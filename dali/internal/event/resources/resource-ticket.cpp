@@ -160,48 +160,6 @@ void ResourceTicket::Uploaded()
   mObservers.erase( endIter, mObservers.end() );
 }
 
-void ResourceTicket::SavingSucceeded()
-{
-  // Using array operator as the call back out to application code might call back in
-  // and corrupt the mObservers list. Presumption is the operator gets the current address
-  // and adds an offset so a push_back() triggered reallocation should still work.
-  size_t count = mObservers.size();
-  for(size_t i = 0; i < count; i++)
-  {
-    if( mObservers[i] != NULL)
-    {
-      mObservers[i]->ResourceSavingSucceeded(*this);
-    }
-  }
-
-  // Move NULL pointers to the end...
-  ObserverIter endIter = remove_if( mObservers.begin(), mObservers.end(), isNULL );
-
-  // ...and remove them
-  mObservers.erase( endIter, mObservers.end() );
-}
-
-void ResourceTicket::SavingFailed()
-{
-  // Using array operator as the call back out to application code might call back in
-  // and corrupt the mObservers list. Presumption is the operator gets the current address
-  // and adds an offset so a push_back() triggered reallocation should still work.
-  size_t count = mObservers.size();
-  for(size_t i = 0; i < count; i++)
-  {
-    if( mObservers[i] != NULL)
-    {
-      mObservers[i]->ResourceSavingFailed(*this);
-    }
-  }
-
-  // Move NULL pointers to the end...
-  ObserverIter endIter = remove_if( mObservers.begin(), mObservers.end(), isNULL );
-
-  // ...and remove them
-  mObservers.erase( endIter, mObservers.end() );
-}
-
 void ResourceTicket::StopLifetimeObservation()
 {
   mLifetimeObserver = NULL;

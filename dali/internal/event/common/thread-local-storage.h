@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_THREAD_LOCAL_STORAGE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-def.h>
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
 
 namespace Dali
 {
@@ -101,14 +98,6 @@ public:
    */
   Dali::Integration::PlatformAbstraction& GetPlatformAbstraction();
 
-#ifdef DALI_DYNAMICS_SUPPORT
-  /**
-   * Get DynamicsWorld instance
-   * @return A pointer to the current DynamicsWorld.
-   */
-  Dali::Internal::DynamicsWorldPtr GetDynamicsWorldInstance();
-#endif
-
   /**
    * Retrieve the update manager
    * @return reference to update manager
@@ -166,9 +155,6 @@ public:
 private:
 
   Core* mCore;                                              ///< reference to core
-#ifdef DALI_DYNAMICS_SUPPORT
-  Dali::Internal::DynamicsWorldPtr mDynamicsWorldInstance;  ///< Instance of DynamicsWorld (This does not need to be in core)
-#endif
 
 };
 

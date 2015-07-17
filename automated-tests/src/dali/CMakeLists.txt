@@ -82,7 +82,6 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/dali-test-suite-utils.cpp
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
-        dali-test-suite-utils/test-dynamics.cpp
         dali-test-suite-utils/test-gesture-manager.cpp
         dali-test-suite-utils/test-gl-abstraction.cpp
         dali-test-suite-utils/test-gl-sync-abstraction.cpp

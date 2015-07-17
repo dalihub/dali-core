@@ -37,6 +37,7 @@ namespace Internal
 namespace SceneGraph
 {
 class SceneController;
+class RenderGeometry;
 
 /**
  * This scene graph object is a property owner. It describes a geometry using a
@@ -129,6 +130,19 @@ public: // UniformMap::Observer
    */
    PropertyBuffer* GetIndexBuffer();
 
+   /**
+    * Gets the associated RenderGeometry
+    * @param[in] sceneController The scene controller
+    * @return The RenderGeometry associated to this Geometry
+    */
+   RenderGeometry* GetRenderGeometry(SceneController* sceneController);
+
+   /**
+    * Called from renderers using this geometry when they get disconnected from the scenegraph
+    */
+   void OnRendererDisconnect();
+
+
 public: // GeometryDataProvider
   /**
    * Get the type of geometry to draw
@@ -161,6 +175,10 @@ private:
   Vector<PropertyBuffer*> mVertexBuffers; ///< The vertex buffers
   PropertyBuffer* mIndexBuffer;  ///< The index buffer if required
   ConnectionChangePropagator mConnectionObservers;
+
+  RenderGeometry*               mRenderGeometry;
+  SceneController*              mSceneController;
+  unsigned int                  mRendererRefCount;
 
 public: // Properties
   AnimatableProperty<Vector3>   mCenter;

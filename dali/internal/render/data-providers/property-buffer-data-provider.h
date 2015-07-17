@@ -123,6 +123,13 @@ public:
    */
   virtual unsigned int GetGpuBufferId( BufferIndex bufferIndex ) const = 0;
 
+  /**
+   * Checks if data in the PropertyBuffer has changed repect previous frame
+   * @param[in] bufferIndex Index to access double buffered values
+   * @return true if data has changed, false otherwise
+   */
+  virtual bool HasDataChanged( BufferIndex bufferIndex ) const = 0;
+
 protected:
   /**
    * No deletion through this interface

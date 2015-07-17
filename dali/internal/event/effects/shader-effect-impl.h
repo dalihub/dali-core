@@ -207,7 +207,6 @@ private: // Data
   EventThreadServices& mEventThreadServices; ///< Event thread services, for sending messages
   SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
   Dali::Image mImage;                       ///< Client-side handle for the effect image
-  std::vector<ResourceTicketPtr>  mTickets; ///< Collection of shader program tickets
   unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
   Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry
   Dali::Vector< UniformCoordinateType > mCoordinateTypes; ///< cached to avoid sending tons of unnecessary messages

@@ -93,16 +93,6 @@ void Image::ResourceUploaded(const ResourceTicket& ticket)
   mUploaded.Emit( Dali::Image( this ) );
 }
 
-void Image::ResourceSavingSucceeded( const ResourceTicket& ticket )
-{
-  // do nothing
-}
-
-void Image::ResourceSavingFailed( const ResourceTicket& ticket )
-{
-  // do nothing
-}
-
 unsigned int Image::GetWidth() const
 {
   return mWidth;

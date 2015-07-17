@@ -67,7 +67,7 @@ PropertyBuffer CreateIndexBuffer()
 {
   unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
-  indexFormat["indices"] = Property::UNSIGNED_INTEGER; // Should be Unsigned Short
+  indexFormat["indices"] = Property::INTEGER;
   PropertyBuffer indices = PropertyBuffer::New( indexFormat, 3 );
   indices.SetData(indexData);
 
@@ -189,10 +189,9 @@ int UtcDaliGeometryAddVertexBuffer(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
         application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS( bufferDataCalls.size(), 2u, TEST_LOCATION );
-
+    //Check that only the new buffer gets uploaded
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
-    DALI_TEST_EQUALS( bufferDataCalls[1], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
   }
 
   END_TEST;
@@ -301,11 +300,11 @@ int UtcDaliGeometrySetIndexBuffer(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
         application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS( bufferDataCalls.size(), 2u, TEST_LOCATION );
+    //Only the index buffer should be uploaded
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
 
-    DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
     // should be unsigned short instead of unsigned int
-    DALI_TEST_EQUALS( bufferDataCalls[1], 6*sizeof( unsigned short ), TEST_LOCATION );
+    DALI_TEST_EQUALS( bufferDataCalls[0], 6*sizeof( unsigned short ), TEST_LOCATION );
   }
 
 

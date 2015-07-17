@@ -1202,22 +1202,5 @@ int UtcDaliConstraintTestPropertyTypesP(void)
   END_TEST;
 }
 
-int UtcDaliConstraintTestPropertyTypesN(void)
-{
-  // unsigned int not supported so we should assert
-
-  try
-  {
-    TestPropertyTypes::Execute< unsigned int >( 0u );
-    DALI_TEST_CHECK( false ); // Should not come here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-
-  END_TEST;
-}
 ///////////////////////////////////////////////////////////////////////////////
 

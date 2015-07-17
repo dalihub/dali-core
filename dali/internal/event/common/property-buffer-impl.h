@@ -247,7 +247,6 @@ template<Property::Type type> struct PropertyImplementationType
 template<> struct PropertyImplementationType< Property::BOOLEAN > { typedef bool Type; };
 template<> struct PropertyImplementationType< Property::FLOAT > { typedef float Type; };
 template<> struct PropertyImplementationType< Property::INTEGER > { typedef int Type; };
-template<> struct PropertyImplementationType< Property::UNSIGNED_INTEGER > { typedef unsigned int Type; };
 template<> struct PropertyImplementationType< Property::VECTOR2 > { typedef Vector2 Type; };
 template<> struct PropertyImplementationType< Property::VECTOR3 > { typedef Vector3 Type; };
 template<> struct PropertyImplementationType< Property::VECTOR4 > { typedef Vector4 Type; };

@@ -129,7 +129,6 @@ Filter* Filter::gNode       = NULL;
 Filter* Filter::gElement    = NULL;
 Filter* Filter::gActor      = Filter::New(Debug::Concise, false, "LOG_ACTOR");
 Filter* Filter::gShader     = Filter::New(Debug::Concise, false, "LOG_SHADER");
-Filter* Filter::gDynamics   = Filter::New(Debug::Concise, false, "LOG_DYNAMICS");
 
 Filter::FilterList* Filter::GetActiveFilters()
 {

@@ -373,7 +373,7 @@ inline int UpdateNodesAndAttachments( Node& node,
   // It is important that the modified version of these flags are used by the RenderableAttachment.
   UpdateNodeTransformValues( node, nodeDirtyFlags, updateBufferIndex );
 
-  // Setting STENCIL will override OVERLAY, if that would otherwise have been inherited.
+  // Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
   inheritedDrawMode |= node.GetDrawMode();
 
   if ( node.HasAttachment() )

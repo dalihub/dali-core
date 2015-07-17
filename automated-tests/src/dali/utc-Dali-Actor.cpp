@@ -406,33 +406,6 @@ int UtcDaliActorAddN(void)
   END_TEST;
 }
 
-int UtcDaliActorInsert(void)
-{
-  tet_infoline("Testing Actor::Insert");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Stage::GetCurrent().Add( parent );
-  Actor first = Actor::New();
-  Actor second = Actor::New();
-  Actor third = Actor::New();
-
-  parent.Insert(1, first); // test insert beyond range
-  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
-  parent.Insert(0, second);
-  DALI_TEST_EQUALS( parent.GetChildCount(), 2u, TEST_LOCATION );
-  parent.Insert(1, third);
-
-  DALI_TEST_EQUALS( parent.GetChildCount(), 3u, TEST_LOCATION );
-
-  DALI_TEST_CHECK(parent.GetChildAt(0) == second);
-  DALI_TEST_CHECK(parent.GetChildAt(1) == third);
-  DALI_TEST_CHECK(parent.GetChildAt(2) == first);
-
-  END_TEST;
-}
-
-
 int UtcDaliActorRemoveN(void)
 {
   tet_infoline("Testing Actor::Remove");
@@ -2210,11 +2183,11 @@ int UtcDaliActorSetDrawMode(void)
 
   DALI_TEST_CHECK( DrawMode::NORMAL == a.GetDrawMode() ); // Ensure overlay is off by default
 
-  a.SetDrawMode( DrawMode::OVERLAY );
+  a.SetDrawMode( DrawMode::OVERLAY_2D );
   app.SendNotification();
   app.Render(1);
 
-  DALI_TEST_CHECK( DrawMode::OVERLAY == a.GetDrawMode() ); // Check Actor is overlay
+  DALI_TEST_CHECK( DrawMode::OVERLAY_2D == a.GetDrawMode() ); // Check Actor is overlay
 
   a.SetDrawMode( DrawMode::STENCIL );
   app.SendNotification();
@@ -2278,7 +2251,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   // b (9)
   // c (10)
   // a (8)
-  a.SetDrawMode( DrawMode::OVERLAY );
+  a.SetDrawMode( DrawMode::OVERLAY_2D );
   app.GetGlAbstraction().ClearBoundTextures();
 
   app.SendNotification();
@@ -2468,19 +2441,11 @@ int UtcDaliActorSetGetOverlay(void)
   tet_infoline(" UtcDaliActorSetGetOverlay");
 
   Actor parent = Actor::New();
-  parent.SetDrawMode(DrawMode::OVERLAY );
-  DALI_TEST_CHECK( parent.GetDrawMode() == DrawMode::OVERLAY );
+  parent.SetDrawMode(DrawMode::OVERLAY_2D );
+  DALI_TEST_CHECK( parent.GetDrawMode() == DrawMode::OVERLAY_2D );
   END_TEST;
 }
 
-
-// Current Dynamics functions are crashing, so testing these sections are futile
-
-int UtcDaliActorDynamics(void)
-{
-  DALI_TEST_CHECK( true );
-  END_TEST;
-}
 
 int UtcDaliActorCreateDestroy(void)
 {

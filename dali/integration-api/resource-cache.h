@@ -70,28 +70,12 @@ public:
   virtual void LoadResponse(ResourceId id, ResourceTypeId type, ResourcePointer resource, LoadStatus status) = 0;
 
   /**
-   * Provide the results of a resource saving operation.
-   * @param[in] id The unique ID of the resource.
-   *               This should match an ID previously passed into PlatformAbstraction::SaveResource().
-   * @param[in] type The type of the resource.
-   */
-  virtual void SaveComplete(ResourceId id, ResourceTypeId type) = 0;
-
-  /**
    * Report that a resource loading operation has failed.
    * @param[in] id The unique ID of the load request.
    *               This should match an ID previously passed into PlatformAbstraction::LoadResource().
    * @param[in] failure An error code, used to determine why the load failed.
    */
   virtual void LoadFailed(ResourceId id, ResourceFailure failure) = 0;
-
-  /**
-   * Report that a resource saving operation has failed.
-   * @param[in] id The unique ID of the save request.
-   *               This should match an ID previously passed into PlatformAbstraction::LoadResource().
-   * @param[in] failure An error code, used to determine why the save failed.
-   */
-  virtual void SaveFailed(ResourceId id, ResourceFailure failure) = 0;
 };
 
 

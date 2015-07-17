@@ -178,7 +178,7 @@ private:
   DoubleBuffered< OwnerPointer<PropertyBufferDataProvider::BufferType> > mBufferData; ///< Data
   DoubleBuffered< bool > mDataChanged; ///< Flag to know if data has changed in a frame
 
-  DoubleBufferedProperty<unsigned int>  mSize; ///< Number of Elements in the buffer
+  DoubleBufferedProperty<int>  mSize; ///< Number of Elements in the buffer
 };
 
 inline void SetFormatMessage( EventThreadServices& eventThreadServices,

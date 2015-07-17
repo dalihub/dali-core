@@ -183,7 +183,7 @@ public: // Properties
 
 private:
   std::string mTextureUnitUniformName; ///< The name of the uniform of the texture unit
-  DoubleBufferedProperty<unsigned int> mTextureId;
+  Integration::ResourceId mTextureId[ 2 ]; //< double buffered
   ConnectionChangePropagator mConnectionObservers; ///< Connection observers that will be informed when textures change.
   bool mFullyOpaque; // Update only flag - no need for double buffering
 };

@@ -169,7 +169,10 @@ void BitmapTexture::AssignBitmap( bool generateTexture, const unsigned char* pix
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  INCREASE_BY( PerformanceMonitor::TEXTURE_DATA_UPLOADED, GetBytesPerPixel(mPixelFormat) * mWidth * mHeight );
+  if( pixels != NULL )
+  {
+    INCREASE_BY( PerformanceMonitor::TEXTURE_DATA_UPLOADED, GetBytesPerPixel(mPixelFormat) * mWidth * mHeight );
+  }
 }
 
 void BitmapTexture::Update( Integration::Bitmap* bitmap )
@@ -322,11 +325,11 @@ bool BitmapTexture::CreateGlTexture()
   else
   {
     const unsigned char* pixels = NULL;
-    std::vector<unsigned char> pixelData;
-    if( ( NULL == pixels ) && ( true == mClearPixels ) )
+    Dali::Vector<unsigned char> pixelData; // Okay to create outside branch as empty vector has no heap allocation.
+    if( true == mClearPixels )
     {
-      unsigned int size = mWidth * mHeight * Pixel::GetBytesPerPixel(mPixelFormat);
-      pixelData.resize(size, 0);
+      unsigned int size = mWidth * mHeight * Pixel::GetBytesPerPixel( mPixelFormat );
+      pixelData.Resize( size, 0 );
       pixels = &pixelData[0];
     }
     AssignBitmap( true, pixels );

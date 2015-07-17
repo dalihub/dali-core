@@ -51,7 +51,6 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
       break;
     }
     case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
     {
       type = GL_SHORT;
       break;
@@ -93,7 +92,6 @@ size_t GetPropertyImplementationGlSize( Property::Type& propertyType )
       break;
     }
     case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
     {
       size = 2u;
       break;
@@ -152,61 +150,57 @@ RenderPropertyBuffer::~RenderPropertyBuffer()
 {
 }
 
-void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
+void RenderPropertyBuffer::Update( Context& context, BufferIndex bufferIndex )
 {
-  // Check if we have a gpu-buffer
-  unsigned int gpuBufferId = 0; // TODO: MESH_REWORK FIX THIS  mDataProvider.GetGpuBufferId( bufferIndex );
-  if ( ! mGpuBuffer )
+  if( !mGpuBuffer || mDataProvider.HasDataChanged( bufferIndex ) )
   {
-    // TODO: MESH_REWORK
-//    mGpuBuffer /*= gpuBufferCache.GetGpuBuffer( gpuBufferId ) */;
-    (void )gpuBufferId;
-
-    mGpuBuffer = new GpuBuffer( context, mGpuBufferTarget, mGpuBufferUsage );
-  }
-
-  // Update the GpuBuffer
-  if ( mGpuBuffer )
-  {
-    std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
-    DALI_ASSERT_DEBUG( dataSize && "No data in the property buffer!" );
-
-    const void *data = &(mDataProvider.GetData( bufferIndex )[0]);
-    Vector<unsigned short> ushortData;
-
-    // Index buffer needs to be unsigned short which is not supported by the property system
-    if( mGpuBufferTarget == GpuBuffer::ELEMENT_ARRAY_BUFFER )
+    if ( ! mGpuBuffer )
     {
-      ushortData.Resize( dataSize );
-      const unsigned int* unsignedData = static_cast<const unsigned int*>(data);
-      unsigned int numberOfElements = dataSize / sizeof(unsigned int);
-      for( unsigned int i = 0; i < numberOfElements; ++i )
-      {
-        ushortData[i] = unsignedData[i];
-      }
-      data = &(ushortData[0]);
+       mGpuBuffer = new GpuBuffer( context, mGpuBufferTarget, mGpuBufferUsage );
     }
 
-    mGpuBuffer->UpdateDataBuffer( dataSize, data );
-    mGpuBuffer->SetStride( mDataProvider.GetElementSize( bufferIndex ) );
+    // Update the GpuBuffer
+    if ( mGpuBuffer )
+    {
+      std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
+      DALI_ASSERT_DEBUG( dataSize && "No data in the property buffer!" );
+
+      const void *data = &(mDataProvider.GetData( bufferIndex )[0]);
+      Vector<unsigned short> ushortData;
+
+      // Index buffer needs to be unsigned short which is not supported by the property system
+      if( mGpuBufferTarget == GpuBuffer::ELEMENT_ARRAY_BUFFER )
+      {
+        ushortData.Resize( dataSize );
+        const unsigned int* unsignedData = static_cast<const unsigned int*>(data);
+        unsigned int numberOfElements = dataSize / sizeof(unsigned int);
+        for( unsigned int i = 0; i < numberOfElements; ++i )
+        {
+          ushortData[i] = unsignedData[i];
+        }
+        data = &(ushortData[0]);
+      }
+
+      mGpuBuffer->UpdateDataBuffer( dataSize, data );
+      mGpuBuffer->SetStride( mDataProvider.GetElementSize( bufferIndex ) );
+    }
   }
 }
 
-void RenderPropertyBuffer::BindBuffer( Context& context, Program& progam )
+void RenderPropertyBuffer::BindBuffer( Context& context )
 {
   mGpuBuffer->Bind();
 }
 
-void RenderPropertyBuffer::EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program )
+unsigned int RenderPropertyBuffer::EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Vector<GLint>& vAttributeLocation, unsigned int locationBase )
 {
   unsigned int attributeCount = mDataProvider.GetAttributeCount( bufferIndex );
-  DALI_ASSERT_DEBUG( attributeCount == mAttributesLocation.Size() && "Incorrect number of attributes!" );
 
   GLsizei elementSize = mDataProvider.GetElementSize( bufferIndex );
 
   for( unsigned int i = 0; i < attributeCount; ++i )
   {
-    GLint attributeLocation = mAttributesLocation[i];
+    GLint attributeLocation = vAttributeLocation[i+locationBase];
     if( attributeLocation != -1 )
     {
       context.EnableVertexAttributeArray( attributeLocation );
@@ -223,19 +217,8 @@ void RenderPropertyBuffer::EnableVertexAttributes( Context& context, BufferIndex
                        elementSize );
     }
   }
-}
 
-void RenderPropertyBuffer::DisableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program )
-{
-  unsigned int attributeCount = mDataProvider.GetAttributeCount( bufferIndex );
-  for( unsigned int i = 0; i < attributeCount; ++i )
-  {
-    GLint attributeLocation = mAttributesLocation[i];
-    if( attributeLocation != -1 )
-    {
-      context.DisableVertexAttributeArray( attributeLocation );
-    }
-  }
+  return attributeCount;
 }
 
 void RenderPropertyBuffer::UpdateAttributeLocations( Context& context, BufferIndex bufferIndex, Program& program )

@@ -1,6 +1,3 @@
-#ifndef __DALI_DYNAMICS_H__
-#define __DALI_DYNAMICS_H__
-
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -18,12 +15,23 @@
  *
  */
 
-#include <dali/devel-api/dynamics/dynamics-body.h>
-#include <dali/devel-api/dynamics/dynamics-body-config.h>
-#include <dali/devel-api/dynamics/dynamics-collision.h>
-#include <dali/devel-api/dynamics/dynamics-joint.h>
-#include <dali/devel-api/dynamics/dynamics-shape.h>
-#include <dali/devel-api/dynamics/dynamics-world-config.h>
-#include <dali/devel-api/dynamics/dynamics-world.h>
+// HEADER
+#include <dali/devel-api/rendering/cull-face.h>
 
-#endif //__DALI_DYNAMICS_H__
+// INTERNAL INCLUDES
+#include <dali/internal/event/actors/image-actor-impl.h>
+
+namespace Dali
+{
+
+void SetCullFace( ImageActor actor, CullFaceMode mode )
+{
+  GetImplementation( actor ).SetCullFace( mode );
+}
+
+CullFaceMode GetCullFace( ImageActor actor )
+{
+  return GetImplementation( actor ).GetCullFace();
+}
+
+} //namespace Dali

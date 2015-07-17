@@ -50,11 +50,6 @@ void CheckTypeName(const Property::Type& type)
       DALI_TEST_CHECK( "INTEGER" == std::string(PropertyTypes::GetName( type ) ) );
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      DALI_TEST_CHECK( "UNSIGNED_INTEGER" == std::string(PropertyTypes::GetName( type ) ) );
-      break;
-    }
     case Property::VECTOR2:
     {
       DALI_TEST_CHECK( "VECTOR2" == std::string(PropertyTypes::GetName( type ) ) );
@@ -206,26 +201,6 @@ int UtcDaliPropertyValueConstructorsIntTypeP(void)
 
   DALI_TEST_CHECK( value.GetType() == Property::INTEGER );
   DALI_TEST_CHECK( value.Get<int>() == 0 );
-
-  END_TEST;
-}
-
-int UtcDaliPropertyValueConstructorsUnsignedIntP(void)
-{
-  Property::Value value(1u);
-
-  DALI_TEST_CHECK( value.GetType() == Property::UNSIGNED_INTEGER );
-  DALI_TEST_CHECK( value.Get<unsigned int>() == 1u );
-
-  END_TEST;
-}
-
-int UtcDaliPropertyValueConstructorsUnsignedIntTypeP(void)
-{
-  Property::Value value( Property::UNSIGNED_INTEGER );
-
-  DALI_TEST_CHECK( value.GetType() == Property::UNSIGNED_INTEGER );
-  DALI_TEST_CHECK( value.Get<unsigned int>() == 0u );
 
   END_TEST;
 }
@@ -508,12 +483,6 @@ int UtcDaliPropertyValueCopyConstructorIntP(void)
   END_TEST;
 }
 
-int UtcDaliPropertyValueCopyConstructorUnsignedIntP(void)
-{
-  CheckCopyCtorP<unsigned int> check(1u);
-  END_TEST;
-}
-
 int UtcDaliPropertyValueCopyConstructoVector2P(void)
 {
   CheckCopyCtorP<Vector2> check( Vector2(2,1) );
@@ -636,17 +605,6 @@ int UtcDaliPropertyValueAssignmentOperatorIntP(void)
   Property::Value copy( 99 );
   copy = value; // type match
   DALI_TEST_CHECK( 10 == copy.Get<int>() );
-  END_TEST;
-}
-
-int UtcDaliPropertyValueAssignmentOperatorUnsignedIntP(void)
-{
-  Property::Value value;
-  value = Property::Value(10U); // type mismatch
-  DALI_TEST_CHECK( 10U == value.Get<unsigned int>() );
-  Property::Value copy( 123U);
-  copy = value; // type match
-  DALI_TEST_CHECK( 10U == copy.Get<unsigned int>() );
   END_TEST;
 }
 
@@ -879,29 +837,6 @@ int UtcDaliPropertyValueGetIntN(void)
   Property::Value value2("");
   DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
   DALI_TEST_EQUALS( 10, result, TEST_LOCATION ); // result is not modified
-  END_TEST;
-}
-
-int UtcDaliPropertyValueGetUnsignedIntP(void)
-{
-  Property::Value value(123u);
-  unsigned int result( 10u );
-  DALI_TEST_EQUALS( 123u, value.Get<unsigned int>(), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 123u, result, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliPropertyValueGetUnsignedIntN(void)
-{
-  Property::Value value;
-  unsigned int result( 10u );
-  DALI_TEST_EQUALS( 0u, value.Get<unsigned int>(), TEST_LOCATION );
-  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 10u, result, TEST_LOCATION );
-  Property::Value value2("");
-  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 10u, result, TEST_LOCATION ); // result is not modified
   END_TEST;
 }
 
@@ -1228,13 +1163,6 @@ int UtcDaliPropertyValueOutputStream(void)
     std::ostringstream stream;
     stream <<  value;
     DALI_TEST_CHECK( stream.str() == "-25" )
-  }
-
-  {
-    value = Property::Value(25U);
-    std::ostringstream stream;
-    stream <<  value;
-    DALI_TEST_CHECK( stream.str() == "25" )
   }
 
   {

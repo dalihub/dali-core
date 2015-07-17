@@ -33,9 +33,9 @@ namespace DrawMode
  */
 enum Type
 {
-  NORMAL  = 0, ///< binary 00. The default draw-mode
-  OVERLAY = 1, ///< binary 01. Draw the actor and its children as an overlay
-  STENCIL = 3  ///< binary 11. Draw the actor and its children into the stencil buffer
+  NORMAL     = 0, ///< binary 00. The default draw-mode
+  OVERLAY_2D = 1, ///< binary 01. Draw the actor and its children as an overlay
+  STENCIL    = 3  ///< binary 11. Draw the actor and its children into the stencil buffer
 };
 
 } // namespace DrawMode

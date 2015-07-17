@@ -22,6 +22,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
+#include <dali/integration-api/gl-abstraction.h>
 
 using std::max;
 using namespace Dali;
@@ -122,6 +123,110 @@ int UtcDaliFrameBufferImageNew03(void)
 
   DALI_TEST_CHECK( image );
   DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferImageAttachments01(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageAttachments01 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+
+  // initialise handle
+  image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR);       // create framebuffer with Color buffer
+  ImageActor actor=ImageActor::New(image);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferImageAttachments02(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageAttachments02 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+
+  // initialise handle
+  image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_DEPTH); // create framebuffer with Color and Depth buffer
+  ImageActor actor=ImageActor::New(image);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferImageAttachments03(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageAttachments03 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+
+  // initialise handle
+  image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_STENCIL);  // create framebuffer with Color and Stencil
+  ImageActor actor=ImageActor::New(image);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferImageAttachments04(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageAttachments04 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+
+  // initialise handle
+  image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_DEPTH_STENCIL);  // create framebuffer with Color, Depth and Stencil buffers
+  ImageActor actor=ImageActor::New(image);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), true, TEST_LOCATION);
 
   END_TEST;
 }

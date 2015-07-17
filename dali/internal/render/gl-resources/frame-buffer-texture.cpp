@@ -32,24 +32,42 @@ namespace Internal
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Context& context)
 : Texture( context,
            width, height,
-           width, height )
+           width, height ),
+  mFrameBufferName(0),
+  mRenderBufferName(0),
+  mStencilBufferName(0),
+  mPixelFormat(Pixel::RGBA8888),
+  mBufferFormat(RenderBuffer::COLOR)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
-  mFrameBufferName  = 0;
-  mRenderBufferName = 0;
 }
 
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, Context& context)
 : Texture( context,
            width, height,
            width, height ),
-  mPixelFormat( pixelFormat )
+  mFrameBufferName(0),
+  mRenderBufferName(0),
+  mStencilBufferName(0),
+  mPixelFormat( pixelFormat ),
+  mBufferFormat(RenderBuffer::COLOR)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
-  mFrameBufferName  = 0;
-  mRenderBufferName = 0;
+}
+
+FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat, Context& context)
+: Texture( context,
+           width, height,
+           width, height ),
+  mFrameBufferName(0),
+  mRenderBufferName(0),
+  mStencilBufferName(0),
+  mPixelFormat( pixelFormat ),
+  mBufferFormat( bufferFormat )
+{
+  DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 }
 
 FrameBufferTexture::~FrameBufferTexture()
@@ -84,19 +102,6 @@ bool FrameBufferTexture::Prepare()
   {
     // bind frame buffer
     mContext.BindFramebuffer(GL_FRAMEBUFFER, mFrameBufferName);
-    // bind render buffer
-    mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
-    // attach texture to the color attachment point
-    mContext.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mId, 0);
-    // attach render buffer to the depth buffer attachment point
-    mContext.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRenderBufferName);
-
-    int status = mContext.CheckFramebufferStatus(GL_FRAMEBUFFER);
-    if ( GL_FRAMEBUFFER_COMPLETE != status )
-    {
-      DALI_LOG_ERROR( "status (0x%x), glError (0x%x)\n", status, mContext.GetError() );
-      DALI_ASSERT_ALWAYS( false && "Frame buffer is not complete!" );
-    }
 
     return true;
   }
@@ -123,15 +128,65 @@ bool FrameBufferTexture::CreateGlTexture()
   GLenum pixelDataType = GL_UNSIGNED_BYTE;
   Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
 
-  mContext.TexImage2D(GL_TEXTURE_2D, 0, pixelFormat,mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL);
+  mContext.TexImage2D(GL_TEXTURE_2D, 0, pixelFormat, mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL);
 
   // generate frame and render buffer names
   mContext.GenFramebuffers(1, &mFrameBufferName);
-  mContext.GenRenderbuffers(1, &mRenderBufferName);
 
-  // Bind render buffer and create 16 depth buffer
-  mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
-  mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
+  /* WE ALWAYS HAVE COLOR COMPONENT */
+
+  // bind frame buffer
+  mContext.BindFramebuffer(GL_FRAMEBUFFER, mFrameBufferName);
+  // attach texture to the color attachment point
+  mContext.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mId, 0);
+
+  if (mBufferFormat == RenderBuffer::COLOR_DEPTH_STENCIL)
+  {
+    mContext.GenRenderbuffers(1, &mRenderBufferName);
+    mContext.GenRenderbuffers(1, &mStencilBufferName);
+
+    // Bind render buffer and create 16 depth buffer
+    mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
+    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
+
+    // Bind render buffer and create 8 stencil buffer
+    mContext.BindRenderbuffer(GL_RENDERBUFFER, mStencilBufferName);
+    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, mWidth, mHeight);
+
+    // attach render buffer to the depth buffer attachment point
+    mContext.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRenderBufferName);
+    // attach render buffer to the stencil buffer attachment point
+    mContext.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mStencilBufferName);
+  }
+  else if (mBufferFormat == RenderBuffer::COLOR_DEPTH)
+  {
+    mContext.GenRenderbuffers(1, &mRenderBufferName);
+
+    // Bind render buffer and create 8 stencil buffer
+    mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
+    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
+
+    // attach render buffer to the depth buffer attachment point
+    mContext.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRenderBufferName);
+  }
+  else if (mBufferFormat == RenderBuffer::COLOR_STENCIL)
+  {
+    mContext.GenRenderbuffers(1, &mStencilBufferName);
+
+    // Bind render buffer and create 8 stencil buffer
+    mContext.BindRenderbuffer(GL_RENDERBUFFER, mStencilBufferName);
+    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, mWidth, mHeight);
+
+    // attach render buffer to the depth buffer attachment point
+    mContext.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mStencilBufferName);
+  }
+
+  int status = mContext.CheckFramebufferStatus(GL_FRAMEBUFFER);
+  if ( GL_FRAMEBUFFER_COMPLETE != status )
+  {
+    DALI_LOG_ERROR( "status (0x%x), glError (0x%x)\n", status, mContext.GetError() );
+    DALI_ASSERT_ALWAYS( false && "Frame buffer is not complete!" );
+  }
 
   return mId != 0;
 }
@@ -151,9 +206,13 @@ void FrameBufferTexture::GlCleanup()
     mContext.DeleteRenderbuffers(1, &mRenderBufferName );
     mRenderBufferName = 0;
   }
+
+  if (mStencilBufferName != 0)
+  {
+    mContext.DeleteRenderbuffers(1, &mStencilBufferName );
+    mStencilBufferName = 0;
+  }
 }
-
-
 
 } //namespace Internal
 

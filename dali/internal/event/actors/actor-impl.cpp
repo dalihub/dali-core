@@ -54,13 +54,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-impl.h>
-#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
-
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -173,28 +166,6 @@ struct Actor::RelayoutData
   bool relayoutEnabled :1;                   ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
   bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
 };
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-// Encapsulate actor related dynamics data
-struct DynamicsData
-{
-  DynamicsData( Actor* slotOwner )
-  : slotDelegate( slotOwner )
-  {
-  }
-
-  typedef std::map<Actor*, DynamicsJointPtr> JointContainer;
-  typedef std::vector<DynamicsJointPtr> ReferencedJointContainer;
-
-  DynamicsBodyPtr body;
-  JointContainer joints;
-  ReferencedJointContainer referencedJoints;
-
-  SlotDelegate< Actor > slotDelegate;
-};
-
-#endif // DALI_DYNAMICS_SUPPORT
 
 namespace // unnamed namespace
 {
@@ -450,63 +421,6 @@ void Actor::Add( Actor& child )
       {
         RelayoutRequest();
       }
-    }
-  }
-}
-
-void Actor::Insert( unsigned int index, Actor& child )
-{
-  DALI_ASSERT_ALWAYS( this != &child && "Cannot add actor to itself" );
-  DALI_ASSERT_ALWAYS( !child.IsRoot() && "Cannot add root actor" );
-
-  if( !mChildren )
-  {
-    mChildren = new ActorContainer;
-  }
-
-  Actor* const oldParent( child.mParent );
-
-  // since an explicit position has been given, always insert, even if already a child
-  if( oldParent )
-  {
-    oldParent->Remove( child ); // This causes OnChildRemove callback
-
-    // Old parent may need to readjust to missing child
-    if( oldParent->RelayoutDependentOnChildren() )
-    {
-      oldParent->RelayoutRequest();
-    }
-  }
-
-  // Guard against Add() during previous OnChildRemove callback
-  if( !child.mParent )
-  {
-    // Do this first, since user callbacks from within SetParent() may need to remove child
-    if( index < GetChildCount() )
-    {
-      ActorIter it = mChildren->begin();
-      std::advance( it, index );
-      mChildren->insert( it, ActorPtr( &child ) );
-    }
-    else
-    {
-      mChildren->push_back( ActorPtr( &child ) );
-    }
-    // SetParent asserts that child can be added
-    child.SetParent( this, index );
-
-    // Notification for derived classes
-    OnChildAdd( child );
-
-    // Only put in a relayout request if there is a suitable dependency
-    if( RelayoutDependentOnChildren() )
-    {
-      RelayoutRequest();
-    }
-
-    if( child.RelayoutDependentOnParent() )
-    {
-      child.RelayoutRequest();
     }
   }
 }
@@ -1485,397 +1399,18 @@ void Actor::RemoveRenderer( unsigned int index )
   mAttachment = NULL;
 }
 
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-//--------------- Dynamics ---------------
-
-void Actor::DisableDynamics()
-{
-  if( NULL != mDynamicsData )
-  {
-    DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s- (\"%s\")\n", __PRETTY_FUNCTION__, mName.c_str());
-
-    // ensure dynamics object are disconnected from scene
-    DisconnectDynamics();
-
-    // delete joint owned by this actor
-    while( !mDynamicsData->joints.empty() )
-    {
-      RemoveDynamicsJoint( mDynamicsData->joints.begin()->second );
-    }
-
-    // delete other joints referencing this actor
-    while( !mDynamicsData->referencedJoints.empty() )
-    {
-      DynamicsJointPtr joint( *(mDynamicsData->referencedJoints.begin()) );
-      ActorPtr jointOwner( joint->GetActor( true ) );
-      if( jointOwner )
-      {
-        jointOwner->RemoveDynamicsJoint( joint );
-      }
-      else
-      {
-        mDynamicsData->referencedJoints.erase( mDynamicsData->referencedJoints.begin() );
-      }
-    }
-    // delete the DynamicsBody object
-    mDynamicsData->body.Reset();
-
-    // Discard Dynamics data structure
-    delete mDynamicsData;
-    mDynamicsData = NULL;
-  }
-}
-
-DynamicsBodyPtr Actor::GetDynamicsBody() const
-{
-  DynamicsBodyPtr body;
-
-  if( NULL != mDynamicsData )
-  {
-    body = mDynamicsData->body;
-  }
-
-  return body;
-}
-
-DynamicsBodyPtr Actor::EnableDynamics(DynamicsBodyConfigPtr bodyConfig)
-{
-  DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s- (\"%s\")\n", __PRETTY_FUNCTION__, mName.c_str());
-
-  if( NULL == mDynamicsData )
-  {
-    mDynamicsData = new DynamicsData( this );
-  }
-
-  if( !mDynamicsData->body )
-  {
-    mDynamicsData->body = new DynamicsBody(mName, bodyConfig, *this, *(const_cast<SceneGraph::Node*>(mNode)) );
-
-    if( OnStage() )
-    {
-      DynamicsWorldPtr world( DynamicsWorld::Get() );
-      if( world )
-      {
-        if( mParent == world->GetRootActor().Get() )
-        {
-          mDynamicsData->body->Connect( GetEventThreadServices() );
-        }
-      }
-    }
-  }
-
-  return mDynamicsData->body;
-}
-
-DynamicsJointPtr Actor::AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offset )
-{
-  DALI_ASSERT_ALWAYS( attachedActor && "'attachedActor' must be initialized!" );
-  return AddDynamicsJoint( attachedActor, offset, ( GetCurrentPosition() + offset ) - attachedActor->GetCurrentPosition() );
-}
-
-DynamicsJointPtr Actor::AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offsetA, const Vector3& offsetB )
-{
-  DALI_ASSERT_ALWAYS( attachedActor && "'attachedActor' must be initialized!" );
-  DALI_ASSERT_ALWAYS( this != attachedActor.Get() && "Cannot create a joint to oneself!" );
-
-  DynamicsJointPtr joint;
-
-  DynamicsWorldPtr world( DynamicsWorld::Get() );
-
-  if( world )
-  {
-    if( NULL != mDynamicsData )
-    {
-      DynamicsData::JointContainer::iterator it( mDynamicsData->joints.find( attachedActor.Get() ) );
-
-      if( mDynamicsData->joints.end() != it )
-      {
-        // use existing joint
-        joint = it->second;
-      }
-
-      if( !joint )
-      {
-        DynamicsBodyPtr bodyA( GetDynamicsBody() );
-        DynamicsBodyPtr bodyB( attachedActor->GetDynamicsBody() );
-
-        if( !bodyA )
-        {
-          bodyA = EnableDynamics( new DynamicsBodyConfig );
-        }
-
-        if( !bodyB )
-        {
-          bodyB = attachedActor->EnableDynamics( new DynamicsBodyConfig );
-        }
-
-        joint = new DynamicsJoint(world, bodyA, bodyB, offsetA, offsetB);
-        mDynamicsData->joints[ attachedActor.Get() ] = joint;
-
-        if( OnStage() && attachedActor->OnStage() )
-        {
-          joint->Connect( GetEventThreadServices() );
-        }
-
-        attachedActor->ReferenceJoint( joint );
-
-        attachedActor->OnStageSignal().Connect( mDynamicsData->slotDelegate, &Actor::AttachedActorOnStage );
-        attachedActor->OffStageSignal().Connect( mDynamicsData->slotDelegate, &Actor::AttachedActorOffStage );
-      }
-    }
-  }
-  return joint;
-}
-
-const int Actor::GetNumberOfJoints() const
-{
-  return static_cast<int>( NULL != mDynamicsData ? mDynamicsData->joints.size() : 0 );
-}
-
-DynamicsJointPtr Actor::GetDynamicsJointByIndex( const int index ) const
-{
-  DynamicsJointPtr joint;
-
-  if( NULL != mDynamicsData )
-  {
-    if( index >= 0 && index < static_cast<int>(mDynamicsData->joints.size()) )
-    {
-      DynamicsData::JointContainer::const_iterator it( mDynamicsData->joints.begin() );
-
-      for( int i = 0; i < index; ++i )
-      {
-        ++it;
-      }
-
-      joint = it->second;
-    }
-  }
-
-  return joint;
-}
-
-DynamicsJointPtr Actor::GetDynamicsJoint( ActorPtr attachedActor ) const
-{
-  DynamicsJointPtr joint;
-
-  if( NULL != mDynamicsData )
-  {
-    DynamicsData::JointContainer::const_iterator it( mDynamicsData->joints.find( attachedActor.Get() ) );
-
-    if( mDynamicsData->joints.end() != it )
-    {
-      // use existing joint
-      joint = it->second;
-    }
-  }
-
-  return joint;
-}
-
-void Actor::RemoveDynamicsJoint( DynamicsJointPtr joint )
-{
-  if( NULL != mDynamicsData )
-  {
-    DynamicsData::JointContainer::iterator it( mDynamicsData->joints.begin() );
-    DynamicsData::JointContainer::iterator endIt( mDynamicsData->joints.end() );
-
-    for(; it != endIt; ++it )
-    {
-      if( it->second == joint.Get() )
-      {
-        ActorPtr attachedActor( it->first );
-
-        if( OnStage() && attachedActor && attachedActor->OnStage() )
-        {
-          joint->Disconnect( GetEventThreadServices() );
-        }
-
-        if( attachedActor )
-        {
-          attachedActor->ReleaseJoint( joint );
-          attachedActor->OnStageSignal().Disconnect( mDynamicsData->slotDelegate, &Actor::AttachedActorOnStage );
-          attachedActor->OffStageSignal().Disconnect( mDynamicsData->slotDelegate, &Actor::AttachedActorOffStage );
-        }
-
-        mDynamicsData->joints.erase(it);
-        break;
-      }
-    }
-  }
-}
-
-void Actor::ReferenceJoint( DynamicsJointPtr joint )
-{
-  DALI_ASSERT_DEBUG( NULL != mDynamicsData && "Dynamics not enabled on this actor!" );
-
-  if( NULL != mDynamicsData )
-  {
-    mDynamicsData->referencedJoints.push_back(joint);
-  }
-}
-
-void Actor::ReleaseJoint( DynamicsJointPtr joint )
-{
-  DALI_ASSERT_DEBUG( NULL != mDynamicsData && "Dynamics not enabled on this actor!" );
-
-  if( NULL != mDynamicsData )
-  {
-    DynamicsData::ReferencedJointContainer::iterator it( std::find( mDynamicsData->referencedJoints.begin(), mDynamicsData->referencedJoints.end(), joint ) );
-
-    if( it != mDynamicsData->referencedJoints.end() )
-    {
-      mDynamicsData->referencedJoints.erase( it );
-    }
-  }
-}
-
-void Actor::SetDynamicsRoot(bool flag)
-{
-  if( mIsDynamicsRoot != flag )
-  {
-    mIsDynamicsRoot = flag;
-
-    if( OnStage() && mChildren )
-    {
-      // walk the children connecting or disconnecting any dynamics enabled child from the dynamics simulation
-      ActorIter end = mChildren->end();
-      for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
-      {
-        ActorPtr child = (*iter);
-
-        if( child->GetDynamicsBody() )
-        {
-          if( mIsDynamicsRoot )
-          {
-            child->ConnectDynamics();
-          }
-          else
-          {
-            child->DisconnectDynamics();
-          }
-        }
-      }
-    }
-  }
-}
-
-bool Actor::IsDynamicsRoot() const
-{
-  return mIsDynamicsRoot;
-}
-
-void Actor::AttachedActorOnStage( Dali::Actor actor )
-{
-  DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
-
-  if( OnStage() )
-  {
-    ActorPtr attachedActor( &GetImplementation(actor) );
-
-    DALI_ASSERT_DEBUG( NULL != mDynamicsData && "Dynamics not enabled on this actor!" );
-    if( NULL != mDynamicsData )
-    {
-      DynamicsData::JointContainer::iterator it( mDynamicsData->joints.find( attachedActor.Get() ) );
-      if( mDynamicsData->joints.end() != it )
-      {
-        DynamicsJointPtr joint( it->second );
-        joint->Connect( GetEventThreadServices() );
-      }
-    }
-  }
-}
-
-void Actor::AttachedActorOffStage( Dali::Actor actor )
-{
-  DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
-
-  if( OnStage() )
-  {
-    ActorPtr attachedActor( &GetImplementation(actor) );
-
-    DALI_ASSERT_DEBUG( NULL != mDynamicsData && "Dynamics not enabled on this actor!" );
-    if( NULL != mDynamicsData )
-    {
-      DynamicsData::JointContainer::iterator it( mDynamicsData->joints.find( attachedActor.Get() ) );
-      if( mDynamicsData->joints.end() != it )
-      {
-        DynamicsJointPtr joint( it->second );
-        joint->Disconnect( GetEventThreadServices() );
-      }
-    }
-  }
-}
-
-void Actor::ConnectDynamics()
-{
-  if( NULL != mDynamicsData && mDynamicsData->body )
-  {
-    if( OnStage() && mParent && mParent->IsDynamicsRoot() )
-    {
-      mDynamicsData->body->Connect( GetEventThreadServices() );
-
-      // Connect all joints where attachedActor is also on stage
-      if( !mDynamicsData->joints.empty() )
-      {
-        DynamicsData::JointContainer::iterator it( mDynamicsData->joints.begin() );
-        DynamicsData::JointContainer::iterator endIt( mDynamicsData->joints.end() );
-
-        for(; it != endIt; ++it )
-        {
-          Actor* attachedActor( it->first );
-          if( NULL != attachedActor && attachedActor->OnStage() )
-          {
-            DynamicsJointPtr joint( it->second );
-
-            joint->Connect( GetEventThreadServices() );
-          }
-        }
-      }
-    }
-  }
-}
-
-void Actor::DisconnectDynamics()
-{
-  if( NULL != mDynamicsData && mDynamicsData->body )
-  {
-    if( OnStage() )
-    {
-      mDynamicsData->body->Disconnect( GetEventThreadServices() );
-
-      // Disconnect all joints
-      if( !mDynamicsData->joints.empty() )
-      {
-        DynamicsData::JointContainer::iterator it( mDynamicsData->joints.begin() );
-        DynamicsData::JointContainer::iterator endIt( mDynamicsData->joints.end() );
-
-        for(; it != endIt; ++it )
-        {
-          DynamicsJointPtr joint( it->second );
-
-          joint->Disconnect( GetEventThreadServices() );
-        }
-      }
-    }
-  }
-}
-
-#endif // DALI_DYNAMICS_SUPPORT
-
 void Actor::SetOverlay( bool enable )
 {
-  // Setting STENCIL will override OVERLAY
+  // Setting STENCIL will override OVERLAY_2D
   if( DrawMode::STENCIL != mDrawMode )
   {
-    SetDrawMode( enable ? DrawMode::OVERLAY : DrawMode::NORMAL );
+    SetDrawMode( enable ? DrawMode::OVERLAY_2D : DrawMode::NORMAL );
   }
 }
 
 bool Actor::IsOverlay() const
 {
-  return ( DrawMode::OVERLAY == mDrawMode );
+  return ( DrawMode::OVERLAY_2D == mDrawMode );
 }
 
 void Actor::SetDrawMode( DrawMode::Type drawMode )
@@ -2315,9 +1850,6 @@ Actor::Actor( DerivedType derivedType )
   mParentOrigin( NULL ),
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
-#ifdef DALI_DYNAMICS_SUPPORT
-  mDynamicsData( NULL ),
-#endif
   mGestureData( NULL ),
   mAttachment(),
   mTargetSize( 0.0f, 0.0f, 0.0f ),
@@ -2328,7 +1860,6 @@ Actor::Actor( DerivedType derivedType )
   mIsRenderable( RENDERABLE == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
-  mIsDynamicsRoot( false ),
   mSensitive( true ),
   mLeaveRequired( false ),
   mKeyboardFocusable( false ),
@@ -2383,11 +1914,6 @@ Actor::~Actor()
 
     GetEventThreadServices().UnregisterObject( this );
   }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  // Cleanup dynamics
-  delete mDynamicsData;
-#endif
 
   // Cleanup optional gesture data
   delete mGestureData;
@@ -2470,14 +1996,6 @@ void Actor::ConnectToSceneGraph( int index )
   {
     mAttachment->Connect();
   }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  // Notify dynamics
-  if( NULL != mDynamicsData )
-  {
-    ConnectDynamics();
-  }
-#endif
 
   // Request relayout on all actors that are added to the scenegraph
   RelayoutRequest();
@@ -2565,14 +2083,6 @@ void Actor::DisconnectFromSceneGraph()
   {
     mAttachment->Disconnect();
   }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  // Notify dynamics
-  if( NULL != mDynamicsData )
-  {
-    DisconnectDynamics();
-  }
-#endif
 }
 
 void Actor::NotifyStageDisconnection()
@@ -3022,17 +2532,6 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 
       // property is being used in a separate thread; queue a message to set the property
       SceneGraph::NodePropertyMessage<int>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
-
-      break;
-    }
-
-    case Property::UNSIGNED_INTEGER:
-    {
-      const AnimatableProperty< unsigned int >* property = dynamic_cast< const AnimatableProperty< unsigned int >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<unsigned int>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<unsigned int>::Bake, value.Get<unsigned int>() );
 
       break;
     }

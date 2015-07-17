@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/type-abstraction-enums.h>
@@ -48,7 +48,6 @@ typedef unsigned int ResourceId;
 namespace Internal
 {
 
-class ProgramController;
 class Program;
 
 namespace SceneGraph
@@ -238,15 +237,13 @@ public:
   void SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
   /**
-   * @brief Set the program for a geometry type.
-   * @param[in] resourceId        The resource ID for the program.
-   * @param[in] shaderData        The program's vertex/fragment source and optionally compiled bytecode
-   * @param[in] programCache      Owner of the Programs
+   * @brief Set the program for this shader.
+   * @param[in] shaderData        The program's vertex/fragment source and optionally precompiled shader binary.
+   * @param[in] programCache      Owner of the Programs.
    * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
    * they might exceed the bounding box of vertexes passing through the default transformation.
    */
-  void SetProgram( Integration::ResourceId resourceId,
-                   Integration::ShaderDataPtr shaderData,
+  void SetProgram( Internal::ShaderDataPtr shaderData,
                    ProgramCache* programCache,
                    bool modifiesGeometry );
 

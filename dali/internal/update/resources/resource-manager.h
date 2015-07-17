@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
@@ -30,13 +31,12 @@
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/resource-cache.h>
-#include <dali/integration-api/shader-data.h>
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/resources/resource-type-path.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
-#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
@@ -60,6 +60,8 @@ template <> struct ParameterType< Integration::LoadResourcePriority >
 : public BasicType< Integration::LoadResourcePriority > {};
 template <> struct ParameterType< Pixel::Format >
 : public BasicType< Pixel::Format > {};
+template <> struct ParameterType< RenderBuffer::Format >
+: public BasicType< RenderBuffer::Format > {};
 template <> struct ParameterType< Integration::ResourceTypeId >
 : public BasicType< Integration::ResourceTypeId > {};
 
@@ -218,7 +220,7 @@ public: // Used by ResourceClient
    * @param[in] height      height in pixels
    * @param[in] pixelFormat Pixel format
    */
-  void HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  void HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Add an existing resource to the resource manager.
@@ -235,14 +237,6 @@ public: // Used by ResourceClient
    * @param[in] pixelFormat Pixel format
    */
   void HandleAllocateTextureRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
-
-
-  /**
-   * Load a shader program from a file
-   * @param[in] id The resource id
-   * @param[in] typePath The type & path of the resource
-   */
-  void HandleLoadShaderRequest(ResourceId id, const ResourceTypePath& typePath );
 
   /**
    * Update bitmap area request
@@ -279,13 +273,6 @@ public: // Used by ResourceClient
   void HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, Integration::LoadResourcePriority priority, bool resetFinishedStatus );
 
   /**
-   * Save a resource to the given url
-   * @param[in] id       The resource id
-   * @param[in] typePath The type & path of the resource
-   */
-  void HandleSaveResourceRequest( ResourceId id, const ResourceTypePath& typePath );
-
-  /**
    * Resource ticket has been discarded, throw away the actual resource
    */
   void HandleDiscardResourceRequest( ResourceId id, Integration::ResourceTypeId typeId );
@@ -320,14 +307,7 @@ public: // Used by ResourceClient
    */
   BitmapMetadata GetBitmapMetadata(ResourceId id);
 
-  /**
-   * Returns the shader resource corresponding to the Id
-   * @param[in] id - the id of a shader binary resource.
-   * @return the shader binary resource data or NULL if it has not been loaded.
-   */
-  Integration::ShaderDataPtr GetShaderData(ResourceId id);
-
-  /********************************************************************************
+    /********************************************************************************
    ************************* ResourceCache Implementation  ************************
    ********************************************************************************/
 public:
@@ -338,19 +318,9 @@ public:
   virtual void LoadResponse(ResourceId id, Integration::ResourceTypeId type, Integration::ResourcePointer resource, Integration::LoadStatus loadStatus);
 
   /**
-   * @copydoc Integration::ResourceCache::SaveComplete
-   */
-  virtual void SaveComplete(ResourceId id, Integration::ResourceTypeId type);
-
-  /**
    * @copydoc Integration::ResourceCache::LoadFailed
    */
   virtual void LoadFailed(ResourceId id, Integration::ResourceFailure failure);
-
-  /**
-   * @copydoc Integration::ResourceCache::SaveFailed
-   */
-  virtual void SaveFailed(ResourceId id, Integration::ResourceFailure failure);
 
   /********************************************************************************
    ********************************* Private Methods  *****************************
@@ -457,15 +427,17 @@ inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadS
                                                ResourceId id,
                                                unsigned int width,
                                                unsigned int height,
-                                               Pixel::Format pixelFormat )
+                                               Pixel::Format pixelFormat,
+                                               RenderBuffer::Format bufferFormat
+                                               )
 {
-  typedef MessageValue4< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format > LocalType;
+  typedef MessageValue5< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, width, height, pixelFormat );
+  new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, width, height, pixelFormat, bufferFormat );
 }
 
 inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadServices,
@@ -496,21 +468,6 @@ inline void RequestAllocateTextureMessage( EventThreadServices& eventThreadServi
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateTextureRequest, id, width, height, pixelFormat );
-}
-
-
-inline void RequestLoadShaderMessage( EventThreadServices& eventThreadServices,
-                                      ResourceManager& manager,
-                                      ResourceId id,
-                                      const ResourceTypePath& typePath )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleLoadShaderRequest, id, typePath );
 }
 
 inline void RequestUpdateBitmapAreaMessage( EventThreadServices& eventThreadServices,
@@ -573,20 +530,6 @@ inline void RequestReloadResourceMessage( EventThreadServices& eventThreadServic
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleReloadResourceRequest, id, typePath, priority, resetFinishedStatus );
-}
-
-inline void RequestSaveResourceMessage( EventThreadServices& eventThreadServices,
-                                        ResourceManager& manager,
-                                        ResourceId id,
-                                        const ResourceTypePath& typePath )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleSaveResourceRequest, id, typePath );
 }
 
 inline void RequestDiscardResourceMessage( EventThreadServices& eventThreadServices,

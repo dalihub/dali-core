@@ -99,14 +99,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInput::GetUnsignedInteger()
-   */
-  virtual const unsigned int& GetUnsignedInteger() const
-  {
-    return mInput->GetConstraintInputUnsignedInteger( mBufferIndex );
-  }
-
-  /**
    * @copydoc Dali::Internal::PropertyInput::GetFloat()
    */
   virtual const float& GetFloat() const

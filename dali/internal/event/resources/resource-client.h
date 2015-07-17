@@ -22,6 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
@@ -120,14 +121,6 @@ public:
                                     Integration::LoadResourcePriority priority = Integration::LoadPriorityNormal );
 
   /**
-   * Load a shader program from a file
-   * @param[in] type     A ResourceType specialization describing a shader program resource
-   * @param[in] filename The file's full path/file name
-   * @return             A ref-counted request object. Keep a copy until the resource is no longer required.
-   */
-  ResourceTicketPtr LoadShader(Integration::ShaderResourceType& type, const std::string& filename);
-
-  /**
    * Request reloading a resource from the native filesystem.
    * If the resource is still loading, this request is ignored.
    * The ticket observer will be notified of completion with ResourceLoadingSucceeded() or
@@ -139,16 +132,6 @@ public:
    * @return true if successful, false if resource doesn't exist
    */
   bool ReloadResource( ResourceId id, bool resetFinishedStatus = false, Integration::LoadResourcePriority priority = Integration::LoadPriorityNormal );
-
-  /**
-   * Save a resource to the given url.
-   * If the resource type is saveable (model or shader), then the ticket observer will get
-   * notified with ResourceSavingSucceeded() or ResourceSavingFailed(), otherwise there
-   * will be no response.
-   * @param[in] ticket The ticket of the resource to save
-   * @param[in] url The url to save the resource to.
-   */
-  void SaveResource( ResourceTicketPtr ticket, const std::string& url );
 
   /**
    * Get the ticket for the associated resource ID.
@@ -197,7 +180,7 @@ public:
    * @param[in] pixelFormat Pixel format
    * @return A ref-counted request object. Keep a copy until the resource is no longer required.
    */
-  ImageTicketPtr AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  ImageTicketPtr AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Add a framebuffer resource to the resource manager.
@@ -274,12 +257,6 @@ public: // Message methods
   void NotifyUploaded( ResourceId id );
 
   /**
-   * Notify client that the resource has been updated and requires saving.
-   * @param[in] id The resource id of the updated resource
-   */
-  void NotifySaveRequested( ResourceId id );
-
-  /**
    * Notify associated ticket observers that the resource is loading.
    * @param[in] id The resource id of the loading resource
    */
@@ -296,18 +273,6 @@ public: // Message methods
    * @param[in] id The resource id of the resource
    */
   void NotifyLoadingFailed( ResourceId id );
-
-  /**
-   * Notify associated ticket observers that the resource has saved successfully
-   * @param[in] id The resource id of the saved resource
-   */
-  void NotifySavingSucceeded( ResourceId id );
-
-  /**
-   * Notify associated ticket observers that the resource save failed
-   * @param[in] id The resource id of the failed resource
-   */
-  void NotifySavingFailed( ResourceId id );
 
  /**
    * Finds ImageTicket which belongs to resource identified by id and updates the cached
@@ -338,11 +303,6 @@ inline MessageBase* UploadedMessage( ResourceClient& client, ResourceId id )
   return new MessageValue1< ResourceClient, ResourceId >( &client, &ResourceClient::NotifyUploaded, id );
 }
 
-inline MessageBase* SaveResourceMessage( ResourceClient& client, ResourceId id )
-{
-  return new MessageValue1< ResourceClient, ResourceId >( &client, &ResourceClient::NotifySaveRequested, id );
-}
-
 inline MessageBase* LoadingMessage( ResourceClient& client, ResourceId id )
 {
   return new MessageValue1< ResourceClient, ResourceId  >( &client, &ResourceClient::NotifyLoading, id );
@@ -356,16 +316,6 @@ inline MessageBase* LoadingSucceededMessage( ResourceClient& client, ResourceId 
 inline MessageBase* LoadingFailedMessage( ResourceClient& client, ResourceId id )
 {
   return new MessageValue1< ResourceClient, ResourceId  >( &client, &ResourceClient::NotifyLoadingFailed, id );
-}
-
-inline MessageBase* SavingSucceededMessage( ResourceClient& client, ResourceId id )
-{
-  return new MessageValue1< ResourceClient, ResourceId  >( &client, &ResourceClient::NotifySavingSucceeded, id );
-}
-
-inline MessageBase* SavingFailedMessage( ResourceClient& client, ResourceId id )
-{
-  return new MessageValue1< ResourceClient, ResourceId  >( &client, &ResourceClient::NotifySavingFailed, id );
 }
 
 } // namespace Internal

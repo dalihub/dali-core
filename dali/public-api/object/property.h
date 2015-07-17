@@ -72,7 +72,6 @@ struct DALI_IMPORT_API Property
     BOOLEAN,         ///< A boolean type
     FLOAT,           ///< A float type
     INTEGER,         ///< An integer type
-    UNSIGNED_INTEGER,///< An unsigned integer type
     VECTOR2,         ///< a vector array of size=2 with float precision
     VECTOR3,         ///< a vector array of size=3 with float precision
     VECTOR4,         ///< a vector array of size=4 with float precision

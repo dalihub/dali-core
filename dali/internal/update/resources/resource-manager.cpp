@@ -69,10 +69,6 @@ typedef std::map<ResourceId, BitmapMetadata>     BitmapMetadataCache;
 typedef BitmapMetadataCache::iterator            BitmapMetadataIter;
 typedef std::pair<ResourceId, BitmapMetadata>    BitmapMetadataPair;
 
-typedef std::map<ResourceId, ShaderDataPtr>      ShaderCache;
-typedef ShaderCache::iterator                    ShaderCacheIter;
-typedef ShaderCache::size_type                   ShaderCacheSize;
-typedef std::pair<ResourceId, ShaderDataPtr>     ShaderDataPair;
 
 static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
 {
@@ -134,14 +130,11 @@ struct ResourceManager::ResourceManagerImpl
   LiveRequestContainer newFailedRequests;
   LiveRequestContainer oldFailedRequests;
   DeadRequestContainer deadRequests;
-  LiveRequestContainer saveRequests;          ///< copy of id's being saved (must also be in newCompleteRequests or oldCompleteRequests)
-  LiveRequestContainer completeSaveRequests;  ///< successful save ids are moved from saveRequests to here
 
   /**
    * This is the resource cache. It's filled/emptied from within Core::Update()
    */
   BitmapMetadataCache mBitmapMetadata;
-  ShaderCache         mShaders;
 };
 
 ResourceManager::ResourceManager( PlatformAbstraction& platformAbstraction,
@@ -214,12 +207,6 @@ void ResourceManager::PostProcessResources( BufferIndex updateBufferIndex )
         SendToClient( UploadedMessage( *mImpl->mResourceClient, ppRequest.id ) );
         break;
       }
-      case ResourcePostProcessRequest::SAVE:
-      {
-        SendToClient( SaveResourceMessage( *mImpl->mResourceClient, ppRequest.id ) );
-        break;
-
-      }
       case ResourcePostProcessRequest::DELETED:
       {
         // TextureObservers handled in TextureCache
@@ -245,7 +232,6 @@ bool ResourceManager::ResourcesToProcess()
   workTodo |= !mImpl->newFailedRequests.empty();
   // check if there's something still loading
   workTodo |= !mImpl->loadingRequests.empty();
-  workTodo |= !mImpl->saveRequests.empty();
 
   return workTodo;
 }
@@ -302,7 +288,7 @@ void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInte
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImage );
 }
 
-void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
@@ -313,7 +299,7 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
   bitmapMetadata.SetIsFramebuffer(true);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
 
-  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat );
+  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat, bufferFormat );
 }
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImageInterfacePtr nativeImage )
@@ -337,30 +323,6 @@ void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int 
 
   mImpl->oldCompleteRequests.insert(id);
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
-}
-
-void ResourceManager::HandleLoadShaderRequest( ResourceId id, const ResourceTypePath& typePath )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleLoadShaderRequest(id:%u, path:%s)\n", id, typePath.path.c_str());
-
-  const ShaderResourceType* shaderType = dynamic_cast<const ShaderResourceType*>(typePath.type);
-  DALI_ASSERT_DEBUG(shaderType);
-
-  if( shaderType )
-  {
-    ShaderDataPtr shaderData(new ShaderData(shaderType->vertexShader, shaderType->fragmentShader));
-
-    mImpl->mPlatformAbstraction.LoadShaderBinFile(typePath.path, shaderData->GetBuffer());
-
-    // Add the ID to the completed set
-    mImpl->newCompleteRequests.insert(id);
-
-    // Cache the resource
-    mImpl->mShaders.insert(ShaderDataPair(id, shaderData));
-
-    // Let NotificationManager know that the resource manager needs to do some processing
-    NotifyTickets();
-  }
 }
 
 void ResourceManager::HandleUpdateBitmapAreaRequest( ResourceId textureId, const RectArea& area )
@@ -419,73 +381,12 @@ void ResourceManager::HandleReloadResourceRequest( ResourceId id, const Resource
   }
 }
 
-void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTypePath& typePath )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleSaveResourceRequest(id:%u, path:%s)\n", id, typePath.path.c_str());
-
-  bool resourceFound = false;
-
-  // ID must be in the complete sets
-  LiveRequestIter iter = mImpl->newCompleteRequests.find(id);
-  if (iter != mImpl->newCompleteRequests.end())
-  {
-    resourceFound = true;
-  }
-  else
-  {
-    LiveRequestIter iter = mImpl->oldCompleteRequests.find(id);
-    if (iter != mImpl->oldCompleteRequests.end())
-    {
-      resourceFound = true;
-    }
-  }
-
-  if( resourceFound )
-  {
-    ResourcePointer resource;
-    DALI_ASSERT_DEBUG( typePath.type != NULL );
-
-    switch( typePath.type->id )
-    {
-      case ResourceBitmap:
-      {
-        break;
-      }
-      case ResourceNativeImage:
-      {
-        break;
-      }
-      case ResourceTargetImage:
-      {
-        break;
-      }
-      case ResourceShader:
-      {
-        resource = GetShaderData(id);
-        break;
-      }
-
-    }
-
-    if( resource ) // i.e. if it's a saveable resource
-    {
-      mImpl->saveRequests.insert(id);
-
-      ResourceRequest request(id, *typePath.type, typePath.path, resource);
-      mImpl->mPlatformAbstraction.SaveResource(request);
-    }
-  }
-}
-
 void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceTypeId typeId )
 {
   bool wasComplete = false;
   bool wasLoading = false;
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleDiscardResourceRequest(id:%u)\n", deadId);
-
-  // remove copies of the deadId from completed/failed saving sets
-  RemoveId(mImpl->completeSaveRequests, deadId);
 
   // Search for the ID in one of the live containers
   // IDs are only briefly held in the new-completed or failed containers; check those last
@@ -621,17 +522,6 @@ BitmapMetadata ResourceManager::GetBitmapMetadata(ResourceId id)
   return metadata;
 }
 
-ShaderDataPtr ResourceManager::GetShaderData(ResourceId id)
-{
-  ShaderDataPtr shaderData;
-  ShaderCacheIter iter = mImpl->mShaders.find(id);
-  if(iter != mImpl->mShaders.end())
-  {
-    shaderData = iter->second;
-  }
-  return shaderData;
-}
-
 /********************************************************************************
  ************************* ResourceCache Implementation  ************************
  ********************************************************************************/
@@ -710,13 +600,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
       {
         break;
       }
-
-      case ResourceShader:
-      {
-        mImpl->mShaders.insert(ShaderDataPair(id, static_cast<ShaderData*>(resource.Get())));
-        break;
-      }
-
     }
 
     // Let ResourceClient know that the resource manager has loaded something that its clients might want to hear about:
@@ -729,29 +612,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
   {
     // This warning can fire if a cancelled load is forgotten here while already complete on a resource thread:
     DALI_LOG_WARNING( "Received a notification for an untracked resource: (id:%u, status=%s)\n", id, loadStatus==RESOURCE_LOADING?"LOADING":loadStatus==RESOURCE_PARTIALLY_LOADED?"PARTIAL":"COMPLETE");
-  }
-}
-
-void ResourceManager::SaveComplete(ResourceId id, ResourceTypeId type)
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: SaveComplete(id:%u)\n", id);
-
-  // ID must be in the saving set
-  LiveRequestIter iter = mImpl->saveRequests.find(id);
-
-  if (iter != mImpl->saveRequests.end())
-  {
-    // Remove from the saving set
-    mImpl->saveRequests.erase(iter);
-
-    // If resource has not been discarded..
-    if( mImpl->deadRequests.find(id) == mImpl->deadRequests.end() )
-    {
-      SendToClient( SavingSucceededMessage( *mImpl->mResourceClient, id ) );
-    }
-
-    mImpl->cacheUpdated = true;
   }
 }
 
@@ -772,30 +632,6 @@ void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
 
     // Let NotificationManager know that the resource manager needs to do some processing
     NotifyTickets();
-
-    mImpl->cacheUpdated = true;
-  }
-}
-
-void ResourceManager::SaveFailed(ResourceId id, ResourceFailure failure)
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: SaveFailed(id:%u)\n", id);
-
-  // ID must be in the saving set
-  LiveRequestIter iter = mImpl->saveRequests.find(id);
-
-  if (iter != mImpl->saveRequests.end())
-  {
-    // Remove from the saving set
-    mImpl->saveRequests.erase(iter);
-
-    // If resource has not been discarded..
-
-    if( mImpl->deadRequests.find(id) == mImpl->deadRequests.end() )
-    {
-      SendToClient( SavingFailedMessage( *mImpl->mResourceClient, id ) );
-    }
 
     mImpl->cacheUpdated = true;
   }
@@ -849,33 +685,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
 {
   for (DeadRequestIter iter = mImpl->deadRequests.begin(); iter != mImpl->deadRequests.end(); )
   {
-    // Delay destroying ids in saveRequests
-    if( mImpl->saveRequests.find(iter->first) != mImpl->saveRequests.end())
-    {
-      ++iter;
-      continue;
-    }
-
-    /**
-     * We should find a resource of the correct type, and move it to the DiscardQueue.
-     */
-    switch (iter->second)
-    {
-      case ResourceBitmap:
-      case ResourceNativeImage:
-      case ResourceTargetImage:
-        break;
-
-      case ResourceShader:
-      {
-        ShaderCacheIter shaderIter = mImpl->mShaders.find(iter->first);
-        DALI_ASSERT_DEBUG( mImpl->mShaders.end() != shaderIter );
-        // shader data is owned through intrusive pointers so no need for discard queue
-        mImpl->mShaders.erase( shaderIter );
-        break;
-      }
-    }
-
     // Erase the item and increment the iterator
     mImpl->deadRequests.erase(iter++);
   }

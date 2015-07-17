@@ -18,13 +18,10 @@
  *
  */
 
-
-//PUBLIC INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+// INTERNAL INCLUDES
 #include <dali/public-api/actors/blending.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-
-// INTERNAL INCLUDES
+#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 

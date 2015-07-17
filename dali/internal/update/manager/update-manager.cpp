@@ -24,7 +24,7 @@
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/debug.h>
 
 #include <dali/internal/common/core-impl.h>
@@ -34,6 +34,7 @@
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
+#include <dali/internal/event/effects/shader-factory.h>
 
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -70,11 +71,6 @@
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/integration-api/dynamics/dynamics-world-settings.h>
-#include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
-#endif
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -135,6 +131,9 @@ typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
 
+typedef std::vector<Internal::ShaderDataPtr> ShaderDataBatchedQueue;
+typedef ShaderDataBatchedQueue::iterator        ShaderDataBatchedQueueIterator;
+
 typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
 typedef GestureContainer::ConstIterator        GestureConstIter;
@@ -162,6 +161,7 @@ struct UpdateManager::Impl
     notificationManager( notificationManager ),
     animationFinishedNotifier( animationFinishedNotifier ),
     propertyNotifier( propertyNotifier ),
+    shaderSaver( NULL ),
     resourceManager( resourceManager ),
     discardQueue( discardQueue ),
     renderController( renderController ),
@@ -181,7 +181,6 @@ struct UpdateManager::Impl
     samplers( sceneGraphBuffers, discardQueue ),
     propertyBuffers( sceneGraphBuffers, discardQueue ),
     messageQueue( renderController, sceneGraphBuffers ),
-    dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
@@ -244,6 +243,7 @@ struct UpdateManager::Impl
   NotificationManager&                notificationManager;           ///< Queues notification messages for the event-thread.
   CompleteNotificationInterface&      animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
   PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
+  ShaderSaver*                        shaderSaver;                   ///< Saves shader binaries.
   ResourceManager&                    resourceManager;               ///< resource manager
   DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&                   renderController;              ///< render controller
@@ -281,11 +281,7 @@ struct UpdateManager::Impl
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  OwnerPointer<DynamicsWorld>         dynamicsWorld;                 ///< Wrapper for dynamics simulation
-#endif
-  bool                                dynamicsChanged;               ///< This is set to true if an object is changed in the dynamics simulation tick
+  ShaderDataBatchedQueue              compiledShaders[2];            ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
@@ -614,26 +610,26 @@ void UpdateManager::RemoveShader( Shader* shader )
 }
 
 void UpdateManager::SetShaderProgram( Shader* shader,
-                                      ResourceId resourceId, size_t shaderHash, bool modifiesGeometry )
+                                      Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
-  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (id:%d hash:%d)\n", resourceId, shaderHash);
-
-  DALI_ASSERT_ALWAYS( NULL != shader && "shader is uninitialized" );
-
-  Integration::ShaderDataPtr shaderData( mImpl->resourceManager.GetShaderData(resourceId) );
   if( shaderData )
   {
-    shaderData->SetHashValue( shaderHash );
-    shaderData->SetResourceId( resourceId );
 
-    typedef MessageValue4< Shader, Integration::ResourceId, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
+    typedef MessageValue3< Shader, Internal::ShaderDataPtr, ProgramCache*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, resourceId, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
+    new (slot) DerivedType( shader, &Shader::SetProgram, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
   }
+}
+
+void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
+{
+  DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
+  DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
+  mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex() > 0 ? 0 : 1].push_back( shaderData );
 }
 
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
@@ -918,6 +914,25 @@ void UpdateManager::ProcessPropertyNotifications()
   }
 }
 
+void UpdateManager::ForwardCompiledShadersToEventThread()
+{
+  DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
+  if( mImpl->shaderSaver )
+  {
+    ShaderDataBatchedQueue& compiledShaders = mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex()];
+    if( compiledShaders.size() > 0 )
+    {
+      ShaderSaver& factory = *mImpl->shaderSaver;
+      ShaderDataBatchedQueueIterator i   = compiledShaders.begin();
+      ShaderDataBatchedQueueIterator end = compiledShaders.end();
+      for( ; i != end; ++i )
+      {
+        mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, *i ) );
+      }
+    }
+  }
+}
+
 void UpdateManager::UpdateNodes()
 {
   mImpl->nodeDirtyFlags = NothingFlag;
@@ -976,7 +991,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   const bool updateScene =                                            // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
       IsAnimationRunning() ||                                         // ..at least one animation is running OR
-      mImpl->dynamicsChanged ||                                       // ..there was a change in the dynamics simulation OR
       mImpl->messageQueue.IsSceneUpdateRequired() ||                  // ..a message that modifies the scene graph node tree is queued OR
       resourceChanged ||                                              // ..one or more resources were updated/changed OR
       gestureUpdated;                                                // ..a gesture property was updated
@@ -995,6 +1009,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
 
+  // 6.1) Forward a batch of compiled shader programs to event thread for saving
+  ForwardCompiledShadersToEventThread();
+
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
@@ -1006,27 +1023,18 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 8) Apply Constraints
     ApplyConstraints();
 
-#ifdef DALI_DYNAMICS_SUPPORT
-    // 9) Update dynamics simulation
-    mImpl->dynamicsChanged = false;
-    if( mImpl->dynamicsWorld )
-    {
-      mImpl->dynamicsChanged = mImpl->dynamicsWorld->Update( elapsedSeconds );
-    }
-#endif
-
-    // 10) Check Property Notifications
+    // 9) Check Property Notifications
     ProcessPropertyNotifications();
 
-    // 11) Clear the lists of renderable-attachments from the previous update
+    // 10) Clear the lists of renderable-attachments from the previous update
     ClearRenderables( mImpl->sortedLayers );
     ClearRenderables( mImpl->systemLevelSortedLayers );
 
-    // 12) Update node hierarchy and perform sorting / culling.
+    // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
     UpdateNodes();
 
-    // 13) Prepare for the next render
+    // 12) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
 
     PrepareRenderables( bufferIndex, mImpl->sortedLayers );
@@ -1147,11 +1155,6 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
     keepUpdatingRequest |= KeepUpdating::ANIMATIONS_RUNNING;
   }
 
-  if ( mImpl->dynamicsChanged )
-  {
-    keepUpdatingRequest |= KeepUpdating::DYNAMICS_CHANGED;
-  }
-
   if ( mImpl->renderTaskWaiting )
   {
     keepUpdatingRequest |= KeepUpdating::RENDER_TASK_SYNC;
@@ -1200,20 +1203,10 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
-#ifdef DALI_DYNAMICS_SUPPORT
-
-void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings )
+void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
 {
-  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, &mSceneGraphBuffers );
-  mImpl->dynamicsWorld = dynamicsWorld;
+  mImpl->shaderSaver = &upstream;
 }
-
-void UpdateManager::TerminateDynamicsWorld()
-{
-  mImpl->dynamicsWorld.Reset();
-}
-
-#endif // DALI_DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 

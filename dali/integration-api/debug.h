@@ -251,7 +251,6 @@ public:
   static Filter *gElement;
   static Filter *gActor;
   static Filter *gShader;
-  static Filter *gDynamics;
 
 private:
   LogLevel mLoggingLevel;

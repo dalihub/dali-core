@@ -27,7 +27,6 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/sampling.h>
 
 #include <dali/public-api/animation/alpha-function.h>

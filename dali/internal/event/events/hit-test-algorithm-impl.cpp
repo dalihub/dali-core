@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/integration-api/debug.h>
@@ -28,7 +29,6 @@
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/actors/renderable-actor-impl.h>
 #include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/projection.h>
@@ -170,7 +170,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                              HitTestInterface& hitCheck,
                              bool& stencilOnLayer,
                              bool& stencilHit,
-                             bool parentIsStencil )
+                             bool parentIsStencil,
+                             bool layerIs3d )
 {
   HitActor hit;
 
@@ -215,22 +216,16 @@ HitActor HitTestWithinLayer( Actor& actor,
             hit.x = hitPointLocal.x;
             hit.y = hitPointLocal.y;
             hit.distance = distance;
+            hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
 
             // Is this actor an Image Actor or contains a renderer?
             if ( ImageActor* imageActor = dynamic_cast< ImageActor* >( &actor ) )
             {
-              hit.depth = imageActor->GetDepthIndex();
+              hit.depth += imageActor->GetDepthIndex();
             }
-            else
+            else if ( actor.GetRendererCount() )
             {
-              if ( actor.GetRendererCount() )
-              {
-                hit.depth = actor.GetRendererAt( 0 ).GetDepthIndex();
-              }
-              else
-              {
-                hit.depth = 0;
-              }
+              hit.depth += actor.GetRendererAt( 0 ).GetDepthIndex();
             }
           }
         }
@@ -271,31 +266,27 @@ HitActor HitTestWithinLayer( Actor& actor,
                                                   hitCheck,
                                                   stencilOnLayer,
                                                   stencilHit,
-                                                  isStencil ) );
+                                                  isStencil,
+                                                  layerIs3d) );
 
         bool updateChildHit = false;
-        // If our ray casting hit, then check then if the hit actor's depth is greater that the favorite, it will be preferred
         if ( currentHit.distance >= 0.0f )
         {
-          if ( currentHit.depth > childHit.depth )
+          if( layerIs3d )
           {
-            updateChildHit = true;
+            updateChildHit = ( ( currentHit.depth > childHit.depth ) ||
+                ( ( currentHit.depth == childHit.depth ) && ( currentHit.distance < childHit.distance ) ) );
           }
-
-          // If the hit actor's depth is equal to current favorite, then we check the distance and prefer the closer
-          else if ( currentHit.depth == childHit.depth )
+          else
           {
-            if ( currentHit.distance < childHit.distance )
-            {
-              updateChildHit = true;
-            }
+            updateChildHit = currentHit.depth >= childHit.depth;
           }
         }
 
         if ( updateChildHit )
         {
           if( !parentIsRenderable || currentHit.depth > hit.depth ||
-            ( currentHit.depth == hit.depth && currentHit.distance < hit.distance ) )
+            ( layerIs3d && ( currentHit.depth == hit.depth && currentHit.distance < hit.distance )) )
             {
               childHit = currentHit;
             }
@@ -457,7 +448,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
-                                        false );
+                                        false,
+                                        layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
             else if ( IsWithinSourceActors( *sourceActor, *layer ) )
             {
@@ -472,7 +464,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
-                                        false );
+                                        false,
+                                        layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
 
             // If a stencil on this layer hasn't been hit, then discard hit results for this layer if our current hit actor is renderable

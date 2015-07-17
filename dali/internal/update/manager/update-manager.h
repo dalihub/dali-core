@@ -26,6 +26,7 @@
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
+#include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -44,7 +45,6 @@ namespace Integration
 {
 class GlSyncAbstraction;
 class RenderController;
-struct DynamicsWorldSettings;
 
 } // namespace Integration
 
@@ -52,7 +52,6 @@ namespace Internal
 {
 
 class PropertyNotifier;
-struct DynamicsWorldSettings;
 class NotificationManager;
 class CompleteNotificationInterface;
 class ResourceManager;
@@ -71,7 +70,6 @@ class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderQueue;
-class DynamicsWorld;
 class TextureCache;
 class Geometry;
 class PropertyBuffer;
@@ -87,7 +85,7 @@ class RendererAttachment;
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager
+class UpdateManager : public ShaderSaver
 {
 public:
 
@@ -118,9 +116,9 @@ public:
                  TouchResampler& touchResampler );
 
   /**
-   * Destructor. Not virtual as this is not a base class
+   * Destructor.
    */
-  ~UpdateManager();
+  virtual ~UpdateManager();
 
   // Node connection methods
 
@@ -308,11 +306,25 @@ public:
   /**
    * Set the shader program for a Shader object
    * @param[in] shader        The shader to modify
-   * @param[in] resourceId    A ResourceManager ticket ID for the program data (source and compiled binary)
-   * @param[in] shaderHash    hash key created with vertex and fragment shader code
+   * @param[in] shaderData    Source code, hash over source, and optional compiled binary for the shader program
    * @param[in] modifiesGeometry True if the vertex shader modifies geometry
    */
-  void SetShaderProgram( Shader* shader, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
+  void SetShaderProgram( Shader* shader, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
+
+  /**
+   * @brief Accept compiled shaders passed back on render thread for saving.
+   * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
+   */
+  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
+
+  /**
+   * @brief Set the destination for compiled shader binaries to be passed on to.
+   * The dispatcher passed in will be called from the update thread.
+   * @param[in] upstream A sink for ShaderDatas to be passed into.
+   */
+  void SetShaderSaver( ShaderSaver& upstream );
+
+  // Gestures
 
   /**
    * Add a newly created gesture.
@@ -400,23 +412,6 @@ public:
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
 
-#ifdef DALI_DYNAMICS_SUPPORT
-
-  /**
-   * Initialize the dynamics world
-   * @param[in] world The dynamics world
-   * @param[in] worldSettings The dynamics world settings
-   * @param[in] debugShader The shader used for rendering dynamics debug information
-   */
-  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings );
-
-  /**
-   * Terminate the dynamics world
-   */
-  void TerminateDynamicsWorld();
-
-#endif // DALI_DYNAMICS_SUPPORT
-
 private:
 
   // Undefined
@@ -479,6 +474,11 @@ private:
    * Perform property notification updates
    */
   void ProcessPropertyNotifications();
+
+  /**
+   * Pass shader binaries queued here on to event thread.
+   */
+  void ForwardCompiledShadersToEventThread();
 
   /**
    * Update the default camera.
@@ -698,8 +698,6 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
 }
 
-
-
 // The render thread can safely change the Shader
 inline void AddShaderMessage( UpdateManager& manager, Shader& shader )
 {
@@ -726,17 +724,16 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
 
 inline void SetShaderProgramMessage( UpdateManager& manager,
                                      Shader& shader,
-                                     Integration::ResourceId resourceId,
-                                     size_t shaderHash,
+                                     Internal::ShaderDataPtr shaderData,
                                      bool modifiesGeometry )
 {
-  typedef MessageValue4< UpdateManager, Shader*, Integration::ResourceId, size_t, bool > LocalType;
+  typedef MessageValue3< UpdateManager, Shader*, Internal::ShaderDataPtr, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, resourceId, shaderHash, modifiesGeometry );
+  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, shaderData, modifiesGeometry );
 }
 
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
@@ -810,34 +807,6 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-// Dynamics messages
-inline void InitializeDynamicsWorldMessage( UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings )
-{
-  typedef MessageValue2< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings );
-}
-
-inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
-{
-  typedef Message< UpdateManager > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::TerminateDynamicsWorld );
-}
-
-#endif // DALI_DYNAMICS_SUPPORT
-
 
 template< typename T >
 inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )

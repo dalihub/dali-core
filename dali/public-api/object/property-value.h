@@ -65,13 +65,6 @@ public:
   Value( int integerValue );
 
   /**
-   * @brief Create an unsigned integer property value.
-   *
-   * @param [in] unsignedIntegerValue An unsigned integer value.
-   */
-  Value( unsigned int unsignedIntegerValue );
-
-  /**
    * @brief Create a float property value.
    *
    * @param [in] floatValue A floating-point value.
@@ -239,15 +232,6 @@ public:
    * @return true if the value is successfully retrieved, false if the type is not convertible
    */
   bool Get( int& integerValue ) const;
-
-  /**
-   * @brief Retrieve an unsigned integer value.
-   *
-   * @pre GetType() returns Property::UNSIGNED_INTEGER.
-   * @param [out] unsignedIntegerValue On return, an unsigned integer value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
-   */
-  bool Get( unsigned int& unsignedIntegerValue ) const;
 
   /**
    * @brief Retrieve an integer rectangle.

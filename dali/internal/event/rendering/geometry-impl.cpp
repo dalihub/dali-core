@@ -68,7 +68,7 @@ std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
   connector.Set( vertexBuffer, OnStage() );
   mVertexBufferConnectors.push_back( connector );
 
-  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = dynamic_cast<const SceneGraph::PropertyBuffer&>( *vertexBuffer.GetSceneObject() );
+  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *vertexBuffer.GetSceneObject() );
 
   SceneGraph::AddVertexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
 
@@ -82,6 +82,9 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
 
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
+  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *(mVertexBufferConnectors[index].Get()->GetSceneObject()) );
+  SceneGraph::RemoveVertexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
+
   mVertexBufferConnectors.erase( mVertexBufferConnectors.begin() + index );
 }
 

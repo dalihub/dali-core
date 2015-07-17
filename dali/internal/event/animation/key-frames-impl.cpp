@@ -46,32 +46,45 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
   switch(type)
   {
     case Property::BOOLEAN:
+    {
       mKeyFrames = Internal::KeyFrameBoolean::New();
       break;
+    }
     case Property::INTEGER:
+    {
       mKeyFrames = Internal::KeyFrameInteger::New();
       break;
-    case Property::UNSIGNED_INTEGER:
-      mKeyFrames = Internal::KeyFrameUnsignedInteger::New();
-      break;
+    }
     case Property::FLOAT:
+    {
       mKeyFrames = Internal::KeyFrameNumber::New();
       break;
+    }
     case Property::VECTOR2:
+    {
       mKeyFrames = Internal::KeyFrameVector2::New();
       break;
+    }
     case Property::VECTOR3:
+    {
       mKeyFrames = Internal::KeyFrameVector3::New();
       break;
+    }
     case Property::VECTOR4:
+    {
       mKeyFrames = Internal::KeyFrameVector4::New();
       break;
+    }
     case Property::ROTATION:
+    {
       mKeyFrames = Internal::KeyFrameQuaternion::New();
       break;
+    }
     default:
+    {
       DALI_ASSERT_DEBUG(!"Type not supported");
       break;
+    }
   }
 }
 
@@ -104,12 +117,6 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
     {
       Internal::KeyFrameInteger* kf = static_cast<Internal::KeyFrameInteger*>(mKeyFrames.Get());
       kf->AddKeyFrame(time, value.Get<int>(), alpha);
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      Internal::KeyFrameUnsignedInteger* kf = static_cast<Internal::KeyFrameUnsignedInteger*>(mKeyFrames.Get());
-      kf->AddKeyFrame(time, value.Get<unsigned int>(), alpha);
       break;
     }
     case Property::FLOAT:

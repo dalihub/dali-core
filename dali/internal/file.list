@@ -20,7 +20,6 @@ internal_src_files = \
   $(internal_src_dir)/event/actors/layer-impl.cpp \
   $(internal_src_dir)/event/actors/layer-list.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \
-  $(internal_src_dir)/event/actors/renderable-actor-impl.cpp \
   $(internal_src_dir)/event/animation/animation-impl.cpp \
   $(internal_src_dir)/event/animation/animation-playlist.cpp \
   $(internal_src_dir)/event/animation/constrainer.cpp \
@@ -174,26 +173,3 @@ internal_src_files = \
   $(internal_src_dir)/update/resources/resource-tracker.cpp \
   $(internal_src_dir)/update/resources/sync-resource-tracker.cpp \
   $(internal_src_dir)/update/resources/complete-status-manager.cpp
-
-internal_dynamics_src_files = \
-  $(internal_src_dir)/event/dynamics/dynamics-body-config-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-body-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-capsule-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-collision-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-cone-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-cube-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-cylinder-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-joint-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-sphere-shape-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-world-config-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-world-impl.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-body.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-capsule-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cone-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cube-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cylinder-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-joint.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-sphere-shape.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-world.cpp

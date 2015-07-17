@@ -203,15 +203,14 @@ void Shader::SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::
   mUniformMetadata[ index ]->SetCoordinateType( type );
 }
 
-void Shader::SetProgram( Integration::ResourceId resourceId,
-                         Integration::ShaderDataPtr shaderData,
+void Shader::SetProgram( Internal::ShaderDataPtr shaderData,
                          ProgramCache* programCache,
                          bool modifiesGeometry )
 {
-  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", resourceId);
+  DALI_LOG_TRACE_METHOD_FMT( Debug::Filter::gShader, "%d\n", shaderData->GetHashValue() );
 
   mProgram = Program::New( *programCache, shaderData, modifiesGeometry );
-  // The program cache owns the Program object so we don't need to worry here.
+  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
 }
 
 Program* Shader::GetProgram()
@@ -283,11 +282,6 @@ void Shader::SetUniforms( Context& context,
           case Property::INTEGER :
           {
             program.SetUniform1i( loc, property.GetInteger( bufferIndex ) );
-            break;
-          }
-          case Property::UNSIGNED_INTEGER :
-          {
-            program.SetUniform1i( loc, property.GetUnsignedInteger( bufferIndex ) );
             break;
           }
           case Property::FLOAT :
