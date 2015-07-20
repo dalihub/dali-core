@@ -106,7 +106,7 @@ int UtcFrustumCullN(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
   meshActor.SetParentOrigin( ParentOrigin::CENTER );
@@ -137,11 +137,13 @@ int UtcFrustumLeftCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
-  meshActor.SetParentOrigin( Vector3( -0.42f, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  float offset = -0.01f;
+
+  meshActor.SetParentOrigin( Vector3( offset, 0.5f, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER_RIGHT );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
@@ -150,13 +152,18 @@ int UtcFrustumLeftCullP(void)
   // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+
   drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( -0.5f, 0.5f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( -radius/stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
   application.SendNotification();
   application.Render(16);
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -178,26 +185,33 @@ int UtcFrustumRightCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
-  meshActor.SetParentOrigin( Vector3( 1.42f, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  float offset = 1.01f;
+
+  meshActor.SetParentOrigin( Vector3( offset, 0.5f, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
   application.Render(16);
 
-  // This should be box culled
+  // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+
   drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( 1.5f, 0.0f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( radius/stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
   application.SendNotification();
   application.Render(16);
 
-  // This should be sphere culled
+  // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -219,26 +233,33 @@ int UtcFrustumTopCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, -0.32f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  float offset = -0.01f;
+
+  meshActor.SetParentOrigin( Vector3( 0.5f, offset, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
   application.Render(16);
 
-  // This should be box culled
+  // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+
   drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( 0.5f, -0.5f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( 0.5f, -radius/stageSize.width + offset, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
   application.SendNotification();
   application.Render(16);
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -260,26 +281,33 @@ int UtcFrustumBottomCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, 1.32f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  float offset = 1.01f;
+
+  meshActor.SetParentOrigin( Vector3( 0.5f, offset, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
   application.Render(16);
 
-  // This should be box culled
+  // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+
   drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( 0.5f, 1.5f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( 0.5f, radius/stageSize.width + offset, 0.5f ) );
+  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
   application.SendNotification();
   application.Render(16);
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -301,7 +329,7 @@ int UtcFrustumNearCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
   meshActor.SetParentOrigin( Vector3( 0.5f, 0.5f, 7.0f ) );
@@ -334,7 +362,7 @@ int UtcFrustumFarCullP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
   meshActor.SetParentOrigin( Vector3( 0.5f, 0.5f, -7.0f ) );
@@ -367,10 +395,10 @@ int UtcFrustumCullDisabledP(void)
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize(400, 400);
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, 0.5f, -7.0f ) );
+  meshActor.SetParentOrigin( ParentOrigin::CENTER );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
   Stage::GetCurrent().Add( meshActor );
 

@@ -182,8 +182,6 @@ private:
 
 public: // Properties
   AnimatableProperty<Vector3>   mCenter;
-  AnimatableProperty<Vector3>   mHalfExtents;
-  AnimatableProperty<float>     mRadius;
   DoubleBufferedProperty<int>   mGeometryType;
   DoubleBufferedProperty<bool>  mRequiresDepthTest;
 };
