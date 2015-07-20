@@ -48,7 +48,6 @@ RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
   mBlendingMode( Dali::ImageActor::DEFAULT_BLENDING_MODE ),
   mUsesGeometryScaling( usesGeometryScaling ),
   mScaleForSizeDirty( true ),
-  mUseBlend( false ),
   mHasSizeAndColorFlag( false ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
@@ -208,30 +207,6 @@ void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) cons
     }
 
     complete = mFinishedResourceAcquisition || trackersComplete;
-  }
-}
-
-void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
-{
-  // call the derived class first as it might change its state regarding blending
-  DoPrepareRender( updateBufferIndex );
-
-  // @todo MESH_REWORK Remove remainder of method after removing ImageAttachment
-
-  bool blend = !IsFullyOpaque( updateBufferIndex );
-
-  if ( mUseBlend != blend )
-  {
-    mUseBlend = blend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< Renderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, blend );
   }
 }
 

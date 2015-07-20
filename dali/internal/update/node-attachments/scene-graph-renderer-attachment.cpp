@@ -70,6 +70,7 @@ RendererAttachment::RendererAttachment()
   mRegenerateUniformMap(REGENERATE_UNIFORM_MAP),
   mResendDataProviders(false),
   mResendGeometry(false),
+  mUseBlend( false ),
   mDepthIndex(0)
 {
   mUniformMapChanged[0]=false;
@@ -384,6 +385,13 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
+  bool blend = !IsFullyOpaque( updateBufferIndex );
+  if( mUseBlend != blend )
+  {
+    mUseBlend = blend;
+    mResendDataProviders = true;
+  }
+
   if( mResendDataProviders )
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
@@ -494,6 +502,7 @@ RenderDataProvider* RendererAttachment::NewRenderDataProvider()
   dataProvider->mMaterialDataProvider = mMaterial;
   dataProvider->mUniformMapDataProvider = this;
   dataProvider->mShader = mMaterial->GetShader();
+  dataProvider->mUseBlend = mUseBlend;
 
   Vector<Sampler*>& samplers = mMaterial->GetSamplers();
   dataProvider->mSamplers.Reserve( samplers.Count() );

@@ -220,6 +220,8 @@ private:
 
   Vector<GLint> mAttributesLocation;
   bool mUpdateAttributesLocation;
+
+  bool mUseBlend:1; ///< True if blending should be enabled, 1 bit is enough
 };
 
 

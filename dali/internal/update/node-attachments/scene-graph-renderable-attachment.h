@@ -176,13 +176,6 @@ public: // For use during in the update algorithm only
    */
   void GetReadyAndComplete(bool& ready, bool& complete) const;
 
-  /**
-   * Prepare the object for rendering.
-   * This is called by the UpdateManager when an object is due to be rendered in the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void PrepareRender( BufferIndex updateBufferIndex );
-
 public: // API for derived classes
 
   /**
@@ -212,7 +205,9 @@ public: // API for derived classes
   virtual bool DoPrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager ) = 0;
 
   /**
-   * @copydoc RenderableAttachment::PrepareRender()
+   * Prepare the object for rendering.
+   * This is called by the UpdateManager when an object is due to be rendered in the current frame.
+   * @param[in] updateBufferIndex The current update buffer index.
    */
   virtual void DoPrepareRender( BufferIndex updateBufferIndex ) = 0;
 
@@ -283,7 +278,6 @@ protected:
 
   bool mUsesGeometryScaling:1;         ///< True if the derived renderer uses scaling.
   bool mScaleForSizeDirty:1;           ///< True if mScaleForSize has changed in the current frame.
-  bool mUseBlend:1;                    ///< True if the attachment & renderer should be considered opaque for sorting and blending.
   bool mHasSizeAndColorFlag:1;         ///< Set during the update algorithm to tell whether this renderer can potentially be seen
   bool mResourcesReady:1;              ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
   bool mFinishedResourceAcquisition:1; ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)

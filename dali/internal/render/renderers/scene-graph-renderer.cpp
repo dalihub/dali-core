@@ -123,21 +123,6 @@ void Renderer::SetShader( Shader* shader )
   mShader = shader;
 }
 
-void Renderer::SetUseBlend( bool useBlend )
-{
-  mUseBlend = useBlend;
-}
-
-void Renderer::SetBlendingOptions( unsigned int options )
-{
-  mBlendingOptions.SetBitmask( options );
-}
-
-void Renderer::SetBlendColor( const Vector4& color )
-{
-  mBlendingOptions.SetBlendColor( color );
-}
-
 void Renderer::SetCullFace( CullFaceMode mode )
 {
   DALI_ASSERT_DEBUG(mode >= CullNone && mode <= CullFrontAndBack);
@@ -253,42 +238,12 @@ void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
   context.CullFace( mCullFaceMode );
 }
 
-// can be overridden by deriving class
-void Renderer::DoSetBlending(Context& context, BufferIndex bufferIndex )
-{
-  // Enables/disables blending mode.
-  context.SetBlend( mUseBlend );
-
-  // Set the blend color
-  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
-  if( customColor )
-  {
-    context.SetCustomBlendColor( *customColor );
-  }
-  else
-  {
-    context.SetDefaultBlendColor();
-  }
-
-  // Set blend source & destination factors
-  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
-                             mBlendingOptions.GetBlendDestFactorRgb(),
-                             mBlendingOptions.GetBlendSrcFactorAlpha(),
-                             mBlendingOptions.GetBlendDestFactorAlpha() );
-
-  // Set blend equations
-  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
-                                 mBlendingOptions.GetBlendEquationAlpha() );
-
-}
-
 Renderer::Renderer( NodeDataProvider& dataprovider )
 : mDataProvider( dataprovider ),
   mContextDELETEME(NULL),
   mTextureCacheDELETEME( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
-  mUseBlend( false ),
   mCullFaceMode( CullNone )
 {
 }

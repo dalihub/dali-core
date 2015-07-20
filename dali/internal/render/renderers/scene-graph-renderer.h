@@ -73,24 +73,6 @@ public:
   void SetShader( Shader* shader );
 
   /**
-   * Set whether the ImageRenderer should use blending
-   * @param[in] useBlend True if blending should be used.
-   */
-  void SetUseBlend( bool useBlend );
-
-  /**
-   * Set the blending options.
-   * @param[in] options A bitmask of blending options.
-   */
-  void SetBlendingOptions( unsigned int options );
-
-  /**
-   * Set the blend color.
-   * @param[in] color The new blend-color.
-   */
-  void SetBlendColor( const Vector4& color );
-
-  /**
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
@@ -176,7 +158,7 @@ private:
    * Called from Render prior to DoRender(). Default method to set blending options
    * @todo MESH_REWORK Remove after merge
    */
-  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex );
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex ) = 0;
 
   /**
    * Called from Render; implemented in derived classes.
@@ -198,10 +180,8 @@ protected:
   Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
-  bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
 private:
 
-  BlendingOptions mBlendingOptions;
   CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
 };
 
