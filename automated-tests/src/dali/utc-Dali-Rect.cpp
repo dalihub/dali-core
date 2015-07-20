@@ -295,3 +295,18 @@ int UtcDaliRectOperatorEquals(void)
   DALI_TEST_CHECK(ri1 == ri1p);
   END_TEST;
 }
+
+int UtcDaliRectOStreamOperatorP(void)
+{
+  TestApplication application;
+  std::ostringstream oss;
+
+  Rect<int> rect( 1, 2, 10, 10 );
+
+  oss << rect;
+
+  std::string expectedOutput = "[1, 2, 10, 10]";
+
+  DALI_TEST_EQUALS( oss.str(), expectedOutput, TEST_LOCATION);
+  END_TEST;
+}
