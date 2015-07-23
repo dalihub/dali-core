@@ -35,8 +35,6 @@ Geometry::Geometry()
   mSceneController(0),
   mRendererRefCount(0u),
   mCenter(),
-  mHalfExtents(),
-  mRadius( 0.0f ),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mRequiresDepthTest(false)
 {
@@ -149,8 +147,6 @@ void Geometry::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
   // Reset the animated properties
   mCenter.ResetToBaseValue( updateBufferIndex );
-  mHalfExtents.ResetToBaseValue( updateBufferIndex );
-  mRadius.ResetToBaseValue( updateBufferIndex );
 
   // Age the double buffered properties
   mGeometryType.CopyPrevious(updateBufferIndex);
@@ -159,7 +155,6 @@ void Geometry::ResetDefaultProperties( BufferIndex updateBufferIndex )
 
 void Geometry::CalculateExtents( PropertyBuffer* vertexBuffer )
 {
-  // TODO calculate extents for all vertex buffers attached to geometry
   unsigned int elementIndex = 0;
   unsigned int elementCount = vertexBuffer->GetElementCount( 0 );
   unsigned int elementCount1 = vertexBuffer->GetElementCount( 1 );
@@ -271,15 +266,6 @@ void Geometry::CalculateExtents( PropertyBuffer* vertexBuffer )
       }
       mCenter.Bake( 0, center );
       mCenter.Bake( 1, center );
-      mHalfExtents.Bake( 0, halfExtents );
-      mHalfExtents.Bake( 1, halfExtents );
-
-      float radius = halfExtents.x;
-      if ( radius < halfExtents.y )
-      {
-        radius = halfExtents.y;
-      }
-      mRadius.SetInitial( radius );
     }
   }
 }

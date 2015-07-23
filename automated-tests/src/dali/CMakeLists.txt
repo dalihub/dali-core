@@ -75,6 +75,7 @@ SET(TC_SOURCES
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
         utc-Dali-WheelEvent.cpp
+        utc-Dali-Constrainer.cpp
 )
 
 LIST(APPEND TC_SOURCES

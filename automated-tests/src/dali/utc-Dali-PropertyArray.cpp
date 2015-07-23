@@ -206,3 +206,16 @@ int UtcDaliPropertyArrayAssignmentOperatorP(void)
 
   END_TEST;
 }
+
+int UtcDaliPropertyArrayResize(void)
+{
+  Property::Array array;
+
+  array.Resize(3);
+  DALI_TEST_CHECK( array.Count() == 3 );
+
+  array.Resize(5);
+  DALI_TEST_CHECK( array.Count() == 5 );
+
+  END_TEST;
+}

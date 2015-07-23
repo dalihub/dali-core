@@ -176,20 +176,16 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
   {
     if ( rendererAttachment->GetMaterial().GetShader()->GeometryHintEnabled( Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) )
     {
-      // Get the geometry extents for frustum checking
       const Vector3& position = worldMatrix.GetTranslation3();
-      const Geometry& geometry = rendererAttachment->GetGeometry();
       const Vector3& scale = parentNode.GetScale( updateBufferIndex );
-
-      Vector3 center( geometry.mCenter[ updateBufferIndex ] );
-      center *= scale;
-      center += position;
+      const Vector3& halfSize = parentNode.GetSize( updateBufferIndex ) * scale * 0.5f;
 
       // Do a fast sphere check
-      if ( cameraAttachment.CheckSphereInFrustum( updateBufferIndex, center, geometry.mRadius[ updateBufferIndex ] * scale.Length() ) )
+      if ( cameraAttachment.CheckSphereInFrustum( updateBufferIndex, position, halfSize.Length() ) )
       {
         // Check geometry AABB
-        if ( !cameraAttachment.CheckAABBInFrustum( updateBufferIndex, center, geometry.mHalfExtents[ updateBufferIndex ] * scale ) )
+        //TODO: Take into account orientation
+        if ( !cameraAttachment.CheckAABBInFrustum( updateBufferIndex, position, halfSize ) )
         {
           inside = false;
         }
@@ -200,6 +196,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       }
     }
   }
+
   if ( inside )
   {
     // Get the next free RenderItem

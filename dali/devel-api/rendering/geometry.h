@@ -61,7 +61,6 @@ public:
     {
       GEOMETRY_TYPE = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depth-index",            type STRING
       GEOMETRY_CENTER,                                      ///< name "geometry-center",        type VECTOR3
-      GEOMETRY_HALF_EXTENTS,                                ///< name "geometry-half-extents",  type VECTOR3
       REQUIRES_DEPTH_TEST,                                  ///< name "requires-depth-testing", type BOOLEAN
     };
   };

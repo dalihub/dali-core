@@ -1363,6 +1363,10 @@ unsigned int Actor::AddRenderer( Renderer& renderer )
   if ( ! mAttachment )
   {
     mAttachment = RendererAttachment::New( GetEventThreadServices(), *mNode, renderer );
+    if( mIsOnStage )
+    {
+      mAttachment->Connect();
+    }
   }
 
   return 0;
