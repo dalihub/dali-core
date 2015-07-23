@@ -80,7 +80,7 @@ TextureCache::TextureCache( RenderQueue& renderQueue,
 : TextureCacheDispatcher(renderQueue),
   mPostProcessResourceDispatcher(postProcessResourceDispatcher),
   mContext(context),
-  mDiscardBitmapsPolicy(ResourcePolicy::DISCARD)
+  mDiscardBitmapsPolicy(ResourcePolicy::OWNED_DISCARD)
 {
 }
 
@@ -417,7 +417,7 @@ void TextureCache::GlContextDestroyed()
 void TextureCache::SetDiscardBitmapsPolicy( ResourcePolicy::Discardable policy )
 {
   DALI_LOG_INFO( gTextureCacheFilter, Debug::General, "TextureCache::SetDiscardBitmapsPolicy(%s)\n",
-                 policy==ResourcePolicy::RETAIN?"RETAIN":"DISCARD" );
+                 policy==ResourcePolicy::OWNED_DISCARD?"DISCARD":"RETAIN" );
   mDiscardBitmapsPolicy = policy;
 }
 

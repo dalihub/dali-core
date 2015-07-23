@@ -43,7 +43,7 @@ static void EmulateImageLoaded( TestApplication& application, unsigned int width
 {
   // emulate load success
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::DISCARD );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource( bitmap );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height, width, height );
   if( request )

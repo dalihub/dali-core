@@ -42,7 +42,7 @@ namespace
 void LoadBitmapResource(TestPlatformAbstraction& platform)
 {
   Integration::ResourceRequest* request = platform.GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource(bitmap);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
 
@@ -149,7 +149,7 @@ int UtcDaliImageSignalUploaded(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = platform.GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource(bitmap);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
 
