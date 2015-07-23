@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -186,6 +190,10 @@ public: // Not intended for Application developers
    */
   explicit DALI_INTERNAL TapGestureDetector(Internal::TapGestureDetector* internal);
 };
+
+/**
+ * @}
+ */
 
 } // namespace Dali
 

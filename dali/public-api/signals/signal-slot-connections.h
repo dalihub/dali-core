@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-signals
+ * @{
+ */
 
 class CallbackBase;
 
@@ -142,6 +146,9 @@ private:
   CallbackBase* mCallback;         ///< The callback, has ownership.
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SIGNAL_SLOT_CONNECTIONS_H__

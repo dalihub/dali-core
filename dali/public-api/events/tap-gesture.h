@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 /**
  * @brief A TapGesture is emitted when the user taps the screen with the stated number of fingers a stated number of times.
@@ -84,6 +88,9 @@ struct DALI_IMPORT_API TapGesture : public Gesture
   Vector2 localPoint;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_TAP_GESTURE_H__

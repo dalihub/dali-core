@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-animation
+ * @{
+ */
 
 class Handle;
 
@@ -497,6 +501,9 @@ private: // Not intended for use by Application developers
   static Constraint New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONSTRAINT_H__

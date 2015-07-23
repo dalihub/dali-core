@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace BlendingMode
 {
@@ -91,6 +95,9 @@ DALI_IMPORT_API extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR
 DALI_IMPORT_API extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_RGB;     ///< BlendingEquation::ADD
 DALI_IMPORT_API extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_ALPHA;   ///< BlendingEquation::ADD
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_BLENDING_H__

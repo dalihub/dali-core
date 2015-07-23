@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -309,6 +313,10 @@ public: // Not intended for application developers
    */
   explicit DALI_INTERNAL Stage(Internal::Stage* stage);
 };
+
+/**
+ * @}
+ */
 
 } // namespace Dali
 

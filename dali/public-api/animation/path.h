@@ -24,11 +24,16 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-animation
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
 class Path;
 }
+
 /**
  * @brief A 3D parametric curve
  *
@@ -172,6 +177,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL Path(Internal::Path* path);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_KEY_FRAMES_H__

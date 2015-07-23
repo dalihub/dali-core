@@ -31,6 +31,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 class Constraint;
 class PropertyNotification;
@@ -348,6 +352,9 @@ DALI_IMPORT_API Handle New();
 
 } // namespace WeightObject
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_HANDLE_H__

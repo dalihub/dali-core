@@ -27,10 +27,15 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 /**
  * @brief Template class to create and operate on rectangles.
  */
+
 template< typename T = float >
 struct Rect
 {
@@ -297,6 +302,9 @@ inline std::ostream& operator<< (std::ostream& stream, const Rect<T>& rectangle)
   return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_RECT_H__

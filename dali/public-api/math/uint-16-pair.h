@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-math
+ * @{
+ */
 
 /**
  * @brief Simple class for passing around pairs of small unsigned integers.
@@ -177,6 +181,9 @@ private:
   };
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_UINT_16_PAIR_H__

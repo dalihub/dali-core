@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -167,6 +171,9 @@ DALI_IMPORT_API PropertyCondition StepCondition( float stepAmount, float initial
  */
 DALI_IMPORT_API PropertyCondition VariableStepCondition( const Dali::Vector<float>& steps );
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_CONDITIONS_H__

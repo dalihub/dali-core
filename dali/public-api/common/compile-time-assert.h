@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 template <bool x> struct CompileTimeAssertBool;    ///< Bool Template to test condition
 template <> struct CompileTimeAssertBool<true> {}; ///< Specialize for true, but not for false
@@ -39,6 +43,9 @@ template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditi
  */
 #define DALI_COMPILE_TIME_ASSERT( x ) typedef CompileTimeAssertInt< sizeof( CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType __attribute__((__unused__))
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_COMPILE_TIME_ASSERT_H__

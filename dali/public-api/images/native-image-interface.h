@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-images
+ * @{
+ */
 
 /**
  * @brief Abstract interface to provide platform-specific support for handling image data.
@@ -118,6 +122,9 @@ protected:
  */
 typedef IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_H__

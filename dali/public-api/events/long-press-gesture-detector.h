@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -201,6 +205,9 @@ public: // Not intended for Application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_LONG_PRESS_GESTURE_DETECTOR_H__

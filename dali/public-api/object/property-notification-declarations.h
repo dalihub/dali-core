@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 class PropertyNotification;
 
@@ -32,6 +36,9 @@ class PropertyNotification;
  */
 typedef Signal< void (PropertyNotification& source) > PropertyNotifySignalType;
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H__

@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -105,6 +109,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_NATIVE_IMAGE_H__

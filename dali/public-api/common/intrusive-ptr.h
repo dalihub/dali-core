@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * @brief Templated intrusive pointer class
@@ -294,6 +298,9 @@ inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
   return lhs != rhs.Get();
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif /* __DALI_INTRUSIVE_PTR_H__ */

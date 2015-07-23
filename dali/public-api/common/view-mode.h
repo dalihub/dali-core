@@ -20,6 +20,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * Stereoscopic view modes
@@ -32,6 +36,9 @@ enum ViewMode
   STEREO_INTERLACED  ///< Stereoscopic. Left/Right camera views are rendered into the framebuffer on alternate frames.
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_VIEW_MODE_H__

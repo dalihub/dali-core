@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-math
+ * @{
+ */
 
 /**
  * @brief An angle in radians.
@@ -292,6 +296,9 @@ inline Radian Clamp( Radian angle, float min, float max )
   return Radian( Clamp<float>( angle.radian, min, max ) );
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_RADIAN_H__
