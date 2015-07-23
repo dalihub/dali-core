@@ -226,10 +226,8 @@ public:
    * @pre The childNode does not already have a parent.
    * @pre The childNode is not a root node.
    * @param[in] childNode The child to add.
-   * @param[in] index to insert at, if not supplied or -1 it will be appended
-   *
    */
-  void ConnectChild( Node* childNode, int index = -1);
+  void ConnectChild( Node* childNode );
 
   /**
    * Disconnect a child (& its children) from the scene-graph.
