@@ -1077,23 +1077,19 @@ void Actor::SetSize( float width, float height, float depth )
 
 void Actor::SetSize( const Vector2& size )
 {
-  SetSize( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
+  SetSize( Vector3( size.width, size.height, 0.f ) );
 }
 
 void Actor::SetSizeInternal( const Vector2& size )
 {
-  SetSizeInternal( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
-}
-
-float Actor::CalculateSizeZ( const Vector2& size ) const
-{
-  return std::min( size.width, size.height );
+  SetSizeInternal( Vector3( size.width, size.height, 0.f ) );
 }
 
 void Actor::SetSize( const Vector3& size )
 {
   if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
   {
+    // TODO we cannot just ignore the given Z but that means rewrite the size negotiation!!
     SetPreferredSize( size.GetVectorXY() );
   }
   else
@@ -4041,7 +4037,7 @@ Vector2 Actor::GetPreferredSize() const
 {
   if ( mRelayoutData )
   {
-    return mRelayoutData->preferredSize;
+    return Vector2( mRelayoutData->preferredSize );
   }
 
   return GetDefaultPreferredSize();

@@ -1542,16 +1542,8 @@ protected:
    */
   bool IsNodeConnected() const;
 
-  /**
-   * Calculate the size of the z dimension for a 2D size
-   *
-   * @param[in] size The 2D size (X, Y) to calculate Z from
-   *
-   * @return Return the Z dimension for this size
-   */
-  float CalculateSizeZ( const Vector2& size ) const;
-
 public:
+
   // Default property extensions from Object
 
   /**

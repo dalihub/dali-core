@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ int UtcDaliImageActorSetSize01(void)
   actor.SetShaderEffect( effect );
 
   const float INVALID_SIZE = float(1u<<31);
-  Vector3 vector( INVALID_SIZE, INVALID_SIZE, INVALID_SIZE );
+  Vector3 vector( INVALID_SIZE, INVALID_SIZE, 0.0f );
 
   DALI_TEST_CHECK(vector != actor.GetCurrentSize());
 

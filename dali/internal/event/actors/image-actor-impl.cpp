@@ -104,6 +104,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
+  // TODO: Remove this, at the moment its needed for size negotiation to work
   SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 }
 
@@ -208,7 +209,7 @@ ImageActor::~ImageActor()
 Vector3 ImageActor::GetNaturalSize() const
 {
   Vector2 naturalSize( CalculateNaturalSize() );
-  return Vector3( naturalSize.width, naturalSize.height, CalculateSizeZ( naturalSize ) );
+  return Vector3( naturalSize.width, naturalSize.height, 0.f );
 }
 
 Vector2 ImageActor::CalculateNaturalSize() const
