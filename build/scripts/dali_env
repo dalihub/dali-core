@@ -54,9 +54,10 @@ my @system_packages = (
 );
 
 # Some packages like require building from source
+# v8 is currently disabled until we can get it working without a http proxy being setup
 my @source_pkgs = (
 
-    {"name" => "v8",
+    {"name" => "disabled-v8",
      "force-rebuild" => 0,
      "use_depot_tools" => 1,
      "repo" => "https://chromium.googlesource.com/v8/v8.git",
