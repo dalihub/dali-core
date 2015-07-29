@@ -245,7 +245,6 @@ void Core::SurfaceResized( unsigned int width, unsigned int height )
 
 void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
 {
-  mPlatform.SetDpi( dpiHorizontal, dpiVertical );
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
 }
 
