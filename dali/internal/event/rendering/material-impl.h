@@ -270,8 +270,7 @@ private: // unimplemented methods
   Material& operator=( const Material& );
 
 private: //data
-  typedef ObjectConnector<Shader> ShaderConnector;
-  ShaderConnector mShaderConnector; ///< Connector that holds the shader used by this material
+  IntrusivePtr<Shader> mShader; ///< Connector that holds the shader used by this material
 
   typedef ObjectConnector<Sampler> SamplerConnector;
   typedef std::vector< SamplerConnector > SamplerConnectorContainer;

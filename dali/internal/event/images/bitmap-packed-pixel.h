@@ -48,7 +48,7 @@ public:
    * Constructor
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    */
-  BitmapPackedPixel( ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
+  BitmapPackedPixel( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
 
 public:
   virtual const Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() const { return this; }

@@ -72,11 +72,9 @@ public:
    * There should exactly one of these objects per Dali Core.
    * @param[in] resourceManager The resource manager
    * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
-   * @param[in] dataRetentionPolicy The data retention policy of the current application
    */
   ResourceClient( ResourceManager& resourceManager,
-                  EventThreadServices& eventThreadServices,
-                  ResourcePolicy::DataRetention dataRetentionPolicy );
+                  EventThreadServices& eventThreadServices );
 
   /**
    * Virtual destructor.
@@ -84,11 +82,6 @@ public:
   virtual ~ResourceClient();
 
 public:
-  /**
-   * Get the global data retention policy.
-   * @return the global data retention policy
-   */
-  ResourcePolicy::DataRetention GetResourceDataRetentionPolicy();
 
   /**
    * Request a resource from the native filesystem.

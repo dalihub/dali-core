@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -663,7 +663,7 @@ int UtcDaliActorSetSize01(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Vector3 vector(100.0f, 100.0f, 100.0f);
+  Vector3 vector(100.0f, 100.0f, 0.0f);
 
   DALI_TEST_CHECK(vector != actor.GetCurrentSize());
 
@@ -703,7 +703,7 @@ int UtcDaliActorSetSize03(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Vector3 vector(100.0f, 100.0f, 100.0f);
+  Vector3 vector(100.0f, 100.0f, 0.0f);
 
   DALI_TEST_CHECK(vector != actor.GetCurrentSize());
 

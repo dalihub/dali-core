@@ -22,7 +22,6 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/devel-api/rendering/shader.h> // Dali::Shader
-#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
@@ -43,7 +42,7 @@ typedef IntrusivePtr<Shader> ShaderPtr;
  * Shader is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Shader : public Object, public Connectable
+class Shader : public Object
 {
 public:
 
@@ -143,22 +142,6 @@ public: // Default property extensions from Object
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
-public: // Functions from Connectable
-  /**
-   * @copydoc Dali::Internal::Connectable::OnStage()
-   */
-  virtual bool OnStage() const;
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Connect()
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Disconnect()
-   */
-  virtual void Disconnect();
-
 private: // implementation
   Shader();
 
@@ -179,7 +162,6 @@ private: // unimplemented methods
 
 private:
   SceneGraph::Shader* mSceneObject;
-  bool mOnStage;
 };
 
 } // namespace Internal

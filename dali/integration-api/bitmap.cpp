@@ -245,7 +245,7 @@ void ConvertToGlFormat( Format pixelformat, unsigned& pixelDataType, unsigned& i
 }
 
 Bitmap* Bitmap::New( const Profile profile = BITMAP_2D_PACKED_PIXELS,
-                     ResourcePolicy::Discardable discardable = ResourcePolicy::DISCARD )
+                     ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_DISCARD )
 {
   DALI_ASSERT_DEBUG(profile == BITMAP_2D_PACKED_PIXELS || profile == BITMAP_COMPRESSED);
 
@@ -284,7 +284,7 @@ Bitmap::Bitmap( ResourcePolicy::Discardable discardable, Dali::Integration::Pixe
 
 void Bitmap::DiscardBuffer()
 {
-  if( mDiscardable == ResourcePolicy::DISCARD )
+  if( mDiscardable == ResourcePolicy::OWNED_DISCARD )
   {
     DeletePixelBuffer();
   }
@@ -303,7 +303,10 @@ PixelBuffer* Bitmap::ReleaseBuffer()
 Bitmap::~Bitmap()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-  if( mDiscardable == ResourcePolicy::DISCARD )
+
+  // If owned
+  if( mDiscardable == ResourcePolicy::OWNED_DISCARD ||
+      mDiscardable == ResourcePolicy::OWNED_RETAIN )
   {
     DeletePixelBuffer();
   }

@@ -88,34 +88,71 @@ Geometry CreateGeometry()
   return texturedQuadGeometry;
 }
 
-int UtcFrustumCullN(void)
+Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::ShaderHints shaderHints = Shader::HINT_NONE )
 {
-  TestApplication application;
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
-
   PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
   BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
 
   Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
+  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints ) );
   Sampler sampler = Sampler::New( image, "sTexture" );
   material.AddSampler( sampler );
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
-  drawTrace.Reset();
-
-  meshActor.SetParentOrigin( ParentOrigin::CENTER );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f ) );
+  meshActor.SetParentOrigin( parentOrigin );
+  meshActor.SetAnchorPoint( anchorPoint );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
+
+  return meshActor;
+}
+
+bool GetCameraDepths( TestApplication& application, float& nearPlane, float& farPlane, float& cameraDepth )
+{
+  RenderTaskList renderTasks = Stage::GetCurrent().GetRenderTaskList();
+  CameraActor cameraActor;
+  for( unsigned int i = 0; i < renderTasks.GetTaskCount(); ++i )
+  {
+    RenderTask task = renderTasks.GetTask( i );
+    cameraActor = task.GetCameraActor();
+    if( cameraActor )
+    {
+      break;
+    }
+  }
+  if( cameraActor )
+  {
+    application.SendNotification();
+    application.Render( 16 );
+
+    nearPlane = cameraActor.GetNearClippingPlane();
+    farPlane = cameraActor.GetFarClippingPlane();
+    cameraDepth = cameraActor.GetCurrentPosition().z;
+  }
+
+  return !!cameraActor;
+}
+
+int UtcFrustumCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  CreateMeshActorToStage( application );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -124,30 +161,14 @@ int UtcFrustumLeftCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
-
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
-
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
-  drawTrace.Reset();
+  drawTrace.Enable( true );
 
   float offset = -0.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
 
-  meshActor.SetParentOrigin( Vector3( offset, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER_RIGHT );
-  Stage::GetCurrent().Add( meshActor );
-
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
@@ -155,14 +176,34 @@ int UtcFrustumLeftCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( -radius/stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( -radius / stageSize.width + offset, 0.5f, 0.5f ) );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumLeftCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float offset = 0.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -172,30 +213,14 @@ int UtcFrustumRightCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
-
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
-
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
-  drawTrace.Reset();
+  drawTrace.Enable( true );
 
   float offset = 1.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
 
-  meshActor.SetParentOrigin( Vector3( offset, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  Stage::GetCurrent().Add( meshActor );
-
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
@@ -203,14 +228,34 @@ int UtcFrustumRightCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( radius/stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( radius / stageSize.width + offset, 0.5f, 0.5f ) );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumRightCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float offset = 0.99f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -220,30 +265,14 @@ int UtcFrustumTopCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
-
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
-
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
-  drawTrace.Reset();
+  drawTrace.Enable( true );
 
   float offset = -0.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, offset, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-  Stage::GetCurrent().Add( meshActor );
-
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
@@ -251,14 +280,35 @@ int UtcFrustumTopCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( 0.5f, -radius/stageSize.width + offset, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( 0.5f, -radius / stageSize.width + offset, 0.5f ) );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumTopCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float offset = 0.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  // This will be box culled
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -268,30 +318,14 @@ int UtcFrustumBottomCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
-
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
-
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
-  drawTrace.Reset();
+  drawTrace.Enable( true );
 
   float offset = 1.01f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, offset, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-  Stage::GetCurrent().Add( meshActor );
-
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be box culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
@@ -299,14 +333,34 @@ int UtcFrustumBottomCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  drawTrace.Reset();
-  meshActor.SetParentOrigin( Vector3( 0.5f, radius/stageSize.width + offset, 0.5f ) );
+  meshActor.SetParentOrigin( Vector3( 0.5f, radius / stageSize.width + offset, 0.5f ) );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+
+  drawTrace.Reset();
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumBottomCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float offset = 0.99f;
+  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -316,31 +370,63 @@ int UtcFrustumNearCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
+  drawTrace.Enable( true );
 
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
+  float nearPlane, farPlane, cameraDepth;
+  DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
+  Actor meshActor = CreateMeshActorToStage( application );
+  Vector3 meshPosition = meshActor.GetCurrentPosition();
 
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  float offset = ( meshActor.GetTargetSize().z + radius ) * 0.5f; //midpoint between AABB and sphere
+  meshPosition.z = cameraDepth - nearPlane +  offset;
+  meshActor.SetPosition( meshPosition );
+
   drawTrace.Reset();
-
-  meshActor.SetParentOrigin( Vector3( 0.5f, 0.5f, 7.0f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( meshActor );
-
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
+
+  // This will be box culled
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  offset = radius + 0.1f;
+  meshPosition.z = cameraDepth - nearPlane + offset;
+  meshActor.SetPosition( meshPosition );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumNearCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float nearPlane, farPlane, cameraDepth;
+  DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
+
+  Actor meshActor = CreateMeshActorToStage( application );
+  Vector3 meshPosition = meshActor.GetCurrentPosition();
+
+  float offset = meshActor.GetTargetSize().z - 0.1f;
+  meshPosition.z = cameraDepth - nearPlane + offset;
+  meshActor.SetPosition( meshPosition );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
@@ -349,63 +435,82 @@ int UtcFrustumFarCullP(void)
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
+  drawTrace.Enable( true );
 
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
+  float nearPlane, farPlane, cameraDepth;
+  DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
+  Actor meshActor = CreateMeshActorToStage( application );
+  Vector3 meshPosition = meshActor.GetCurrentPosition();
 
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
+  float radius = meshActor.GetTargetSize().Length() * 0.5f;
+  float offset = ( meshActor.GetTargetSize().z + radius ) * 0.5f; //midpoint between AABB and sphere
+
+  meshPosition.z = cameraDepth - farPlane - offset;
+  meshActor.SetPosition( meshPosition );
+
   drawTrace.Reset();
-
-  meshActor.SetParentOrigin( Vector3( 0.5f, 0.5f, -7.0f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( meshActor );
-
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
+
+  // This will be box culled
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  offset = radius + 0.1f;
+  meshPosition.z = cameraDepth - farPlane - offset;
+  meshActor.SetPosition( meshPosition );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
+
+  END_TEST;
+}
+
+int UtcFrustumFarCullN(void)
+{
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  float nearPlane, farPlane, cameraDepth;
+  DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
+
+  Actor meshActor = CreateMeshActorToStage( application );
+  Vector3 meshPosition = meshActor.GetCurrentPosition();
+
+  float offset = meshActor.GetTargetSize().z - 0.1f;
+  meshPosition.z = cameraDepth - farPlane - offset;
+  meshActor.SetPosition( meshPosition );
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render( 16 );
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }
 
 int UtcFrustumCullDisabledP(void)
 {
-    TestApplication application;
+  TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-  drawTrace.Enable(true);
+  drawTrace.Enable( true );
 
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
+  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::HINT_MODIFIES_GEOMETRY );
 
-  Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Shader::HINT_MODIFIES_GEOMETRY ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor meshActor = Actor::New();
-  meshActor.AddRenderer( renderer );
-  meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f) );
   drawTrace.Reset();
-
-  meshActor.SetParentOrigin( ParentOrigin::CENTER );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( meshActor );
-
   application.SendNotification();
-  application.Render(16);
+  application.Render( 16 );
 
   // This should not be culled
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
+
   END_TEST;
 }

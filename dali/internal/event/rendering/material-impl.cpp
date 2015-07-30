@@ -72,7 +72,7 @@ MaterialPtr Material::New()
 void Material::SetShader( Shader& shader )
 {
   DALI_ASSERT_DEBUG( mSceneObject )
-  mShaderConnector.Set( shader, OnStage() );
+  mShader = &shader;
 
   const SceneGraph::Shader& sceneGraphShader = dynamic_cast<const SceneGraph::Shader&>( *shader.GetSceneObject() );
   SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
@@ -80,7 +80,7 @@ void Material::SetShader( Shader& shader )
 
 Shader* Material::GetShader() const
 {
-  return mShaderConnector.Get().Get();
+  return mShader.Get();
 }
 
 void Material::AddSampler( Sampler& sampler )
@@ -548,7 +548,6 @@ void Material::Connect()
   {
     it->OnStageConnect();
   }
-  mShaderConnector.OnStageConnect();
 }
 
 void Material::Disconnect()
@@ -562,7 +561,6 @@ void Material::Disconnect()
   {
     it->OnStageDisconnect();
   }
-  mShaderConnector.OnStageDisconnect();
 }
 
 Material::Material()

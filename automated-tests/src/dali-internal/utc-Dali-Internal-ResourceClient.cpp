@@ -105,7 +105,7 @@ Internal::ImagePtr LoadImage(TestApplication& application, char* name)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 80,80,80,80 );
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
@@ -127,7 +127,7 @@ Internal::ResourceTicketPtr CheckLoadBitmap(TestApplication& application, const 
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest*   req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, w, h, w, h );
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
@@ -193,7 +193,7 @@ int UtcDaliInternalRequestResourceBitmapRequests01(void)
 
     // Create a resource
     Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
     bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 80, 80, 80, 80 );
     Integration::ResourcePointer resourcePtr(bitmap); // reference it
 
@@ -406,7 +406,7 @@ int UtcDaliInternalRequestReloadBitmapRequests01(void)
 
     // Create a new resource - the image size could have changed in the meantime
     Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+    Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
     bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 120, 120, 120, 120 );
     Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
     DALI_TEST_CHECK( req->GetId() == ticket->GetId() );
@@ -504,7 +504,7 @@ int UtcDaliInternalRequestReloadBitmapRequests02(void)
     DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::GetResourcesFunc ) );
     // Create a resource
     Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
     bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 80, 80, 80, 80 );
     Integration::ResourcePointer resourcePtr(bitmap); // reference it
 
@@ -613,7 +613,7 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
 
     // Create a resource
     Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
     bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 80, 80, 80, 80 );
     Integration::ResourcePointer resourcePtr(bitmap); // reference it
 
@@ -657,7 +657,7 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
 
     // Create a new resource - the image size could have changed in the meantime
     req = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+    Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
     bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 120, 120, 120, 120 );
     Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
     DALI_TEST_CHECK( req->GetId() == id );
@@ -763,7 +763,7 @@ int UtcDaliInternalAddBitmapImage01(void)
   tet_infoline("Testing AddBitmap with reserved buffer()");
   testTicketObserver.Reset();
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::RETAIN  );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::OWNED_RETAIN  );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGB565, 80, 80, 80, 80 );
 
   Internal::ImageTicketPtr imageTicket = resourceClient.AddBitmapImage( bitmap );
@@ -800,7 +800,7 @@ int UtcDaliInternalAddBitmapImage02(void)
   tet_infoline("Testing AddBitmap without reserved buffer()");
   testTicketObserver.Reset();
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::RETAIN  );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::OWNED_RETAIN  );
 
   Internal::ImageTicketPtr imageTicket = resourceClient.AddBitmapImage( bitmap );
   DALI_TEST_CHECK( imageTicket );
@@ -865,7 +865,7 @@ int UtcDaliInternalGetBitmapImage01(void)
   testTicketObserver.Reset();
 
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::RETAIN  );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS,  ResourcePolicy::OWNED_RETAIN  );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 20, 20, 80, 80 );
   Internal::ImageTicketPtr imageTicket = resourceClient.AddBitmapImage( bitmap );
 

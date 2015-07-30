@@ -175,17 +175,14 @@ const SceneGraph::PropertyBase* Shader::GetSceneObjectAnimatableProperty( Proper
   DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
   const SceneGraph::PropertyBase* property = NULL;
 
-  if( OnStage() )
-  {
-    property = SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                            &Shader::FindAnimatableProperty,
-                                                            &Shader::FindCustomProperty,
-                                                            index );
+  property = SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                          &Shader::FindAnimatableProperty,
+                                                          &Shader::FindCustomProperty,
+                                                          index );
 
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
-    }
+  if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+  {
+    DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
   }
 
   return property;
@@ -195,25 +192,22 @@ const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index in
 {
   const PropertyInputImpl* property = NULL;
 
-  if( OnStage() )
-  {
-    const SceneGraph::PropertyBase* baseProperty =
-      SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                   &Shader::FindAnimatableProperty,
-                                                   &Shader::FindCustomProperty,
-                                                   index );
-    property = static_cast<const PropertyInputImpl*>( baseProperty );
+  const SceneGraph::PropertyBase* baseProperty =
+    SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                 &Shader::FindAnimatableProperty,
+                                                 &Shader::FindCustomProperty,
+                                                 index );
+  property = static_cast<const PropertyInputImpl*>( baseProperty );
 
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+  if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+  {
+    if( index == Dali::Shader::Property::SHADER_HINTS )
     {
-      if( index == Dali::Shader::Property::SHADER_HINTS )
-      {
-        // @todo MESH_REWORK - return the property
-      }
-      else
-      {
-        DALI_ASSERT_ALWAYS( 0 && "Property is not a valid constraint input" );
-      }
+      // @todo MESH_REWORK - return the property
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Property is not a valid constraint input" );
     }
   }
 
@@ -225,24 +219,8 @@ int Shader::GetPropertyComponentIndex( Property::Index index ) const
   return Property::INVALID_COMPONENT_INDEX;
 }
 
-bool Shader::OnStage() const
-{
-  return mOnStage;
-}
-
-void Shader::Connect()
-{
-  mOnStage = true;
-}
-
-void Shader::Disconnect()
-{
-  mOnStage = false;
-}
-
 Shader::Shader()
-: mSceneObject( NULL ),
-  mOnStage( false )
+: mSceneObject( NULL )
 {
 }
 
