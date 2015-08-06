@@ -164,7 +164,8 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      RenderList& renderList,
                                      RenderableAttachment& renderable,
                                      const Matrix& viewMatrix,
-                                     SceneGraph::CameraAttachment& cameraAttachment )
+                                     SceneGraph::CameraAttachment& cameraAttachment,
+                                     bool isLayer3d )
 {
   // Check for cull against view frustum
   bool inside = true;
@@ -203,7 +204,14 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
     RenderItem& item = renderList.GetNextFreeItem();
     const Renderer& renderer = renderable.GetRenderer();
     item.SetRenderer( const_cast< Renderer* >( &renderer ) );
-    item.SetDepthIndex( renderable.GetDepthIndex() + static_cast<int>( parentNode.GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
+    if( isLayer3d )
+    {
+      item.SetDepthIndex( renderable.GetDepthIndex() );
+    }
+    else
+    {
+      item.SetDepthIndex( renderable.GetDepthIndex() + static_cast<int>( parentNode.GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
+    }
 
     // save MV matrix onto the item
     Matrix& modelViewMatrix = item.GetModelViewMatrix();
@@ -222,7 +230,8 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
                                       RenderList& renderList,
                                       RenderableAttachmentContainer& attachments,
                                       const Matrix& viewMatrix,
-                                      SceneGraph::CameraAttachment& cameraAttachment )
+                                      SceneGraph::CameraAttachment& cameraAttachment,
+                                      bool isLayer3d )
 {
   DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
 
@@ -232,7 +241,7 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
   for ( RenderableAttachmentIter iter = attachments.begin(); iter != endIter; ++iter )
   {
     RenderableAttachment& attachment = **iter;
-    AddRendererToRenderList( updateBufferIndex, renderList, attachment, viewMatrix, cameraAttachment );
+    AddRendererToRenderList( updateBufferIndex, renderList, attachment, viewMatrix, cameraAttachment, isLayer3d );
 
     DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  List[%d].renderer = %p\n", index, &(attachment.GetRenderer()));
     index++;
@@ -418,7 +427,7 @@ inline void AddOpaqueRenderers( BufferIndex updateBufferIndex,
       return;
     }
   }
-  AddRenderersToRenderList( updateBufferIndex, opaqueRenderList, layer.opaqueRenderables, viewMatrix, cameraAttachment );
+  AddRenderersToRenderList( updateBufferIndex, opaqueRenderList, layer.opaqueRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
 
   // opaque flags can only be set after renderers are added
   SetOpaqueRenderFlags(opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, disableDepthTest );
@@ -467,7 +476,7 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
       layer.transparentRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
 
       // the default sorting function should get inlined here
-      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() );
+      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() ) + item.GetDepthIndex();
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].renderItem = &item;
@@ -547,7 +556,7 @@ inline void AddTransparentRenderers( BufferIndex updateBufferIndex,
   }
   transparentRenderList.SetSourceLayer( &layer );
 
-  AddRenderersToRenderList( updateBufferIndex, transparentRenderList, layer.transparentRenderables, viewMatrix, cameraAttachment );
+  AddRenderersToRenderList( updateBufferIndex, transparentRenderList, layer.transparentRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
 
   // sorting is only needed if more than 1 item
   if( renderableCount > 1 )
@@ -585,7 +594,7 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
       return;
     }
   }
-  AddRenderersToRenderList( updateBufferIndex, overlayRenderList, layer.overlayRenderables, viewMatrix, cameraAttachment );
+  AddRenderersToRenderList( updateBufferIndex, overlayRenderList, layer.overlayRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
 }
 
 /**
@@ -615,7 +624,7 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
       return;
     }
   }
-  AddRenderersToRenderList( updateBufferIndex, stencilRenderList, layer.stencilRenderables, viewMatrix, cameraAttachment );
+  AddRenderersToRenderList( updateBufferIndex, stencilRenderList, layer.stencilRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
 }
 
 /**

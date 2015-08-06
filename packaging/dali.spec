@@ -1,9 +1,9 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.0.51
+Version:    1.0.52
 Release:    1
 Group:      System/Libraries
-License:    Apache-2.0
+License:    Apache-2.0, BSD-2.0, MIT
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
