@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <stdlib.h>
+#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -126,15 +127,14 @@ struct Epsilon
  * @brief Compile time template to calculate the machine epsilon for a given floating point number.
  *
  * Specialisation for epsilon of 1
- * predefined value calculated on ARM Cortex A9 target
  */
 template<>
 struct Epsilon< 1 >
 {
 #ifdef _CPP11
-  static constexpr float value = 1.19209e-07f;
+  static constexpr float value = FLT_EPSILON;
 #else
-  static const float value = 1.19209e-07f;
+  static const float value = FLT_EPSILON;
 #endif
 };
 
@@ -142,15 +142,14 @@ struct Epsilon< 1 >
  * @brief Compile time template to calculate the machine epsilon for a given floating point number.
  *
  * Specialisation for epsilon of 0
- * predefined value calculated on ARM Cortex A9 target
  */
 template<>
 struct Epsilon< 0 >
 {
 #ifdef _CPP11
-  static constexpr float value = 1.4013e-45f;
+  static constexpr float value = FLT_MIN;
 #else
-  static const float value = 1.4013e-45f;
+  static const float value = FLT_MIN;
 #endif
 };
 
