@@ -55,105 +55,6 @@ namespace SceneGraph
 {
 
 /**
- * Set flags for opaque renderlist
- * @param renderList to set the flags to
- * @param transparentRenderersExist is true if there is transparent renderers in this layer
- * @param stencilRenderablesExist is true if there are stencil renderers on this layer
- * @param depthTestDisabled whether depth test is disabled.
- */
-inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRenderersExist, bool stencilRenderablesExist, bool depthTestDisabled )
-{
-  //@todo MESH_REWORK Move RequiresDepthTest from render thread object to update thread object
-
-  renderList.SetInterleave(transparentRenderersExist);
-
-  // Special optimization if depth test is disabled or if only one opaque rendered in the layer (for example background image)
-  // and this renderer does not need depth test against itself (e.g. mesh)
-  // and if this layer has got exactly one opaque renderer
-  // and this renderer is not interested in depth testing
-  // (i.e. is an image and not a mesh)
-  if ( (  renderList.Count() == 1 ) &&
-       (  !transparentRenderersExist ) &&
-       (  !renderList.GetRenderer( 0 )->RequiresDepthTest() ) )
-  {
-    // no need to enable depth test or clear depth buffer
-    // if there's something transparent already rendered by previous layers,
-    // this opaque renderer will correctly draw on top of them since no depth test
-    renderList.ClearFlags();
-    renderList.SetInterleave(false);
-  }
-  else if( depthTestDisabled )
-  {
-    renderList.ClearFlags();
-  }
-  else
-  {
-    // Prepare for rendering multiple opaque objects
-    unsigned int flags = RenderList::DEPTH_BUFFER_ENABLED | RenderList::DEPTH_WRITE | RenderList::DEPTH_CLEAR; // clear depth buffer, draw over the previously rendered layers;
-
-    renderList.ClearFlags();
-    renderList.SetFlags(flags);
-  }
-
-  if( stencilRenderablesExist )
-  {
-    renderList.SetFlags( RenderList::STENCIL_BUFFER_ENABLED );
-  }
-}
-
-/**
- * Set the transparent flags on the renderlist
- * @param renderList to set the flags on
- * @param opaqueRenderersExist is true if there are opaque renderers on this layer
- * @param stencilRenderablesExist is true if there are stencil renderers on this layer
- * @param depthTestDisabled whether depth test is disabled.
- */
-inline void SetTransparentRenderFlags( RenderList& renderList, bool opaqueRenderersExist, bool stencilRenderablesExist, bool depthTestDisabled )
-{
-  renderList.ClearFlags();
-  // We don't need to write to the depth buffer, as transparent objects
-  // don't obscure each other.
-
-  renderList.SetInterleave(opaqueRenderersExist);
-  if ( opaqueRenderersExist && !depthTestDisabled )
-  {
-    // If there are a mix of opaque and transparent objects, the transparent
-    // objects should be rendered with depth test on to avoid background objects
-    // appearing in front of opaque foreground objects.
-    renderList.SetFlags( RenderList::DEPTH_BUFFER_ENABLED );
-  }
-
-  if( stencilRenderablesExist )
-  {
-    renderList.SetFlags( RenderList::STENCIL_BUFFER_ENABLED );
-  }
-}
-
-
-/**
- * Set flags for overlay renderlist
- * @param renderList to set the flags for
- * @param stencilRenderablesExist is true if there are stencil renderers on this layer
- */
-inline void SetOverlayRenderFlags( RenderList& renderList, bool stencilRenderablesExist )
-{
-  if(stencilRenderablesExist)
-  {
-    renderList.SetFlags(RenderList::STENCIL_BUFFER_ENABLED);
-  }
-}
-
-/**
- * Set flags for stencil renderlist
- * @param renderList to set the flags for
- */
-inline void SetStencilRenderFlags( RenderList& renderList )
-{
-  renderList.ClearFlags();
-  renderList.SetFlags(RenderList::STENCIL_CLEAR | RenderList::STENCIL_WRITE | RenderList::STENCIL_BUFFER_ENABLED );
-}
-
-/**
  * Add a renderer to the list
  * @param updateBufferIndex to read the model matrix from
  * @param renderList to add the item to
@@ -200,10 +101,11 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if ( inside )
   {
-    // Get the next free RenderItem
+    // Get the next free RenderItem and initialization
     RenderItem& item = renderList.GetNextFreeItem();
     const Renderer& renderer = renderable.GetRenderer();
     item.SetRenderer( const_cast< Renderer* >( &renderer ) );
+    item.SetIsOpaque( renderable.IsFullyOpaque(updateBufferIndex) );
     if( isLayer3d )
     {
       item.SetDepthIndex( renderable.GetDepthIndex() );
@@ -214,8 +116,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
     }
 
     // save MV matrix onto the item
-    Matrix& modelViewMatrix = item.GetModelViewMatrix();
-    Matrix::Multiply( modelViewMatrix, worldMatrix, viewMatrix );
+    Matrix::Multiply( item.GetModelViewMatrix(), worldMatrix, viewMatrix );
   }
 }
 
@@ -321,133 +222,57 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
  * @param rhs item
  * @return true if left item is greater than right
  */
-bool CompareItemsWithZValue( const RendererWithSortAttributes& lhs, const RendererWithSortAttributes& rhs )
+bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSortAttributes& rhs )
 {
-  // @todo MESH_REWORK Consider replacing all these sortAttributes with a single long int that
-  // encapsulates the same data (e.g. the middle-order bits of the ptrs)
-
-  if( Equals(lhs.zValue, rhs.zValue) )
+  bool lhsIsOpaque = lhs.renderItem->IsOpaque();
+  if( lhsIsOpaque ==  rhs.renderItem->IsOpaque())
   {
-    if( lhs.shader == rhs.shader )
+    if( lhsIsOpaque )
     {
-      if( lhs.material == rhs.material )
+      //If both RenderItems are opaque, sort using shader, then material then geometry
+      if( lhs.shader == rhs.shader )
       {
-        return lhs.geometry < rhs.geometry;
+        if( lhs.material == rhs.material )
+        {
+          return lhs.geometry < rhs.geometry;
+        }
+        return lhs.material < rhs.material;
       }
-      return lhs.material < rhs.material;
+      return lhs.shader < rhs.shader;
     }
-    return lhs.shader < rhs.shader;
-  }
-  return lhs.zValue > rhs.zValue;
-}
-
-inline void SortOpaqueRenderItems(
-  BufferIndex bufferIndex,
-  RenderList& opaqueRenderList,
-  Layer& layer,
-  RenderItemSortingHelper& sortingHelper )
-{
-  const size_t renderableCount = opaqueRenderList.Count();
-  // reserve space if needed
-  const unsigned int oldcapacity = sortingHelper.size();
-  if( oldcapacity < renderableCount )
-  {
-    sortingHelper.reserve( renderableCount );
-    // add real objects (reserve does not construct objects)
-    sortingHelper.insert( sortingHelper.begin() + oldcapacity,
-                          (renderableCount - oldcapacity),
-                          RendererWithSortAttributes() );
+    else
+    {
+      //If both RenderItems are transparent, sort using z,then shader, then material, then geometry
+      if( Equals(lhs.zValue, rhs.zValue) )
+      {
+        if( lhs.shader == rhs.shader )
+        {
+          if( lhs.material == rhs.material )
+          {
+            return lhs.geometry < rhs.geometry;
+          }
+          return lhs.material < rhs.material;
+        }
+        return lhs.shader < rhs.shader;
+      }
+      return lhs.zValue > rhs.zValue;
+    }
   }
   else
   {
-    // clear extra elements from helper, does not decrease capability
-    sortingHelper.resize( renderableCount );
-  }
-
-  for( size_t index = 0; index < renderableCount; ++index )
-  {
-    RenderItem& item = opaqueRenderList.GetItem( index );
-
-    //@todo MESH_REWORK After merge of RenderableAttachment and RendererAttachment, should instead store the renderable ptr and get the fields directly
-    layer.opaqueRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
-
-    sortingHelper[ index ].zValue = 0;
-    sortingHelper[ index ].renderItem = &item;
-  }
-
-  // Sort the renderers by depth index, then by instance
-  std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItems );
-
-  DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "Sorted Opaque List:\n");
-
-  // Repopulate the render items in the render list based on the sorting helper
-  RenderItemContainer::Iterator renderListIter = opaqueRenderList.GetContainer().Begin();
-  for( unsigned int index = 0; index < renderableCount; ++index, ++renderListIter )
-  {
-    *renderListIter = sortingHelper[ index ].renderItem;
-    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, sortingHelper[ index ].renderItem->GetRenderer() );
+    return lhsIsOpaque;
   }
 }
 
 /**
- * Add opaque renderers from the layer onto the next free render list
- * @param updateBufferIndex to use
- * @param layer to get the renderers from
- * @param viewmatrix for the camera from rendertask
- * @param cameraAttachment to use the view frustum
- * @param transparentRenderersExist is true if there is transparent renderers in this layer
- * @param stencilRenderablesExist is true if there are stencil renderers on this layer
- * @param disableDepthTest is true if depth test should be disabled on this layer
- * @param instruction to fill in
- * @param tryReuseRenderList whether to try to reuse the cached items from the instruction
- */
-inline void AddOpaqueRenderers( BufferIndex updateBufferIndex,
-                                Layer& layer,
-                                const Matrix& viewMatrix,
-                                SceneGraph::CameraAttachment& cameraAttachment,
-                                bool transparentRenderablesExist,
-                                bool stencilRenderablesExist,
-                                bool disableDepthTest,
-                                RenderInstruction& instruction,
-                                RendererSortingHelper& sortingHelper,
-                                bool tryReuseRenderList )
-{
-  const size_t renderableCount = layer.opaqueRenderables.size();
-  RenderList& opaqueRenderList = instruction.GetNextFreeRenderList( layer.opaqueRenderables.size() );
-  opaqueRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
-
-  // try to reuse cached renderitems from last time around
-  if( tryReuseRenderList )
-  {
-    if( TryReuseCachedRenderers( layer, opaqueRenderList, layer.opaqueRenderables ) )
-    {
-      // reset the flags as other layers might have changed
-      // opaque flags can only be set after renderers are added
-      SetOpaqueRenderFlags( opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, disableDepthTest );
-      return;
-    }
-  }
-  AddRenderersToRenderList( updateBufferIndex, opaqueRenderList, layer.opaqueRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
-
-  // opaque flags can only be set after renderers are added
-  SetOpaqueRenderFlags(opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, disableDepthTest );
-
-  // sorting is only needed if more than 1 item
-  if( renderableCount > 1 )
-  {
-    SortOpaqueRenderItems( updateBufferIndex, opaqueRenderList, layer, sortingHelper.opaque );
-  }
-}
-
-/**
- * Sort transparent render items
- * @param transparentRenderList to sort
+ * Sort color render items
+ * @param colorRenderList to sort
  * @param layer where the renderers are from
  * @param sortingHelper to use for sorting the renderitems (to avoid reallocating)
  */
-inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& transparentRenderList, Layer& layer, RenderItemSortingHelper& sortingHelper )
+inline void SortColorRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, RendererSortingHelper& sortingHelper )
 {
-  const size_t renderableCount = transparentRenderList.Count();
+  const size_t renderableCount = renderList.Count();
   // reserve space if needed
   const unsigned int oldcapacity = sortingHelper.size();
   if( oldcapacity < renderableCount )
@@ -470,13 +295,13 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
   {
     for( size_t index = 0; index < renderableCount; ++index )
     {
-      RenderItem& item = transparentRenderList.GetItem( index );
+      RenderItem& item = renderList.GetItem( index );
 
       //@todo MESH_REWORK After merge of RenderableAttachment and RendererAttachment, should instead store the renderable ptr and get the fields directly
-      layer.transparentRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
+      layer.colorRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
 
       // the default sorting function should get inlined here
-      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() ) + item.GetDepthIndex();
+      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].renderItem = &item;
@@ -487,10 +312,10 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
     const Dali::Layer::SortFunctionType sortFunction = layer.GetSortFunction();
     for( size_t index = 0; index < renderableCount; ++index )
     {
-      RenderItem& item = transparentRenderList.GetItem( index );
+      RenderItem& item = renderList.GetItem( index );
 
-      layer.transparentRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
-      sortingHelper[ index ].zValue = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3() );
+      layer.colorRenderables[index]->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
+      sortingHelper[ index ].zValue = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].renderItem = &item;
@@ -500,7 +325,7 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
   if( layer.GetBehavior() ==  Dali::Layer::LAYER_3D)
   {
     // sort the renderers back to front, Z Axis point from near plane to far plane
-    std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItemsWithZValue );
+    std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItems3D );
   }
   else
   {
@@ -510,7 +335,7 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
 
   // reorder/repopulate the renderitems in renderlist to correct order based on sortinghelper
   DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
-  RenderItemContainer::Iterator renderListIter = transparentRenderList.GetContainer().Begin();
+  RenderItemContainer::Iterator renderListIter = renderList.GetContainer().Begin();
   for( unsigned int index = 0; index < renderableCount; ++index, ++renderListIter )
   {
     *renderListIter = sortingHelper[ index ].renderItem;
@@ -519,50 +344,67 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
 }
 
 /**
- * Add transparent renderers from the layer onto the next free render list
+ * Add color renderers from the layer onto the next free render list
  * @param updateBufferIndex to use
  * @param layer to get the renderers from
  * @param viewmatrix for the camera from rendertask
- * @param opaqueRenderablesExist is true if there are opaque renderers on this layer
+ * @param cameraAttachment to use the view frustum
  * @param stencilRenderablesExist is true if there are stencil renderers on this layer
  * @param instruction to fill in
  * @param sortingHelper to use for sorting the renderitems (to avoid reallocating)
  * @param tryReuseRenderList whether to try to reuse the cached items from the instruction
  */
-inline void AddTransparentRenderers( BufferIndex updateBufferIndex,
-                                     Layer& layer,
-                                     const Matrix& viewMatrix,
-                                     SceneGraph::CameraAttachment& cameraAttachment,
-                                     bool opaqueRenderablesExist,
-                                     bool stencilRenderablesExist,
-                                     RenderInstruction& instruction,
-                                     RendererSortingHelper& sortingHelper,
-                                     bool tryReuseRenderList )
+inline void AddColorRenderers( BufferIndex updateBufferIndex,
+                               Layer& layer,
+                               const Matrix& viewMatrix,
+                               SceneGraph::CameraAttachment& cameraAttachment,
+                               bool stencilRenderablesExist,
+                               RenderInstruction& instruction,
+                               RendererSortingHelper& sortingHelper,
+                               bool tryReuseRenderList )
 {
-  const size_t renderableCount = layer.transparentRenderables.size();
-  RenderList& transparentRenderList = instruction.GetNextFreeRenderList( renderableCount );
-  transparentRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
-
-  // transparent flags are independent of the amount of transparent renderers
-  SetTransparentRenderFlags( transparentRenderList, opaqueRenderablesExist, stencilRenderablesExist, layer.IsDepthTestDisabled() );
+  RenderList& renderList = instruction.GetNextFreeRenderList( layer.colorRenderables.size() );
+  renderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
+  renderList.SetHasColorRenderItems( true );
 
   // try to reuse cached renderitems from last time around
   if( tryReuseRenderList )
   {
-    if( TryReuseCachedRenderers( layer, transparentRenderList, layer.transparentRenderables ) )
+    if( TryReuseCachedRenderers( layer, renderList, layer.colorRenderables ) )
     {
       return;
     }
   }
-  transparentRenderList.SetSourceLayer( &layer );
 
-  AddRenderersToRenderList( updateBufferIndex, transparentRenderList, layer.transparentRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
+  AddRenderersToRenderList( updateBufferIndex, renderList, layer.colorRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D );
+  SortColorRenderItems( updateBufferIndex, renderList, layer, sortingHelper );
 
-  // sorting is only needed if more than 1 item
-  if( renderableCount > 1 )
+  //Set render flags
+  unsigned int flags = 0u;
+  if( stencilRenderablesExist )
   {
-    SortTransparentRenderItems( updateBufferIndex, transparentRenderList, layer, sortingHelper.transparent );
+    flags = RenderList::STENCIL_BUFFER_ENABLED;
   }
+
+  // Special optimization if depth test is disabled or if only one opaque rendered in the layer (for example background image)
+  // and this renderer does not need depth test against itself (e.g. mesh)
+  // and if this layer has got exactly one opaque renderer
+  // and this renderer is not interested in depth testing
+  // (i.e. is an image and not a mesh)
+  if ( ( renderList.Count() == 1 ) &&
+       ( !renderList.GetRenderer( 0 )->RequiresDepthTest() ) &&
+       ( !renderList.GetItem(0).IsOpaque() ) )
+  {
+    //Nothing to do here
+  }
+  else if( !layer.IsDepthTestDisabled())
+  {
+    flags |= RenderList::DEPTH_BUFFER_ENABLED;
+    flags |= RenderList::DEPTH_CLEAR;
+  }
+
+  renderList.ClearFlags();
+  renderList.SetFlags( flags );
 }
 
 /**
@@ -584,7 +426,14 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& overlayRenderList = instruction.GetNextFreeRenderList( layer.overlayRenderables.size() );
   overlayRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
-  SetOverlayRenderFlags( overlayRenderList, stencilRenderablesExist );
+  overlayRenderList.SetHasColorRenderItems( false );
+
+  //Set render flags
+  overlayRenderList.ClearFlags();
+  if(stencilRenderablesExist)
+  {
+    overlayRenderList.SetFlags(RenderList::STENCIL_BUFFER_ENABLED);
+  }
 
   // try to reuse cached renderitems from last time around
   if( tryReuseRenderList )
@@ -614,7 +463,11 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& stencilRenderList = instruction.GetNextFreeRenderList( layer.stencilRenderables.size() );
   stencilRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
-  SetStencilRenderFlags( stencilRenderList );
+  stencilRenderList.SetHasColorRenderItems( false );
+
+  //Set render flags
+  stencilRenderList.ClearFlags();
+  stencilRenderList.SetFlags(RenderList::STENCIL_CLEAR | RenderList::STENCIL_WRITE | RenderList::STENCIL_BUFFER_ENABLED );
 
   // try to reuse cached renderitems from last time around
   if( tryReuseRenderList )
@@ -658,48 +511,28 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
     Layer& layer = **iter;
 
     const bool stencilRenderablesExist( !layer.stencilRenderables.empty() );
-    const bool opaqueRenderablesExist( !layer.opaqueRenderables.empty() );
-    const bool transparentRenderablesExist( !layer.transparentRenderables.empty() );
+    const bool colorRenderablesExist( !layer.colorRenderables.empty() );
     const bool overlayRenderablesExist( !layer.overlayRenderables.empty() );
-    const bool disableDepthTest( layer.IsDepthTestDisabled() );
     const bool tryReuseRenderList( viewMatrixHasNotChanged && layer.CanReuseRenderers(renderTask.GetCamera()) );
 
     // Ignore stencils if there's nothing to test
     if( stencilRenderablesExist &&
-        ( opaqueRenderablesExist || transparentRenderablesExist || overlayRenderablesExist ) )
+        ( colorRenderablesExist || overlayRenderablesExist ) )
     {
       AddStencilRenderers( updateBufferIndex, layer, viewMatrix, cameraAttachment, instruction, tryReuseRenderList );
     }
 
-    if ( opaqueRenderablesExist )
+    if ( colorRenderablesExist )
     {
-      AddOpaqueRenderers( updateBufferIndex,
-                          layer,
-                          viewMatrix,
-                          cameraAttachment,
-                          transparentRenderablesExist,
-                          stencilRenderablesExist,
-                          disableDepthTest,
-                          instruction,
-                          sortingHelper,
-                          tryReuseRenderList );
+      AddColorRenderers( updateBufferIndex,
+                         layer,
+                         viewMatrix,
+                         cameraAttachment,
+                         stencilRenderablesExist,
+                         instruction,
+                         sortingHelper,
+                         tryReuseRenderList );
     }
-
-    if ( transparentRenderablesExist )
-    {
-      AddTransparentRenderers( updateBufferIndex,
-                               layer,
-                               viewMatrix,
-                               cameraAttachment,
-                               opaqueRenderablesExist,
-                               stencilRenderablesExist,
-                               instruction,
-                               sortingHelper,
-                               tryReuseRenderList );
-    }
-
-    // @todo MESH_REWORK Mark opaque and transparent render lists as interleaveable.
-    // ( Saves having to have a pair of lists for each depth index )
 
     if ( overlayRenderablesExist )
     {

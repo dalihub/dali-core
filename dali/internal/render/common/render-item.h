@@ -96,6 +96,21 @@ public:
    */
   void SetDepthIndex( int depthIndex );
 
+  /**
+   * Set if the RenderItem is opaque
+   * @param[in] isOpaque true if the RenderItem is opaque, false otherwise
+   */
+  void SetIsOpaque( bool isOpaque );
+
+  /**
+   * Check if the RenderItem is opaque
+   * @return True if it is opaque, false otherwise
+   */
+  bool IsOpaque() const
+  {
+    return mIsOpaque;
+  }
+
 private:
 
   // RenderItems should not be copied as they are heavy
@@ -105,6 +120,7 @@ private:
   Matrix    mModelViewMatrix;
   Renderer* mRenderer;
   int       mDepthIndex;
+  bool      mIsOpaque:1;
 };
 
 } // namespace SceneGraph

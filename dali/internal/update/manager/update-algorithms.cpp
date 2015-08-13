@@ -319,7 +319,7 @@ inline void AddRenderableToLayer( Layer& layer,
 {
   // The renderables are stored into the opaque list temporarily for PrepareRenderables()
   // step. The list is cleared by ProcessRenderTasks().
-  layer.opaqueRenderables.push_back( &renderable );
+  layer.colorRenderables.push_back( &renderable );
 }
 
 /**

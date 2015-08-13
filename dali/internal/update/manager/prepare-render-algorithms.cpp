@@ -48,8 +48,7 @@ void ClearRenderables( SortedLayerPointers& sortedLayers )
   for ( SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter )
   {
     (*iter)->stencilRenderables.clear();
-    (*iter)->opaqueRenderables.clear();
-    (*iter)->transparentRenderables.clear();
+    (*iter)->colorRenderables.clear();
     (*iter)->overlayRenderables.clear();
   }
 }
@@ -77,8 +76,7 @@ void PrepareRenderables( BufferIndex updateBufferIndex, SortedLayerPointers& sor
     Layer& layer = **iter;
 
     PrepareRenderables( updateBufferIndex, layer.stencilRenderables );
-    PrepareRenderables( updateBufferIndex, layer.opaqueRenderables );
-    PrepareRenderables( updateBufferIndex, layer.transparentRenderables );
+    PrepareRenderables( updateBufferIndex, layer.colorRenderables );
     PrepareRenderables( updateBufferIndex, layer.overlayRenderables );
   }
 }
