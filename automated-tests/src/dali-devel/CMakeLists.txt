@@ -23,6 +23,7 @@ SET(TC_SOURCES
         utc-Dali-SignalDelegate.cpp
         utc-Dali-Scripting.cpp
         utc-Dali-Shader.cpp
+        utc-Dali-WeakHandle.cpp
 )
 
 LIST(APPEND TC_SOURCES
