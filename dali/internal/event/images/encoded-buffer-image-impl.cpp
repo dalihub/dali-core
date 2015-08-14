@@ -63,19 +63,19 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   memcpy( &(buffer->GetVector()[0]), encodedImage, encodedImageByteCount );
 
   // Get image size from buffer
-  const ImageDimensions expectedSize = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( buffer, size, fittingMode, samplingMode, orientationCorrection );
+  Dali::Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
+  const ImageDimensions expectedSize = platformAbstraction.GetClosestImageSize( buffer, size, fittingMode, samplingMode, orientationCorrection );
   image->mWidth = (unsigned int) expectedSize.GetWidth();
   image->mHeight = (unsigned int) expectedSize.GetHeight();
 
-  ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
-  ResourceTicketPtr ticket = resourceClient.DecodeResource( resourceType, buffer );
-  if( ticket )
-  {
-    DALI_ASSERT_DEBUG( dynamic_cast<ImageTicket*>( ticket.Get() ) && "Resource ticket returned for image resource has to be an ImageTicket subclass.\n" );
-    ImageTicket * const imageTicket = static_cast<ImageTicket*>( ticket.Get() );
+  // Load the image synchronously
+  Integration::BitmapPtr bitmap = platformAbstraction.DecodeBuffer( resourceType, &(buffer->GetVector()[0]), encodedImageByteCount );
 
-    image->mTicket = imageTicket;
-    imageTicket->AddObserver( *image );
+  if( bitmap )
+  {
+    ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
+    image->mTicket = resourceClient.AddBitmapImage( bitmap.Get() );
+    image->mTicket->AddObserver( *image );
   }
 
   return image;

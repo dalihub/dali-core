@@ -142,6 +142,16 @@ public:
   virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
 
   /**
+   * Decode a buffer of data synchronously.
+   * @param[in] resourceType The type of resource to load
+   * @param[in] buffer The decoded data
+   * @param[in] bufferSize The size of the buffer used by the decoded data.
+   *
+   * @return A pointer to the decoded buffer.
+   */
+  virtual BitmapPtr DecodeBuffer( const ResourceType& resourceType, uint8_t * buffer, size_t bufferSize ) = 0;
+
+  /**
    * Cancel an ongoing LoadResource() request.
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.
