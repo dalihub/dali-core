@@ -199,8 +199,7 @@ private:
 public: // For update-algorithms
 
   RenderableAttachmentContainer stencilRenderables;
-  RenderableAttachmentContainer transparentRenderables;
-  RenderableAttachmentContainer opaqueRenderables;
+  RenderableAttachmentContainer colorRenderables;
   RenderableAttachmentContainer overlayRenderables;
 
 private:

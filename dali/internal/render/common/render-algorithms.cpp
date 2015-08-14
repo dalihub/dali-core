@@ -71,12 +71,10 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context )
   const unsigned int renderFlags = renderList.GetFlags();
 
   bool enableDepthBuffer = ( ( renderFlags & RenderList::DEPTH_BUFFER_ENABLED ) != 0u );
-  bool depthMask         = ( ( renderFlags & RenderList::DEPTH_WRITE ) != 0u );
 
   GLbitfield clearMask   = ( renderFlags & RenderList::DEPTH_CLEAR ) ? GL_DEPTH_BUFFER_BIT : 0u;
 
   context.EnableDepthBuffer( enableDepthBuffer );
-  context.DepthMask( depthMask );
 
   // Stencil enabled, writing, and clearing...
   const bool enableStencilBuffer( renderFlags & RenderList::STENCIL_BUFFER_ENABLED );
@@ -132,17 +130,34 @@ inline void ProcessRenderList(
   SetScissorTest( renderList, context );
   SetRenderFlags( renderList, context );
 
-  size_t count = renderList.Count();
-  for ( size_t index = 0; index < count; ++index )
+  if( renderList.HasColorRenderItems() )
   {
-    const RenderItem& item = renderList.GetItem( index );
+    bool depthBufferEnabled = ( ( renderList.GetFlags() & RenderList::DEPTH_BUFFER_ENABLED ) != 0u );
+    size_t count = renderList.Count();
+    for ( size_t index = 0; index < count; ++index )
+    {
+      const RenderItem& item = renderList.GetItem( index );
+      DALI_PRINT_RENDER_ITEM( item );
 
-    DALI_PRINT_RENDER_ITEM( item );
+      //Enable depth writes if depth buffer is enabled and item is opaque
+      context.DepthMask( depthBufferEnabled && item.IsOpaque() );
 
-    SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
-    const Matrix& modelViewMatrix = item.GetModelViewMatrix();
+      SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
+      renderer->Render( context, textureCache, bufferIndex, defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode );
+    }
+  }
+  else
+  {
+    size_t count = renderList.Count();
+    for ( size_t index = 0; index < count; ++index )
+    {
+      const RenderItem& item = renderList.GetItem( index );
+      DALI_PRINT_RENDER_ITEM( item );
 
-    renderer->Render( context, textureCache, bufferIndex, defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
+      SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
+      renderer->Render( context, textureCache, bufferIndex, defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode );
+    }
+
   }
 }
 
@@ -197,87 +212,6 @@ inline void RenderItemsAtDepthIndex(
 }
 
 
-/**
- * Process two interleaved render-lists.
- *
- * For each depth index, it will set the flags for the first list,
- * render items in the first list, set flags for the second list and
- * render items from the second list.
- *
- * @param[in] renderList1 The first render-list to process.
- * @param[in] renderList2 The second render-list to process.
- * @param[in] context The GL context.
- * @param[in] defaultShader The default shader to use.
- * @param[in] buffer The current render buffer index (previous update buffer)
- * @param[in] frameTime The elapsed time between the last two updates.
- * @param[in] viewMatrix The view matrix from the appropriate camera.
- * @param[in] projectionMatrix The projection matrix from the appropriate camera.
- * @param[in] cullMode True if the renderers should be subjected to clipspace culling
- */
-
-inline void ProcessInterleavedRenderLists(
-  const RenderList&         renderList1,
-  const RenderList&         renderList2,
-  Context&                  context,
-  SceneGraph::TextureCache& textureCache,
-  SceneGraph::Shader&       defaultShader,
-  BufferIndex               bufferIndex,
-  float                     frameTime,
-  const Matrix&             viewMatrix,
-  const Matrix&             projectionMatrix,
-  bool                      cullMode )
-{
-
-  SetScissorTest( renderList1, context ); // Scissor settings are identical for both lists
-  size_t count1 = renderList1.Count();
-  size_t count2 = renderList2.Count();
-  size_t index1 = 0;
-  size_t index2 = 0;
-
-  int depthIndex=renderList1.GetItem( 0 ).GetDepthIndex();
-
-  while( index1 < count1 || index2 < count2 )
-  {
-    if( index1 < count1 && index2 < count2 )
-    {
-      // Take the lowest depth index in both lists
-      depthIndex = std::min( renderList1.GetItem( index1 ).GetDepthIndex(),
-                             renderList2.GetItem( index2 ).GetDepthIndex() );
-    }
-    else if( index1 < count1 )
-    {
-      // Items left only in list 1
-      depthIndex = renderList1.GetItem( index1 ).GetDepthIndex();
-    }
-    else // index2 < count2
-    {
-      // Items left only in list 2
-      depthIndex = renderList2.GetItem( index2 ).GetDepthIndex();
-    }
-
-    // Between each successive depth index, reset the flags.
-    SetRenderFlags( renderList1, context );
-
-    // Find and render items in the first list that correspond to the current depth index
-    if( index1 < count1 )
-    {
-      RenderItemsAtDepthIndex( renderList1, context, textureCache, defaultShader,
-                               bufferIndex, frameTime, viewMatrix, projectionMatrix,
-                               cullMode, depthIndex,
-                               index1 ); // Out parameter
-    }
-
-    SetRenderFlags( renderList2, context );
-    if( index2 < count2 )
-    {
-      RenderItemsAtDepthIndex( renderList2, context, textureCache, defaultShader,
-                               bufferIndex, frameTime, viewMatrix, projectionMatrix,
-                               cullMode, depthIndex,
-                               index2 ); // Out parameter
-    }
-  }
-}
-
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
@@ -308,26 +242,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        if( renderList->GetInterleave() &&
-            index < count-1 &&
-            instruction.GetRenderList(index+1)->GetInterleave() )
-        {
-          ProcessInterleavedRenderLists( *renderList,
-                                         *(instruction.GetRenderList(index+1)),
-                                         context,
-                                         textureCache,
-                                         defaultShader,
-                                         bufferIndex,
-                                         frameTime,
-                                         *viewMatrix,
-                                         *projectionMatrix,
-                                         instruction.mCullMode );
-          index++; // Skip over next render list
-        }
-        else
-        {
           ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
-        }
       }
     }
   }
