@@ -20,14 +20,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/resource-declarations.h>
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/image-sampler.h>
 
 namespace Dali
@@ -39,66 +40,83 @@ namespace Internal
 namespace SceneGraph
 {
 
-void RenderableAttachment::SetSortModifier(float modifier)
+RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
+: mSceneController(NULL), //@todo MESH_REWORK Pass in where required rather than store
+  mShader( NULL ),
+  mTrackedResources(),
+  mSortModifier( 0.0f ),
+  mBlendingMode( Dali::ImageActor::DEFAULT_BLENDING_MODE ),
+  mUsesGeometryScaling( usesGeometryScaling ),
+  mScaleForSizeDirty( true ),
+  mUseBlend( false ),
+  mHasSizeAndColorFlag( false ),
+  mResourcesReady( false ),
+  mFinishedResourceAcquisition( false ),
+  mHasUntrackedResources( false )
 {
-  // Setting sort modifier makes the node dirty, i.e. we cannot reuse previous frames render items
-  if( mParent )
+}
+
+RenderableAttachment::~RenderableAttachment()
+{
+}
+
+void RenderableAttachment::Initialize( SceneController& sceneController, BufferIndex updateBufferIndex )
+{
+  mSceneController = &sceneController;
+
+  // Chain to derived attachments
+  Initialize2( updateBufferIndex );
+}
+
+void RenderableAttachment::OnDestroy()
+{
+  // Chain to derived attachments
+  OnDestroy2();
+
+  // SceneController is no longer valid
+  mSceneController = NULL;
+}
+
+void RenderableAttachment::SetRecalculateScaleForSize()
+{
+  mScaleForSizeDirty = true;
+}
+
+void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
+{
+  DoGetScaleForSize( nodeSize, scaling );
+  mScaleForSizeDirty = false;
+}
+
+bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
+{
+  mHasSizeAndColorFlag = false;
+  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
+  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
   {
-    // only do this if we are on-stage
-    mParent->SetDirtyFlag( SortModifierFlag );
+    const float MAX_NODE_SIZE = float(1u<<30);
+    const Vector3& size = mParent->GetSize( updateBufferIndex );
+    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
+        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
+    {
+      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
+          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
+      {
+        mHasSizeAndColorFlag = true;
+      }
+      else
+      {
+        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
+        DALI_LOG_ACTOR_TREE( mParent );
+      }
+    }
   }
-  mSortModifier = modifier;
+  return mHasSizeAndColorFlag;
 }
 
-void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
+void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
 {
-  mBlendingMode = mode;
-}
-
-BlendingMode::Type RenderableAttachment::GetBlendingMode() const
-{
-  return mBlendingMode;
-}
-
-void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
-{
-  if ( mUseBlend != useBlend )
-  {
-    mUseBlend = useBlend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< Renderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
-  }
-}
-
-void RenderableAttachment::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
-{
-  // Blending options are forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendingOptions, options );
-}
-
-void RenderableAttachment::SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color )
-{
-  // Blend color is forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, Vector4 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendColor, color );
+  scaling = Vector3::ONE;
 }
 
 void RenderableAttachment::PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager )
@@ -161,99 +179,6 @@ void RenderableAttachment::FollowTracker( Integration::ResourceId id )
   }
 }
 
-void RenderableAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-  DALI_ASSERT_DEBUG(mode >= CullNone && mode <= CullFrontAndBack);
-
-  mCullFaceMode = mode;
-
-  typedef MessageValue1< Renderer, CullFaceMode > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetCullFace, mode );
-}
-
-void RenderableAttachment::SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetSampler, samplerBitfield );
-}
-
-void RenderableAttachment::SetRecalculateScaleForSize()
-{
-  mScaleForSizeDirty = true;
-}
-
-void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
-{
-  DoGetScaleForSize( nodeSize, scaling );
-  mScaleForSizeDirty = false;
-}
-
-void RenderableAttachment::ApplyShader( BufferIndex updateBufferIndex, Shader* shader )
-{
-  mShader = shader;
-
-  // send the message to renderer
-  SendShaderChangeMessage( updateBufferIndex );
-
-  // tell derived class to do something
-  ShaderChanged( updateBufferIndex );
-}
-
-void RenderableAttachment::RemoveShader( BufferIndex updateBufferIndex )
-{
-  // return to default shader
-  mShader = NULL;
-
-  // send the message to renderer
-  SendShaderChangeMessage( updateBufferIndex );
-
-  // tell derived class to do something
-  ShaderChanged( updateBufferIndex );
-}
-
-bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
-{
-  mHasSizeAndColorFlag = false;
-  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
-  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-  {
-    const float MAX_NODE_SIZE = float(1u<<30);
-    const Vector3& size = mParent->GetSize( updateBufferIndex );
-    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
-        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-    {
-      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
-          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
-      {
-        mHasSizeAndColorFlag = true;
-      }
-      else
-      {
-        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
-        DALI_LOG_ACTOR_TREE( mParent );
-      }
-    }
-  }
-  return mHasSizeAndColorFlag;
-}
-
-void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
-{
-  scaling = Vector3::ONE;
-}
 
 void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) const
 {
@@ -286,90 +211,28 @@ void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) cons
   }
 }
 
-bool RenderableAttachment::IsBlendingOn( BufferIndex updateBufferIndex )
-{
-  // Check whether blending needs to be disabled / enabled
-  bool blend = false;
-  switch( mBlendingMode )
-  {
-    case BlendingMode::OFF:
-    {
-      // No blending.
-      blend = false;
-      break;
-    }
-    case BlendingMode::AUTO:
-    {
-      // Blending if the node is not fully opaque only.
-      blend = !IsFullyOpaque( updateBufferIndex );
-      break;
-    }
-    case BlendingMode::ON:
-    {
-      // Blending always.
-      blend = true;
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( !"RenderableAttachment::PrepareRender. Wrong blending mode" );
-    }
-  }
-  return blend;
-}
-
 void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 {
   // call the derived class first as it might change its state regarding blending
   DoPrepareRender( updateBufferIndex );
 
-  bool blend = IsBlendingOn( updateBufferIndex );
-  ChangeBlending( updateBufferIndex, blend );
-}
+  // @todo MESH_REWORK Remove remainder of method after removing ImageAttachment
 
-RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
-: mSceneController(NULL),
-  mShader( NULL ),
-  mTrackedResources(),
-  mSortModifier( 0.0f ),
-  mBlendingMode( Dali::RenderableActor::DEFAULT_BLENDING_MODE ),
-  mUsesGeometryScaling( usesGeometryScaling ),
-  mScaleForSizeDirty( true ),
-  mUseBlend( false ),
-  mHasSizeAndColorFlag( false ),
-  mResourcesReady( false ),
-  mFinishedResourceAcquisition( false ),
-  mHasUntrackedResources( false ),
-  mCullFaceMode( CullNone )
-{
-}
+  bool blend = !IsFullyOpaque( updateBufferIndex );
 
-RenderableAttachment::~RenderableAttachment()
-{
-}
+  if ( mUseBlend != blend )
+  {
+    mUseBlend = blend;
 
-void RenderableAttachment::ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
-{
-  mSceneController = &sceneController;
+    // Enable/disable blending in the next render
+    typedef MessageValue1< Renderer, bool > DerivedType;
 
-  // Chain to derived attachments
-  ConnectToSceneGraph2( updateBufferIndex );
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-  // After derived classes have (potentially) created their renderer
-  Renderer& renderer = GetRenderer();
-  renderer.SetCullFace( mCullFaceMode );
-
-  // set the default shader here as well
-  renderer.SetShader( mShader );
-}
-
-void RenderableAttachment::OnDestroy()
-{
-  // Chain to derived attachments
-  OnDestroy2();
-
-  // SceneController is no longer valid
-  mSceneController = NULL;
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, blend );
+  }
 }
 
 RenderableAttachment* RenderableAttachment::GetRenderable()
@@ -377,13 +240,22 @@ RenderableAttachment* RenderableAttachment::GetRenderable()
   return this;
 }
 
-void RenderableAttachment::SendShaderChangeMessage( BufferIndex updateBufferIndex )
+void RenderableAttachment::SetSortModifier(float modifier)
 {
-  typedef MessageValue1< Renderer, Shader* > DerivedType;
-  // Reserve memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-  // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetShader, mShader );
+  // Setting sort modifier makes the node dirty, i.e. we cannot reuse previous frames render items
+  if( mParent )
+  {
+    // only do this if we are on-stage
+    mParent->SetDirtyFlag( SortModifierFlag );
+  }
+  mSortModifier = modifier;
+}
+
+void RenderableAttachment::SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes )
+{
+  sortAttributes.shader = mShader;
+  sortAttributes.material = NULL;
+  sortAttributes.geometry = NULL;
 }
 
 } // namespace SceneGraph

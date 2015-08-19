@@ -21,12 +21,13 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/common/image-sampler.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 namespace Dali
 {
@@ -109,8 +110,8 @@ namespace SceneGraph
 
 void Renderer::Initialize( Context& context, TextureCache& textureCache )
 {
-  mContext = &context;
-  mTextureCache = &textureCache;
+  mContextDELETEME = &context;
+  mTextureCacheDELETEME = &textureCache;
 }
 
 Renderer::~Renderer()
@@ -148,7 +149,9 @@ void Renderer::SetSampler( unsigned int samplerBitfield )
   mSamplerBitfield = samplerBitfield;
 }
 
-void Renderer::Render( BufferIndex bufferIndex,
+void Renderer::Render( Context& context,
+                       TextureCache& textureCache,
+                       BufferIndex bufferIndex,
                        Shader& defaultShader,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -156,7 +159,13 @@ void Renderer::Render( BufferIndex bufferIndex,
                        float frametime,
                        bool cull )
 {
-  DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
+  // @todo MESH_REWORK Fix when merging! :D
+  NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
+  if( renderer )
+  {
+    // Get the shader from the material:
+    mShader = &renderer->mRenderDataProvider->GetShader();
+  }
 
   // if mShader is NULL it means we're set to default
   if( !mShader )
@@ -175,23 +184,25 @@ void Renderer::Render( BufferIndex bufferIndex,
   const Matrix& modelMatrix = mDataProvider.GetModelMatrix( bufferIndex );
   Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
 
-  // Get the program to use
-  GeometryType geometryType=GEOMETRY_TYPE_IMAGE;
-  ShaderSubTypes subType=SHADER_DEFAULT;
-  ResolveGeometryTypes( bufferIndex, geometryType, subType );
-  unsigned int programIndex = 0;
-  Program* program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
+  // Get the program to use:
+  Program* program = mShader->GetProgram();
   if( !program )
   {
     // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
-    program = defaultShader.GetProgram( *mContext, geometryType, subType, programIndex );
-    DALI_ASSERT_ALWAYS( program && "Default shader is missing a geometry type!!" );
+    program = defaultShader.GetProgram();
+    DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
+    if( !program )
+    {
+      DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*) &*mShader );
+      return;
+    }
+
   }
 
   // Check culling (does not need the program to be in use)
   if( cull && ! program->ModifiesGeometry() )
   {
-    if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
+    if( IsOutsideClipSpace( context, modelMatrix, gModelViewProjectionMatrix ) )
     {
       // don't do any further gl state changes as this renderer is not visible
       return;
@@ -201,32 +212,9 @@ void Renderer::Render( BufferIndex bufferIndex,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  // Enables/disables blending mode.
-  mContext->SetBlend( mUseBlend );
+  DoSetCullFaceMode( context, bufferIndex );
 
-  // Set face culling mode
-  mContext->CullFace( mCullFaceMode );
-
-  // Set the blend color
-  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
-  if( customColor )
-  {
-    mContext->SetCustomBlendColor( *customColor );
-  }
-  else
-  {
-    mContext->SetDefaultBlendColor();
-  }
-
-  // Set blend source & destination factors
-  mContext->BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
-                               mBlendingOptions.GetBlendDestFactorRgb(),
-                               mBlendingOptions.GetBlendSrcFactorAlpha(),
-                               mBlendingOptions.GetBlendDestFactorAlpha() );
-
-  // Set blend equations
-  mContext->BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
-                                   mBlendingOptions.GetBlendEquationAlpha() );
+  DoSetBlending( context, bufferIndex );
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
   // set projection and view matrix if program has not yet received them yet this frame
@@ -245,18 +233,59 @@ void Renderer::Render( BufferIndex bufferIndex,
     program->SetUniform1f( loc, frametime );
   }
 
-  // set custom uniforms
-  mShader->SetUniforms( *mContext, *program, bufferIndex, programIndex, subType );
+  //@todo MESH_REWORK Remove after removing ImageRenderer
+  DoSetUniforms(context, bufferIndex, mShader, program );
 
   // subclass rendering and actual draw call
-  DoRender( bufferIndex, *program, modelViewMatrix, viewMatrix );
+  DoRender( context, textureCache, bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
-Renderer::Renderer( RenderDataProvider& dataprovider )
-: mDataProvider( dataprovider ),
-  mContext( NULL ),
+// can be overridden by deriving class
+void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program )
+{
+  shader->SetUniforms( context, *program, bufferIndex );
+}
 
-  mTextureCache( NULL ),
+// can be overridden by deriving class
+void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
+{
+  // Set face culling mode
+  context.CullFace( mCullFaceMode );
+}
+
+// can be overridden by deriving class
+void Renderer::DoSetBlending(Context& context, BufferIndex bufferIndex )
+{
+  // Enables/disables blending mode.
+  context.SetBlend( mUseBlend );
+
+  // Set the blend color
+  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
+  if( customColor )
+  {
+    context.SetCustomBlendColor( *customColor );
+  }
+  else
+  {
+    context.SetDefaultBlendColor();
+  }
+
+  // Set blend source & destination factors
+  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
+                             mBlendingOptions.GetBlendDestFactorRgb(),
+                             mBlendingOptions.GetBlendSrcFactorAlpha(),
+                             mBlendingOptions.GetBlendDestFactorAlpha() );
+
+  // Set blend equations
+  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
+                                 mBlendingOptions.GetBlendEquationAlpha() );
+
+}
+
+Renderer::Renderer( NodeDataProvider& dataprovider )
+: mDataProvider( dataprovider ),
+  mContextDELETEME(NULL),
+  mTextureCacheDELETEME( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUseBlend( false ),

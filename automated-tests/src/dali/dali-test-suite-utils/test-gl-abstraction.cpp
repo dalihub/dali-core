@@ -46,6 +46,11 @@ void TestGlAbstraction::Initialize()
   mVertexAttribArrayChanged = false;
 
   mCheckFramebufferStatusResult = 0;
+  mFramebufferStatus = 0;
+  mFramebufferColorAttached = 0;
+  mFramebufferDepthAttached = 0;
+  mFramebufferStencilAttached = 0;
+
   mNumBinaryFormats = 0;
   mBinaryFormats = 0;
   mProgramBinaryLength = 0;

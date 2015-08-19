@@ -20,8 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
+#include <dali/internal/common/shader-saver.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
+#include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali
 {
@@ -38,17 +40,19 @@ namespace Internal
 {
 class Context;
 class ProgramCache;
+class ShaderSaver;
 
 namespace SceneGraph
 {
 class Renderer;
 class RenderQueue;
-class RenderMaterial;
 class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
 class RenderTracker;
 class Shader;
+class RenderGeometry;
+class PropertyBufferDataProvider;
 
 /**
  * RenderManager is responsible for rendering the result of the previous "update", which
@@ -97,7 +101,15 @@ public:
    * Dispatch requests onto the postProcessResourcesQueue
    * @param[in] request The request to dispatch
    */
-  virtual void DispatchPostProcessRequest(ResourcePostProcessRequest& request);
+  virtual void DispatchPostProcessRequest( ResourcePostProcessRequest& request );
+
+  /**
+   * Set the upstream interface for compiled shader binaries to be sent back to for eventual
+   * caching and saving.
+   * @param[in] upstream The abstract interface to send any received ShaderDatas onwards to..
+   * @note This should be called during core initialisation if shader binaries are to be used.
+   */
+  void SetShaderSaver( ShaderSaver& upstream );
 
   /**
    * Retrieve the render instructions; these should be set during each "update" traversal.
@@ -140,21 +152,35 @@ public:
   void RemoveRenderer( Renderer* renderer );
 
   /**
-   * Adds a RenderMaterial to the render manager for MeshRenderers to use.
-   * The RenderManager takes ownership of the material
-   * @param[in] renderMaterial
-   * @post renderMaterial is owned by RenderManager
+   * Add a geometry to the render manager.
+   * @param[in] geometry The geometry to add.
+   * @post geometry is owned by RenderManager
    */
-  void AddRenderMaterial( RenderMaterial* renderMaterial );
+  void AddGeometry( RenderGeometry* geometry );
 
   /**
-   * Removes a RenderMaterial from the RenderManager
-   * RenderManager will destroy the material
-   * @pre renderManager owns the materail
-   * @param[in] renderMaterial
-   * @post renderMaterial is destroyed
+   * Remove a geometry from the render manager.
+   * @param[in] geometry The geometry to remove.
+   * @post geometry is destroyed.
    */
-  void RemoveRenderMaterial( RenderMaterial* renderMaterial );
+  void RemoveGeometry( RenderGeometry* geometry );
+
+  /**
+   * Adds a property buffer to a RenderGeometry from the render manager.
+   * @param[in] geometry The geometry
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @param[in] target Specifies the type of the buffer
+   * @param[in] usage Specifies how will the buffer be used
+   */
+  void AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage );
+
+  /**
+   * Remove a property buffer from a RenderGeometry from the render manager.
+   * @param[in] geometry The geometry
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @post property buffer is destroyed.
+   */
+  void RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

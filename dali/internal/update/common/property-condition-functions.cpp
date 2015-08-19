@@ -49,11 +49,6 @@ ConditionFunction LessThan::GetFunction(Property::Type valueType)
       function = LessThan::EvalInteger;
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      function = LessThan::EvalUnsignedInteger;
-      break;
-    }
     case Property::FLOAT:
     {
       function = LessThan::EvalFloat;
@@ -94,12 +89,6 @@ bool LessThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotificati
 {
   const int arg0 = arg[0];
   return (value.GetInteger() < arg0);
-}
-
-bool LessThan::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const unsigned int arg0 = arg[0];
-  return (value.GetUnsignedInteger() < arg0);
 }
 
 bool LessThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -149,11 +138,6 @@ ConditionFunction GreaterThan::GetFunction(Property::Type valueType)
       function = GreaterThan::EvalInteger;
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      function = GreaterThan::EvalUnsignedInteger;
-      break;
-    }
     case Property::FLOAT:
     {
       function = GreaterThan::EvalFloat;
@@ -194,12 +178,6 @@ bool GreaterThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotific
 {
   const int arg0 = arg[0];
   return (value.GetInteger() > arg0);
-}
-
-bool GreaterThan::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const unsigned int arg0 = arg[0];
-  return (value.GetUnsignedInteger() > arg0);
 }
 
 bool GreaterThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -249,11 +227,6 @@ ConditionFunction Inside::GetFunction(Property::Type valueType)
       function = Inside::EvalInteger;
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      function = Inside::EvalUnsignedInteger;
-      break;
-    }
     case Property::FLOAT:
     {
       function = Inside::EvalFloat;
@@ -294,12 +267,6 @@ bool Inside::EvalInteger( const Dali::PropertyInput& value, PropertyNotification
 {
   const int valueInteger = value.GetInteger();
   return ( (valueInteger > arg[0]) && (valueInteger < arg[1]) );
-}
-
-bool Inside::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const unsigned int valueUInt = value.GetUnsignedInteger();
-  return ( (valueUInt > arg[0]) && (valueUInt < arg[1]) );
 }
 
 bool Inside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -349,11 +316,6 @@ ConditionFunction Outside::GetFunction(Property::Type valueType)
       function = Outside::EvalInteger;
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      function = Outside::EvalUnsignedInteger;
-      break;
-    }
     case Property::FLOAT:
     {
       function = Outside::EvalFloat;
@@ -394,12 +356,6 @@ bool Outside::EvalInteger( const Dali::PropertyInput& value, PropertyNotificatio
 {
   const int valueInteger = value.GetInteger();
   return ( (valueInteger < arg[0]) || (valueInteger > arg[1]) );
-}
-
-bool Outside::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const unsigned int valueUInt = value.GetUnsignedInteger();
-  return ( (valueUInt < arg[0]) || (valueUInt > arg[1]) );
 }
 
 bool Outside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )

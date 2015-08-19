@@ -41,7 +41,7 @@ typedef IntrusivePtr<BitmapPackedPixel>        BitmapPackedPixelPtr;
  *
  * \sa{Bitmap BitmapCompressed BitmapExternal}
  */
-class DALI_IMPORT_API BitmapPackedPixel : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::PackedPixelsProfile
+class BitmapPackedPixel : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::PackedPixelsProfile
 {
 public:
   /**

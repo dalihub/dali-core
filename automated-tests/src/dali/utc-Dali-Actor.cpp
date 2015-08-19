@@ -42,7 +42,6 @@ void utc_dali_actor_cleanup(void)
 namespace
 {
 bool gTouchCallBackCalled=false;
-bool gTouchCallBack2Called=false;
 bool gHoverCallBackCalled=false;
 
 /**
@@ -57,7 +56,6 @@ int SimulateTouchForSetOverlayHitTest(TestApplication& app)
   app.Render(1);
 
   gTouchCallBackCalled = false;
-  gTouchCallBack2Called = false;
 
   // simulate a touch event
   Dali::TouchPoint point( 0, TouchPoint::Down, 25.0f, 25.0f );
@@ -109,13 +107,6 @@ struct TestConstraintRef
 static bool TestCallback(Actor actor, const TouchEvent& event)
 {
   gTouchCallBackCalled = true;
-  return false;
-  END_TEST;
-}
-
-static bool TestCallback2(Actor actor, const TouchEvent& event)
-{
-  gTouchCallBack2Called = true;
   return false;
   END_TEST;
 }
@@ -415,33 +406,6 @@ int UtcDaliActorAddN(void)
   END_TEST;
 }
 
-int UtcDaliActorInsert(void)
-{
-  tet_infoline("Testing Actor::Insert");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Stage::GetCurrent().Add( parent );
-  Actor first = Actor::New();
-  Actor second = Actor::New();
-  Actor third = Actor::New();
-
-  parent.Insert(1, first); // test insert beyond range
-  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
-  parent.Insert(0, second);
-  DALI_TEST_EQUALS( parent.GetChildCount(), 2u, TEST_LOCATION );
-  parent.Insert(1, third);
-
-  DALI_TEST_EQUALS( parent.GetChildCount(), 3u, TEST_LOCATION );
-
-  DALI_TEST_CHECK(parent.GetChildAt(0) == second);
-  DALI_TEST_CHECK(parent.GetChildAt(1) == third);
-  DALI_TEST_CHECK(parent.GetChildAt(2) == first);
-
-  END_TEST;
-}
-
-
 int UtcDaliActorRemoveN(void)
 {
   tet_infoline("Testing Actor::Remove");
@@ -463,24 +427,10 @@ int UtcDaliActorRemoveN(void)
 
   // add child back
   parent.Add(child);
-  // try illegal Remove
-  try
-  {
-    parent.Remove( parent );
-    tet_printf("Assertion test failed - no Exception\n" );
-    tet_result(TET_FAIL);
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "this != &child", TEST_LOCATION);
-    DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
-  }
-  catch(...)
-  {
-    tet_printf("Assertion test failed - wrong Exception\n" );
-    tet_result(TET_FAIL);
-  }
+  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
+  // try Remove self, its a no-op
+  parent.Remove( parent );
+  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
 
   // try Remove empty
   try
@@ -2233,11 +2183,11 @@ int UtcDaliActorSetDrawMode(void)
 
   DALI_TEST_CHECK( DrawMode::NORMAL == a.GetDrawMode() ); // Ensure overlay is off by default
 
-  a.SetDrawMode( DrawMode::OVERLAY );
+  a.SetDrawMode( DrawMode::OVERLAY_2D );
   app.SendNotification();
   app.Render(1);
 
-  DALI_TEST_CHECK( DrawMode::OVERLAY == a.GetDrawMode() ); // Check Actor is overlay
+  DALI_TEST_CHECK( DrawMode::OVERLAY_2D == a.GetDrawMode() ); // Check Actor is overlay
 
   a.SetDrawMode( DrawMode::STENCIL );
   app.SendNotification();
@@ -2301,7 +2251,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   // b (9)
   // c (10)
   // a (8)
-  a.SetDrawMode( DrawMode::OVERLAY );
+  a.SetDrawMode( DrawMode::OVERLAY_2D );
   app.GetGlAbstraction().ClearBoundTextures();
 
   app.SendNotification();
@@ -2315,89 +2265,6 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
     DALI_TEST_CHECK( boundTextures[1] == 10u );
     DALI_TEST_CHECK( boundTextures[2] == 8u );
   }
-  END_TEST;
-}
-
-
-int UtcDaliActorSetDrawModeOverlayHitTest(void)
-{
-  TestApplication app;
-  tet_infoline(" UtcDaliActorSetDrawModeOverlayHitTest");
-
-  BufferImage imageA = BufferImage::New(16, 16);
-  BufferImage imageB = BufferImage::New(16, 16);
-  ImageActor a = ImageActor::New( imageA );
-  ImageActor b = ImageActor::New( imageB );
-
-  // Render a,b as regular non-overlays. so order will be:
-  Stage::GetCurrent().Add(a);
-  Stage::GetCurrent().Add(b);
-
-  a.SetSize( 100.0f, 100.0f );
-  b.SetSize( 100.0f, 100.0f );
-
-  // position b overlapping a. (regular non-overlays)
-  // hit test at point 'x'
-  // --------
-  // |      |
-  // | a    |
-  // |   --------
-  // |   |x     |
-  // |   |      |
-  // ----|      |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: b is on top, because it's Z position is higher.
-  a.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-  b.SetPosition(Vector3(50.0f, 50.0f, 1.0f));
-
-  // connect to their touch signals
-  a.TouchedSignal().Connect(TestCallback);
-  b.TouchedSignal().Connect(TestCallback2);
-
-  a.SetDrawMode( DrawMode::NORMAL );
-  b.SetDrawMode( DrawMode::NORMAL );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
-  DALI_TEST_CHECK( gTouchCallBack2Called == true );
-  // Make Actor a an overlay.
-  // --------
-  // |      |
-  // | a    |
-  // |      |----
-  // |    x |   |
-  // |      |   |
-  // --------   |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: a is on top, because it is an overlay.
-  a.SetDrawMode( DrawMode::OVERLAY );
-  b.SetDrawMode( DrawMode::NORMAL );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == true );
-  DALI_TEST_CHECK( gTouchCallBack2Called == false );
-  // Make both Actors as overlays
-  // --------
-  // |      |
-  // | a    |
-  // |   --------
-  // |   |x     |
-  // |   |      |
-  // ----|      |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: b is on top, because it is the 2nd child in the hierarchy.
-  a.SetDrawMode( DrawMode::OVERLAY );
-  b.SetDrawMode( DrawMode::OVERLAY );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
-  DALI_TEST_CHECK( gTouchCallBack2Called == true );
   END_TEST;
 }
 
@@ -2574,19 +2441,11 @@ int UtcDaliActorSetGetOverlay(void)
   tet_infoline(" UtcDaliActorSetGetOverlay");
 
   Actor parent = Actor::New();
-  parent.SetDrawMode(DrawMode::OVERLAY );
-  DALI_TEST_CHECK( parent.GetDrawMode() == DrawMode::OVERLAY );
+  parent.SetDrawMode(DrawMode::OVERLAY_2D );
+  DALI_TEST_CHECK( parent.GetDrawMode() == DrawMode::OVERLAY_2D );
   END_TEST;
 }
 
-
-// Current Dynamics functions are crashing, so testing these sections are futile
-
-int UtcDaliActorDynamics(void)
-{
-  DALI_TEST_CHECK( true );
-  END_TEST;
-}
 
 int UtcDaliActorCreateDestroy(void)
 {
@@ -2974,3 +2833,78 @@ int UtcDaliActorOnRelayoutSignal(void)
 
   END_TEST;
 }
+
+int UtcDaliActorGetHierachyDepth(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Actor::GetHierarchyDepth()");
+
+
+  /* Build tree of actors:
+   *
+   *                      Depth
+   *
+   *       A (parent)       1
+   *      / \
+   *     B   C              2`
+   *    / \   \
+   *   D   E   F            3
+   *
+   * GetHierarchyDepth should return 1 for A, 2 for B and C, and 3 for D, E and F.
+   */
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+  Actor actorD = Actor::New();
+  Actor actorE = Actor::New();
+  Actor actorF = Actor::New();
+
+  //Test that root actor has depth equal 0
+  DALI_TEST_EQUALS( 0, stage.GetRootLayer().GetHierarchyDepth(), TEST_LOCATION );
+
+  //Test actors return depth -1 when not connected to the tree
+  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Create the hierarchy
+  stage.Add( actorA );
+  actorA.Add( actorB );
+  actorA.Add( actorC );
+  actorB.Add( actorD );
+  actorB.Add( actorE );
+  actorC.Add( actorF );
+
+  //Test actors return correct depth
+  DALI_TEST_EQUALS( 1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Removing actorB from the hierarchy. actorB, actorD and actorE should now have depth equal -1
+  actorA.Remove( actorB );
+
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Removing actorA from the stage. All actors should have depth equal -1
+  stage.Remove( actorA );
+
+  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  END_TEST;
+}
+

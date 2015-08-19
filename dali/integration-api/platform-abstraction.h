@@ -23,15 +23,13 @@
 #include <dali/integration-api/resource-cache.h>
 #include <dali/integration-api/bitmap.h> ///@todo Remove this include (a bunch of stuff needs to include it though)
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
 
 namespace Integration
 {
-
-class DynamicsFactory;
-
 
 /**
  * PlatformAbstraction is an abstract interface, used by Dali to access platform specific services.
@@ -144,12 +142,6 @@ public:
   virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
 
   /**
-   * Request that a resource be saved to the native filesystem.
-   * This is an asynchronous request.
-   */
-  virtual void SaveResource(const ResourceRequest& request) = 0;
-
-  /**
    * Cancel an ongoing LoadResource() request.
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.
@@ -215,21 +207,16 @@ public:
    * @param[out] buffer  A buffer to receive the file.
    * @result             true if the file is loaded.
    */
-  virtual bool LoadFile( const std::string& filename, std::vector< unsigned char >& buffer ) const = 0;
+  virtual bool LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const = 0;
 
   /**
    * Load a file into a buffer
    * @param[in] filename The filename to save
    * @param[out] buffer  A buffer containing some data
-   *                     The buffer is implemeneted with a std::vector. The size() member specifies the buffer length.
+   *                     The buffer is implemeneted with a Dali::Vector. The size() member specifies the buffer length.
    * @result             true if the file is saved.
    */
-  virtual bool SaveFile(const std::string& filename, std::vector< unsigned char >& buffer) const = 0;
-
-  /**
-   * Get a pointer to the DynamicsFactory.
-   */
-  virtual DynamicsFactory* GetDynamicsFactory() = 0;
+  virtual bool SaveFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const = 0;
 
   /**
    * Load a shader binary file into a buffer
@@ -237,7 +224,16 @@ public:
    * @param[out] buffer  A buffer to receive the file.
    * @result             true if the file is loaded.
    */
-  virtual bool LoadShaderBinFile( const std::string& filename, std::vector< unsigned char >& buffer ) const = 0;
+  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const = 0;
+
+  /**
+   * Save a shader binary file to the resource file system.
+   * @param[in] filename The shader binary filename to save to.
+   * @param[in] buffer  A buffer to write the file from.
+   * @param[in] numbytes Size of the buffer.
+   * @result             true if the file is saved, else false.
+   */
+  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const = 0;
 
 }; // class PlatformAbstraction
 

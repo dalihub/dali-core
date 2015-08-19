@@ -46,7 +46,7 @@ namespace PropertyTypes
  * @param [in] type The property type.
  * @return The name of this type.
  */
-DALI_IMPORT_API const char* const GetName(Property::Type type);
+DALI_IMPORT_API const char* GetName(Property::Type type);
 
 /**
  * @brief Retrieve an enumerated property type.
@@ -62,8 +62,6 @@ template <>
 inline Property::Type Get<float>()            { return Property::FLOAT;    }
 template <>
 inline Property::Type Get<int>()              { return Property::INTEGER;  }
-template <>
-inline Property::Type Get<unsigned int>()     { return Property::UNSIGNED_INTEGER;  }
 template <>
 inline Property::Type Get<Vector2>()          { return Property::VECTOR2;  }
 template <>

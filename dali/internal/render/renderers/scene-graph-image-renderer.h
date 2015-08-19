@@ -35,7 +35,7 @@ class GpuBuffer;
 
 namespace SceneGraph
 {
-class RenderDataProvider;
+class NodeDataProvider;
 
 /**
  * Used to render an image.
@@ -61,7 +61,7 @@ public:
    * @param dataprovider to render
    * @return The newly allocated ImageRenderer.
    */
-  static ImageRenderer* New( RenderDataProvider& dataprovider );
+  static ImageRenderer* New( NodeDataProvider& dataprovider );
 
   /**
    * Virtual destructor
@@ -116,19 +116,14 @@ public:
   virtual bool CheckResources();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResolveGeometryTypes()
-   */
-  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
    */
-  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
+  virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
 
 protected: // TextureObserver implementation
 
@@ -141,12 +136,12 @@ private:
   /**
    * Helper to update the vertex buffer.
    */
-  void UpdateVertexBuffer( GLsizeiptr size, const GLvoid *data );
+  void UpdateVertexBuffer( Context& context, GLsizeiptr size, const GLvoid *data );
 
   /**
    * Helper to update the index buffer.
    */
-  void UpdateIndexBuffer( GLsizeiptr size, const GLvoid *data );
+  void UpdateIndexBuffer( Context& context, GLsizeiptr size, const GLvoid *data );
 
   /**
    * Helper to generate mesh data when required
@@ -199,13 +194,13 @@ private:
   /**
    * Private constructor. @see New()
    */
-  ImageRenderer(RenderDataProvider& dataprovider);
+  ImageRenderer( NodeDataProvider& dataprovider );
 
   // Undefined
-  ImageRenderer(const ImageRenderer&);
+  ImageRenderer( const ImageRenderer& );
 
   // Undefined
-  ImageRenderer& operator=(const ImageRenderer& rhs);
+  ImageRenderer& operator=( const ImageRenderer& rhs );
 
 private:
 

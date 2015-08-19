@@ -606,9 +606,9 @@ int UtcDaliConstraintTagP(void)
 
   Actor actor = Actor::New();
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTag(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraint.GetTag(), 0u, TEST_LOCATION );
 
-  const int tag = 123;
+  const unsigned int tag = 123;
   constraint.SetTag( tag );
   DALI_TEST_EQUALS( constraint.GetTag(), tag, TEST_LOCATION );
 
@@ -1202,22 +1202,5 @@ int UtcDaliConstraintTestPropertyTypesP(void)
   END_TEST;
 }
 
-int UtcDaliConstraintTestPropertyTypesN(void)
-{
-  // unsigned int not supported so we should assert
-
-  try
-  {
-    TestPropertyTypes::Execute< unsigned int >( 0u );
-    DALI_TEST_CHECK( false ); // Should not come here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-
-  END_TEST;
-}
 ///////////////////////////////////////////////////////////////////////////////
 

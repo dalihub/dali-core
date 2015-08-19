@@ -25,6 +25,7 @@
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/integration-api/resource-declarations.h>
@@ -108,7 +109,7 @@ public:
    * @param[in] height Height of the framebuffer
    * @param[in] pixelFormat Pixel format of the framebuffer
    */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat ) = 0;
+  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat ) = 0;
 
   /**
    * Dispatch a message to create a framebuffer texture and add it to the texture cache

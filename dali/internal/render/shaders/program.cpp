@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/shaders/program-cache.h>
@@ -102,14 +102,15 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "sEffectRect",          // UNIFORM_EFFECT_SAMPLER_RECT
   "uTimeDelta",           // UNIFORM_TIME_DELTA
   "sOpacityTexture",      // UNIFORM_SAMPLER_OPACITY
-  "sNormalMapTexture"     // UNIFORM_SAMPLER_NORMAL_MAP
+  "sNormalMapTexture",    // UNIFORM_SAMPLER_NORMAL_MAP
+  "uSize"                 // UNIFORM_SIZE
 };
 
 }  // <unnamed> namespace
 
 // IMPLEMENTATION
 
-Program* Program::New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+Program* Program::New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = cache.GetProgram( shaderHash );
@@ -155,15 +156,45 @@ GLint Program::GetAttribLocation( AttribType type )
 {
   DALI_ASSERT_DEBUG(type != ATTRIB_UNKNOWN);
 
-  if( mAttribLocations[ type ] == ATTRIB_UNKNOWN )
+  return GetCustomAttributeLocation( type );
+}
+
+unsigned int Program::RegisterCustomAttribute( const std::string& name )
+{
+  unsigned int index = 0;
+  // find the value from cache
+  for( ;index < mAttributeLocations.size(); ++index )
   {
-    GLint loc = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, gStdAttribs[type] ) );
-    mAttribLocations[ type ] = loc;
-    LOG_GL( "GetAttribLocation(program=%d,%s) = %d\n", mProgramId, gStdAttribs[type], mAttribLocations[type] );
+    if( mAttributeLocations[ index ].first == name )
+    {
+      // name found so return index
+      return index;
+    }
+  }
+  // if we get here, index is one past end so push back the new name
+  mAttributeLocations.push_back( std::make_pair( name, ATTRIB_UNKNOWN ) );
+  return index;
+}
+
+GLint Program::GetCustomAttributeLocation( unsigned int attributeIndex )
+{
+  // debug check that index is within name cache
+  DALI_ASSERT_DEBUG( mAttributeLocations.size() > attributeIndex );
+
+  // check if we have already queried the location of the attribute
+  GLint location = mAttributeLocations[ attributeIndex ].second;
+
+  if( location == ATTRIB_UNKNOWN )
+  {
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, mAttributeLocations[ attributeIndex ].first.c_str() ) );
+
+    mAttributeLocations[ attributeIndex ].second = location;
+    LOG_GL( "GetAttributeLocation(program=%d,%s) = %d\n", mProgramId, mAttributeLocations[ attributeIndex ].first.c_str(), mAttributeLocations[ attributeIndex ].second );
   }
 
-  return mAttribLocations[type];
+  return location;
 }
+
 
 unsigned int Program::RegisterUniform( const std::string& name )
 {
@@ -417,7 +448,7 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 : mCache( cache ),
   mGlAbstraction( mCache.GetGlAbstraction() ),
   mProjectionMatrix( NULL ),
@@ -429,6 +460,13 @@ Program::Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bo
   mProgramData(shaderData),
   mModifiesGeometry( modifiesGeometry )
 {
+  // reserve space for standard attributes
+  mAttributeLocations.reserve( ATTRIB_TYPE_LAST );
+  for( int i=0; i<ATTRIB_TYPE_LAST; ++i )
+  {
+    RegisterCustomAttribute( gStdAttribs[i] );
+  }
+
   // reserve space for standard uniforms
   mUniformLocations.reserve( UNIFORM_TYPE_LAST );
   // reset built in uniform names in cache
@@ -448,6 +486,7 @@ Program::~Program()
 void Program::Load()
 {
   DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
+  DALI_ASSERT_DEBUG( mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it." );
 
   LOG_GL( "CreateProgram()\n" );
   mProgramId = CHECK_GL( mGlAbstraction, mGlAbstraction.CreateProgram() );
@@ -489,6 +528,7 @@ void Program::Load()
     else
     {
       mLinked = true;
+      DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Reused binary.\n" );
     }
   }
 
@@ -506,6 +546,7 @@ void Program::Load()
         {
           GLint  binaryLength = 0;
           GLenum binaryFormat;
+          DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Compiled and linked.\n\nVS:\n%s\nFS:\n%s\n", mProgramData->GetVertexShader(), mProgramData->GetFragmentShader() );
 
           CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength) );
           DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - GL_PROGRAM_BINARY_LENGTH_OES: %d\n", binaryLength);
@@ -516,6 +557,7 @@ void Program::Load()
             // Copy the bytecode to ShaderData
             CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, NULL, &binaryFormat, mProgramData->GetBufferData()) );
             mCache.StoreBinary( mProgramData );
+            DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Saved binary.\n" );
           }
         }
       }
@@ -640,9 +682,9 @@ void Program::FreeShaders()
 void Program::ResetAttribsUniformCache()
 {
   // reset attribute locations
-  for( unsigned i = 0; i < ATTRIB_TYPE_LAST; ++i )
+  for( unsigned i = 0; i < mAttributeLocations.size() ; ++i )
   {
-    mAttribLocations[ i ] = ATTRIB_UNKNOWN;
+    mAttributeLocations[ i ].second = ATTRIB_UNKNOWN;
   }
 
   // reset all gl uniform locations

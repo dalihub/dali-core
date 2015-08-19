@@ -148,6 +148,8 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        textureCache,
                                       *mTouchResampler );
 
+  mRenderManager->SetShaderSaver( *mUpdateManager );
+
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
 
   // This must be called after stage is created but before stage initialization
@@ -161,7 +163,8 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
   mImageFactory = new ImageFactory( *mResourceClient );
-  mShaderFactory = new ShaderFactory(*mResourceClient);
+  mShaderFactory = new ShaderFactory();
+  mUpdateManager->SetShaderSaver( *mShaderFactory );
   mShaderFactory->LoadDefaultShaders();
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
@@ -234,12 +237,13 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized(unsigned int width, unsigned int height)
+void Core::SurfaceResized( unsigned int width, unsigned int height )
 {
-  mStage->SetSize(width, height);
+  mStage->SetSize( width, height );
+  mRelayoutController->SetStageSize( width, height );
 }
 
-void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
+void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
 {
   mPlatform.SetDpi( dpiHorizontal, dpiVertical );
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );

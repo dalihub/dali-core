@@ -61,7 +61,8 @@ struct TestCustomActor : public CustomActorImpl
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
     mTargetSize( Vector3::ZERO ),
-    mNego( false )
+    mNego( false ),
+    mDepth(0u)
   {
   }
 
@@ -119,9 +120,10 @@ struct TestCustomActor : public CustomActorImpl
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
     AddToCallStacks("OnStageConnection");
+    mDepth = depth;
   }
   virtual void OnStageDisconnection()
   {
@@ -253,6 +255,7 @@ struct TestCustomActor : public CustomActorImpl
   Vector3 mSizeSet;
   Vector3 mTargetSize;
   bool mNego;
+  unsigned int mDepth;
 };
 
 /**
@@ -269,10 +272,10 @@ struct TestCustomActorVariant1 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection();
+    TestCustomActor::OnStageConnection( depth );
 
     // Add the child
     Self().Add( mChildToAdd );
@@ -294,10 +297,10 @@ struct TestCustomActorVariant2 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection();
+    TestCustomActor::OnStageConnection( depth );
 
     // Remove all the children
     for( unsigned int i=0, num=Self().GetChildCount(); i<num; ++i )
@@ -372,10 +375,10 @@ struct TestCustomActorVariant5 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection();
+    TestCustomActor::OnStageConnection( depth );
 
     // Take parent off-stage
     Actor parent = Self().GetParent();
@@ -497,7 +500,7 @@ public:
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
   }
   virtual void OnStageDisconnection()
@@ -780,6 +783,10 @@ public:
     return GetImpl().TestRelayoutDependentOnChildrenBase( dimension );
   }
 
+  unsigned int GetDepth()
+  {
+    return GetImpl().mDepth;
+  }
 private:
 
   TestCustomActor( Impl::TestCustomActor& impl ) : CustomActor( impl )
@@ -1946,6 +1953,59 @@ int UtcDaliCustomActorGetExtensionP(void)
   TestCustomActor custom = TestCustomActor::NewVariant5();
 
   DALI_TEST_CHECK( NULL == custom.GetImplementation().GetExtension() );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorOnConnectionDepth(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CustomActor::OnStageConnection() hierarchy depth");
+
+  Stage stage = Stage::GetCurrent();
+
+  /* Build tree of actors:
+   *
+   *                      Depth
+   *
+   *       A (parent)       1
+   *      / \
+   *     B   C              2
+   *    / \   \
+   *   D   E   F            3
+   *
+   * OnStageConnection should return 1 for A, 2 for B and C, and 3 for D, E and F.
+   */
+
+  TestCustomActor actorA = TestCustomActor::New();
+  stage.Add( actorA );
+
+  TestCustomActor actorB = TestCustomActor::New();
+  actorA.Add( actorB );
+
+  TestCustomActor actorC = TestCustomActor::New();
+  actorA.Add( actorC );
+
+  TestCustomActor actorD = TestCustomActor::New();
+  actorB.Add( actorD );
+
+  TestCustomActor actorE = TestCustomActor::New();
+  actorB.Add( actorE );
+
+  TestCustomActor actorF = TestCustomActor::New();
+  actorC.Add( actorF );
+
+  // Excercise the message passing to Update thread
+  application.SendNotification();
+  application.Render();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1u, actorA.GetDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2u, actorB.GetDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2u, actorC.GetDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, actorD.GetDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, actorE.GetDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, actorF.GetDepth(), TEST_LOCATION );
 
   END_TEST;
 }

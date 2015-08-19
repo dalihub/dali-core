@@ -49,7 +49,7 @@ const unsigned int POSITION_INHERITANCE_MODE_VALUES_COUNT = sizeof( POSITION_INH
 const StringEnum DRAW_MODE_VALUES[] =
 {
     { "NORMAL", DrawMode::NORMAL },
-    { "OVERLAY", DrawMode::OVERLAY },
+    { "OVERLAY_2D", DrawMode::OVERLAY_2D },
     { "STENCIL", DrawMode::STENCIL },
 };
 const unsigned int DRAW_MODE_VALUES_COUNT = sizeof( DRAW_MODE_VALUES ) / sizeof( DRAW_MODE_VALUES[0] );

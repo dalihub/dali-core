@@ -90,20 +90,27 @@ AnimationPtr Animation::New(float durationSeconds)
 {
   Stage* stage = Stage::GetCurrent();
 
-  AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
-
-  if( durationSeconds < 0.0f )
+  if( stage )
   {
-    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
-    durationSeconds = 0.0f;
+    AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
+
+    if( durationSeconds < 0.0f )
+    {
+      DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+      durationSeconds = 0.0f;
+    }
+
+    AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
+
+    // Second-phase construction
+    animation->Initialize();
+
+    return animation;
   }
-
-  AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
-
-  // Second-phase construction
-  animation->Initialize();
-
-  return animation;
+  else
+  {
+    return NULL;
+  }
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
@@ -333,17 +340,6 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
       break;
     }
 
-    case Property::UNSIGNED_INTEGER:
-    {
-      AddAnimatorConnector( AnimatorConnector<unsigned int>::New( object,
-                                                         target.propertyIndex,
-                                                         target.componentIndex,
-                                                         new AnimateByUnsignedInteger(relativeValue.Get<unsigned int>()),
-                                                         alpha,
-                                                         period ) );
-      break;
-    }
-
     case Property::FLOAT:
     {
       AddAnimatorConnector( AnimatorConnector<float>::New( object,
@@ -466,17 +462,6 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
                                                          new AnimateToInteger( destinationValue.Get<int>() ),
                                                          alpha,
                                                          period ) );
-      break;
-    }
-
-    case Property::UNSIGNED_INTEGER:
-    {
-      AddAnimatorConnector( AnimatorConnector<unsigned int>::New( targetObject,
-                                                                  targetPropertyIndex,
-                                                                  componentIndex,
-                                                                  new AnimateToUnsignedInteger( destinationValue.Get<unsigned int>() ),
-                                                                  alpha,
-                                                                  period ) );
       break;
     }
 
@@ -629,20 +614,6 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
                                                          target.propertyIndex,
                                                          target.componentIndex,
                                                          new KeyFrameIntegerFunctor(kfCopy,interpolation),
-                                                         alpha,
-                                                         period ) );
-      break;
-    }
-
-    case Dali::Property::UNSIGNED_INTEGER:
-    {
-      const KeyFrameUnsignedInteger* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameUnsignedIntegerPtr kfCopy = KeyFrameUnsignedInteger::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<int>::New( object,
-                                                         target.propertyIndex,
-                                                         target.componentIndex,
-                                                         new KeyFrameUnsignedIntegerFunctor(kfCopy,interpolation),
                                                          alpha,
                                                          period ) );
       break;

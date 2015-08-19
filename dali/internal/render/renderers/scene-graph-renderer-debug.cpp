@@ -15,11 +15,11 @@
  */
 
 #include "scene-graph-renderer-debug.h"
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali
@@ -62,7 +62,7 @@ void DebugBoundingBox(Context& context, Rect<float> boundingBox, const Matrix& m
 #if defined ( DEBUG_ENABLED )
   if( gDebugProgram == NULL )
   {
-    Integration::ShaderDataPtr shaderData( new Integration::ShaderData( DEBUG_DRAW_VERTEX_SHADER, DEBUG_DRAW_FRAGMENT_SHADER ) );
+    Internal::ShaderDataPtr shaderData( new Internal::ShaderData( DEBUG_DRAW_VERTEX_SHADER, DEBUG_DRAW_FRAGMENT_SHADER ) );
     gDebugProgram = Program::New( shaderData.Get(), context, true );
   }
 

@@ -29,7 +29,6 @@ const char* const PROPERTY_TYPE_NAMES[] =
   "BOOLEAN",
   "FLOAT",
   "INTEGER",
-  "UNSIGNED_INTEGER",
   "VECTOR2",
   "VECTOR3",
   "VECTOR4",
@@ -47,8 +46,7 @@ const unsigned int PROPERTY_TYPE_NAMES_COUNT = sizeof( PROPERTY_TYPE_NAMES ) / s
 namespace PropertyTypes
 {
 
-DALI_EXPORT_API
-const char* const GetName(Property::Type type)
+DALI_EXPORT_API const char* GetName(Property::Type type)
 {
   if (type < PROPERTY_TYPE_NAMES_COUNT )
   {

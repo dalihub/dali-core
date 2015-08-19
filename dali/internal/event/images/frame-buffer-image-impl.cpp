@@ -38,9 +38,13 @@ FrameBufferImage::~FrameBufferImage()
 {
 }
 
-FrameBufferImagePtr  FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
+FrameBufferImagePtr  FrameBufferImage::New(unsigned int width, 
+                                           unsigned int height, 
+                                           Pixel::Format pixelFormat, 
+                                           ReleasePolicy releasePolicy,
+                                           RenderBuffer::Format bufferformat)
 {
-  FrameBufferImagePtr image = new FrameBufferImage(width, height, pixelFormat, releasePolicy);
+  FrameBufferImagePtr image = new FrameBufferImage(width, height, pixelFormat, releasePolicy, bufferformat);
   image->Initialize();
   return image;
 }
@@ -59,9 +63,10 @@ FrameBufferImagePtr  FrameBufferImage::New( NativeImageInterface& nativeImage, R
   return image;
 }
 
-FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
+FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat)
 : Image(releasePolicy),
-  mPixelFormat(pixelFormat)
+  mPixelFormat(pixelFormat),
+  mBufferFormat(bufferformat)
 {
   mWidth  = width;
   mHeight = height;
@@ -100,7 +105,7 @@ void FrameBufferImage::Connect()
       }
       else
       {
-        mTicket = resourceClient.AddFrameBufferImage(mWidth, mHeight, mPixelFormat);
+        mTicket = resourceClient.AddFrameBufferImage(mWidth, mHeight, mPixelFormat, mBufferFormat);
         mTicket->AddObserver(*this);
       }
     }

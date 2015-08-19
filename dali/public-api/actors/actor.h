@@ -28,7 +28,6 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
-
 namespace Dali
 {
 
@@ -38,6 +37,7 @@ class Actor;
 }
 
 class Actor;
+class Renderer;
 struct Degree;
 class Quaternion;
 class Layer;
@@ -431,24 +431,6 @@ public:
    * even if the handle passed into this method is reset or destroyed.
    */
   void Add(Actor child);
-
-  /**
-   * @brief Inserts a child Actor to this actor's list of children at the given index
-   *
-   * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color,
-   * scale etc as it now inherits them from this actor
-   * @pre This Actor (the parent) has been initialized.
-   * @pre The child actor has been initialized.
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The actor is not the Root actor
-   * @param [in] index of actor to insert before
-   * @param [in] child The child.
-   * @post The child will be referenced by its parent. This means that the child will be kept alive,
-   * even if the handle passed into this method is reset or destroyed.
-   * @post If the index is greater than the current child count, it will be ignored and added at the end.
-   */
-  void Insert(unsigned int index, Actor child);
 
   /**
    * @brief Removes a child Actor from this Actor.
@@ -1022,9 +1004,9 @@ public:
    * By default a renderable actor will be drawn as a 3D object. It will be depth-tested against
    * other objects in the world i.e. it may be obscured if other objects are in front.
    *
-   * If DrawMode::OVERLAY is used, the actor and its children will be drawn as a 2D overlay.
+   * If DrawMode::OVERLAY_2D is used, the actor and its children will be drawn as a 2D overlay.
    * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
-   * For overlay actors, the drawing order is determined by the hierachy (depth-first search order),
+   * For overlay actors, the drawing order is with respect to depth-index property of Renderers,
    * and depth-testing will not be used.
    *
    * If DrawMode::STENCIL is used, the actor and its children will be used to stencil-test other actors
@@ -1032,7 +1014,7 @@ public:
    * actors within the Layer.
    *
    * @param[in] drawMode The new draw-mode to use.
-   * @note Setting STENCIL will override OVERLAY, if that would otherwise have been inherited.
+   * @note Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
    * @note Layers do not inherit the DrawMode from their parents.
    */
   void SetDrawMode( DrawMode::Type drawMode );
@@ -1260,6 +1242,13 @@ public:
    */
   Vector2 GetMaximumSize();
 
+  /**
+   * @brief Get depth in the hierarchy for the actor
+   *
+   * @return The current depth in the hierarchy of the actor, or -1 if actor is not in the hierarchy
+   */
+  int GetHierarchyDepth();
+
 public: // Signals
 
   /**
@@ -1345,6 +1334,50 @@ public: // Signals
    */
   OffStageSignalType& OffStageSignal();
 
+public: // Renderer
+
+  /**
+   * @brief Add a renderer to this actor.
+   *
+   * @pre The renderer must be initialized.
+   *
+   * @param[in] renderer Renderer to add to the actor
+   * @return The index of the Renderer that was added
+   */
+  unsigned int AddRenderer( Renderer& renderer );
+
+  /**
+   * @brief Get the number of renderers on this actor.
+   *
+   * @return the number of renderers on this actor
+   */
+  unsigned int GetRendererCount() const;
+
+  /**
+   * @brief Get a Renderer by index.
+   *
+   * @pre The index must be between 0 and GetRendererCount()-1
+   *
+   * @param[in] index The index of the renderer to fetch
+   * @return The renderer at the specified index
+   */
+  Renderer GetRendererAt( unsigned int index );
+
+  /**
+   * @brief Remove an renderer from the actor.
+   *
+   * @param[in] renderer Handle to the renderer that is to be removed
+   */
+  void RemoveRenderer( Renderer& renderer );
+
+  /**
+   * @brief Remove an renderer from the actor by index.
+   *
+   * @pre The index must be between 0 and GetRendererCount()-1
+   *
+   * @param[in] index Index of the renderer that is to be removed
+   */
+  void RemoveRenderer( unsigned int index );
   /**
    * @brief This signal is emitted after the size has been set on the actor during relayout
    *
@@ -1369,7 +1402,16 @@ public: // Not intended for application developers
  * actor.Unparent() will be called, followed by actor.Reset().
  * @param[in,out] actor A handle to an actor, or an empty handle.
  */
- DALI_IMPORT_API void UnparentAndReset( Actor& actor );
+inline void UnparentAndReset( Actor& actor )
+{
+  if( actor )
+  {
+    actor.Unparent();
+    actor.Reset();
+  }
+}
+
+
 
 } // namespace Dali
 

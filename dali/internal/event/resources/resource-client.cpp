@@ -119,8 +119,6 @@ ResourceTicketPtr ResourceClient::RequestResource(
       break;
     }
     case ResourceTargetImage:
-    case ResourceShader:
-    case ResourceMesh:
     {
       newTicket = new ResourceTicket(*this, newId, typePath);
       break;
@@ -166,8 +164,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       // FALLTHROUGH:
       case ResourceNativeImage:
       case ResourceTargetImage:
-      case ResourceShader:
-      case ResourceMesh:
       {
         DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
       }
@@ -181,24 +177,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       RequestDecodeResourceMessage( mEventThreadServices, mResourceManager, newId, typePath, buffer, priority );
     }
   }
-  return newTicket;
-}
-
-ResourceTicketPtr ResourceClient::LoadShader( ShaderResourceType& type,
-                                              const std::string& path )
-{
-  ResourceTicketPtr newTicket;
-
-  const ResourceId newId = ++(mImpl->mNextId);
-
-  ResourceTypePath typePath(type, path);
-  newTicket = new ResourceTicket(*this, newId, typePath);
-
-  mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: LoadShader(path:%s) newId:%u\n", path.c_str(), newId);
-
-  RequestLoadShaderMessage( mEventThreadServices, mResourceManager, newId, typePath );
   return newTicket;
 }
 
@@ -225,28 +203,6 @@ bool ResourceClient::ReloadResource( ResourceId id, bool resetFinishedStatus, Lo
     DALI_LOG_ERROR ("Resource %d does not exist\n", id);
   }
   return resourceExists;
-}
-
-void ResourceClient::SaveResource( ResourceTicketPtr ticket, const std::string& url )
-{
-  DALI_ASSERT_DEBUG( ticket );
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: SaveResource(Id: %u, path:%s)\n", ticket->GetId(), url.c_str());
-
-  const ResourceTypePath * const typePathPtr = &ticket->GetTypePath();
-  if( typePathPtr )
-  {
-    if( 0 != url.length() )
-    {
-      ResourceTypePath typePath( *(typePathPtr->type), url );
-      RequestSaveResourceMessage( mEventThreadServices, mResourceManager, ticket->GetId(), typePath );
-    }
-    else
-    {
-      ResourceTypePath typePath( *typePathPtr );
-      RequestSaveResourceMessage( mEventThreadServices, mResourceManager, ticket->GetId(), typePath );
-    }
-  }
 }
 
 ResourceTicketPtr ResourceClient::RequestResourceTicket( ResourceId id )
@@ -334,7 +290,7 @@ ResourceTicketPtr ResourceClient::AddNativeImage ( NativeImageInterface& resourc
   return newTicket;
 }
 
-ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   ImageTicketPtr newTicket;
 
@@ -350,7 +306,7 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigne
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
-  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelFormat );
+  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelFormat, bufferFormat );
 
   return newTicket;
 }
@@ -400,21 +356,6 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
   return newTicket;
 }
 
-ResourceTicketPtr ResourceClient::AllocateMesh( OwnerPointer<MeshData>& meshData )
-{
-  ResourceTicketPtr newTicket;
-  const ResourceId newId = ++(mImpl->mNextId);
-  MeshResourceType meshResourceType; // construct first as no copy ctor (needed to bind ref to object)
-  ResourceTypePath typePath(meshResourceType, "");
-  newTicket = new ResourceTicket(*this, newId, typePath);
-  mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AllocateMesh() New id = %u\n", newId);
-  RequestAllocateMeshMessage( mEventThreadServices, mResourceManager, newId, meshData );
-
-  return newTicket;
-}
-
 void ResourceClient::UpdateBitmapArea( ResourceTicketPtr ticket, RectArea& updateArea )
 {
   DALI_ASSERT_DEBUG( ticket );
@@ -441,23 +382,6 @@ void ResourceClient::UploadBitmap( ResourceId destId,Integration::BitmapPtr bitm
                               bitmap,
                               xOffset,
                               yOffset );
-}
-
-void ResourceClient::UpdateMesh( ResourceTicketPtr ticket, const Dali::MeshData& meshData )
-{
-  DALI_ASSERT_DEBUG( ticket );
-
-  ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN;
-  if( mImpl->mDataRetentionPolicy == ResourcePolicy::DALI_DISCARDS_ALL_DATA )
-  {
-    discardable = ResourcePolicy::DISCARD;
-  }
-
-  RequestUpdateMeshMessage( mEventThreadServices,
-                            mResourceManager,
-                            ticket->GetId(),
-                            meshData,
-                            discardable );
 }
 
 Bitmap* ResourceClient::GetBitmap(ResourceTicketPtr ticket)
@@ -517,19 +441,6 @@ void ResourceClient::NotifyUploaded( ResourceId id )
   }
 }
 
-void ResourceClient::NotifySaveRequested( ResourceId id )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: NotifySaveRequested(id:%u)\n", id);
-
-  TicketContainerIter ticketIter = mImpl->mTickets.find(id);
-  if(ticketIter != mImpl->mTickets.end())
-  {
-    ResourceTicket* ticket = ticketIter->second;
-    SaveResource( ticket, "" );
-  }
-}
-
-
 void ResourceClient::NotifyLoading( ResourceId id )
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: NotifyLoading(id:%u)\n", id);
@@ -563,30 +474,6 @@ void ResourceClient::NotifyLoadingFailed( ResourceId id )
   {
     ResourceTicket* ticket = ticketIter->second;
     ticket->LoadingFailed();
-  }
-}
-
-void ResourceClient::NotifySavingSucceeded( ResourceId id )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: NotifySavingSucceeded(id:%u)\n", id);
-
-  TicketContainerIter ticketIter = mImpl->mTickets.find(id);
-  if(ticketIter != mImpl->mTickets.end())
-  {
-    ResourceTicket* ticket = ticketIter->second;
-    ticket->SavingSucceeded();
-  }
-}
-
-void ResourceClient::NotifySavingFailed( ResourceId id )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: NotifySavingFailed(id:%u)\n", id);
-
-  TicketContainerIter ticketIter = mImpl->mTickets.find(id);
-  if(ticketIter != mImpl->mTickets.end())
-  {
-    ResourceTicket* ticket = ticketIter->second;
-    ticket->SavingFailed();
   }
 }
 

@@ -27,6 +27,7 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -105,11 +106,6 @@ void Actor::Add(Actor actor)
   GetImplementation(*this).Add(GetImplementation(actor));
 }
 
-void Actor::Insert(unsigned int index, Actor actor)
-{
-  GetImplementation(*this).Insert(index, GetImplementation(actor));
-}
-
 void Actor::Remove(Actor actor)
 {
   GetImplementation(*this).Remove(GetImplementation(actor));
@@ -127,19 +123,20 @@ unsigned int Actor::GetChildCount() const
 
 Actor Actor::GetChildAt(unsigned int index) const
 {
-  return GetImplementation(*this).GetChildAt(index);
+  Internal::ActorPtr child = GetImplementation(*this).GetChildAt( index );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildByName(const std::string& actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName( actorName );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildById(const unsigned int id)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildById( id );
+  return Actor( child.Get() );
 }
 
 Actor Actor::GetParent() const
@@ -533,6 +530,11 @@ Vector2 Actor::GetMaximumSize()
   return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
+int Actor::GetHierarchyDepth()
+{
+  return GetImplementation(*this).GetHierarchyDepth();
+}
+
 Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
@@ -558,6 +560,31 @@ Actor::OffStageSignalType& Actor::OffStageSignal()
   return GetImplementation(*this).OffStageSignal();
 }
 
+unsigned int Actor::AddRenderer( Renderer& renderer )
+{
+  return GetImplementation(*this).AddRenderer( GetImplementation( renderer ) );
+}
+
+unsigned int Actor::GetRendererCount() const
+{
+  return GetImplementation(*this).GetRendererCount();
+}
+
+Renderer Actor::GetRendererAt( unsigned int index )
+{
+  return Renderer( &GetImplementation(*this).GetRendererAt( index ) );
+}
+
+void Actor::RemoveRenderer( Renderer& renderer )
+{
+  GetImplementation(*this).RemoveRenderer( GetImplementation( renderer ) );
+}
+
+void Actor::RemoveRenderer( unsigned int index )
+{
+  GetImplementation(*this).RemoveRenderer( index );
+}
+
 Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
   return GetImplementation(*this).OnRelayoutSignal();
@@ -566,15 +593,6 @@ Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 Actor::Actor(Internal::Actor* internal)
 : Handle(internal)
 {
-}
-
-void UnparentAndReset( Actor& actor )
-{
-  if( actor )
-  {
-    actor.Unparent();
-    actor.Reset();
-  }
 }
 
 } // namespace Dali

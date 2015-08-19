@@ -203,7 +203,7 @@ struct MyTestCustomActor : public CustomActorImpl
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection()
+  virtual void OnStageConnection( int depth )
   {
   }
   virtual void OnStageDisconnection()
@@ -1709,7 +1709,7 @@ int UtcDaliTypeInfoGetActionNameN(void)
 
   std::string name = typeInfo.GetActionName(std::numeric_limits<size_t>::max());
 
-  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, name.size(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -1743,7 +1743,7 @@ int UtcDaliTypeInfoGetSignalNameN(void)
 
   std::string name = typeInfo.GetSignalName(std::numeric_limits<size_t>::max());
 
-  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, name.size(), TEST_LOCATION );
 
   END_TEST;
 }

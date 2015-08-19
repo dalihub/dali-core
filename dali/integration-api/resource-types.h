@@ -47,9 +47,7 @@ enum ResourceTypeId
 {
   ResourceBitmap,
   ResourceNativeImage,
-  ResourceTargetImage,
-  ResourceShader,
-  ResourceMesh
+  ResourceTargetImage
 };
 
 /**
@@ -232,86 +230,6 @@ private:
 
   // Undefined assignment operator.
   RenderTargetResourceType& operator=(const RenderTargetResourceType& rhs);
-};
-
-/**
- * ShaderResourceType describes a shader program resource, which can be requested
- * from PlatformAbstraction::LoadResource()
- */
-struct ShaderResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  ShaderResourceType(size_t shaderHash, const std::string& vertexSource, const std::string& fragmentSource)
-  : ResourceType(ResourceShader),
-    hash(shaderHash),
-    vertexShader(vertexSource),
-    fragmentShader(fragmentSource)
-  {
-  }
-
-  /**
-   * Destructor.
-   */
-  virtual ~ShaderResourceType()
-  {
-  }
-
-  /**
-   * @copydoc ResourceType::Clone
-   */
-  virtual ResourceType* Clone() const
-  {
-    return new ShaderResourceType(hash, vertexShader, fragmentShader);
-  }
-
-public: // Attributes
-  size_t            hash;              ///< Hash of the vertex/fragment sources
-  const std::string vertexShader;      ///< source code for vertex program
-  const std::string fragmentShader;    ///< source code for fragment program
-
-private:
-
-  // Undefined copy constructor.
-  ShaderResourceType(const ShaderResourceType& typePath);
-
-  // Undefined assignment operator.
-  ShaderResourceType& operator=(const ShaderResourceType& rhs);
-};
-
-/**
- * MeshResourceType describes a mesh program resource, which can be created
- * using ResourceManager::AllocateMesh.
- */
-struct MeshResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  MeshResourceType()
-  : ResourceType(ResourceMesh) {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~MeshResourceType() {}
-
-  /**
-   * @copydoc ResourceType::Clone
-   */
-  virtual ResourceType* Clone() const
-  {
-    return new MeshResourceType();
-  }
-
-private:
-
-  // Undefined copy constructor.
-  MeshResourceType(const MeshResourceType& typePath);
-
-  // Undefined assignment operator.
-  MeshResourceType& operator=(const MeshResourceType& rhs);
 };
 
 } // namespace Integration

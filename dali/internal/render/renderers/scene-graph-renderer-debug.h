@@ -31,7 +31,7 @@ class Context;
 
 namespace SceneGraph
 {
-class RenderDataProvider;
+class NodeDataProvider;
 
 void DebugBoundingBox(Context& context, Rect<float> boundingBox, const Matrix& mvp);
 

@@ -32,7 +32,7 @@ FrameBufferImage::FrameBufferImage()
 }
 
 FrameBufferImage::FrameBufferImage(Internal::FrameBufferImage* internal)
-  : Image(internal)
+: Image(internal)
 {
 }
 
@@ -51,26 +51,28 @@ FrameBufferImage& FrameBufferImage::operator=(const FrameBufferImage& rhs)
   return *this;
 }
 
-FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat)
+FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, RenderBuffer::Format bufferformat)
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
     (0 == width) ? stageSize.width : width,
     (0 == height) ? stageSize.height : height,
     pixelformat,
-    Dali::Image::NEVER);
+    Dali::Image::NEVER,
+    bufferformat);
 
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy)
+FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat)
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
     (0 == width) ? stageSize.width : width,
     (0 == height) ? stageSize.height : height,
     pixelformat,
-    releasePolicy);
+    releasePolicy,
+    bufferformat);
 
   return FrameBufferImage(internal.Get());
 }

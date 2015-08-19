@@ -38,6 +38,7 @@ SET(TC_SOURCES
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
+        utc-Dali-MeshMaterial.cpp
         utc-Dali-NativeImage.cpp
         utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
@@ -58,7 +59,6 @@ SET(TC_SOURCES
         utc-Dali-Rect.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
-        utc-Dali-RenderableActor.cpp
         utc-Dali-ResourceImage.cpp
         utc-Dali-ShaderEffect.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
@@ -78,10 +78,10 @@ SET(TC_SOURCES
 )
 
 LIST(APPEND TC_SOURCES
-        dali-test-suite-utils/test-harness.cpp
+        dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
+        dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
-        dali-test-suite-utils/test-dynamics.cpp
         dali-test-suite-utils/test-gesture-manager.cpp
         dali-test-suite-utils/test-gl-abstraction.cpp
         dali-test-suite-utils/test-gl-sync-abstraction.cpp

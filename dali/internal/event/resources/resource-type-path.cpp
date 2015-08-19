@@ -116,27 +116,6 @@ int ResourceTypeCompare(const ResourceType& lhs, const ResourceType& rhs)
         // else result = 0
         break;
       }
-
-      case ResourceShader:
-      {
-        // compare shader source hashes
-        const ShaderResourceType& lhsShader = static_cast<const ShaderResourceType&>(lhs);
-        const ShaderResourceType& rhsShader = static_cast<const ShaderResourceType&>(rhs);
-
-        if (lhsShader.hash != rhsShader.hash)
-        {
-          result = lhsShader.hash < rhsShader.hash ? -1 : 1;
-        }
-        // else result = 0
-        break;
-      }
-
-
-      case ResourceMesh:
-      {
-        break; // result = 0
-      }
-
     }
   }
   return result;

@@ -31,6 +31,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 #if defined(DEBUG_ENABLED)
@@ -77,6 +78,11 @@ RenderTask* RenderTask::New( bool isSystemLevel )
 
 void RenderTask::SetSourceActor( Actor* actor )
 {
+  const Stage* stage = Stage::GetCurrent();
+  if ( stage )
+  {
+    stage->GetRenderTaskList().SetExclusive( this, mExclusive );
+  }
   mSourceConnector.SetActor( actor );
 }
 
@@ -90,6 +96,12 @@ void RenderTask::SetExclusive( bool exclusive )
   if ( mExclusive != exclusive )
   {
     mExclusive = exclusive;
+
+    const Stage* stage = Stage::GetCurrent();
+    if ( stage )
+    {
+      stage->GetRenderTaskList().SetExclusive( this, exclusive );
+    }
 
     if ( mSceneObject )
     {
@@ -359,31 +371,34 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
   {
     CameraActor* localCamera = GetCameraActor();
     StagePtr stage = Stage::GetCurrent();
-    CameraActor& defaultCamera = stage->GetDefaultCameraActor();
-    if( localCamera )
+    if( stage )
     {
-      Viewport viewport;
-      Vector2 size( stage->GetSize() );
-      viewport.x = viewport.y = 0;
-      viewport.width = size.width;
-      viewport.height = size.height;
-
-      float localX, localY;
-      inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
-      Vector3 actorSize = mMappingConnector.mActor->GetCurrentSize();
-      if( inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
+      CameraActor& defaultCamera = stage->GetDefaultCameraActor();
+      if( localCamera )
       {
-        screenCoords.x = localX;
-        screenCoords.y = localY;
+        Viewport viewport;
+        Vector2 size( stage->GetSize() );
+        viewport.x = viewport.y = 0;
+        viewport.width = size.width;
+        viewport.height = size.height;
+
+        float localX, localY;
+        inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
+        Vector3 actorSize = mMappingConnector.mActor->GetCurrentSize();
+        if( inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
+        {
+          screenCoords.x = localX;
+          screenCoords.y = localY;
+        }
+        else
+        {
+          inside = false;
+        }
       }
       else
       {
         inside = false;
       }
-    }
-    else
-    {
-      inside = false;
     }
   }
   else if ( mFrameBufferImage && mScreenToFrameBufferFunction )

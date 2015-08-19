@@ -26,6 +26,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-vector3.h>
@@ -34,7 +35,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 
 namespace Dali
 {
@@ -83,11 +84,13 @@ static const int RenderableUpdateFlags = TransformFlag | SortModifierFlag | Chil
 
 /**
  * Node is the base class for all nodes in the Scene Graph.
- * Each node provides a transformation which applies to the node and its children.
- * Node data is double-buffered. This allows an update thread to modify node data, without interferring
- * with another thread reading the values from the previous update traversal.
+ *
+ * Each node provides a transformation which applies to the node and
+ * its children.  Node data is double-buffered. This allows an update
+ * thread to modify node data, without interferring with another
+ * thread reading the values from the previous update traversal.
  */
-class Node : public PropertyOwner, public RenderDataProvider
+class Node : public PropertyOwner, public NodeDataProvider
 {
 public:
 
@@ -398,12 +401,8 @@ public:
           localOffset *= mSize[updateBufferIndex];
 
           Vector3 scale = mWorldScale[updateBufferIndex];
-          if(GetTransmitGeometryScaling())
-          {
-            // Remove geometry scaling to get back to actor scale
-            scale /= mGeometryScale;
-          }
-          // Also pick up sign of local scale
+
+          // Pick up sign of local scale
           if (mScale[updateBufferIndex].x < 0.0f)
           {
             scale.x = -scale.x;
@@ -591,57 +590,6 @@ public:
   }
 
   /**
-   * Set the initial volume of the node. Used for calculating geometry scaling
-   * as the node size is changed  when transmitGeometryScaling is set to true.
-   *
-   * This property is not animatable.
-   *
-   * @param[in] volume The initial volume of this nodes meshes & children
-   */
-  void SetInitialVolume( const Vector3& volume )
-  {
-    mInitialVolume = volume;
-    SetDirtyFlag(SizeFlag);
-  }
-
-  /**
-   * Get the initial volume.  Used for calculating geometry scaling
-   * when TransmitGeometryScaling is true (i.e., the scaling is baked
-   * into the node tranform)
-   *
-   * @return The initial volume of this node and children.
-   */
-  Vector3 GetInitialVolume()
-  {
-    return mInitialVolume;
-  }
-
-  /**
-   * Sets whether the geometry scaling should be applied to the node
-   * (In which case, set the initial scale using SetInitialVolume()).
-   *
-   * If it is applied to the node, then the attachments are not scaled,
-   * as the scaling is then already baked into the node transform.
-   *
-   * @param[in] transmitGeometryScaling true if scaling is to be applied
-   * to the node.
-   */
-  void SetTransmitGeometryScaling(bool transmitGeometryScaling)
-  {
-    mTransmitGeometryScaling = transmitGeometryScaling;
-    SetDirtyFlag(SizeFlag);
-  }
-
-  /**
-   * Find out whether the node allows geometry scaling to be transmitted to its children.
-   * @return true if transmitted.
-   */
-  bool GetTransmitGeometryScaling() const
-  {
-    return mTransmitGeometryScaling;
-  }
-
-  /**
    * Retrieve the local scale of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
    * @return The local scale.
@@ -658,7 +606,7 @@ public:
    */
   void SetWorldScale(BufferIndex updateBufferIndex, const Vector3& scale)
   {
-    mWorldScale.Set( updateBufferIndex, mGeometryScale * scale );
+    mWorldScale.Set( updateBufferIndex, scale );
   }
 
   /**
@@ -671,7 +619,7 @@ public:
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
-    mWorldScale.Set( updateBufferIndex, mParent->GetWorldScale(updateBufferIndex) * mGeometryScale * mScale[updateBufferIndex] );
+    mWorldScale.Set( updateBufferIndex, mParent->GetWorldScale(updateBufferIndex) * mScale[updateBufferIndex] );
   }
 
   /**
@@ -716,27 +664,6 @@ public:
   bool IsScaleInherited() const
   {
     return mInheritScale;
-  }
-
-  /**
-   * Sets a geometry scale, calculated when TransmitGeometryScaling is true.
-   * Must only be used from render thread.
-   * @param[in] geometryScale The geometry scale value
-   */
-  void SetGeometryScale(Vector3 geometryScale)
-  {
-    mGeometryScale = geometryScale;
-
-    SetDirtyFlag( TransformFlag );
-  }
-
-  /**
-   * Retrieve the geometry scale, calculated when TransmitGeometryScaling is true.
-   * @return The geometry scale value.
-   */
-  const Vector3& GetGeometryScale() const
-  {
-    return mGeometryScale;
   }
 
   /**
@@ -994,6 +921,11 @@ public:
     return mInhibitLocalTransform;
   }
 
+  unsigned short GetDepth() const
+  {
+    return mDepth;
+  }
+
 protected:
 
   /**
@@ -1007,10 +939,10 @@ protected:
    */
   Node();
 
-private: // from RenderDataProvider
+private: // from NodeDataProvider
 
   /**
-   * @copydoc RenderDataProvider::GetModelMatrix
+   * @copydoc NodeDataProvider::GetModelMatrix
    */
   virtual const Matrix& GetModelMatrix( unsigned int bufferId )
   {
@@ -1018,12 +950,18 @@ private: // from RenderDataProvider
   }
 
   /**
-   * @copydoc RenderDataProvider::GetRenderColor
+   * @copydoc NodeDataProvider::GetRenderColor
    */
   virtual const Vector4& GetRenderColor( unsigned int bufferId )
   {
     return GetWorldColor( bufferId );
   }
+
+  virtual const Vector3& GetRenderSize( unsigned int bufferId )
+  {
+    return GetSize( bufferId );
+  }
+
 
 private:
 
@@ -1075,16 +1013,14 @@ protected:
   NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
   NodeContainer       mChildren;                     ///< Container of children; not owned
 
-  Vector3             mGeometryScale;                ///< Applied before calculating world transform.
-  Vector3             mInitialVolume;                ///< Initial volume... TODO - need a better name.
 
   // flags, compressed to bitfield
-  int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
+  unsigned short mDepth: 12;                        ///< Depth in the hierarchy
+  int  mDirtyFlags:8;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
-  bool mTransmitGeometryScaling:1;                   ///< Whether geometry scaling should be applied to world transform.
   bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
   bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
@@ -1109,27 +1045,7 @@ inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServic
   new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
 }
 
-inline void SetInitialVolumeMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& initialVolume )
-{
-  typedef MessageValue1< Node, Vector3 > LocalType;
 
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInitialVolume, initialVolume );
-}
-
-inline void SetTransmitGeometryScalingMessage( EventThreadServices& eventThreadServices, const Node& node, bool transmitGeometryScaling )
-{
-  typedef MessageValue1< Node, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetTransmitGeometryScaling, transmitGeometryScaling );
-}
 
 inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {

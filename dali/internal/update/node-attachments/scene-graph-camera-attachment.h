@@ -67,20 +67,47 @@ public:
   static const Vector3 DEFAULT_TARGET_POSITION;
 
   /**
+   * Plane equation container for a plane of the view frustum
+   */
+  struct Plane
+  {
+    Vector3 mNormal;
+    float mDistance;
+  };
+
+  /**
+   * @brief Container for six planes in a view frustum
+   */
+  struct FrustumPlanes
+  {
+    Plane mPlanes[ 6 ];
+  };
+
+  /**
    * Construct a new CameraAttachment.
    * @return a new camera.
    */
   static CameraAttachment* New();
 
   /**
-   * @copydoc NodeAttachment::ConnectToSceneGraph().
+   * @copydoc NodeAttachment::Initialize().
    */
-  virtual void ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex );
+  virtual void Initialize( SceneController& sceneController, BufferIndex updateBufferIndex );
 
   /**
    * @copydoc NodeAttachment::OnDestroy().
    */
   virtual void OnDestroy();
+
+  /**
+   * @copydoc NodeAttachment::ConnectedToSceneGraph()
+   */
+  virtual void ConnectedToSceneGraph();
+
+  /**
+   * @copydoc NodeAttachment::DisconnectedFromSceneGraph()
+   */
+  virtual void DisconnectedFromSceneGraph();
 
   /**
    * Virtual destructor
@@ -171,6 +198,28 @@ public:
   const Matrix& GetViewMatrix( BufferIndex bufferIndex ) const;
 
   /**
+   * @brief Check to see if a sphere lies within the view frustum.
+   *
+   * @param bufferIndex The buffer to read from.
+   * @param origin The world position center of the sphere to check.
+   * @param radius The length of the sphere radius in world scale.
+   *
+   * @return false if the sphere lies outside of the frustum.
+   */
+  bool CheckSphereInFrustum( BufferIndex bufferIndex, const Vector3& origin, float radius );
+
+  /**
+   * @brief Check to see if a bounding box lies within the view frustum.
+   *
+   * @param bufferIndex The buffer to read from.
+   * @param origin the world position center of the cubeoid to check.
+   * @param extents The half length of the cubeoid in world co-ordinates in each axis.
+   *
+   * @return false if the cubeoid lies outside of the frustum.
+   */
+  bool CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& extents );
+
+  /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
    * @param[in] bufferIndex The buffer to read from.
    * @return The projection-matrix.
@@ -240,6 +289,15 @@ private:
 
 private:
 
+  /**
+   * @brief Extracts the frustum planes.
+   *
+   * @param[in] bufferIndex The current update buffer index.
+   * @param[in] normalize will normalize plane equation coefficients by default.
+   */
+  void UpdateFrustum( BufferIndex updateBufferIndex, bool normalize = true );
+
+
   unsigned int                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   unsigned int                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
 
@@ -262,7 +320,8 @@ public:  // PROPERTIES
   InheritedMatrix mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
   InheritedMatrix mProjectionMatrix;     ///< The projection-matrix; this is double buffered for input handling.
 
-  DoubleBuffered< Matrix >      mInverseViewProjection;///< Inverted viewprojection; double buffered for input handling
+  DoubleBuffered< FrustumPlanes > mFrustum;               ///< Clipping frustum; double buffered for input handling
+  DoubleBuffered< Matrix >        mInverseViewProjection; ///< Inverted viewprojection; double buffered for input handling
 
 };
 

@@ -65,6 +65,13 @@ public:
   static RelayoutController* Get();
 
   /**
+   * Set the stage size
+   * @param width of the stage
+   * @param height of the stage
+   */
+  void SetStageSize( unsigned int width, unsigned int height );
+
+  /**
    * @brief Request to relayout the given actor and all sub-actors of it.
    *
    * This flags the actor and all actors dependent on it for relayout. The actual
@@ -207,11 +214,13 @@ private:
 
   RawActorList mDirtyLayoutSubTrees;    ///< List of roots of sub trees that are dirty
   MemoryPoolRelayoutContainer* mRelayoutStack;  ///< Stack for relayouting
-  bool mRelayoutConnection : 1;         ///< Whether EventProcessingFinishedSignal signal is connected.
-  bool mRelayoutFlag : 1;               ///< Relayout flag to avoid unnecessary calls
-  bool mEnabled : 1;                    ///< Initially disabled. Must be enabled at some point.
-  bool mPerformingRelayout : 1;         ///< The relayout controller is currently performing a relayout
-  bool mProcessingCoreEvents : 1;       ///< Whether core is processing events.
+
+  Vector2 mStageSize;              ///< size of the stage
+  bool mRelayoutConnection : 1;    ///< Whether EventProcessingFinishedSignal signal is connected.
+  bool mRelayoutFlag : 1;          ///< Relayout flag to avoid unnecessary calls
+  bool mEnabled : 1;               ///< Initially disabled. Must be enabled at some point.
+  bool mPerformingRelayout : 1;    ///< The relayout controller is currently performing a relayout
+  bool mProcessingCoreEvents : 1;  ///< Whether core is processing events.
 
 };
 

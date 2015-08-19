@@ -86,7 +86,7 @@ public:
    * @tparam  P  The property type to constrain.
    */
   template< typename P >
-  class Function : public CallbackBase
+  class DALI_INTERNAL Function : public CallbackBase
   {
   public:
 

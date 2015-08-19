@@ -35,7 +35,7 @@
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/integration-api/resource-cache.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/image-attributes.h>
 
@@ -51,7 +51,6 @@ class TestTicketObserver : public Internal::ResourceTicketObserver
 public:
   TestTicketObserver()
   : mLoadingFailedCalled(0), mLoadingSucceededCalled(0),
-    mSavingFailedCalled(0), mSavingSucceededCalled(0),
     mUploadedCount(0)
   {}
 
@@ -63,14 +62,6 @@ public:
     tet_printf("TicketObserver: LoadingSucceeded()  called %d times", mLoadingSucceededCalled);
     return mLoadingSucceededCalled;
   }
-  int SaveFailedCalled() {
-    tet_printf("TicketObserver: SavingFailed() called %d times", mSavingFailedCalled);
-    return mSavingFailedCalled;
-  }
-  int SaveSucceededCalled() {
-    tet_printf("TicketObserver: SavingSucceeded() called %d times", mSavingSucceededCalled);
-    return mSavingSucceededCalled;
-  }
   int  UploadCalled() {
     tet_printf("TicketObserver: Uploaded() called %d times", mUploadedCount);
     return mUploadedCount;
@@ -78,23 +69,17 @@ public:
   void Reset() {
     mLoadingFailedCalled    = 0;
     mLoadingSucceededCalled = 0;
-    mSavingFailedCalled     = 0;
-    mSavingSucceededCalled  = 0;
     mUploadedCount           = 0;
   }
 
 public: // From ResourceTicketObserver
   virtual void ResourceLoadingFailed(const Internal::ResourceTicket& ticket) {mLoadingFailedCalled++;}
   virtual void ResourceLoadingSucceeded(const Internal::ResourceTicket& ticket) {mLoadingSucceededCalled++;}
-  virtual void ResourceSavingFailed(const Internal::ResourceTicket& ticket) {mSavingFailedCalled++;}
-  virtual void ResourceSavingSucceeded(const Internal::ResourceTicket& ticket) {mSavingSucceededCalled++;}
   virtual void ResourceUploaded(const Internal::ResourceTicket& ticket) {mUploadedCount++;}
 
 private:
   int mLoadingFailedCalled;
   int mLoadingSucceededCalled;
-  int mSavingFailedCalled;
-  int mSavingSucceededCalled;
   int mUploadedCount;
 };
 
@@ -702,69 +687,6 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
   END_TEST;
 }
 
-/**
-//int UtcDaliInternalSaveResource01(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, and valid filename");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK(0);
-  END_TEST;
-}
-
-
-//int UtcDaliInternalSaveResource02(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with invalid id");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK(0);
-  END_TEST;
-}
-
-//int UtcDaliInternalSaveResource03(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with invalid id");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK ( 0 );
-  END_TEST;
-}
-
-
-//int UtcDaliInternalSaveResource04(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, but invalid filename");
-  testTicketObserver.Reset();
-  DALI_TEST_CHECK( 0 );
-  END_TEST;
-}
-*/
-
-int UtcDaliInternalSaveResource05(void)
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, but invalid resource type");
-  testTicketObserver.Reset();
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  // First, load a bitmap resource
-  Internal::ResourceTicketPtr ticket = CheckLoadBitmap(application, "bitmap.jpg", 80, 80);
-
-  // Try saving it
-  resourceClient.SaveResource( ticket, "bitmap.png" );
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
-  END_TEST;
-}
-
 int UtcDaliInternalRequestResourceTicket01(void)
 {
   TestApplication application;
@@ -798,57 +720,6 @@ int UtcDaliInternalRequestResourceTicket02(void)
 
   Internal::ResourceTicketPtr newTicket = resourceClient.RequestResourceTicket( ticket->GetId() + 2000 );
   DALI_TEST_CHECK( ! newTicket );
-  END_TEST;
-}
-
-int UtcDaliInternalLoadShaderRequest01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing LoadShader() success");
-  testTicketObserver.Reset();
-
-  // Clear through all of the outstanding shader load requests from the default shader effect
-  std::vector< unsigned char > buffer;
-  for( int i=0; i<10; i++ )
-  {
-    buffer.push_back((unsigned char)i);
-  }
-  application.GetPlatform().SetLoadFileResult( true, buffer );
-  application.GetGlAbstraction().SetLinkStatus(1);
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process load shader request (immediately)
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  Integration::ShaderResourceType shaderRequest(123, "vertex src", "frag src");
-  std::string shaderBinaryFile("shader.bin");
-  Internal::ResourceTicketPtr ticket = resourceClient.LoadShader(shaderRequest, shaderBinaryFile);
-  DALI_TEST_CHECK( ticket );
-
-  application.GetPlatform().SetLoadFileResult( true, buffer );
-  application.GetGlAbstraction().EnableShaderCallTrace( true );
-  application.GetGlAbstraction().SetLinkStatus(1);
-
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process load shader request (immediately)
-
-  application.SendNotification();
-  application.Render();
-
-  application.SendNotification();
-  application.Render();
-
-  // If shader program loads OK, we shouldn't see any calls to CompileShader or SaveResource
-  TraceCallStack& shaderTrace = application.GetGlAbstraction().GetShaderTrace();
-  DALI_TEST_CHECK( ! shaderTrace.FindMethod("CompileShader") );
-
-  // Ensure no request sent to platform abstraction
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
   END_TEST;
 }
 
@@ -1126,7 +997,7 @@ int UtcDaliInternalAddFrameBufferImage(void)
 
   testTicketObserver.Reset();
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Internal::ImageTicketPtr imageTicket = resourceClient.AddFrameBufferImage(80, 80, Pixel::A8 );
+  Internal::ImageTicketPtr imageTicket = resourceClient.AddFrameBufferImage(80, 80, Pixel::A8, RenderBuffer::COLOR );
   DALI_TEST_CHECK( imageTicket );
   imageTicket->AddObserver( testTicketObserver );
 
@@ -1147,38 +1018,5 @@ int UtcDaliInternalAddFrameBufferImage(void)
   Integration::Bitmap* theBitmap = NULL;
   theBitmap = resourceClient.GetBitmap(imageTicket);
   DALI_TEST_CHECK ( theBitmap == NULL );
-  END_TEST;
-}
-
-int UtcDaliInternalAllocateMesh01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing AllocateMesh() with vald mesh data");
-
-  MeshData publicMeshData;
-  MeshData::VertexContainer    vertices;
-  MeshData::FaceIndices        faces;
-  BoneContainer                bones;
-  ConstructVertices(vertices, 60);
-  ConstructFaces(vertices, faces);
-  Material customMaterial = ConstructMaterial();
-  publicMeshData.SetData(vertices, faces, bones, customMaterial);
-  publicMeshData.SetHasNormals(true);
-  publicMeshData.SetHasTextureCoords(true);
-
-  testTicketObserver.Reset();
-  Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Internal::OwnerPointer<Internal::MeshData> meshDataPtr( new Internal::MeshData( publicMeshData, ResourcePolicy::DISCARD, true ) );
-  Internal::ResourceTicketPtr meshTicket = resourceClient.AllocateMesh(meshDataPtr);
-  DALI_TEST_CHECK( meshTicket );
-  meshTicket->AddObserver( testTicketObserver );
-
-  DALI_TEST_EQUALS ( meshTicket->GetLoadingState(), ResourceLoading, TEST_LOCATION );
-
-  application.SendNotification(); // Flush update queue
-  application.Render(0); // Process message
-  application.SendNotification(); // Send message to tickets
-
-  DALI_TEST_EQUALS ( meshTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   END_TEST;
 }

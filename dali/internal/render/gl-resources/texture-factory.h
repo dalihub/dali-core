@@ -79,6 +79,7 @@ Internal::Texture* NewNativeImageTexture( NativeImageInterface& nativeImage, Con
 Internal::Texture* NewFrameBufferTexture( unsigned int width,
                                           unsigned int height,
                                           Pixel::Format pixelFormat,
+                                          RenderBuffer::Format bufferFormat,
                                           Context& context );
 
 /**

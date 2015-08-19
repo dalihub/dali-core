@@ -92,9 +92,10 @@ Internal::Texture* NewNativeImageTexture( NativeImageInterface& nativeImg, Conte
 Internal::Texture* NewFrameBufferTexture( unsigned int width,
                                           unsigned int height,
                                           Pixel::Format pixelFormat,
+                                          RenderBuffer::Format bufferFormat,
                                           Context& context )
 {
-  FrameBufferTexture* texture = new FrameBufferTexture(width, height, pixelFormat, context);
+  FrameBufferTexture* texture = new FrameBufferTexture(width, height, pixelFormat, bufferFormat, context);
   if (!texture->Init())
   {
     delete texture;

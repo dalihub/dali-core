@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali
 {
@@ -34,7 +35,8 @@ class Renderer;
 class RenderManager;
 class RenderQueue;
 class RenderTracker;
-
+class RenderGeometry;
+class PropertyBufferDataProvider;
 /**
  * A utility class for sending messages to the render-thread.
  */
@@ -61,11 +63,41 @@ public:
 
   /**
    * Remove a Renderer.
-   * @param[in] updateBufferIndex The current buffer index.
    * @param[in] renderer The renderer to remove.
    * @post renderer will be destroyed in the next Render.
    */
   void RemoveRenderer( Renderer& renderer );
+
+  /**
+   * Add a Geometry
+   * @param[in] renderGeometry The geometry to add.
+   * @post RenderGeometry ownership is transferred.
+   */
+  void AddGeometry( RenderGeometry& renderGeometry );
+
+  /**
+   * Remove a Geometry.
+   * @param[in] renderGeometry The geometry to remove.
+   * @post RenderGeometry will be destroyed in the next Render.
+   */
+  void RemoveGeometry( RenderGeometry& renderGeometry );
+
+  /**
+   * Add a PropertyBuffer.
+   * @param[in] renderGeometry The geometry
+   * @param[in] propertyBuffer The PropertyBuffer
+   * @param[in] target Specifies the type of the buffer
+   * @param[in] usage Specifies how will the buffer be used
+   */
+  void AddPropertyBuffer( RenderGeometry& renderGeometry, PropertyBufferDataProvider* propertyBuffer, GpuBuffer::Target target, GpuBuffer::Usage usage );
+
+  /**
+   * Remove a PropertyBuffer.
+   * @param[in] renderGeometry The geometry
+   * @param[in] propertyBuffer The PropertyBuffer
+   * @post PropertyBuffer will be destroyed in the next Render.
+   */
+  void RemovePropertyBuffer( RenderGeometry& renderGeometry, PropertyBufferDataProvider* propertyBuffer );
 
   /**
    * Add a Render tracker.

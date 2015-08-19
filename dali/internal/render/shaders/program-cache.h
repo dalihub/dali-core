@@ -94,7 +94,7 @@ public: // API
   /**
    * @param programData to store/save
    */
-  virtual void StoreBinary( Integration::ShaderDataPtr programData ) = 0;
+  virtual void StoreBinary( Internal::ShaderDataPtr programData ) = 0;
 
 private: // not implemented as non-copyable
 

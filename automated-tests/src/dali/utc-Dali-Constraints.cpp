@@ -47,7 +47,6 @@ public:
   static const bool BOOLEAN_VALUE;
   static const float FLOAT_VALUE;
   static const int INTEGER_VALUE;
-  static const unsigned int UNSIGNED_INTEGER_VALUE;
   static const Vector2 VECTOR2_VALUE;
   static const Vector3 VECTOR3_VALUE;
   static const Vector4 VECTOR4_VALUE;
@@ -66,7 +65,6 @@ public:
   virtual const bool& GetBoolean() const                 { return BOOLEAN_VALUE;          }
   virtual const float& GetFloat() const                  { return FLOAT_VALUE;            }
   virtual const int& GetInteger() const                  { return INTEGER_VALUE;          }
-  virtual const unsigned int& GetUnsignedInteger() const { return UNSIGNED_INTEGER_VALUE; }
   virtual const Vector2& GetVector2() const              { return VECTOR2_VALUE;          }
   virtual const Vector3& GetVector3() const              { return VECTOR3_VALUE;          }
   virtual const Vector4& GetVector4() const              { return VECTOR4_VALUE;          }
@@ -81,7 +79,6 @@ public:
 const bool PropertyInputImpl::BOOLEAN_VALUE                  = true;
 const float PropertyInputImpl::FLOAT_VALUE                   = 123.0f;
 const int PropertyInputImpl::INTEGER_VALUE                   = 456;
-const unsigned int PropertyInputImpl::UNSIGNED_INTEGER_VALUE = 789u;
 const Vector2 PropertyInputImpl::VECTOR2_VALUE               = Vector2( 10.0f, 20.0f );
 const Vector3 PropertyInputImpl::VECTOR3_VALUE               = Vector3( 30.0f, 40.0f, 50.0f );
 const Vector4 PropertyInputImpl::VECTOR4_VALUE               = Vector4( 60.0f, 70.0f, 80.0f, 90.0f );

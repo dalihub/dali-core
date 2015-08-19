@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/images/image-connector.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
@@ -52,7 +53,7 @@ BaseHandle Create()
   return Dali::ImageActor::New();
 }
 
-TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::RenderableActor ), Create );
+TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::Actor ), Create );
 
 ImageActor::Style StyleEnum(const std::string &s)
 {
@@ -196,7 +197,7 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
 }
 
 ImageActor::ImageActor()
-: RenderableActor()
+: Actor( Actor::RENDERABLE )
 {
 }
 
@@ -243,12 +244,12 @@ void ImageActor::OnStageDisconnectionInternal()
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
 {
-  return RenderableActor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
+  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
 }
 
 void ImageActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  RenderableActor::GetDefaultPropertyIndices( indices ); // RenderableActor class properties
+  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
 
   indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
@@ -263,7 +264,7 @@ bool ImageActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyWritable(index);
+    return Actor::IsDefaultPropertyWritable(index);
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -279,7 +280,7 @@ bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyAnimatable( index );
+    return Actor::IsDefaultPropertyAnimatable( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -295,7 +296,7 @@ bool ImageActor::IsDefaultPropertyAConstraintInput( Property::Index index ) cons
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyAConstraintInput( index );
+    return Actor::IsDefaultPropertyAConstraintInput( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -311,7 +312,7 @@ Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::GetDefaultPropertyType( index );
+    return Actor::GetDefaultPropertyType( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -328,7 +329,7 @@ const char* ImageActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
-    return RenderableActor::GetDefaultPropertyName(index);
+    return Actor::GetDefaultPropertyName(index);
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -359,7 +360,7 @@ Property::Index ImageActor::GetDefaultPropertyIndex(const std::string& name) con
   // If not found, check in base class
   if( Property::INVALID_INDEX == index )
   {
-    index = RenderableActor::GetDefaultPropertyIndex( name );
+    index = Actor::GetDefaultPropertyIndex( name );
   }
   return index;
 }
@@ -368,7 +369,7 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    RenderableActor::SetDefaultProperty( index, propertyValue );
+    Actor::SetDefaultProperty( index, propertyValue );
   }
   else
   {
@@ -418,7 +419,7 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
   Property::Value ret;
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    ret = RenderableActor::GetDefaultProperty( index );
+    ret = Actor::GetDefaultProperty( index );
   }
   else
   {
@@ -457,6 +458,115 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
 
   return ret;
 }
+
+
+void ImageActor::SetSortModifier(float modifier)
+{
+  mImageAttachment->SetSortModifier( modifier );
+}
+
+float ImageActor::GetSortModifier() const
+{
+  return mImageAttachment->GetSortModifier();
+}
+
+void ImageActor::SetDepthIndex( int depthIndex )
+{
+   mImageAttachment->SetSortModifier( depthIndex );
+}
+
+int ImageActor::GetDepthIndex() const
+{
+  return static_cast< int >( mImageAttachment->GetSortModifier() );
+}
+
+void ImageActor::SetCullFace(CullFaceMode mode)
+{
+  mImageAttachment->SetCullFace( mode );
+}
+
+CullFaceMode ImageActor::GetCullFace() const
+{
+  return mImageAttachment->GetCullFace();
+}
+
+void ImageActor::SetBlendMode( BlendingMode::Type mode )
+{
+  mImageAttachment->SetBlendMode( mode );
+}
+
+BlendingMode::Type ImageActor::GetBlendMode() const
+{
+  return mImageAttachment->GetBlendMode();
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
+{
+  mImageAttachment->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                               BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
+{
+  mImageAttachment->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                                    BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
+{
+  mImageAttachment->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
+{
+  mImageAttachment->SetBlendEquation( equationRgba, equationRgba );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
+{
+  mImageAttachment->SetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
+{
+  mImageAttachment->GetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::SetBlendColor( const Vector4& color )
+{
+  mImageAttachment->SetBlendColor( color );
+}
+
+const Vector4& ImageActor::GetBlendColor() const
+{
+  return mImageAttachment->GetBlendColor();
+}
+
+void ImageActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  mImageAttachment->SetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  return mImageAttachment->GetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::SetShaderEffect(ShaderEffect& effect)
+{
+  mImageAttachment->SetShaderEffect( effect );
+}
+
+ShaderEffectPtr ImageActor::GetShaderEffect() const
+{
+  return mImageAttachment->GetShaderEffect();
+}
+
+void ImageActor::RemoveShaderEffect()
+{
+  return mImageAttachment->RemoveShaderEffect();
+}
+
 
 } // namespace Internal
 

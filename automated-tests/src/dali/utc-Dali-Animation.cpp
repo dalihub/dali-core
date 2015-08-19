@@ -8882,21 +8882,21 @@ int UtcDaliAnimationExtendDurationP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationCustomUnsignedIntProperty(void)
+int UtcDaliAnimationCustomIntProperty(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
-  unsigned int startValue(0u);
+  int startValue(0u);
 
   Property::Index index = actor.RegisterProperty("an-index", startValue);
-  DALI_TEST_EQUALS( actor.GetProperty<unsigned int>(index), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, index), 20u );
+  animation.AnimateTo( Property(actor, index), 20 );
 
   // Start the animation
   animation.Play();
@@ -8911,7 +8911,7 @@ int UtcDaliAnimationCustomUnsignedIntProperty(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<unsigned int>(index), 10u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), 10, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -8919,7 +8919,7 @@ int UtcDaliAnimationCustomUnsignedIntProperty(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<unsigned int>(index), 20u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), 20, TEST_LOCATION );
   END_TEST;
 }
 

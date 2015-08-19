@@ -217,15 +217,14 @@ int UtcDaliHitTestAlgorithmWithFunctorOnRenderTask(void)
   DALI_TEST_CHECK( results.actor == actor[1]);
   DALI_TEST_EQUALS( screenCoordinates - position, results.actorCoordinates, 0.1f, TEST_LOCATION );
 
-
   screenCoordinates.x = 120.f;
   screenCoordinates.y = 130.f;
 
   results.actor = Actor();
   results.actorCoordinates = Vector2::ZERO;
   Dali::HitTestAlgorithm::HitTest( renderTask[0], screenCoordinates, results, IsActorHittableFunction );
-  DALI_TEST_CHECK( results.actor == actor[1] );
-  DALI_TEST_EQUALS( screenCoordinates - position, results.actorCoordinates, 0.1f, TEST_LOCATION );
+  DALI_TEST_CHECK( !results.actor );
+  DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
 
   results.actor = Actor();
   results.actorCoordinates = Vector2::ZERO;
@@ -275,9 +274,9 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2( 240.0f, 400.0f ), results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( results.actor == blue );
-  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 5.0f/6.0f, TEST_LOCATION );
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == green );
+  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 1.0f/6.0f, TEST_LOCATION );
 
   HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK( results.actor == blue );

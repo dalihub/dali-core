@@ -119,18 +119,6 @@ public: // Used by the ResourceClient
   void Uploaded();
 
   /**
-   * Called when a resource is saved successfully.
-   * The ResourceTicketObservers will be notified.
-   */
-  void SavingSucceeded();
-
-  /**
-   * Called when a resource fails to save.
-   * The ResourceTicketObservers will be notified.
-   */
-  void SavingFailed();
-
-  /**
    * Called when the ResourceTicketLifetimeObserver is being destroyed.
    * This method should only be called during destruction of the Dali core.
    */

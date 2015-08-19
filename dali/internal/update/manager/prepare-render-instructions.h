@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PREPARE_RENDER_INSTRUCTIONS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,15 +32,54 @@ namespace SceneGraph
 {
 class RenderTracker;
 class RenderItem;
-typedef std::pair< float, RenderItem* > RendererWithSortValue;
-typedef std::vector< RendererWithSortValue > RendererSortingHelper;
+class Shader;
+class Material;
+class Geometry;
+
+/**
+ * Structure to store information for sorting the renderers.
+ * (Note, depthIndex is stored within the renderItem).
+ */
+struct RendererWithSortAttributes
+{
+  RendererWithSortAttributes()
+  : renderItem( NULL ),
+    shader(NULL),
+    material(NULL),
+    geometry(NULL),
+    zValue(0.0f)
+  {
+  }
+
+  RenderItem* renderItem;       ///< The render item that is being sorted (includes depth index)
+  Shader*     shader;           ///< The shader instance
+  Material*   material;         ///< The material instance
+  Geometry*   geometry;         ///< The geometry instance
+  float       zValue;           // The zValue of the given renderer (either distance from camera, or a custom calculated value)
+};
+
+typedef std::vector< RendererWithSortAttributes > RenderItemSortingHelper;
+
+struct RendererSortingHelper
+{
+  RenderItemSortingHelper transparent;
+  RenderItemSortingHelper opaque;
+};
 
 class RenderTask;
 class RenderInstructionContainer;
 
 /**
- * Sorts and prepares the list of opaque/transparent renderable attachments for each layer.
- * Whilst iterating through each layer, update the attachments ModelView matrices
+ * Sorts and prepares the list of opaque/transparent renderable
+ * attachments for each layer.  Whilst iterating through each layer,
+ * update the attachments ModelView matrices
+ *
+ * The opaque and transparent render lists are sorted first by depth
+ * index, then by Z (for transparent only), then by shader, material
+ * and geometry. The render algorithm should then work through both
+ * lists simultaneously, working through opaque then transparent
+ * items at each depth index, resetting the flags appropriately.
+ *
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] sortedLayers The layers containing lists of opaque/transparent renderables.
  * @param[in] renderTask The rendering task information.

@@ -180,17 +180,13 @@ int UtcDaliObjectRegistryGet(void)
 int UtcDaliObjectRegistryCopyConstructor(void)
 {
   TestApplication application;
-  tet_printf(" copy consturctor ");
 
   ObjectRegistry myRegistry;
-
   ObjectRegistry anotherRegistry( myRegistry );
 
-  tet_result( TET_PASS );
+  DALI_TEST_EQUALS( myRegistry, anotherRegistry, TEST_LOCATION );
   END_TEST;
 }
-
-
 
 int UtcDaliObjectRegistrySignalActorCreated(void)
 {

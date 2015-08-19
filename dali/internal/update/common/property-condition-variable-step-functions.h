@@ -73,14 +73,6 @@ private:
   static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
-   * Checks if unsigned integer is Outside
-   * @param[in] value The value being examined.
-   * @param[in] arg The supplied arguments for the condition.
-   * @return Condition result (true if condition met, false if not)
-   */
-  static bool EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
-
-  /**
    * Checks if float is Outside
    * @param[in] value The value being examined.
    * @param[in] arg The supplied arguments for the condition.

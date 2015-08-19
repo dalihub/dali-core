@@ -22,22 +22,19 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
-#include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#endif
 
 namespace Dali
 {
@@ -54,10 +51,9 @@ class Actor;
 class ActorGestureData;
 class Animation;
 class RenderTask;
-struct DynamicsData;
+class Renderer;
 
-typedef IntrusivePtr< Actor > ActorPtr;
-typedef std::vector< Dali::Actor > ActorContainer; // Store handles to return via public-api
+typedef std::vector< ActorPtr > ActorContainer;
 typedef ActorContainer::iterator ActorIter;
 typedef ActorContainer::const_iterator ActorConstIter;
 
@@ -201,16 +197,6 @@ public:
   void Add( Actor& child );
 
   /**
-   * Inserts a child Actor to this Actor's child list
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The child actor does not already have a parent.
-   * @param [in] index in childlist to insert child at
-   * @param [in] child The child.
-   * @post The child will be referenced by its parent.
-   */
-  void Insert( unsigned int index, Actor& child );
-
-  /**
    * Removes a child Actor from this Actor.
    * @param [in] child The child.
    * @post The child will be unreferenced.
@@ -231,7 +217,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetChildAt
    */
-  Dali::Actor GetChildAt( unsigned int index ) const;
+  ActorPtr GetChildAt( unsigned int index ) const;
 
   /**
    * Retrieve a reference to Actor's children.
@@ -712,28 +698,6 @@ public:
   bool IsOverlay() const;
 
   /**
-   * Sets whether an actor transmits geometry scaling to it's children.
-   * The default value is for it not to transmit scaling.
-   * @param[in] transmitGeometryScaling True to transmit scaling.
-   */
-  void SetTransmitGeometryScaling( bool transmitGeometryScaling );
-
-  /**
-   * Get the TransmitGeometryScaling property for this actor.
-   * @return True if geometry scaling is applied to the inherited scale.
-   */
-  bool GetTransmitGeometryScaling() const;
-
-  /**
-   * Sets the initial volume of the actor. Used for scaling the
-   * actor appropriately as the actor is sized when transmitGeometryScaling
-   * is set to true.
-   *
-   * @param[in] volume the volume of the model and it's children
-   */
-  void SetInitialVolume( const Vector3& volume );
-
-  /**
    * Sets the actor's color.  The final color of actor depends on its color mode.
    * This final color is applied to the drawable elements of an actor.
    * @param [in] color The new color.
@@ -781,6 +745,19 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldColor()
    */
   const Vector4& GetCurrentWorldColor() const;
+
+  /**
+   * @copydoc Dali::Actor::GetHierarchyDepth()
+   */
+  int GetHierarchyDepth() const
+  {
+    if( mIsOnStage )
+    {
+      return static_cast<int>(mDepth);
+    }
+
+    return -1;
+  }
 
 public:
 
@@ -1219,94 +1196,34 @@ public:
    * @copydoc Dali::Actor::GetMaximumSize
    */
   float GetMaximumSize( Dimension::Type dimension ) const;
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-  // Dynamics
-
-  /// @copydoc Dali::Actor::DisableDynamics
-  void DisableDynamics();
-
-  /// @copydoc Dali::Actor::EnableDynamics(Dali::DynamicsBodyConfig)
-  DynamicsBodyPtr EnableDynamics(DynamicsBodyConfigPtr bodyConfig);
-
-  /// @copydoc Dali::Actor::GetDynamicsBody
-  DynamicsBodyPtr GetDynamicsBody() const;
-
-  /// @copydoc Dali::Actor::AddDynamicsJoint(Dali::Actor,const Vector3&)
-  DynamicsJointPtr AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offset );
-
-  /// @copydoc Dali::Actor::AddDynamicsJoint(Dali::Actor,const Vector3&,const Vector3&)
-  DynamicsJointPtr AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offsetA, const Vector3& offsetB );
-
-  /// @copydoc Dali::Actor::GetNumberOfJoints
-  const int GetNumberOfJoints() const;
-
-  /// @copydoc Dali::Actor::GetDynamicsJointByIndex
-  DynamicsJointPtr GetDynamicsJointByIndex( const int index ) const;
-
-  /// @copydoc Dali::Actor::GetDynamicsJoint
-  DynamicsJointPtr GetDynamicsJoint( ActorPtr attachedActor ) const;
-
-  /// @copydoc Dali::Actor::RemoveDynamicsJoint
-  void RemoveDynamicsJoint( DynamicsJointPtr joint );
+  
+  /**
+   * @copydoc Dali::Actor::AddRenderer()
+   */
+  unsigned int AddRenderer( Renderer& renderer );
 
   /**
-   * Hold a reference to a DynamicsJoint
-   * @param[in] joint The joint
+   * @copydoc Dali::Actor::GetRendererCount()
    */
-  void ReferenceJoint( DynamicsJointPtr joint );
+  unsigned int GetRendererCount() const;
 
   /**
-   * Release a reference to a DynamicsJoint
-   * @param[in] joint The joint
+   * @copydoc Dali::Actor::GetRendererAt()
    */
-  void ReleaseJoint( DynamicsJointPtr joint );
+  Renderer& GetRendererAt( unsigned int index );
 
   /**
-   * Set this actor to be the root actor in the dynamics simulation
-   * All children of the actor are added/removed from the simulation.
-   * @param[in] flag  When true sets this actor to be the simulation world root actor and
-   *                  if OnStage() all dynamics enabled child actors are added to the simulation,
-   *                  when false stops this actor being the simulation root and if OnStage() all
-   *                  dynamics enabled child actors are removed from the simulation.
+   * @copydoc Dali::Actor::RemoveRenderer()
    */
-  void SetDynamicsRoot(bool flag);
-
-private:
-  /**
-   * Check if this actor is the root actor in the dynamics simulation
-   * @return true if this is the dynamics root actor.
-   */
-  bool IsDynamicsRoot() const;
+  void RemoveRenderer( Renderer& renderer );
 
   /**
-   * Add actor to the dynamics simulation
-   * Invoked when the actor is staged, or it's parent becomes the simulation root
+   * @copydoc Dali::Actor::RemoveRenderer()
    */
-  void ConnectDynamics();
-
-  /**
-   * Remove actor from the dynamics simulation
-   * Invoked when the actor is unstaged, or it's parent stops being the the simulation root
-   */
-  void DisconnectDynamics();
-
-  /**
-   * An actor in a DynamicsJoint relationship has been staged
-   * @param[in] actor The actor passed into AddDynamicsJoint()
-   */
-  void AttachedActorOnStage( Dali::Actor actor );
-
-  /**
-   * An actor in a DynamicsJoint relationship has been unstaged
-   * @param[in] actor The actor passed into AddDynamicsJoint()
-   */
-  void AttachedActorOffStage( Dali::Actor actor );
-
-#endif // DALI_DYNAMICS_SUPPORT
+  void RemoveRenderer( unsigned int index );
 
 public:
+
   /**
    * Converts screen coordinates into the actor's coordinate system.
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
@@ -1576,17 +1493,19 @@ protected:
   /**
    * Called on a child during Add() when the parent actor is connected to the Stage.
    * @param[in] stage The stage.
+   * @param[in] parentDepth The depth of the parent in the hierarchy
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToStage( int index = -1 );
+  void ConnectToStage( unsigned int parentDepth, int index = -1 );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
+   * @param[in] depth The depth in the hierarchy of the actor
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( ActorContainer& connectionList, int index = -1 );
+  void RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index = -1 );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1773,7 +1692,7 @@ private:
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic ConnectToStage() traversal has been completed.
    */
-  virtual void OnStageConnectionExternal()
+  virtual void OnStageConnectionExternal( int depth )
   {
   }
 
@@ -1845,7 +1764,7 @@ private:
   /**
    * @brief Ensure the relayout data is allocated
    */
-  void EnsureRelayoutData() const;
+  void EnsureRelayoutData();
 
   /**
    * @brief Apply the size set policy to the input size
@@ -1857,7 +1776,6 @@ private:
 
 protected:
 
-  StagePtr mStage;                ///< Used to send messages to Node; valid until Core destruction
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
   ActorContainer* mChildren;      ///< Container of referenced actors
   const SceneGraph::Node* mNode;  ///< Not owned
@@ -1865,11 +1783,7 @@ protected:
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
   struct RelayoutData;
-  mutable RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  DynamicsData* mDynamicsData; ///< optional physics data
-#endif
+  RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
@@ -1889,11 +1803,11 @@ protected:
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
+  unsigned short mDepth                            :12; ///< Cached: The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
   bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
-  bool mIsDynamicsRoot                             : 1; ///< Flag to identify if this is the dynamics world root
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals
   bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation

@@ -61,18 +61,10 @@ class ShaderEffect;
 }
 
 /**
- * @brief GeometryType determines how geometry is shaped.
- */
-enum GeometryType
-{
-  GEOMETRY_TYPE_IMAGE = 0x01,           ///< image, with flat color or texture
-  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x02, ///< Complex meshes, with flat color
-  GEOMETRY_TYPE_TEXTURED_MESH = 0x04,   ///< Complex meshes, with texture
-  GEOMETRY_TYPE_LAST = 0x08
-};
-
-/**
- * @brief Shader effects provide a visual effect for actors.
+ * @brief Shader effects provide a visual effect for image actors.
+ *
+ * @deprecated Use classes Dali::Shader, Dali::Material, and Dali::Sampler to implement
+ * any new programmable shading effects.
  *
  * For a Custom shader you can provide the vertex and fragment shader code as strings.
  * These shader snippets get concatenated with the default attributes and uniforms.
@@ -145,27 +137,6 @@ public:
   static const float DEFAULT_GRID_DENSITY;              ///< The default density is 40 pixels
 
   /**
-   * @brief The Extension class is a base class for objects that can be attached to the
-   * ShaderEffects as extensions.
-   *
-   * Extensions are useful to create pimpled implementations of custom shaders.
-   * The shader effect will hold an intrusive pointer to the extension.
-   */
-  class Extension : public RefObject
-  {
-  protected:
-    /**
-     * @brief Disable default constructor. This a base class is not meant to be initialised on its own.
-     */
-    Extension();
-
-    /**
-     * @brief Virtual destructor.
-     */
-    virtual ~Extension();
-  };
-
-  /**
    * @brief Hints for rendering/subdividing geometry.
    */
   enum GeometryHints
@@ -206,13 +177,11 @@ public:
    *
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param type GeometryType to define the shape of the geometry
    * @param hints GeometryHints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
   static ShaderEffect New( const std::string& vertexShader,
                            const std::string& fragmentShader,
-                           GeometryType type = GeometryType(GEOMETRY_TYPE_IMAGE),
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
@@ -221,7 +190,6 @@ public:
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
    * @param fragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param type GeometryType to define the shape of the geometry
    * @param hints GeometryHints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
@@ -229,7 +197,6 @@ public:
                                     const std::string& vertexShader,
                                     const std::string& fragmentShaderPrefix,
                                     const std::string& fragmentShader,
-                                    GeometryType type = GeometryType(GEOMETRY_TYPE_IMAGE),
                                     GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
@@ -357,35 +324,6 @@ public:
   void SetUniform( const std::string& name,
                    const Matrix3& value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
-
-  /**
-   * @brief Attach an extension object.
-   *
-   * This object is reference counted and will be automatically deleted.
-   * This object can be retrieved back with the GetExtension function.
-   * @param object Pointer to a Extension.
-   * @pre extension is not NULL
-   */
-  void AttachExtension( Extension *object );
-
-  /**
-   * @brief Retrieve the attached extension object.
-   *
-   * This object can be set with the AttachExtension function.
-   * @return implementation Pointer to a Extension.
-   * @pre An extension needs to be attached previously.
-   */
-  Extension& GetExtension();
-
-  /**
-   * @brief Retrieve the attached extension object.
-   *
-   * This object can be set with the AttachExtension function.
-   * @return implementation Pointer to a Extension.
-   * @pre An extension needs to be attached previously.
-   */
-  const Extension& GetExtension() const;
-
 
 public: // Not intended for application developers
 

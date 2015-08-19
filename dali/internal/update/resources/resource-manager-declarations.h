@@ -39,7 +39,6 @@ struct ResourcePostProcessRequest
   enum PostProcess
   {
     UPLOADED,
-    SAVE,
     DELETED
   };
 

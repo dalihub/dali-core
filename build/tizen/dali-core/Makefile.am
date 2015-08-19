@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2015 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,10 +39,6 @@ src_files = $(internal_src_files) \
             $(public_api_src_files) \
             $(devel_api_src_files)
 
-if DALI_DYNAMICS_SUPPORT
-src_files += $(internal_dynamics_src_files)
-endif
-
 lib_LTLIBRARIES = libdali-core.la
 
 libdali_core_la_SOURCES = $(dali_shaders_src_file) \
@@ -62,11 +58,13 @@ dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 dali_core_includes = \
         -I../../..
 
+cxx_flags = -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal
+
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
-                           -Werror -Wall -Wfloat-equal \
+                           $(cxx_flags) \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS)
 
@@ -76,35 +74,32 @@ libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
-platformabstractiondynamicsdir = $(includedir)/dali/integration-api/dynamics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
-platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
 develapiactorsdir = $(develapidir)/actors
 develapianimationdir = $(develapidir)/animation
 develapicommondir = $(develapidir)/common
-develapidynamicsdir = $(develapidir)/dynamics
 develapieventsdir = $(develapidir)/events
 develapigeometrydir = $(develapidir)/geometry
 develapiimagesdir = $(develapidir)/images
 develapimodelingdir = $(develapidir)/modeling
 develapiobjectdir = $(develapidir)/object
+develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 
 develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
 develapianimation_HEADERS = $(devel_api_core_animation_header_files)
 develapicommon_HEADERS = $(devel_api_core_common_header_files)
-develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
 develapievents_HEADERS = $(devel_api_core_events_header_files)
-develapigeometry_HEADERS = $(devel_api_core_geometry_header_files)
 develapiimages_HEADERS = $(devel_api_core_images_header_files)
 develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
 develapiobject_HEADERS = $(devel_api_core_object_header_files)
+develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 
 
@@ -151,11 +146,10 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-dynamics.cpp
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
 linker_test_CXXFLAGS = \
-  -Werror -Wall -Wfloat-equal \
+  $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
   $(DALI_CFLAGS)

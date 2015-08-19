@@ -25,7 +25,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/gl-abstraction.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 
 namespace Dali
 {
@@ -105,6 +105,7 @@ public:
     UNIFORM_SAMPLER_OPACITY,
     UNIFORM_SAMPLER_NORMAL_MAP,
 
+    UNIFORM_SIZE,
     UNIFORM_TYPE_LAST
   };
 
@@ -117,7 +118,7 @@ public:
    * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
+  static Program* New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
   /**
    * Takes this program into use
@@ -134,6 +135,20 @@ public:
    * @return the index of the attribute
    */
   GLint GetAttribLocation( AttribType type );
+
+  /**
+   * Register an attribute name in our local cache
+   * @param [in] name attribute name
+   * @return the index of the attribute name in local cache
+   */
+  unsigned int RegisterCustomAttribute( const std::string& name );
+
+  /**
+   * Gets the location of a pre-registered attribute.
+   * @param [in] attributeIndex of the attribute in local cache
+   * @return the index of the attribute in the GL program
+   */
+  GLint GetCustomAttributeLocation( unsigned int attributeIndex );
 
   /**
    * Register a uniform name in our local cache
@@ -278,7 +293,7 @@ private: // Implementation
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
+  Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
 public:
 
@@ -338,10 +353,10 @@ private:  // Data
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader
   GLuint mProgramId;                          ///< GL identifier for program
-  Integration::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
+  Internal::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
-  GLint mAttribLocations[ ATTRIB_TYPE_LAST ]; ///< attribute location cache
+  std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache
   std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
 
   // uniform value caching

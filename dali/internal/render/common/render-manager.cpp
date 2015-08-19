@@ -35,8 +35,8 @@
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/native-frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 // Uncomment the next line to enable frame snapshot logging
@@ -72,9 +72,8 @@ namespace SceneGraph
 typedef OwnerContainer< Renderer* >            RendererOwnerContainer;
 typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 
-typedef OwnerContainer< RenderMaterial* >      RenderMaterialContainer;
-typedef RenderMaterialContainer::Iterator      RenderMaterialIter;
-typedef RenderMaterialContainer::ConstIterator RenderMaterialConstIter;
+typedef OwnerContainer< RenderGeometry* >      RenderGeometryOwnerContainer;
+typedef RenderGeometryOwnerContainer::Iterator RenderGeometryOwnerIter;
 
 typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
 typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
@@ -100,11 +99,10 @@ struct RenderManager::Impl
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
-    materials(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
-    programController( postProcessDispatcher, glAbstraction )
+    programController( glAbstraction )
   {
   }
 
@@ -141,35 +139,35 @@ struct RenderManager::Impl
 
   // the order is important for destruction,
   // programs are owned by context at the moment.
-  Context                             context;                  ///< holds the GL state
-  RenderQueue                         renderQueue;              ///< A message queue for receiving messages from the update-thread.
-  TextureCache                        textureCache;             ///< Cache for all GL textures
-  ResourcePostProcessList&            resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
+  Context                       context;                  ///< holds the GL state
+  RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
+  TextureCache                  textureCache;             ///< Cache for all GL textures
+  ResourcePostProcessList&      resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
-  RenderInstructionContainer          instructions;
+  RenderInstructionContainer    instructions;
 
-  Vector4                             backgroundColor;      ///< The glClear color used at the beginning of each frame.
+  Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
 
-  float                               frameTime;            ///< The elapsed time since the previous frame
-  float                               lastFrameTime;        ///< Last frame delta.
+  float                         frameTime;                ///< The elapsed time since the previous frame
+  float                         lastFrameTime;            ///< Last frame delta.
 
-  unsigned int                        frameCount;           ///< The current frame count
-  BufferIndex                         renderBufferIndex;    ///< The index of the buffer to read from; this is opposite of the "update" buffer
+  unsigned int                  frameCount;               ///< The current frame count
+  BufferIndex                   renderBufferIndex;        ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                           defaultSurfaceRect;   ///< Rectangle for the default surface we are rendering to
+  Rect<int>                     defaultSurfaceRect;       ///< Rectangle for the default surface we are rendering to
 
-  RendererOwnerContainer              rendererContainer;    ///< List of owned renderers
-  RenderMaterialContainer             materials;            ///< List of owned render materials
+  RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
+  RenderGeometryOwnerContainer  renderGeometryContainer;  ///< List of owned RenderGeometries
 
-  bool                                renderersAdded;
+  bool                          renderersAdded;
 
-  RenderTrackerContainer              mRenderTrackers;      ///< List of render trackers
+  RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
 
-  bool                                firstRenderCompleted; ///< False until the first render is done
-  Shader*                             defaultShader;        ///< Default shader to use
-  ProgramController                   programController;    ///< Owner of the GL programs
+  bool                          firstRenderCompleted;     ///< False until the first render is done
+  Shader*                       defaultShader;            ///< Default shader to use
+  ProgramController             programController;        ///< Owner of the GL programs
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
@@ -234,6 +232,11 @@ void RenderManager::DispatchPostProcessRequest(ResourcePostProcessRequest& reque
   mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].push_back( request );
 }
 
+void RenderManager::SetShaderSaver( ShaderSaver& upstream )
+{
+  mImpl->programController.SetShaderSaver( upstream );
+}
+
 RenderInstructionContainer& RenderManager::GetRenderInstructionContainer()
 {
   return mImpl->instructions;
@@ -284,31 +287,62 @@ void RenderManager::RemoveRenderer( Renderer* renderer )
   }
 }
 
-void RenderManager::AddRenderMaterial( RenderMaterial* renderMaterial )
+void RenderManager::AddGeometry( RenderGeometry* renderGeometry )
 {
-  DALI_ASSERT_DEBUG( NULL != renderMaterial );
-
-  mImpl->materials.PushBack( renderMaterial );
-  renderMaterial->Initialize( mImpl->textureCache );
+  mImpl->renderGeometryContainer.PushBack( renderGeometry );
 }
 
-void RenderManager::RemoveRenderMaterial( RenderMaterial* renderMaterial )
+void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
 {
-  DALI_ASSERT_DEBUG( NULL != renderMaterial );
+  DALI_ASSERT_DEBUG( NULL != renderGeometry );
 
-  RenderMaterialContainer& materials = mImpl->materials;
+  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
 
-  // Find the render material and destroy it
-  for ( RenderMaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
+  // Find the renderer
+  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
-    RenderMaterial& current = **iter;
-    if ( &current == renderMaterial )
+    if ( *iter == renderGeometry )
     {
-      materials.Erase( iter );
+      geometries.Erase( iter ); // Geometry found; now destroy it
       break;
     }
   }
 }
+
+void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage )
+{
+  DALI_ASSERT_DEBUG( NULL != renderGeometry );
+
+  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
+
+  // Find the renderer
+  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  {
+    if ( *iter == renderGeometry )
+    {
+      (*iter)->AddPropertyBuffer( propertyBuffer, target, usage );
+      break;
+    }
+  }
+}
+
+void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer )
+{
+  DALI_ASSERT_DEBUG( NULL != renderGeometry );
+
+  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
+
+  // Find the renderer
+  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  {
+    if ( *iter == renderGeometry )
+    {
+      (*iter)->RemovePropertyBuffer( propertyBuffer );
+      break;
+    }
+  }
+}
+
 
 void RenderManager::AddRenderTracker( RenderTracker* renderTracker )
 {
@@ -418,6 +452,12 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // check if anything has been posted to the update thread
   bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
 
+  //Notify RenderGeometries that rendering has finished
+  for ( RenderGeometryOwnerIter iter = mImpl->renderGeometryContainer.Begin(); iter != mImpl->renderGeometryContainer.End(); ++iter )
+  {
+    (*iter)->OnRenderFinished();
+  }
+
   /**
    * The rendering has finished; swap to the next buffer.
    * Ideally the update has just finished using this buffer; otherwise the render thread
@@ -512,6 +552,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
+                                    mImpl->textureCache,
                                     defaultShader,
                                     mImpl->renderBufferIndex,
                                     elapsedTime );

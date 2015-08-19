@@ -74,9 +74,6 @@ typedef std::vector<ProgressBoolean>                    ProgressBooleanContainer
 typedef ProgressValue<int>                              ProgressInteger;
 typedef std::vector<ProgressInteger>                    ProgressIntegerContainer;
 
-typedef ProgressValue<unsigned int>                     ProgressUnsignedInteger;
-typedef std::vector<ProgressUnsignedInteger>            ProgressUnsignedIntegerContainer;
-
 typedef ProgressValue<float>                            ProgressNumber;
 typedef std::vector<ProgressNumber>                     ProgressNumberContainer;
 

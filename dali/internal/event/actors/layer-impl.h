@@ -44,22 +44,20 @@ class Layer : public Actor
 public:
 
   /**
-   * @brief This sort function sorts translucent actors according to the Z-value in view space.
-   *
-   * This is useful for 2D user interfaces.
+   * @copydoc Dali::Layer::ZValue(const Vector3&, float)
    *
    * This is the default sorting function.
+   * It is useful for 2D user interfaces, and it's used to sort translucent renderers.
    *
-   * We return a negative z value as in our translation, a low z means that it should
-   * be sorted further away and a high z means that it should be closer.
+   * Only the Z signed distance from the camera is considererd, lower values will be drawn on top.
+   *
    * @param[in] position     position of actor in view space
-   * @param[in] sortModifier additional sort modifer
    * @return depth
    */
-  static float ZValue(const Vector3& position, float sortModifier)
+  static float ZValue(const Vector3& position)
   {
     // inlined so we avoid a function call when sorting renderers
-    return position.z + sortModifier;
+    return position.z;
   }
 
   /**
@@ -151,6 +149,19 @@ public:
   const Dali::ClippingBox& GetClippingBox() const
   {
     return mClippingBox; // Actor-side has most up-to-date value
+  }
+
+  /**
+   * @copydoc Dali::Layer::SetBehavior()
+   */
+  void SetBehavior( Dali::Layer::Behavior behavior );
+
+  /**
+   * @copydoc Dali::Layer::GetBehavior()
+   */
+  Dali::Layer::Behavior GetBehavior() const
+  {
+    return mBehavior;
   }
 
   /**
@@ -289,6 +300,8 @@ private:
   // These properties not animatable; the actor side has the most up-to-date values
   ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates
   Dali::Layer::SortFunctionType mSortFunction;  ///< Used to sort semi-transparent geometry
+
+  Dali::Layer::Behavior mBehavior;              ///< Behavior of the layer
 
   bool mIsClipping:1;                           ///< True when clipping is enabled
   bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.

@@ -31,6 +31,22 @@ namespace Internal DALI_INTERNAL
 class FrameBufferImage;
 }
 
+namespace RenderBuffer
+{
+/**
+ * @brief Render Buffer formats
+ * The default format for framebuffer creation is COLOR, so If a depth buffer for 3D rendering is required use
+ * COLOR_DEPTH instead
+ */
+enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alpha
+{
+  COLOR,                ///< Framebuffer will be created with color buffer.
+  COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer
+  COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer
+  COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. NOTE: May be not supported in all devices
+};
+}
+
 /**
  * @brief FrameBufferImage represents a GLES Frame Buffer Object and contains the result
  * of an 'off screen' render pass of a RenderTask.
@@ -54,11 +70,13 @@ public:
    * The ReleasePolicy defaults to Dali::Image::Never.
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
    * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
-   * @param [in] pixelformat The pixel format (rgba 32 bit by default)
+   * @param [in] pixelFormat The pixel format (rgba 32 bit by default)
+   * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    * @return A handle to a new instance of a FrameBufferImage.
    */
-  static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelformat = Pixel::RGBA8888);
+  static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
+                              RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
    * @brief Create a new FrameBufferImage.
@@ -66,8 +84,9 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
    * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
-   * @param [in] pixelformat The pixel format.
+   * @param [in] pixelFormat The pixel format.
    * @param [in] releasePolicy The ReleasePolicy to apply to the FrameBufferImage.
+   * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
    *
    * Note that there is no need for a LoadPolicy - by definition it is always OnDemand, since there is no point in the FrameBufferImage existing unless someone is rendering to
    * it, or it is being used as an input (e.g. ShaderEffect / ImageActor).
@@ -75,7 +94,8 @@ public:
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    * @return A handle to a new instance of a FrameBufferImage.
    */
-  static FrameBufferImage New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy );
+  static FrameBufferImage New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy,
+                              RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
    * @brief Create a new FrameBufferImage.

@@ -160,11 +160,11 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
           {
             layer->stencilRenderables.push_back( renderable );
           }
-          else if( DrawMode::OVERLAY == inheritedDrawMode )
+          else if( DrawMode::OVERLAY_2D == inheritedDrawMode )
           {
             layer->overlayRenderables.push_back( renderable );
           }
-          else if ( ! renderable->IsBlendingOn( updateBufferIndex ) )
+          else if ( renderable->IsFullyOpaque( updateBufferIndex ) )
           {
             layer->opaqueRenderables.push_back( renderable );
           }

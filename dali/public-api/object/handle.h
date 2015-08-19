@@ -213,7 +213,6 @@ public:
    *       - Property::BOOLEAN
    *       - Property::FLOAT
    *       - Property::INTEGER
-   *       - Property::UNSIGNED_INTEGER
    *       - Property::VECTOR2
    *       - Property::VECTOR3
    *       - Property::VECTOR4
@@ -236,7 +235,6 @@ public:
    *       - Property::BOOLEAN
    *       - Property::FLOAT
    *       - Property::INTEGER
-   *       - Property::UNSIGNED_INTEGER
    *       - Property::VECTOR2
    *       - Property::VECTOR3
    *       - Property::VECTOR4
@@ -333,6 +331,7 @@ public:
    * @param[in] tag The tag of the constraints which will be removed
    */
   void RemoveConstraints( unsigned int tag );
+
 };
 
 namespace WeightObject

@@ -126,6 +126,16 @@ int UtcDaliRectIsEmpty(void)
   END_TEST;
 }
 
+int UtcDaliRectLeft(void)
+{
+  TestApplication application;
+
+  Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
+
+  DALI_TEST_EQUALS(rf.Left(), 10.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliRectRight(void)
 {
   TestApplication application;
@@ -136,6 +146,15 @@ int UtcDaliRectRight(void)
   END_TEST;
 }
 
+int UtcDaliRectTop(void)
+{
+  TestApplication application;
+
+  Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
+
+  DALI_TEST_EQUALS(rf.Top(), 20.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
 
 int UtcDaliRectBottom(void)
 {
