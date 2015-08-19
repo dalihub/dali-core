@@ -311,12 +311,6 @@ public:
     return mDiscardable == ResourcePolicy::OWNED_DISCARD;
   }
 
- /**
-   * Transfer ownership of the pixel buffer to the calling function.
-   * @post bitmaps pixel data is set to NULL
-   * @return the bitmaps pixel buffer
-   */
-  PixelBuffer* ReleaseBuffer();
   /**
    * Delete the pixel buffer data
    */

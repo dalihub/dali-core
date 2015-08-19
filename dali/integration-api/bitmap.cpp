@@ -18,8 +18,6 @@
 // CLASS HEADER
 #include <dali/integration-api/bitmap.h>
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -290,16 +288,6 @@ void Bitmap::DiscardBuffer()
   }
 }
 
-PixelBuffer* Bitmap::ReleaseBuffer()
-{
-  PixelBuffer* const data = mData;
-
-  // Ownership of mData has been transferred, so indicate that mData pointer is no longer valid:
-  mData = NULL;
-
-  return data;
-}
-
 Bitmap::~Bitmap()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
@@ -320,7 +308,7 @@ void Bitmap::DeletePixelBuffer()
   {
     return;
   }
-  delete [] mData;
+  free ( mData );
   mData = NULL;
 }
 

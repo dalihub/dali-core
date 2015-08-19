@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/images/bitmap-packed-pixel.h>
 
+// EXTERNAL INCLUDES
+#include <cstdlib>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/common/core-impl.h>
@@ -54,7 +57,7 @@ Dali::Integration::PixelBuffer* BitmapPackedPixel::ReserveBuffer(Pixel::Format p
   //allocate buffer
   unsigned int bufSize = mBufferWidth * mBufferHeight * mBytesPerPixel;
 
-  mData = new Dali::Integration::PixelBuffer[bufSize];
+  mData = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufSize) );
 
   return mData;
 }
