@@ -105,7 +105,15 @@ public:
    */
   virtual void LoadResource(const Integration::ResourceRequest& request);
 
+  /**
+   * @copydoc PlatformAbstraction::LoadResourceSynchronously()
+   */
   virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
+
+  /**
+   * @copydoc PlatformAbstraction::DecodeBuffer()
+   */
+  virtual Integration::BitmapPtr DecodeBuffer( const Dali::Integration::ResourceType& resourceType, uint8_t * buffer, size_t size );
 
   /**
    * @copydoc PlatformAbstraction::CancelLoad()

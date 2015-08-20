@@ -84,7 +84,7 @@ void TestGlAbstraction::PreRender()
 {
 }
 
-void TestGlAbstraction::PostRender(unsigned int timeDelta)
+void TestGlAbstraction::PostRender()
 {
 }
 

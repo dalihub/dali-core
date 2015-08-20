@@ -164,13 +164,9 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
           {
             layer->overlayRenderables.push_back( renderable );
           }
-          else if ( renderable->IsFullyOpaque( updateBufferIndex ) )
-          {
-            layer->opaqueRenderables.push_back( renderable );
-          }
           else
           {
-            layer->transparentRenderables.push_back( renderable );
+            layer->colorRenderables.push_back( renderable );
           }
         }
       }

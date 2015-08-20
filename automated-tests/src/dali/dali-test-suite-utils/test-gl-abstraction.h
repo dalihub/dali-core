@@ -54,7 +54,7 @@ public:
   void Initialize();
 
   void PreRender();
-  void PostRender(unsigned int timeDelta);
+  void PostRender();
 
   /* OpenGL ES 2.0 */
 

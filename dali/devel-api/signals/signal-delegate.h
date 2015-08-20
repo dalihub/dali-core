@@ -57,8 +57,7 @@ public:
    *
    * This is required to allow connection to an actor's signal. Typically this is done in a generic
    * way (IE. via a string of the signal name) using the ConnectSignal function.
-   * This function requires a functor, and whilst we can bind to this with something like boost::bind
-   * we avoid this by providing a local functor built in to this delegate object.
+   * This function requires a functor.
    *
    * @param[in] connectionTracker Passed in to the ConnectSignal function of the actor.
    * @param[in] functorDelegate A functor delegate object that must be executed when the signal is emitted.

@@ -122,6 +122,12 @@ Integration::ResourcePointer TestPlatformAbstraction::LoadResourceSynchronously(
   return mResources.loadedResource;
 }
 
+Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::ResourceType& resourceType, uint8_t * buffer, size_t size )
+{
+  mTrace.PushCall("DecodeBuffer", "");
+  return Integration::BitmapPtr();
+}
+
 /**
  * @copydoc PlatformAbstraction::CancelLoad()
  */
