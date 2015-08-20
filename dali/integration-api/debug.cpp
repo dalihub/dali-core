@@ -198,13 +198,21 @@ void Filter::Log(LogLevel level, const char* format, ...)
     va_list arg;
     va_start(arg, format);
 
-    char *buffer = NULL;
-    int numChars = asprintf(&buffer, "%-*c %s", mNesting, ':', format);
-    if(numChars >= 0) // No error
+    if( mTraceEnabled )
     {
-      std::string message = ArgListToString(buffer, arg);
-      LogMessage(DebugInfo, message.c_str());
-      free(buffer);
+      char *buffer = NULL;
+      int numChars = asprintf( &buffer, "    %-*c %s", mNesting, ':', format );
+      if( numChars >= 0 ) // No error
+      {
+        std::string message = ArgListToString( buffer, arg );
+        LogMessage( DebugInfo, message.c_str() );
+        free( buffer );
+      }
+    }
+    else
+    {
+      std::string message = ArgListToString( format, arg );
+      LogMessage( DebugInfo, message.c_str() );
     }
     va_end(arg);
   }
