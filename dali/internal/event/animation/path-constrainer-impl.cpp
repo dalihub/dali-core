@@ -128,10 +128,14 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
       Property::Array* array = value.GetArray();
       const Dali::Vector<Vector3>& point = mPath->GetPoints();
       Property::Array::SizeType pointCount = point.Size();
-      array->Reserve( pointCount );
-      for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+
+      if( array )
       {
-        array->PushBack( point[i] );
+        array->Reserve( pointCount );
+        for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+        {
+          array->PushBack( point[i] );
+        }
       }
       return value;
     }
@@ -141,10 +145,14 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
       Property::Array* array = value.GetArray();
       const Dali::Vector<Vector3>& point = mPath->GetControlPoints();
       Property::Array::SizeType pointCount = point.Size();
-      array->Reserve( pointCount );
-      for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+
+      if( array )
       {
-        array->PushBack( point[i] );
+        array->Reserve( pointCount );
+        for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+        {
+          array->PushBack( point[i] );
+        }
       }
       return value;
     }
