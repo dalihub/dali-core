@@ -1631,12 +1631,11 @@ bool Actor::RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vecto
   if( OnStage() &&
   NULL != mNode )
   {
-    BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
-
     // Transforms the ray to the local reference system.
-
     // Calculate the inverse of Model matrix
     Matrix invModelMatrix( false/*don't init*/);
+
+    BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
     // need to use the components as world matrix is only updated for actors that need it
     invModelMatrix.SetInverseTransformComponents( mNode->GetWorldScale( bufferIndex ), mNode->GetWorldOrientation( bufferIndex ), mNode->GetWorldPosition( bufferIndex ) );
 
@@ -2112,10 +2111,9 @@ bool Actor::IsNodeConnected() const
 {
   bool connected( false );
 
-  if( OnStage() &&
-  NULL != mNode )
+  if( OnStage() && ( NULL != mNode ) )
   {
-    if( mNode->IsRoot() || mNode->GetParent() )
+    if( IsRoot() || mNode->GetParent() )
     {
       connected = true;
     }
