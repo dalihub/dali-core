@@ -110,11 +110,25 @@ public:
    */
   const Samplers& GetSamplers() const;
 
+  /**
+   * Set the use blend flag to decide if the renderer will perform blending
+   * @param[in] useBlend The flag to decide if the renderer will perform blending
+   */
+  void SetUseBlend( bool useBlend );
+
+  /**
+   * Get the use blend flag that decides if the renderer will perform blending
+   * @param[in] buffer index
+   * @return The use blend flag that decides if the renderer will perform blending
+   */
+  bool GetUseBlend( BufferIndex bufferIndex ) const;
+
 private:
   const MaterialDataProvider*   mMaterialDataProvider;
   const UniformMapDataProvider* mUniformMapDataProvider;
   Shader*                       mShader;
   Samplers                      mSamplers;
+  bool                          mUseBlend;
 
 // Give RendererAttachment access to our private data to reduce copying vectors on construction.
   friend class RendererAttachment;

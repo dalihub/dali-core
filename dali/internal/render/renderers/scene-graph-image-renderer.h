@@ -88,6 +88,24 @@ public:
   void SetNinePatchBorder( const Vector4& border, bool inPixels );
 
   /**
+   * Set whether the ImageRenderer should use blending
+   * @param[in] useBlend True if blending should be used.
+   */
+  void SetUseBlend( bool useBlend );
+
+  /**
+   * Set the blending options.
+   * @param[in] options A bitmask of blending options.
+   */
+  void SetBlendingOptions( unsigned int options );
+
+  /**
+   * Set the blend color.
+   * @param[in] color The new blend-color.
+   */
+  void SetBlendColor( const Vector4& color );
+
+  /**
    * Calculate the mesh data used by the ImageRenderer.
    * @param[in] type The type of mesh data required; either quad, nine-patch or grid.
    * @param[in] targetSize The size which the mesh data should fit inside.
@@ -124,6 +142,11 @@ public:
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
   virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::DoSetBlending()
+   */
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex );
 
 protected: // TextureObserver implementation
 
@@ -214,10 +237,13 @@ private:
   Vector2   mGeometrySize;
   ResourceId  mTextureId;
 
+  BlendingOptions mBlendingOptions;
+
   // flags
   MeshType  mMeshType        : 3; // 4 values fits in 3 bits just fine
   bool      mIsMeshGenerated : 1;
   bool      mBorderInPixels  : 1;
+  bool      mUseBlend        : 1; ///< True if blending should be enabled, 1 bit is enough
   bool      mUsePixelArea    : 1;
 
 };

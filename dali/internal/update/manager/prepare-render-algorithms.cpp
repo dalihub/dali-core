@@ -63,7 +63,7 @@ void PrepareRenderables( BufferIndex updateBufferIndex, RenderableAttachmentCont
   for ( RenderableAttachmentIter iter = renderableList.begin(); iter != endIter; ++iter )
   {
     RenderableAttachment& renderable = **iter;
-    renderable.PrepareRender( updateBufferIndex );
+    renderable.DoPrepareRender( updateBufferIndex );
   }
 }
 
