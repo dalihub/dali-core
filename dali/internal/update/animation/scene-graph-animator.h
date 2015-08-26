@@ -221,8 +221,10 @@ public:
           result = 1.0f + progress * progress * ( ( sqrt2 + 1.0f ) * progress + sqrt2 );
           break;
         }
-        default:
+        case AlphaFunction::COUNT:
+        {
           break;
+        }
       }
     }
     else if(  alphaFunctionMode == AlphaFunction::CUSTOM_FUNCTION )
