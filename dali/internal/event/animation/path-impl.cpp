@@ -308,7 +308,7 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   //Find segment and local progress
   unsigned int numSegs = GetNumberOfSegments();
 
-  if( t <= 0.0f )
+  if( t <= 0.0f || numSegs == 0 )
   {
     segment = 0;
     tLocal = 0.0f;
