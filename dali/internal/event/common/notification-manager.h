@@ -81,6 +81,14 @@ public:
 
 private:
 
+  // Undefined
+  NotificationManager( const NotificationManager& notificationManager );
+
+  // Undefined
+  NotificationManager& operator=( const NotificationManager& notificationManager );
+
+private:
+
   struct Impl;
   Impl* mImpl;
 
