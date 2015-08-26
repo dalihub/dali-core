@@ -65,7 +65,8 @@ ImageAttachment::ImageAttachment( unsigned int textureId )
   mIsPixelAreaSet( false ),
   mPreviousRefreshHints( 0 ),
   mStyle( Dali::ImageActor::STYLE_QUAD ),
-  mCullFaceMode( CullNone )
+  mCullFaceMode( CullNone ),
+  mUseBlend( false )
 {
 }
 
@@ -209,25 +210,25 @@ void ImageAttachment::SetBorder( BufferIndex updateBufferIndex, const Vector4& b
 void ImageAttachment::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
 {
   // Blending options are forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
+  typedef MessageValue1< ImageRenderer, unsigned int > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendingOptions, options );
+  new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetBlendingOptions, options );
 }
 
 void ImageAttachment::SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color )
 {
   // Blend color is forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, Vector4 > DerivedType;
+  typedef MessageValue1< ImageRenderer, Vector4 > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendColor, color );
+  new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetBlendColor, color );
 }
 
 void ImageAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode )
@@ -427,6 +428,22 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     }
 
     mRefreshMeshData = false;
+  }
+
+  bool blend = !IsFullyOpaque( updateBufferIndex );
+
+  if ( mUseBlend != blend )
+  {
+    mUseBlend = blend;
+
+    // Enable/disable blending in the next render
+    typedef MessageValue1< ImageRenderer, bool > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetUseBlend, blend );
   }
 }
 

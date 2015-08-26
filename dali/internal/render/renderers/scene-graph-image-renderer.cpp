@@ -159,6 +159,21 @@ void ImageRenderer::SetNinePatchBorder( const Vector4& border, bool inPixels )
   mIsMeshGenerated = false;
 }
 
+void ImageRenderer::SetUseBlend( bool useBlend )
+{
+  mUseBlend = useBlend;
+}
+
+void ImageRenderer::SetBlendingOptions( unsigned int options )
+{
+  mBlendingOptions.SetBitmask( options );
+}
+
+void ImageRenderer::SetBlendColor( const Vector4& color )
+{
+  mBlendingOptions.SetBlendColor( color );
+}
+
 void ImageRenderer::CalculateMeshData( MeshType type, const Vector2& targetSize, bool usePixelArea )
 {
   mMeshType        = type;
@@ -349,6 +364,34 @@ void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, Buff
   {
     context.DisableVertexAttributeArray( texCoordLoc );
   }
+}
+
+void ImageRenderer::DoSetBlending(Context& context, BufferIndex bufferIndex )
+{
+  // Enables/disables blending mode.
+  context.SetBlend( mUseBlend );
+
+  // Set the blend color
+  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
+  if( customColor )
+  {
+    context.SetCustomBlendColor( *customColor );
+  }
+  else
+  {
+    context.SetDefaultBlendColor();
+  }
+
+  // Set blend source & destination factors
+  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
+                             mBlendingOptions.GetBlendDestFactorRgb(),
+                             mBlendingOptions.GetBlendSrcFactorAlpha(),
+                             mBlendingOptions.GetBlendDestFactorAlpha() );
+
+  // Set blend equations
+  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
+                                 mBlendingOptions.GetBlendEquationAlpha() );
+
 }
 
 void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const GLvoid *data )
@@ -927,6 +970,7 @@ ImageRenderer::ImageRenderer( NodeDataProvider& dataProvider )
   mMeshType( ImageRenderer::QUAD ),
   mIsMeshGenerated( false ),
   mBorderInPixels( false ),
+  mUseBlend( false ),
   mUsePixelArea( false )
 {
 }

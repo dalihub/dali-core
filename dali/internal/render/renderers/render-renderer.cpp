@@ -100,9 +100,9 @@ void NewRenderer::DoSetCullFaceMode( Context& context, BufferIndex bufferIndex )
 
 void NewRenderer::DoSetBlending( Context& context, BufferIndex bufferIndex )
 {
-  context.SetBlend(mUseBlend); // @todo MESH_REWORK Should use a RendererDataProvider
-
-  if( mUseBlend )
+  bool blend = mRenderDataProvider->GetUseBlend( bufferIndex );
+  context.SetBlend( blend );
+  if( blend )
   {
     const MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
 
