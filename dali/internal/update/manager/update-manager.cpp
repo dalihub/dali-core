@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/set-wrapper.h>
+#include <dali/devel-api/common/mutex.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>
@@ -131,8 +132,7 @@ typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
 
-typedef std::vector<Internal::ShaderDataPtr> ShaderDataBatchedQueue;
-typedef ShaderDataBatchedQueue::iterator        ShaderDataBatchedQueueIterator;
+typedef std::vector<Internal::ShaderDataPtr>   ShaderDataBinaryQueue;
 
 typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
@@ -276,12 +276,14 @@ struct UpdateManager::Impl
   ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
   ObjectOwnerContainer<Material>      materials;                     ///< A container of materials
   ObjectOwnerContainer<Sampler>       samplers;                      ///< A container of samplers
-  ObjectOwnerContainer<PropertyBuffer> propertyBuffers;             ///< A container of property buffers
+  ObjectOwnerContainer<PropertyBuffer> propertyBuffers;              ///< A container of property buffers
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
-  ShaderDataBatchedQueue              compiledShaders[2];            ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
+  ShaderDataBinaryQueue               renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
+  ShaderDataBinaryQueue               updateCompiledShaders;         ///< Shaders to be sent from Update to Event
+  Mutex                               compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
@@ -629,7 +631,11 @@ void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
 {
   DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
   DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
-  mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex() > 0 ? 0 : 1].push_back( shaderData );
+  {
+    // lock as update might be sending previously compiled shaders to event thread
+    Mutex::ScopedLock lock( mImpl->compiledShaderMutex );
+    mImpl->renderCompiledShaders.push_back( shaderData );
+  }
 }
 
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
@@ -919,16 +925,24 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
   DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
   if( mImpl->shaderSaver )
   {
-    ShaderDataBatchedQueue& compiledShaders = mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex()];
-    if( compiledShaders.size() > 0 )
+    // lock and swap the queues
+    {
+      // render might be attempting to send us more binaries at the same time
+      Mutex::ScopedLock lock( mImpl->compiledShaderMutex );
+      mImpl->renderCompiledShaders.swap( mImpl->updateCompiledShaders );
+    }
+
+    if( mImpl->updateCompiledShaders.size() > 0 )
     {
       ShaderSaver& factory = *mImpl->shaderSaver;
-      ShaderDataBatchedQueueIterator i   = compiledShaders.begin();
-      ShaderDataBatchedQueueIterator end = compiledShaders.end();
+      ShaderDataBinaryQueue::iterator i   = mImpl->updateCompiledShaders.begin();
+      ShaderDataBinaryQueue::iterator end = mImpl->updateCompiledShaders.end();
       for( ; i != end; ++i )
       {
         mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, *i ) );
       }
+      // we don't need them in update anymore
+      mImpl->updateCompiledShaders.clear();
     }
   }
 }
@@ -1009,7 +1023,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
 
-  // 6.1) Forward a batch of compiled shader programs to event thread for saving
+  // 6.1) Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
