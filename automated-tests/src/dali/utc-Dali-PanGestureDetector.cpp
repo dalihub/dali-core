@@ -2197,8 +2197,9 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
   PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);
   DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+  // Take into account resampling done when prediction is off.
+  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION );
 
   constraintData.Reset();
   END_TEST;
