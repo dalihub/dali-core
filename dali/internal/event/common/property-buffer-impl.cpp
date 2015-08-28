@@ -88,7 +88,7 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
     case Property::ARRAY:
     case Property::MAP:
     {
-      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
+      DALI_ASSERT_ALWAYS( false && "No size for properties with no type, or dynamic sizes" );
       break;
     }
     case Property::BOOLEAN:
@@ -446,10 +446,13 @@ void PropertyBuffer::FormatChanged()
   }
 
   // Check the alignment for the maxAlignment required to calculate the size of the format
-  if( unsigned int offset = currentAlignment % maxAlignmentRequired )
+  if( maxAlignmentRequired != 0 )
   {
-    // Not compatible, realign
-    currentAlignment = currentAlignment + maxAlignmentRequired - offset;
+    if( unsigned int offset = currentAlignment % maxAlignmentRequired )
+    {
+      // Not compatible, realign
+      currentAlignment = currentAlignment + maxAlignmentRequired - offset;
+    }
   }
 
   // Set the format size
