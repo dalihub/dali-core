@@ -27,7 +27,8 @@ namespace SceneGraph
 RenderDataProvider::RenderDataProvider()
 : mMaterialDataProvider( NULL ),
   mUniformMapDataProvider( NULL ),
-  mShader( NULL )
+  mShader( NULL ),
+  mUseBlend( false )
 {
 }
 
@@ -75,6 +76,15 @@ const RenderDataProvider::Samplers& RenderDataProvider::GetSamplers() const
   return mSamplers;
 }
 
+void RenderDataProvider::SetUseBlend( bool useBlend )
+{
+  mUseBlend = useBlend;
+}
+
+bool RenderDataProvider::GetUseBlend( BufferIndex bufferIndex ) const
+{
+  return mUseBlend;
+}
 
 } // SceneGraph
 } // Internal

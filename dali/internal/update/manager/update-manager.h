@@ -151,10 +151,9 @@ public:
    * Connect a Node to the scene-graph.
    * A disconnected Node has has no parent or children, and its properties cannot be animated/constrained.
    * @pre The node does not already have a parent.
-   * @param[in] node The new parent node.
-   * @param[in] node The node to connect.
+   * @param[in] parent The new parent node.
    */
-  void ConnectNode( Node* parent, Node* node, int index );
+  void ConnectNode( Node* parent, Node* node );
 
   /**
    * Disconnect a Node from the scene-graph.
@@ -526,19 +525,19 @@ inline void AddNodeMessage( UpdateManager& manager, Node& node )
   new (slot) LocalType( &manager, &UpdateManager::AddNode, &node );
 }
 
-inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent, const Node& constChild, int index )
+inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent, const Node& constChild )
 {
   // Update thread can edit the object
   Node& parent = const_cast< Node& >( constParent );
   Node& child = const_cast< Node& >( constChild );
 
-  typedef MessageValue3< UpdateManager, Node*, Node*, int > LocalType;
+  typedef MessageValue2< UpdateManager, Node*, Node* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::ConnectNode, &parent, &child, index );
+  new (slot) LocalType( &manager, &UpdateManager::ConnectNode, &parent, &child );
 }
 
 inline void DisconnectNodeMessage( UpdateManager& manager, const Node& constNode )

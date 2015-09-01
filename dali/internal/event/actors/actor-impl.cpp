@@ -1077,23 +1077,19 @@ void Actor::SetSize( float width, float height, float depth )
 
 void Actor::SetSize( const Vector2& size )
 {
-  SetSize( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
+  SetSize( Vector3( size.width, size.height, 0.f ) );
 }
 
 void Actor::SetSizeInternal( const Vector2& size )
 {
-  SetSizeInternal( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
-}
-
-float Actor::CalculateSizeZ( const Vector2& size ) const
-{
-  return std::min( size.width, size.height );
+  SetSizeInternal( Vector3( size.width, size.height, 0.f ) );
 }
 
 void Actor::SetSize( const Vector3& size )
 {
   if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
   {
+    // TODO we cannot just ignore the given Z but that means rewrite the size negotiation!!
     SetPreferredSize( size.GetVectorXY() );
   }
   else
@@ -1363,6 +1359,10 @@ unsigned int Actor::AddRenderer( Renderer& renderer )
   if ( ! mAttachment )
   {
     mAttachment = RendererAttachment::New( GetEventThreadServices(), *mNode, renderer );
+    if( mIsOnStage )
+    {
+      mAttachment->Connect();
+    }
   }
 
   return 0;
@@ -1631,12 +1631,11 @@ bool Actor::RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vecto
   if( OnStage() &&
   NULL != mNode )
   {
-    BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
-
     // Transforms the ray to the local reference system.
-
     // Calculate the inverse of Model matrix
     Matrix invModelMatrix( false/*don't init*/);
+
+    BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
     // need to use the components as world matrix is only updated for actors that need it
     invModelMatrix.SetInverseTransformComponents( mNode->GetWorldScale( bufferIndex ), mNode->GetWorldOrientation( bufferIndex ), mNode->GetWorldPosition( bufferIndex ) );
 
@@ -1929,15 +1928,14 @@ Actor::~Actor()
   }
 }
 
-void Actor::ConnectToStage( unsigned int parentDepth, int index )
+void Actor::ConnectToStage( unsigned int parentDepth )
 {
-  // This container is used instead of walking the Actor hierachy.
-  // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
+  // This container is used instead of walking the Actor hierarchy.
+  // It protects us when the Actor hierarchy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
-
-  // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( connectionList, parentDepth+1, index );
+  // This stage is atomic i.e. not interrupted by user callbacks.
+  RecursiveConnectToStage( connectionList, parentDepth + 1 );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -1949,14 +1947,14 @@ void Actor::ConnectToStage( unsigned int parentDepth, int index )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
   mDepth = depth;
 
-  ConnectToSceneGraph( index );
+  ConnectToSceneGraph();
 
   // Notification for internal derived classes
   OnStageConnectionInternal();
@@ -1979,16 +1977,16 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned in
  * This method is called when the Actor is connected to the Stage.
  * The parent must have added its Node to the scene-graph.
  * The child must connect its Node to the parent's Node.
- * This is resursive; the child calls ConnectToStage() for its children.
+ * This is recursive; the child calls ConnectToStage() for its children.
  */
-void Actor::ConnectToSceneGraph( int index )
+void Actor::ConnectToSceneGraph()
 {
   DALI_ASSERT_DEBUG( mNode != NULL); DALI_ASSERT_DEBUG( mParent != NULL); DALI_ASSERT_DEBUG( mParent->mNode != NULL );
 
   if( NULL != mNode )
   {
     // Reparent Node in next Update
-    ConnectNodeMessage( GetEventThreadServices().GetUpdateManager(), *(mParent->mNode), *mNode, index );
+    ConnectNodeMessage( GetEventThreadServices().GetUpdateManager(), *(mParent->mNode), *mNode );
   }
 
   // Notify attachment
@@ -2113,10 +2111,9 @@ bool Actor::IsNodeConnected() const
 {
   bool connected( false );
 
-  if( OnStage() &&
-  NULL != mNode )
+  if( OnStage() && ( NULL != mNode ) )
   {
-    if( mNode->IsRoot() || mNode->GetParent() )
+    if( IsRoot() || mNode->GetParent() )
     {
       connected = true;
     }
@@ -3366,7 +3363,7 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
   return componentIndex;
 }
 
-void Actor::SetParent( Actor* parent, int index )
+void Actor::SetParent( Actor* parent )
 {
   if( parent )
   {
@@ -3378,7 +3375,7 @@ void Actor::SetParent( Actor* parent, int index )
          parent->OnStage() )
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage( parent->GetHierarchyDepth(), index );
+      ConnectToStage( parent->GetHierarchyDepth() );
     }
   }
   else // parent being set to NULL
@@ -4038,7 +4035,7 @@ Vector2 Actor::GetPreferredSize() const
 {
   if ( mRelayoutData )
   {
-    return mRelayoutData->preferredSize;
+    return Vector2( mRelayoutData->preferredSize );
   }
 
   return GetDefaultPreferredSize();

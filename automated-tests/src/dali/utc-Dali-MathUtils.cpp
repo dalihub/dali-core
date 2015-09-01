@@ -33,6 +33,32 @@ void utc_dali_math_utils_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+int UtcDaliMathUtilsIsPowerOfTwo(void)
+{
+  Dali::TestApplication testApp;
+  DALI_TEST_EQUALS(IsPowerOfTwo(0), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(IsPowerOfTwo(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(3), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(4), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(5), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(6), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(7), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(8), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(255), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(256), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(257), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(511), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(512), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(513), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(768), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(1023), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(1024), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(IsPowerOfTwo(1025), false, TEST_LOCATION);
+
+  END_TEST;
+}
 
 int UtcDaliMathUtilsNextPowerOfTwoP(void)
 {

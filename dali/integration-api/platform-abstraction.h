@@ -97,7 +97,7 @@ public:
                                                bool orientationCorrection = true) = 0;
 
   /**
-   @brief Determine the size of an image the resource loaders will provide when
+   * @brief Determine the size of an image the resource loaders will provide when
    * given the same image loading parameters.
    *
    * This is a synchronous request.
@@ -142,6 +142,16 @@ public:
   virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
 
   /**
+   * Decode a buffer of data synchronously.
+   * @param[in] resourceType The type of resource to load
+   * @param[in] buffer The decoded data
+   * @param[in] bufferSize The size of the buffer used by the decoded data.
+   *
+   * @return A pointer to the decoded buffer.
+   */
+  virtual BitmapPtr DecodeBuffer( const ResourceType& resourceType, uint8_t * buffer, size_t bufferSize ) = 0;
+
+  /**
    * Cancel an ongoing LoadResource() request.
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.
@@ -149,13 +159,6 @@ public:
    * @param[in] typeId The ID type of the resource to cancel.
    */
   virtual void CancelLoad(ResourceId id, ResourceTypeId typeId) = 0;
-
-  /**
-   * Query whether any asynchronous LoadResource() requests are ongoing.
-   * Multi-threading note: this method may be called from either the main or rendering thread.
-   * @return True if resources are being loaded.
-   */
-  virtual bool IsLoading() = 0;
 
   /**
    * Retrieve newly loaded resources.
@@ -195,28 +198,12 @@ public:
   virtual int GetDefaultFontSize() const = 0;
 
   /**
-   * Sets horizontal and vertical pixels per inch value that is used by the display
-   * @param[in] dpiHorizontal horizontal dpi value
-   * @param[in] dpiVertical   vertical dpi value
-   */
-  virtual void SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical) = 0;
-
-  /**
    * Load a file into a buffer
    * @param[in] filename The filename to load
    * @param[out] buffer  A buffer to receive the file.
    * @result             true if the file is loaded.
    */
   virtual bool LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const = 0;
-
-  /**
-   * Load a file into a buffer
-   * @param[in] filename The filename to save
-   * @param[out] buffer  A buffer containing some data
-   *                     The buffer is implemeneted with a Dali::Vector. The size() member specifies the buffer length.
-   * @result             true if the file is saved.
-   */
-  virtual bool SaveFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const = 0;
 
   /**
    * Load a shader binary file into a buffer

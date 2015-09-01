@@ -98,3 +98,18 @@ int UtcDaliAngleAxisCopy(void)
   DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliAngleAxisEqual(void)
+{
+  TestApplication application;
+
+  Radian r(Math::PI_2);
+  AngleAxis a(r, Vector3::ZAXIS);
+  AngleAxis b(a);
+
+  tet_result((a == b) ? TET_PASS : TET_FAIL);
+
+  b.axis = Vector3::YAXIS;
+  tet_result(!(a == b) ? TET_PASS : TET_FAIL);
+  END_TEST;
+}

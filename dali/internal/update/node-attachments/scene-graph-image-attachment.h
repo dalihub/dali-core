@@ -253,6 +253,7 @@ private: // Data
   int  mPreviousRefreshHints : 4; ///< The shader geometry hints, when the vertex buffer was last refreshed, 4 bits is enough as there's 4 flags
   Style mStyle               : 2; ///< rendering style, 2 bits is enough as only 2 values in the enum
   CullFaceMode mCullFaceMode : 3; ///< Cullface mode, 3 bits is enough for 4 values
+  bool mUseBlend             : 1; ///< True if the attachment & renderer should be considered opaque for sorting and blending.
 
   BitmapMetadata  mBitmapMetadata;///< The bitmap metadata
   Vector2 mGeometrySize;          ///< The size of the currently used geometry

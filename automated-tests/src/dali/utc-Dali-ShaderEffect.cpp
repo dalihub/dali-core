@@ -93,7 +93,7 @@ static const char* TestImageFilename = "icon_wrt.png";
 
 Integration::Bitmap* CreateBitmap( unsigned int imageHeight, unsigned int imageWidth, unsigned int initialColor )
 {
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  imageWidth,imageHeight,imageWidth,imageHeight );
   unsigned int bytesPerPixel = GetBytesPerPixel(  Pixel::RGBA8888 );
 
@@ -539,6 +539,42 @@ int UtcDaliShaderEffectMethodApplyConstraint(void)
   END_TEST;
 }
 
+int UtcDaliShaderEffectMethodApplyConstraintOffStage(void)
+{
+  // The same test as UtcDaliShaderEffectMethodApplyConstraint,
+  // except the Actor is off-stage when the constraint is applied to the shader
+  TestApplication application;
+
+  ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
+  DALI_TEST_CHECK( effect );
+
+  BufferImage image = CreateBufferImage();
+
+  effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
+
+  ImageActor actor = ImageActor::New( image );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetName("TestImageFilenameActor");
+  actor.SetShaderEffect(effect);
+  // Note - Do not add actor to stage here
+
+  Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
+
+  Constraint constraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
+  constraint.Apply();
+
+  // Note - Now we add the actor (after constraint was applied to the shader)
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Test effects of Constraint.
+  DALI_TEST_CHECK(
+      application.GetGlAbstraction().CheckUniformValue(
+          "uVec3", Vector3( 4.0f, 9.0f, 16.0f ) ) );
+  END_TEST;
+}
 
 int UtcDaliShaderEffectMethodApplyConstraintFromActor(void)
 {

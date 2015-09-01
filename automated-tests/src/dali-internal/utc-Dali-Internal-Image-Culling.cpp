@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ Image LoadImage( TestApplication& application, GLuint textureId, int width, int 
   ids.push_back( textureId );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource(bitmap);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, width, height, width, height);
   DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
@@ -126,7 +126,7 @@ void TestImageInside( TestApplication& application, int width, int height )
   imageActor.SetPosition(0.0f, 0.0f, 0.0f);
 
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   drawTrace.Reset();
   imageActor.SetParentOrigin(ParentOrigin::TOP_LEFT);
@@ -228,7 +228,7 @@ void SphereTestImageAtBoundary( TestApplication& application, int width, int hei
   ImageActor imageActor = CreateOnStageActor(application, image, width, height, true);
 
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   imageSize.z = 0.0f;
   float radius = imageSize.Length() * 0.5f; // Radius of bounding box
@@ -279,7 +279,7 @@ void OBBTestImageAtBoundary( TestApplication& application, int width, int height
   ImageActor imageActor = CreateOnStageActor(application, image, width, height, true);
 
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   imageSize.z = 0.0f;
   tet_printf("Testing Stage Size: (%3.0f, %3.0f) image size:(%3.0f, %3.0f) \n",
@@ -336,7 +336,7 @@ void SphereTestImageOutsideBoundary( TestApplication& application, int width, in
 
   ImageActor imageActor = CreateOnStageActor(application, image, width, height, true);
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   imageSize.z = 0.0f;
   float radius = imageSize.Length() * 0.5f; // Radius of bounding box
@@ -380,7 +380,7 @@ void OBBTestImageOutsideBoundary( TestApplication& application, int width, int h
 
   ImageActor imageActor = CreateOnStageActor(application, image, width, height, true);
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   imageSize.z = 0.0f;
   tet_printf("Testing Stage Size: (%3.0f, %3.0f) image size:(%3.0f, %3.0f)\n",
@@ -817,7 +817,7 @@ int UtcDaliImageCulling_Disable(void)
 
   ImageActor imageActor = CreateOnStageActor(application, image, width, height, true);
   Vector3 imageSize = imageActor.GetCurrentSize();
-  DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
+  DALI_TEST_EQUALS( imageSize, Vector3(width, height, 0), TEST_LOCATION);
 
   imageSize.z = 0.0f;
 

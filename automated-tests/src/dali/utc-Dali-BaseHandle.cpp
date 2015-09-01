@@ -522,3 +522,14 @@ int UtcDaliBaseHandleBooleanCast(void)
   DALI_TEST_CHECK( static_cast<BaseHandle::BooleanType>( handle ) );
   END_TEST;
 }
+
+int UtcDaliBaseHandleCompareOperatorN(void)
+{
+  TestApplication application;
+  BaseHandle handle1 = Actor::New();
+  BaseHandle handle2 = handle1;
+
+  DALI_TEST_CHECK( (handle1 < handle2) == false );
+
+  END_TEST;
+}

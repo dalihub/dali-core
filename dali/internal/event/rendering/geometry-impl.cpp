@@ -40,7 +40,6 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "geometry-type",         STRING,   true, false,  true, Dali::Geometry::Property::GEOMETRY_TYPE )
 DALI_PROPERTY( "geometry-center",       VECTOR3,  true, true,   true, Dali::Geometry::Property::GEOMETRY_CENTER )
-DALI_PROPERTY( "geometry-half-extents", VECTOR3,  true, true,   true, Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS )
 DALI_PROPERTY( "requires-depth-test",   BOOLEAN,  true, false,  true, Dali::Geometry::Property::REQUIRES_DEPTH_TEST )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
@@ -193,13 +192,6 @@ void Geometry::SetDefaultProperty( Property::Index index,
       SceneGraph::AnimatablePropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mCenter, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
       break;
     }
-
-    case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
-    {
-      SceneGraph::AnimatablePropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mHalfExtents, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
-      break;
-    }
-
     case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
     {
       SceneGraph::DoubleBufferedPropertyMessage<bool>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mRequiresDepthTest, &SceneGraph::DoubleBufferedProperty<bool>::Set, propertyValue.Get<bool>() );
@@ -235,15 +227,6 @@ Property::Value Geometry::GetDefaultProperty( Property::Index index ) const
       if( mSceneObject )
       {
         value = mSceneObject->mCenter[bufferIndex];
-      }
-      break;
-    }
-
-    case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
-    {
-      if( mSceneObject )
-      {
-        value = mSceneObject->mHalfExtents[bufferIndex];
       }
       break;
     }
@@ -291,11 +274,6 @@ const SceneGraph::PropertyBase* Geometry::GetSceneObjectAnimatableProperty( Prop
           property = &mSceneObject->mCenter;
           break;
         }
-        case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
-        {
-          property = &mSceneObject->mHalfExtents;
-          break;
-        }
         default:
         {
           DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
@@ -333,11 +311,6 @@ const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index 
         case Dali::Geometry::Property::GEOMETRY_CENTER :
         {
           property = &mSceneObject->mCenter;
-          break;
-        }
-        case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
-        {
-          property = &mSceneObject->mHalfExtents;
           break;
         }
         case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :

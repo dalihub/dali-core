@@ -58,13 +58,7 @@ struct RendererWithSortAttributes
   float       zValue;           // The zValue of the given renderer (either distance from camera, or a custom calculated value)
 };
 
-typedef std::vector< RendererWithSortAttributes > RenderItemSortingHelper;
-
-struct RendererSortingHelper
-{
-  RenderItemSortingHelper transparent;
-  RenderItemSortingHelper opaque;
-};
+typedef std::vector< RendererWithSortAttributes > RendererSortingHelper;
 
 class RenderTask;
 class RenderInstructionContainer;

@@ -112,9 +112,8 @@ public:
    * Invoked by Render thread after Core::Render
    * Inform the gl implementation that the rendering in this frame has finished,
    * and how much time was spent.
-   * @param[in] timeDelta Time in microseconds since last PostRender call
    */
-  virtual void PostRender( unsigned int timeDelta ) = 0;
+  virtual void PostRender() = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.

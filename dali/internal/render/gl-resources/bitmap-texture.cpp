@@ -367,9 +367,9 @@ unsigned int BitmapTexture::GetHeight() const
 
 void BitmapTexture::DiscardBitmapBuffer()
 {
-  DALI_LOG_INFO(Debug::Filter::gImage, Debug::General, "BitmapTexture::DiscardBitmapBuffer() DiscardPolicy: %s\n", mDiscardPolicy == ResourcePolicy::DISCARD?"DISCARD":"RETAIN");
+  DALI_LOG_INFO(Debug::Filter::gImage, Debug::General, "BitmapTexture::DiscardBitmapBuffer() DiscardPolicy: %s\n", mDiscardPolicy == ResourcePolicy::OWNED_DISCARD?"DISCARD":"RETAIN");
 
-  if( ResourcePolicy::DISCARD == mDiscardPolicy )
+  if( ResourcePolicy::OWNED_DISCARD == mDiscardPolicy )
   {
     DALI_LOG_INFO(Debug::Filter::gImage, Debug::General, "  Discarding bitmap\n");
     mBitmap->DiscardBuffer();

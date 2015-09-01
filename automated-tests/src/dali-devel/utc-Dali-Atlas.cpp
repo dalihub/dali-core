@@ -35,7 +35,7 @@ void PrepareResourceImage( TestApplication& application, unsigned int imageHeigh
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetClosestImageSize(Vector2( 16, 16));
 
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
   unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
   unsigned int initialColor = 0xFF;

@@ -33,7 +33,8 @@ namespace SceneGraph
 RenderItem::RenderItem()
 : mModelViewMatrix( false ),
   mRenderer( NULL ),
-  mDepthIndex(0)
+  mDepthIndex(0),
+  mIsOpaque(true)
 {
 }
 
@@ -69,6 +70,11 @@ const Matrix& RenderItem::GetModelViewMatrix() const
 void RenderItem::SetDepthIndex( int depthIndex )
 {
   mDepthIndex = depthIndex;
+}
+
+void RenderItem::SetIsOpaque( bool isOpaque )
+{
+  mIsOpaque = isOpaque;
 }
 
 } // namespace SceneGraph

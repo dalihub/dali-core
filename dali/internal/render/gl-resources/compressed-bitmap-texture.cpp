@@ -135,7 +135,7 @@ void CompressedBitmapTexture::Update( Integration::Bitmap* bitmap )
     {
       AssignBitmap( false, pixels, mBitmap->GetBufferSize() );
 
-      if( mDiscardPolicy == ResourcePolicy::DISCARD )
+      if( mDiscardPolicy == ResourcePolicy::OWNED_DISCARD )
       {
         mBitmap->DiscardBuffer();
       }

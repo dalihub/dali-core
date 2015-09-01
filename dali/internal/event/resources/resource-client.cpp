@@ -44,25 +44,22 @@ typedef BitmapCache::iterator                        BitmapCacheIter;
 
 struct ResourceClient::Impl
 {
-  Impl(ResourcePolicy::DataRetention dataRetentionPolicy)
-  : mNextId(0),
-    mDataRetentionPolicy( dataRetentionPolicy )
+  Impl()
+  : mNextId(0)
   {
   }
 
   ResourceId       mNextId;
   TicketContainer  mTickets;
   BitmapCache      mBitmaps;
-  ResourcePolicy::DataRetention mDataRetentionPolicy;
 };
 
 ResourceClient::ResourceClient( ResourceManager& resourceManager,
-                                EventThreadServices& eventThreadServices,
-                                ResourcePolicy::DataRetention dataRetentionPolicy)
+                                EventThreadServices& eventThreadServices)
 : mResourceManager(resourceManager),
   mEventThreadServices(eventThreadServices)
 {
-  mImpl = new ResourceClient::Impl(dataRetentionPolicy);
+  mImpl = new ResourceClient::Impl();
   mResourceManager.SetClient(*this);
 }
 
@@ -77,11 +74,6 @@ ResourceClient::~ResourceClient()
     }
   }
   delete mImpl;
-}
-
-ResourcePolicy::DataRetention ResourceClient::GetResourceDataRetentionPolicy()
-{
-  return mImpl->mDataRetentionPolicy;
 }
 
 ResourceTicketPtr ResourceClient::RequestResource(
@@ -228,7 +220,7 @@ ImageTicketPtr ResourceClient::AllocateBitmapImage( unsigned int width,
                                                     Pixel::Format pixelformat )
 {
   /* buffer is available via public-api, therefore not discardable */
-  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
   DALI_ASSERT_DEBUG(packedBitmap);
 

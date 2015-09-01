@@ -70,6 +70,7 @@ RendererAttachment::RendererAttachment()
   mRegenerateUniformMap(REGENERATE_UNIFORM_MAP),
   mResendDataProviders(false),
   mResendGeometry(false),
+  mUseBlend( false ),
   mDepthIndex(0)
 {
   mUniformMapChanged[0]=false;
@@ -384,6 +385,13 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
+  bool blend = !IsFullyOpaque( updateBufferIndex );
+  if( mUseBlend != blend )
+  {
+    mUseBlend = blend;
+    mResendDataProviders = true;
+  }
+
   if( mResendDataProviders )
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
@@ -399,15 +407,16 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendGeometry )
   {
+    // The first call to GetRenderGeometry() creates the geometry and sends it in a message
+    RenderGeometry* geometry = mGeometry->GetRenderGeometry( mSceneController );
+
     typedef MessageValue1< NewRenderer, RenderGeometry* > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-    new (slot) DerivedType( mRenderer, &NewRenderer::SetGeometry,mGeometry->GetRenderGeometry(mSceneController) );
+    new (slot) DerivedType( mRenderer, &NewRenderer::SetGeometry, geometry );
     mResendGeometry = false;
-
   }
 }
-
 
 void RendererAttachment::ConnectionsChanged( PropertyOwner& object )
 {
@@ -493,6 +502,7 @@ RenderDataProvider* RendererAttachment::NewRenderDataProvider()
   dataProvider->mMaterialDataProvider = mMaterial;
   dataProvider->mUniformMapDataProvider = this;
   dataProvider->mShader = mMaterial->GetShader();
+  dataProvider->mUseBlend = mUseBlend;
 
   Vector<Sampler*>& samplers = mMaterial->GetSamplers();
   dataProvider->mSamplers.Reserve( samplers.Count() );

@@ -357,7 +357,7 @@ void UpdateManager::AddNode( Node* node )
   mImpl->activeDisconnectedNodes.insert( node ); // Takes ownership of node
 }
 
-void UpdateManager::ConnectNode( Node* parent, Node* node, int index )
+void UpdateManager::ConnectNode( Node* parent, Node* node )
 {
   DALI_ASSERT_ALWAYS( NULL != parent );
   DALI_ASSERT_ALWAYS( NULL != node );
@@ -374,7 +374,7 @@ void UpdateManager::ConnectNode( Node* parent, Node* node, int index )
 
   node->SetActive( true );
 
-  parent->ConnectChild( node, index );
+  parent->ConnectChild( node );
 }
 
 void UpdateManager::DisconnectNode( Node* node )

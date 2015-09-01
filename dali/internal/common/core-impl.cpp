@@ -117,10 +117,10 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
 
-  ResourcePolicy::Discardable discardPolicy = ResourcePolicy::DISCARD;
+  ResourcePolicy::Discardable discardPolicy = ResourcePolicy::OWNED_DISCARD;
   if( dataRetentionPolicy == ResourcePolicy::DALI_RETAINS_ALL_DATA )
   {
-    discardPolicy = ResourcePolicy::RETAIN;
+    discardPolicy = ResourcePolicy::OWNED_RETAIN;
   }
   textureCache.SetDiscardBitmapsPolicy(discardPolicy);
 
@@ -157,7 +157,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mStage->Initialize();
 
-  mResourceClient = new ResourceClient( *mResourceManager, *mStage, dataRetentionPolicy );
+  mResourceClient = new ResourceClient( *mResourceManager, *mStage );
 
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
@@ -245,7 +245,6 @@ void Core::SurfaceResized( unsigned int width, unsigned int height )
 
 void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
 {
-  mPlatform.SetDpi( dpiHorizontal, dpiVertical );
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
 }
 

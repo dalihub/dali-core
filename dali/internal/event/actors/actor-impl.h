@@ -1492,26 +1492,22 @@ protected:
 
   /**
    * Called on a child during Add() when the parent actor is connected to the Stage.
-   * @param[in] stage The stage.
-   * @param[in] parentDepth The depth of the parent in the hierarchy
-   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
+   * @param[in] parentDepth The depth of the parent in the hierarchy.
    */
-  void ConnectToStage( unsigned int parentDepth, int index = -1 );
+  void ConnectToStage( unsigned int parentDepth );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
-   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
-   * @param[in] depth The depth in the hierarchy of the actor
+   * @param[in]  depth The depth in the hierarchy of the actor
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index = -1 );
+  void RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
-   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToSceneGraph( int index = -1 );
+  void ConnectToSceneGraph();
 
   /**
    * Helper for ConnectToStage, to notify a connected actor through the public API.
@@ -1546,16 +1542,8 @@ protected:
    */
   bool IsNodeConnected() const;
 
-  /**
-   * Calculate the size of the z dimension for a 2D size
-   *
-   * @param[in] size The 2D size (X, Y) to calculate Z from
-   *
-   * @return Return the Z dimension for this size
-   */
-  float CalculateSizeZ( const Vector2& size ) const;
-
 public:
+
   // Default property extensions from Object
 
   /**
@@ -1652,9 +1640,8 @@ private:
   /**
    * Set the actors parent.
    * @param[in] parent The new parent.
-   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void SetParent( Actor* parent, int index = -1 );
+  void SetParent( Actor* parent );
 
   /**
    * Helper to create a Node for this Actor.

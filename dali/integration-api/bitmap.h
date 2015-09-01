@@ -61,7 +61,7 @@ protected:
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    * @param[in] pixBuf External buffer of pixel data or null.
    */
-  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
+  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
 
   /**
    * Initializes internal class members
@@ -94,12 +94,13 @@ public:
    * wrap this in a reference-counting smart pointer or store it in a similarly
    * automatic owning collection.
    * @param[in] profile Defines required features of the bitmap (\sa Profile).
-   * @param[in] discardable If this is set to DISCARD, the bitmap
-   * object owns it's own buffer of pixel data and can delete it. If
-   * it's set to RETAIN, then the lifetime of the pixel buffer is
-   * managed by an external component and is guaranteed to remain
-   * dereferenceable at least as long as the Bitmap remains alive.
-   **/
+   * @param[in] discardable OWNED_DISCARD means that the data is owned by bitmap,
+   * and may released away after uploading to GPU.
+   * OWNED_RETAIN means that the data is owned and must be kept in CPU memory
+   * e.g. for an image that cannot be reloaded from disk.
+   * NOT_OWNED means that the data is managed by an external component and is
+   * guaranteed to remain dereferenceable at least as long as the Bitmap remains alive.
+   */
   static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable );
 
   /** \name GeneralFeatures
@@ -307,7 +308,7 @@ public:
    */
   bool IsDiscardable() const
   {
-    return mDiscardable == ResourcePolicy::DISCARD;
+    return mDiscardable == ResourcePolicy::OWNED_DISCARD;
   }
 
  /**
