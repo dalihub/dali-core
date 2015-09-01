@@ -387,6 +387,7 @@ Property::Value::Value( Type type )
     }
   }
 }
+
 Property::Value::Value( const Property::Value& value )
 : mImpl( NULL )
 {

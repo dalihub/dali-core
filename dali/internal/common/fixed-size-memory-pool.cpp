@@ -61,6 +61,13 @@ struct FixedSizeMemoryPool::Impl
     {
       ::operator delete( blockMemory );
     }
+
+  private:
+    // Undefined
+    Block( const Block& block );
+
+    // Undefined
+    Block& operator=( const Block& block );
   };
 
   /**
