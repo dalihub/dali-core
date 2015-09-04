@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -144,6 +148,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ObjectRegistry(Internal::ObjectRegistry* objectRegistry);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_OBJECT_REGISTRY_H__

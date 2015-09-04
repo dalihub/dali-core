@@ -30,6 +30,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-math
+ * @{
+ */
 
 // Forward declaration
 class Matrix;
@@ -431,6 +435,9 @@ DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Quaternion& qua
 // Allow Quaternion to be treated as a POD type
 template <> struct TypeTraits< Quaternion > : public BasicTypes< Quaternion > { enum { IS_TRIVIAL_TYPE = true }; };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_QUATERNION_H__

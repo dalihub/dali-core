@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -43,7 +47,6 @@ struct HoverEvent;
 struct WheelEvent;
 struct Vector2;
 struct Vector3;
-
 
 /**
  * @brief Pointer to Dali::CustomActorImpl object.
@@ -398,6 +401,9 @@ private:
   ActorFlags mFlags :ACTOR_FLAG_COUNT;  ///< ActorFlags flags to determine behaviour
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CUSTOM_ACTOR_IMPL_H__

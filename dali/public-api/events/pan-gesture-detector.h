@@ -36,6 +36,11 @@ class PanGestureDetector;
 struct PanGesture;
 
 /**
+ * @addtogroup dali-core-events
+ * @{
+ */
+
+/**
  * @brief This class looks for panning (or dragging) gestures.
  *
  * The user will be pressing one or more fingers on an actor while they pan it.
@@ -317,6 +322,10 @@ public: // Not intended for Application developers
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
 
 };
+
+/**
+ * @}
+ */
 
 } // namespace Dali
 

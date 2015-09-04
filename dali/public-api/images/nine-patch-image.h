@@ -25,12 +25,15 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
 class NinePatchImage;
 }
-
 
 /**
  * @brief NinePatchImage represents an image resource that can be added to ImageActors.
@@ -126,6 +129,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL NinePatchImage(Internal::NinePatchImage*);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_NINE_PATCH_IMAGE_H__

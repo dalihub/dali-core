@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * @brief The status during resource loading operations.
@@ -34,6 +38,9 @@ enum LoadingState
   ResourceLoadingFailed     ///< The resource failed to load
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_LOADING_STATE_H__

@@ -44,6 +44,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * @brief Base class to handle the memory of simple vector.
@@ -693,6 +697,9 @@ public: // API
   }
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif /* __DALI_VECTOR_H__ */

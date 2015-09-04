@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 /**
  * @brief A LongPressGesture is emitted when the user touches and holds the screen with the stated number of fingers.
@@ -85,6 +89,9 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
   Vector2 localPoint;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_LONG_PRESS_GESTURE_H__

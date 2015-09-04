@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-images
+ * @{
+ */
 
 /**
  * @brief Pixel format types and their properties.
@@ -113,6 +117,9 @@ DALI_IMPORT_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, 
 
 } //namespace Pixel
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PIXEL_H__

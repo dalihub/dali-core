@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-math
+ * @{
+ */
 
 struct Radian;
 
@@ -103,6 +107,9 @@ inline Degree Clamp( Degree angle, float min, float max )
   return Degree( Clamp<float>( angle.degree, min, max ) );
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_DEGREE_H__

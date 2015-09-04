@@ -20,6 +20,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * @brief Basic type traits that every type has by default
@@ -51,6 +55,9 @@ struct TypeTraits : public BasicTypes< Type >
 {
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif /* __DALI_TYPE_TRAITS_H__ */

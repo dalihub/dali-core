@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -142,6 +146,9 @@ protected:
   explicit DALI_INTERNAL GestureDetector(Internal::GestureDetector* internal);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_GESTURE_DETECTOR_H__

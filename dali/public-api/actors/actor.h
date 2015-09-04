@@ -30,6 +30,10 @@
 #include <dali/public-api/signals/dali-signal.h>
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -233,6 +237,7 @@ typedef Rect<float> Padding;      ///< Padding definition
  * | show              | %SetVisible( true )          |
  * | hide              | %SetVisible( false )         |
  */
+
 class DALI_IMPORT_API Actor : public Handle
 {
 public:
@@ -1411,8 +1416,9 @@ inline void UnparentAndReset( Actor& actor )
   }
 }
 
-
-
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ACTOR_H__

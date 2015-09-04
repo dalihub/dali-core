@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-signals
+ * @{
+ */
 
 /**
  * @brief Implementation class for Dali::Signal.
@@ -492,6 +496,9 @@ private:
   bool mEmittingFlag; ///< Used to guard against nested Emit() calls
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_BASE_SIGNAL_H__

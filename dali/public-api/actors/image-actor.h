@@ -31,6 +31,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -509,6 +513,9 @@ DALI_IMPORT_API void SetShaderEffectRecursively( Actor actor, ShaderEffect effec
  */
 DALI_IMPORT_API void RemoveShaderEffectRecursively( Actor actor );
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_IMAGE_ACTOR_H__

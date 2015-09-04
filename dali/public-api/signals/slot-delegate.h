@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-signals
+ * @{
+ */
 
 /**
  * @brief SlotDelegates can be used to connect member functions to signals, without inheriting from SlotDelegateInterface.
@@ -140,6 +144,9 @@ private:
   ConnectionTracker mConnectionTracker; ///< A connection tracker
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SLOT_DELEGATE_H__

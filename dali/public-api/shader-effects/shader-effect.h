@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-shader-effects
+ * @{
+ */
 
 /**
  * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
@@ -334,6 +338,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ShaderEffect(Internal::ShaderEffect* effect);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SHADER_EFFECT_H__
