@@ -62,6 +62,7 @@ PanGesture::~PanGesture()
 
 void PanGesture::AddGesture( const Dali::PanGesture& gesture )
 {
+  Dali::Mutex::ScopedLock lock( mMutex );
   mGestures[ mWritePosition ] = gesture;
 
   // Update our write position.
@@ -298,6 +299,7 @@ bool PanGesture::ReadGestures( FrameGestureInfo& info, unsigned int currentTimes
 bool PanGesture::ReadAndResampleGestures( FrameGestureInfo& info, unsigned int currentTimestamp )
 {
   PanInfo lastReadGesture;
+  Dali::Mutex::ScopedLock lock( mMutex );
   while( mReadPosition != mWritePosition )
   {
     // Copy the gesture first

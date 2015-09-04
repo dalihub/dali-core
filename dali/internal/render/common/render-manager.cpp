@@ -150,7 +150,7 @@ struct RenderManager::Impl
 
   Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
 
-  float                         frameTime;                ///< The elapsed time since the previous frame
+  volatile float                frameTime;                ///< The elapsed time since the previous frame
   float                         lastFrameTime;            ///< Last frame delta.
 
   unsigned int                  frameCount;               ///< The current frame count
@@ -249,6 +249,7 @@ void RenderManager::SetBackgroundColor( const Vector4& color )
 
 void RenderManager::SetFrameDeltaTime( float deltaTime )
 {
+  Dali::Mutex::ScopedLock lock( mMutex );
   mImpl->frameTime = deltaTime;
 }
 
@@ -446,8 +447,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
 
-  // Update the frame time
-  mImpl->lastFrameTime = mImpl->frameTime;
+  SetLastFrameTime();
 
   // check if anything has been posted to the update thread
   bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
@@ -471,6 +471,12 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   DALI_PRINT_CULL_COUNT(mImpl->frameCount, mImpl->context.GetCulledCount());
 
   return updateRequired;
+}
+
+void RenderManager::SetLastFrameTime()
+{
+  Dali::Mutex::ScopedLock lock(mMutex);
+  mImpl->lastFrameTime = mImpl->frameTime;
 }
 
 void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime )

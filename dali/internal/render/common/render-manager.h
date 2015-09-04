@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/mutex.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
@@ -240,10 +241,14 @@ private:
   // Undefined
   RenderManager& operator=( const RenderManager& rhs );
 
+  // Set the last frame time while locking access
+  void SetLastFrameTime();
+
 private:
 
   struct Impl;
   Impl* mImpl;
+  Dali::Mutex mMutex;
 
 };
 

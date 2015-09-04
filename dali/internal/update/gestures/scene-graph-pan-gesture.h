@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/mutex.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/internal/update/common/property-owner.h>
@@ -392,7 +393,7 @@ private:
   PanInfo mLastGesture;                       ///< The last gesture. (last update frame).
   PanInfo mTargetGesture;                     ///< The most recent input gesture, if the current used gesture does not match.
   PanInfo mLastUnmodifiedGesture;             ///< The last gesture before any processing was done on it.
-  unsigned int mWritePosition;                ///< The next PanInfo buffer to write to. (starts at 0).
+  volatile unsigned int mWritePosition;       ///< The next PanInfo buffer to write to. (starts at 0).
   unsigned int mReadPosition;                 ///< The next PanInfo buffer to read. (starts at 0).
   bool mNotAtTarget;                          ///< Keeps track of if the last gesture used was the most recent received.
   bool mInGesture;                            ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled.
@@ -406,6 +407,7 @@ private:
   SmoothingMode mSmoothingMode;               ///< The pan gesture prediction mode
   float         mSmoothingAmount;             ///< How much smoothing to apply [0.0f,1.0f]
   PanGestureProfiling* mProfiling;            ///< NULL unless pan-gesture profiling information is required.
+  Dali::Mutex mMutex;                         ///< Mutex to lock access.
 };
 
 } // namespace SceneGraph
