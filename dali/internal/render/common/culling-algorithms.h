@@ -2,7 +2,7 @@
 #define _DALI_INTERNAL_SCENE_GRAPH_CULLING_ALGORITHMS_H_
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,11 @@ namespace SceneGraph
 /**
  * Determine if the given bounding box is outside clip space (given by the
  * model view projection matrix).
- * @param[in] modelMatrix The world matrix of the bounding box.
  * @param[in] modelViewProjectionMatrix The clip space matrix
  * @param[in] boundingBox The bounding box of the geometry in object space
  * @return true if the bounding box is outside clip space
  */
-bool Is2dBoxOutsideClipSpace(const Matrix& modelMatrix,
-                             const Matrix& modelViewProjectionMatrix,
+bool Is2dBoxOutsideClipSpace(const Matrix& modelViewProjectionMatrix,
                              const Rect<float>& boundingBox );
 } // SceneGraph
 } // Internal

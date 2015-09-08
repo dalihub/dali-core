@@ -32,7 +32,6 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
-#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
@@ -54,12 +53,14 @@
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
-#include <dali/internal/render/renderers/scene-graph-image-renderer.h>
+#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-image-renderer.h>
+#include <dali/internal/render/renderers/render-new-renderer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 
 using Dali::Internal::GestureEventProcessor;
@@ -115,7 +116,7 @@ const int IMAGE_ACTOR_MEMORY_SIZE(
   sizeof( Internal::ImageAttachment ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::ImageAttachment ) +
-  sizeof( Internal::SceneGraph::ImageRenderer ));
+  sizeof( Internal::Render::ImageRenderer ));
 const int LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
   sizeof( Internal::ActorAttachment ) +
@@ -130,13 +131,12 @@ const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::ImageTicket ) );
 const int RENDERER_MEMORY_SIZE(
   sizeof( Internal::Renderer ) +
-  sizeof( Internal::RendererAttachment ) +
-  sizeof( Internal::SceneGraph::RendererAttachment ) +
   sizeof( Internal::SceneGraph::Renderer ) +
-  sizeof( Internal::SceneGraph::NewRenderer ) );
+  sizeof( Internal::Render::NewRenderer ) );
 const int GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::Geometry ) +
-  sizeof( Internal::SceneGraph::Geometry ) );
+  sizeof( Internal::SceneGraph::Geometry ) +
+  sizeof( Internal::SceneGraph::RenderGeometry) );
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
   sizeof( Internal::SceneGraph::PropertyBuffer ) );

@@ -80,6 +80,16 @@ void ConnectionChangePropagator::ConnectedUniformMapChanged()
   }
 }
 
+void ConnectionChangePropagator::Destroy( PropertyOwner& object )
+{
+  // Inform observers that the object's children have changed
+  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  {
+    Observer* observer = (*iter);
+    observer->ObservedObjectDestroyed( object );
+  }
+}
+
 } // SceneGraph
 } // Internal
 } // Dali

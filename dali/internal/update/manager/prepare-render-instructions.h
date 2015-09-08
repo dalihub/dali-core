@@ -33,8 +33,8 @@ namespace SceneGraph
 class RenderTracker;
 class RenderItem;
 class Shader;
-class Material;
-class Geometry;
+class RenderGeometry;
+class MaterialDataProvider;
 
 /**
  * Structure to store information for sorting the renderers.
@@ -51,11 +51,11 @@ struct RendererWithSortAttributes
   {
   }
 
-  RenderItem* renderItem;       ///< The render item that is being sorted (includes depth index)
-  Shader*     shader;           ///< The shader instance
-  Material*   material;         ///< The material instance
-  Geometry*   geometry;         ///< The geometry instance
-  float       zValue;           // The zValue of the given renderer (either distance from camera, or a custom calculated value)
+  RenderItem*                   renderItem;       ///< The render item that is being sorted (includes depth index)
+  const Shader*                 shader;           ///< The shader instance
+  const MaterialDataProvider*   material;         ///< The material instance
+  const RenderGeometry*         geometry;         ///< The geometry instance
+  float                         zValue;           // The zValue of the given renderer (either distance from camera, or a custom calculated value)
 };
 
 typedef std::vector< RendererWithSortAttributes > RendererSortingHelper;

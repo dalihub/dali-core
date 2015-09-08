@@ -32,7 +32,7 @@
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/integration-api/debug.h>
 
 #if defined(DEBUG_ENABLED)
@@ -135,6 +135,7 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
 
   inheritedDrawMode |= node.GetDrawMode();
 
+
   if ( node.HasAttachment() )
   {
     RenderableAttachment* renderable = node.GetAttachment().GetRenderable(); // not all attachments render
@@ -172,6 +173,43 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
       }
     }
   }
+
+  if( node.ResolveVisibility( updateBufferIndex ) )
+  {
+    for( unsigned int i(0); i<node.GetRendererCount(); ++i )
+    {
+      Renderer* renderer = node.GetRendererAt( i );
+      bool ready = false;
+      bool complete = false;
+      renderer->GetReadyAndComplete(ready, complete);
+
+      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderer, ready?"T":"F", complete?"T":"F");
+
+      resourcesFinished = !complete ? complete : resourcesFinished;
+
+      resourcesFinished = !complete ? complete : resourcesFinished;
+
+      if( ready ) // i.e. some resources are ready
+      {
+        if( DrawMode::STENCIL == inheritedDrawMode )
+        {
+          layer->stencilRenderers.PushBack( NodeRenderer(&node, renderer ) );
+        }
+        else if( DrawMode::OVERLAY_2D == inheritedDrawMode )
+        {
+          layer->overlayRenderers.PushBack( NodeRenderer(&node, renderer ) );
+        }
+        else
+        {
+          layer->colorRenderers.PushBack( NodeRenderer(&node, renderer ) );
+        }
+      }
+
+
+
+    }
+  }
+
 
   // Recurse children
   NodeContainer& children = node.GetChildren();

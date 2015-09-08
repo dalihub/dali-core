@@ -23,6 +23,7 @@
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/internal/common/internal-constants.h>
 
 namespace Dali
 {
@@ -59,6 +60,7 @@ Node::Node()
   mExclusiveRenderTask( NULL ),
   mAttachment( NULL ),
   mChildren(),
+  mRegenerateUniformMap( 0 ),
   mDepth(0u),
   mDirtyFlags(AllFlags),
   mIsRoot( false ),
@@ -70,6 +72,8 @@ Node::Node()
   mPositionInheritanceMode( DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( DEFAULT_COLOR_MODE )
 {
+  mUniformMapChanged[0] = 0u;
+  mUniformMapChanged[1] = 0u;
 }
 
 Node::~Node()
@@ -108,6 +112,76 @@ void Node::SetRoot(bool isRoot)
   DALI_ASSERT_DEBUG(!isRoot || mParent == NULL); // Root nodes cannot have a parent
 
   mIsRoot = isRoot;
+}
+
+bool Node::ResolveVisibility( BufferIndex updateBufferIndex )
+{
+  bool result = false;
+  const Vector4& color = GetWorldColor( updateBufferIndex );
+  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
+  {
+    const float MAX_NODE_SIZE = float(1u<<30);
+    const Vector3& size = GetSize( updateBufferIndex );
+    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
+        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
+    {
+      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
+          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
+      {
+        result = true;
+      }
+      else
+      {
+        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
+        DALI_LOG_ACTOR_TREE( mParent );
+      }
+    }
+  }
+  return result;
+}
+
+void Node::AddUniformMapping( UniformPropertyMapping* map )
+{
+  PropertyOwner::AddUniformMapping( map );
+  mRegenerateUniformMap = 2;
+}
+
+void Node::RemoveUniformMapping( const std::string& uniformName )
+{
+  PropertyOwner::RemoveUniformMapping( uniformName );
+  mRegenerateUniformMap = 2;
+}
+
+void Node::PrepareRender( BufferIndex bufferIndex )
+{
+  if(mRegenerateUniformMap != 0 )
+  {
+    if( mRegenerateUniformMap == 2 )
+    {
+      CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
+      localMap.Resize(0);
+
+      for( unsigned int i=0, count=mUniformMaps.Count(); i<count; ++i )
+      {
+        localMap.PushBack( &mUniformMaps[i] );
+      }
+    }
+    else if( mRegenerateUniformMap == 1 )
+    {
+      CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
+      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-bufferIndex ];
+
+      localMap.Resize( oldMap.Count() );
+
+      unsigned int index=0;
+      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
+      {
+        localMap[index] = *iter;
+      }
+    }
+    --mRegenerateUniformMap;
+    mUniformMapChanged[bufferIndex] = 1u;
+  }
 }
 
 void Node::ConnectChild( Node* childNode )
@@ -156,6 +230,19 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode, std:
   DALI_ASSERT_ALWAYS( NULL != found );
 
   found->RecursiveDisconnectFromSceneGraph( updateBufferIndex, connectedNodes, disconnectedNodes );
+}
+
+void Node::RemoveRenderer( Renderer* renderer )
+{
+  unsigned int rendererCount( mRenderer.Size() );
+  for( unsigned int i(0); i<rendererCount; ++i )
+  {
+    if( mRenderer[i] == renderer )
+    {
+      mRenderer.Erase( mRenderer.Begin()+i);
+      return;
+    }
+  }
 }
 
 int Node::GetDirtyFlags() const

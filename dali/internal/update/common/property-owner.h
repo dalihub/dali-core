@@ -184,12 +184,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( UniformPropertyMapping* map );
+  virtual void AddUniformMapping( UniformPropertyMapping* map );
 
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const std::string& uniformName );
+  virtual void RemoveUniformMapping( const std::string& uniformName );
 
   /**
    * Get the mappings table

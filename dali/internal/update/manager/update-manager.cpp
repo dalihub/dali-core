@@ -52,7 +52,6 @@
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
@@ -176,7 +175,8 @@ struct UpdateManager::Impl
     systemLevelTaskList ( completeStatusManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
-    geometries(  sceneGraphBuffers, discardQueue ),
+    renderers( sceneGraphBuffers, discardQueue ),
+    geometries( sceneGraphBuffers, discardQueue ),
     materials( sceneGraphBuffers, discardQueue ),
     samplers( sceneGraphBuffers, discardQueue ),
     propertyBuffers( sceneGraphBuffers, discardQueue ),
@@ -191,6 +191,7 @@ struct UpdateManager::Impl
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
 
+    renderers.SetSceneController( *sceneController );
     geometries.SetSceneController( *sceneController );
     materials.SetSceneController( *sceneController );
     propertyBuffers.SetSceneController( *sceneController );
@@ -273,6 +274,7 @@ struct UpdateManager::Impl
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
+  ObjectOwnerContainer<Renderer>      renderers;
   ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
   ObjectOwnerContainer<Material>      materials;                     ///< A container of materials
   ObjectOwnerContainer<Sampler>       samplers;                      ///< A container of samplers
@@ -437,14 +439,6 @@ void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
   }
 }
 
-void UpdateManager::AttachToSceneGraph( RendererAttachment* renderer )
-{
-  // @todo MESH_REWORK Take ownership of this object after merge with SceneGraph::RenderableAttachment
-
-  SceneGraph::NodeAttachment* attachment = static_cast<SceneGraph::NodeAttachment*>(renderer);
-  attachment->Initialize( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
-}
-
 void UpdateManager::AddObject( PropertyOwner* object )
 {
   DALI_ASSERT_DEBUG( NULL != object );
@@ -549,6 +543,12 @@ ObjectOwnerContainer<Geometry>& UpdateManager::GetGeometryOwner()
 {
   return mImpl->geometries;
 }
+
+ObjectOwnerContainer<Renderer>& UpdateManager::GetRendererOwner()
+{
+  return mImpl->renderers;
+}
+
 
 ObjectOwnerContainer<Material>& UpdateManager::GetMaterialOwner()
 {
@@ -758,6 +758,7 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   mImpl->geometries.ResetToBaseValues( bufferIndex );
   mImpl->propertyBuffers.ResetToBaseValues( bufferIndex );
   mImpl->samplers.ResetToBaseValues( bufferIndex );
+  mImpl->renderers.ResetToBaseValues( bufferIndex );
 
 
   // Reset animatable shader properties to base values
@@ -876,6 +877,7 @@ void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
   mImpl->geometries.ConstrainObjects( bufferIndex );
   mImpl->samplers.ConstrainObjects( bufferIndex );
   mImpl->propertyBuffers.ConstrainObjects( bufferIndex );
+  mImpl->renderers.ConstrainObjects( bufferIndex );
 
   // constrain shaders... (in construction order)
   ShaderContainer& shaders = mImpl->shaders;
@@ -929,6 +931,20 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
       }
       // we don't need them in update anymore
       mImpl->updateCompiledShaders.clear();
+    }
+  }
+}
+
+void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
+{
+  const Internal::OwnerContainer<Renderer*>& rendererContainer( mImpl->renderers.GetObjectContainer() );
+  unsigned int rendererCount( rendererContainer.Size() );
+  for( unsigned int i(0); i<rendererCount; ++i )
+  {
+    if( rendererContainer[i]->IsReferenced() )
+    {
+      rendererContainer[i]->PrepareResources(bufferIndex, mImpl->resourceManager);
+      rendererContainer[i]->PrepareRender( bufferIndex );
     }
   }
 }
@@ -988,12 +1004,13 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   mImpl->touchResampler.Update();
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
-  const bool updateScene =                                            // The scene-graph requires an update if..
-      (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
-      IsAnimationRunning() ||                                         // ..at least one animation is running OR
-      mImpl->messageQueue.IsSceneUpdateRequired() ||                  // ..a message that modifies the scene graph node tree is queued OR
-      resourceChanged ||                                              // ..one or more resources were updated/changed OR
-      gestureUpdated;                                                // ..a gesture property was updated
+  const bool updateScene =                                  // The scene-graph requires an update if..
+      (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
+      IsAnimationRunning()                            ||    // ..at least one animation is running OR
+      mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
+      resourceChanged                                 ||    // ..one or more resources were updated/changed OR
+      gestureUpdated;                                       // ..a gesture property was updated
+
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -1033,6 +1050,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
+    UpdateRenderers( bufferIndex );
+
 
     // 12) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);

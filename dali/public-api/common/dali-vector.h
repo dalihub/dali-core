@@ -105,6 +105,14 @@ public: // API
   }
 
   /**
+   * @ return If the vector is empty
+   */
+  bool Empty() const
+  {
+    return Count() == 0u;
+  }
+
+  /**
    * @return The capacity of this vector.
    */
   SizeType Capacity() const;

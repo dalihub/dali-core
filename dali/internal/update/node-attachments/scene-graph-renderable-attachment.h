@@ -27,7 +27,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
-#include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 
 namespace Dali
 {
@@ -37,9 +36,12 @@ namespace Internal
 class ResourceManager;
 class ResourceTracker;
 
-namespace SceneGraph
+namespace Render
 {
 class Renderer;
+}
+namespace SceneGraph
+{
 class Shader;
 class SortAttributes;
 struct RendererWithSortAttributes;
@@ -184,7 +186,7 @@ public: // API for derived classes
    * should always exist during the lifetime of the RenderableAttachment.
    * @return A Renderer.
    */
-  virtual Renderer& GetRenderer() = 0;
+  virtual Render::Renderer& GetRenderer() = 0;
 
   /**
    * Retrieve a Renderer used by this attachment.
@@ -193,7 +195,7 @@ public: // API for derived classes
    * Other renderers are for effects such as shadows and reflections.
    * @return A Renderer.
    */
-  virtual const Renderer& GetRenderer() const = 0;
+  virtual const Render::Renderer& GetRenderer() const = 0;
 
   /**
    * Prepare the object resources.

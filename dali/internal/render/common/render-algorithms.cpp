@@ -23,7 +23,7 @@
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 using Dali::Internal::SceneGraph::RenderItem;
 using Dali::Internal::SceneGraph::RenderList;
@@ -142,8 +142,7 @@ inline void ProcessRenderList(
       //Enable depth writes if depth buffer is enabled and item is opaque
       context.DepthMask( depthBufferEnabled && item.IsOpaque() );
 
-      SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
-      renderer->Render( context, textureCache, bufferIndex, defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode, !item.IsOpaque() );
     }
   }
   else
@@ -154,8 +153,7 @@ inline void ProcessRenderList(
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
-      renderer->Render( context, textureCache, bufferIndex, defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode, !item.IsOpaque() );
     }
 
   }
@@ -199,9 +197,8 @@ inline void RenderItemsAtDepthIndex(
 
     if( renderItem.GetDepthIndex() == depthIndex )
     {
-      SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( renderItem.GetRenderer() );
       const Matrix& modelViewMatrix = renderItem.GetModelViewMatrix();
-      renderer->Render( context, textureCache, bufferIndex, defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
+      renderItem.GetRenderer().Render( context, textureCache, bufferIndex, renderItem.GetNode(), defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode, !renderItem.IsOpaque() );
 
     }
     else
