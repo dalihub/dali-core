@@ -71,7 +71,8 @@ public:
     mAlphaFunction(AlphaFunction::DEFAULT),
     mDisconnectAction(Dali::Animation::BakeFinal),
     mActive(false),
-    mEnabled(true)
+    mEnabled(true),
+    mConnectedToSceneGraph(false)
   {
   }
 
@@ -81,6 +82,11 @@ public:
   virtual ~AnimatorBase()
   {
   }
+
+  /**
+   * Called when Animator is added to the scene-graph in update-thread.
+   */
+  virtual void ConnectToSceneGraph() = 0;
 
   /**
    * Set the duration of the animator.
@@ -356,6 +362,7 @@ protected:
   Dali::Animation::EndAction mDisconnectAction;     ///< EndAction to apply when target object gets disconnected from the stage.
   bool mActive:1;                                   ///< Animator is "active" while it's running.
   bool mEnabled:1;                                  ///< Animator is "enabled" while its target object is valid and on the stage.
+  bool mConnectedToSceneGraph:1;                    ///< True if ConnectToSceneGraph() has been called in update-thread.
 };
 
 /**
@@ -399,7 +406,7 @@ public:
    */
   virtual ~Animator()
   {
-    if (mPropertyOwner)
+    if (mPropertyOwner && mConnectedToSceneGraph)
     {
       mPropertyOwner->RemoveObserver(*this);
     }
@@ -408,6 +415,15 @@ public:
     {
       delete mAnimatorFunction;
     }
+  }
+
+  /**
+   * Called when Animator is added to the scene-graph in update-thread.
+   */
+  virtual void ConnectToSceneGraph()
+  {
+    mConnectedToSceneGraph = true;
+    mPropertyOwner->AddObserver(*this);
   }
 
   /**
@@ -487,7 +503,8 @@ private:
     mAnimatorFunction( animatorFunction ),
     mCurrentProgress( 0.0f )
   {
-    mPropertyOwner->AddObserver(*this);
+    // WARNING - this object is created in the event-thread
+    // The scene-graph mPropertyOwner object cannot be observed here
   }
 
   // Undefined
