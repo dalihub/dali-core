@@ -39,9 +39,6 @@ typedef TicketContainer::iterator                    TicketContainerIter;
 typedef TicketContainer::size_type                   TicketContainerSize;
 typedef std::pair<ResourceId, ResourceTicket*>       TicketPair;
 
-typedef std::map<ResourceId, Bitmap*>                BitmapCache;
-typedef BitmapCache::iterator                        BitmapCacheIter;
-
 struct ResourceClient::Impl
 {
   Impl()
@@ -51,7 +48,6 @@ struct ResourceClient::Impl
 
   ResourceId       mNextId;
   TicketContainer  mTickets;
-  BitmapCache      mBitmaps;
 };
 
 ResourceClient::ResourceClient( ResourceManager& resourceManager,
@@ -213,28 +209,6 @@ ResourceTicketPtr ResourceClient::RequestResourceTicket( ResourceId id )
   return ticket;
 }
 
-ImageTicketPtr ResourceClient::AllocateBitmapImage( unsigned int width,
-                                                    unsigned int height,
-                                                    unsigned int bufferWidth,
-                                                    unsigned int bufferHeight,
-                                                    Pixel::Format pixelformat )
-{
-  /* buffer is available via public-api, therefore not discardable */
-  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
-  DALI_ASSERT_DEBUG(packedBitmap);
-
-  packedBitmap->ReserveBuffer(pixelformat, width, height, bufferWidth, bufferHeight);
-  DALI_ASSERT_DEBUG(bitmap->GetBuffer() != 0);
-  DALI_ASSERT_DEBUG(bitmap->GetBufferSize() >= width * height);
-
-  ImageTicketPtr ticket = AddBitmapImage(bitmap);
-
-  DALI_ASSERT_DEBUG(bitmap->GetBuffer() != 0);
-  DALI_ASSERT_DEBUG(bitmap->GetBufferSize() >= width * height);
-  return ticket;
-}
-
 ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
 {
   DALI_ASSERT_DEBUG( bitmap != NULL );
@@ -251,9 +225,6 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
   newTicket->LoadingSucceeded();
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
-  // Store bitmap for immediate access.
-  mImpl->mBitmaps[newId] = bitmap;
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddBitmapImage() New id = %u\n", newId);
   RequestAddBitmapImageMessage( mEventThreadServices, mResourceManager, newId, bitmap );
@@ -376,20 +347,6 @@ void ResourceClient::UploadBitmap( ResourceId destId,Integration::BitmapPtr bitm
                               yOffset );
 }
 
-Bitmap* ResourceClient::GetBitmap(ResourceTicketPtr ticket)
-{
-  DALI_ASSERT_DEBUG( ticket );
-
-  Bitmap* bitmap = NULL;
-  BitmapCacheIter iter = mImpl->mBitmaps.find(ticket->GetId());
-
-  if( iter != mImpl->mBitmaps.end() )
-  {
-    bitmap = iter->second;
-  }
-  return bitmap;
-}
-
 void ResourceClient::CreateGlTexture( ResourceId id )
 {
   RequestCreateGlTextureMessage( mEventThreadServices, mResourceManager, id );
@@ -404,9 +361,6 @@ void ResourceClient::ResourceTicketDiscarded(const ResourceTicket& ticket)
 {
   const ResourceId deadId = ticket.GetId();
   const ResourceTypePath& typePath = ticket.GetTypePath();
-
-  // Ensure associated event owned resources are also removed
-  mImpl->mBitmaps.erase(ticket.GetId());
 
   // The ticket object is dead, remove from tickets container
   TicketContainerSize erased = mImpl->mTickets.erase(deadId);

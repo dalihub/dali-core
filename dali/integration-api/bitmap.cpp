@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/bitmap-packed-pixel.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
-#include <dali/internal/event/images/bitmap-external.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
 
@@ -291,13 +290,7 @@ void Bitmap::DiscardBuffer()
 Bitmap::~Bitmap()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-
-  // If owned
-  if( mDiscardable == ResourcePolicy::OWNED_DISCARD ||
-      mDiscardable == ResourcePolicy::OWNED_RETAIN )
-  {
-    DeletePixelBuffer();
-  }
+  DeletePixelBuffer();
 }
 
 /**
