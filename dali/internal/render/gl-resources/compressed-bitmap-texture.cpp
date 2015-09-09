@@ -134,11 +134,6 @@ void CompressedBitmapTexture::Update( Integration::Bitmap* bitmap )
     if ( mId ) // If the texture is already bound
     {
       AssignBitmap( false, pixels, mBitmap->GetBufferSize() );
-
-      if( mDiscardPolicy == ResourcePolicy::OWNED_DISCARD )
-      {
-        mBitmap->DiscardBuffer();
-      }
     }
   }
 }

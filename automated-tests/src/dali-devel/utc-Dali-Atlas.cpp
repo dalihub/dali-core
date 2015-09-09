@@ -84,7 +84,7 @@ int UtcDaliAtlasUpload01(void)
   DALI_TEST_CHECK( atlas );
 
   // Using correct pixel format
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
+  PixelBuffer* buffer = new PixelBuffer[16 * 16 * 4];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( atlas.Upload( image, 0, 0 ) );
 
@@ -122,7 +122,7 @@ int UtcDaliAtlasUpload03(void)
   DALI_TEST_CHECK( atlas );
 
   // Using image too big for atlas
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
+  PixelBuffer* buffer = new PixelBuffer[16 * 16 * 4];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( !atlas.Upload( image, 0, 0 ) );
 
@@ -141,7 +141,7 @@ int UtcDaliAtlasUpload04(void)
   DALI_TEST_CHECK( atlas );
 
   // Using valid offsets
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
+  PixelBuffer* buffer = new PixelBuffer[16 * 16 * 4];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
 
   DALI_TEST_CHECK( atlas.Upload( image,  0,  0 ) );
@@ -167,7 +167,7 @@ int UtcDaliAtlasUpload05(void)
   DALI_TEST_CHECK( atlas );
 
   // Using invalid offsets
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
+  PixelBuffer* buffer = new PixelBuffer[16 * 16 * 4];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
 
   DALI_TEST_CHECK( !atlas.Upload( image,  0, 17 ) );

@@ -98,8 +98,6 @@ public:
    * and may released away after uploading to GPU.
    * OWNED_RETAIN means that the data is owned and must be kept in CPU memory
    * e.g. for an image that cannot be reloaded from disk.
-   * NOT_OWNED means that the data is managed by an external component and is
-   * guaranteed to remain dereferenceable at least as long as the Bitmap remains alive.
    */
   static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable );
 
