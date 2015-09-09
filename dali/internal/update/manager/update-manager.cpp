@@ -694,40 +694,30 @@ bool UpdateManager::FlushQueue()
   return mImpl->messageQueue.FlushQueue();
 }
 
-void UpdateManager::ResetNodeProperty( Node& node )
-{
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
-
-  node.ResetToBaseValues( bufferIndex );
-}
-
-void UpdateManager::ResetProperties()
+void UpdateManager::ResetProperties( BufferIndex bufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::RESET_PROPERTIES);
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
   // Animated properties have to be reset to their original value each frame
 
-  // Reset node properties
+  // Reset root properties
   if ( mImpl->root )
   {
-    ResetNodeProperty( *mImpl->root );
+    mImpl->root->ResetToBaseValues( bufferIndex );
   }
-
   if ( mImpl->systemLevelRoot )
   {
-    ResetNodeProperty( *mImpl->systemLevelRoot );
+    mImpl->systemLevelRoot->ResetToBaseValues( bufferIndex );
   }
 
   // Reset the Connected Nodes
   const std::set<Node*>::iterator endIter = mImpl->connectedNodes.end();
   for( std::set<Node*>::iterator iter = mImpl->connectedNodes.begin(); endIter != iter; ++iter )
   {
-    ResetNodeProperty( **iter );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   // If a Node is disconnected, it may still be "active" (requires a reset in next frame)
@@ -779,7 +769,7 @@ void UpdateManager::ResetProperties()
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
-bool UpdateManager::ProcessGestures( unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
+bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
 {
   bool gestureUpdated( false );
 
@@ -789,14 +779,14 @@ bool UpdateManager::ProcessGestures( unsigned int lastVSyncTimeMilliseconds, uns
   for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
   {
     PanGesture& gesture = **iter;
-    gesture.ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
+    gesture.ResetToBaseValues( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
     gestureUpdated |= gesture.UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
   }
 
   return gestureUpdated;
 }
 
-void UpdateManager::Animate( float elapsedSeconds )
+void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
   PERF_MONITOR_START(PerformanceMonitor::ANIMATE_NODES);
 
@@ -805,7 +795,7 @@ void UpdateManager::Animate( float elapsedSeconds )
   while ( iter != animations.End() )
   {
     Animation* animation = *iter;
-    bool finished = animation->Update(mSceneGraphBuffers.GetUpdateBufferIndex(), elapsedSeconds);
+    bool finished = animation->Update( bufferIndex, elapsedSeconds );
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
 
@@ -829,11 +819,9 @@ void UpdateManager::Animate( float elapsedSeconds )
   PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
 }
 
-void UpdateManager::ApplyConstraints()
+void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // constrain custom objects... (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
@@ -901,12 +889,10 @@ void UpdateManager::ApplyConstraints()
   PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
 }
 
-void UpdateManager::ProcessPropertyNotifications()
+void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 {
   PropertyNotificationContainer &notifications = mImpl->propertyNotifications;
   PropertyNotificationIter iter = notifications.Begin();
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   while ( iter != notifications.End() )
   {
@@ -947,7 +933,7 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
   }
 }
 
-void UpdateManager::UpdateNodes()
+void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NothingFlag;
 
@@ -961,14 +947,14 @@ void UpdateManager::UpdateNodes()
   // Prepare resources, update shaders, update attachments, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
   mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
-                                                     mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                     bufferIndex,
                                                      mImpl->resourceManager,
                                                      mImpl->renderQueue );
 
   if ( mImpl->systemLevelRoot )
   {
     mImpl->nodeDirtyFlags |= UpdateNodesAndAttachments( *( mImpl->systemLevelRoot ),
-                                                        mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                        bufferIndex,
                                                         mImpl->resourceManager,
                                                         mImpl->renderQueue );
   }
@@ -987,7 +973,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Measure the time spent in UpdateManager::Update
   PERF_MONITOR_START(PerformanceMonitor::UPDATE);
 
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+  const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // Update the frame time delta on the render thread.
   mImpl->renderManager.SetFrameDeltaTime(elapsedSeconds);
@@ -1000,7 +986,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
   // 3) Process Touches & Gestures
   mImpl->touchResampler.Update();
-  const bool gestureUpdated = ProcessGestures( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+  const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                            // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
@@ -1014,11 +1000,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   if( updateScene || mImpl->previousUpdateScene )
   {
     // 4) Reset properties from the previous update
-    ResetProperties();
+    ResetProperties( bufferIndex );
   }
 
   // 5) Process the queued scene messages
-  mImpl->messageQueue.ProcessMessages();
+  mImpl->messageQueue.ProcessMessages( bufferIndex );
 
   // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
@@ -1032,13 +1018,13 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   if( updateScene || mImpl->previousUpdateScene )
   {
     // 7) Animate
-    Animate( elapsedSeconds );
+    Animate( bufferIndex, elapsedSeconds );
 
     // 8) Apply Constraints
-    ApplyConstraints();
+    ApplyConstraints( bufferIndex );
 
     // 9) Check Property Notifications
-    ProcessPropertyNotifications();
+    ProcessPropertyNotifications( bufferIndex );
 
     // 10) Clear the lists of renderable-attachments from the previous update
     ClearRenderables( mImpl->sortedLayers );
@@ -1046,7 +1032,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
-    UpdateNodes();
+    UpdateNodes( bufferIndex );
 
     // 12) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
@@ -1059,7 +1045,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     // 14) Process the RenderTasks; this creates the instructions for rendering the next frame.
     // reset the update buffer index and make sure there is enough room in the instruction container
-    mImpl->renderInstructions.ResetAndReserve( mSceneGraphBuffers.GetUpdateBufferIndex(),
+    mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
 
     if ( NULL != mImpl->root )
@@ -1131,11 +1117,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   keepUpdating |= KeepUpdating::MONITORING_PERFORMANCE;
 #endif
 
-  // The update has finished; swap the double-buffering indices
-  mSceneGraphBuffers.Swap();
-
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
+
+  // The update has finished; swap the double-buffering indices
+  mSceneGraphBuffers.Swap();
 
   PERF_MONITOR_END(PerformanceMonitor::UPDATE);
 

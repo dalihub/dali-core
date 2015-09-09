@@ -237,7 +237,7 @@ bool MessageQueue::FlushQueue()
   return messagesToProcess;
 }
 
-void MessageQueue::ProcessMessages()
+void MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
@@ -253,7 +253,7 @@ void MessageQueue::ProcessMessages()
     {
       MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
 
-      message->Process( mImpl->sceneGraphBuffers.GetUpdateBufferIndex() );
+      message->Process( updateBufferIndex  );
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
