@@ -438,41 +438,40 @@ private:
   void PostProcessResources();
 
   /**
-   * Helper to reset a Node properties.
-   * @param[in] node The node.
-   */
-  void ResetNodeProperty( Node& node );
-
-  /**
    * Helper to reset all Node properties
+   * @param[in] bufferIndex to use
    */
-  void ResetProperties();
+  void ResetProperties( BufferIndex bufferIndex );
 
   /**
    * Perform gesture updates.
-   * @param[in]  lastVSyncTime  The last VSync time in milliseconds.
-   * @param[in]  nextVSyncTime  The estimated time of the next VSync in milliseconds.
+   * @param[in] bufferIndex to use
+   * @param[in] lastVSyncTime  The last VSync time in milliseconds.
+   * @param[in] nextVSyncTime  The estimated time of the next VSync in milliseconds.
    * @return true, if any properties were updated.
    */
-  bool ProcessGestures( unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds );
+  bool ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds );
 
   /**
    * Perform animation updates
+   * @param[in] bufferIndex to use
    * @param[in] elapsedSeconds time since last frame
    */
-  void Animate( float elapsedSeconds );
+  void Animate( BufferIndex bufferIndex, float elapsedSeconds );
 
   /**
    * Perform constraint updates.
    * @note Applies constraints to nodes first (depth first search order).
    * Then shader constraints second (construction order)
+   * @param[in] bufferIndex to use
    */
-  void ApplyConstraints();
+  void ApplyConstraints( BufferIndex bufferIndex );
 
   /**
    * Perform property notification updates
+   * @param[in] bufferIndex to use
    */
-  void ProcessPropertyNotifications();
+  void ProcessPropertyNotifications( BufferIndex bufferIndex );
 
   /**
    * Pass shader binaries queued here on to event thread.
@@ -488,8 +487,9 @@ private:
 
   /**
    * Update node shaders, opacity, geometry etc.
+   * @param[in] bufferIndex to use
    */
-  void UpdateNodes();
+  void UpdateNodes( BufferIndex bufferIndex );
 
 private:
 

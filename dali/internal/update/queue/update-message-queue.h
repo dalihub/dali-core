@@ -86,8 +86,9 @@ public:
 
   /**
    * Called once per update; process the previously flushed messages.
+   * @param updateBufferIndex to use
    */
-  void ProcessMessages();
+  void ProcessMessages( BufferIndex updateBufferIndex );
 
   /**
    * Query whether the queue was empty this frame.
