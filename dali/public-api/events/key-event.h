@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 /**
  * @brief The key event structure is used to store a key press.
@@ -134,6 +138,9 @@ struct DALI_IMPORT_API KeyEvent
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_KEY_EVENT_H__

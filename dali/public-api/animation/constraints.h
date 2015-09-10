@@ -29,6 +29,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-animation
+ * @{
+ */
 
 /**
  * @brief EqualToConstraint
@@ -218,6 +222,9 @@ inline void LookAt( Quaternion& current, const PropertyInputContainer& inputs )
   current = Quaternion( vX, vY, vForward );
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONSTRAINTS_H__

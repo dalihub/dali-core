@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
 
 struct AngleAxis;
 class Quaternion;
@@ -367,6 +371,9 @@ private:
  */
 DALI_IMPORT_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_VALUE_H__

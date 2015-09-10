@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -288,6 +292,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL BufferImage(Internal::BufferImage*);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_BUFFER_IMAGE_H__

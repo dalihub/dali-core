@@ -32,14 +32,13 @@ enum DataRetention
 };
 
 /**
- * The discardable policy describes whether a resource is owned or can be discarded.
+ * The discardable policy determines if a resource can be discarded.
  * Discarded means that it can be released after uploading to GPU.
  */
 enum Discardable
 {
   OWNED_DISCARD,
   OWNED_RETAIN,
-  NOT_OWNED
 };
 
 } // namespace ResourcePolicy

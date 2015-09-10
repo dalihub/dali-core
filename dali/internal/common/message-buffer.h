@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 
+// INTERNAL INCLUDES
+#include <dali/devel-api/common/mutex.h>
+
 namespace Dali
 {
 
@@ -143,6 +146,7 @@ private:
 
   std::size_t mCapacity; ///< The memory allocated with respect to sizeof(WordType)
   std::size_t mSize;     ///< The memory reserved for messages with respect to sizeof(WordType)
+  Dali::Mutex mMutex;    ///< Mutex to ensure correct access locking
 };
 
 } // namespace Internal

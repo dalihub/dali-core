@@ -1,0 +1,2 @@
+package_doxy_files = \
+  $(package_doxy_dir)/dali-core-doc.h

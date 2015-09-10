@@ -28,6 +28,11 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-object
+ * @{
+ */
+
 typedef std::pair<std::string, Property::Value> StringValuePair;
 
 /**
@@ -193,6 +198,9 @@ private:
   Impl* mImpl; ///< Pointer to private data
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_MAP_H__

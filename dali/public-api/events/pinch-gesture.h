@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 /**
  * @brief A PinchGesture is emitted when the user moves two fingers towards or away from each other.
@@ -91,6 +95,9 @@ struct DALI_IMPORT_API PinchGesture: public Gesture
   Vector2 localCenterPoint;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PINCH_GESTURE_H__

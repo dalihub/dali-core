@@ -64,6 +64,7 @@ MessageBuffer::~MessageBuffer()
 
 unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
 {
+  Dali::Mutex::ScopedLock lock(mMutex);
   DALI_ASSERT_DEBUG( 0 != size );
 
   // Number of aligned words required to handle a message of size in bytes

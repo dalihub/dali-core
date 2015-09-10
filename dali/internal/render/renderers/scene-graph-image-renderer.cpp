@@ -221,7 +221,10 @@ bool ImageRenderer::CheckResources()
 {
   if( mTexture == NULL )
   {
-    mTexture = mTextureCacheDELETEME->GetTexture( mTextureId );
+    if ( mTextureCacheDELETEME )
+    {
+      mTexture = mTextureCacheDELETEME->GetTexture( mTextureId );
+    }
   }
 
   if( mTexture == NULL )

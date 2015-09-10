@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/mutex.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/internal/update/common/property-owner.h>
@@ -343,6 +344,38 @@ private:
   // PropertyOwner
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
+  // Defines information to be gathered by the gesture reading code.
+  struct FrameGestureInfo
+  {
+    PanGesture::PanInfo frameGesture;
+    float acceleration;
+    unsigned int eventsThisFrame;
+    bool justStarted;
+    bool justFinished;
+
+    FrameGestureInfo()
+    : acceleration( 0.0f ),
+      eventsThisFrame( 0 ),
+      justStarted( false ),
+      justFinished( false )
+    {
+    }
+  };
+
+  /**
+   * Reads gestures from input, builds history.
+   * @param[out] info Written to with information about gestures read this frame.
+   * @param[in] currentTimestamp The time of this frame.
+   */
+  bool ReadGestures( FrameGestureInfo& info, unsigned int currentTimestamp );
+
+  /**
+   * Reads gestures from input and resamples data, builds history.
+   * @param[out] info Written to with information about gestures read this frame.
+   * @param[in] currentTimestamp The time of this frame.
+   */
+  bool ReadAndResampleGestures( FrameGestureInfo& info, unsigned int currentTimestamp );
+
 private:
 
   // Properties
@@ -354,27 +387,27 @@ private:
   GesturePropertyVector2 mLocalDisplacement;  ///< local-displacement
   GesturePropertyVector2 mLocalVelocity;      ///< local-velocity
 
-  PanInfo mGestures[PAN_GESTURE_HISTORY];         ///< Circular buffer storing the 4 most recent gestures.
   PanInfoHistory mPanHistory;
   PanInfoHistory mPredictionHistory;
-  unsigned int mWritePosition;  ///< The next PanInfo buffer to write to. (starts at 0)
-  unsigned int mReadPosition;   ///< The next PanInfo buffer to read. (starts at 0)
+  PanInfo mGestures[PAN_GESTURE_HISTORY];     ///< Circular buffer storing the 4 most recent gestures.
+  PanInfo mLastGesture;                       ///< The last gesture. (last update frame).
+  PanInfo mTargetGesture;                     ///< The most recent input gesture, if the current used gesture does not match.
+  PanInfo mLastUnmodifiedGesture;             ///< The last gesture before any processing was done on it.
+  volatile unsigned int mWritePosition;       ///< The next PanInfo buffer to write to. (starts at 0).
+  unsigned int mReadPosition;                 ///< The next PanInfo buffer to read. (starts at 0).
+  bool mNotAtTarget;                          ///< Keeps track of if the last gesture used was the most recent received.
+  bool mInGesture;                            ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled.
 
-  PanInfo mEventGesture;        ///< Result of all pan events received this frame
-  PanInfo mLastEventGesture;    ///< The last frame's event gesture.
-  PanInfo mLastGesture;         ///< The latest gesture. (this update frame)
-  PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
-  bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
-
-  PredictionMode mPredictionMode;  ///< The pan gesture prediction mode
-  unsigned int mPredictionAmount;  ///< how far into future to predict in milliseconds
-  unsigned int mCurrentPredictionAmount;  ///< the current prediction amount used by the prediction algorithm
-  unsigned int mMaxPredictionAmount;  ///< the maximum prediction amount used by the prediction algorithm
-  unsigned int mMinPredictionAmount;  ///< the minimum prediction amount used by the prediction algorithm
-  unsigned int mPredictionAmountAdjustment;  ///< the prediction amount to adjust in milliseconds when pan velocity changes
-  SmoothingMode mSmoothingMode;    ///< The pan gesture prediction mode
-  float         mSmoothingAmount;  ///< How much smoothing to apply [0.0f,1.0f]
-  PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
+  PredictionMode mPredictionMode;             ///< The pan gesture prediction mode
+  unsigned int mPredictionAmount;             ///< how far into future to predict in milliseconds
+  unsigned int mCurrentPredictionAmount;      ///< the current prediction amount used by the prediction algorithm
+  unsigned int mMaxPredictionAmount;          ///< the maximum prediction amount used by the prediction algorithm
+  unsigned int mMinPredictionAmount;          ///< the minimum prediction amount used by the prediction algorithm
+  unsigned int mPredictionAmountAdjustment;   ///< the prediction amount to adjust in milliseconds when pan velocity changes
+  SmoothingMode mSmoothingMode;               ///< The pan gesture prediction mode
+  float         mSmoothingAmount;             ///< How much smoothing to apply [0.0f,1.0f]
+  PanGestureProfiling* mProfiling;            ///< NULL unless pan-gesture profiling information is required.
+  Dali::Mutex mMutex;                         ///< Mutex to lock access.
 };
 
 } // namespace SceneGraph

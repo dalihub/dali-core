@@ -106,6 +106,14 @@ public:
 
 private:
 
+  // Undefined
+  MemoryPoolObjectAllocator( const MemoryPoolObjectAllocator& memoryPoolObjectAllocator );
+
+  // Undefined
+  MemoryPoolObjectAllocator& operator=( const MemoryPoolObjectAllocator& memoryPoolObjectAllocator );
+
+private:
+
   FixedSizeMemoryPool* mPool;      ///< Memory pool from which allocations are made
 
 };

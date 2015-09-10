@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.1.1
+Version:    1.1.2
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0, BSD-2.0, MIT
@@ -135,6 +135,7 @@ exit 0
 %{_libdir}/pkgconfig/*.pc
 %{dev_include_path}/%{name}/public-api/*
 %{dev_include_path}/%{name}/devel-api/*
+%{dev_include_path}/%{name}/doc/*
 
 %files integration-devel
 %defattr(-,root,root,-)

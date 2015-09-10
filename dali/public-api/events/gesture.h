@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-events
+ * @{
+ */
 
 /**
  * @brief Base structure for different gestures that an application can receive.
@@ -113,6 +117,9 @@ protected: // Creation
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_GESTURE_H__

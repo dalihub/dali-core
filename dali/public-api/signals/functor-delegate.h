@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-signals
+ * @{
+ */
 
 /**
  * @brief Dispatcher to call a functor
@@ -129,6 +133,9 @@ public: // Data for deriving classes & Dispatchers
   Destructor mDestructorDispatcher;     ///< Destructor for owned objects
 };
 
+/**
+ * @}
+ */
 } // namespace DALI
 
 #endif // __DALI_FUNCTOR_DELEGATE_H__

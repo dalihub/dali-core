@@ -632,7 +632,7 @@ bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordin
   bool wasHit( false );
   Results hitTestResults;
 
-  const Vector< RenderTaskList::Exclusive >& exclusives = Stage::GetCurrent()->GetRenderTaskList().GetExclusivesList();
+  const Vector< RenderTaskList::Exclusive >& exclusives = stage.GetRenderTaskList().GetExclusivesList();
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
   if ( HitTestRenderTask( exclusives, stage, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {

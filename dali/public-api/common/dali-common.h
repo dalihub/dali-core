@@ -23,6 +23,7 @@
 #ifdef EMSCRIPTEN
 #include <emscripten/emscripten.h>
 #endif
+
 /*
  * Definitions for shared library support
  *
@@ -79,6 +80,10 @@
  */
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-common
+ * @{
+ */
 
 /**
  * @brief Method to log assertion message in DALI_ASSERT_ALWAYS macro below.
@@ -108,6 +113,9 @@ public:
   const char* condition;
 };
 
+/**
+ * @}
+ */
 }// Dali
 
 /**

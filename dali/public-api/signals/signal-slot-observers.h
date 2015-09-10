@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-signals
+ * @{
+ */
 
 class SlotObserver;
 class CallbackBase;
@@ -82,6 +86,9 @@ public:
   virtual void SlotDisconnected( CallbackBase* callback ) = 0;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SIGNAL_SLOT_OBSERVERS_H__

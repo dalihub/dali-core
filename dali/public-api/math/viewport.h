@@ -23,12 +23,19 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-math
+ * @{
+ */
 
 /**
  * @brief Typedef for a viewport ( a rectangle representing a screen area ).
  */
 typedef Rect<int> Viewport;
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_VIEWPORT_H__

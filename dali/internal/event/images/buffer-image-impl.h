@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,15 @@ public:
   /**
    * Create a new BufferImage, which uses external data source.
    * Pixel buffer has to be allocated by application.
-   * Application holds ownership of the buffer.
+   * An internal copy is made of the Pixel Buffer, which can then be freed by the Application, unless if there will be a call to Update() later.
+   * The buffer should only be freed when there is no chance of an Update() being called again.
+   * Obtaining the buffer with GetBuffer() and altering the contents, then Update() will not work with externally owned buffers.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * @note  in case releasePol is "OffStage", application has to call Update() whenever image is re-added to the stage
+   *
+   * @deprecated Support for externally owned Pixel Buffers is due to be removed TBA.
+   * It is recommended that a BufferImage owned Buffer be used instead.
+
    * @param [in] pixBuf      pixel buffer. has to be allocated by application.
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
@@ -101,10 +106,12 @@ public:
   /**
    * Create a new BufferImage, which uses external data source.
    * Pixel buffer has to be allocated by application.
-   * Application holds ownership of the buffer.
+   * An internal copy is made of the Pixel Buffer, which can then be freed by the Application, unless if there will be a call to Update() later.
+   * The buffer should only be freed when there is no chance of Update() being called again.
+   * Note: obtaining the buffer with GetBuffer(), writing changes, then Update() will cause any changes to be lost.
+   * In this case, the BufferImage will update from the external buffer and so changes should be written there.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * @note  in case releasePol is "OffStage", application has to call Update() whenever image is re-added to the stage
    * @param [in] pixBuf      pixel buffer. has to be allocated by application.
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
@@ -143,27 +150,48 @@ public:
    * Upload the modified contents with Update().
    * @return the pixel buffer
    */
-  PixelBuffer* GetBuffer();
+  PixelBuffer* GetBuffer() const
+  {
+    return ( mExternalBuffer ? mExternalBuffer : mInternalBuffer );
+  }
 
   /**
    * Returns buffer size in bytes.
    * @return the buffer size in bytes
    */
-  unsigned int GetBufferSize() const;
+  unsigned int GetBufferSize() const
+  {
+    return mBufferSize;
+  }
 
   /**
    * Returns buffer stride (in bytes).
    * @return the buffer stride
    */
-  unsigned int GetBufferStride() const;
+  unsigned int GetBufferStride() const
+  {
+    return mByteStride;
+  }
 
   /**
    * Get the pixel format
    * @return The pixel format
    */
-  Pixel::Format GetPixelFormat() const;
+  Pixel::Format GetPixelFormat() const
+  {
+    return mPixelFormat;
+  }
 
-protected: // From Resource
+  /**
+   * @brief Upload pixel data to another resource at an offset
+   *
+   * @param destId ResourceId of the destination
+   * @param xOffset x offset in the destination
+   * @param yOffset y offset in the destination
+   */
+  void UploadBitmap( ResourceId destId, std::size_t xOffset, std::size_t yOffset );
+
+protected: // From Image
   /**
    * @copydoc Dali::Internal::Image::Connect
    */
@@ -174,18 +202,29 @@ protected: // From Resource
    */
   virtual void Disconnect();
 
-  /**
-   * Get the bitmap from local cache or ticket.
-   **/
-  Integration::Bitmap * GetBitmap() const;
+private:
+
+  void ValidateBitmap();
+
+  void ReserveBitmap();
+
+  void UpdateBitmap( RectArea& updateArea );
+
+  void MirrorExternal( const RectArea& area );
+
+  void UpdateBufferArea( PixelBuffer* src, const RectArea& area );
 
 private:
-  bool mIsDataExternal; ///< whether application holds ownership of pixel buffer or not
 
-  ResourceClient*            mResourceClient;
-
-protected:
-  Integration::BitmapPtr     mBitmapCached;
+  PixelBuffer*                 mInternalBuffer;       ///< NULL if the data is supplied by an external buffer.
+  PixelBuffer*                 mExternalBuffer;       ///< NULL if there is no external pixel data (this is never owned by BufferImage).
+  ResourceClient*              mResourceClient;       ///< pointer to the resource client.
+  Integration::Bitmap*         mBitmap;               ///< pointer to the bitmap object containing the pixel buffer used to update GL.
+  uint32_t                     mBufferSize;           ///< size of the pixel buffer.
+  uint32_t                     mByteStride;           ///< width of the pixel buffer in bytes.
+  uint32_t                     mBytesPerPixel;        ///< width of a pixel in bytes.
+  Pixel::Format                mPixelFormat;          ///< pixel format of bitmap.
+  ResourcePolicy::Discardable  mResourcePolicy;       ///< whether to discard the pixel buffer when removed from the stage or to retain the data.
 };
 
 } // namespace Internal

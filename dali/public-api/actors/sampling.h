@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace FilterMode
 {
@@ -40,6 +44,9 @@ enum Type
 
 } //namespace FilterMode
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SAMPLING_H__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@
 // CLASS HEADER
 #include <dali/integration-api/bitmap.h>
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/bitmap-packed-pixel.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
-#include <dali/internal/event/images/bitmap-external.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
 
@@ -290,26 +287,10 @@ void Bitmap::DiscardBuffer()
   }
 }
 
-PixelBuffer* Bitmap::ReleaseBuffer()
-{
-  PixelBuffer* const data = mData;
-
-  // Ownership of mData has been transferred, so indicate that mData pointer is no longer valid:
-  mData = NULL;
-
-  return data;
-}
-
 Bitmap::~Bitmap()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-
-  // If owned
-  if( mDiscardable == ResourcePolicy::OWNED_DISCARD ||
-      mDiscardable == ResourcePolicy::OWNED_RETAIN )
-  {
-    DeletePixelBuffer();
-  }
+  DeletePixelBuffer();
 }
 
 /**
@@ -320,7 +301,7 @@ void Bitmap::DeletePixelBuffer()
   {
     return;
   }
-  delete [] mData;
+  free ( mData );
   mData = NULL;
 }
 

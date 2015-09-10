@@ -25,6 +25,11 @@
 namespace Dali
 {
 /**
+ * @addtogroup dali-core-events
+ * @{
+ */
+
+/**
  * @brief Touch events are a collection of touch points at a specific moment in time.
  *
  * When a multi-touch event occurs, each touch point represents the points that are currently being
@@ -87,6 +92,9 @@ struct DALI_IMPORT_API TouchEvent
   const TouchPoint& GetPoint(unsigned int point) const;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_TOUCH_EVENT_H__

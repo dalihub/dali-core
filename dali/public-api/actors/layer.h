@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali-core-actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -391,6 +395,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL Layer(Internal::Layer* Layer);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif //__DALI_LAYER_H__

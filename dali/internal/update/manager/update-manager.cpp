@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/set-wrapper.h>
+#include <dali/devel-api/common/mutex.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>
@@ -131,8 +132,7 @@ typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
 
-typedef std::vector<Internal::ShaderDataPtr> ShaderDataBatchedQueue;
-typedef ShaderDataBatchedQueue::iterator        ShaderDataBatchedQueueIterator;
+typedef std::vector<Internal::ShaderDataPtr>   ShaderDataBinaryQueue;
 
 typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
@@ -276,12 +276,14 @@ struct UpdateManager::Impl
   ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
   ObjectOwnerContainer<Material>      materials;                     ///< A container of materials
   ObjectOwnerContainer<Sampler>       samplers;                      ///< A container of samplers
-  ObjectOwnerContainer<PropertyBuffer> propertyBuffers;             ///< A container of property buffers
+  ObjectOwnerContainer<PropertyBuffer> propertyBuffers;              ///< A container of property buffers
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
-  ShaderDataBatchedQueue              compiledShaders[2];            ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
+  ShaderDataBinaryQueue               renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
+  ShaderDataBinaryQueue               updateCompiledShaders;         ///< Shaders to be sent from Update to Event
+  Mutex                               compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
@@ -629,7 +631,11 @@ void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
 {
   DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
   DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
-  mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex() > 0 ? 0 : 1].push_back( shaderData );
+  {
+    // lock as update might be sending previously compiled shaders to event thread
+    Mutex::ScopedLock lock( mImpl->compiledShaderMutex );
+    mImpl->renderCompiledShaders.push_back( shaderData );
+  }
 }
 
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
@@ -688,40 +694,30 @@ bool UpdateManager::FlushQueue()
   return mImpl->messageQueue.FlushQueue();
 }
 
-void UpdateManager::ResetNodeProperty( Node& node )
-{
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
-
-  node.ResetToBaseValues( bufferIndex );
-}
-
-void UpdateManager::ResetProperties()
+void UpdateManager::ResetProperties( BufferIndex bufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::RESET_PROPERTIES);
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
   // Animated properties have to be reset to their original value each frame
 
-  // Reset node properties
+  // Reset root properties
   if ( mImpl->root )
   {
-    ResetNodeProperty( *mImpl->root );
+    mImpl->root->ResetToBaseValues( bufferIndex );
   }
-
   if ( mImpl->systemLevelRoot )
   {
-    ResetNodeProperty( *mImpl->systemLevelRoot );
+    mImpl->systemLevelRoot->ResetToBaseValues( bufferIndex );
   }
 
   // Reset the Connected Nodes
   const std::set<Node*>::iterator endIter = mImpl->connectedNodes.end();
   for( std::set<Node*>::iterator iter = mImpl->connectedNodes.begin(); endIter != iter; ++iter )
   {
-    ResetNodeProperty( **iter );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   // If a Node is disconnected, it may still be "active" (requires a reset in next frame)
@@ -773,7 +769,7 @@ void UpdateManager::ResetProperties()
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
-bool UpdateManager::ProcessGestures( unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
+bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
 {
   bool gestureUpdated( false );
 
@@ -783,14 +779,14 @@ bool UpdateManager::ProcessGestures( unsigned int lastVSyncTimeMilliseconds, uns
   for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
   {
     PanGesture& gesture = **iter;
-    gesture.ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
+    gesture.ResetToBaseValues( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
     gestureUpdated |= gesture.UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
   }
 
   return gestureUpdated;
 }
 
-void UpdateManager::Animate( float elapsedSeconds )
+void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
   PERF_MONITOR_START(PerformanceMonitor::ANIMATE_NODES);
 
@@ -799,7 +795,7 @@ void UpdateManager::Animate( float elapsedSeconds )
   while ( iter != animations.End() )
   {
     Animation* animation = *iter;
-    bool finished = animation->Update(mSceneGraphBuffers.GetUpdateBufferIndex(), elapsedSeconds);
+    bool finished = animation->Update( bufferIndex, elapsedSeconds );
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
 
@@ -823,11 +819,9 @@ void UpdateManager::Animate( float elapsedSeconds )
   PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
 }
 
-void UpdateManager::ApplyConstraints()
+void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // constrain custom objects... (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
@@ -895,12 +889,10 @@ void UpdateManager::ApplyConstraints()
   PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
 }
 
-void UpdateManager::ProcessPropertyNotifications()
+void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 {
   PropertyNotificationContainer &notifications = mImpl->propertyNotifications;
   PropertyNotificationIter iter = notifications.Begin();
-
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   while ( iter != notifications.End() )
   {
@@ -919,21 +911,29 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
   DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
   if( mImpl->shaderSaver )
   {
-    ShaderDataBatchedQueue& compiledShaders = mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex()];
-    if( compiledShaders.size() > 0 )
+    // lock and swap the queues
+    {
+      // render might be attempting to send us more binaries at the same time
+      Mutex::ScopedLock lock( mImpl->compiledShaderMutex );
+      mImpl->renderCompiledShaders.swap( mImpl->updateCompiledShaders );
+    }
+
+    if( mImpl->updateCompiledShaders.size() > 0 )
     {
       ShaderSaver& factory = *mImpl->shaderSaver;
-      ShaderDataBatchedQueueIterator i   = compiledShaders.begin();
-      ShaderDataBatchedQueueIterator end = compiledShaders.end();
+      ShaderDataBinaryQueue::iterator i   = mImpl->updateCompiledShaders.begin();
+      ShaderDataBinaryQueue::iterator end = mImpl->updateCompiledShaders.end();
       for( ; i != end; ++i )
       {
         mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, *i ) );
       }
+      // we don't need them in update anymore
+      mImpl->updateCompiledShaders.clear();
     }
   }
 }
 
-void UpdateManager::UpdateNodes()
+void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NothingFlag;
 
@@ -947,14 +947,14 @@ void UpdateManager::UpdateNodes()
   // Prepare resources, update shaders, update attachments, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
   mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
-                                                     mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                     bufferIndex,
                                                      mImpl->resourceManager,
                                                      mImpl->renderQueue );
 
   if ( mImpl->systemLevelRoot )
   {
     mImpl->nodeDirtyFlags |= UpdateNodesAndAttachments( *( mImpl->systemLevelRoot ),
-                                                        mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                        bufferIndex,
                                                         mImpl->resourceManager,
                                                         mImpl->renderQueue );
   }
@@ -973,7 +973,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Measure the time spent in UpdateManager::Update
   PERF_MONITOR_START(PerformanceMonitor::UPDATE);
 
-  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+  const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // Update the frame time delta on the render thread.
   mImpl->renderManager.SetFrameDeltaTime(elapsedSeconds);
@@ -986,7 +986,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
   // 3) Process Touches & Gestures
   mImpl->touchResampler.Update();
-  const bool gestureUpdated = ProcessGestures( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+  const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                            // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
@@ -1000,16 +1000,16 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   if( updateScene || mImpl->previousUpdateScene )
   {
     // 4) Reset properties from the previous update
-    ResetProperties();
+    ResetProperties( bufferIndex );
   }
 
   // 5) Process the queued scene messages
-  mImpl->messageQueue.ProcessMessages();
+  mImpl->messageQueue.ProcessMessages( bufferIndex );
 
   // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
 
-  // 6.1) Forward a batch of compiled shader programs to event thread for saving
+  // 6.1) Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -1018,13 +1018,13 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   if( updateScene || mImpl->previousUpdateScene )
   {
     // 7) Animate
-    Animate( elapsedSeconds );
+    Animate( bufferIndex, elapsedSeconds );
 
     // 8) Apply Constraints
-    ApplyConstraints();
+    ApplyConstraints( bufferIndex );
 
     // 9) Check Property Notifications
-    ProcessPropertyNotifications();
+    ProcessPropertyNotifications( bufferIndex );
 
     // 10) Clear the lists of renderable-attachments from the previous update
     ClearRenderables( mImpl->sortedLayers );
@@ -1032,7 +1032,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
-    UpdateNodes();
+    UpdateNodes( bufferIndex );
 
     // 12) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
@@ -1045,7 +1045,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     // 14) Process the RenderTasks; this creates the instructions for rendering the next frame.
     // reset the update buffer index and make sure there is enough room in the instruction container
-    mImpl->renderInstructions.ResetAndReserve( mSceneGraphBuffers.GetUpdateBufferIndex(),
+    mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
 
     if ( NULL != mImpl->root )
@@ -1117,11 +1117,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   keepUpdating |= KeepUpdating::MONITORING_PERFORMANCE;
 #endif
 
-  // The update has finished; swap the double-buffering indices
-  mSceneGraphBuffers.Swap();
-
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
+
+  // The update has finished; swap the double-buffering indices
+  mSceneGraphBuffers.Swap();
 
   PERF_MONITOR_END(PerformanceMonitor::UPDATE);
 
