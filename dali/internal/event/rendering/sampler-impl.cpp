@@ -118,6 +118,11 @@ const SceneGraph::Sampler* Sampler::GetSamplerSceneObject() const
   return mSceneObject;
 }
 
+SceneGraph::Sampler* Sampler::GetSamplerSceneObject()
+{
+  return mSceneObject;
+}
+
 unsigned int Sampler::GetDefaultPropertyCount() const
 {
   return SAMPLER_IMPL.GetDefaultPropertyCount();

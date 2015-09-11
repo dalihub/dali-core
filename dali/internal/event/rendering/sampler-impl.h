@@ -90,6 +90,12 @@ public:
    */
   const SceneGraph::Sampler* GetSamplerSceneObject() const;
 
+  /**
+   * Retrieve the scene-graph sampler added by this object.
+   * @return A pointer to the sampler, or NULL if no sampler has been added to the scene-graph.
+   */
+  SceneGraph::Sampler* GetSamplerSceneObject();
+
 public: // Default property extensions from Object
 
   /**
