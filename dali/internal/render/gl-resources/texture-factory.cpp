@@ -24,7 +24,6 @@
 #include <dali/internal/render/gl-resources/compressed-bitmap-texture.h>
 #include <dali/internal/render/gl-resources/native-texture.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
-#include <dali/internal/render/gl-resources/native-frame-buffer-texture.h>
 
 
 namespace Dali
@@ -107,7 +106,7 @@ Internal::Texture* NewFrameBufferTexture( unsigned int width,
 Internal::Texture* NewFrameBufferTexture( NativeImageInterfacePtr nativeImage,
                                           Context& context )
 {
-  NativeFrameBufferTexture* texture = new NativeFrameBufferTexture(nativeImage, context);
+  FrameBufferTexture* texture = new FrameBufferTexture(nativeImage, context);
   if (!texture->Init())
   {
     delete texture;
