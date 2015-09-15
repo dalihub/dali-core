@@ -36,7 +36,8 @@ class NinePatchImage;
 }
 
 /**
- * @brief NinePatchImage represents an image resource that can be added to ImageActors.
+ * @brief NinePatchImage represents a stretchable image resource
+ *
  * It contains a bitmap that is synchronously loaded from the file system that contains
  * a 9 patch border - a 1 pixel border that describes the stretch borders and the child
  * area.
