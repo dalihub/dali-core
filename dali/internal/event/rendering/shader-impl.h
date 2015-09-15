@@ -60,6 +60,12 @@ public:
    */
   const SceneGraph::Shader* GetShaderSceneObject() const;
 
+  /**
+   * Retrieve the scene-graph shader added by this object.
+   * @return A pointer to the shader, or NULL if no shader has been added to the scene-graph.
+   */
+  SceneGraph::Shader* GetShaderSceneObject();
+
 public: // Default property extensions from Object
 
   /**

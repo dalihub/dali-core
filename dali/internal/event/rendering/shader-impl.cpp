@@ -72,6 +72,11 @@ const SceneGraph::Shader* Shader::GetShaderSceneObject() const
   return mSceneObject;
 }
 
+SceneGraph::Shader* Shader::GetShaderSceneObject()
+{
+  return mSceneObject;
+}
+
 unsigned int Shader::GetDefaultPropertyCount() const
 {
   return SHADER_IMPL.GetDefaultPropertyCount();

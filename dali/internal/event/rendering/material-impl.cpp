@@ -74,7 +74,7 @@ void Material::SetShader( Shader& shader )
   DALI_ASSERT_DEBUG( mSceneObject )
   mShader = &shader;
 
-  const SceneGraph::Shader& sceneGraphShader = dynamic_cast<const SceneGraph::Shader&>( *shader.GetSceneObject() );
+  SceneGraph::Shader& sceneGraphShader = *shader.GetShaderSceneObject();
   SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
 }
 
@@ -89,7 +89,7 @@ void Material::AddSampler( Sampler& sampler )
   connector.Set( sampler, OnStage() );
   mSamplerConnectors.push_back( connector );
 
-  const SceneGraph::Sampler& sceneGraphSampler = dynamic_cast<const SceneGraph::Sampler&>( *sampler.GetSceneObject() );
+  SceneGraph::Sampler& sceneGraphSampler = *sampler.GetSamplerSceneObject();
   SceneGraph::AddSamplerMessage( GetEventThreadServices(), *mSceneObject, sceneGraphSampler );
 }
 
@@ -100,7 +100,13 @@ std::size_t Material::GetNumberOfSamplers() const
 
 void Material::RemoveSampler( std::size_t index )
 {
-  mSamplerConnectors.erase( mSamplerConnectors.begin() + index );
+  if( index < mSamplerConnectors.size() )
+  {
+    SamplerConnectorContainer::iterator iter = mSamplerConnectors.begin() + index;
+    SceneGraph::Sampler& sceneGraphSampler = *iter->Get()->GetSamplerSceneObject();
+    SceneGraph::RemoveSamplerMessage( GetEventThreadServices(), *mSceneObject, sceneGraphSampler );
+    mSamplerConnectors.erase( iter );
+  }
 }
 
 Sampler* Material::GetSamplerAt( unsigned int index ) const
