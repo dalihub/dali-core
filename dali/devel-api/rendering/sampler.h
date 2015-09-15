@@ -129,6 +129,13 @@ public:
   void SetUniformName( const std::string& name );
 
   /**
+   * @brief Gets the name of the shader uniform that this sampler uses
+   *
+   * @return Returns the name of the uniform
+   */
+  const std::string& GetUniformName() const;
+
+  /**
    * @brief Set the image used by this sampler
    *
    * @param[in] image Image used by this sampler

@@ -68,6 +68,11 @@ void Sampler::SetTextureUnitUniformName( const std::string& name )
   SetTextureUnitUniformNameMessage( GetEventThreadServices(), *mSceneObject, name);
 }
 
+const std::string& Sampler::GetTextureUnitUniformName() const
+{
+  return mSceneObject->GetTextureUnitUniformName();
+}
+
 void Sampler::SetImage( ImagePtr& image )
 {
   // Keep a reference to the image object

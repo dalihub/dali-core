@@ -15,6 +15,7 @@
  *
  */
 
+#include <unistd.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
@@ -185,6 +186,52 @@ int UtcDaliSamplerSetUniformName02(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSamplerGetUniformName01(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  std::string uniformName = "sTextureTEST";
+  Sampler sampler = Sampler::New(image, uniformName);
+
+  std::string actual = sampler.GetUniformName();
+
+  DALI_TEST_EQUALS( uniformName, actual, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSamplerGetUniformName02(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Sampler sampler = Sampler::New(image, "sTextureFAIL" );
+
+  std::string uniformName = "sTextureTEST";
+  sampler.SetUniformName( uniformName );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddSampler( sampler );
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  std::string actual = sampler.GetUniformName();
+
+  DALI_TEST_EQUALS( uniformName, actual, TEST_LOCATION );
 
   END_TEST;
 }

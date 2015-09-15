@@ -61,6 +61,11 @@ void Sampler::SetUniformName( const std::string& name )
   GetImplementation(*this).SetTextureUnitUniformName( name );
 }
 
+const std::string& Sampler::GetUniformName() const
+{
+  return GetImplementation(*this).GetTextureUnitUniformName();
+}
+
 void Sampler::SetImage( Image& image )
 {
   Internal::ImagePtr imagePtr = &GetImplementation( image );
