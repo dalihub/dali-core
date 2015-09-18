@@ -40,31 +40,13 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
 
 
 /**
- * @brief BufferImage represents an image resource that can be added to ImageActors.
+ * @brief BufferImage represents an image resource as a pixel data buffer
  * Its pixel buffer data is provided by the application developer.
- *
- * Care should be taken with pixel data allocated by the application,
- * as the data is copied to GL both when the image is added to the
- * stage and after a call to Update().  In both of these cases, a
- * SignalUploaded will be sent to the application confirming that the
- * operation has completed.
- *
- * The application can free the pixel data after receiving a
- * SignalUploaded.
- *
- * Similarly, once the image is on stage (i.e. it's being used by an
- * ImageActor that is on stage), the application should only write to
- * the buffer after receiving a SignalUploaded, then call Update()
- * once the write is finished. This avoids the pixel data being changed
- * whilst it's being copied to GL. Writing to the buffer without waiting
- * for the signal will likely result in visible tearing.
  *
  * If the pixel format of the pixel buffer contains an alpha channel,
  * then the image is considered to be have transparent pixels without
  * regard for the actual content of the channel, and will be blended.
  *
- * If the image is opaque and blending is not required, then the user
- * should call ImageActor::SetUseImageAlpha(false) on the containing actor.
  */
 class DALI_IMPORT_API BufferImage : public Image
 {
@@ -97,6 +79,8 @@ public:
 
   /**
    * @brief Create a new BufferImage.
+   *
+   * @deprecated DALi 1.1.3, use New( unsigned int width, unsigned int height ) instead.
    *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
@@ -144,6 +128,8 @@ public:
 
   /**
    * @brief Create a new BufferImage, which uses an external data source.
+   *
+   * @deprecated DALi 1.1.3, use New( PixelBuffer* pixelBuffer, unsigned int width, unsigned int height ) instead.
    *
    * The PixelBuffer has to be allocated by application.
    *

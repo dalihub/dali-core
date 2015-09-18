@@ -8,6 +8,7 @@ SET(CAPI_LIB "dali-devel")
 SET(TC_SOURCES
         utc-Dali-Actor.cpp
         utc-Dali-Atlas.cpp
+        utc-Dali-ConditionalWait.cpp
         utc-Dali-Context.cpp
         utc-Dali-Constrainer.cpp
         utc-Dali-CullFace.cpp

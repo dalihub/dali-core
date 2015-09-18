@@ -44,26 +44,16 @@ class ResourceImage;
  *
  * <h3>ResourceImage Loading</h3>
  *
- * When the ResourceImage is created, resource loading will be attempted unless
- * the ResourceImage is created with IMMEDIATE loading policy or a compatible resource is found in cache.
- * In case of loading images ON_DEMAND, resource loading will only be attempted if the associated ImageActor
- * is put on Stage.
+ * When the ResourceImage is created, resource loading will be attempted unless a compatible resource is found in cache.
  * Scaling of images to a desired smaller size can be requested by providing desired dimensions,
  * scaling mode and filter mode to to ResourceImage::New().
- *
- * <i>LoadPolicies</i>
- * - IMMEDIATE: acquire image resource when creating ResourceImage.
- * - ON_DEMAND: only load in case the associated ImageActor is put on Stage
- *
- * <i>Resolution of conflicting policies</i>
- * If the same image is created more than once with conflicting policies, LoadPolicy "IMMEDIATE" overrides "ON_DEMAND".
  *
  * <i>Custom load requests</i>
  * Size, scaling mode, filter mode, and orientation compensation can be set when requesting an image.
  *
  * <i>Compatible resources</i>
  *
- * Before loading a new ResourceImage the internal image resource cache is checked by dali.
+ * Before loading a new ResourceImage the internal image resource cache is checked by DALi.
  * If there is an image already loaded in memory and is deemed "compatible" with the requested image,
  * that resource is reused.
  * This happens for example if a loaded image exists with the same URL, scaling and filtering modes,
@@ -73,9 +63,7 @@ class ResourceImage;
  *
  * The same request used on creating the ResourceImage is re-issued when reloading images.
  * If the file changed since the last load operation, this might result in a different resource.
- * Reload only takes effect if both of these conditions apply:
- * - The ResourceImage has already finished loading
- * - The ResourceImage is either on Stage or using IMMEDIATE load policy
+ * Reload only takes effect if the ResourceImage has already finished loading
  *
  * Signals
  * | %Signal Name           | Method                       |
@@ -85,12 +73,10 @@ class ResourceImage;
 class DALI_IMPORT_API ResourceImage : public Image
 {
 public:
-  /**
-   * @brief Resource management options.
-   */
 
   /**
    * @brief LoadPolicy controls the way images are loaded into memory.
+   * @deprecated DALi 1.1.3 Image loading starts immediately in the frame when then ResourceImage object is created
    */
   enum LoadPolicy
   {
@@ -167,6 +153,8 @@ public:
   /**
    * @brief Create an initialised ResourceImage object.
    *
+   * @deprecated DALi 1.1.3 use New( const std::string& url ) instead.
+   *
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
@@ -193,6 +181,8 @@ public:
 
   /**
    * @brief Create an initialised ResourceImage object.
+   *
+   * @deprecated DALi 1.1.3 use New( const std::string& url, ImageDimensions size ) instead.
    *
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
@@ -225,6 +215,7 @@ public:
 
   /**
    * @brief Return load policy.
+   * @deprecated DALi 1.1.3
    *
    * @return resource load policy
    */

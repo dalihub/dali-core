@@ -217,7 +217,7 @@ private:
   BlendPolicy mBlendPolicy; ///< The blend policy as determined by PrepareRender
 };
 
-inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )
+inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, Shader& shader )
 {
   typedef MessageValue1< Material, Shader* > LocalType;
 
@@ -225,10 +225,10 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Ma
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::SetShader, const_cast<Shader*>(&shader) );
+  new (slot) LocalType( &material, &Material::SetShader, &shader );
 }
 
-inline void AddSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, const Sampler& sampler )
+inline void AddSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, Sampler& sampler )
 {
   typedef MessageValue1< Material, Sampler* > LocalType;
 
@@ -236,7 +236,7 @@ inline void AddSamplerMessage( EventThreadServices& eventThreadServices, const M
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::AddSampler, const_cast<Sampler*>(&sampler) );
+  new (slot) LocalType( &material, &Material::AddSampler, &sampler );
 }
 
 inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, Sampler& sampler )
@@ -247,7 +247,7 @@ inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, cons
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::RemoveSampler, const_cast<Sampler*>(&sampler) );
+  new (slot) LocalType( &material, &Material::RemoveSampler, &sampler );
 }
 
 inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Material& material, unsigned int options )

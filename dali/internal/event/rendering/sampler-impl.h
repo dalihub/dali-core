@@ -59,6 +59,11 @@ public:
   void SetTextureUnitUniformName( const std::string& name );
 
   /**
+   * @copydoc Dali::Sampler::GetUniformName()
+   */
+  const std::string& GetTextureUnitUniformName() const;
+
+  /**
    * @copydoc Dali::Sampler::SetImage()
    */
   void SetImage( ImagePtr& image );
@@ -89,6 +94,12 @@ public:
    * @return the sampler scene object
    */
   const SceneGraph::Sampler* GetSamplerSceneObject() const;
+
+  /**
+   * Retrieve the scene-graph sampler added by this object.
+   * @return A pointer to the sampler, or NULL if no sampler has been added to the scene-graph.
+   */
+  SceneGraph::Sampler* GetSamplerSceneObject();
 
 public: // Default property extensions from Object
 

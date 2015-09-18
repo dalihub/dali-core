@@ -3,6 +3,7 @@
 devel_api_src_files = \
   $(devel_api_src_dir)/animation/animation-data.cpp \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
+  $(devel_api_src_dir)/common/conditional-wait.cpp \
   $(devel_api_src_dir)/common/hash.cpp \
   $(devel_api_src_dir)/common/mutex.cpp \
   $(devel_api_src_dir)/events/hit-test-algorithm.cpp \
@@ -28,6 +29,7 @@ devel_api_core_animation_header_files = \
 devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/hash.h \
   $(devel_api_src_dir)/common/map-wrapper.h \
+  $(devel_api_src_dir)/common/conditional-wait.h \
   $(devel_api_src_dir)/common/mutex.h \
   $(devel_api_src_dir)/common/ref-counted-dali-vector.h \
     $(devel_api_src_dir)/common/set-wrapper.h
