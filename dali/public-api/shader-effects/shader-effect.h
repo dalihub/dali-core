@@ -67,8 +67,7 @@ class ShaderEffect;
 /**
  * @brief Shader effects provide a visual effect for image actors.
  *
- * @deprecated Use classes Dali::Shader, Dali::Material, and Dali::Sampler to implement
- * any new programmable shading effects.
+ * @deprecated DALi 1.0.47
  *
  * For a Custom shader you can provide the vertex and fragment shader code as strings.
  * These shader snippets get concatenated with the default attributes and uniforms.
