@@ -70,7 +70,7 @@ std::size_t PropertyBuffer::GetSize() const
   return  GetImplementation(*this).GetSize();
 }
 
-void PropertyBuffer::SetData( void* data )
+void PropertyBuffer::SetData( const void* data )
 {
   GetImplementation(*this).SetData( data );
 }
