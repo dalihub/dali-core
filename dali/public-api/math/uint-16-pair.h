@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -180,6 +181,9 @@ private:
     uint32_t mData;
   };
 };
+
+// Allow Uint16Pair to be treated as a POD type
+template <> struct TypeTraits< Uint16Pair > : public BasicTypes< Uint16Pair > { enum { IS_TRIVIAL_TYPE = true }; };
 
 /**
  * @}

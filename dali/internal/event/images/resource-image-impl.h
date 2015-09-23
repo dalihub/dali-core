@@ -166,13 +166,6 @@ protected:
 private:
 
   /**
-   * Helper method to determine if the filename indicates that the image has a 9 patch border.
-   * @param [in] url The URL of the image file.
-   * @return true if it is a 9 patch image
-   */
-  static bool IsNinePatch( const std::string& url );
-
-  /**
    * Helper method to set new resource ticket. Stops observing current ticket if any, and starts observing
    * the new one or just resets the intrusive pointer.
    * @param[in] ticket pointer to new resource Ticket or NULL.

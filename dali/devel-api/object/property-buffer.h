@@ -167,7 +167,7 @@ public:
    *
    * @param[in] data A pointer to the data that will be copied to the buffer.
    */
-  void SetData( void* data );
+  void SetData( const void* data );
 
 public:
   /**
