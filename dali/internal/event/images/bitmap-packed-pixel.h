@@ -38,8 +38,6 @@ typedef IntrusivePtr<BitmapPackedPixel>        BitmapPackedPixelPtr;
  * number of bytes.
  * This is a vanilla Bitmap class, typically used to hold data decompressed
  * from PNG and JPEG file formats for example.
- *
- * \sa{Bitmap BitmapCompressed BitmapExternal}
  */
 class BitmapPackedPixel : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::PackedPixelsProfile
 {
