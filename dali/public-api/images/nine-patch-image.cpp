@@ -53,9 +53,7 @@ NinePatchImage& NinePatchImage::operator=(const NinePatchImage& rhs)
 
 NinePatchImage NinePatchImage::New( const std::string& filename )
 {
-  Internal::ImageAttributes defaultAttrs;
-
-  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, defaultAttrs, Image::NEVER );
+  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, Image::NEVER );
   return NinePatchImage(internal.Get());
 }
 

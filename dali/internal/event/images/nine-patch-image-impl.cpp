@@ -137,14 +137,14 @@ namespace
 TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-NinePatchImagePtr NinePatchImage::New( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
+NinePatchImagePtr NinePatchImage::New( const std::string& filename, ReleasePolicy releasePol )
 {
-  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, attributes, releasePol ) );
+  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, releasePol ) );
   internal->Initialize();
   return internal;
 }
 
-NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
+NinePatchImage::NinePatchImage( const std::string& filename, ReleasePolicy releasePol )
 : ResourceImage( IMAGE_LOAD_POLICY_DEFAULT, releasePol ),
   mParsedBorder(false)
 {
@@ -152,7 +152,7 @@ NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttribut
   mResourceClient = &tls.GetResourceClient();
 
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
-  Integration::BitmapResourceType resourceType( ImageDimensions::FromFloatVec2( attributes.GetSize() ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
+  Integration::BitmapResourceType resourceType;
 
   // Note, bitmap is only destroyed when the image is destroyed.
   Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, filename );

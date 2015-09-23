@@ -76,7 +76,7 @@ ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttribut
   ResourceImagePtr image;
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    image = NinePatchImage::New( url, attributes, releasePol );
+    image = NinePatchImage::New( url, releasePol );
   }
   else
   {
