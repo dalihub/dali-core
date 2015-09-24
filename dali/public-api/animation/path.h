@@ -25,7 +25,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-animation
+ * @addtogroup dali_core_animation
  * @{
  */
 

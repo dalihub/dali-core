@@ -21,7 +21,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-common
+ * @addtogroup dali_core_common
  * @{
  */
 

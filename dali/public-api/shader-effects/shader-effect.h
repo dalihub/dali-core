@@ -25,7 +25,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-shader-effects
+ * @addtogroup dali_core_shader_effects
  * @{
  */
 

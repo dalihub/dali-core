@@ -26,7 +26,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-math
+ * @addtogroup dali_core_math
  * @{
  */
 

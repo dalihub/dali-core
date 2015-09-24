@@ -28,7 +28,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-signals
+ * @addtogroup dali_core_signals
  * @{
  */
 
