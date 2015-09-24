@@ -36,7 +36,6 @@ typedef IntrusivePtr<BitmapCompressed>        BitmapCompressedPtr;
  * A container for image data that remains in compresssed form as an opaque blob
  * in memory rather than being decompressed at load time.
  * Used for formats that are supported as GLES texture data directly.
- * \sa{Bitmap BitmapPackedPixel BitmapExternal}
  */
 class BitmapCompressed : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::CompressedProfile
 {
