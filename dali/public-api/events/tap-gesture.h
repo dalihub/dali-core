@@ -25,7 +25,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-events
+ * @addtogroup dali_core_events
  * @{
  */
 

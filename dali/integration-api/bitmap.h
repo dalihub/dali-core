@@ -48,8 +48,6 @@ typedef unsigned char                 PixelBuffer;  ///< Pixel data buffers are 
 /**
  * Bitmap class.
  * An abstract container for image data.
- * \sa{BitmapPackedPixel BitmapCompressed BitmapExternal} for concrete
- * subclasses.
  */
 class DALI_IMPORT_API Bitmap : public Dali::RefObject
 {

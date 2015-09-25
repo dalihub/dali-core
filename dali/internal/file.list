@@ -112,7 +112,6 @@ internal_src_files = \
   $(internal_src_dir)/render/gl-resources/frame-buffer-texture.cpp \
   $(internal_src_dir)/render/gl-resources/gl-call-debug.cpp \
   $(internal_src_dir)/render/gl-resources/gpu-buffer.cpp \
-  $(internal_src_dir)/render/gl-resources/native-frame-buffer-texture.cpp \
   $(internal_src_dir)/render/gl-resources/native-texture.cpp \
   $(internal_src_dir)/render/gl-resources/texture.cpp \
   $(internal_src_dir)/render/gl-resources/texture-factory.cpp \

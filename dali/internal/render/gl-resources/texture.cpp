@@ -100,6 +100,19 @@ Texture::Texture(Context&      context,
 {
 }
 
+Texture::Texture(Context&      context,
+                 unsigned int  width,
+                 unsigned int  height)
+: mContext(context),
+  mId(0),
+  mSamplerBitfield( 0 ),
+  mWidth(width),
+  mHeight(height),
+  mImageWidth(width),
+  mImageHeight(height)
+{
+}
+
 Texture::~Texture()
 {
   // GlCleanup() should already have been called by TextureCache ensuring the resource is destroyed

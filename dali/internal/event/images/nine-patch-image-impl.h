@@ -48,17 +48,18 @@ class UpdateManager;
 class NinePatchImage : public ResourceImage
 {
 public:
+  typedef Dali::Vector< Uint16Pair > StretchRanges;
+
+public:
 
   /**
    * Create a new NinePatchImage.
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * @param [in] filename    File to load synchronously into buffer
-   * @param [in] attributes  Image attributes of the file
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   static NinePatchImagePtr New( const std::string& filename,
-                                const ImageAttributes& attributes,
                                 ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
@@ -66,11 +67,9 @@ public:
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] filename    File to load synchronously into buffer
-   * @param [in] attributes  Image attributes of the file
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   NinePatchImage( const std::string& filename,
-                  const ImageAttributes& attributes,
                   ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
@@ -90,10 +89,14 @@ protected:
 
 public:
   /**
-   * Get the stretch borders
-   * @return The border in pixels from the left, top, right, and bottom of the image respectively.
+   * @copydoc Dali::NinePatchImage::GetStretchPixelsX
    */
-  Vector4 GetStretchBorders();
+  const StretchRanges& GetStretchPixelsX();
+
+  /**
+   * @copydoc Dali::NinePatchImage::GetStretchPixelsY
+   */
+  const StretchRanges& GetStretchPixelsY();
 
   /**
    * Get the child rectangle
@@ -108,6 +111,12 @@ public:
    * @return the cropped bitmap.
    */
   BufferImagePtr CreateCroppedBufferImage();
+
+  /**
+   *
+   * @copydoc Dali::NinePatchImage::
+   */
+  static bool IsNinePatchUrl( const std::string& url );
 
 
 protected: // From Resource
@@ -128,10 +137,13 @@ private:
    */
   void ParseBorders();
 
+  Uint16Pair ParseRange( unsigned int& index, unsigned int width, const PixelBuffer* & pixel, unsigned int pixelStride, int testByte, int testBits, int testValue );
+
 private:
   ResourceClient*               mResourceClient;
   Integration::BitmapPtr        mBitmap;
-  Vector4                       mStretchBorders;
+  StretchRanges                 mStretchPixelsX;  //< The horizontal stretchable pixels in the cropped image space
+  StretchRanges                 mStretchPixelsY;  //< The vertical stretchable pixels in the cropped image space
   Rect<int>                     mChildRectangle;
   bool                          mParsedBorder;
 };

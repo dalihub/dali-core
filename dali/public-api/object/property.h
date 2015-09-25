@@ -30,7 +30,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-object
+ * @addtogroup dali_core_object
  * @{
  */
 

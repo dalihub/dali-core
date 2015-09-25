@@ -36,7 +36,7 @@ class PanGestureDetector;
 struct PanGesture;
 
 /**
- * @addtogroup dali-core-events
+ * @addtogroup dali_core_events
  * @{
  */
 

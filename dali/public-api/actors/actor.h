@@ -31,7 +31,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-actors
+ * @addtogroup dali_core_actors
  * @{
  */
 

@@ -69,6 +69,13 @@ public:
   FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat, Context& context);
 
   /**
+   * Creates a new texture object
+   * @param[in] nativeImage The NativeImage
+   * @param     context The GL context
+   */
+  FrameBufferTexture( NativeImageInterfacePtr nativeImage, Context& context );
+
+  /**
    * Destructor.
    */
   virtual ~FrameBufferTexture();
@@ -100,6 +107,7 @@ protected:
   unsigned int mStencilBufferName;
   Pixel::Format mPixelFormat;
   RenderBuffer::Format mBufferFormat;
+  NativeImageInterfacePtr mNativeImage; ///< For native FBOs only
 
   /**
    * @copydoc Texture::CreateGlTexture

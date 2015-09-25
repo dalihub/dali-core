@@ -74,9 +74,9 @@ ResourceImagePtr ResourceImage::New()
 ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
   ResourceImagePtr image;
-  if( IsNinePatch( url ) )
+  if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    image = NinePatchImage::New( url, attributes, releasePol );
+    image = NinePatchImage::New( url, releasePol );
   }
   else
   {
@@ -241,66 +241,6 @@ void ResourceImage::Disconnect()
     // release image memory when it's not visible anymore (decrease ref. count of texture)
     SetTicket( NULL );
   }
-}
-
-bool ResourceImage::IsNinePatch( const std::string& url )
-{
-  bool match = false;
-
-  std::string::const_reverse_iterator iter = url.rbegin();
-  enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
-  while(iter < url.rend())
-  {
-    switch(state)
-    {
-      case SUFFIX:
-      {
-        if(*iter == '.')
-        {
-          state = HASH;
-        }
-        else if(!isalnum(*iter))
-        {
-          state = DONE;
-        }
-      }
-      break;
-      case HASH:
-      {
-        if( *iter == '#' || *iter == '9' )
-        {
-          state = HASH_DOT;
-        }
-        else
-        {
-          state = DONE;
-        }
-      }
-      break;
-      case HASH_DOT:
-      {
-        if(*iter == '.')
-        {
-          match = true;
-        }
-        state = DONE; // Stop testing characters
-      }
-      break;
-      case DONE:
-      {
-      }
-      break;
-    }
-
-    // Satisfy prevent
-    if( state == DONE )
-    {
-      break;
-    }
-
-    ++iter;
-  }
-  return match;
 }
 
 void ResourceImage::SetTicket( ResourceTicket* ticket )

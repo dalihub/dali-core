@@ -128,7 +128,21 @@ void ImageActor::SetImage( ImagePtr& image )
     {
       newImage = ninePatchImage->CreateCroppedBufferImage();
       SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
-      SetNinePatchBorder( ninePatchImage->GetStretchBorders(), true );
+
+      const NinePatchImage::StretchRanges& stretchPixelsX = ninePatchImage->GetStretchPixelsX();
+      const NinePatchImage::StretchRanges& stretchPixelsY = ninePatchImage->GetStretchPixelsY();
+
+      if( stretchPixelsX.Size() > 0 && stretchPixelsY.Size() > 0 )
+      {
+        Vector4 border;
+        //The NinePatchImage stretch pixels are in the cropped image space, inset by 1 to get it to uncropped image space
+        border.x = stretchPixelsX[ 0 ].GetX() + 1;
+        border.y = stretchPixelsY[ 0 ].GetX() + 1;
+        border.z = image->GetWidth() - stretchPixelsX[ 0 ].GetY() - 1;
+        border.w = image->GetHeight() - stretchPixelsY[ 0 ].GetY() - 1;
+
+        SetNinePatchBorder( border, true );
+      }
     }
   }
   // set the actual image (normal or 9 patch) and natural size based on that

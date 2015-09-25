@@ -2,41 +2,41 @@
 #define __DALI_DOC_H__
 
 /**
- * @defgroup dali-core DALi Core
+ * @defgroup dali_core DALi Core
  * @ingroup dali
  *
  * @brief This module provides scene graph-based rendering, animation, and event handling.
  * It is a base module and forms the biggest part of DALi.
  *
  * @{
- *   @defgroup dali-core-actors Actors
+ *   @defgroup dali_core_actors Actors
  *   @brief Actor is the primary object for interaction in DALi applications.
 
- *   @defgroup dali-core-animation Animation
+ *   @defgroup dali_core_animation Animation
  *   @brief Animation allows your objects to move around / change their properties for a specified duration.
 
- *   @defgroup dali-core-common Common
+ *   @defgroup dali_core_common Common
  *   @brief Common classes for using DALi.
 
- *   @defgroup dali-core-events Events
+ *   @defgroup dali_core_events Events
  *   @brief Input events and gestures supported by DALi.
 
- *   @defgroup dali-core-images Images
+ *   @defgroup dali_core_images Images
  *   @brief Classes for handling resource images.
 
- *   @defgroup dali-core-math Math
+ *   @defgroup dali_core_math Math
  *   @brief Basic math classes.
 
- *   @defgroup dali-core-object Object
+ *   @defgroup dali_core_object Object
  *   @brief Classes for the handle/body pattern and property system.
 
- *   @defgroup dali-core-render-tasks Render Tasks
+ *   @defgroup dali_core_render_tasks Render Tasks
  *   @brief Render task classes.
 
- *   @defgroup dali-core-shader-effects Shader Effects
+ *   @defgroup dali_core_shader_effects Shader Effects
  *   @brief Shader effect classes.
 
- *   @defgroup dali-core-signals Signals
+ *   @defgroup dali_core_signals Signals
  *   @brief Classes for the signal and slot structure.
  * @}
  */

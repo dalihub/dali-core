@@ -28,7 +28,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-images
+ * @addtogroup dali_core_images
  * @{
  */
 

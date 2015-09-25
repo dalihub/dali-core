@@ -29,7 +29,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali-core-images
+ * @addtogroup dali_core_images
  * @{
  */
 
@@ -129,6 +129,8 @@ public:
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.
    * @return A handle to a newly allocated object.
+   *
+   * @since DALi 1.1.4
    */
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
 
