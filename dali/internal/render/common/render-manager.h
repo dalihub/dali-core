@@ -43,9 +43,13 @@ class Context;
 class ProgramCache;
 class ShaderSaver;
 
-namespace SceneGraph
+namespace Render
 {
 class Renderer;
+}
+
+namespace SceneGraph
+{
 class RenderQueue;
 class TextureCache;
 class RenderInstruction;
@@ -143,14 +147,14 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer is owned by RenderManager
    */
-  void AddRenderer( Renderer* renderer );
+  void AddRenderer( Render::Renderer* renderer );
 
   /**
    * Remove a Renderer from the render manager.
    * @param[in] renderer The renderer to remove.
    * @post renderer is destroyed.
    */
-  void RemoveRenderer( Renderer* renderer );
+  void RemoveRenderer( Render::Renderer* renderer );
 
   /**
    * Add a geometry to the render manager.

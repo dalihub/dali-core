@@ -194,6 +194,20 @@ void RenderGeometry::UploadAndDraw(
       context.DrawArrays(GL_POINTS, 0, numVertices );
       break;
     }
+    case Dali::Geometry::TRIANGLE_STRIP:
+    {
+      const PropertyBufferDataProvider& firstVertexBuffer = mVertexBuffers[0]->GetDataProvider();
+      unsigned int numVertices = firstVertexBuffer.GetElementCount( bufferIndex );
+      context.DrawArrays(GL_TRIANGLE_STRIP, 0, numVertices );
+      break;
+    }
+    case Dali::Geometry::TRIANGLE_FAN:
+    {
+      const PropertyBufferDataProvider& firstVertexBuffer = mVertexBuffers[0]->GetDataProvider();
+      unsigned int numVertices = firstVertexBuffer.GetElementCount( bufferIndex );
+      context.DrawArrays(GL_TRIANGLE_FAN, 0, numVertices );
+      break;
+    }
     default:
     {
       DALI_ASSERT_ALWAYS( 0 && "Geometry type not supported (yet)" );

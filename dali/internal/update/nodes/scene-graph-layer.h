@@ -42,6 +42,27 @@ namespace SceneGraph
 {
 
 /**
+ * Pair of node-renderer
+ */
+struct NodeRenderer
+{
+  NodeRenderer()
+  :mNode(0),
+   mRenderer(0)
+  {}
+
+  NodeRenderer( Node* node, Renderer* renderer )
+  :mNode(node),
+   mRenderer(renderer)
+  {}
+
+  Node* mNode;
+  Renderer* mRenderer;
+};
+
+typedef Dali::Vector< NodeRenderer > NodeRendererContainer;
+
+/**
  * Layers have a "depth" relative to all other layers in the scene-graph.
  * Non-layer child nodes (and their attachments) are considered part of the layer.
  *
@@ -201,6 +222,10 @@ public: // For update-algorithms
   RenderableAttachmentContainer stencilRenderables;
   RenderableAttachmentContainer colorRenderables;
   RenderableAttachmentContainer overlayRenderables;
+
+  NodeRendererContainer stencilRenderers;
+  NodeRendererContainer colorRenderers;
+  NodeRendererContainer overlayRenderers;
 
 private:
 

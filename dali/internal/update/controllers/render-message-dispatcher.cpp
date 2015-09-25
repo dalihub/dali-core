@@ -43,9 +43,9 @@ RenderMessageDispatcher::~RenderMessageDispatcher()
 {
 }
 
-void RenderMessageDispatcher::AddRenderer( Renderer& renderer )
+void RenderMessageDispatcher::AddRenderer( Render::Renderer& renderer )
 {
-  typedef MessageValue1< RenderManager, Renderer* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::Renderer* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -54,9 +54,9 @@ void RenderMessageDispatcher::AddRenderer( Renderer& renderer )
   new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderer, &renderer );
 }
 
-void RenderMessageDispatcher::RemoveRenderer( Renderer& renderer )
+void RenderMessageDispatcher::RemoveRenderer( Render::Renderer& renderer )
 {
-  typedef MessageValue1< RenderManager, Renderer* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::Renderer* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

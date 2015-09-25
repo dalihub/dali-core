@@ -45,9 +45,7 @@ Geometry::Geometry()
 
 Geometry::~Geometry()
 {
-  // @todo Inform renderers of deletion of buffers?
-
-  // could remove self from own uniform map observer, but it's about to be destroyed.
+  mConnectionObservers.Destroy( *this );
 }
 
 void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )

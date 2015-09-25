@@ -14,7 +14,6 @@ internal_src_files = \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/image-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderable-attachment-impl.cpp \
-  $(internal_src_dir)/event/actor-attachments/renderer-attachment-impl.cpp \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
   $(internal_src_dir)/event/actors/image-actor-impl.cpp \
@@ -118,11 +117,10 @@ internal_src_files = \
   $(internal_src_dir)/render/gl-resources/texture-cache.cpp \
   $(internal_src_dir)/render/queue/render-queue.cpp \
   $(internal_src_dir)/render/renderers/render-geometry.cpp \
-  $(internal_src_dir)/render/renderers/render-renderer.cpp \
+  $(internal_src_dir)/render/renderers/render-new-renderer.cpp \
   $(internal_src_dir)/render/renderers/render-renderer-property-buffer.cpp \
-  $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
-  $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
-  $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \
+  $(internal_src_dir)/render/renderers/render-image-renderer.cpp \
+  $(internal_src_dir)/render/renderers/render-renderer.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
@@ -158,7 +156,6 @@ internal_src_files = \
   $(internal_src_dir)/update/node-attachments/scene-graph-camera-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-renderer-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \
@@ -166,6 +163,7 @@ internal_src_files = \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-material.cpp \
+  $(internal_src_dir)/update/rendering/scene-graph-renderer.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-sampler.cpp \
   $(internal_src_dir)/update/resources/bitmap-metadata.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp \

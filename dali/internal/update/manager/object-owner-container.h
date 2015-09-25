@@ -131,8 +131,13 @@ public:
     }
   }
 
+  const ObjectContainer& GetObjectContainer()
+  {
+    return mObjectContainer;
+  }
+
 private:
-  SceneController* mSceneController;      ///< SceneControler used to send messages
+  SceneController* mSceneController;      ///< SceneController used to send messages
   ObjectContainer mObjectContainer;       ///< Container for the objects owned
   SceneGraphBuffers& mSceneGraphBuffers;  ///< Reference to a SceneGraphBuffers to get the indexBuffer
   DiscardQueue& mDiscardQueue;            ///< Discard queue used for removed objects

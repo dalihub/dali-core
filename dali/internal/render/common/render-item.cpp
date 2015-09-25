@@ -19,7 +19,7 @@
 #include <dali/internal/render/common/render-item.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 namespace Dali
 {
@@ -47,14 +47,19 @@ void RenderItem::Reset()
   mRenderer = NULL;
 }
 
-void RenderItem::SetRenderer( Renderer* renderer )
+void RenderItem::SetRenderer( Render::Renderer* renderer )
 {
   mRenderer = renderer;
 }
 
-const Renderer* RenderItem::GetRenderer() const
+void RenderItem::SetNode( Node* node )
 {
-  return mRenderer;
+  mNode = node;
+}
+
+Render::Renderer& RenderItem::GetRenderer() const
+{
+  return *mRenderer;
 }
 
 Matrix& RenderItem::GetModelViewMatrix()

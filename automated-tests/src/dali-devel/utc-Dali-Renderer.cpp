@@ -490,10 +490,10 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   application.SendNotification();
   application.Render(0);
 
-  // Expect that the renderer's fade color property is accessed
+  // Expect that the actor's fade color property is accessed
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   // Animate material's fade color property. Should be no change to uniform
   Animation  animation = Animation::New(1.0f);
@@ -507,11 +507,11 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   application.Render(500);
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   END_TEST;
 }

@@ -35,7 +35,7 @@
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
@@ -75,7 +75,6 @@ class Geometry;
 class PropertyBuffer;
 class Material;
 class Sampler;
-class RendererAttachment;
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes and attachments and
@@ -189,12 +188,6 @@ public:
   void AttachToNode( Node* node, NodeAttachment* attachment );
 
   /**
-   * Attach a renderer to the scene graph
-   */
-  void AttachToSceneGraph( RendererAttachment* renderer );
-
-
-  /**
    * Add a newly created object.
    * @param[in] object The object to add.
    * @post The object is owned by UpdateManager.
@@ -263,6 +256,7 @@ public:
    */
   ObjectOwnerContainer< Geometry >& GetGeometryOwner();
 
+  ObjectOwnerContainer< Renderer >& GetRendererOwner();
   /**
    * @brief Get the material owner
    *
@@ -491,6 +485,12 @@ private:
    */
   void UpdateNodes( BufferIndex bufferIndex );
 
+  /**
+   * Update Renderers
+   * @param[in] bufferIndex to use
+   */
+  void UpdateRenderers( BufferIndex bufferIndex );
+
 private:
 
   // needs to be direct member so that getter for event buffer can be inlined
@@ -581,18 +581,6 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachToNode, &parent, attachment );
-}
-
-inline void AttachToSceneGraphMessage( UpdateManager& manager, RendererAttachment* renderer )
-{
-  // @todo MESH_REWORK Pass by owner pointer after merge with SceneGraph::RenderableAttachment
-  typedef MessageValue1< UpdateManager, RendererAttachment* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AttachToSceneGraph, renderer );
 }
 
 inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )

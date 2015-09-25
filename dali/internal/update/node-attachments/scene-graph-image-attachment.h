@@ -36,9 +36,13 @@ namespace Internal
 template <> struct ParameterType< Dali::ImageActor::Style >
 : public BasicType< Dali::ImageActor::Style > {};
 
-namespace SceneGraph
+namespace Render
 {
 class ImageRenderer;
+}
+
+namespace SceneGraph
+{
 class Shader;
 class RenderQueue;
 
@@ -67,12 +71,12 @@ public:
   /**
    * @copydoc RenderableAttachment::GetRenderer().
    */
-  virtual Renderer& GetRenderer();
+  virtual Render::Renderer& GetRenderer();
 
   /**
    * @copydoc RenderableAttachment::GetRenderer().
    */
-  virtual const Renderer& GetRenderer() const;
+  virtual const Render::Renderer& GetRenderer() const;
 
   /**
    * Set the ID used to retrieve a texture from ResourceManager.
@@ -244,7 +248,7 @@ private:
 
 private: // Data
 
-  ImageRenderer* mImageRenderer; ///< Raw-pointers to renderer that is owned by RenderManager
+  Render::ImageRenderer* mImageRenderer; ///< Raw-pointers to renderer that is owned by RenderManager
   unsigned int mTextureId;        ///< The resource ID for a texture
 
   // bitfields to fit in single byte
@@ -253,7 +257,6 @@ private: // Data
   int  mPreviousRefreshHints : 4; ///< The shader geometry hints, when the vertex buffer was last refreshed, 4 bits is enough as there's 4 flags
   Style mStyle               : 2; ///< rendering style, 2 bits is enough as only 2 values in the enum
   CullFaceMode mCullFaceMode : 3; ///< Cullface mode, 3 bits is enough for 4 values
-  bool mUseBlend             : 1; ///< True if the attachment & renderer should be considered opaque for sorting and blending.
 
   BitmapMetadata  mBitmapMetadata;///< The bitmap metadata
   Vector2 mGeometrySize;          ///< The size of the currently used geometry

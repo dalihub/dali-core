@@ -53,6 +53,7 @@ Material::Material()
 
 Material::~Material()
 {
+  mConnectionObservers.Destroy( *this );
 }
 
 void Material::SetShader( Shader* shader )

@@ -28,6 +28,7 @@
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
 {
@@ -61,6 +62,7 @@ public:
   typedef OwnerContainer< Material* > MaterialQueue;
   typedef OwnerContainer< Sampler* > SamplerQueue;
   typedef OwnerContainer< PropertyBuffer* > PropertyBufferQueue;
+  typedef OwnerContainer< Renderer* > RendererQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -125,6 +127,14 @@ public:
   void Add( BufferIndex bufferIndex, Shader* shader );
 
   /**
+   * Adds an unwanted Renderer to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] renderer The discarded renderer; DiscardQueue takes ownership.
+   */
+  void Add( BufferIndex updateBufferIndex, Renderer* renderer );
+
+  /**
    * Release the nodes which were queued in the frame N-2.
    * @pre This method should be called (once) at the beginning of every Update.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -151,6 +161,7 @@ private:
   MaterialQueue                mMaterialQueue0;
   SamplerQueue                 mSamplerQueue0;
   PropertyBufferQueue          mPropertyBufferQueue0;
+  RendererQueue                mRendererQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
@@ -160,6 +171,7 @@ private:
   MaterialQueue                mMaterialQueue1;
   SamplerQueue                 mSamplerQueue1;
   PropertyBufferQueue          mPropertyBufferQueue1;
+  RendererQueue                mRendererQueue1;
 };
 
 } // namespace SceneGraph

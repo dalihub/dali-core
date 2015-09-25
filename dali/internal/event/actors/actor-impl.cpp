@@ -42,7 +42,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
-#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -1355,48 +1354,71 @@ bool Actor::RelayoutRequired( Dimension::Type dimension ) const
 
 unsigned int Actor::AddRenderer( Renderer& renderer )
 {
-  //TODO: MESH_REWORK : Add support for multiple renderers
-  if ( ! mAttachment )
+  if( !mRenderers )
   {
-    mAttachment = RendererAttachment::New( GetEventThreadServices(), *mNode, renderer );
-    if( mIsOnStage )
-    {
-      mAttachment->Connect();
-    }
+    mRenderers = new RendererContainer;
   }
 
-  return 0;
+  unsigned int index = mRenderers->size();
+  RendererPtr rendererPtr = RendererPtr( &renderer );
+  mRenderers->push_back( rendererPtr );
+  AddRendererMessage( GetEventThreadServices(), *mNode, renderer.GetRendererSceneObject() );
+
+  if( mIsOnStage)
+  {
+    rendererPtr->Connect();
+  }
+
+  return index;
 }
 
 unsigned int Actor::GetRendererCount() const
 {
-  //TODO: MESH_REWORK : Add support for multiple renderers
-  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
-  return attachment ? 1u : 0u;
+  unsigned int rendererCount(0);
+  if( mRenderers )
+  {
+    rendererCount = mRenderers->size();
+  }
+
+  return rendererCount;
 }
 
-Renderer& Actor::GetRendererAt( unsigned int index )
+RendererPtr Actor::GetRendererAt( unsigned int index )
 {
-  //TODO: MESH_REWORK : Add support for multiple renderers
-  DALI_ASSERT_DEBUG( index == 0 && "Only one renderer is supported." );
+  RendererPtr renderer;
+  if( index < GetRendererCount() )
+  {
+    renderer = ( *mRenderers )[ index ];
+  }
 
-  //TODO: MESH_REWORK : Temporary code
-  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
-  DALI_ASSERT_ALWAYS( attachment && "Actor doesn't have a renderer" );
-
-  return attachment->GetRenderer();
+  return renderer;
 }
 
 void Actor::RemoveRenderer( Renderer& renderer )
 {
-  //TODO: MESH_REWORK : Add support for multiple renderers
-  mAttachment = NULL;
+  if( mRenderers )
+  {
+    RendererIter end = mRenderers->end();
+    for( RendererIter iter = mRenderers->begin(); iter != end; ++iter )
+    {
+      if( (*iter).Get() == &renderer )
+      {
+        mRenderers->erase( iter );
+        RemoveRendererMessage( GetEventThreadServices(), *mNode, renderer.GetRendererSceneObject() );
+        break;
+      }
+    }
+  }
 }
 
 void Actor::RemoveRenderer( unsigned int index )
 {
-  //TODO: MESH_REWORK : Add support for multiple renderers
-  mAttachment = NULL;
+  if( index < GetRendererCount() )
+  {
+    RendererPtr renderer = ( *mRenderers )[ index ];
+    RemoveRendererMessage( GetEventThreadServices(), *mNode, renderer.Get()->GetRendererSceneObject() );
+    mRenderers->erase( mRenderers->begin()+index );
+  }
 }
 
 void Actor::SetOverlay( bool enable )
@@ -1845,6 +1867,7 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 Actor::Actor( DerivedType derivedType )
 : mParent( NULL ),
   mChildren( NULL ),
+  mRenderers( NULL ),
   mNode( NULL ),
   mParentOrigin( NULL ),
   mAnchorPoint( NULL ),
@@ -1901,6 +1924,7 @@ Actor::~Actor()
     }
   }
   delete mChildren;
+  delete mRenderers;
 
   // Guard to allow handle destruction after Core has been destroyed
   if( EventThreadServices::IsCoreRunning() )
@@ -1995,6 +2019,12 @@ void Actor::ConnectToSceneGraph()
     mAttachment->Connect();
   }
 
+  unsigned int rendererCount( GetRendererCount() );
+  for( unsigned int i(0); i<rendererCount; ++i )
+  {
+    GetRendererAt(i)->Connect();
+  }
+
   // Request relayout on all actors that are added to the scenegraph
   RelayoutRequest();
 
@@ -2080,6 +2110,12 @@ void Actor::DisconnectFromSceneGraph()
   if( mAttachment )
   {
     mAttachment->Disconnect();
+  }
+
+  unsigned int rendererCount( GetRendererCount() );
+  for( unsigned int i(0); i<rendererCount; ++i )
+  {
+    GetRendererAt(i)->Disconnect();
   }
 }
 

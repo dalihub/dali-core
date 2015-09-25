@@ -31,9 +31,14 @@ namespace Internal
 class Context;
 class Program;
 
-namespace SceneGraph
+namespace Render
 {
 class NewRenderer;
+}
+
+namespace SceneGraph
+{
+
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
  * to it's GPU buffers, to bind all the buffers and to setup/teardown vertex attribute
