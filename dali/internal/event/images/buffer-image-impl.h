@@ -62,7 +62,10 @@ public:
                              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
-   * Create a new BufferImage, which uses external data source.
+   * @deprecated Support for externally owned Pixel Buffers is due to be removed TBA. It is recommended that a BufferImage owned Buffer be used instead.
+   *
+   * @brief Create a new BufferImage, which uses external data source.
+   *
    * Pixel buffer has to be allocated by application.
    * An internal copy is made of the Pixel Buffer, which can then be freed by the Application, unless if there will be a call to Update() later.
    * The buffer should only be freed when there is no chance of an Update() being called again.
@@ -70,9 +73,6 @@ public:
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
-   * @deprecated Support for externally owned Pixel Buffers is due to be removed TBA.
-   * It is recommended that a BufferImage owned Buffer be used instead.
-
    * @param [in] pixBuf      pixel buffer. has to be allocated by application.
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels

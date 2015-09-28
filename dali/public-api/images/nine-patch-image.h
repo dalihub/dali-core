@@ -110,7 +110,9 @@ public:
 
   /**
    * @deprecated DALi 1.1.4 use GetStretchPixelsX and GetStretchPixelsY instead
-   * Get the stretch borders
+   *
+   * @brief Get the stretch borders
+   *
    * @return The border in pixels from the left, top, right, and bottom of the image respectively.
    */
   Vector4 GetStretchBorders();
@@ -118,18 +120,18 @@ public:
   /**
    * @brief Retrieves the horizontal stretch pixel ranges in the cropped image space
    *
-   * @return the horizontal stretch pixel ranges in the cropped image space
-   *
    * @since DALi 1.1.4
+   *
+   * @return the horizontal stretch pixel ranges in the cropped image space
    */
   const StretchRanges& GetStretchPixelsX();
 
   /**
    * @brief Retrieves the vertical stretch pixel ranges in the cropped image space
    *
-   * @return the vertical stretch pixel ranges in the cropped image space
-   *
    * @since DALi 1.1.4
+   *
+   * @return the vertical stretch pixel ranges in the cropped image space
    */
   const StretchRanges& GetStretchPixelsY();
 
@@ -152,10 +154,10 @@ public:
   /**
    * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.
    *
+   * @since DALi 1.1.4
+   *
    * @param [in] url The URL of the image file.
    * @return true if it is a 9 patch or n patch image
-   *
-   * @since DALi 1.1.4
    */
   static bool IsNinePatchUrl( const std::string& url );
 

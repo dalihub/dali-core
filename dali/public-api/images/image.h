@@ -56,8 +56,8 @@ class DALI_IMPORT_API Image : public BaseHandle
 public:
 
   /**
+   * @deprecated DALi 1.1.3 Image resource is released as soon as last handle is released
    * @brief ReleasePolicy controls the way images are deleted from memory.
-   * @deprecated DALi 1.1.3 Image resource is relased as soon as last handle is released
    */
   enum ReleasePolicy
   {
@@ -112,8 +112,9 @@ public:
   static Image DownCast( BaseHandle handle );
 
   /**
-   * @brief Return resource release policy.
    * @deprecated DALi 1.1.3
+   *
+   * @brief Return resource release policy.
    *
    * @return resource release policy
    */

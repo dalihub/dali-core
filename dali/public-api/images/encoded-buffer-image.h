@@ -76,9 +76,9 @@ public:
   EncodedBufferImage();
 
   /**
-   * @brief Create an initialised image object from an encoded image buffer in memory.
-   *
    * @deprecated DALi 1.1.3 use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
+   *
+   * @brief Create an initialised image object from an encoded image buffer in memory.
    *
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
@@ -115,6 +115,8 @@ public:
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
+   * @since DALi 1.1.4
+   *
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -129,8 +131,6 @@ public:
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.
    * @return A handle to a newly allocated object.
-   *
-   * @since DALi 1.1.4
    */
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
 

@@ -75,8 +75,9 @@ class DALI_IMPORT_API ResourceImage : public Image
 public:
 
   /**
-   * @brief LoadPolicy controls the way images are loaded into memory.
    * @deprecated DALi 1.1.3 Image loading starts immediately in the frame when then ResourceImage object is created
+   *
+   * @brief LoadPolicy controls the way images are loaded into memory.
    */
   enum LoadPolicy
   {
@@ -151,9 +152,9 @@ public:
   static ResourceImage New( const std::string& url, bool orientationCorrection = true );
 
   /**
-   * @brief Create an initialised ResourceImage object.
-   *
    * @deprecated DALi 1.1.3 use New( const std::string& url ) instead.
+   *
+   * @brief Create an initialised ResourceImage object.
    *
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
@@ -180,9 +181,9 @@ public:
                             bool orientationCorrection = true );
 
   /**
-   * @brief Create an initialised ResourceImage object.
-   *
    * @deprecated DALi 1.1.3 use New( const std::string& url, ImageDimensions size ) instead.
+   *
+   * @brief Create an initialised ResourceImage object.
    *
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
@@ -214,8 +215,9 @@ public:
   static ResourceImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Return load policy.
    * @deprecated DALi 1.1.3
+   *
+   * @brief Return load policy.
    *
    * @return resource load policy
    */
