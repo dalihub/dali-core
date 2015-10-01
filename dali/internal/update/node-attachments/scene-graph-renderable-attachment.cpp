@@ -209,7 +209,7 @@ void RenderableAttachment::SetSortModifier(float modifier)
 void RenderableAttachment::SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes )
 {
   sortAttributes.shader = mShader;
-  sortAttributes.material = NULL;
+  sortAttributes.textureResourceId = Integration::InvalidResourceId;
   sortAttributes.geometry = NULL;
 }
 

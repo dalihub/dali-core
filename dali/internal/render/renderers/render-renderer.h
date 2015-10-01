@@ -127,7 +127,7 @@ public:
    * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  virtual void SetSortAttributes( SceneGraph::RendererWithSortAttributes& sortAttributes ) const;
+  virtual void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const;
 
 protected:
   /**

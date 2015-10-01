@@ -228,10 +228,10 @@ void Renderer::Render( Context& context,
   DoRender( context, textureCache, node, bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
-void Renderer::SetSortAttributes( SceneGraph::RendererWithSortAttributes& sortAttributes ) const
+void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const
 {
   sortAttributes.shader = mShader;
-  sortAttributes.material = NULL;
+  sortAttributes.textureResourceId = Integration::InvalidResourceId;
   sortAttributes.geometry = NULL;
 }
 

@@ -251,11 +251,11 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
   {
     if( lhs.shader == rhs.shader )
     {
-      if( lhs.material == rhs.material )
+      if( lhs.textureResourceId == rhs.textureResourceId )
       {
         return lhs.geometry < rhs.geometry;
       }
-      return lhs.material < rhs.material;
+      return lhs.textureResourceId < rhs.textureResourceId;
     }
     return lhs.shader < rhs.shader;;
   }
@@ -278,11 +278,11 @@ bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSo
       //If both RenderItems are opaque, sort using shader, then material then geometry
       if( lhs.shader == rhs.shader )
       {
-        if( lhs.material == rhs.material )
+        if( lhs.textureResourceId == rhs.textureResourceId )
         {
           return lhs.geometry < rhs.geometry;
         }
-        return lhs.material < rhs.material;
+        return lhs.textureResourceId < rhs.textureResourceId;
       }
       return lhs.shader < rhs.shader;
     }
@@ -293,11 +293,11 @@ bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSo
       {
         if( lhs.shader == rhs.shader )
         {
-          if( lhs.material == rhs.material )
+          if( lhs.textureResourceId == rhs.textureResourceId )
           {
             return lhs.geometry < rhs.geometry;
           }
-          return lhs.material < rhs.material;
+          return lhs.textureResourceId < rhs.textureResourceId;
         }
         return lhs.shader < rhs.shader;
       }
@@ -343,7 +343,7 @@ inline void SortColorRenderItems( BufferIndex bufferIndex, RenderList& renderLis
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.GetRenderer().SetSortAttributes(sortingHelper[ index ]);
+      item.GetRenderer().SetSortAttributes( bufferIndex, sortingHelper[ index ] );
 
       // the default sorting function should get inlined here
       sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
@@ -359,7 +359,7 @@ inline void SortColorRenderItems( BufferIndex bufferIndex, RenderList& renderLis
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.GetRenderer().SetSortAttributes(sortingHelper[ index ]);
+      item.GetRenderer().SetSortAttributes( bufferIndex, sortingHelper[ index ] );
       sortingHelper[ index ].zValue = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
