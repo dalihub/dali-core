@@ -36,6 +36,7 @@
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
 {
@@ -170,6 +171,48 @@ public:
   bool HasAttachment() const
   {
     return mAttachment;
+  }
+
+  /**
+   * Add a renderer to the node
+   * @param[in] renderer The renderer added to the node
+   */
+  void AddRenderer( Renderer* renderer )
+  {
+    //Check that it has not been already added
+    unsigned int rendererCount( mRenderer.Size() );
+    for( unsigned int i(0); i<rendererCount; ++i )
+    {
+      if( mRenderer[i] == renderer )
+      {
+        mRenderer.Erase( mRenderer.Begin()+i);
+        return;
+      }
+    }
+    mRenderer.PushBack( renderer );
+  }
+
+  /**
+   * Remove a renderer from the node
+   * @param[in] renderer The renderer to be removed
+   */
+  void RemoveRenderer( Renderer* renderer );
+
+  /*
+   * Get the renderer at the given index
+   * @param[in] index
+   */
+  Renderer* GetRendererAt( unsigned int index )
+  {
+    return mRenderer[index];
+  }
+
+  /**
+   * Retrieve the number of renderers for the node
+   */
+  unsigned int GetRendererCount()
+  {
+    return mRenderer.Size();
   }
 
   /**
@@ -815,6 +858,11 @@ public:
   }
 
   /**
+   * Check if the node is visible i.e Is not fully transparent and has valid size
+   */
+  bool ResolveVisibility( BufferIndex updateBufferIndex );
+
+  /**
    * Set the world-matrix of a node, with scale + rotation + translation.
    * Scale and rotation are centered at the origin.
    * Translation is applied independently of the scale or rotatation axis.
@@ -924,6 +972,24 @@ public:
     return mDepth;
   }
 
+public:
+  /**
+   * @copydoc UniformMap::Add
+   */
+  void AddUniformMapping( UniformPropertyMapping* map );
+
+  /**
+   * @copydoc UniformMap::Remove
+   */
+  void RemoveUniformMapping( const std::string& uniformName );
+
+  /**
+   * Prepare the node for rendering.
+   * This is called by the UpdateManager when an object is due to be rendered in the current frame.
+   * @param[in] updateBufferIndex The current update buffer index.
+   */
+  void PrepareRender( BufferIndex bufferIndex );
+
 protected:
 
   /**
@@ -942,7 +1008,7 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetModelMatrix
    */
-  virtual const Matrix& GetModelMatrix( unsigned int bufferId )
+  virtual const Matrix& GetModelMatrix( unsigned int bufferId ) const
   {
     return GetWorldMatrix( bufferId );
   }
@@ -950,16 +1016,32 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
-  virtual const Vector4& GetRenderColor( unsigned int bufferId )
+  virtual const Vector4& GetRenderColor( unsigned int bufferId ) const
   {
     return GetWorldColor( bufferId );
   }
 
-  virtual const Vector3& GetRenderSize( unsigned int bufferId )
+  virtual const Vector3& GetRenderSize( unsigned int bufferId ) const
   {
     return GetSize( bufferId );
   }
 
+public: // From UniformMapDataProvider
+  /**
+   * @copydoc UniformMapDataProvider::GetUniformMapChanged
+   */
+  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const
+  {
+    return mUniformMapChanged[bufferIndex];
+  }
+
+  /**
+   * @copydoc UniformMapDataProvider::GetUniformMap
+   */
+  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const
+  {
+    return mCollectedUniformMap[bufferIndex];
+  }
 
 private:
 
@@ -1009,8 +1091,13 @@ protected:
   RenderTask*         mExclusiveRenderTask;          ///< Nodes can be marked as exclusive to a single RenderTask
 
   NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
+  RendererContainer   mRenderer;                     ///< Container of renderers; not owned
+
   NodeContainer       mChildren;                     ///< Container of children; not owned
 
+  CollectedUniformMap mCollectedUniformMap[2];      ///< Uniform maps of the node
+  unsigned int        mUniformMapChanged[2];        ///< Records if the uniform map has been altered this frame
+  unsigned int        mRegenerateUniformMap : 2;    ///< Indicate if the uniform map has to be regenerated this frame
 
   // flags, compressed to bitfield
   unsigned short mDepth: 12;                        ///< Depth in the hierarchy
@@ -1042,8 +1129,6 @@ inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServic
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
 }
-
-
 
 inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {
@@ -1111,6 +1196,27 @@ inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &node, &Node::SetDrawMode, drawMode );
 }
 
+inline void AddRendererMessage( EventThreadServices& eventThreadServices, const Node& node, Renderer* renderer )
+{
+  typedef MessageValue1< Node, Renderer* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::AddRenderer, renderer );
+}
+
+inline void RemoveRendererMessage( EventThreadServices& eventThreadServices, const Node& node, Renderer* renderer )
+{
+  typedef MessageValue1< Node, Renderer* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::RemoveRenderer, renderer );
+}
 } // namespace SceneGraph
 
 } // namespace Internal

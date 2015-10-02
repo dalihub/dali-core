@@ -29,9 +29,13 @@ namespace Internal
 {
 class MessageBase;
 
-namespace SceneGraph
+namespace Render
 {
 class Renderer;
+}
+namespace SceneGraph
+{
+
 class RenderManager;
 class RenderQueue;
 class RenderTracker;
@@ -59,14 +63,14 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer ownership is transferred.
    */
-  void AddRenderer( Renderer& renderer );
+  void AddRenderer( Render::Renderer& renderer );
 
   /**
    * Remove a Renderer.
    * @param[in] renderer The renderer to remove.
    * @post renderer will be destroyed in the next Render.
    */
-  void RemoveRenderer( Renderer& renderer );
+  void RemoveRenderer( Render::Renderer& renderer );
 
   /**
    * Add a Geometry

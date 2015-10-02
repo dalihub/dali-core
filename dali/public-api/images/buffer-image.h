@@ -78,9 +78,9 @@ public:
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * @brief Create a new BufferImage.
-   *
    * @deprecated DALi 1.1.3, use New( unsigned int width, unsigned int height ) instead.
+   *
+   * @brief Create a new BufferImage.
    *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
@@ -127,9 +127,9 @@ public:
                          unsigned int  stride=0);
 
   /**
-   * @brief Create a new BufferImage, which uses an external data source.
-   *
    * @deprecated DALi 1.1.3, use New( PixelBuffer* pixelBuffer, unsigned int width, unsigned int height ) instead.
+   *
+   * @brief Create a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
    *

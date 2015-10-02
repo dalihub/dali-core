@@ -223,9 +223,19 @@ HitActor HitTestWithinLayer( Actor& actor,
             {
               hit.depth += imageActor->GetDepthIndex();
             }
-            else if ( actor.GetRendererCount() )
+            else if ( actor.GetRendererCount() > 0 )
             {
-              hit.depth += actor.GetRendererAt( 0 ).GetDepthIndex();
+              //Get renderer with maximum depth
+              int rendererMaxDepth(actor.GetRendererAt( 0 ).Get()->GetDepthIndex());
+              for( unsigned int i(1); i<actor.GetRendererCount(); ++i)
+              {
+                int depth = actor.GetRendererAt( i ).Get()->GetDepthIndex();
+                if( depth > rendererMaxDepth )
+                {
+                  rendererMaxDepth = depth;
+                }
+              }
+              hit.depth += rendererMaxDepth;
             }
           }
         }

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/matrix.h>
+#include <dali/internal/update/nodes/node.h>
 
 namespace Dali
 {
@@ -29,10 +30,14 @@ namespace Dali
 namespace Internal
 {
 
+namespace Render
+{
+class Renderer;
+}
+
 namespace SceneGraph
 {
 
-class Renderer;
 class RenderItem;
 
 typedef std::vector< RenderItem > RendererItemContainer;
@@ -63,14 +68,28 @@ public:
    * Retrieve the renderer.
    * @return The renderer.
    */
-  const Renderer* GetRenderer() const;
+  Render::Renderer& GetRenderer() const;
 
   /**
    * Set the renderer
    * @param[in] renderer The renderer
    */
-  void SetRenderer( Renderer* renderer );
+  void SetRenderer( Render::Renderer* renderer );
 
+  /**
+   * Set the node
+   * @param[in] node The node
+   */
+  void SetNode( Node* node );
+
+  /**
+   * Retrieve the node
+   * @return The node
+   */
+  const Node& GetNode() const
+  {
+    return *mNode;
+  }
   /**
    * Retrieve the modelView matrix.
    * @return The modelView matrix.
@@ -117,10 +136,11 @@ private:
   RenderItem( const RenderItem& item );
   RenderItem& operator = ( const RenderItem& item );
 
-  Matrix    mModelViewMatrix;
-  Renderer* mRenderer;
-  int       mDepthIndex;
-  bool      mIsOpaque:1;
+  Matrix            mModelViewMatrix;
+  Render::Renderer* mRenderer;
+  Node*             mNode;
+  int               mDepthIndex;
+  bool              mIsOpaque:1;
 };
 
 } // namespace SceneGraph

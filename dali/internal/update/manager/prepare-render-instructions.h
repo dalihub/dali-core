@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
@@ -33,8 +34,8 @@ namespace SceneGraph
 class RenderTracker;
 class RenderItem;
 class Shader;
-class Material;
-class Geometry;
+class RenderGeometry;
+class MaterialDataProvider;
 
 /**
  * Structure to store information for sorting the renderers.
@@ -45,17 +46,17 @@ struct RendererWithSortAttributes
   RendererWithSortAttributes()
   : renderItem( NULL ),
     shader(NULL),
-    material(NULL),
+    textureResourceId( Integration::InvalidResourceId ),
     geometry(NULL),
     zValue(0.0f)
   {
   }
 
-  RenderItem* renderItem;       ///< The render item that is being sorted (includes depth index)
-  Shader*     shader;           ///< The shader instance
-  Material*   material;         ///< The material instance
-  Geometry*   geometry;         ///< The geometry instance
-  float       zValue;           // The zValue of the given renderer (either distance from camera, or a custom calculated value)
+  RenderItem*                   renderItem;       ///< The render item that is being sorted (includes depth index)
+  const Shader*                 shader;           ///< The shader instance
+  Integration::ResourceId       textureResourceId;///< The first texture resource ID of the sampler instance, is InvalidResourceId if the material doesn't have any samplers
+  const RenderGeometry*         geometry;         ///< The geometry instance
+  float                         zValue;           ///< The zValue of the given renderer (either distance from camera, or a custom calculated value)
 };
 
 typedef std::vector< RendererWithSortAttributes > RendererSortingHelper;

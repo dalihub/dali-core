@@ -34,7 +34,7 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
@@ -43,7 +43,6 @@
 
 #ifdef FRAME_SNAPSHOT_LOGGING
 
-using namespace Dali::Internal::Render;
 
 namespace // unnamed namespace
 {
@@ -68,7 +67,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-typedef OwnerContainer< Renderer* >            RendererOwnerContainer;
+typedef OwnerContainer< Render::Renderer* >    RendererOwnerContainer;
 typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 
 typedef OwnerContainer< RenderGeometry* >      RenderGeometryOwnerContainer;
@@ -257,7 +256,7 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
   mImpl->defaultSurfaceRect = rect;
 }
 
-void RenderManager::AddRenderer( Renderer* renderer )
+void RenderManager::AddRenderer( Render::Renderer* renderer )
 {
   // Initialize the renderer as we are now in render thread
   renderer->Initialize( mImpl->context, mImpl->textureCache );
@@ -270,7 +269,7 @@ void RenderManager::AddRenderer( Renderer* renderer )
   }
 }
 
-void RenderManager::RemoveRenderer( Renderer* renderer )
+void RenderManager::RemoveRenderer( Render::Renderer* renderer )
 {
   DALI_ASSERT_DEBUG( NULL != renderer );
 

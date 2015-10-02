@@ -57,6 +57,9 @@ typedef std::vector< ActorPtr > ActorContainer;
 typedef ActorContainer::iterator ActorIter;
 typedef ActorContainer::const_iterator ActorConstIter;
 
+typedef std::vector< RendererPtr > RendererContainer;
+typedef RendererContainer::iterator RendererIter;
+
 /**
  * Actor is the primary object which Dali applications interact with.
  * UI controls can be built by combining multiple actors.
@@ -1210,7 +1213,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetRendererAt()
    */
-  Renderer& GetRendererAt( unsigned int index );
+  RendererPtr GetRendererAt( unsigned int index );
 
   /**
    * @copydoc Dali::Actor::RemoveRenderer()
@@ -1765,6 +1768,8 @@ protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
   ActorContainer* mChildren;      ///< Container of referenced actors
+  RendererContainer* mRenderers;   ///< Renderer container
+
   const SceneGraph::Node* mNode;  ///< Not owned
   Vector3* mParentOrigin;         ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable

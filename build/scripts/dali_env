@@ -39,7 +39,6 @@ my @system_packages = (
     "ccache",
     "libelementary-dev",
     "libexif-dev",
-    "libxml2-dev",
     "libgles2-mesa-dev",
     "libdrm-dev",
     "libgif-dev",

@@ -24,7 +24,7 @@
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -99,7 +99,7 @@ int Renderer::GetDepthIndex() const
   return mDepthIndex;
 }
 
-SceneGraph::RendererAttachment* Renderer::GetRendererSceneObject()
+SceneGraph::Renderer* Renderer::GetRendererSceneObject()
 {
   return mSceneObject;
 }
@@ -235,7 +235,7 @@ bool Renderer::OnStage() const
 
 void Renderer::Connect()
 {
-  // @todo: MESH_REWORK : check this
+  OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
   mGeometryConnector.OnStageConnect();
   mMaterialConnector.OnStageConnect();
   mOnStage = true;
@@ -243,7 +243,7 @@ void Renderer::Connect()
 
 void Renderer::Disconnect()
 {
-  // @todo: MESH_REWORK : check this
+  OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
   mGeometryConnector.OnStageDisconnect();
   mMaterialConnector.OnStageDisconnect();
   mOnStage = false;
@@ -261,11 +261,8 @@ void Renderer::Initialize()
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  // Transfer object ownership of scene-object to message
-  mSceneObject = SceneGraph::RendererAttachment::New();
-
-  // Send message to update to connect to scene graph:
-  AttachToSceneGraphMessage( updateManager, mSceneObject );
+  mSceneObject = new SceneGraph::Renderer();
+  AddMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
 
   eventThreadServices.RegisterObject( this );
 }
@@ -275,6 +272,9 @@ Renderer::~Renderer()
   if( EventThreadServices::IsCoreRunning() )
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
+
     eventThreadServices.UnregisterObject( this );
   }
 }

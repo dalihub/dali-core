@@ -24,7 +24,7 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
@@ -59,6 +59,23 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
   else
   {
     mNodeQueue1.PushBack( node );
+  }
+}
+
+void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
+{
+  DALI_ASSERT_DEBUG( NULL != renderer );
+
+  // The GL resources will now be freed in frame N
+  // The Update for frame N+1 may occur in parallel with the rendering of frame N
+  // Queue the node for destruction in frame N+2
+  if ( 0u == updateBufferIndex )
+  {
+    mRendererQueue0.PushBack( renderer );
+  }
+  else
+  {
+    mRendererQueue1.PushBack( renderer );
   }
 }
 
@@ -174,6 +191,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mMaterialQueue0.Clear();
     mSamplerQueue0.Clear();
     mPropertyBufferQueue0.Clear();
+    mRendererQueue0.Clear();
   }
   else
   {
@@ -184,6 +202,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mMaterialQueue1.Clear();
     mSamplerQueue1.Clear();
     mPropertyBufferQueue1.Clear();
+    mRendererQueue1.Clear();
   }
 }
 

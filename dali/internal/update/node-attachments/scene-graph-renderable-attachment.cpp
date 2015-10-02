@@ -27,7 +27,7 @@
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/image-sampler.h>
 
@@ -89,27 +89,7 @@ void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& sc
 
 bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
 {
-  mHasSizeAndColorFlag = false;
-  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
-  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-  {
-    const float MAX_NODE_SIZE = float(1u<<30);
-    const Vector3& size = mParent->GetSize( updateBufferIndex );
-    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
-        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-    {
-      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
-          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
-      {
-        mHasSizeAndColorFlag = true;
-      }
-      else
-      {
-        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
-        DALI_LOG_ACTOR_TREE( mParent );
-      }
-    }
-  }
+  mHasSizeAndColorFlag = mParent->ResolveVisibility(updateBufferIndex);
   return mHasSizeAndColorFlag;
 }
 
@@ -229,7 +209,7 @@ void RenderableAttachment::SetSortModifier(float modifier)
 void RenderableAttachment::SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes )
 {
   sortAttributes.shader = mShader;
-  sortAttributes.material = NULL;
+  sortAttributes.textureResourceId = Integration::InvalidResourceId;
   sortAttributes.geometry = NULL;
 }
 

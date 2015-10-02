@@ -82,9 +82,9 @@ public:
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
-   * @brief Create a new FrameBufferImage.
-   *
    * @deprecated DALi 1.1.3 use New() instead.
+   *
+   * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
@@ -111,9 +111,9 @@ public:
   static FrameBufferImage New(NativeImageInterface& image);
 
   /**
-   * @brief Create a new FrameBufferImage.
-   *
    * @deprecated DALi 1.1.3 use New( NativeImageInterface& ) instead.
+   *
+   * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] image       The native image.
