@@ -230,29 +230,35 @@ int Renderer::GetPropertyComponentIndex( Property::Index index ) const
 
 bool Renderer::OnStage() const
 {
-  return mOnStage;
+  return mOnStageCount > 0;
 }
 
 void Renderer::Connect()
 {
-  OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
-  mGeometryConnector.OnStageConnect();
-  mMaterialConnector.OnStageConnect();
-  mOnStage = true;
+  if( mOnStageCount == 0 )
+  {
+    OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
+    mGeometryConnector.OnStageConnect();
+    mMaterialConnector.OnStageConnect();
+  }
+  ++mOnStageCount;
 }
 
 void Renderer::Disconnect()
 {
-  OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
-  mGeometryConnector.OnStageDisconnect();
-  mMaterialConnector.OnStageDisconnect();
-  mOnStage = false;
+  --mOnStageCount;
+  if( mOnStageCount == 0 )
+  {
+    OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
+    mGeometryConnector.OnStageDisconnect();
+    mMaterialConnector.OnStageDisconnect();
+  }
 }
 
 Renderer::Renderer()
 : mSceneObject(NULL),
   mDepthIndex(0),
-  mOnStage(false)
+  mOnStageCount(0)
 {
 }
 
