@@ -66,14 +66,12 @@ int UtcDaliMaterialCopyConstructor(void)
 
   Shader shader = Shader::New("vertexSrc", "fragmentSrc");
   Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Sampler sampler = Sampler::New(image, "sTexture");
   Material material = Material::New(shader);
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
 
   Material materialCopy(material);
 
   DALI_TEST_CHECK( materialCopy );
-  DALI_TEST_EQUALS( materialCopy.GetSamplerAt(0), sampler, TEST_LOCATION );
 
   END_TEST;
 }
@@ -84,16 +82,13 @@ int UtcDaliMaterialAssignmentOperator(void)
 
   Shader shader = Shader::New("vertexSrc", "fragmentSrc");
   Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Sampler sampler = Sampler::New(image, "sTexture");
   Material material = Material::New(shader);
-  material.AddSampler( sampler );
 
   Material material2;
   DALI_TEST_CHECK( !material2 );
 
   material2 = material;
   DALI_TEST_CHECK( material2 );
-  DALI_TEST_EQUALS( material2.GetSamplerAt(0), sampler, TEST_LOCATION );
 
   END_TEST;
 }
@@ -194,16 +189,13 @@ int UtcDaliMaterialGetShader(void)
   END_TEST;
 }
 
-int UtcDaliMaterialAddSampler(void)
+int UtcDaliMaterialGetNumberOfTextures(void)
 {
   TestApplication application;
 
-  tet_infoline("Test AddSampler(sampler)");
+  tet_infoline("Test GetNumberOfTextures()");
 
   Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Sampler sampler1 = Sampler::New(image, "sTexture1");
-  Sampler sampler2 = Sampler::New(image, "sTexture2");
-
   Material material = CreateMaterial(0.5f);
 
   Geometry geometry = CreateQuadGeometry();
@@ -214,147 +206,21 @@ int UtcDaliMaterialAddSampler(void)
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add( actor );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit=-1;
+  material.AddTexture( image, "sTexture0" );
+  material.AddTexture( image, "sTexture1" );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 2u, TEST_LOCATION );
 
-  material.AddSampler( sampler1 );
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture1", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  material.AddTexture( image, "sTexture2" );
+  material.AddTexture( image, "sTexture3" );
+  material.AddTexture( image, "sTexture4" );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 5u, TEST_LOCATION );
 
-  material.AddSampler( sampler2 );
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 1, TEST_LOCATION );
+  material.RemoveTexture(3);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 4u, TEST_LOCATION );
 
-  END_TEST;
-}
-
-int UtcDaliMaterialGetNumberOfSampler(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test GetNumberOfSampler()");
-
-  Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Sampler sampler0 = Sampler::New(image, "sTexture0");
-  Sampler sampler1 = Sampler::New(image, "sTexture1");
-  Sampler sampler2 = Sampler::New(image, "sTexture2");
-  Sampler sampler3 = Sampler::New(image, "sTexture3");
-  Sampler sampler4 = Sampler::New(image, "sTexture4");
-
-  Material material = CreateMaterial(0.5f);
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add( actor );
-
-  material.AddSampler( sampler0 );
-  material.AddSampler( sampler1 );
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 2u, TEST_LOCATION );
-
-  material.AddSampler( sampler2 );
-  material.AddSampler( sampler3 );
-  material.AddSampler( sampler4 );
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 5u, TEST_LOCATION );
-
-  material.RemoveSampler(3); // remove sampler3
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 4u, TEST_LOCATION );
-
-  material.RemoveSampler(3); // remove sampler4
-  material.RemoveSampler(0); // remove sampler0
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 2u, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliMaterialRemoveSampler(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test RemoveSampler(index)");
-  Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Sampler sampler1 = Sampler::New(image, "sTexture1");
-  Sampler sampler2 = Sampler::New(image, "sTexture2");
-
-  Material material = CreateMaterial(0.5f);
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add( actor );
-
-  material.AddSampler( sampler1 );
-  material.AddSampler( sampler2 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit=-1;
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture1", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 1, TEST_LOCATION );
-
-  material.RemoveSampler(0); // remove sampler1
-  application.SendNotification();
-  application.Render();
-  // Todo: test the sampler is removed from gl, cannot pass this test with current implementation
-  //DALI_TEST_CHECK( ! gl.GetUniformValue<int>( "sTexture1", textureUnit ) );
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 1u, TEST_LOCATION );
-
-  material.RemoveSampler(0); // remove sampler2
-  application.SendNotification();
-  application.Render();
-  // Todo: test the sampler is removed from gl, cannot pass this test with current implementation
-  //DALI_TEST_CHECK( ! gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
-  DALI_TEST_EQUALS( material.GetNumberOfSamplers(), 0u, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliMaterialGetSamplerAt(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test GetSamplerAt(index)");
-
-  Image image = BufferImage::New(16, 16, Pixel::RGBA8888);
-  Sampler sampler1 = Sampler::New(image, "sTexture1");
-  Sampler sampler2 = Sampler::New(image, "sTexture2");
-  Sampler sampler3 = Sampler::New(image, "sTexture3");
-
-  Material material = CreateMaterial(0.5f);
-  material.AddSampler( sampler1 );
-  material.AddSampler( sampler2 );
-  material.AddSampler( sampler3 );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add( actor );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( material.GetSamplerAt( 0 ), sampler1, TEST_LOCATION );
-  DALI_TEST_EQUALS( material.GetSamplerAt( 1 ), sampler2, TEST_LOCATION );
-  DALI_TEST_EQUALS( material.GetSamplerAt( 2 ), sampler3, TEST_LOCATION );
-
-  Sampler sampler = material.GetSamplerAt( 1 );
-  DALI_TEST_EQUALS( sampler.GetImage().GetWidth(), 16u, TEST_LOCATION );
+  material.RemoveTexture(3);
+  material.RemoveTexture(0);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 2u, TEST_LOCATION );
 
   END_TEST;
 }
@@ -851,8 +717,7 @@ int UtcDaliMaterialSetBlendMode08(void)
   Material material = Material::New(shader);
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -869,9 +734,7 @@ int UtcDaliMaterialSetBlendMode08(void)
   application.Render();
 
   TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", "GL_BLEND" ) );
 
   END_TEST;
 }
@@ -914,8 +777,7 @@ int UtcDaliMaterialSetBlendColor(void)
   Material material = Material::New(shader);
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -1164,6 +1026,118 @@ int UtcDaliMaterialAnimatedProperty02(void)
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliMaterialSetTextureUniformName01(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image, "sTexture" );
+  material.SetTextureUniformName( 0, "sEffectTexture" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sEffectTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetTextureUniformName02(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image2 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image, "sTexture");
+  material.SetTextureUniformName( 0, "sEffectTexture" );
+  material.AddTexture( image2, "sTexture2");
+
+    Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sEffectTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetTextureAffectsTransparency(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image, "sTexture" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  // Test SetAffectsTransparency( false )
+  material.SetTextureAffectsTransparency( 0, false );
+
+  gl.EnableCullFaceCallTrace(true);
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = gl.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  // Test SetAffectsTransparency( true )
+  material.SetTextureAffectsTransparency( 0, true );
+
+  glEnableStack.Reset();
+  gl.EnableCullFaceCallTrace(true);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
 
   END_TEST;
 }

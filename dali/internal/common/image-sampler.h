@@ -39,7 +39,7 @@ namespace ImageSampler
    * @param[in] magnify The magnification filter.
    * @return Return the packed bitfield.
    */
-   unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify );
+   unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap = WrapMode::DEFAULT, WrapMode::Type vWrap = WrapMode::DEFAULT );
 
    /**
    * @brief Return the minification filter from a packed bitfield.
@@ -54,6 +54,20 @@ namespace ImageSampler
    * @return Return the magnification filter.
    */
    FilterMode::Type GetMagnifyFilterMode( unsigned int bitfield );
+
+   /**
+    * @brief Return the wrap mode in x direction from a packed bitfield.
+    *
+    * @return Return the wrap mode.
+    */
+   WrapMode::Type GetUWrapMode( unsigned int bitfield );
+
+   /**
+    * @brief Return the wrap mode in y direction from a packed bitfield.
+    *
+    * @return Return the wrap mode.
+    */
+   WrapMode::Type GetVWrapMode( unsigned int bitfield );
 
 } // namespace ImageSampler
 

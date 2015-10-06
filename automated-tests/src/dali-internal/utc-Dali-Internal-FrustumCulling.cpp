@@ -95,8 +95,7 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
 
   Geometry geometry = CreateGeometry();
   Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints ) );
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor meshActor = Actor::New();

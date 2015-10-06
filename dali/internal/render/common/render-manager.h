@@ -45,6 +45,7 @@ class ShaderSaver;
 namespace Render
 {
 class Renderer;
+class Sampler;
 }
 
 namespace SceneGraph
@@ -154,6 +155,34 @@ public:
    * @post renderer is destroyed.
    */
   void RemoveRenderer( Render::Renderer* renderer );
+
+  /**
+   * Add a sampler to the render manager.
+   * @param[in] sampler The sampler to add.
+   * @post sampler is owned by RenderManager
+   */
+  void AddSampler( Render::Sampler* sampler );
+
+  /**
+   * Remove a sampler from the render manager.
+   * @param[in] sampler The sampler to remove.
+   * @post sampler is destroyed.
+   */
+  void RemoveSampler( Render::Sampler* sampler );
+
+  /**
+   * Set minification and magnification filter modes for a sampler
+   * @param[in] minFilterMode Filter mode to use when the texture is minificated
+   * @param[in] magFilterMode Filter mode to use when the texture is magnified
+   */
+  void SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode );
+
+  /**
+   * Set wrapping mode for a sampler
+   * @param[in] uWrapMode Wrap mode in the x direction
+   * @param[in] vWrapMode Wrap mode in the y direction
+   */
+  void SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode );
 
   /**
    * Add a geometry to the render manager.

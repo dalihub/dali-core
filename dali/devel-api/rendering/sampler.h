@@ -18,14 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstddef> // std::size_t
-#include <string> // std::string
-
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h> // Dali::Handle
-#include <dali/public-api/images/image.h> // Dali::Image
-#include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
+#include <dali/public-api/actors/sampling.h>
 
 namespace Dali
 {
@@ -36,48 +31,11 @@ class Sampler;
 }
 
 /**
- * @brief Sampler is a handle to an object that can be used to provide an image to a material.
+ * @brief Sampler is a handle to an object that can be used to provide the sampling parameters to sample textures
  */
-class DALI_IMPORT_API Sampler : public Handle
+class DALI_IMPORT_API Sampler : public BaseHandle
 {
 public:
-
-  /**
-   * @brief Texture filter mode.
-   */
-  enum FilterMode
-  {
-    NONE,     ///< Use GL system defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR)
-    DEFAULT,  ///< Use dali defaults (minification LINEAR, magnification LINEAR)
-    NEAREST,  ///< Filter nearest
-    LINEAR    ///< Filter linear
-  };
-
-  /**
-   * @brief Texture wrap mode.
-   */
-  enum WrapMode
-  {
-    CLAMP_TO_EDGE,    ///< The texture coordinates get clamped to the range [0, 1]
-    REPEAT,           ///< Only the fractional part of the texture coordinates is used
-    MIRRORED_REPEAT,  ///< If the integer part of the texture coordinate is odd then it uses
-                      ///< the fractional part, if it's even it uses 1 - the fractional part
-  };
-
-  /**
-   * @brief An enumeration of properties belonging to the Sampler class.
-   */
-  struct Property
-  {
-    enum
-    {
-      MINIFICATION_FILTER = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "minification-filter",  type STRING
-      MAGNIGICATION_FILTER,                                       ///< name "magnification-filter", type STRING
-      U_WRAP,                                                     ///< name "u-wrap",               type STRING
-      V_WRAP,                                                     ///< name "v-wrap",               type STRING
-      AFFECTS_TRANSPARENCY,                                       ///< name "affects-transparency", type BOOLEAN
-    };
-  };
 
   /**
    * @brief Creates a new Sampler object
@@ -85,7 +43,7 @@ public:
    * @param[in] image Image used by this sampler
    * @param[in] uniformName String with the name of the uniform
    */
-  static Sampler New( Image& image, const std::string& uniformName );
+  static Sampler New();
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -121,34 +79,6 @@ public:
    */
   Sampler& operator=( const Sampler& handle );
 
-  /**
-   * @brief Sets the name of the shader uniform that will use this sampler
-   *
-   * @param[in] name String with the name of the uniform
-   */
-  void SetUniformName( const std::string& name );
-
-  /**
-   * @brief Gets the name of the shader uniform that this sampler uses
-   *
-   * @return Returns the name of the uniform
-   */
-  const std::string& GetUniformName() const;
-
-  /**
-   * @brief Set the image used by this sampler
-   *
-   * @param[in] image Image used by this sampler
-   */
-  void SetImage( Image& image );
-
-  /**
-   * @brief Retrieve the image used by this sampler
-   *
-   * If no image is assigned, an empty handle is returned
-   * @return The image.
-   */
-  Image GetImage() const;
 
   /**
    * @brief Set the filter modes for this sampler
@@ -159,7 +89,7 @@ public:
    * @param[in] minFilter The minification filter that will be used
    * @param[in] magFilter The magnification filter that will be used
    */
-  void SetFilterMode( FilterMode minFilter, FilterMode magFilter );
+  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
 
   /**
    * @brief Set the wrap modes for this sampler
@@ -169,16 +99,7 @@ public:
    * param[in] uWrap Wrap mode for u coordinates
    * param[in] vWrap Wrap mode for v coordinates
    */
-  void SetWrapMode( WrapMode uWrap, WrapMode vWrap );
-
-  /**
-   * @brief Set if this sampler should be considered for opacity hinting
-   *
-   * Calling this function sets the property AFFECTS_TRANSPARENCY
-   *
-   * param[in] affectsTransparency Specifies if this sampler should be considered for opacity hinting
-   */
-  void SetAffectsTransparency( bool affectsTransparency );
+  void SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap );
 
 public:
   /**

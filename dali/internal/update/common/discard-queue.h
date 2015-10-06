@@ -27,7 +27,6 @@
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
-#include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
@@ -60,7 +59,6 @@ public:
   typedef OwnerContainer< Shader* > ShaderQueue;
   typedef OwnerContainer< Geometry* > GeometryQueue;
   typedef OwnerContainer< Material* > MaterialQueue;
-  typedef OwnerContainer< Sampler* > SamplerQueue;
   typedef OwnerContainer< PropertyBuffer* > PropertyBufferQueue;
   typedef OwnerContainer< Renderer* > RendererQueue;
 
@@ -112,12 +110,6 @@ public:
   void Add( BufferIndex updateBufferIndex, Material* material );
 
   /**
-   * Adds an unwanted material to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render.
-   */
-  void Add( BufferIndex updateBufferIndex, Sampler* material );
-
-  /**
    * Adds an unwanted shader to the discard queue.
    * A message will be sent to clean-up GL resources in the next Render.
    * @pre This method is not thread-safe, and should only be called from the update-thread.
@@ -159,7 +151,6 @@ private:
   ShaderQueue                  mShaderQueue0;
   GeometryQueue                mGeometryQueue0;
   MaterialQueue                mMaterialQueue0;
-  SamplerQueue                 mSamplerQueue0;
   PropertyBufferQueue          mPropertyBufferQueue0;
   RendererQueue                mRendererQueue0;
 
@@ -169,7 +160,6 @@ private:
   ShaderQueue                  mShaderQueue1;
   GeometryQueue                mGeometryQueue1;
   MaterialQueue                mMaterialQueue1;
-  SamplerQueue                 mSamplerQueue1;
   PropertyBufferQueue          mPropertyBufferQueue1;
   RendererQueue                mRendererQueue1;
 };

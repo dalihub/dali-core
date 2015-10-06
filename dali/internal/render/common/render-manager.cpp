@@ -19,6 +19,7 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task.h>
@@ -36,6 +37,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 // Uncomment the next line to enable frame snapshot logging
@@ -73,6 +75,9 @@ typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 typedef OwnerContainer< RenderGeometry* >      RenderGeometryOwnerContainer;
 typedef RenderGeometryOwnerContainer::Iterator RenderGeometryOwnerIter;
 
+typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
+typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
+
 typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
 typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
 typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
@@ -97,6 +102,7 @@ struct RenderManager::Impl
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
+    samplerContainer(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
@@ -157,6 +163,7 @@ struct RenderManager::Impl
   Rect<int>                     defaultSurfaceRect;       ///< Rectangle for the default surface we are rendering to
 
   RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
+  SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
   RenderGeometryOwnerContainer  renderGeometryContainer;  ///< List of owned RenderGeometries
 
   bool                          renderersAdded;
@@ -285,6 +292,38 @@ void RenderManager::RemoveRenderer( Render::Renderer* renderer )
   }
 }
 
+void RenderManager::AddSampler( Render::Sampler* sampler )
+{
+  mImpl->samplerContainer.PushBack( sampler );
+}
+
+void RenderManager::RemoveSampler( Render::Sampler* sampler )
+{
+  DALI_ASSERT_DEBUG( NULL != sampler );
+
+  SamplerOwnerContainer& samplers = mImpl->samplerContainer;
+
+  // Find the sampler
+  for ( SamplerOwnerIter iter = samplers.Begin(); iter != samplers.End(); ++iter )
+  {
+    if ( *iter == sampler )
+    {
+      samplers.Erase( iter ); // Sampler found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+{
+  sampler->SetFilterMode( (Dali::FilterMode::Type)minFilterMode, (Dali::FilterMode::Type)magFilterMode );
+}
+
+void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode )
+{
+  sampler->SetWrapMode( (Dali::WrapMode::Type)uWrapMode, (Dali::WrapMode::Type)vWrapMode );
+}
+
 void RenderManager::AddGeometry( RenderGeometry* renderGeometry )
 {
   mImpl->renderGeometryContainer.PushBack( renderGeometry );
@@ -296,7 +335,7 @@ void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
 
   RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
 
-  // Find the renderer
+  // Find the geometry
   for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
     if ( *iter == renderGeometry )

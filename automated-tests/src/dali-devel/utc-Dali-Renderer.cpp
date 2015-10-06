@@ -452,12 +452,10 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -477,7 +475,6 @@ int UtcDaliRendererUniformMapPrecendence01(void)
 
   Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
   geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
@@ -523,12 +520,10 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -548,7 +543,6 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
   geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
@@ -595,12 +589,10 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -618,7 +610,6 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
   Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
@@ -665,12 +656,10 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -685,8 +674,6 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   application.Render(0);
 
   // Don't add property / uniform map to renderer/actor/material
-
-  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
   Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
@@ -702,7 +689,7 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   // Expect that the sampler's fade color property is accessed
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::CYAN, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::MAGENTA, TEST_LOCATION );
 
   // Animate geometry's fade color property. Should be no change to uniform
   Animation  animation = Animation::New(1.0f);
@@ -716,11 +703,11 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   application.Render(500);
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::CYAN, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::MAGENTA, TEST_LOCATION );
 
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::CYAN, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualValue, Color::MAGENTA, TEST_LOCATION );
 
   END_TEST;
 }
@@ -732,12 +719,9 @@ int UtcDaliRendererUniformMapPrecendence05(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -798,12 +782,9 @@ int UtcDaliRendererUniformMapPrecendence06(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -862,12 +843,9 @@ int UtcDaliRendererUniformMapPrecendence07(void)
   tet_infoline("Test the uniform map precedence is applied properly");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -924,12 +902,9 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   tet_infoline("Test the uniform maps are collected from all objects (same type)");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -946,10 +921,9 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   renderer.RegisterProperty( "uUniform1", Color::RED );
   actor.RegisterProperty( "uUniform2", Color::GREEN );
   material.RegisterProperty( "uUniform3", Color::BLUE );
-  sampler.RegisterProperty( "uUniform4", Color::CYAN );
-  shader.RegisterProperty( "uUniform5", Color::MAGENTA );
-  geometry.RegisterProperty( "uUniform6", Color::YELLOW );
-  vertexBuffer.RegisterProperty( "uUniform7", Color::BLACK );
+  shader.RegisterProperty( "uUniform4", Color::MAGENTA );
+  geometry.RegisterProperty( "uUniform5", Color::YELLOW );
+  vertexBuffer.RegisterProperty( "uUniform6", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -970,20 +944,16 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform3", uniform3Value ) );
   DALI_TEST_EQUALS( uniform3Value, Color::BLUE, TEST_LOCATION );
 
-  Vector4 uniform4Value(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform4", uniform4Value ) );
-  DALI_TEST_EQUALS( uniform4Value, Color::CYAN, TEST_LOCATION );
-
   Vector4 uniform5Value(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform5", uniform5Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform4", uniform5Value ) );
   DALI_TEST_EQUALS( uniform5Value, Color::MAGENTA, TEST_LOCATION );
 
   Vector4 uniform6Value(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform6", uniform6Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform5", uniform6Value ) );
   DALI_TEST_EQUALS( uniform6Value, Color::YELLOW, TEST_LOCATION );
 
   Vector4 uniform7Value(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform7", uniform7Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform6", uniform7Value ) );
   DALI_TEST_EQUALS( uniform7Value, Color::BLACK, TEST_LOCATION );
 
 
@@ -998,12 +968,9 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   tet_infoline("Test the uniform maps are collected from all objects (different types)");
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Sampler sampler = Sampler::New(image, "sTexture");
-  sampler.SetUniformName( "sEffectTexture" );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.AddSampler( sampler );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
@@ -1025,9 +992,6 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   Property::Value value3(Vector3(0.5f, 0.5f, 1.0f));
   material.RegisterProperty( "uFadePosition", value3);
-
-  Property::Value value4(Vector2(0.5f, 1.0f));
-  sampler.RegisterProperty( "uFadeUV", value4 );
 
   Property::Value value5(Matrix3::IDENTITY);
   shader.RegisterProperty( "uANormalMatrix", value5 );
@@ -1056,10 +1020,6 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   Vector3 uniform3Value(Vector3::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "uFadePosition", uniform3Value ) );
   DALI_TEST_EQUALS( uniform3Value, value3.Get<Vector3>(), TEST_LOCATION );
-
-  Vector2 uniform4Value(Vector2::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "uFadeUV", uniform4Value ) );
-  DALI_TEST_EQUALS( uniform4Value, value4.Get<Vector2>(), TEST_LOCATION );
 
   Matrix3 uniform5Value;
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uANormalMatrix", uniform5Value ) );
