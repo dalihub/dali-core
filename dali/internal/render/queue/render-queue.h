@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/mutex.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message-buffer.h>
 
@@ -92,7 +91,6 @@ private:
 
 private:
 
-  Dali::Mutex mMutex;        ///< Mutex to ensure access locking
   MessageBuffer* container0; ///< Messages are queued here when the update buffer index == 0
   MessageBuffer* container1; ///< Messages are queued here when the update buffer index == 1
 };
