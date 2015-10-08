@@ -333,6 +333,19 @@ void Program::SetUniform2f( GLint location, GLfloat value0, GLfloat value1 )
   CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
 }
 
+void Program::SetSizeUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
+{
+  if( ( fabsf(value0 - mSizeUniformCache.x) >= Math::MACHINE_EPSILON_1 )||
+      ( fabsf(value1 - mSizeUniformCache.y) >= Math::MACHINE_EPSILON_1 )||
+      ( fabsf(value2 - mSizeUniformCache.z) >= Math::MACHINE_EPSILON_1 ) )
+  {
+    mSizeUniformCache.x = value0;
+    mSizeUniformCache.y = value1;
+    mSizeUniformCache.z = value2;
+    SetUniform3f( location, value0, value1, value2 );
+  }
+}
+
 void Program::SetUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
 {
   DALI_ASSERT_DEBUG( IsUsed() ); // should not call this if this program is not used
@@ -694,7 +707,9 @@ void Program::ResetAttribsUniformCache()
     mUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
   }
 
-  // reset uniform cache
+  // reset uniform caches
+  mSizeUniformCache.x = mSizeUniformCache.y = mSizeUniformCache.z = 0.f;
+
   for( int i = 0; i < MAX_UNIFORM_CACHE_SIZE; ++i )
   {
     // GL initializes uniforms to 0

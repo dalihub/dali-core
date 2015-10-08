@@ -205,7 +205,7 @@ void NewRenderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDa
   if( -1 != sizeLoc )
   {
     Vector3 size = node.GetRenderSize( bufferIndex );
-    program.SetUniform3f( sizeLoc, size.x, size.y, size.z );
+    program.SetSizeUniform3f( sizeLoc, size.x, size.y, size.z );
   }
 }
 
