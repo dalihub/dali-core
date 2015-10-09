@@ -18,8 +18,7 @@
  */
 
 #include <dali/devel-api/common/hash.h>
-#include <dali/internal/common/owner-container.h>
-
+#include <dali/devel-api/common/owner-container.h>
 #include <string>
 
 namespace Dali

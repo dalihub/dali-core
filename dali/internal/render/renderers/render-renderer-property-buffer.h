@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>

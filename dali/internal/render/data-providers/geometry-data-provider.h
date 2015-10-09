@@ -18,8 +18,8 @@
  */
 
 #include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 
 namespace Dali
