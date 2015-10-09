@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/internal/common/owner-container.h>
 
 namespace Dali
 {

@@ -31,6 +31,7 @@ devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/map-wrapper.h \
   $(devel_api_src_dir)/common/conditional-wait.h \
   $(devel_api_src_dir)/common/mutex.h \
+  $(devel_api_src_dir)/common/owner-container.h \
   $(devel_api_src_dir)/common/ref-counted-dali-vector.h \
     $(devel_api_src_dir)/common/set-wrapper.h
 

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/set-wrapper.h>
 #include <dali/devel-api/common/mutex.h>
+#include <dali/devel-api/common/owner-container.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>
@@ -29,7 +30,6 @@
 #include <dali/integration-api/debug.h>
 
 #include <dali/internal/common/core-impl.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/message.h>
 
 #include <dali/internal/event/common/notification-manager.h>
@@ -937,7 +937,7 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 {
-  const Internal::OwnerContainer<Renderer*>& rendererContainer( mImpl->renderers.GetObjectContainer() );
+  const OwnerContainer<Renderer*>& rendererContainer( mImpl->renderers.GetObjectContainer() );
   unsigned int rendererCount( rendererContainer.Size() );
   for( unsigned int i(0); i<rendererCount; ++i )
   {

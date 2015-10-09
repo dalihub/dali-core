@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_OWNER_CONTAINER_H__
-#define __DALI_INTERNAL_OWNER_CONTAINER_H__
+#ifndef __DALI_OWNER_CONTAINER_H__
+#define __DALI_OWNER_CONTAINER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@
 #include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
-{
-
-namespace Internal
 {
 
 /**
@@ -171,8 +168,6 @@ private:
 
 };
 
-} // namespace Internal
-
 } // namespace Dali
 
-#endif //__DALI_INTERNAL_OWNER_CONTAINER_H__
+#endif //__DALI_OWNER_CONTAINER_H__

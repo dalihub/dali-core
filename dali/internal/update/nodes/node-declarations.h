@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/common/owner-container.h>
 
 namespace Dali
 {

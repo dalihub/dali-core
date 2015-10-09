@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/owner-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/update/nodes/node.h>

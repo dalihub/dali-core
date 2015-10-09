@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
