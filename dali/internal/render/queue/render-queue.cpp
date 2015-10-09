@@ -42,14 +42,12 @@ RenderQueue::RenderQueue()
 : container0( NULL ),
   container1( NULL )
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
   container0 = new MessageBuffer( INITIAL_BUFFER_SIZE );
   container1 = new MessageBuffer( INITIAL_BUFFER_SIZE );
 }
 
 RenderQueue::~RenderQueue()
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
   if( container0 )
   {
     for( MessageBuffer::Iterator iter = container0->Begin(); iter.IsValid(); iter.Next() )
@@ -79,7 +77,6 @@ RenderQueue::~RenderQueue()
 
 unsigned int* RenderQueue::ReserveMessageSlot( BufferIndex updateBufferIndex, std::size_t size )
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
   MessageBuffer* container = GetCurrentContainer( updateBufferIndex );
 
   return container->ReserveMessageSlot( size );
@@ -87,7 +84,6 @@ unsigned int* RenderQueue::ReserveMessageSlot( BufferIndex updateBufferIndex, st
 
 void RenderQueue::ProcessMessages( BufferIndex bufferIndex )
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
   MessageBuffer* container = GetCurrentContainer( bufferIndex );
 
   for( MessageBuffer::Iterator iter = container->Begin(); iter.IsValid(); iter.Next() )

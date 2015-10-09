@@ -198,6 +198,16 @@ public:
   void SetUniform2f( GLint location, GLfloat value0, GLfloat value1 );
 
   /**
+   * Special handling for size as we're using uniform geometry so size is passed on to most programs
+   * but it rarely changes so we can cache it
+   * @param [in] location of uniform
+   * @param [in] value0 as float
+   * @param [in] value1 as float
+   * @param [in] value2 as float
+   */
+  void SetSizeUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 );
+
+  /**
    * Sets the uniform value
    * @param [in] location of uniform
    * @param [in] value0 as float
@@ -363,6 +373,7 @@ private:  // Data
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
   GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
+  Vector3 mSizeUniformCache;                                ///< Cache value for size uniform
   bool mModifiesGeometry;  ///< True if the program changes geometry
 
 };

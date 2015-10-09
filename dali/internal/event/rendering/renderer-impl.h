@@ -210,7 +210,7 @@ private: // data
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
   int mDepthIndex;
-  bool mOnStage;
+  int mOnStageCount;
 };
 
 } // namespace Internal
