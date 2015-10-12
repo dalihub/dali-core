@@ -27,6 +27,8 @@
 namespace Dali
 {
 
+const std::size_t INITIAL_HASH_VALUE = 5381;
+
 /**
  * @brief Create a hash code for a string
  * @param toHash string to hash

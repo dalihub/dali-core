@@ -27,7 +27,6 @@ namespace //unnamed namespace
 /*
  * djb2 (http://www.cse.yorku.ca/~oz/hash.html)
  */
-const std::size_t INITIAL_HASH_VALUE = 5381;
 
 inline void HashString( const char* string, std::size_t& hash )
 {
