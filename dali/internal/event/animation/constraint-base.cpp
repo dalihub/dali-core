@@ -194,25 +194,14 @@ void ConstraintBase::ObjectDestroyed( Object& object )
   DALI_ASSERT_DEBUG( mObservedObjects.End() != iter );
   mObservedObjects.Erase( iter );
 
-  if ( &object != mTargetObject )
-  {
-    // Constraint is not useful anymore as an input-source has been destroyed
-    mSourceDestroyed = true;
+  // Constraint is not useful anymore as an input-source has been destroyed
+  mSourceDestroyed = true;
 
-    // Stop observing the remaining objects
-    StopObservation();
+  // Stop observing the remaining objects
+  StopObservation();
 
-    // Clear our sources as well
-    mSources.clear();
-
-    // We should remove ourselves from the target-object's constraints as well
-    if ( mTargetObject )
-    {
-      mTargetObject->RemoveConstraint( *this );
-    }
-  }
-
-  // NOTE: We do not clear our sources if our target-object is destroyed because we may want to clone this constraint for another target
+  // Clear our sources as well
+  mSources.clear();
 
   // Discard all object & scene-graph pointers
   mSceneGraphConstraint = NULL;
