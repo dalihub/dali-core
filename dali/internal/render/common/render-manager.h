@@ -256,9 +256,8 @@ private:
    * Helper to process a single RenderInstruction.
    * @param[in] instruction A description of the rendering operation.
    * @param[in] defaultShader default shader to use.
-   * @param[in] elapsedTime from previous render.
    */
-  void DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime );
+  void DoRender( RenderInstruction& instruction, Shader& defaultShader );
 
 private:
 

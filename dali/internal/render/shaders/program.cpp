@@ -95,14 +95,9 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "uViewMatrix",          // UNIFORM_VIEW_MATRIX,
   "uNormalMatrix",        // UNIFORM_NORMAL_MATRIX
   "uColor",               // UNIFORM_COLOR
-  "uCustomTextureCoords", // UNIFORM_CUSTOM_TEXTURE_COORDS
   "sTexture",             // UNIFORM_SAMPLER
   "sTextureRect",         // UNIFORM_SAMPLER_RECT
   "sEffect",              // UNIFORM_EFFECT_SAMPLER
-  "sEffectRect",          // UNIFORM_EFFECT_SAMPLER_RECT
-  "uTimeDelta",           // UNIFORM_TIME_DELTA
-  "sOpacityTexture",      // UNIFORM_SAMPLER_OPACITY
-  "sNormalMapTexture",    // UNIFORM_SAMPLER_NORMAL_MAP
   "uSize"                 // UNIFORM_SIZE
 };
 

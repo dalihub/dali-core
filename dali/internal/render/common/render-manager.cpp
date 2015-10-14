@@ -96,8 +96,6 @@ struct RenderManager::Impl
     resourcePostProcessQueue( resourcePostProcessQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    frameTime( 0.0f ),
-    lastFrameTime( 0.0f ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
@@ -153,9 +151,6 @@ struct RenderManager::Impl
   RenderInstructionContainer    instructions;
 
   Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
-
-  float                         frameTime;                ///< The elapsed time since the previous frame
-  float                         lastFrameTime;            ///< Last frame delta.
 
   unsigned int                  frameCount;               ///< The current frame count
   BufferIndex                   renderBufferIndex;        ///< The index of the buffer to read from; this is opposite of the "update" buffer
@@ -250,11 +245,6 @@ RenderInstructionContainer& RenderManager::GetRenderInstructionContainer()
 void RenderManager::SetBackgroundColor( const Vector4& color )
 {
   mImpl->backgroundColor = color;
-}
-
-void RenderManager::SetFrameDeltaTime( float deltaTime )
-{
-  mImpl->frameTime = deltaTime;
 }
 
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
@@ -453,7 +443,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
-    // @todo move programs out of context onto a program controller and let that handle this
     mImpl->programController.ResetProgramMatrices();
 
     // if we don't have default shader, no point doing the render calls
@@ -464,7 +453,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
       {
         RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
-        DoRender( instruction, *mImpl->defaultShader, mImpl->lastFrameTime );
+        DoRender( instruction, *mImpl->defaultShader );
 
         const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
         if ( countRenderList > 0 )
@@ -482,9 +471,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   }
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
-
-  // Update the frame time
-  mImpl->lastFrameTime = mImpl->frameTime;
 
   // check if anything has been posted to the update thread
   bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
@@ -510,7 +496,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   return updateRequired;
 }
 
-void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime )
+void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
 {
   Rect<int> viewportRect;
   Vector4   clearColor;
@@ -591,8 +577,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
                                     mImpl->context,
                                     mImpl->textureCache,
                                     defaultShader,
-                                    mImpl->renderBufferIndex,
-                                    elapsedTime );
+                                    mImpl->renderBufferIndex );
 
   if(instruction.mOffscreenTextureId != 0)
   {

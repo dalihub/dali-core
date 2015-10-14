@@ -981,9 +981,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
-  // Update the frame time delta on the render thread.
-  mImpl->renderManager.SetFrameDeltaTime(elapsedSeconds);
-
   // 1) Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear( bufferIndex );
 

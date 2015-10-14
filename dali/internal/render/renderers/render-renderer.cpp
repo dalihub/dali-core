@@ -141,12 +141,9 @@ void Renderer::Render( Context& context,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
-                       float frametime,
                        bool cull,
-                       bool blend)
+                       bool blend )
 {
-  // @todo MESH_REWORK Fix when merging! :D
-
   NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
 
   if( renderer )
@@ -214,11 +211,6 @@ void Renderer::Render( Context& context,
   {
     const Vector4& color = node.GetRenderColor( bufferIndex );
     program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
-  }
-  loc = program->GetUniformLocation(Program::UNIFORM_TIME_DELTA);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    program->SetUniform1f( loc, frametime );
   }
 
   //@todo MESH_REWORK Remove after removing ImageRenderer
