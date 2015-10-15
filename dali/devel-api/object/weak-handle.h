@@ -93,6 +93,12 @@ public:
    */
   Handle GetBaseHandle() const;
 
+  /**
+   * @brief Resets this weak handle to not point to any Dali object
+   */
+  void Reset();
+
+
 protected:
 
   struct Impl;
