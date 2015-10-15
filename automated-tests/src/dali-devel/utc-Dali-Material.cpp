@@ -932,8 +932,6 @@ int UtcDaliMaterialConstraint02(void)
   END_TEST;
 }
 
-
-
 int UtcDaliMaterialAnimatedProperty01(void)
 {
   TestApplication application;
@@ -1039,7 +1037,13 @@ int UtcDaliMaterialSetTextureUniformName01(void)
 
   Material material = CreateMaterial(1.0f);
   material.AddTexture( image, "sTexture" );
+
+  int textureIndex = material.GetTextureIndex( "sTexture" );
+  DALI_TEST_EQUALS( textureIndex, 0, TEST_LOCATION );
+
   material.SetTextureUniformName( 0, "sEffectTexture" );
+  textureIndex = material.GetTextureIndex( "sEffectTexture" );
+  DALI_TEST_EQUALS( textureIndex, 0, TEST_LOCATION );
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -1074,7 +1078,13 @@ int UtcDaliMaterialSetTextureUniformName02(void)
   material.SetTextureUniformName( 0, "sEffectTexture" );
   material.AddTexture( image2, "sTexture2");
 
-    Geometry geometry = CreateQuadGeometry();
+  int textureIndex = material.GetTextureIndex( "sEffectTexture" );
+  DALI_TEST_EQUALS( textureIndex, 0, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture2" );
+  DALI_TEST_EQUALS( textureIndex, 1, TEST_LOCATION );
+
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1138,6 +1148,217 @@ int UtcDaliMaterialSetTextureAffectsTransparency(void)
   application.Render();
 
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialAddTexture01(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image, "sTexture");
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // There are three calls to TexParameteri when the texture is first created
+  // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMaterialAddTexture02(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  material.AddTexture( image, "sTexture", sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // There are three calls to TexParameteri when the texture is first created
+  // Texture minification and magnification filters are now different than default so
+  //there should have been two extra TexParameteri calls to set the new filter mode
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMaterialRemoveTexture(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.RemoveTexture(0);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+
+  material.RemoveTexture(1);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  material.AddTexture( image, "sTexture", sampler );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+
+  material.RemoveTexture(1);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+
+  material.RemoveTexture(0);
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetSampler(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image, "sTexture");
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // There are three calls to TexParameteri when the texture is first created
+  // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  material.SetTextureSampler(0, sampler );
+
+
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  //There should have been two calls to TexParameteri to set the new filtering mode
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+
+
+  END_TEST;
+}
+
+int UtcDaliMaterialGetTextureIndex(void)
+{
+  TestApplication application;
+
+  Image image0 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image1 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image2 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image3 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+
+  Material material = CreateMaterial(1.0f);
+  material.AddTexture( image0, "sTexture0");
+  material.AddTexture( image1, "sTexture1");
+  material.AddTexture( image2, "sTexture2");
+  material.AddTexture( image3, "sTexture3");
+
+  int textureIndex = material.GetTextureIndex( "sTexture0" );
+  DALI_TEST_EQUALS( textureIndex, 0, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture1" );
+  DALI_TEST_EQUALS( textureIndex, 1, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture2" );
+  DALI_TEST_EQUALS( textureIndex, 2, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture3" );
+  DALI_TEST_EQUALS( textureIndex, 3, TEST_LOCATION );
+
+  material.RemoveTexture(1);
+
+  textureIndex = material.GetTextureIndex( "sTexture0" );
+  DALI_TEST_EQUALS( textureIndex, 0, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture2" );
+  DALI_TEST_EQUALS( textureIndex, 1, TEST_LOCATION );
+
+  textureIndex = material.GetTextureIndex( "sTexture3" );
+  DALI_TEST_EQUALS( textureIndex, 2, TEST_LOCATION );
 
   END_TEST;
 }

@@ -107,7 +107,7 @@ public:
     return mVWrapMode;
   }
 
-public:
+private:
 
   FilterMode  mMinFilter;    ///< The minify filter
   FilterMode  mMagFilter;    ///< The magnify filter

@@ -149,6 +149,7 @@ void Material::SetTextureUniformName( size_t index, const std::string& uniformNa
 {
   if( index < GetNumberOfTextures() )
   {
+    mTextures[index].mUniformName = uniformName;
     SceneGraph::SetTextureUniformNameMessage( GetEventThreadServices(), *mSceneObject, index,  uniformName );
   }
 }
