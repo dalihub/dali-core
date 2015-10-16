@@ -406,12 +406,6 @@ int UtcDaliBufferImageUpdate02(void)
   SignalReceived = false;
   image.UploadedSignal().Connect( ImageUploaded );
 
-  std::vector<GLuint> ids;
-  ids.push_back(200);
-  ids.push_back(201);
-  ids.push_back(202);
-  application.GetGlAbstraction().SetNextTextureIds(ids);
-
   application.SendNotification();
   application.Render(0);
   application.Render(16);
@@ -422,7 +416,10 @@ int UtcDaliBufferImageUpdate02(void)
   DALI_TEST_CHECK( image.IsDataExternal() );
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
-  image.Update(RectArea(9,9,5,5));              // notify Core that the image has been updated
+  // Check that multiple updates in a frame will be properly uploaded
+  image.Update(RectArea(9,9,5,5));
+  image.Update(RectArea(2,2,4,4));
+  image.Update(RectArea(3,3,1,6));
 
   application.SendNotification();
   application.Render(16);
@@ -432,11 +429,9 @@ int UtcDaliBufferImageUpdate02(void)
   application.SendNotification();
 
   const TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", "9, 9, 5, 1"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(1, "TexSubImage2D", "9, 10, 5, 1"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", "9, 11, 5, 1"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(3, "TexSubImage2D", "9, 12, 5, 1"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(4, "TexSubImage2D", "9, 13, 5, 1"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", "9, 9, 5, 5"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( callStack.TestMethodAndParams(1, "TexSubImage2D", "2, 2, 4, 4"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", "3, 3, 1, 6"), true, TEST_LOCATION);
 
   DALI_TEST_CHECK( SignalReceived == true );
   SignalReceived = false;
