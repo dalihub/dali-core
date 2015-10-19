@@ -26,7 +26,6 @@
 #include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 
@@ -34,6 +33,10 @@ namespace Dali
 {
 namespace Internal
 {
+namespace Render
+{
+class PropertyBuffer;
+}
 namespace SceneGraph
 {
 class SceneController;
@@ -60,19 +63,19 @@ public:
   /**
    * Add a property buffer to be used as a vertex buffer
    */
-  void AddVertexBuffer( PropertyBuffer* vertexBuffer );
+  void AddVertexBuffer( Render::PropertyBuffer* vertexBuffer );
 
   /**
    * Remove a property buffer to be used as a vertex buffer
    * @param[in] vertexBuffer the associated vertex buffer to remove
    */
-  void RemoveVertexBuffer( PropertyBuffer* vertexBuffer );
+  void RemoveVertexBuffer( Render::PropertyBuffer* vertexBuffer );
 
   /**
    * Set the buffer to be used as a source of indices for the geometry
    * @param[in] indexBuffer the Property buffer describing the indexes for Line, Triangle tyes.
    */
-  void SetIndexBuffer( PropertyBuffer* indexBuffer );
+  void SetIndexBuffer( Render::PropertyBuffer* indexBuffer );
 
   /**
    * Clear the index buffer if it is no longer required, e.g. if changing geometry type
@@ -122,13 +125,13 @@ public: // UniformMap::Observer
    * Get the vertex buffers of the geometry
    * @return A const reference to the vertex buffers
    */
-  Vector<PropertyBuffer*>& GetVertexBuffers();
+  Vector<Render::PropertyBuffer*>& GetVertexBuffers();
 
   /**
    * Get the index buffer of the geometry
    * @return A pointer to the index buffer if it exists, or NULL if it doesn't.
    */
-   PropertyBuffer* GetIndexBuffer();
+   Render::PropertyBuffer* GetIndexBuffer();
 
    /**
     * Gets the associated RenderGeometry
@@ -165,15 +168,8 @@ protected: // From PropertyOwner
 
 private:
 
-  /**
-   * @brief Calculate the extents of geometry contained in a vertex buffer.
-   *
-   * @param[in] vertexBuffer pointer to a vertex buffer.
-   */
-  void CalculateExtents( PropertyBuffer* vertexBuffer );
-
-  Vector<PropertyBuffer*> mVertexBuffers; ///< The vertex buffers
-  PropertyBuffer* mIndexBuffer;  ///< The index buffer if required
+  Vector<Render::PropertyBuffer*> mVertexBuffers; ///< The vertex buffers
+  Render::PropertyBuffer* mIndexBuffer;  ///< The index buffer if required
   ConnectionChangePropagator mConnectionObservers;
 
   RenderGeometry*               mRenderGeometry;
@@ -186,37 +182,37 @@ public: // Properties
   DoubleBufferedProperty<bool>  mRequiresDepthTest;
 };
 
-inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, const PropertyBuffer& vertexBuffer )
+inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue1< Geometry, PropertyBuffer* > LocalType;
+  typedef MessageValue1< Geometry, Render::PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &geometry, &Geometry::AddVertexBuffer, const_cast<PropertyBuffer*>(&vertexBuffer) );
+  new (slot) LocalType( &geometry, &Geometry::AddVertexBuffer, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
 }
 
-inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const PropertyBuffer& vertexBuffer )
+inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue1< Geometry, PropertyBuffer* > LocalType;
+  typedef MessageValue1< Geometry, Render::PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &geometry, &Geometry::RemoveVertexBuffer, const_cast<PropertyBuffer*>(&vertexBuffer) );
+  new (slot) LocalType( &geometry, &Geometry::RemoveVertexBuffer, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
 }
 
-inline void SetIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const PropertyBuffer& indexBuffer )
+inline void SetIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const Render::PropertyBuffer& indexBuffer )
 {
-  typedef MessageValue1< Geometry, PropertyBuffer* > LocalType;
+  typedef MessageValue1< Geometry, Render::PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &geometry, &Geometry::SetIndexBuffer, const_cast<PropertyBuffer*>(&indexBuffer) );
+  new (slot) LocalType( &geometry, &Geometry::SetIndexBuffer, const_cast<Render::PropertyBuffer*>(&indexBuffer) );
 }
 
 inline void ClearIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry )

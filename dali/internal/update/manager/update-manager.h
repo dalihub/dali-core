@@ -37,6 +37,7 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
 {
@@ -396,6 +397,45 @@ public:
    * @param[in] vWrapMode Wrapping mode in y direction
    */
   void SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode );
+
+  /**
+   * Add a new sampler to RenderManager
+   * @param[in] propertryBuffer The property buffer to add
+   * @post Sends a message to RenderManager to add the property buffer.
+   * The property buffer will be owned by RenderManager
+   */
+  void AddPropertyBuffer( Render::PropertyBuffer* propertryBuffer );
+
+  /**
+   * Removes an existing PropertyBuffer from RenderManager
+   * @param[in] propertryBuffer The property buffer to remove
+   * @post The property buffer will be destroyed in the render thread
+   */
+  void RemovePropertyBuffer( Render::PropertyBuffer* propertryBuffer );
+
+  /**
+   * Sets the format of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] format The new format of the buffer
+   * @post Sends a message to RenderManager to set the new format to the property buffer.
+   */
+  void SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
+
+  /**
+   * Sets the data of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] data The new data of the buffer
+   * @post Sends a message to RenderManager to set the new data to the property buffer.
+   */
+  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data);
+
+  /**
+   * Sets the size of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] size The new size of the buffer
+   * @post Sends a message to RenderManager to set the new size to the property buffer.
+   */
+  void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
 
 public:
 
@@ -886,6 +926,61 @@ inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, uWrapMode, vWrapMode );
+}
+
+inline void AddPropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
+{
+  typedef MessageValue1< UpdateManager, Render::PropertyBuffer*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, &propertyBuffer );
+}
+
+inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
+{
+  typedef MessageValue1< UpdateManager, Render::PropertyBuffer*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
+}
+
+inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Render::PropertyBuffer::Format* format )
+{
+  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, Render::PropertyBuffer::Format*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferFormat, &propertyBuffer, format );
+}
+
+inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Vector<char>* data )
+{
+  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, Vector<char>*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data );
+}
+
+inline void SetPropertyBufferSize( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, size_t size )
+{
+  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, size_t  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferSize, &propertyBuffer, size );
 }
 
 

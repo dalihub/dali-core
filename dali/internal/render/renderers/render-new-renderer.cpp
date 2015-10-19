@@ -20,6 +20,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
+#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/renderers/render-sampler.h>

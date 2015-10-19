@@ -23,7 +23,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-renderer-property-buffer.h>
+#include <dali/integration-api/gl-abstraction.h>
 
 namespace Dali
 {
@@ -33,15 +33,15 @@ class Context;
 class Program;
 class GpuBuffer;
 
+namespace Render
+{
+class PropertyBuffer;
+}
+
 namespace SceneGraph
 {
 class RenderDataProvider;
 class GeometryDataProvider;
-
-typedef OwnerPointer< RenderPropertyBuffer > RenderPropertyBufferPtr;
-typedef OwnerContainer< RenderPropertyBuffer* > RenderPropertyBufferContainer;
-typedef RenderPropertyBufferContainer::Iterator RenderPropertyBufferIter;
-
 
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
@@ -75,16 +75,15 @@ public:
   /**
    * Adds a property buffer to the geometry
    * @param[in] dataProvider The PropertyBuffer data provider
-   * @param[in] gpuBufferTarget target Specifies the type of the buffer
-   * @param[in] gpuBufferUsage usage Specifies how will the buffer be used
+   * @param[in] isIndexBuffer True if the property buffer is intended to be used as an index buffer
    */
-  void AddPropertyBuffer( const PropertyBufferDataProvider* dataProvider, GpuBuffer::Target gpuBufferTarget, GpuBuffer::Usage gpuBufferUsage );
+  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
 
   /**
    * Removes a PropertyBuffer from the geometry
-   * @param[in] dataProvider The property buffer to be removed
+   * @param[in] propertyBuffer The property buffer to be removed
    */
-  void RemovePropertyBuffer(  const PropertyBufferDataProvider* dataProvider );
+  void RemovePropertyBuffer(  const Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
@@ -124,8 +123,8 @@ private:
   const GeometryDataProvider& mGeometryDataProvider;  //Reference to update thread object
 
   // PropertyBuffers
-  RenderPropertyBufferPtr       mIndexBuffer;
-  RenderPropertyBufferContainer mVertexBuffers;
+  Render::PropertyBuffer* mIndexBuffer;
+  Vector<Render::PropertyBuffer*> mVertexBuffers;
 
   // Booleans
   bool mHasBeenUpdated : 1;

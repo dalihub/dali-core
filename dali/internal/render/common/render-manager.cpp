@@ -78,6 +78,9 @@ typedef RenderGeometryOwnerContainer::Iterator RenderGeometryOwnerIter;
 typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
 typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
 
+typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
+typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
+
 typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
 typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
 typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
@@ -159,6 +162,7 @@ struct RenderManager::Impl
 
   RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
   SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
+  PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
   RenderGeometryOwnerContainer  renderGeometryContainer;  ///< List of owned RenderGeometries
 
   bool                          renderersAdded;
@@ -314,6 +318,43 @@ void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMod
   sampler->SetWrapMode( (Dali::WrapMode::Type)uWrapMode, (Dali::WrapMode::Type)vWrapMode );
 }
 
+void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+{
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer );
+}
+
+void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+{
+  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
+
+  PropertyBufferOwnerContainer& propertyBuffers = mImpl->propertyBufferContainer;
+
+  // Find the sampler
+  for ( PropertyBufferOwnerIter iter = propertyBuffers.Begin(); iter != propertyBuffers.End(); ++iter )
+  {
+    if ( *iter == propertyBuffer )
+    {
+      propertyBuffers.Erase( iter ); // Property buffer found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
+{
+  propertyBuffer->SetFormat( format );
+}
+
+void RenderManager::SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data)
+{
+  propertyBuffer->SetData( data );
+}
+
+void RenderManager::SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size )
+{
+  propertyBuffer->SetSize( size );
+}
+
 void RenderManager::AddGeometry( RenderGeometry* renderGeometry )
 {
   mImpl->renderGeometryContainer.PushBack( renderGeometry );
@@ -336,7 +377,7 @@ void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
   }
 }
 
-void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage )
+void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != renderGeometry );
 
@@ -347,13 +388,13 @@ void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyB
   {
     if ( *iter == renderGeometry )
     {
-      (*iter)->AddPropertyBuffer( propertyBuffer, target, usage );
+      (*iter)->AddPropertyBuffer( propertyBuffer, isIndexBuffer );
       break;
     }
   }
 }
 
-void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer )
+void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != renderGeometry );
 
