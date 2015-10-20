@@ -62,7 +62,7 @@ public:
 
   /**
    * Retrieve the scene-graph shader added by this object.
-   * @return A pointer to the shader, or NULL if no shader has been added to the scene-graph.
+   * @return A pointer to the shader.
    */
   SceneGraph::Shader* GetShaderSceneObject();
 

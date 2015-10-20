@@ -23,7 +23,6 @@
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
-//#include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-new-renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>

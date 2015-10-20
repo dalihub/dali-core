@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
 
+//EXTERNAL INCLUDES
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/rendering/material.h> // Dali::Internal::Material
@@ -25,10 +28,6 @@
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
-//#include <dali/internal/update/rendering/scene-graph-sampler.h>
-
-//EXTERNAL INCLUDES
-#include <string>
 
 namespace Dali
 {
@@ -601,7 +600,6 @@ const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index 
 
 int Material::GetPropertyComponentIndex( Property::Index index ) const
 {
-  // @todo MESH_REWORK - Change this if component properties are added for color/blend-color
   return Property::INVALID_COMPONENT_INDEX;
 }
 
