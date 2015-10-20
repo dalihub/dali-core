@@ -328,7 +328,7 @@ void NewRenderer::BindTextures(
   }
 }
 
-unsigned int NewRenderer::GetTextureUniformIndex( Program& program, std::string uniformName )
+unsigned int NewRenderer::GetTextureUniformIndex( Program& program, const std::string& uniformName )
 {
   unsigned int uniformIndex = 0;
   bool found = false;

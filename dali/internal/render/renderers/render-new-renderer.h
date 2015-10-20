@@ -179,7 +179,7 @@ private:
    * @param[in] sampler The sampler holding a texture unit uniform name to search for
    * @return The texture uniform index in the program
    */
-  unsigned int GetTextureUniformIndex( Program& program, std::string uniformName );
+  unsigned int GetTextureUniformIndex( Program& program, const std::string& uniformName );
 
 
 public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
