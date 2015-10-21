@@ -19,10 +19,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/common/mutex.h>
+#include <dali/devel-api/threading/mutex.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali-test-suite-utils.h>
 
 using Dali::Mutex;
+using Dali::Thread;
 
 int UtcDaliMutexSingleThread(void)
 {
@@ -55,21 +57,24 @@ volatile int gGlobalValue = 0;
 volatile bool gWorkerThreadWait = true;
 volatile enum ThreadState { INIT, RUN, LOCKING, TERMINATE } gWorkerThreadState = INIT;
 Mutex* volatile gGlobalValueMutex; // volatile pointer to a mutex object
-}
-void* WorkerThread1( void* ptr )
+
+class TestThread : public Thread
 {
-  gWorkerThreadState = RUN;
+  virtual void Run()
   {
-    Mutex::ScopedLock lock( *gGlobalValueMutex );
-    gWorkerThreadState = LOCKING;
-    gGlobalValue = -1;
-    while( gWorkerThreadWait ) // wait till we can exit
+    gWorkerThreadState = RUN;
     {
-      usleep( 1 ); // 1 microsecond
+      Mutex::ScopedLock lock( *gGlobalValueMutex );
+      gWorkerThreadState = LOCKING;
+      gGlobalValue = -1;
+      while( gWorkerThreadWait ) // wait till we can exit
+      {
+        usleep( 1 ); // 1 microsecond
+      }
     }
+    gWorkerThreadState = TERMINATE;
   }
-  gWorkerThreadState = TERMINATE;
-  return NULL;
+};
 }
 
 int UtcDaliMutexMultiThread(void)
@@ -78,7 +83,7 @@ int UtcDaliMutexMultiThread(void)
 
   gGlobalValueMutex = new Dali::Mutex();
 
-  pthread_t thread1;
+  TestThread thread1;
   // initialize values
   gGlobalValue = 0;
   gWorkerThreadWait = true;
@@ -90,7 +95,7 @@ int UtcDaliMutexMultiThread(void)
   {
     Mutex::ScopedLock lock( *gGlobalValueMutex );
     DALI_TEST_EQUALS( true, gGlobalValueMutex->IsLocked(), TEST_LOCATION );
-    pthread_create( &thread1, NULL, &WorkerThread1, NULL );
+    thread1.Start();
     // wait till the thread is in run state
     while( RUN != gWorkerThreadState )
     {
@@ -119,8 +124,7 @@ int UtcDaliMutexMultiThread(void)
     usleep( 1 ); // 1 microsecond
   }
   DALI_TEST_EQUALS( false, gGlobalValueMutex->IsLocked(), TEST_LOCATION );
-  void* exitValue;
-  pthread_join( thread1, &exitValue );
+  thread1.Join();
 
   END_TEST;
 }

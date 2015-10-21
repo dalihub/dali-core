@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/common/mutex.h>
+#include <dali/devel-api/threading/mutex.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/mutex-impl.h>

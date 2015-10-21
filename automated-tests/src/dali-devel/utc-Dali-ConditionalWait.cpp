@@ -19,9 +19,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/common/conditional-wait.h>
+#include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/devel-api/threading/thread.h>
 
 using Dali::ConditionalWait;
+using Dali::Thread;
 
 namespace // for local variables to avoid name clashes
 {
@@ -29,35 +31,59 @@ volatile int gGlobalValue = 0;
 volatile bool gWorkerThreadWait = true;
 enum ThreadState { INIT, RUN, TERMINATE } volatile gWorkerThreadState = INIT;
 ConditionalWait* volatile gConditionalWait; // volatile pointer to a ConditionalWait object
-}
 
-void* WorkerThreadNotify( void* ptr )
+class WorkerThreadNotify : public Thread
 {
-  gGlobalValue = -1;
-  while( gWorkerThreadWait ) // wait till we can exit
+  virtual void Run()
   {
-    gWorkerThreadState = RUN;
-    usleep( 1 ); // 1 microseconds
+    gGlobalValue = -1;
+    while( gWorkerThreadWait ) // wait till we can exit
+    {
+      gWorkerThreadState = RUN;
+      usleep( 1 ); // 1 microseconds
+    }
+    usleep( 200 ); // give other thread time to get to Wait
+    gGlobalValue = 1;
+    gConditionalWait->Notify();
+    gWorkerThreadState = TERMINATE;
   }
-  usleep( 200 ); // give other thread time to get to Wait
-  gGlobalValue = 1;
-  gConditionalWait->Notify();
-  gWorkerThreadState = TERMINATE;
-  return NULL;
+};
+
+volatile int gNotifyCount = 0;
+class WorkerThreadNotifyN : public Thread
+{
+  virtual void Run()
+  {
+    while( gNotifyCount > 0 )
+    {
+      gConditionalWait->Notify();
+      usleep( 10 ); // 10 microseconds between each notify
+    }
+  }
+};
+
+class WorkerThreadWaitN : public Thread
+{
+  virtual void Run()
+  {
+    gConditionalWait->Wait();
+  }
+};
+
 }
 
 int UtcConditionalWait1P(void)
 {
   tet_infoline("Testing ConditionalWait - scenario:  wait - notify with 2 threads");
 
-  pthread_t thread1;
+  WorkerThreadNotify thread1;
   // initialize values
   gConditionalWait = new ConditionalWait();
   gWorkerThreadWait = true;
   DALI_TEST_EQUALS( INIT, gWorkerThreadState, TEST_LOCATION );
   DALI_TEST_EQUALS( 0, gGlobalValue, TEST_LOCATION );
 
-  pthread_create( &thread1, NULL, &WorkerThreadNotify, NULL );
+  thread1.Start();
   // wait till the thread is in run state
   while( RUN != gWorkerThreadState )
   {
@@ -75,8 +101,7 @@ int UtcConditionalWait1P(void)
     usleep( 1 ); // 1 microsecond
   }
 
-  void* exitValue;
-  pthread_join( thread1, &exitValue );
+  thread1.Join();
 
   delete gConditionalWait;
   END_TEST;
@@ -94,16 +119,6 @@ int UtcConditionalWait2P(void)
   END_TEST;
 }
 
-volatile int gNotifyCount = 0;
-void* WorkerThreadNotifyN( void* ptr )
-{
-  while( gNotifyCount > 0 )
-  {
-    gConditionalWait->Notify();
-    usleep( 10 ); // 10 microseconds between each notify
-  }
-  return NULL;
-}
 
 int UtcConditionalWait3P(void)
 {
@@ -113,8 +128,8 @@ int UtcConditionalWait3P(void)
   gConditionalWait = new ConditionalWait();
   gNotifyCount = 100;
 
-  pthread_t thread1;
-  pthread_create( &thread1, NULL, &WorkerThreadNotifyN, NULL );
+  WorkerThreadNotifyN thread1;
+  thread1.Start();
 
   while( gNotifyCount > 0 )
   {
@@ -125,8 +140,7 @@ int UtcConditionalWait3P(void)
   }
   DALI_TEST_EQUALS( 0u, gConditionalWait->GetWaitCount(), TEST_LOCATION );
 
-  void* exitValue;
-  pthread_join( thread1, &exitValue );
+  thread1.Join();
 
   delete gConditionalWait;
   END_TEST;
@@ -140,12 +154,12 @@ int UtcConditionalWait4P(void)
   gConditionalWait = new ConditionalWait();
   gNotifyCount = 100;
 
-  pthread_t thread1;
-  pthread_create( &thread1, NULL, &WorkerThreadNotifyN, NULL );
-  pthread_t thread2;
-  pthread_create( &thread2, NULL, &WorkerThreadNotifyN, NULL );
-  pthread_t thread3;
-  pthread_create( &thread3, NULL, &WorkerThreadNotifyN, NULL );
+  WorkerThreadNotifyN thread1;
+  thread1.Start();
+  WorkerThreadNotifyN thread2;
+  thread2.Start();
+  WorkerThreadNotifyN thread3;
+  thread3.Start();
 
   while( gNotifyCount > 0 )
   {
@@ -155,20 +169,12 @@ int UtcConditionalWait4P(void)
     usleep( 10 ); // 10 microseconds between each notify
   }
 
-  void* exitValue;
-  pthread_join( thread1, &exitValue );
-  pthread_join( thread2, &exitValue );
-  pthread_join( thread3, &exitValue );
+  thread1.Join();
+  thread2.Join();
+  thread3.Join();
 
   delete gConditionalWait;
   END_TEST;
-}
-
-void* WorkerThreadWaitN( void* ptr )
-{
-  gConditionalWait->Wait();
-
-  return NULL;
 }
 
 int UtcConditionalWait5P(void)
@@ -178,15 +184,14 @@ int UtcConditionalWait5P(void)
   // initialize values
   gConditionalWait = new ConditionalWait();
 
-  pthread_t thread1;
-  pthread_create( &thread1, NULL, &WorkerThreadWaitN, NULL );
-  pthread_t thread2;
-  pthread_create( &thread2, NULL, &WorkerThreadWaitN, NULL );
-  pthread_t thread3;
-  pthread_create( &thread3, NULL, &WorkerThreadWaitN, NULL );
-  pthread_t thread4;
-  pthread_create( &thread4, NULL, &WorkerThreadWaitN, NULL );
-
+  WorkerThreadWaitN thread1;
+  thread1.Start();
+  WorkerThreadWaitN thread2;
+  thread2.Start();
+  WorkerThreadWaitN thread3;
+  thread3.Start();
+  WorkerThreadWaitN thread4;
+  thread4.Start();
   // wait till all child threads are waiting
   while( gConditionalWait->GetWaitCount() < 4 )
   { }
@@ -194,11 +199,10 @@ int UtcConditionalWait5P(void)
   // notify once, it will resume all threads
   gConditionalWait->Notify();
 
-  void* exitValue;
-  pthread_join( thread1, &exitValue );
-  pthread_join( thread2, &exitValue );
-  pthread_join( thread3, &exitValue );
-  pthread_join( thread4, &exitValue );
+  thread1.Join();
+  thread2.Join();
+  thread3.Join();
+  thread4.Join();
 
   DALI_TEST_EQUALS( 0u, gConditionalWait->GetWaitCount(), TEST_LOCATION );
 
