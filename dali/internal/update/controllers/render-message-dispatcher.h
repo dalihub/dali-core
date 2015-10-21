@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
 {
@@ -90,10 +91,9 @@ public:
    * Add a PropertyBuffer.
    * @param[in] renderGeometry The geometry
    * @param[in] propertyBuffer The PropertyBuffer
-   * @param[in] target Specifies the type of the buffer
-   * @param[in] usage Specifies how will the buffer be used
+   * @param[in] isIndexBuffer True if the buffer is intended to be used as an index buffer
    */
-  void AddPropertyBuffer( RenderGeometry& renderGeometry, PropertyBufferDataProvider* propertyBuffer, GpuBuffer::Target target, GpuBuffer::Usage usage );
+  void AddPropertyBuffer( RenderGeometry& renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
 
   /**
    * Remove a PropertyBuffer.
@@ -101,7 +101,7 @@ public:
    * @param[in] propertyBuffer The PropertyBuffer
    * @post PropertyBuffer will be destroyed in the next Render.
    */
-  void RemovePropertyBuffer( RenderGeometry& renderGeometry, PropertyBufferDataProvider* propertyBuffer );
+  void RemovePropertyBuffer( RenderGeometry& renderGeometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Add a Render tracker.

@@ -61,6 +61,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-image-renderer.h>
 #include <dali/internal/render/renderers/render-new-renderer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
@@ -140,7 +141,7 @@ const int GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::RenderGeometry) );
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
-  sizeof( Internal::SceneGraph::PropertyBuffer ) );
+  sizeof( Internal::Render::PropertyBuffer ) );
 const int MATERIAL_MEMORY_SIZE(
   sizeof( Internal::Material ) +
   sizeof( Internal::SceneGraph::Material ) );

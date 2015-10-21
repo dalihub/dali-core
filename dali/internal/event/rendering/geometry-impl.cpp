@@ -63,37 +63,28 @@ GeometryPtr Geometry::New()
 
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
-  PropertyBufferConnector connector;
-  connector.Set( vertexBuffer, OnStage() );
-  mVertexBufferConnectors.push_back( connector );
-
-  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *vertexBuffer.GetSceneObject() );
-
-  SceneGraph::AddVertexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
-
-  return mVertexBufferConnectors.size() - 1u;
+  mVertexBuffers.push_back( &vertexBuffer );
+  SceneGraph::AddVertexBufferMessage( GetEventThreadServices(), *mSceneObject, *vertexBuffer.GetRenderObject() );
+  return mVertexBuffers.size() - 1u;
 }
 
 std::size_t Geometry::GetNumberOfVertexBuffers() const
 {
-  return mVertexBufferConnectors.size();
+  return mVertexBuffers.size();
 }
 
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
-  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *(mVertexBufferConnectors[index].Get()->GetSceneObject()) );
-  SceneGraph::RemoveVertexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
+  const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
+  SceneGraph::RemoveVertexBufferMessage( GetEventThreadServices(), *mSceneObject, renderPropertyBuffer );
 
-  mVertexBufferConnectors.erase( mVertexBufferConnectors.begin() + index );
+  mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
 
 void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
 {
-  mIndexBufferConnector.Set( indexBuffer, OnStage() );
-
-  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = dynamic_cast<const SceneGraph::PropertyBuffer&>( *indexBuffer.GetSceneObject() );
-
-  SceneGraph::SetIndexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
+  mIndexBuffer = &indexBuffer;
+  SceneGraph::SetIndexBufferMessage( GetEventThreadServices(), *mSceneObject, *indexBuffer.GetRenderObject() );
 }
 
 void Geometry::SetGeometryType( Dali::Geometry::GeometryType geometryType )
@@ -344,33 +335,16 @@ bool Geometry::OnStage() const
 void Geometry::Connect()
 {
   mOnStage = true;
-
-  PropertyBufferConnectorContainer::const_iterator end = mVertexBufferConnectors.end();
-  for( PropertyBufferConnectorContainer::iterator it = mVertexBufferConnectors.begin();
-       it < end;
-       ++it )
-  {
-    it->OnStageConnect();
-  }
-  mIndexBufferConnector.OnStageConnect();
 }
 
 void Geometry::Disconnect()
 {
   mOnStage = false;
-
-  PropertyBufferConnectorContainer::const_iterator end = mVertexBufferConnectors.end();
-  for( PropertyBufferConnectorContainer::iterator it = mVertexBufferConnectors.begin();
-       it < end;
-       ++it )
-  {
-    it->OnStageDisconnect();
-  }
-  mIndexBufferConnector.OnStageDisconnect();
 }
 
 Geometry::Geometry()
-: mSceneObject( NULL ),
+: mIndexBuffer( NULL ),
+  mSceneObject( NULL ),
   mOnStage( false )
 {
 }

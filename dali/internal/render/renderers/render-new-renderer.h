@@ -26,10 +26,12 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
 
+
 namespace Dali
 {
 namespace Internal
 {
+class Context;
 class PropertyInputImpl;
 
 namespace Render
