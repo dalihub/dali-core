@@ -29,4 +29,13 @@ Degree::Degree( Radian radian )
 {
 }
 
+const Radian ANGLE_360 = Radian( Math::PI * 2.f     ); ///< 360 degree turn in radians
+const Radian ANGLE_180 = Radian( Math::PI           ); ///< 180 degree turn in radians
+const Radian ANGLE_120 = Radian( Math::PI * 2.f/3.f ); ///< 120 degree turn in radians
+const Radian ANGLE_90  = Radian( Math::PI_2         ); ///< 90 degree turn in radians
+const Radian ANGLE_60  = Radian( Math::PI / 3.f     ); ///< 60 degree turn in radians
+const Radian ANGLE_45  = Radian( Math::PI_4         ); ///< 45 degree turn in radians
+const Radian ANGLE_30  = Radian( Math::PI / 6.f     ); ///< 30 degree turn in radians
+const Radian ANGLE_0   = Radian( 0.0f               ); ///< 0 degree turn in radians
+
 } // namespace Dali
