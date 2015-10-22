@@ -62,13 +62,17 @@ const float BezierBasisCoeff[] = {  -1.0f,  3.0f, -3.0f, 1.0f,
 
 const Dali::Matrix BezierBasis = Dali::Matrix( BezierBasisCoeff );
 
-
 Dali::BaseHandle Create()
 {
   return Dali::Path::New();
 }
 
 Dali::TypeRegistration mType( typeid(Dali::Path), typeid(Dali::Handle), Create );
+
+inline bool PathIsComplete(const Dali::Vector<Vector3>& point, const Dali::Vector<Vector3>& controlPoint)
+{
+  return ( point.Size() > 1 && controlPoint.Size() == (point.Size()-1)*2 );
+}
 
 } //Unnamed namespace
 
@@ -346,161 +350,184 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
 
 void Path::Sample( float t, Vector3& position, Vector3& tangent ) const
 {
-  DALI_ASSERT_ALWAYS(mPoint.Size() > 1 && mControlPoint.Size() == (mPoint.Size()-1)*2 && "Spline not fully initialized" );
-
-  unsigned int segment;
-  float tLocal;
-  FindSegmentAndProgress( t, segment, tLocal );
-
-  //Get points and control points in the segment
-  const Vector3& controlPoint0 = mControlPoint[2*segment];
-  const Vector3& controlPoint1 = mControlPoint[2*segment+1];
-  const Vector3& point0 = mPoint[segment];
-  const Vector3& point1 = mPoint[segment+1];
-
-  if(tLocal < Math::MACHINE_EPSILON_1)
+  if( !SampleAt(t, position, tangent) )
   {
-    position = point0;
-    tangent = ( controlPoint0 - point0 ) * 3.0f;
-    tangent.Normalize();
-  }
-  else if( (1.0 - tLocal) < Math::MACHINE_EPSILON_1)
-  {
-    position = point1;
-    tangent = ( point1 - controlPoint1 ) * 3.0f;
-    tangent.Normalize();
-  }
-  else
-  {
-    const Vector4 sVect(tLocal*tLocal*tLocal, tLocal*tLocal, tLocal, 1.0f );
-    const Vector3 sVectDerivative(3.0f*tLocal*tLocal, 2.0f*tLocal, 1.0f );
-
-    //X
-    Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
-
-    Vector4 A = BezierBasis * cVect;
-    position.x = sVect.Dot4(A);
-    tangent.x  = sVectDerivative.Dot(Vector3(A));
-
-    //Y
-    cVect.x  = point0.y;
-    cVect.y  = controlPoint0.y;
-    cVect.z  = controlPoint1.y;
-    cVect.w  = point1.y;
-
-    A = BezierBasis * cVect;
-    position.y = sVect.Dot4(A);
-    tangent.y  = sVectDerivative.Dot(Vector3(A));
-
-    //Z
-    cVect.x  = point0.z;
-    cVect.y  = controlPoint0.z;
-    cVect.z  = controlPoint1.z;
-    cVect.w  = point1.z;
-
-    A = BezierBasis * cVect;
-    position.z = sVect.Dot4(A);
-    tangent.z  = sVectDerivative.Dot(Vector3(A));
-
-    tangent.Normalize();
+    DALI_ASSERT_ALWAYS(!"Spline not fully initialized" );
   }
 }
 
-Vector3 Path::SamplePosition( float t ) const
+bool Path::SampleAt( float t, Vector3& position, Vector3& tangent ) const
 {
-  DALI_ASSERT_ALWAYS(mPoint.Size() > 1 && mControlPoint.Size() == (mPoint.Size()-1)*2 && "Spline not fully initialized" );
+  bool done = false;
 
-  unsigned int segment;
-  float tLocal;
-  FindSegmentAndProgress( t, segment, tLocal );
-
-  const Vector3& controlPoint0 = mControlPoint[2*segment];
-  const Vector3& controlPoint1 = mControlPoint[2*segment+1];
-  const Vector3& point0 = mPoint[segment];
-  const Vector3& point1 = mPoint[segment+1];
-
-  Vector3 position;
-  if(tLocal < Math::MACHINE_EPSILON_1)
+  if( PathIsComplete(mPoint, mControlPoint) )
   {
-    position = point0;
+    unsigned int segment;
+    float tLocal;
+    FindSegmentAndProgress( t, segment, tLocal );
+
+    //Get points and control points in the segment
+    const Vector3& controlPoint0 = mControlPoint[2*segment];
+    const Vector3& controlPoint1 = mControlPoint[2*segment+1];
+    const Vector3& point0 = mPoint[segment];
+    const Vector3& point1 = mPoint[segment+1];
+
+    if(tLocal < Math::MACHINE_EPSILON_1)
+    {
+      position = point0;
+      tangent = ( controlPoint0 - point0 ) * 3.0f;
+      tangent.Normalize();
+    }
+    else if( (1.0 - tLocal) < Math::MACHINE_EPSILON_1)
+    {
+      position = point1;
+      tangent = ( point1 - controlPoint1 ) * 3.0f;
+      tangent.Normalize();
+    }
+    else
+    {
+      const Vector4 sVect(tLocal*tLocal*tLocal, tLocal*tLocal, tLocal, 1.0f );
+      const Vector3 sVectDerivative(3.0f*tLocal*tLocal, 2.0f*tLocal, 1.0f );
+
+      //X
+      Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
+
+      Vector4 A = BezierBasis * cVect;
+      position.x = sVect.Dot4(A);
+      tangent.x  = sVectDerivative.Dot(Vector3(A));
+
+      //Y
+      cVect.x  = point0.y;
+      cVect.y  = controlPoint0.y;
+      cVect.z  = controlPoint1.y;
+      cVect.w  = point1.y;
+
+      A = BezierBasis * cVect;
+      position.y = sVect.Dot4(A);
+      tangent.y  = sVectDerivative.Dot(Vector3(A));
+
+      //Z
+      cVect.x  = point0.z;
+      cVect.y  = controlPoint0.z;
+      cVect.z  = controlPoint1.z;
+      cVect.w  = point1.z;
+
+      A = BezierBasis * cVect;
+      position.z = sVect.Dot4(A);
+      tangent.z  = sVectDerivative.Dot(Vector3(A));
+
+      tangent.Normalize();
+    }
+
+    done = true;
   }
-  else if( (1.0 - tLocal) < Math::MACHINE_EPSILON_1)
-  {
-    position = point1;
-  }
-  else
-  {
-    const Vector4 sVect(tLocal*tLocal*tLocal, tLocal*tLocal, tLocal, 1.0f );
 
-    //X
-    Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
-    position.x = sVect.Dot4(BezierBasis * cVect);
-
-    //Y
-    cVect.x  = point0.y;
-    cVect.y  = controlPoint0.y;
-    cVect.z  = controlPoint1.y;
-    cVect.w  = point1.y;
-    position.y = sVect.Dot4(BezierBasis * cVect);
-
-    //Z
-    cVect.x  = point0.z;
-    cVect.y  = controlPoint0.z;
-    cVect.z  = controlPoint1.z;
-    cVect.w  = point1.z;
-    position.z = sVect.Dot4(BezierBasis * cVect);
-  }
-
-  return position;
+  return done;
 }
 
-Vector3 Path::SampleTangent( float t ) const
+bool Path::SamplePosition( float t, Vector3& position ) const
 {
-  DALI_ASSERT_ALWAYS(mPoint.Size() > 1 && mControlPoint.Size() == (mPoint.Size()-1)*2 && "Spline not fully initialized" );
+  bool done = false;
 
-  unsigned int segment;
-  float tLocal;
-  FindSegmentAndProgress( t, segment, tLocal );
-
-  const Vector3& controlPoint0 = mControlPoint[2*segment];
-  const Vector3& controlPoint1 = mControlPoint[2*segment+1];
-  const Vector3& point0 = mPoint[segment];
-  const Vector3& point1 = mPoint[segment+1];
-
-  Vector3 tangent;
-  if(tLocal < Math::MACHINE_EPSILON_1)
+  if( PathIsComplete(mPoint, mControlPoint) )
   {
-    tangent = ( controlPoint0 - point0 ) * 3.0f;
+    unsigned int segment;
+    float tLocal;
+    FindSegmentAndProgress( t, segment, tLocal );
+
+    const Vector3& controlPoint0 = mControlPoint[2*segment];
+    const Vector3& controlPoint1 = mControlPoint[2*segment+1];
+    const Vector3& point0 = mPoint[segment];
+    const Vector3& point1 = mPoint[segment+1];
+
+    if(tLocal < Math::MACHINE_EPSILON_1)
+    {
+      position = point0;
+    }
+    else if( (1.0 - tLocal) < Math::MACHINE_EPSILON_1)
+    {
+      position = point1;
+    }
+    else
+    {
+      const Vector4 sVect(tLocal*tLocal*tLocal, tLocal*tLocal, tLocal, 1.0f );
+
+      //X
+      Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
+      position.x = sVect.Dot4(BezierBasis * cVect);
+
+      //Y
+      cVect.x  = point0.y;
+      cVect.y  = controlPoint0.y;
+      cVect.z  = controlPoint1.y;
+      cVect.w  = point1.y;
+      position.y = sVect.Dot4(BezierBasis * cVect);
+
+      //Z
+      cVect.x  = point0.z;
+      cVect.y  = controlPoint0.z;
+      cVect.z  = controlPoint1.z;
+      cVect.w  = point1.z;
+      position.z = sVect.Dot4(BezierBasis * cVect);
+    }
+
+    done = true;
   }
-  else if( (1.0f - tLocal) < Math::MACHINE_EPSILON_1)
+
+  return done;
+}
+
+bool Path::SampleTangent( float t, Vector3& tangent ) const
+{
+  bool done = false;
+
+  if( PathIsComplete(mPoint, mControlPoint) )
   {
-    tangent = ( point1 - controlPoint1 ) * 3.0f;
+    unsigned int segment;
+    float tLocal;
+    FindSegmentAndProgress( t, segment, tLocal );
+
+    const Vector3& controlPoint0 = mControlPoint[2*segment];
+    const Vector3& controlPoint1 = mControlPoint[2*segment+1];
+    const Vector3& point0 = mPoint[segment];
+    const Vector3& point1 = mPoint[segment+1];
+
+    if(tLocal < Math::MACHINE_EPSILON_1)
+    {
+      tangent = ( controlPoint0 - point0 ) * 3.0f;
+    }
+    else if( (1.0f - tLocal) < Math::MACHINE_EPSILON_1)
+    {
+      tangent = ( point1 - controlPoint1 ) * 3.0f;
+    }
+    else
+    {
+      const Vector3 sVectDerivative(3.0f*tLocal*tLocal, 2.0f*tLocal, 1.0f );
+
+      //X
+      Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
+      tangent.x  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
+
+      //Y
+      cVect.x  = point0.y;
+      cVect.y  = controlPoint0.y;
+      cVect.z  = controlPoint1.y;
+      cVect.w  = point1.y;
+      tangent.y  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
+
+      //Z
+      cVect.x  = point0.z;
+      cVect.y  = controlPoint0.z;
+      cVect.z  = controlPoint1.z;
+      cVect.w  = point1.z;
+      tangent.z  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
+    }
+
+    tangent.Normalize();
+    done = true;
   }
-  else
-  {
-    const Vector3 sVectDerivative(3.0f*tLocal*tLocal, 2.0f*tLocal, 1.0f );
 
-    //X
-    Vector4  cVect( point0.x, controlPoint0.x, controlPoint1.x,  point1.x);
-    tangent.x  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
-
-    //Y
-    cVect.x  = point0.y;
-    cVect.y  = controlPoint0.y;
-    cVect.z  = controlPoint1.y;
-    cVect.w  = point1.y;
-    tangent.y  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
-
-    //Z
-    cVect.x  = point0.z;
-    cVect.y  = controlPoint0.z;
-    cVect.z  = controlPoint1.z;
-    cVect.w  = point1.z;
-    tangent.z  = sVectDerivative.Dot(Vector3(BezierBasis * cVect));
-  }
-
-  tangent.Normalize();
-  return tangent;
+  return done;
 }
 
 Vector3& Path::GetPoint( size_t index )

@@ -165,20 +165,32 @@ public:
   void Sample( float t, Vector3& position, Vector3& tangent ) const;
 
   /**
+   * @brief Sample path at a given progress. Calculates position and tangent at that point of the curve
+   *
+   * @param[in]  progress  A floating point value between 0.0 and 1.0.
+   * @param[out] position The interpolated position at that progress.
+   * @param[out] tangent The interpolated tangent at that progress.
+   * @return true if Sample could be calculated
+   */
+  bool SampleAt( float t, Vector3& position, Vector3& tangent ) const;
+
+  /**
    * Sample position at point t.
    *
    * @param[in] progress  A floating point value between 0.0 and 1.0.
    * @param[out] position The interpolated position at that progress.
+   * @return true if sample could be calculated
    */
-  Vector3 SamplePosition( float t ) const;
+  bool SamplePosition( float t, Vector3& position ) const;
 
   /**
    * @brief Sample tangent at point t.
    *
    * @param[in] progress  A floating point value between 0.0 and 1.0.
    * @param[out] tangent The interpolated tangent at that progress.
+   * @return true if sample could be calculated
    */
-  Vector3 SampleTangent( float t ) const;
+  bool SampleTangent( float t, Vector3& tangent ) const;
 
   /**
    * @copydoc Dali::Path::GetPoint

@@ -988,7 +988,9 @@ struct PathPositionFunctor : public AnimatorFunctionBase
 
   Vector3 operator()(float progress, const Vector3& property)
   {
-    return mPath->SamplePosition(progress );
+    Vector3 position(property);
+    static_cast<void>( mPath->SamplePosition(progress, position) );
+    return position;
   }
 
   PathPtr mPath;
@@ -1005,8 +1007,15 @@ struct PathRotationFunctor : public AnimatorFunctionBase
 
   Quaternion operator()(float progress, const Quaternion& property)
   {
-    Vector3 tangent( mPath->SampleTangent(progress) );
-    return Quaternion( mForward, tangent );
+    Vector3 tangent;
+    if( mPath->SampleTangent(progress, tangent) )
+    {
+      return Quaternion( mForward, tangent );
+    }
+    else
+    {
+      return property;
+    }
   }
 
   PathPtr mPath;
