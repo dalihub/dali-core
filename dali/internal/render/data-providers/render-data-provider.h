@@ -18,7 +18,6 @@
  *
  */
 
-#include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/material-data-provider.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>

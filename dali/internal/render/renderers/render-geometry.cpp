@@ -15,10 +15,7 @@
  */
 
 #include <dali/internal/render/renderers/render-geometry.h>
-
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
@@ -31,9 +28,10 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderGeometry::RenderGeometry( const GeometryDataProvider& geometryDataProvider )
-: mGeometryDataProvider( geometryDataProvider ),
-  mIndexBuffer(0),
+RenderGeometry::RenderGeometry( GeometryType type, bool requiresDepthTest )
+: mIndexBuffer(0),
+  mGeometryType( type ),
+  mRequiresDepthTest(requiresDepthTest ),
   mHasBeenUpdated(false),
   mAttributesChanged(true)
 {
@@ -163,8 +161,7 @@ void RenderGeometry::UploadAndDraw(
   }
 
   //Draw call
-  GeometryDataProvider::GeometryType type = mGeometryDataProvider.GetGeometryType( bufferIndex );
-  switch(type)
+  switch(mGeometryType)
   {
     case Dali::Geometry::TRIANGLES:
     {

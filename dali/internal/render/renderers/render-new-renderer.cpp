@@ -71,6 +71,11 @@ void NewRenderer::SetGeometry( SceneGraph::RenderGeometry* renderGeometry )
 // @todo MESH_REWORK Should use Update thread objects only in PrepareRenderInstructions.
 bool NewRenderer::RequiresDepthTest() const
 {
+  if( mRenderGeometry )
+  {
+    return mRenderGeometry->RequiresDepthTest();
+  }
+
   return true;
 }
 

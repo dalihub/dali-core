@@ -27,7 +27,6 @@
 #include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/render-new-renderer.h>
 #include <dali/internal/update/resources/resource-manager.h>
