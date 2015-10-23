@@ -79,11 +79,7 @@ namespace
 const char* gStdAttribs[ Program::ATTRIB_TYPE_LAST ] =
 {
   "aPosition",    // ATTRIB_POSITION
-  "aNormal",      // ATTRIB_NORMAL
   "aTexCoord",    // ATTRIB_TEXCOORD
-  "aColor",       // ATTRIB_COLOR
-  "aBoneWeights", // ATTRIB_BONE_WEIGHTS
-  "aBoneIndices"  // ATTRIB_BONE_INDICES
 };
 
 const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
@@ -323,9 +319,28 @@ void Program::SetUniform2f( GLint location, GLfloat value0, GLfloat value1 )
     return;
   }
 
-  // Not caching these as based on current analysis this is not called that often by our shaders
-  LOG_GL( "Uniform2f(%d,%f,%f)\n", location, value0, value1 );
-  CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
+  // check if uniform location fits the cache
+  if( location >= MAX_UNIFORM_CACHE_SIZE )
+  {
+    // not cached, make the gl call
+    LOG_GL( "Uniform2f(%d,%f,%f)\n", location, value0, value1 );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
+  }
+  else
+  {
+    // check if the same value has already been set, reset if it is different
+    if( ( fabsf(value0 - mUniformCacheFloat2[ location ][ 0 ]) >= Math::MACHINE_EPSILON_1 )||
+        ( fabsf(value1 - mUniformCacheFloat2[ location ][ 1 ]) >= Math::MACHINE_EPSILON_1 ) )
+    {
+      // make the gl call
+      LOG_GL( "Uniform2f(%d,%f,%f)\n", location, value0, value1 );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
+
+      // update cache
+      mUniformCacheFloat2[ location ][ 0 ] = value0;
+      mUniformCacheFloat2[ location ][ 1 ] = value1;
+    }
+  }
 }
 
 void Program::SetSizeUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
@@ -710,6 +725,8 @@ void Program::ResetAttribsUniformCache()
     // GL initializes uniforms to 0
     mUniformCacheInt[ i ] = 0;
     mUniformCacheFloat[ i ] = 0.0f;
+    mUniformCacheFloat2[ i ][ 0 ] = 0.0f;
+    mUniformCacheFloat2[ i ][ 1 ] = 0.0f;
     mUniformCacheFloat4[ i ][ 0 ] = 0.0f;
     mUniformCacheFloat4[ i ][ 1 ] = 0.0f;
     mUniformCacheFloat4[ i ][ 2 ] = 0.0f;

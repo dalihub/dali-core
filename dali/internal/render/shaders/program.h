@@ -74,11 +74,7 @@ public:
   {
     ATTRIB_UNKNOWN = -1,
     ATTRIB_POSITION,
-    ATTRIB_NORMAL,
     ATTRIB_TEXCOORD,
-    ATTRIB_COLOR,
-    ATTRIB_BONE_WEIGHTS,
-    ATTRIB_BONE_INDICES,
     ATTRIB_TYPE_LAST
   };
 
@@ -367,7 +363,8 @@ private:  // Data
   // uniform value caching
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
-  GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
+  GLfloat mUniformCacheFloat2[ MAX_UNIFORM_CACHE_SIZE ][2]; ///< Value cache for uniforms of two floats
+  GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four floats
   Vector3 mSizeUniformCache;                                ///< Cache value for size uniform
   bool mModifiesGeometry;  ///< True if the program changes geometry
 
