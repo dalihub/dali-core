@@ -106,7 +106,6 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] frametime The elapsed time between the last two updates.
    * @param[in] cull Whether to frustum cull this renderer
    */
   void Render( Context& context,
@@ -117,7 +116,6 @@ public:
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
-               float frametime,
                bool cull,
                bool blend);
 

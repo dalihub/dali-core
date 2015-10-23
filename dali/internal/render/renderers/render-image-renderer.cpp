@@ -295,7 +295,7 @@ void ImageRenderer::DoRender( Context& context, SceneGraph::TextureCache& textur
 
   // make sure the vertex is bound, this has to be done before
   // we call VertexAttribPointer otherwise you get weird output on the display
-  mVertexBuffer->Bind();
+  mVertexBuffer->Bind(GpuBuffer::ARRAY_BUFFER);
 
   samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER_RECT );
   if( -1 != samplerLoc )
@@ -350,7 +350,7 @@ void ImageRenderer::DoRender( Context& context, SceneGraph::TextureCache& textur
     case GRID_NINE_PATCH_NO_CENTER:
     {
       const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
-      mIndexBuffer->Bind();
+      mIndexBuffer->Bind(GpuBuffer::ELEMENT_ARRAY_BUFFER);
       context.DrawElements( GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0 );
       break;
     }
@@ -400,7 +400,7 @@ void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const
   // create/destroy if needed/not needed.
   if ( size && !mVertexBuffer )
   {
-    mVertexBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
+    mVertexBuffer = new GpuBuffer( context );
   }
   else if ( !size && mVertexBuffer )
   {
@@ -410,7 +410,7 @@ void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const
   // update
   if ( mVertexBuffer )
   {
-    mVertexBuffer->UpdateDataBuffer( size, data );
+    mVertexBuffer->UpdateDataBuffer( size, data, GpuBuffer::DYNAMIC_DRAW);
   }
 }
 
@@ -419,7 +419,7 @@ void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const 
   // create/destroy if needed/not needed.
   if ( size && !mIndexBuffer )
   {
-    mIndexBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    mIndexBuffer = new GpuBuffer( context );
   }
   else if ( !size && mIndexBuffer )
   {
@@ -429,7 +429,7 @@ void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const 
   // update
   if ( mIndexBuffer )
   {
-    mIndexBuffer->UpdateDataBuffer(size,data);
+    mIndexBuffer->UpdateDataBuffer(size,data,GpuBuffer::STATIC_DRAW);
   }
 }
 

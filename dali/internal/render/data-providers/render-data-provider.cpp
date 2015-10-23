@@ -65,14 +65,9 @@ Shader& RenderDataProvider::GetShader() const
   return *mShader;
 }
 
-void RenderDataProvider::SetSamplers( const RenderDataProvider::Samplers& samplers )
+const RenderDataProvider::Textures& RenderDataProvider::GetTextures() const
 {
-  mSamplers = samplers;
-}
-
-const RenderDataProvider::Samplers& RenderDataProvider::GetSamplers() const
-{
-  return mSamplers;
+  return mTextures;
 }
 
 } // SceneGraph

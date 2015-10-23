@@ -220,10 +220,9 @@ private: // unimplemented methods
   Geometry& operator=( const Geometry& );
 
 private: // data
-  typedef ObjectConnector<PropertyBuffer> PropertyBufferConnector;
-  typedef std::vector< PropertyBufferConnector > PropertyBufferConnectorContainer;
-  PropertyBufferConnectorContainer mVertexBufferConnectors; ///< Vector of connectors that hold the property buffers used by this geometry
-  PropertyBufferConnector mIndexBufferConnector;            ///< Connector that holds the index buffer used by this geometry
+
+  std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
+  PropertyBufferPtr mIndexBuffer;                ///< Intrusive pointer to index buffer
   SceneGraph::Geometry* mSceneObject;
   bool mOnStage;
 };

@@ -610,24 +610,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::PropertyInput::GetQuaternion()
-   */
-  virtual const Quaternion& GetQuaternion() const
-  {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    return DUMMY_QUATERNION_VALUE;
-  }
-
-  /**
-   * @copydoc Dali::PropertyInput::GetQuaternion()
-   */
-  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
-  {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    return DUMMY_QUATERNION_VALUE;
-  }
-
-  /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
    * @param[in] bufferIndex The buffer to write.

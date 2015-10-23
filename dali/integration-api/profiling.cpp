@@ -61,7 +61,9 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-image-renderer.h>
 #include <dali/internal/render/renderers/render-new-renderer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
@@ -139,13 +141,13 @@ const int GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::RenderGeometry) );
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
-  sizeof( Internal::SceneGraph::PropertyBuffer ) );
+  sizeof( Internal::Render::PropertyBuffer ) );
 const int MATERIAL_MEMORY_SIZE(
   sizeof( Internal::Material ) +
   sizeof( Internal::SceneGraph::Material ) );
 const int SAMPLER_MEMORY_SIZE(
   sizeof( Internal::Sampler ) +
-  sizeof( Internal::SceneGraph::Sampler ) );
+  sizeof( Internal::Render::Sampler ) );
 const int SHADER_MEMORY_SIZE(
   sizeof( Internal::Shader ) +
   sizeof( Internal::SceneGraph::Shader ) );

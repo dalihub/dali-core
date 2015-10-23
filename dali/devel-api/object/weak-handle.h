@@ -99,38 +99,6 @@ protected:
   Impl* mImpl;
 };
 
-/**
- * @brief Type CustomActors support
- */
-template <typename Type>
-struct CustomActors
-{
-  /**
-   * This flag tells Dali if a class is derived from CustomActor.
-   */
-  enum { IS_CUSTOM_ACTOR = __is_base_of(Dali::CustomActor, Type) };
-};
-
-template <typename Type>
-struct TypeCustomActors : public CustomActors< Type >
-{
-};
-
-template < bool CustomActorType >
-class InternalTypeName
-{
-public: // Typedefs
-
-  typedef Dali::Internal::CustomActor InternalObjectType;
-};
-
-template <>
-class InternalTypeName< false >
-{
-public: // Typedefs
-
-  typedef Dali::Internal::Actor InternalObjectType;
-};
 
 /**
  * @brief Weak handle for the given type of Dali object.
@@ -138,10 +106,6 @@ public: // Typedefs
 template < class T >
 class WeakHandle : public WeakHandleBase
 {
-public: // Typedefs
-
-  typedef typename InternalTypeName< TypeCustomActors<T>::IS_CUSTOM_ACTOR >::InternalObjectType InternalObjectType;
-
 public:
 
   /**
@@ -201,12 +165,12 @@ public:
   /**
    * @copydoc Dali::WeakHandleBase::GetHandle()
    */
-  T GetHandle()
+  T GetHandle() const
   {
     Handle handle( GetBaseHandle() );
     if( handle )
     {
-      return T( reinterpret_cast< InternalObjectType* >( handle.GetObjectPtr() ) );
+      return DownCast< T >( handle );
     }
     else
     {

@@ -118,7 +118,7 @@ internal_src_files = \
   $(internal_src_dir)/render/queue/render-queue.cpp \
   $(internal_src_dir)/render/renderers/render-geometry.cpp \
   $(internal_src_dir)/render/renderers/render-new-renderer.cpp \
-  $(internal_src_dir)/render/renderers/render-renderer-property-buffer.cpp \
+  $(internal_src_dir)/render/renderers/render-property-buffer.cpp \
   $(internal_src_dir)/render/renderers/render-image-renderer.cpp \
   $(internal_src_dir)/render/renderers/render-renderer.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
@@ -137,7 +137,6 @@ internal_src_files = \
   $(internal_src_dir)/update/common/property-owner.cpp \
   $(internal_src_dir)/update/common/scene-graph-buffers.cpp \
   $(internal_src_dir)/update/common/scene-graph-connection-change-propagator.cpp \
-  $(internal_src_dir)/update/common/scene-graph-property-buffer.cpp \
   $(internal_src_dir)/update/common/scene-graph-property-notification.cpp \
   $(internal_src_dir)/update/common/uniform-map.cpp \
   $(internal_src_dir)/update/controllers/render-message-dispatcher.cpp \
@@ -164,7 +163,6 @@ internal_src_files = \
   $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-material.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-renderer.cpp \
-  $(internal_src_dir)/update/rendering/scene-graph-sampler.cpp \
   $(internal_src_dir)/update/resources/bitmap-metadata.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp \
   $(internal_src_dir)/update/resources/resource-tracker.cpp \

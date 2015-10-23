@@ -19,6 +19,7 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task.h>
@@ -36,6 +37,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 // Uncomment the next line to enable frame snapshot logging
@@ -73,6 +75,12 @@ typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 typedef OwnerContainer< RenderGeometry* >      RenderGeometryOwnerContainer;
 typedef RenderGeometryOwnerContainer::Iterator RenderGeometryOwnerIter;
 
+typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
+typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
+
+typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
+typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
+
 typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
 typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
 typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
@@ -91,12 +99,11 @@ struct RenderManager::Impl
     resourcePostProcessQueue( resourcePostProcessQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    frameTime( 0.0f ),
-    lastFrameTime( 0.0f ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
+    samplerContainer(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
@@ -148,15 +155,14 @@ struct RenderManager::Impl
 
   Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
 
-  float                         frameTime;                ///< The elapsed time since the previous frame
-  float                         lastFrameTime;            ///< Last frame delta.
-
   unsigned int                  frameCount;               ///< The current frame count
   BufferIndex                   renderBufferIndex;        ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
   Rect<int>                     defaultSurfaceRect;       ///< Rectangle for the default surface we are rendering to
 
   RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
+  SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
+  PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
   RenderGeometryOwnerContainer  renderGeometryContainer;  ///< List of owned RenderGeometries
 
   bool                          renderersAdded;
@@ -245,11 +251,6 @@ void RenderManager::SetBackgroundColor( const Vector4& color )
   mImpl->backgroundColor = color;
 }
 
-void RenderManager::SetFrameDeltaTime( float deltaTime )
-{
-  mImpl->frameTime = deltaTime;
-}
-
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
@@ -285,6 +286,75 @@ void RenderManager::RemoveRenderer( Render::Renderer* renderer )
   }
 }
 
+void RenderManager::AddSampler( Render::Sampler* sampler )
+{
+  mImpl->samplerContainer.PushBack( sampler );
+}
+
+void RenderManager::RemoveSampler( Render::Sampler* sampler )
+{
+  DALI_ASSERT_DEBUG( NULL != sampler );
+
+  SamplerOwnerContainer& samplers = mImpl->samplerContainer;
+
+  // Find the sampler
+  for ( SamplerOwnerIter iter = samplers.Begin(); iter != samplers.End(); ++iter )
+  {
+    if ( *iter == sampler )
+    {
+      samplers.Erase( iter ); // Sampler found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+{
+  sampler->SetFilterMode( (Dali::FilterMode::Type)minFilterMode, (Dali::FilterMode::Type)magFilterMode );
+}
+
+void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode )
+{
+  sampler->SetWrapMode( (Dali::WrapMode::Type)uWrapMode, (Dali::WrapMode::Type)vWrapMode );
+}
+
+void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+{
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer );
+}
+
+void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+{
+  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
+
+  PropertyBufferOwnerContainer& propertyBuffers = mImpl->propertyBufferContainer;
+
+  // Find the sampler
+  for ( PropertyBufferOwnerIter iter = propertyBuffers.Begin(); iter != propertyBuffers.End(); ++iter )
+  {
+    if ( *iter == propertyBuffer )
+    {
+      propertyBuffers.Erase( iter ); // Property buffer found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
+{
+  propertyBuffer->SetFormat( format );
+}
+
+void RenderManager::SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data)
+{
+  propertyBuffer->SetData( data );
+}
+
+void RenderManager::SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size )
+{
+  propertyBuffer->SetSize( size );
+}
+
 void RenderManager::AddGeometry( RenderGeometry* renderGeometry )
 {
   mImpl->renderGeometryContainer.PushBack( renderGeometry );
@@ -296,7 +366,7 @@ void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
 
   RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
 
-  // Find the renderer
+  // Find the geometry
   for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
     if ( *iter == renderGeometry )
@@ -307,7 +377,7 @@ void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
   }
 }
 
-void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage )
+void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != renderGeometry );
 
@@ -318,13 +388,13 @@ void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyB
   {
     if ( *iter == renderGeometry )
     {
-      (*iter)->AddPropertyBuffer( propertyBuffer, target, usage );
+      (*iter)->AddPropertyBuffer( propertyBuffer, isIndexBuffer );
       break;
     }
   }
 }
 
-void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer )
+void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != renderGeometry );
 
@@ -414,7 +484,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
-    // @todo move programs out of context onto a program controller and let that handle this
     mImpl->programController.ResetProgramMatrices();
 
     // if we don't have default shader, no point doing the render calls
@@ -425,7 +494,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
       {
         RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
-        DoRender( instruction, *mImpl->defaultShader, mImpl->lastFrameTime );
+        DoRender( instruction, *mImpl->defaultShader );
 
         const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
         if ( countRenderList > 0 )
@@ -443,9 +512,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   }
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
-
-  // Update the frame time
-  mImpl->lastFrameTime = mImpl->frameTime;
 
   // check if anything has been posted to the update thread
   bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
@@ -471,7 +537,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   return updateRequired;
 }
 
-void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime )
+void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
 {
   Rect<int> viewportRect;
   Vector4   clearColor;
@@ -552,8 +618,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
                                     mImpl->context,
                                     mImpl->textureCache,
                                     defaultShader,
-                                    mImpl->renderBufferIndex,
-                                    elapsedTime );
+                                    mImpl->renderBufferIndex );
 
   if(instruction.mOffscreenTextureId != 0)
   {

@@ -109,7 +109,6 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context )
  * @param[in] context The GL context.
  * @param[in] defaultShader The default shader to use.
  * @param[in] buffer The current render buffer index (previous update buffer)
- * @param[in] frameTime The elapsed time between the last two updates.
  * @param[in] viewMatrix The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
  * @param[in] cullMode True if the renderers should be subjected to clipspace culling
@@ -120,7 +119,6 @@ inline void ProcessRenderList(
   SceneGraph::TextureCache& textureCache,
   SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
-  float frameTime,
   const Matrix& viewMatrix,
   const Matrix& projectionMatrix,
   bool cullMode )
@@ -142,7 +140,7 @@ inline void ProcessRenderList(
       //Enable depth writes if depth buffer is enabled and item is opaque
       context.DepthMask( depthBufferEnabled && item.IsOpaque() );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode, !item.IsOpaque() );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, cullMode, !item.IsOpaque() );
     }
   }
   else
@@ -153,69 +151,17 @@ inline void ProcessRenderList(
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, frameTime, cullMode, !item.IsOpaque() );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, cullMode, !item.IsOpaque() );
     }
 
   }
 }
-
-/**
- * Render items from the currentIndex until the depth index changes.
- * Leaves currentIndex pointing at the
- *
- * @param[in] renderList The render-list to process.
- * @param[in] context The GL context.
- * @param[in] defaultShader The default shader to use.
- * @param[in] buffer The current render buffer index (previous update buffer)
- * @param[in] frameTime The elapsed time between the last two updates.
- * @param[in] viewMatrix The view matrix from the appropriate camera.
- * @param[in] projectionMatrix The projection matrix from the appropriate camera.
- * @param[in] cullMode True if the renderers should be subjected to clipspace culling
- * @param[in] depthIndex The current depth index
- * @param[inout] currentIndex On entry, the index in the render list of the first item at the given depth index. On exit, the index of the first item at the next depth index.
- */
-inline void RenderItemsAtDepthIndex(
-  const RenderList&         renderList,
-  Context&                  context,
-  SceneGraph::TextureCache& textureCache,
-  SceneGraph::Shader&       defaultShader,
-  BufferIndex               bufferIndex,
-  float                     frameTime,
-  const Matrix&             viewMatrix,
-  const Matrix&             projectionMatrix,
-  bool                      cullMode,
-  int                       depthIndex,
-  size_t&                   currentIndex ) // Out parameter
-{
-  const size_t count = renderList.Count();
-
-  // Don't initialise currentIndex. Ever.
-  for( ; currentIndex < count ; currentIndex++ )
-  {
-    const RenderItem& renderItem = renderList.GetItem( currentIndex );
-    DALI_PRINT_RENDER_ITEM( renderItem );
-
-    if( renderItem.GetDepthIndex() == depthIndex )
-    {
-      const Matrix& modelViewMatrix = renderItem.GetModelViewMatrix();
-      renderItem.GetRenderer().Render( context, textureCache, bufferIndex, renderItem.GetNode(), defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode, !renderItem.IsOpaque() );
-
-    }
-    else
-    {
-      break; // Stop iterating when we reach a new depth index
-    }
-  }
-}
-
-
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
-                               BufferIndex bufferIndex,
-                               float frameTime )
+                               BufferIndex bufferIndex )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -239,7 +185,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-          ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
+        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix, instruction.mCullMode );
       }
     }
   }

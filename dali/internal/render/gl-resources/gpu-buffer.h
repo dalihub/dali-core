@@ -66,10 +66,8 @@ public:
   /**
    * constructor
    * @param context drawing context
-   * @param target the type of buffer to create @see Type
-   * @param usage how the buffer will be used @see DrawMode
    */
-  GpuBuffer( Context& context, Target target, Usage usage );
+  GpuBuffer( Context& context );
 
   /**
    * Destructor, non virtual as no virtual methods or inheritance
@@ -81,14 +79,15 @@ public:
    * Creates or updates a buffer object and binds it to the target.
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
+   * @param usage How the buffer will be used
    */
-  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data);
+  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage);
 
   /**
    * Bind the buffer object to the target
    * Will assert if the buffer size is zero
    */
-  void Bind() const;
+  void Bind(Target target) const;
 
   /**
    * @return true if the GPU buffer is valid, i.e. its created and not empty
@@ -102,16 +101,6 @@ public:
   GLsizeiptr GetBufferSize() const
   {
     return mSize;
-  }
-
-  void SetStride( GLuint stride )
-  {
-    mStride = stride;
-  }
-
-  GLuint GetStride()
-  {
-    return mStride;
   }
 
   /**
@@ -133,10 +122,7 @@ private: // Data
   GLsizeiptr         mCapacity;            ///< buffer capacity
   GLsizeiptr         mSize;                ///< buffer size
   GLuint             mBufferId;            ///< buffer object name(id)
-  GLuint             mStride;              ///< stride of data in buffer object
 
-  Target             mTarget:2;            ///< type of buffer (array/element), 2 bits are enough
-  Usage              mUsage:2;             ///< how the buffer is used (read, read/write etc), 2 bits are enough
   bool               mBufferCreated:1;     ///< whether buffer has been created
 
 };

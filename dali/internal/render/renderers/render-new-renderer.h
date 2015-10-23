@@ -26,10 +26,12 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
 
+
 namespace Dali
 {
 namespace Internal
 {
+class Context;
 class PropertyInputImpl;
 
 namespace Render
@@ -82,9 +84,16 @@ public:
   void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const
   {
     sortAttributes.shader = &( mRenderDataProvider->GetShader() );
-    const SceneGraph::RenderDataProvider::Samplers& samplers = mRenderDataProvider->GetSamplers();
+    const std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
+    if( !textures.empty() )
+    {
+      sortAttributes.textureResourceId = textures[0].GetTextureId();
+    }
+    else
+    {
+      sortAttributes.textureResourceId = Integration::InvalidResourceId;
+    }
 
-    sortAttributes.textureResourceId = samplers.Empty() ? Integration::InvalidResourceId : samplers[ 0 ]->GetTextureId( bufferIndex );
     sortAttributes.geometry = mRenderGeometry;
   }
 
@@ -161,43 +170,9 @@ private:
   /**
    * Bind the material textures in the samplers and setup the samplers
    * @param[in] textureCache The texture cache
-   * @param[in] bufferIndex The buffer index
    * @param[in] program The shader program
-   * @param[in] samplers The samplers to bind
    */
-  void BindTextures( SceneGraph::TextureCache& textureCache,
-                     BufferIndex bufferIndex,
-                     Program& program,
-                     const SceneGraph::RenderDataProvider::Samplers& samplers );
-
-  /**
-   * Bind a material texture to a texture unit, and set the sampler's texture uniform
-   * to that texture unit.
-   * @param[in] textureCache The texture cache
-   * @param[in] program The shader program
-   * @param[in] id The resource id of the texture to bind
-   * @param[in] texture The texture to bind
-   * @param[in] textureUnit The texture unit index to use
-   * @param[in] nameIndex The index of the texture uniform in the program
-   */
-  void BindTexture( SceneGraph::TextureCache& textureCache,
-                    Program& program,
-                    ResourceId id,
-                    Texture* texture,
-                    TextureUnit textureUnit,
-                    unsigned int nameIndex );
-
-  /**
-   * Apply the sampler modes to the texture.
-   * @param[in] bufferIndex The current buffer index
-   * @param[in] texture The texture to which to apply the sampler modes
-   * @param[in] textureUnit The texture unit of the texture
-   * @param[in] sampler The sampler from which to get the modes.
-   */
-  void ApplySampler( BufferIndex bufferIndex,
-                     Texture* texture,
-                     TextureUnit textureUnit,
-                     const SceneGraph::SamplerDataProvider& sampler );
+  void BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
 
   /**
    * Get the texture uniform index of the name sampler in the program.
@@ -206,9 +181,7 @@ private:
    * @param[in] sampler The sampler holding a texture unit uniform name to search for
    * @return The texture uniform index in the program
    */
-  unsigned int GetTextureUnitUniformIndex( Program& program,
-                                           const SceneGraph::SamplerDataProvider& sampler );
-
+  unsigned int GetTextureUniformIndex( Program& program, const std::string& uniformName );
 
 
 public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
@@ -216,15 +189,6 @@ public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
 
 private:
   SceneGraph::RenderGeometry* mRenderGeometry;
-
-  struct TextureUnitUniformIndex
-  {
-    const SceneGraph::SamplerDataProvider* sampler;
-    unsigned int index;
-  };
-
-  typedef Dali::Vector< TextureUnitUniformIndex > TextureUnitUniforms;
-  TextureUnitUniforms mTextureUnitUniforms;
 
   struct UniformIndexMap
   {
@@ -234,6 +198,15 @@ private:
 
   typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
   UniformIndexMappings mUniformIndexMap;
+
+  struct TextureUniformIndexMap
+  {
+    size_t       uniformNameHash;
+    unsigned int uniformIndex;    // The index of the cached location in the Program
+  };
+
+  typedef Dali::Vector< TextureUniformIndexMap > TextureUniformIndexMappings;
+  TextureUniformIndexMappings mTextureIndexMap;
 
   Vector<GLint> mAttributesLocation;
   bool mUpdateAttributesLocation;

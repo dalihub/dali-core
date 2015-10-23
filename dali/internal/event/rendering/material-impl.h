@@ -70,25 +70,44 @@ public:
   Shader* GetShader() const;
 
   /**
-   * @copydoc Dali::Material::AddSampler()
+   * @copydoc Dali::Material::AddTexture()
    */
-  void AddSampler( Sampler& sampler );
+  size_t AddTexture( ImagePtr image, const std::string& uniformName, SamplerPtr sampler );
 
   /**
-   * @copydoc Dali::Material::GetNumberOfSamplers()
+   * @copydoc Dali::Material::RemoveTexture()
    */
-  std::size_t GetNumberOfSamplers() const;
+  void RemoveTexture( size_t index );
 
   /**
-   * @copydoc Dali::Material::RemoveSampler()
+   * @copydoc Dali::Material::SetTextureImage()
    */
-  void RemoveSampler( std::size_t index );
+  void SetTextureImage( size_t index, Image* image );
 
   /**
-   * @copydoc Dali::Material::GetSamplerAt()
+   * @copydoc Dali::Material::SetTextureSampler()
    */
-  Sampler* GetSamplerAt( unsigned int index ) const;
+  void SetTextureSampler( size_t index, Sampler* sampler );
 
+  /**
+   * @copydoc Dali::Material::SetTextureUniformName()
+   */
+  void SetTextureUniformName( size_t index, const std::string& uniformName );
+
+  /**
+   * @copydoc Dali::Material::GetTextureIndex()
+   */
+  int GetTextureIndex( const std::string& uniformName );
+
+  /**
+   * @copydoc Dali::Material::SetTextureAffectsTransparency()
+   */
+  void SetTextureAffectsTransparency( size_t index, bool affectsTransparency );
+
+  /**
+   * @copydoc Dali::Material::GetNumberOfTextures()
+   */
+  size_t GetNumberOfTextures() const;
   /**
    * @copydoc Dali::Material::SetFaceCullingMode()
    */
@@ -252,6 +271,26 @@ public: // Functions from Connectable
   virtual void Disconnect();
 
 private: // implementation
+
+  struct Texture
+  {
+    Texture()
+    :mUniformName(""),
+     mImage(NULL),
+     mSampler( NULL )
+    {}
+
+    Texture( const std::string& name, ImagePtr image, SamplerPtr sampler )
+    :mUniformName(name),
+     mImage( image ),
+     mSampler( sampler )
+    {}
+
+    std::string mUniformName;
+    ImagePtr    mImage;
+    SamplerPtr  mSampler;
+  };
+
   Material();
 
   /**
@@ -271,16 +310,13 @@ private: // unimplemented methods
 
 private: //data
   IntrusivePtr<Shader> mShader; ///< Connector that holds the shader used by this material
-
-  typedef ObjectConnector<Sampler> SamplerConnector;
-  typedef std::vector< SamplerConnector > SamplerConnectorContainer;
-  SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
-
+  std::vector<Material::Texture> mTextures; ///<Vector of textures used by this material
   SceneGraph::Material* mSceneObject;
 
   BlendingMode::Type mBlendingMode; ///< Local store
   BlendingOptions mBlendingOptions; ///< Local copy of blending options bitmask
   bool mOnStage;
+
 };
 
 } // namespace Internal

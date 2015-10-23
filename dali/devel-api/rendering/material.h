@@ -139,37 +139,66 @@ public:
   Shader GetShader() const;
 
   /**
-   * @brief Add a sampler to this material
+   * @brief Add a new texture to be used by the material
    *
-   * param[in] sampler The sampler to add to this material
+   * @param[in] image The image used by the texture
+   * @param[in] uniformName The uniform name of the texture
+   * @param[in] sampler Sampling parameters. If not provided the default sampling parameters will be used
+   * @return The index of the texture in the array of textures or -1 if texture can not be added
    */
-  void AddSampler( Sampler& sampler );
+  int AddTexture( Image image, const std::string& uniformName, Sampler sampler = Sampler() );
 
   /**
-   * @brief Get the number of samplers
+   * @brief Removes a texture from the material
    *
-   * @return The number of samplers
+   * @param[in] index The index of the texture in the array of textures
    */
-  std::size_t GetNumberOfSamplers() const;
+  void RemoveTexture( size_t  index );
 
   /**
-   * @brief Remove a sampler
+   * @brief Sets the image to be used by a given texture
    *
-   * The index must be between 0 and GetNumberOfSamplers()-1
-   *
-   * @param[in] index The index of the sampler to remove
+   * @param[in] index The index of the texture in the array of textures
+   * @param[in] image The new image
    */
-  void RemoveSampler( std::size_t index );
+  void SetTextureImage( size_t index, Image image );
 
   /**
-   * @brief Get the sampler at the given index for this material
+   * @brief Set the sampler used by a given texture
    *
-   * The index must be between 0 and GetNumberOfSamplers()-1
-   *
-   * @param[in] index The index of the sampler
-   * @return The sampler at that index
+   * @param[in] index The index of the texture in the array of textures
+   * @param[in] sampler The new sampler
    */
-  Sampler GetSamplerAt( unsigned int index ) const;
+  void SetTextureSampler( size_t index, Sampler sampler );
+
+  /**
+   * @brief Set the uniform name of a given texture
+   *
+   * @param[in] index The index of the texture in the array of textures
+   * @param[in] uniformName The new uniform name
+   */
+  void SetTextureUniformName( size_t index, const std::string& uniformName );
+
+  /**
+   * @brief Establish if a given texture will affect the transparency of the material ( true by default )
+   *
+   * @param[in] index The index of the texture in the array of textures
+   * @param[in] affectsTransparency True if the texture affects transparency, false otherwise
+   */
+  void SetTextureAffectsTransparency( size_t index, bool affectsTransparency );
+
+  /*
+   * @brief Retrive the index of a texture given its uniform name
+   *
+   * @param[in] uniformName the uniform name
+   * @returns The index in the array of textures or -1 if the texture is not found
+   */
+  int GetTextureIndex( const std::string& uniformName );
+
+  /**
+   * @brief Retrieve the number of textures used by the material
+   */
+  std::size_t GetNumberOfTextures() const;
 
   /**
    * @brief Set the culling mode for this material

@@ -150,34 +150,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Sampler* sampler )
-{
-  DALI_ASSERT_DEBUG( NULL != sampler );
-
-  if ( 0u == updateBufferIndex )
-  {
-    mSamplerQueue0.PushBack( sampler );
-  }
-  else
-  {
-    mSamplerQueue1.PushBack( sampler );
-  }
-}
-
-void DiscardQueue::Add( BufferIndex updateBufferIndex, PropertyBuffer* propertyBuffer )
-{
-  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
-
-  if ( 0u == updateBufferIndex )
-  {
-    mPropertyBufferQueue0.PushBack( propertyBuffer );
-  }
-  else
-  {
-    mPropertyBufferQueue1.PushBack( propertyBuffer );
-  }
-}
-
 void DiscardQueue::Clear( BufferIndex updateBufferIndex )
 {
   // Destroy some discarded objects; these should no longer own any GL resources
@@ -189,8 +161,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mShaderQueue0.Clear();
     mGeometryQueue0.Clear();
     mMaterialQueue0.Clear();
-    mSamplerQueue0.Clear();
-    mPropertyBufferQueue0.Clear();
     mRendererQueue0.Clear();
   }
   else
@@ -200,8 +170,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mShaderQueue1.Clear();
     mGeometryQueue1.Clear();
     mMaterialQueue1.Clear();
-    mSamplerQueue1.Clear();
-    mPropertyBufferQueue1.Clear();
     mRendererQueue1.Clear();
   }
 }

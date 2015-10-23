@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/common/owner-container.h>
 
 namespace Dali
 {

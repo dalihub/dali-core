@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/render/common/render-item.h>
-#include <dali/internal/common/owner-container.h>
 
 namespace Dali
 {

@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/common/event-thread-services.h>
 
 namespace Dali
