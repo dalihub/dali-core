@@ -286,7 +286,6 @@ void NewRenderer::BindTextures(
   SceneGraph::TextureCache& textureCache,
   Program& program )
 {
-  // @todo MESH_REWORK Write a cache of texture units to commonly used sampler textures
   int textureUnit = 0;
 
   const std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures());
@@ -319,7 +318,7 @@ void NewRenderer::BindTextures(
       }
       else
       {
-        samplerBitfield = ImageSampler::PackBitfield(FilterMode::DEFAULT, FilterMode::DEFAULT, WrapMode::DEFAULT, WrapMode::DEFAULT);
+        samplerBitfield = ImageSampler::DEFAULT_BITFIELD;
       }
 
       texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );

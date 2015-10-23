@@ -37,18 +37,18 @@ public:
    * Constructor
    */
   Texture()
-  :mUniformName(""),
-   mTextureId(Integration::InvalidResourceId),
-   mSampler(0)
+  :mUniformName(),
+   mSampler(0),
+   mTextureId(Integration::InvalidResourceId)
   {}
 
   /**
    * Constructor
    */
-  Texture( const char* samplerName, Integration::ResourceId textureId, Render::Sampler* sampler )
-  :mUniformName(samplerName),
-   mTextureId( textureId),
-   mSampler(sampler)
+  Texture( const std::string& samplerName, Integration::ResourceId textureId, Render::Sampler* sampler )
+  :mUniformName( samplerName ),
+   mSampler( sampler ),
+   mTextureId( textureId)
   {}
 
   /**
@@ -66,7 +66,8 @@ public:
     return mSampler;
   }
 
-public: // SamplerDataProvider interface - called from RenderThread
+public: // called from RenderThread
+
   /**
    * Get the texture unit uniform name
    * @return the name of the texture unit uniform
@@ -87,9 +88,9 @@ public: // SamplerDataProvider interface - called from RenderThread
   }
 
 private:
-  std::string               mUniformName;
-  Integration::ResourceId   mTextureId;
-  Render::Sampler*          mSampler;
+  std::string             mUniformName;
+  Render::Sampler*        mSampler;
+  Integration::ResourceId mTextureId;
 };
 
 } // namespace SceneGraph

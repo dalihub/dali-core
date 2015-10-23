@@ -37,7 +37,7 @@ public:
    * Constructor
    */
   Sampler()
-  : mMinFilter( Dali::FilterMode::DEFAULT),
+  : mMinFilter( Dali::FilterMode::DEFAULT ),
     mMagFilter( Dali::FilterMode::DEFAULT ),
     mUWrapMode( Dali::WrapMode::DEFAULT ),
     mVWrapMode( Dali::WrapMode::DEFAULT )
@@ -46,7 +46,8 @@ public:
   /**
    * Destructor
    */
-  virtual ~Sampler(){}
+  ~Sampler()
+  {}
 
   /**
    * Set the filter modes for minify and magnify filters
@@ -75,7 +76,7 @@ public:
    * Get the filter mode
    * @return The minify filter mode
    */
-  virtual FilterMode GetMinifyFilterMode() const
+  FilterMode GetMinifyFilterMode() const
   {
     return mMinFilter;
   }
@@ -84,7 +85,7 @@ public:
    * Get the filter mode
    * @return The magnify filter mode
    */
-  virtual FilterMode GetMagnifyFilterMode() const
+  FilterMode GetMagnifyFilterMode() const
   {
     return mMagFilter;
   }
@@ -93,7 +94,7 @@ public:
    * Get the horizontal wrap mode
    * @return The horizontal wrap mode
    */
-  virtual WrapMode GetUWrapMode() const
+  WrapMode GetUWrapMode() const
   {
     return mUWrapMode;
   }
@@ -102,7 +103,7 @@ public:
    * Get the vertical wrap mode
    * @return The vertical wrap mode
    */
-  virtual WrapMode GetVWrapMode() const
+  WrapMode GetVWrapMode() const
   {
     return mVWrapMode;
   }
@@ -113,13 +114,13 @@ private:
   FilterMode  mMagFilter;    ///< The magnify filter
   WrapMode  mUWrapMode;    ///< The horizontal wrap mode
   WrapMode  mVWrapMode;    ///< The vertical wrap mode
+
 };
 
 } // namespace Render
 
-
-
 } // namespace Internal
+
 } // namespace Dali
 
 
