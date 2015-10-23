@@ -65,7 +65,7 @@ Shader& RenderDataProvider::GetShader() const
   return *mShader;
 }
 
-const RenderDataProvider::Textures& RenderDataProvider::GetTextures() const
+RenderDataProvider::Textures& RenderDataProvider::GetTextures()
 {
   return mTextures;
 }

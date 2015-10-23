@@ -107,10 +107,11 @@ inline void SetMatrices( Program& program,
 namespace Render
 {
 
-void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache )
+void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache )
 {
   mContext = &context;
   mTextureCache = &textureCache;
+  mUniformNameCache = &uniformNameCache;
 }
 
 Renderer::~Renderer()
@@ -243,6 +244,7 @@ void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
 Renderer::Renderer()
 : mContext(NULL),
   mTextureCache( NULL ),
+  mUniformNameCache( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mCullFaceMode( CullNone )
