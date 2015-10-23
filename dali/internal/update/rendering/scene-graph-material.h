@@ -227,9 +227,9 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the uniform name
    */
-  const char* GetTextureUniformName( size_t index )
+  const std::string& GetTextureUniformName( size_t index )
   {
-    return mUniformName[index].c_str();
+    return mUniformName[index];
   }
 
   /**
