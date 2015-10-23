@@ -35,8 +35,8 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
@@ -411,6 +411,15 @@ void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render
   }
 }
 
+void RenderManager::SetGeometryType( RenderGeometry* geometry, int type )
+{
+  geometry->SetGeometryType( static_cast<Geometry::GeometryType>(type) );
+}
+
+void RenderManager::SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest )
+{
+  geometry->SetRequiresDepthTest( requiresDepthTest );
+}
 
 void RenderManager::AddRenderTracker( RenderTracker* renderTracker )
 {

@@ -138,7 +138,7 @@ inline void ProcessRenderList(
       DALI_PRINT_RENDER_ITEM( item );
 
       //Enable depth writes if depth buffer is enabled and item is opaque
-      context.DepthMask( depthBufferEnabled && item.IsOpaque() );
+      context.DepthMask( depthBufferEnabled && ( item.IsOpaque() || item.GetRenderer().RequiresDepthTest() ) );
 
       item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, cullMode, !item.IsOpaque() );
     }

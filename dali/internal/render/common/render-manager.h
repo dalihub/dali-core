@@ -251,6 +251,20 @@ public:
   void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
 
   /**
+   * Set the geometry type of an existing render geometry
+   * @param[in] geometry The render geometry
+   * @param[in] geometryType The new geometry type
+   */
+  void SetGeometryType( RenderGeometry* geometry, int geometryType );
+
+  /**
+   * Set if an existing geometry requires depth testing
+   * @param[in] geometry The render geometry
+   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
+   */
+  void SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest );
+
+  /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the
    * tracker. The lifetime of the tracker is related to the lifetime of the tracked
    * object, usually an offscreen render task.

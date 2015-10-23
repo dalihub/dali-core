@@ -31,12 +31,11 @@ namespace SceneGraph
 {
 
 Geometry::Geometry()
-: mIndexBuffer( NULL ),
-  mRenderGeometry(0),
-  mSceneController(0),
-  mRendererRefCount(0u),
-  mCenter(),
+: mRenderGeometry(NULL),
+  mSceneController(NULL),
+  mIndexBuffer( NULL ),
   mGeometryType(Dali::Geometry::TRIANGLES),
+  mRendererRefCount(0u),
   mRequiresDepthTest(false)
 {
 
@@ -108,9 +107,22 @@ void Geometry::ClearIndexBuffer()
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
-void Geometry::SetGeometryType( BufferIndex bufferIndex, Geometry::GeometryType geometryType )
+void Geometry::SetGeometryType(Geometry::GeometryType geometryType )
 {
-  mGeometryType.Set( bufferIndex, geometryType);
+  mGeometryType = geometryType;
+  if( mRenderGeometry )
+  {
+    mSceneController->GetRenderMessageDispatcher().SetGeometryType( *mRenderGeometry, static_cast<int>(geometryType) );
+  }
+}
+
+void Geometry::SetRequiresDepthTest( bool requiresDepthTest )
+{
+  mRequiresDepthTest = requiresDepthTest;
+  if( mRenderGeometry )
+  {
+    mSceneController->GetRenderMessageDispatcher().SetGeometryRequiresDepthTest( *mRenderGeometry, requiresDepthTest );
+  }
 }
 
 Vector<Render::PropertyBuffer*>& Geometry::GetVertexBuffers()
@@ -125,23 +137,12 @@ Render::PropertyBuffer* Geometry::GetIndexBuffer()
 
 Geometry::GeometryType Geometry::GetGeometryType( BufferIndex bufferIndex) const
 {
-  int geometryType = mGeometryType[ bufferIndex ];
-  return static_cast< GeometryDataProvider::GeometryType > ( geometryType );
+  return mGeometryType;
 }
 
 bool Geometry::GetRequiresDepthTesting( BufferIndex bufferIndex ) const
 {
-  return mRequiresDepthTest.GetBoolean( bufferIndex );
-}
-
-void Geometry::ResetDefaultProperties( BufferIndex updateBufferIndex )
-{
-  // Reset the animated properties
-  mCenter.ResetToBaseValue( updateBufferIndex );
-
-  // Age the double buffered properties
-  mGeometryType.CopyPrevious(updateBufferIndex);
-  mRequiresDepthTest.CopyPrevious(updateBufferIndex);
+  return mRequiresDepthTest;
 }
 
 void Geometry::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -175,7 +176,7 @@ RenderGeometry* Geometry::GetRenderGeometry(SceneController* sceneController)
   {
     //Create RenderGeometry
     mSceneController = sceneController;
-    mRenderGeometry = new RenderGeometry( *this );
+    mRenderGeometry = new RenderGeometry( mGeometryType, mRequiresDepthTest );
 
     size_t vertexBufferCount( mVertexBuffers.Size() );
     for( size_t i(0); i<vertexBufferCount; ++i )

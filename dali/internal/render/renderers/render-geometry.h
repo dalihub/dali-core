@@ -22,8 +22,8 @@
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
 
 namespace Dali
 {
@@ -40,8 +40,6 @@ class PropertyBuffer;
 
 namespace SceneGraph
 {
-class RenderDataProvider;
-class GeometryDataProvider;
 
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
@@ -52,11 +50,14 @@ class RenderGeometry
 {
 public:
 
+  typedef SceneGraph::Geometry::GeometryType GeometryType;
   /**
    * Constructor. Creates a render geometry object with no GPU buffers.
+   * @param[in] center The center of the geometry
+   * @param[in] geometryType The geometry type
+   * @param[in] requiresDepthTest True if geometry requires depth testing, false otherwise
    */
-  RenderGeometry( const GeometryDataProvider& geometryDataProvider );
-
+  RenderGeometry( GeometryType geometryType, bool requiresDepthTest );
   /**
    * Destructor
    */
@@ -108,6 +109,33 @@ public:
   }
 
   /**
+   * Sets the geometry type
+   * @param[in] type The new geometry type
+   */
+  void SetGeometryType( GeometryType type )
+  {
+    mGeometryType = type;
+  }
+
+  /**
+   * Sets if the geometry requires depth testing
+   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
+   */
+  void SetRequiresDepthTest( bool requiresDepthTest )
+  {
+    mRequiresDepthTest = requiresDepthTest;
+  }
+
+  /**
+   * Check if geometry requires depth testing
+   * @return True if depth testing is required, false otherwise
+   */
+  bool RequiresDepthTest() const
+  {
+    return mRequiresDepthTest;
+  }
+
+  /**
    * Upload the geometry if it has changed, set up the attributes and perform
    * the Draw call corresponding to the geometry type
    * @param[in] context The GL context
@@ -120,15 +148,17 @@ public:
 
 private:
 
-  const GeometryDataProvider& mGeometryDataProvider;  //Reference to update thread object
-
   // PropertyBuffers
   Render::PropertyBuffer* mIndexBuffer;
   Vector<Render::PropertyBuffer*> mVertexBuffers;
 
+  GeometryType  mGeometryType;
+
   // Booleans
+  bool mRequiresDepthTest : 1;
   bool mHasBeenUpdated : 1;
   bool mAttributesChanged : 1;
+
 };
 
 } // namespace SceneGraph
