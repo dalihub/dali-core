@@ -39,12 +39,12 @@ class PropertyBase;
 
 /**
  * An entry in a property metadata lookup.
- * The type field should be queried, before accessing the scene-graph property:
+ * The value type field should be queried, before accessing the scene-graph property:
  *
  * @code
  * void Example(PropertyEntry entry)
  * {
- *   if (entry.type == Property::VECTOR3)
+ *   if (entry.value.GetType() == Property::VECTOR3)
  *   {
  *     SceneGraph::AnimatableProperty<Vector3>* property = dynamic_cast< SceneGraph::AnimatableProperty<Vector3>* >( entry.property );
  *     ...
@@ -60,8 +60,7 @@ public:
    * Constructor for an uninitalized property metadata
    */
   PropertyMetadata()
-  : type(Property::NONE),
-    value(),
+  : value(),
     componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(NULL)
   {
@@ -72,12 +71,11 @@ public:
    * @param [in] newProperty A pointer to the property metadata.
    */
   PropertyMetadata(const SceneGraph::PropertyBase* newProperty)
-  : type(Property::NONE),
-    value(), // value is held by newProperty
+  : value(), // value is held by newProperty
     componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(newProperty)
   {
-    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property") ;
+    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property");
   }
 
   /**
@@ -85,8 +83,7 @@ public:
    * @param [in] newValue The value of the scene-graph owned property.
    */
   PropertyMetadata(Property::Value newValue)
-  : type(newValue.GetType()),
-    value(newValue),
+  : value(newValue),
     componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(NULL)
   {
@@ -117,11 +114,15 @@ public:
    */
   const SceneGraph::PropertyBase* GetSceneGraphProperty() const
   {
-    DALI_ASSERT_DEBUG(mProperty && "Accessing uninitialized SceneGraph property") ;
+    DALI_ASSERT_DEBUG(mProperty && "Accessing uninitialized SceneGraph property");
     return mProperty;
   }
 
-  Property::Type type;    ///< The type of the property
+  /*
+   * @return type of the held property value
+   */
+  inline Property::Type GetType() const { return value.GetType(); }
+
   Property::Value value;  ///< The property value for a non animatable and custom property
   int componentIndex;     ///< The index of the property component
 
@@ -137,7 +138,7 @@ protected:
 
 /**
  * An entry in an animatable property metadata lookup.
- * The type field should be queried, before accessing the animatable property:
+ * The value type field should be queried, before accessing the animatable property:
  */
 class AnimatablePropertyMetadata : public PropertyMetadata
 {
@@ -156,9 +157,9 @@ public:
   : index(newIndex)
   {
     componentIndex = newComponentIndex;
-    type = newType;
+    value = Property::Value(newType);
     mProperty = newProperty;
-    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property") ;
+    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property");
   }
 
   /**
@@ -172,7 +173,6 @@ public:
   : index(newIndex)
   {
     componentIndex = newComponentIndex;
-    type = newValue.GetType();
     value = newValue;
   }
 
@@ -181,7 +181,7 @@ public:
    */
   virtual bool IsWritable(void) const
   {
-    return true ;
+    return true;
   }
 
   Property::Index index;       ///< The index of the property
@@ -210,9 +210,9 @@ public:
   : name(newName),
     mAccessMode(Property::ANIMATABLE)
   {
-    type = newType;
+    value = Property::Value(newType);
     mProperty = newProperty;
-    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property") ;
+    DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property");
   }
 
   /**
@@ -227,9 +227,8 @@ public:
   : name(newName),
     mAccessMode(accessMode)
   {
-    type = newValue.GetType();
     value = newValue;
-    DALI_ASSERT_DEBUG(accessMode != Property::ANIMATABLE && "Animatable must have scenegraph property") ;
+    DALI_ASSERT_DEBUG(accessMode != Property::ANIMATABLE && "Animatable must have scenegraph property");
   }
 
   /**
@@ -237,7 +236,7 @@ public:
    */
   virtual bool IsWritable(void) const
   {
-    return (mAccessMode == Property::ANIMATABLE) || (mAccessMode == Property::READ_WRITE) ;
+    return (mAccessMode == Property::ANIMATABLE) || (mAccessMode == Property::READ_WRITE);
   }
 
   std::string name;       ///< The name of the property
