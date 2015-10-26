@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -60,6 +61,14 @@ const float BezierBasisCoeff[] = {  -1.0f,  3.0f, -3.0f, 1.0f,
                                      1.0f,  0.0f,  0.0f, 0.0f  };
 
 const Dali::Matrix BezierBasis = Dali::Matrix( BezierBasisCoeff );
+
+
+Dali::BaseHandle Create()
+{
+  return Dali::Path::New();
+}
+
+Dali::TypeRegistration mType( typeid(Dali::Path), typeid(Dali::Handle), Create );
 
 } //Unnamed namespace
 
