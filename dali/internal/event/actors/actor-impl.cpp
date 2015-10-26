@@ -2545,7 +2545,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 // TODO: This method needs to be removed
 void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value )
 {
-  switch( entry.type )
+  switch( entry.GetType() )
   {
     case Property::BOOLEAN:
     {
