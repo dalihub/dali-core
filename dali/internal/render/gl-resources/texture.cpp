@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,6 @@ GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )
 }
 
 using Dali::Internal::Vertex2D;
-using Dali::Internal::Vertex3D;
 
 using namespace Dali::Pixel;
 
@@ -206,11 +205,6 @@ void Texture::GlCleanup()
 void Texture::MapUV(unsigned int numVerts,Vertex2D *verts, const PixelArea* pixelArea)
 {
   MapUV(numVerts, (float*)(&verts->mU), sizeof(Vertex2D)/sizeof(float), pixelArea);
-}
-
-void Texture::MapUV(unsigned int numVerts,Vertex3D *verts, const PixelArea* pixelArea)
-{
-  MapUV(numVerts, (float*)(&verts->mU), sizeof(Vertex3D)/sizeof(float), pixelArea);
 }
 
 void Texture::MapUV(unsigned int numVerts, float* verts, unsigned int stride, const PixelArea* pixelArea)
