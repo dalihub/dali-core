@@ -90,12 +90,6 @@ bool NewRenderer::CheckResources()
   return true;
 }
 
-bool NewRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix )
-{
-  // @todo MESH_REWORK Add clipping
-  return false;
-}
-
 void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, SceneGraph::Shader* shader, Program* program, unsigned int programIndex )
 {
   // Do nothing, we're going to set up the uniforms with our own code instead
