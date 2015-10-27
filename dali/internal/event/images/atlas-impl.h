@@ -64,16 +64,23 @@ public:
   void Clear( const Vector4& color  );
 
   /**
-   * @copydoc Dali::Atlas::Upload( const BufferImage&, unsigned int, unsigned int )
+   * @copydoc Dali::Atlas::Upload( const BufferImage&, uint32_t, uint32_t )
    */
   bool Upload( BufferImage& bufferImage,
                SizeType xOffset,
                SizeType yOffset );
 
   /**
-   * @copydoc Dali::Atlas::Upload( const std::string&, unsigned int, unsigned int )
+   * @copydoc Dali::Atlas::Upload( const std::string&, uint32_t, uint32_t )
    */
   bool Upload( const std::string& url,
+               SizeType xOffset,
+               SizeType yOffset );
+
+  /**
+   * @copydoc Dali::Atlas::Upload( Dali::Atlas::PixelDataPtr, uint32_t )
+   */
+  bool Upload( PixelDataPtr pixelData,
                SizeType xOffset,
                SizeType yOffset );
 
@@ -118,11 +125,10 @@ private:
 
   /**
    * Helper for Upload methods
-   * @return True if the bitmap has the same pixel format and its size fits within the atlas at the specified offset
+   * @return True if the size of the bitmap fits within the atlas at the specified offset
    */
-  bool Compatible( Pixel::Format pixelFormat,
-                   SizeType x,
-                   SizeType y );
+  bool IsInside( SizeType x, SizeType y );
+
   /**
    * Helper to create the Atlas resource
    */

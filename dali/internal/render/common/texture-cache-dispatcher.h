@@ -22,10 +22,11 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/images/native-image-interface.h>
+#include <dali/public-api/images/pixel.h>
+#include <dali/devel-api/images/pixel-data.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/integration-api/resource-declarations.h>
@@ -152,6 +153,16 @@ public:
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset ) = 0;
+
+  /**
+   * Dispatch a message to update the part of a texture with the pixel data.
+   * May be called from Update thread
+   * @param[in] destId The ID of the texture to update
+   * @param[in] pixelData The pointer pointing to the pixel data to upload.
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void DispatchUpdateTexture( ResourceId id, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset ) = 0;
 
   /**
    * Dispatch a message to update the texture area

@@ -18,6 +18,7 @@ SET(TC_SOURCES
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-Material.cpp
         utc-Dali-Mutex.cpp
+        utc-Dali-PixelData.cpp
         utc-Dali-PropertyBuffer.cpp
         utc-Dali-Renderer.cpp
         utc-Dali-Sampler.cpp

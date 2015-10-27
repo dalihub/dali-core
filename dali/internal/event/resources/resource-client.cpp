@@ -347,6 +347,16 @@ void ResourceClient::UploadBitmap( ResourceId destId,Integration::BitmapPtr bitm
                               yOffset );
 }
 
+void ResourceClient::UploadBitmap( ResourceId destId, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset)
+{
+  RequestUploadBitmapMessage( mEventThreadServices,
+                              mResourceManager,
+                              destId,
+                              pixelData,
+                              xOffset,
+                              yOffset );
+}
+
 void ResourceClient::CreateGlTexture( ResourceId id )
 {
   RequestCreateGlTextureMessage( mEventThreadServices, mResourceManager, id );

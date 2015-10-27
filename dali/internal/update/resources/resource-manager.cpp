@@ -349,6 +349,14 @@ void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, ResourceId s
   }
 }
 
+void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset )
+{
+  if( destId && pixelData )
+  {
+    mImpl->mTextureCacheDispatcher.DispatchUpdateTexture( destId, pixelData, xOffset, yOffset );
+  }
+}
+
 void ResourceManager::HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, LoadResourcePriority priority, bool resetFinishedStatus )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );

@@ -142,6 +142,13 @@ public:
   }
 
   /**
+   * Get the pixel buffer if it's present and take over the ownership.
+   * @note With this function called, the bitmap loses the ownership and is no longer responsible for the release of pixel buffer.
+   * @return The raw pointer pointing to the pixel buffer
+   */
+  PixelBuffer* GetBufferOwnership();
+
+  /**
    * Get the pixel buffer size in bytes
    * @return The buffer size in bytes.
    * @sa ReserveBuffer GetBuffer

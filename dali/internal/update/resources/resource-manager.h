@@ -27,6 +27,7 @@
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/images/pixel-data.h>
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -262,6 +263,15 @@ public: // Used by ResourceClient
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   void HandleUploadBitmapRequest( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
+
+  /**
+   * Upload a pixel buffer to a position within a specified texture
+   * @param[in] destId The destination texture ID
+   * @param[in] pixelData pointer pointing to the pixel data to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void HandleUploadBitmapRequest( ResourceId destId, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * Request reloading a resource from the native filesystem.
@@ -522,6 +532,22 @@ inline void RequestUploadBitmapMessage( EventThreadServices& eventThreadServices
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, srcId, xOffset, yOffset );
+}
+
+inline void RequestUploadBitmapMessage(EventThreadServices& eventThreadServices,
+                                       ResourceManager& manager,
+                                       ResourceId destId,
+                                       PixelDataPtr pixelData,
+                                       std::size_t xOffset,
+                                       std::size_t yOffset)
+{
+  typedef MessageValue4< ResourceManager, ResourceId, PixelDataPtr , std::size_t, std::size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, pixelData, xOffset, yOffset );
 }
 
 inline void RequestReloadResourceMessage( EventThreadServices& eventThreadServices,
