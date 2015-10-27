@@ -104,6 +104,7 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-manager.cpp \
   $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/render/data-providers/render-data-provider.cpp \
+  $(internal_src_dir)/render/data-providers/uniform-name-cache.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/context.cpp \
   $(internal_src_dir)/render/gl-resources/frame-buffer-state-cache.cpp \

@@ -174,20 +174,12 @@ private:
    */
   void BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
 
-  /**
-   * Get the texture uniform index of the name sampler in the program.
-   * If not already registered in the program, then this performs the registration
-   * @param[in] program The shader program
-   * @param[in] sampler The sampler holding a texture unit uniform name to search for
-   * @return The texture uniform index in the program
-   */
-  unsigned int GetTextureUniformIndex( Program& program, const std::string& uniformName );
+public:
 
-
-public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
   OwnerPointer< SceneGraph::RenderDataProvider > mRenderDataProvider;
 
 private:
+
   SceneGraph::RenderGeometry* mRenderGeometry;
 
   struct UniformIndexMap
@@ -198,15 +190,6 @@ private:
 
   typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
   UniformIndexMappings mUniformIndexMap;
-
-  struct TextureUniformIndexMap
-  {
-    size_t       uniformNameHash;
-    unsigned int uniformIndex;    // The index of the cached location in the Program
-  };
-
-  typedef Dali::Vector< TextureUniformIndexMap > TextureUniformIndexMappings;
-  TextureUniformIndexMappings mTextureIndexMap;
 
   Vector<GLint> mAttributesLocation;
   bool mUpdateAttributesLocation;

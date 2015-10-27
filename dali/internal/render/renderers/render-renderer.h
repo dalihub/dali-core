@@ -49,7 +49,7 @@ class NodeDataProvider;
 
 namespace Render
 {
-
+class UniformNameCache;
 
 /**
  * Renderers are used to render meshes
@@ -63,9 +63,11 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
+   * @param[in] context to use
    * @param[in] textureCache to use
+   * @param[in] uniformNameCache to use
    */
-  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
+  void Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache );
 
   /**
    * Virtual destructor
@@ -189,6 +191,7 @@ protected:
 
   Context* mContext;
   SceneGraph::TextureCache* mTextureCache;
+  Render::UniformNameCache* mUniformNameCache;
   SceneGraph::Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 

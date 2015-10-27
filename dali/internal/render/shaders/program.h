@@ -157,6 +157,13 @@ public:
   GLint GetUniformLocation( unsigned int uniformIndex );
 
   /**
+   * Gets the uniform location for a sampler
+   * @param [in] uniqueIndex of the sampler uniform in local cache
+   * @return the index of the uniform in the GL program
+   */
+  GLint GetSamplerUniformLocation( int32_t uniqueIndex, const std::string& samplerName );
+
+  /**
    * Sets the uniform value
    * @param [in] location of uniform
    * @param [in] value0 as int
@@ -359,6 +366,7 @@ private:  // Data
   // location caches
   std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache
   std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
+  Dali::Vector< GLint > mSamplerUniformLocations; ///< sampler uniform location cache
 
   // uniform value caching
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int

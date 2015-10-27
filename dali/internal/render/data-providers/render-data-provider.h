@@ -100,7 +100,7 @@ public:
    * Returns the list of textures
    * @return The list of textures
    */
-  const Textures& GetTextures() const;
+  Textures& GetTextures();
 
 private:
   const MaterialDataProvider*   mMaterialDataProvider;
