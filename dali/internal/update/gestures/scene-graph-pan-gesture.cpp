@@ -893,6 +893,7 @@ bool PanGesture::InterpolatePoint( PanInfoHistory& history, unsigned int current
   PanInfoHistoryIter historyBegin = history.begin();
   PanInfoHistoryIter lastIt = history.end();
   bool pointGenerated = false;
+  bool havePreviousPoint = false;
   RelativeVectors newAcceleration;
 
   // Iterate through point history to perform interpolation.
@@ -939,7 +940,7 @@ bool PanGesture::InterpolatePoint( PanInfoHistory& history, unsigned int current
       divisor += 1.0f / timeDelta;
 
       // Acceleration requires a previous point.
-      if( lastIt != history.end() )
+      if( havePreviousPoint )
       {
         // Time delta of input.
         float timeDifference( GetDivisibleTimeDifference( it->time, lastIt->time, 1.0f, OUTPUT_TIME_DIFFERENCE ) );
@@ -948,6 +949,10 @@ bool PanGesture::InterpolatePoint( PanInfoHistory& history, unsigned int current
         newAcceleration.screen += ( ( it->screen.velocity - lastIt->screen.velocity ) / timeDifference ) / timeDelta;
 
         accelerationDivisor += 1.0f / timeDelta;
+      }
+      else
+      {
+        havePreviousPoint = true;
       }
 
       tapsUsed++;
