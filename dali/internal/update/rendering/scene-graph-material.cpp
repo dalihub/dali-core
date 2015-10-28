@@ -31,19 +31,19 @@ namespace Internal
 namespace SceneGraph
 {
 
-namespace
-{
-const unsigned int DEFAULT_BLENDING_OPTIONS( BlendingOptions().GetBitmask() );
-}
-
 Material::Material()
-: mColor( Color::WHITE ),
-  mBlendColor( Color::TRANSPARENT ),
-  mFaceCullingMode(Dali::Material::NONE),
-  mBlendingMode(Dali::BlendingMode::AUTO),
-  mBlendingOptions( DEFAULT_BLENDING_OPTIONS ),
-  mShader(NULL),
-  mBlendPolicy(OPAQUE)
+: mShader( NULL ),
+  mBlendColor( NULL ),
+  mSamplers(),
+  mTextureId(),
+  mUniformName(),
+  mIsFullyOpaque(),
+  mAffectsTransparency(),
+  mConnectionObservers(),
+  mFaceCullingMode( Dali::Material::NONE ),
+  mBlendingMode( Dali::BlendingMode::AUTO ),
+  mBlendingOptions(), // initializes to defaults
+  mBlendPolicy( OPAQUE )
 {
   // Observe own property-owner's uniform map
   AddUniformMapObserver( *this );
@@ -66,8 +66,17 @@ void Material::SetShader( Shader* shader )
 
 Shader* Material::GetShader() const
 {
-  // @todo - Fix this - move shader setup to the Renderer connect to stage...
   return mShader;
+}
+
+void Material::SetFaceCullingMode( unsigned int faceCullingMode )
+{
+  mFaceCullingMode = static_cast< Dali::Material::FaceCullingMode >( faceCullingMode );
+}
+
+void Material::SetBlendingMode( unsigned int blendingMode )
+{
+  mBlendingMode = static_cast< BlendingMode::Type >( blendingMode );
 }
 
 void Material::PrepareRender( BufferIndex bufferIndex )
@@ -76,7 +85,7 @@ void Material::PrepareRender( BufferIndex bufferIndex )
 
   // @todo MESH_REWORK Add dirty flags to reduce processing.
 
-  switch(mBlendingMode[bufferIndex])
+  switch( mBlendingMode )
   {
     case BlendingMode::OFF:
     {
@@ -104,12 +113,6 @@ void Material::PrepareRender( BufferIndex bufferIndex )
 
       if( opaque )
       {
-        // Check the material color:
-        opaque = ( mColor[ bufferIndex ].a >= FULLY_OPAQUE );
-      }
-
-      if( opaque )
-      {
         unsigned int opaqueCount=0;
         unsigned int affectingCount=0;
         size_t textureCount( GetTextureCount() );
@@ -132,62 +135,36 @@ void Material::PrepareRender( BufferIndex bufferIndex )
   }
 }
 
-
 Material::BlendPolicy Material::GetBlendPolicy() const
 {
   return mBlendPolicy;
 }
 
-void Material::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
+void Material::SetBlendingOptions( unsigned int options )
 {
-  mBlendingOptions.Set( updateBufferIndex, options );
+  mBlendingOptions.SetBitmask( options );
 }
 
-const Vector4& Material::GetBlendColor(BufferIndex bufferIndex) const
+void Material::SetBlendColor( const Vector4& blendColor )
 {
-  return mBlendColor[bufferIndex];
+  if( mBlendColor )
+  {
+    *mBlendColor = blendColor;
+  }
+  else
+  {
+    mBlendColor = new Vector4( blendColor );
+  }
 }
 
-BlendingFactor::Type Material::GetBlendSrcFactorRgb( BufferIndex bufferIndex ) const
+Vector4* Material::GetBlendColor() const
 {
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendSrcFactorRgb();
+  return mBlendColor;
 }
 
-BlendingFactor::Type Material::GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const
+const BlendingOptions& Material::GetBlendingOptions() const
 {
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendSrcFactorAlpha();
-}
-
-BlendingFactor::Type Material::GetBlendDestFactorRgb( BufferIndex bufferIndex ) const
-{
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendDestFactorRgb();
-}
-
-BlendingFactor::Type Material::GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const
-{
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendDestFactorAlpha();
-}
-
-BlendingEquation::Type Material::GetBlendEquationRgb( BufferIndex bufferIndex ) const
-{
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendEquationRgb();
-}
-
-BlendingEquation::Type Material::GetBlendEquationAlpha( BufferIndex bufferIndex ) const
-{
-  BlendingOptions blendingOptions;
-  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
-  return blendingOptions.GetBlendEquationAlpha();
+  return mBlendingOptions;
 }
 
 void Material::AddTexture( const std::string& name, ResourceId id, Render::Sampler* sampler )
@@ -264,16 +241,8 @@ void Material::ConnectedUniformMapChanged( )
   mConnectionObservers.ConnectedUniformMapChanged();
 }
 
-void Material::ResetDefaultProperties( BufferIndex updateBufferIndex )
-{
-  mColor.ResetToBaseValue( updateBufferIndex );
-  mBlendColor.ResetToBaseValue( updateBufferIndex );
-  mFaceCullingMode.CopyPrevious( updateBufferIndex );
-
-  mBlendingMode.CopyPrevious( updateBufferIndex );
-  mBlendingOptions.CopyPrevious( updateBufferIndex );
-}
-
 } // namespace SceneGraph
+
 } // namespace Internal
+
 } // namespace Dali

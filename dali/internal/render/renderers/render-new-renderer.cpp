@@ -99,25 +99,27 @@ void NewRenderer::DoSetCullFaceMode( Context& context, BufferIndex bufferIndex )
 {
 }
 
-void NewRenderer::DoSetBlending( Context& context, BufferIndex bufferIndex, bool blend )
+void NewRenderer::DoSetBlending( Context& context )
 {
-  context.SetBlend( blend );
-  if( blend )
+  const SceneGraph::MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
+
+  // Blend color is optional and rarely used
+  Vector4* blendColor = material.GetBlendColor();
+  if( blendColor )
   {
-    const SceneGraph::MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
-
-    context.SetCustomBlendColor( material.GetBlendColor( bufferIndex ) );
-
-    // Set blend source & destination factors
-    context.BlendFuncSeparate( material.GetBlendSrcFactorRgb( bufferIndex ),
-                               material.GetBlendDestFactorRgb( bufferIndex ),
-                               material.GetBlendSrcFactorAlpha( bufferIndex ),
-                               material.GetBlendDestFactorAlpha( bufferIndex ) );
-
-    // Set blend equations
-    context.BlendEquationSeparate( material.GetBlendEquationRgb( bufferIndex ),
-                                   material.GetBlendEquationAlpha( bufferIndex ) );
+    context.SetCustomBlendColor( *blendColor );
   }
+
+  const BlendingOptions& blending = material.GetBlendingOptions();
+  // Set blend source & destination factors
+  context.BlendFuncSeparate( blending.GetBlendSrcFactorRgb(),
+                             blending.GetBlendDestFactorRgb(),
+                             blending.GetBlendSrcFactorAlpha(),
+                             blending.GetBlendDestFactorAlpha() );
+
+  // Set blend equations
+  context.BlendEquationSeparate( blending.GetBlendEquationRgb(),
+                                 blending.GetBlendEquationAlpha() );
 }
 
 void NewRenderer::DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )

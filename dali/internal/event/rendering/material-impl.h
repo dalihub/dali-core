@@ -108,10 +108,16 @@ public:
    * @copydoc Dali::Material::GetNumberOfTextures()
    */
   size_t GetNumberOfTextures() const;
+
   /**
    * @copydoc Dali::Material::SetFaceCullingMode()
    */
   void SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode );
+
+  /**
+   * @copydoc Dali::Material::GetFaceCullingMode()
+   */
+  Dali::Material::FaceCullingMode GetFaceCullingMode();
 
   /**
    * @copydoc Dali::Material::SetBlendMode()
@@ -163,7 +169,7 @@ public:
   /**
    * @copydoc Dali::Material::GetBlendColor()
    */
-  const Vector4& GetBlendColor() const;
+  Vector4 GetBlendColor() const;
 
   /**
    * @brief Get the material scene object
@@ -308,13 +314,16 @@ private: // unimplemented methods
   Material( const Material& );
   Material& operator=( const Material& );
 
-private: //data
+private: // Data
+
+  SceneGraph::Material* mSceneObject;
   IntrusivePtr<Shader> mShader; ///< Connector that holds the shader used by this material
   std::vector<Material::Texture> mTextures; ///<Vector of textures used by this material
-  SceneGraph::Material* mSceneObject;
 
-  BlendingMode::Type mBlendingMode; ///< Local store
-  BlendingOptions mBlendingOptions; ///< Local copy of blending options bitmask
+  Dali::Material::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
+  BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
+  BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
+  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its reraly used
   bool mOnStage;
 
 };

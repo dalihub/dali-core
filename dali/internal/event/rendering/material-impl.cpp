@@ -41,16 +41,15 @@ namespace
  *            |name                              |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "color",                           VECTOR4,  true, true,   true, Dali::Material::Property::COLOR )
-DALI_PROPERTY( "face-culling-mode",               STRING,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
-DALI_PROPERTY( "blending-mode",                   STRING,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
-DALI_PROPERTY( "blend-equation-rgb",              STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
-DALI_PROPERTY( "blend-equation-alpha",            STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
-DALI_PROPERTY( "source-blend-factor-rgb",         STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
-DALI_PROPERTY( "destination-blend-factor-rgb",    STRING,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
-DALI_PROPERTY( "source-blend-factor-alpha",       STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
-DALI_PROPERTY( "destination-blend-factor-alpha",  STRING,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
-DALI_PROPERTY( "blend-color",                     VECTOR4,  true, true,   true, Dali::Material::Property::BLEND_COLOR )
+DALI_PROPERTY( "face-culling-mode",               INTEGER,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
+DALI_PROPERTY( "blending-mode",                   INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
+DALI_PROPERTY( "blend-equation-rgb",              INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
+DALI_PROPERTY( "blend-equation-alpha",            INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
+DALI_PROPERTY( "source-blend-factor-rgb",         INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
+DALI_PROPERTY( "destination-blend-factor-rgb",    INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
+DALI_PROPERTY( "source-blend-factor-alpha",       INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
+DALI_PROPERTY( "destination-blend-factor-alpha",  INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
+DALI_PROPERTY( "blend-color",                     VECTOR4,   true, false,  false, Dali::Material::Property::BLEND_COLOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> MATERIAL_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -182,19 +181,26 @@ size_t Material::GetNumberOfTextures() const
 
 void Material::SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode )
 {
-  if( NULL != mSceneObject )
+  if( mFaceCullingMode != cullingMode )
   {
-    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mFaceCullingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(cullingMode) );
+    mFaceCullingMode = cullingMode;
+
+    SetFaceCullingModeMessage( GetEventThreadServices(), *mSceneObject, mFaceCullingMode );
   }
+}
+
+Dali::Material::FaceCullingMode Material::GetFaceCullingMode()
+{
+  return mFaceCullingMode;
 }
 
 void Material::SetBlendMode( BlendingMode::Type mode )
 {
-  mBlendingMode = mode;
-
-  if( NULL != mSceneObject )
+  if( mBlendingMode != mode )
   {
-    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(mode) );
+    mBlendingMode = mode;
+
+    SetBlendingModeMessage( GetEventThreadServices(), *mSceneObject, mBlendingMode );
   }
 }
 
@@ -252,15 +258,24 @@ void Material::GetBlendEquation( BlendingEquation::Type& equationRgb,
 
 void Material::SetBlendColor( const Vector4& color )
 {
-  if( mSceneObject )
+  if( !mBlendColor )
   {
-    SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, color );
+    mBlendColor = new Vector4();
+  }
+  if( *mBlendColor != color )
+  {
+    *mBlendColor = color;
+    SetBlendColorMessage( GetEventThreadServices(), *mSceneObject, *mBlendColor );
   }
 }
 
-const Vector4& Material::GetBlendColor() const
+Vector4 Material::GetBlendColor() const
 {
-  return mSceneObject->mBlendColor[ GetEventThreadServices().GetEventBufferIndex() ];
+  if( mBlendColor )
+  {
+    return *mBlendColor;
+  }
+  return Color::TRANSPARENT; // GL default
 }
 
 const SceneGraph::Material* Material::GetMaterialSceneObject() const
@@ -313,91 +328,121 @@ void Material::SetDefaultProperty( Property::Index index,
 {
   switch( index )
   {
-    case Dali::Material::Property::COLOR:
-    {
-      SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
-      break;
-    }
     case Dali::Material::Property::FACE_CULLING_MODE:
     {
-      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mFaceCullingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
+      int faceCullingMode;
+      if( propertyValue.Get( faceCullingMode ) )
+      {
+        SetFaceCullingMode( Dali::Material::FaceCullingMode( faceCullingMode ) );
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_MODE:
     {
-      if( mSceneObject )
+      int blendingMode;
+      if( propertyValue.Get( blendingMode ) )
       {
-        SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
+        SetBlendMode( BlendingMode::Type( blendingMode ) );
       }
       break;
     }
     case Dali::Material::Property::BLEND_EQUATION_RGB:
     {
-      BlendingEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
-      mBlendingOptions.SetBlendEquation( static_cast<BlendingEquation::Type>(propertyValue.Get<int>()), alphaEquation );
+      int blendingEquation;
+      if( propertyValue.Get( blendingEquation ) )
+      {
+        BlendingEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+        mBlendingOptions.SetBlendEquation( static_cast<BlendingEquation::Type>( blendingEquation ), alphaEquation );
+        SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+      }
       break;
     }
     case Dali::Material::Property::BLEND_EQUATION_ALPHA:
     {
-      BlendingEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
-      mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendingEquation::Type>(propertyValue.Get<int>()) );
+      int blendingEquation;
+      if( propertyValue.Get( blendingEquation ) )
+      {
+        BlendingEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
+        mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendingEquation::Type>( blendingEquation ) );
+        SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
-      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      SetBlendFunc( static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
-                    destFactorRgb,
-                    srcFactorAlpha,
-                    destFactorAlpha );
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
+      {
+        BlendingFactor::Type srcFactorRgb;
+        BlendingFactor::Type destFactorRgb;
+        BlendingFactor::Type srcFactorAlpha;
+        BlendingFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( static_cast<BlendingFactor::Type>( blendingFactor ),
+                      destFactorRgb,
+                      srcFactorAlpha,
+                      destFactorAlpha );
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
-      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      SetBlendFunc( srcFactorRgb,
-                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
-                    srcFactorAlpha,
-                    destFactorAlpha );
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
+      {
+        BlendingFactor::Type srcFactorRgb;
+        BlendingFactor::Type destFactorRgb;
+        BlendingFactor::Type srcFactorAlpha;
+        BlendingFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+                      static_cast<BlendingFactor::Type>( blendingFactor ),
+                      srcFactorAlpha,
+                      destFactorAlpha );
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
-      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      SetBlendFunc( srcFactorRgb,
-                    destFactorRgb,
-                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
-                    destFactorAlpha );
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
+      {
+        BlendingFactor::Type srcFactorRgb;
+        BlendingFactor::Type destFactorRgb;
+        BlendingFactor::Type srcFactorAlpha;
+        BlendingFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+                      destFactorRgb,
+                      static_cast<BlendingFactor::Type>( blendingFactor ),
+                      destFactorAlpha );
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
-      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      SetBlendFunc( srcFactorRgb,
-                    destFactorRgb,
-                    srcFactorAlpha,
-                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()) );
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
+      {
+        BlendingFactor::Type srcFactorRgb;
+        BlendingFactor::Type destFactorRgb;
+        BlendingFactor::Type srcFactorAlpha;
+        BlendingFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+                      destFactorRgb,
+                      srcFactorAlpha,
+                      static_cast<BlendingFactor::Type>( blendingFactor ) );
+      }
       break;
     }
     case Dali::Material::Property::BLEND_COLOR:
     {
-      SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
+      Vector4 blendColor;
+      if( propertyValue.Get( blendColor ) )
+      {
+        SetBlendColor( blendColor );
+      }
       break;
     }
   }
@@ -413,33 +458,18 @@ void Material::SetSceneGraphProperty( Property::Index index,
 
 Property::Value Material::GetDefaultProperty( Property::Index index ) const
 {
-  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
   Property::Value value;
 
   switch( index )
   {
-    case Dali::Material::Property::COLOR:
-    {
-      if( mSceneObject )
-      {
-        value = mSceneObject->mColor[bufferIndex];
-      }
-      break;
-    }
     case Dali::Material::Property::FACE_CULLING_MODE:
     {
-      if( mSceneObject )
-      {
-        value = mSceneObject->mFaceCullingMode[bufferIndex];
-      }
+      value = mFaceCullingMode;
       break;
     }
     case Dali::Material::Property::BLENDING_MODE:
     {
-      if( mSceneObject )
-      {
-        value = mSceneObject->mBlendingMode[bufferIndex];
-      }
+      value = mBlendingMode;
       break;
     }
     case Dali::Material::Property::BLEND_EQUATION_RGB:
@@ -494,10 +524,7 @@ Property::Value Material::GetDefaultProperty( Property::Index index ) const
     }
     case Dali::Material::Property::BLEND_COLOR:
     {
-      if( mSceneObject )
-      {
-        value = mSceneObject->mBlendColor[bufferIndex];
-      }
+      value = mBlendColor;
       break;
     }
   }
@@ -517,85 +544,14 @@ const SceneGraph::PropertyOwner* Material::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Material::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
-
-  const SceneGraph::PropertyBase* property = NULL;
-
-  if( OnStage() )
-  {
-    property = MATERIAL_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                              &Material::FindAnimatableProperty,
-                                                              &Material::FindCustomProperty,
-                                                              index );
-
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      switch(index)
-      {
-        case Dali::Material::Property::COLOR:
-        {
-          property = &mSceneObject->mColor;
-          break;
-        }
-        case Dali::Material::Property::BLEND_COLOR:
-        {
-          property = &mSceneObject->mBlendColor;
-          break;
-        }
-        default:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Property is not animatable");
-          break;
-        }
-      }
-    }
-  }
-
-  return property;
+  PropertyMetadata* property = index >= PROPERTY_CUSTOM_START_INDEX ? static_cast<PropertyMetadata*>(FindCustomProperty( index )) : static_cast<PropertyMetadata*>(FindAnimatableProperty( index ));
+  DALI_ASSERT_ALWAYS( property && "Property index is invalid" );
+  return property->GetSceneGraphProperty();
 }
 
 const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  const PropertyInputImpl* property = NULL;
-
-  if( OnStage() )
-  {
-    const SceneGraph::PropertyBase* baseProperty =
-      MATERIAL_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                     &Material::FindAnimatableProperty,
-                                                     &Material::FindCustomProperty,
-                                                     index );
-    property = static_cast<const PropertyInputImpl*>( baseProperty );
-
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      switch(index)
-      {
-        case Dali::Material::Property::COLOR:
-        {
-          property = &mSceneObject->mColor;
-          break;
-        }
-        case Dali::Material::Property::FACE_CULLING_MODE:
-        {
-          property = &mSceneObject->mFaceCullingMode;
-          break;
-        }
-        case Dali::Material::Property::BLEND_COLOR:
-        {
-          property = &mSceneObject->mBlendColor;
-          break;
-        }
-        default:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Property cannot be a constraint input");
-          break;
-        }
-      }
-    }
-  }
-
-  return property;
+  return GetSceneObjectAnimatableProperty( index );
 }
 
 int Material::GetPropertyComponentIndex( Property::Index index ) const
@@ -640,6 +596,12 @@ void Material::Disconnect()
 
 Material::Material()
 : mSceneObject( NULL ),
+  mShader( NULL ),
+  mTextures(),
+  mFaceCullingMode( Dali::Material::NONE ),
+  mBlendingMode( Dali::BlendingMode::AUTO ),
+  mBlendingOptions(), // initialises to defaults
+  mBlendColor( NULL ),
   mOnStage( false )
 {
 }
@@ -657,6 +619,7 @@ void Material::Initialize()
 
 Material::~Material()
 {
+  delete mBlendColor;
   if( EventThreadServices::IsCoreRunning() )
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();

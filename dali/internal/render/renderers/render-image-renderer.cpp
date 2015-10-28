@@ -352,11 +352,8 @@ void ImageRenderer::DoRender( Context& context, SceneGraph::TextureCache& textur
   }
 }
 
-void ImageRenderer::DoSetBlending(Context& context, BufferIndex bufferIndex, bool blend )
+void ImageRenderer::DoSetBlending( Context& context )
 {
-  // Enables/disables blending mode.
-  context.SetBlend( blend );
-
   // Set the blend color
   const Vector4* const customColor = mBlendingOptions.GetBlendColor();
   if( customColor )

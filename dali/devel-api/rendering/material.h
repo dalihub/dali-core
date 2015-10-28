@@ -63,23 +63,17 @@ public:
   {
     enum
     {
-      COLOR = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "color",                          type VECTOR4
-      FACE_CULLING_MODE,                            ///< name "face-culling-mode",              type STRING
-      BLENDING_MODE,                                ///< name "blending-mode",                  type STRING
-      BLEND_EQUATION_RGB,                           ///< name "blend-equation-rgb",             type STRING
-      BLEND_EQUATION_ALPHA,                         ///< name "blend-equation-alpha",           type STRING
-      BLENDING_SRC_FACTOR_RGB,                      ///< name "source-blend-factor-rgb",        type STRING
-      BLENDING_DEST_FACTOR_RGB,                     ///< name "destination-blend-factor-rgb",   type STRING
-      BLENDING_SRC_FACTOR_ALPHA,                    ///< name "source-blend-factor-alpha",      type STRING
-      BLENDING_DEST_FACTOR_ALPHA,                   ///< name "destination-blend-factor-alpha", type STRING
-      BLEND_COLOR,                                  ///< name "blend-color",                    type VECTOR4
+      FACE_CULLING_MODE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "face-culling-mode",              type INTEGER
+      BLENDING_MODE,                                           ///< name "blending-mode",                  type INTEGER
+      BLEND_EQUATION_RGB,                                      ///< name "blend-equation-rgb",             type INTEGER
+      BLEND_EQUATION_ALPHA,                                    ///< name "blend-equation-alpha",           type INTEGER
+      BLENDING_SRC_FACTOR_RGB,                                 ///< name "source-blend-factor-rgb",        type INTEGER
+      BLENDING_DEST_FACTOR_RGB,                                ///< name "destination-blend-factor-rgb",   type INTEGER
+      BLENDING_SRC_FACTOR_ALPHA,                               ///< name "source-blend-factor-alpha",      type INTEGER
+      BLENDING_DEST_FACTOR_ALPHA,                              ///< name "destination-blend-factor-alpha", type INTEGER
+      BLEND_COLOR,                                             ///< name "blend-color",                    type VECTOR4
     };
   };
-
-  /// @name Uniform Mapping
-  /** @{ */
-       ///< property "COLOR", uniform "uMaterialColor"
-  /** @} */
 
   /**
    * @brief Creates a new Material object
@@ -200,11 +194,18 @@ public:
   /**
    * @brief Set the culling mode for this material
    *
-   * Calling this function sets the properties CULLING_MODE
+   * Calling this function sets the property CULLING_MODE
    *
    * @param[in] cullingMode The culling mode for this material
    */
   void SetFaceCullingMode( FaceCullingMode cullingMode );
+
+  /**
+   * @brief Get the face culling mode for this material
+   *
+   * @return The face culling mode for this material
+   */
+  FaceCullingMode GetFaceCullingMode();
 
   /**
    * @brief Sets the blending mode.
@@ -315,7 +316,7 @@ public:
    *
    * @return The blend color.
    */
-  const Vector4& GetBlendColor() const;
+  Vector4 GetBlendColor() const;
 
 public:
   /**

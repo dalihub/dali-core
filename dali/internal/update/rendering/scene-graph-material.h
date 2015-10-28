@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+// INTERNAL INCLUDES
+#include <dali/devel-api/rendering/material.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -74,6 +76,24 @@ public:
   void SetShader( Shader* shader );
 
   /**
+   * Get the shader effect of this material
+   * @return the shader effect;
+   */
+  Shader* GetShader() const;
+
+  /**
+   * Set the face culling mode
+   * @param[in] faceCullingMode to use
+   */
+  void SetFaceCullingMode( unsigned int faceCullingMode );
+
+  /**
+   * Set the blending mode
+   * @param[in] blendingMode to use
+   */
+  void SetBlendingMode( unsigned int blendingMode );
+
+  /**
    * Prepare the material for rendering.
    *
    * Determine whether blending is enabled for this material, and store the result.
@@ -90,10 +110,15 @@ public:
 
   /**
    * Set the blending options. This should only be called from the update thread.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] options A bitmask of blending options.
    */
-  void SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options );
+  void SetBlendingOptions( unsigned int options );
+
+  /**
+   * Set the blend color for blending operation
+   * @param blendColor to pass to GL
+   */
+  void SetBlendColor( const Vector4& blendColor );
 
   /**
    * Adds a new texture to be used by the material
@@ -128,7 +153,7 @@ public:
    * @param[in] index The index of the texture in the array of textures
    * @param[in] uniformName The new uniform name
    */
-  void SetTextureUniformName( size_t index, const std::string& uniformName);
+  void SetTextureUniformName( size_t index, const std::string& uniformName );
 
   /**
    * Establish if a given texture will affect the transparency of the object ( true by default )
@@ -146,39 +171,15 @@ public: // Implementation of MaterialDataProvider
   /**
    * @copydoc MaterialDataProvider::GetBlendColor
    */
-  virtual const Vector4& GetBlendColor(BufferIndex bufferIndex) const;
+  virtual Vector4* GetBlendColor() const;
 
   /**
-   * @copydoc MaterialDataProvider::GetBlendSrcFactorRgb
+   * @copydoc MaterialDataProvider::GetBlendingOptions
    */
-  virtual BlendingFactor::Type GetBlendSrcFactorRgb(BufferIndex bufferIndex) const;
-
-  /**
-   * @copydoc MaterialDataProvider::GetBlendSrcFactorAlpha
-   */
-  virtual BlendingFactor::Type GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const;
-
-  /**
-   * @copydoc MaterialDataProvider::GetBlendDestFactorRgb
-   */
-  virtual BlendingFactor::Type GetBlendDestFactorRgb( BufferIndex bufferIndex ) const;
-
-  /**
-   * @copydoc MaterialDataProvider::GetBlendDestFactorAlpha
-   */
-  virtual BlendingFactor::Type GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const;
-
-  /**
-   * @copydoc MaterialDataProvider::GetBlendEquationRgb
-   */
-  virtual BlendingEquation::Type GetBlendEquationRgb( BufferIndex bufferIndex ) const;
-
-  /**
-   * @copydoc MaterialDataProvider::GetBlendEquationAlpha
-   */
-  virtual BlendingEquation::Type GetBlendEquationAlpha( BufferIndex bufferIndex ) const;
+  virtual const BlendingOptions& GetBlendingOptions() const;
 
 public: // Implementation of ObjectOwnerContainer template methods
+
   /**
    * Connect the object to the scene graph
    *
@@ -195,6 +196,7 @@ public: // Implementation of ObjectOwnerContainer template methods
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
 public: // Implementation of ConnectionChangePropagator
+
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
    */
@@ -206,11 +208,6 @@ public: // Implementation of ConnectionChangePropagator
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
 
 public:
-  /**
-   * Get the shader effect of this material
-   * @return the shader effect;
-   */
-  Shader* GetShader() const;
 
   /**
    * Get the ResourceId of a texture used by the material
@@ -267,35 +264,30 @@ public: // ConnectionChangePropagator::Observer
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ConnectedUniformMapChanged( );
+  virtual void ConnectedUniformMapChanged();
 
 public: // PropertyOwner implementation
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
-   */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
   void SetIsFullyOpaque( size_t index, bool isFullyOpaque )
   {
     mIsFullyOpaque[index] = isFullyOpaque;
   }
 
-public: // Property data
-  AnimatableProperty<Vector4> mColor;
-  AnimatableProperty<Vector4> mBlendColor;
-  DoubleBufferedProperty<int> mFaceCullingMode;
-  DoubleBufferedProperty<int> mBlendingMode;
-  DoubleBufferedProperty<int> mBlendingOptions;
+private: // Data
 
-private:
   Shader* mShader;
-  Vector<Render::Sampler*> mSamplers; // Not owned
-  Vector<ResourceId>  mTextureId;
-  std::vector<std::string> mUniformName;
-  Vector<bool>        mIsFullyOpaque;
-  Vector<bool>        mAffectsTransparency;
+  Vector4* mBlendColor; // not double buffered as its not animateable and not frequently changed
+  Vector< Render::Sampler* > mSamplers; // Not owned
+  Vector< ResourceId >  mTextureId;
+  std::vector< std::string > mUniformName;
+  Vector< bool >        mIsFullyOpaque;
+  Vector< bool >        mAffectsTransparency;
   ConnectionChangePropagator mConnectionObservers;
+  Dali::Material::FaceCullingMode  mFaceCullingMode; // not double buffered as its not animateable and not frequently changed
+  BlendingMode::Type  mBlendingMode; // not double buffered as its not animateable and not frequently changed
+  BlendingOptions  mBlendingOptions; // not double buffered as its not animateable and not frequently changed
   BlendPolicy mBlendPolicy; ///< The blend policy as determined by PrepareRender
+
 };
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, Shader& shader )
@@ -309,14 +301,44 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Ma
   new (slot) LocalType( &material, &Material::SetShader, &shader );
 }
 
+inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices, const Material& material, Dali::Material::FaceCullingMode faceCullingMode )
+{
+  typedef MessageValue1< Material, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &material, &Material::SetFaceCullingMode, faceCullingMode );
+}
+
+inline void SetBlendingModeMessage( EventThreadServices& eventThreadServices, const Material& material, BlendingMode::Type blendingMode )
+{
+  typedef MessageValue1< Material, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &material, &Material::SetBlendingMode, blendingMode );
+}
+
 inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Material& material, unsigned int options )
 {
-  typedef MessageDoubleBuffered1< Material, unsigned int > LocalType;
+  typedef MessageValue1< Material, unsigned int > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &material, &Material::SetBlendingOptions, options );
+}
+
+inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, const Material& material, const Vector4& blendColor )
+{
+  typedef MessageValue1< Material, Vector4 > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &material, &Material::SetBlendColor, blendColor );
 }
 
 inline void AddTextureMessage( EventThreadServices& eventThreadServices, const Material& material, const std::string& uniformName, ResourceId id, Render::Sampler* sampler )
@@ -386,7 +408,9 @@ inline void SetTextureAffectsTransparencyMessage( EventThreadServices& eventThre
 }
 
 } // namespace SceneGraph
+
 } // namespace Internal
+
 } // namespace Dali
 
 #endif //  DALI_INTERNAL_SCENE_GRAPH_MATERIAL_H
