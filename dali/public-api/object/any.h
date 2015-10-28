@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 /**
  * @brief Stores a value of any type.
@@ -454,6 +458,9 @@ inline const Type& AnyCastReference( const Any& any )
   return any.Get<Type>();
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ANY_TYPE_H__

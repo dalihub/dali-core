@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/owner-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
 namespace Dali

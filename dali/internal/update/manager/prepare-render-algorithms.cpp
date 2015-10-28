@@ -22,7 +22,7 @@
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
@@ -50,6 +50,11 @@ void ClearRenderables( SortedLayerPointers& sortedLayers )
     (*iter)->stencilRenderables.clear();
     (*iter)->colorRenderables.clear();
     (*iter)->overlayRenderables.clear();
+
+    (*iter)->stencilRenderers.Clear();
+    (*iter)->colorRenderers.Clear();
+    (*iter)->overlayRenderers.Clear();
+
   }
 }
 

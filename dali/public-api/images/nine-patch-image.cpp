@@ -53,9 +53,7 @@ NinePatchImage& NinePatchImage::operator=(const NinePatchImage& rhs)
 
 NinePatchImage NinePatchImage::New( const std::string& filename )
 {
-  Internal::ImageAttributes defaultAttrs;
-
-  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, defaultAttrs, Image::NEVER );
+  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, Image::NEVER );
   return NinePatchImage(internal.Get());
 }
 
@@ -66,7 +64,31 @@ NinePatchImage NinePatchImage::DownCast( BaseHandle handle )
 
 Vector4 NinePatchImage::GetStretchBorders()
 {
-  return GetImplementation(*this).GetStretchBorders();
+  Vector4 border;
+
+  const NinePatchImage::StretchRanges& stretchPixelsX = GetStretchPixelsX();
+  const NinePatchImage::StretchRanges& stretchPixelsY = GetStretchPixelsY();
+
+  if( stretchPixelsX.Size() > 0 && stretchPixelsY.Size() > 0 )
+  {
+    //The NinePatchImage stretch pixels are in the cropped image space, inset by 1 to get it to uncropped image space
+    border.x = stretchPixelsX[ 0 ].GetX() + 1;
+    border.y = stretchPixelsY[ 0 ].GetX() + 1;
+    border.z = GetWidth() - stretchPixelsX[ 0 ].GetY() - 1;
+    border.w = GetHeight() - stretchPixelsY[ 0 ].GetY() - 1;
+  }
+
+  return border;
+}
+
+const NinePatchImage::StretchRanges& NinePatchImage::GetStretchPixelsX()
+{
+  return GetImplementation(*this).GetStretchPixelsX();
+}
+
+const NinePatchImage::StretchRanges& NinePatchImage::GetStretchPixelsY()
+{
+  return GetImplementation(*this).GetStretchPixelsY();
 }
 
 Rect<int> NinePatchImage::GetChildRectangle()
@@ -80,5 +102,9 @@ BufferImage NinePatchImage::CreateCroppedBufferImage()
   return BufferImage(internal.Get());
 }
 
+bool NinePatchImage::IsNinePatchUrl( const std::string& url )
+{
+  return Internal::NinePatchImage::IsNinePatchUrl( url );
+}
 
 } // namespace Dali

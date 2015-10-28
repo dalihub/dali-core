@@ -27,11 +27,16 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
   class LinearConstrainer;
 }
+
 /**
  * @brief
  *
@@ -129,6 +134,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL LinearConstrainer(Internal::LinearConstrainer* pathConstrainer);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_LINEAR_CONSTRAINER_H__

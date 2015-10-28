@@ -67,11 +67,10 @@ bool Atlas::Upload( BufferImage& bufferImage,
   {
     AllocateAtlas();
     ResourceId destId = GetResourceId();
-    ResourceId srcId = bufferImage.GetResourceId();
 
-    if( destId && srcId )
+    if( destId )
     {
-      mResourceClient.UploadBitmap( destId, srcId, xOffset, yOffset );
+      bufferImage.UploadBitmap( destId, xOffset, yOffset );
       uploadSuccess = true;
     }
   }

@@ -23,9 +23,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 /**
  * @brief Simple class for passing around pairs of small unsigned integers.
@@ -177,6 +182,12 @@ private:
   };
 };
 
+// Allow Uint16Pair to be treated as a POD type
+template <> struct TypeTraits< Uint16Pair > : public BasicTypes< Uint16Pair > { enum { IS_TRIVIAL_TYPE = true }; };
+
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_UINT_16_PAIR_H__

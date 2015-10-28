@@ -31,6 +31,9 @@ include ../../../dali/devel-api/file.list
 platform_abstraction_src_dir = ../../../dali/integration-api
 include ../../../dali/integration-api/file.list
 
+package_doxy_dir = ../../../doc
+include ../../../doc/file.list
+
 # Build the Dali libtool library
 
 src_files = $(internal_src_files) \
@@ -91,6 +94,7 @@ develapiobjectdir = $(develapidir)/object
 develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 develapisignalsdir = $(develapidir)/signals
+develapithreadingdir = $(develapidir)/threading
 
 develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
@@ -103,6 +107,7 @@ develapiobject_HEADERS = $(devel_api_core_object_header_files)
 develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 develapisignals_HEADERS = $(devel_api_core_signals_header_files)
+develapithreading_HEADERS = $(devel_api_core_threading_header_files)
 
 
 #public api
@@ -135,6 +140,10 @@ publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h
+
+# package doxygen file (contains doxygen grouping information)
+packagedoxydir = $(devincludepath)/dali/doc
+packagedoxy_HEADERS = $(package_doxy_files)
 
 # linking test
 

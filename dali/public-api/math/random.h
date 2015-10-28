@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 /**
  * @brief Provides methods to generate and use random values.
@@ -68,6 +72,9 @@ inline Vector4 Axis()
 
 } // namespace Random
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_RANDOM_H__

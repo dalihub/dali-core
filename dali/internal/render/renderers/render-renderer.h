@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_NEW_RENDERER_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_NEW_RENDERER_H__
+#ifndef __DALI_INTERNAL_RENDER_RENDERER_H__
+#define __DALI_INTERNAL_RENDER_RENDERER_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -18,215 +18,189 @@
  *
  */
 
-#include <dali/integration-api/resource-declarations.h> // For resource id
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/gl-resources/texture-units.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
-#include <dali/internal/render/renderers/render-geometry.h>
+// INTERNAL INCLUDES
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/message.h>
+#include <dali/internal/event/effects/shader-declarations.h>
+#include <dali/internal/render/gl-resources/gl-resource-owner.h>
+#include <dali/integration-api/debug.h>
+#include <dali/internal/common/type-abstraction-enums.h>
+#include <dali/internal/update/manager/prepare-render-instructions.h>
 
 namespace Dali
 {
+
 namespace Internal
 {
-class PropertyInputImpl;
+class Context;
+class Texture;
+class Program;
 
 namespace SceneGraph
 {
+class SceneController;
+class Shader;
+class TextureCache;
+class NodeDataProvider;
+}
+
+
+namespace Render
+{
+
 
 /**
- * The new geometry renderer.
- *
- * @todo MESH_REWORK It will be merged into the base class eventually
+ * Renderers are used to render meshes
+ * These objects are used during RenderManager::Render(), so properties modified during
+ * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class NewRenderer : public Renderer
+class Renderer : public GlResourceOwner
 {
 public:
-  typedef Integration::ResourceId ResourceId;
-
-public:
-  /**
-   * Create a new renderer instance
-   * @param[in] nodeDataProvider The node data provider
-   * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
-   */
-  static NewRenderer* New( NodeDataProvider& nodeDataProvider, RenderDataProvider* dataProviders, RenderGeometry* renderGeometry );
-  /**
-   * Constructor.
-   * @param[in] nodeDataProvider The node data provider
-   * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
-   */
-  NewRenderer( NodeDataProvider& nodeDataProvider, RenderDataProvider* dataProviders, RenderGeometry* renderGeometry );
-
-  virtual ~NewRenderer();
 
   /**
-   * Change the data providers of the renderer
-   * @param[in] dataProviders The data providers
+   * Second-phase construction.
+   * This is called when the renderer is inside render thread
+   * @param[in] textureCache to use
    */
-  void SetRenderDataProvider( RenderDataProvider* dataProviders );
+  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
 
   /**
-   * Change the geometry used by the renderer
-   * @param[in] renderGeometry The new geometry
+   * Virtual destructor
    */
-  void SetGeometry( RenderGeometry* renderGeometry );
-
-public: // Implementation of Renderer
-  /**
-   * @copydoc SceneGraph::Renderer::RequiresDepthTest()
-   */
-  virtual bool RequiresDepthTest() const;
+  virtual ~Renderer();
 
   /**
-   * @copydoc SceneGraph::Renderer::CheckResources()
+   * Set the Shader used to render.
+   * @param[in] shader The shader used to render.
    */
-  virtual bool CheckResources();
+  void SetShader( SceneGraph::Shader* shader );
 
   /**
-   * @copydoc SceneGraph::Renderer::IsOutsideClipSpace()
+   * Set the face-culling mode.
+   * @param[in] mode The face-culling mode.
    */
-  virtual bool IsOutsideClipSpace( Context& context,
-                                   const Matrix& modelMatrix,
-                                   const Matrix& modelViewProjectionMatrix );
+  void SetCullFace( CullFaceMode mode );
 
   /**
-   * @copydoc SceneGraph::Renderer::DoSetUniforms()
+   * Set the sampler used to render the set texture.
+   * @param[in] samplerBitfield The packed sampler options used to render.
    */
-  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex );
+  void SetSampler( unsigned int samplerBitfield );
 
   /**
-   * @copydoc SceneGraph::Renderer::DoSetCullFaceMode
+   * Query whether the derived type of Renderer requires depth testing.
+   * @return True if the renderer requires depth testing.
    */
-  virtual void DoSetCullFaceMode(Context& context, BufferIndex bufferIndex );
+  virtual bool RequiresDepthTest() const = 0;
 
   /**
-   * @copydoc SceneGraph::Renderer::DoSetBlending
+   * Called to render during RenderManager::Render().
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] node The node using this renderer
+   * @param[in] defaultShader in case there is no custom shader
+   * @param[in] modelViewMatrix The model-view matrix.
+   * @param[in] viewMatrix The view matrix.
+   * @param[in] projectionMatrix The projection matrix.
+   * @param[in] cull Whether to frustum cull this renderer
    */
-  virtual void DoSetBlending(Context& context, BufferIndex bufferIndex );
+  void Render( Context& context,
+               SceneGraph::TextureCache& textureCache,
+               BufferIndex bufferIndex,
+               const SceneGraph::NodeDataProvider& node,
+               SceneGraph::Shader& defaultShader,
+               const Matrix& modelViewMatrix,
+               const Matrix& viewMatrix,
+               const Matrix& projectionMatrix,
+               bool cull,
+               bool blend);
 
   /**
-   * @copydoc SceneGraph::Renderer::DoRender()
+   * Write the renderer's sort attributes to the passed in reference
+   *
+   * @param[in] bufferIndex The current update buffer index.
+   * @param[out] sortAttributes
    */
-  virtual void DoRender( Context& context,
-                         TextureCache& textureCache,
-                         BufferIndex bufferIndex,
-                         Program& program,
-                         const Matrix& modelViewMatrix,
-                         const Matrix& viewMatrix );
+  virtual void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const;
 
-public: // Implementation of GlResourceOwner
-
+protected:
   /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
+   * Protected constructor; only derived classes can be instantiated.
+   * @param dataprovider for rendering
    */
-  virtual void GlContextDestroyed();
-
-  /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
-   */
-  virtual void GlCleanup();
+  Renderer();
 
 private:
-  struct UniformIndexMap;
+
+  // Undefined
+  Renderer( const Renderer& );
+
+  // Undefined
+  Renderer& operator=( const Renderer& rhs );
 
   /**
-   * Set the uniforms from properties according to the uniform map
-   * @param[in] program The shader program on which to set the uniforms.
+   * Checks if renderer's resources are ready to be used.
+   *
+   * @return \e true if they are. Otherwise \e false.
    */
-  void SetUniforms( BufferIndex bufferIndex, Program& program );
+  virtual bool CheckResources() = 0;
 
   /**
-   * Set the program uniform in the map from the mapped property
+   * Checks if renderer is culled.
+   * @param[in] modelViewProjectionMatrix The MVP matrix.
+   * @return \e true if it is. Otherwise \e false.
    */
-  void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix ) = 0;
 
   /**
-   * Bind the material textures in the samplers and setup the samplers
-   * @param[in] textureCache The texture cache
-   * @param[in] bufferIndex The buffer index
-   * @param[in] program The shader program
-   * @param[in] samplers The samplers to bind
+   * Called from Render prior to DoRender().
+   * @todo MESH_REWORK Remove after merge
    */
-  void BindTextures( TextureCache& textureCache,
-                     BufferIndex bufferIndex,
-                     Program& program,
-                     const RenderDataProvider::Samplers& samplers );
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, SceneGraph::Shader* shader, Program* program );
 
   /**
-   * Bind a material texture to a texture unit, and set the sampler's texture uniform
-   * to that texture unit.
-   * @param[in] textureCache The texture cache
-   * @param[in] program The shader program
-   * @param[in] id The resource id of the texture to bind
-   * @param[in] texture The texture to bind
-   * @param[in] textureUnit The texture unit index to use
-   * @param[in] nameIndex The index of the texture uniform in the program
+   * Called from Render prior to DoRender(). Default method to set CullFaceMode
+   * @todo MESH_REWORK Remove after merge
    */
-  void BindTexture( TextureCache& textureCache,
-                    Program& program,
-                    ResourceId id,
-                    Texture* texture,
-                    TextureUnit textureUnit,
-                    unsigned int nameIndex );
+  virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
 
   /**
-   * Apply the sampler modes to the texture.
-   * @param[in] bufferIndex The current buffer index
-   * @param[in] texture The texture to which to apply the sampler modes
-   * @param[in] textureUnit The texture unit of the texture
-   * @param[in] sampler The sampler from which to get the modes.
+   * Called from Render prior to DoRender(). Default method to set blending options
+   * @todo MESH_REWORK Remove after merge
    */
-  void ApplySampler( BufferIndex bufferIndex,
-                     Texture* texture,
-                     TextureUnit textureUnit,
-                     const SamplerDataProvider& sampler );
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex, bool blend ) = 0;
 
   /**
-   * Get the texture uniform index of the name sampler in the program.
-   * If not already registered in the program, then this performs the registration
-   * @param[in] program The shader program
-   * @param[in] sampler The sampler holding a texture unit uniform name to search for
-   * @return The texture uniform index in the program
+   * Called from Render; implemented in derived classes.
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] program to use.
+   * @param[in] modelViewMatrix The model-view matrix.
+   * @param[in] viewMatrix The view matrix.
    */
-  unsigned int GetTextureUnitUniformIndex( Program& program,
-                                           const SamplerDataProvider& sampler );
+  virtual void DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
 
-public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
-  OwnerPointer< RenderDataProvider > mRenderDataProvider;
+protected:
+
+  Context* mContext;
+  SceneGraph::TextureCache* mTextureCache;
+  SceneGraph::Shader* mShader;
+  unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
 private:
-  RenderGeometry* mRenderGeometry;
 
-  struct TextureUnitUniformIndex
-  {
-    const SamplerDataProvider* sampler;
-    unsigned int index;
-  };
-
-  typedef Dali::Vector< TextureUnitUniformIndex > TextureUnitUniforms;
-  TextureUnitUniforms mTextureUnitUniforms;
-
-  struct UniformIndexMap
-  {
-    unsigned int uniformIndex; // The index of the cached location in the Program
-    const PropertyInputImpl* propertyValue;
-  };
-
-  typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
-  UniformIndexMappings mUniformIndexMap;
-
-  Vector<GLint> mAttributesLocation;
-  bool mUpdateAttributesLocation;
-
-  bool mUseBlend:1; ///< True if blending should be enabled, 1 bit is enough
+  CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
 };
 
+} // namespace SceneGraph
 
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace Internal
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_NEW_RENDERER_H__
+} // namespace Dali
+
+#endif // __DALI_INTERNAL_RENDER_RENDERER_H__

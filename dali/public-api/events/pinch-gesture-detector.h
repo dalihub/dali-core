@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_events
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -135,6 +139,9 @@ public: // Not intended for Application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PINCH_GESTURE_DETECTOR_H__

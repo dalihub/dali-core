@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_events
+ * @{
+ */
 
 /**
  * @brief The wheel event structure is used to store a wheel rolling, it facilitates
@@ -132,6 +136,9 @@ struct DALI_IMPORT_API WheelEvent
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_WHEEL_EVENT_H__

@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_signals
+ * @{
+ */
 
 class CallbackBase;
 
@@ -1637,6 +1641,9 @@ inline CallbackBase* MakeCallback( T& object, void(Base::*function)(void) )
   return new Callback< T >( object, function );
 }
 
+/**
+ * @}
+ */
 } // namespace DALI
 
 #endif // __DALI_CALLBACK_H__

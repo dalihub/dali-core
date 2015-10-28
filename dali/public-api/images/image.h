@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -34,22 +38,13 @@ class Image;
 }
 
 /**
- * @brief An Image object represents an image resource that can be added to ImageActors.
+ * @brief An Image object represents an image resource that can be used for rendering
  *
- * Image objects can be shared between ImageActors. This is practical if you have a visual element on screen
- * which is repeatedly used. An example would be a button background image.
- * The image resource is discarded when all ImageActors using the Image object are discarded or in case they
- * were created with ReleasePolicy::Unused, taken off stage.
- * Note: if a resource was shared between Image objects it exists until its last reference is gone.
+ * Image objects can be shared between Actors. This is practical if you have a visual element on screen
+ * which is repeatedly used.
  *
  * Image objects are responsible for the underlying resource's lifetime.
- *
- * <i>ReleasePolicies</i>
- * - Unused: release resource once ImageActor using it is taken off stage.
- * - Never: keep resource alive until Image object is thrown away.
- *
- * <i>Resolution of conflicting policies</i>
- * If the same image is created more than once with conflicting policies, ReleasePolicy "Never" overrides "Unused".
+ * Note: if a resource was shared between Image objects it exists until its last reference is gone.
  *
  * Signals
  * | %Signal Name           | Method                       |
@@ -59,11 +54,9 @@ class Image;
 class DALI_IMPORT_API Image : public BaseHandle
 {
 public:
-  /**
-   * @brief Resource management options.
-   */
 
   /**
+   * @deprecated DALi 1.1.3 Image resource is released as soon as last handle is released
    * @brief ReleasePolicy controls the way images are deleted from memory.
    */
   enum ReleasePolicy
@@ -119,6 +112,8 @@ public:
   static Image DownCast( BaseHandle handle );
 
   /**
+   * @deprecated DALi 1.1.3
+   *
    * @brief Return resource release policy.
    *
    * @return resource release policy
@@ -160,6 +155,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL Image(Internal::Image*);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_IMAGE_H__

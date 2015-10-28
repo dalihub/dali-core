@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_render_tasks
+ * @{
+ */
 
 class RenderTask;
 
@@ -120,6 +124,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL RenderTaskList( Internal::RenderTaskList* renderTask );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif //__DALI_RENDER_TASK_LIST_H__

@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 /**
  * @brief A value-type representing a period of time within an animation.
@@ -53,6 +57,9 @@ struct DALI_IMPORT_API TimePeriod
   float durationSeconds; ///< The duration of the time period in seconds
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_TIME_PERIOD_H__

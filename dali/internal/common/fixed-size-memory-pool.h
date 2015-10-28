@@ -89,6 +89,14 @@ public:
 
 private:
 
+  // Undefined
+  FixedSizeMemoryPool( const FixedSizeMemoryPool& fixedSizeMemoryPool );
+
+  // Undefined
+  FixedSizeMemoryPool& operator=( const FixedSizeMemoryPool& fixedSizeMemoryPool );
+
+private:
+
   struct Impl;
   Impl* mImpl;
 

@@ -39,8 +39,7 @@ Material CreateMaterial(float opacity, Image image)
   color.a = opacity;
   material.SetProperty(Material::Property::COLOR, color);
 
-  Sampler sampler = Sampler::New( image, "sTexture" );
-  material.AddSampler( sampler );
+  material.AddTexture( image, "sTexture" );
 
   return material;
 }

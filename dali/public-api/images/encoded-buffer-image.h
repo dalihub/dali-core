@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -38,8 +42,7 @@ typedef Uint16Pair ImageDimensions;
 
 
 /**
- * @brief EncodedBufferImage represents an image resource that can be added to
- * ImageActors.
+ * @brief EncodedBufferImage represents a Image as a buffer of encoded pixel data.
  *
  * A memory buffer of encoded image data is provided by the application and
  * decoded asynchronously on a background thread to fill the image's
@@ -73,11 +76,10 @@ public:
   EncodedBufferImage();
 
   /**
+   * @deprecated DALi 1.1.3 use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
+   *
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
-   * The image will be created eagerly using LoadPolicy::Immediate.
-   * The function is non-blocking and returns immediately while the image
-   * decoding happens on a background thread.
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -88,20 +90,17 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] releasePol The ReleasePolicy to apply to Image. If the Unused
+   * @param [in] releasePol The ReleasePolicy to apply to Image.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.
    * @return A handle to a newly allocated object.
    */
-  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol = Image::NEVER, bool orientationCorrection = true );
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol, bool orientationCorrection = true );
 
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
-   * The image will be created eagerly using LoadPolicy::Immediate.
-   * The function is non-blocking and returns immediately while the image
-   * decoding happens on a background thread.
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -112,6 +111,28 @@ public:
    * @return A handle to a newly allocated object.
    */
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount );
+
+  /**
+   * @brief Create an initialised image object from an encoded image buffer in memory.
+   *
+   * @since DALi 1.1.4
+   *
+   * @param [in] encodedImage The encoded bytes of an image, in a supported
+   * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
+   * exactly as it would be as a file in the filesystem.
+   * The caller retains ownership of this buffer and is free to modify or
+   * discard it as soon as the function returns.
+   * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
+   * by encodedImage.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * policy is set, a reload will not be possible, so the Image should never be
+   * used once all actors using it have gone off-stage.
+   * @return A handle to a newly allocated object.
+   */
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
 
   /**
    * @brief Downcast an Object handle to EncodedBufferImage.
@@ -150,6 +171,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL EncodedBufferImage(Internal::EncodedBufferImage*);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ENCODED_BUFFER_IMAGE_H__

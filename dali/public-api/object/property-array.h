@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 /**
  * @brief A Array of property values.
@@ -169,6 +173,9 @@ private:
   Impl* mImpl; ///< Pointer to private data
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_ARRAY_H__

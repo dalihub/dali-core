@@ -89,13 +89,11 @@ inline GLenum ModeAsGlEnum( GpuBuffer::Usage type )
 
 }
 
-GpuBuffer::GpuBuffer( Context& context, Target target, Usage usage )
+GpuBuffer::GpuBuffer( Context& context )
 : mContext( context ),
   mCapacity( 0 ),
   mSize( 0 ),
   mBufferId( 0 ),
-  mTarget( target ),
-  mUsage( usage ),
   mBufferCreated( false )
 {
 }
@@ -115,7 +113,7 @@ GpuBuffer::~GpuBuffer()
  * Creates or updates the buffer data depending on whether it
  * already exists or not.
  */
-void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data)
+void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data, Usage usage)
 {
   DALI_ASSERT_DEBUG( size > 0 );
   mSize = size;
@@ -127,7 +125,7 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data)
   }
 
   // make sure the buffer is bound, don't perform any checks because size may be zero
-  BindNoChecks(mBufferId);
+  mContext.BindArrayBuffer( mBufferId );
 
   // if the buffer has already been created, just update the data providing it fits
   if (mBufferCreated )
@@ -135,49 +133,39 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data)
     // if the data will fit in the existing buffer, just update it
     if (size <= mCapacity )
     {
-      mContext.BufferSubData( TypeAsGlEnum(mTarget), 0, size, data );
+      mContext.BufferSubData( GL_ARRAY_BUFFER, 0, size, data );
     }
     else
     {
       // create a new buffer of the larger size,
       // gl should automatically deallocate the old buffer
-      mContext.BufferData( TypeAsGlEnum(mTarget), size, data, ModeAsGlEnum( mUsage ) );
+      mContext.BufferData( GL_ARRAY_BUFFER, size, data, ModeAsGlEnum( usage ) );
       mCapacity = size;
     }
   }
   else
   {
     // create the buffer
-    mContext.BufferData( TypeAsGlEnum(mTarget), size, data, ModeAsGlEnum( mUsage ) );
+    mContext.BufferData( GL_ARRAY_BUFFER, size, data, ModeAsGlEnum( usage ) );
     mBufferCreated = true;
     mCapacity = size;
   }
 
-  switch (mTarget)
-  {
-    case ARRAY_BUFFER:
-    {
-      mContext.BindArrayBuffer(0);
-      break;
-    }
-    case ELEMENT_ARRAY_BUFFER:
-    {
-      mContext.BindElementArrayBuffer(0);
-      break;
-    }
-    case TRANSFORM_FEEDBACK_BUFFER:
-    {
-      mContext.BindTransformFeedbackBuffer(0);
-      break;
-    }
-  }
+  mContext.BindArrayBuffer(0);
 }
 
-void GpuBuffer::Bind() const
+void GpuBuffer::Bind(Target target) const
 {
   DALI_ASSERT_DEBUG(mCapacity);
 
-  BindNoChecks(mBufferId);
+  if (target == ARRAY_BUFFER)
+  {
+    mContext.BindArrayBuffer(mBufferId);
+  }
+  else
+  {
+    mContext.BindElementArrayBuffer(mBufferId);
+  }
 }
 
 bool GpuBuffer::BufferIsValid() const
@@ -193,23 +181,6 @@ void GpuBuffer::GlContextDestroyed()
   mBufferId = 0;
   mBufferCreated = false;
 }
-
-void GpuBuffer::BindNoChecks(GLuint bufferId) const
-{
-  // context currently only supports two targets, element and array
-  // and it caches both of them (as in it won't bind them if the
-  // buffer id is already bound).
-
-  if (mTarget == ARRAY_BUFFER)
-  {
-    mContext.BindArrayBuffer(bufferId);
-  }
-  else
-  {
-    mContext.BindElementArrayBuffer(bufferId);
-  }
-}
-
 
 } // namespace Internal
 

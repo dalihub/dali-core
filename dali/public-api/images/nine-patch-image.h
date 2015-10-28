@@ -25,15 +25,19 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
 class NinePatchImage;
 }
 
-
 /**
- * @brief NinePatchImage represents an image resource that can be added to ImageActors.
+ * @brief NinePatchImage represents a stretchable image resource
+ *
  * It contains a bitmap that is synchronously loaded from the file system that contains
  * a 9 patch border - a 1 pixel border that describes the stretch borders and the child
  * area.
@@ -48,6 +52,9 @@ class NinePatchImage;
  */
 class DALI_IMPORT_API NinePatchImage : public ResourceImage
 {
+public:
+  typedef Vector< Uint16Pair > StretchRanges;
+
 public:
   /**
    * @brief Constructor which creates an uninitialized NinePatchImage object.
@@ -102,30 +109,66 @@ public:
   NinePatchImage& operator=(const NinePatchImage& rhs);
 
   /**
-   * Get the stretch borders
+   * @deprecated DALi 1.1.4 use GetStretchPixelsX and GetStretchPixelsY instead
+   *
+   * @brief Get the stretch borders
+   *
    * @return The border in pixels from the left, top, right, and bottom of the image respectively.
    */
   Vector4 GetStretchBorders();
 
   /**
-   * Get the child rectangle
+   * @brief Retrieves the horizontal stretch pixel ranges in the cropped image space
+   *
+   * @since DALi 1.1.4
+   *
+   * @return the horizontal stretch pixel ranges in the cropped image space
+   */
+  const StretchRanges& GetStretchPixelsX();
+
+  /**
+   * @brief Retrieves the vertical stretch pixel ranges in the cropped image space
+   *
+   * @since DALi 1.1.4
+   *
+   * @return the vertical stretch pixel ranges in the cropped image space
+   */
+  const StretchRanges& GetStretchPixelsY();
+
+  /**
+   * @brief Get the child rectangle
+   *
    * @return the position and size of the child rectangle
    */
   Rect<int> GetChildRectangle();
 
   /**
-   * Creates a buffer image from the bitmap with the 1 pixel border cropped off.
+   * @brief Creates a buffer image from the bitmap with the 1 pixel border cropped off.
+   *
    * This does not change the internal bitmap.
    *
    * @return The cropped BufferImage
    */
   BufferImage CreateCroppedBufferImage();
 
+  /**
+   * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.
+   *
+   * @since DALi 1.1.4
+   *
+   * @param [in] url The URL of the image file.
+   * @return true if it is a 9 patch or n patch image
+   */
+  static bool IsNinePatchUrl( const std::string& url );
+
 public: // Not intended for application developers
 
   explicit DALI_INTERNAL NinePatchImage(Internal::NinePatchImage*);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_NINE_PATCH_IMAGE_H__

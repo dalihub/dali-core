@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_events
+ * @{
+ */
 
 /**
  * @brief A PanGesture is emitted when the user moves one or more fingers in a particular direction.
@@ -167,6 +171,9 @@ struct DALI_IMPORT_API PanGesture: public Gesture
   float GetScreenDistance() const;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PAN_GESTURE_H__

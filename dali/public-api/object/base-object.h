@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 class BaseHandle;
 
@@ -132,6 +136,9 @@ inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
   return handle.GetBaseObject();
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 # endif // __DALI_BASE_OBJECT_H__

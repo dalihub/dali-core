@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 /**
  * @brief Constraint source types.
@@ -119,6 +123,9 @@ struct DALI_IMPORT_API ConstraintSource
   Handle object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONSTRAINT_SOURCE_H__

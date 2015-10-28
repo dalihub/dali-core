@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 class Matrix;
 struct Vector2;
@@ -214,6 +218,9 @@ DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix
 // Allow Matrix3 to be treated as a POD type
 template <> struct TypeTraits< Matrix3 > : public BasicTypes< Matrix3 > { enum { IS_TRIVIAL_TYPE = true }; };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif //__DALI_MATRIX3_H__

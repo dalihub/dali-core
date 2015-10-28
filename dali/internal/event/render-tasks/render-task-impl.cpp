@@ -777,6 +777,15 @@ void RenderTask::Connector::SceneObjectRemoved( Object& object )
 
 void RenderTask::Connector::ObjectDestroyed( Object& object )
 {
+  if ( SOURCE_CONNECTOR == mType )
+  {
+    const Stage* stage = Stage::GetCurrent();
+    if ( stage )
+    {
+      stage->GetRenderTaskList().SetExclusive( &mRenderTask, false );
+    }
+  }
+
   mActor = NULL;
 
   UpdateRenderTask();

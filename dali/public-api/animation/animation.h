@@ -30,6 +30,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 class Actor;
 struct Property;
@@ -583,6 +587,9 @@ public: // Not intended for use by Application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ANIMATION_H__

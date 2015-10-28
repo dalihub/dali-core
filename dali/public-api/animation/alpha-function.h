@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 typedef float (*AlphaFunctionPrototype)(float progress); ///< Prototype of an alpha function
 
@@ -148,6 +152,9 @@ private:
   Mode                    mMode    : 2;                   //< Enum indicating the functioning mode of the AlphaFunction
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ALPHA_FUNCTION_H__

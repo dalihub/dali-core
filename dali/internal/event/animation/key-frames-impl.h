@@ -171,6 +171,18 @@ protected:
     mKeyFrames = new KeyFrameChannel<V>(KeyFrameChannelBase::Translate, mPVs);
   }
 
+  KeyFrameBaseSpec<V>& operator=( const KeyFrameBaseSpec<V>& keyFrames )
+  {
+    if( *this != keyFrames )
+    {
+      mPVs.clear();
+      mPVs = keyFrames.mPVs;
+      delete mKeyFrames;
+      mKeyFrames = new KeyFrameChannel<V>(KeyFrameChannelBase::Translate, mPVs);
+    }
+    return *this;
+  }
+
   /**
    * Destructor. Ensure progress value pairs are cleared down
    */

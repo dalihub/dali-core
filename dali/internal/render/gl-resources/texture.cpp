@@ -40,6 +40,7 @@ namespace
 // These match the GL specification
 const GLint SYSTEM_MINIFY_DEFAULT  = GL_NEAREST_MIPMAP_LINEAR;
 const GLint SYSTEM_MAGNIFY_DEFAULT = GL_LINEAR;
+const GLint SYSTEM_WRAP_DEFAULT  = GL_CLAMP_TO_EDGE;
 
 // These are the Dali defaults
 const GLint DALI_MINIFY_DEFAULT  = GL_LINEAR;
@@ -80,6 +81,31 @@ GLint FilterModeToGL( FilterMode::Type filterMode, GLint defaultfilterMode, GLin
   return GL_LINEAR;
 }
 
+GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )
+{
+  switch( wrapMode )
+  {
+    case WrapMode::DEFAULT:
+    {
+      return defaultWrapMode;
+    }
+    case WrapMode::CLAMP_TO_EDGE:
+    {
+      return GL_CLAMP_TO_EDGE;
+    }
+    case WrapMode::REPEAT:
+    {
+      return GL_REPEAT;
+    }
+    case WrapMode::MIRRORED_REPEAT:
+    {
+      return GL_MIRRORED_REPEAT;
+    }
+  }
+
+  return defaultWrapMode;
+}
+
 using Dali::Internal::Vertex2D;
 using Dali::Internal::Vertex3D;
 
@@ -97,6 +123,19 @@ Texture::Texture(Context&      context,
   mHeight(height),
   mImageWidth(imageWidth),
   mImageHeight(imageHeight)
+{
+}
+
+Texture::Texture(Context&      context,
+                 unsigned int  width,
+                 unsigned int  height)
+: mContext(context),
+  mId(0),
+  mSamplerBitfield( 0 ),
+  mWidth(width),
+  mHeight(height),
+  mImageWidth(width),
+  mImageHeight(height)
 {
 }
 
@@ -253,7 +292,7 @@ void Texture::GetDefaultTextureCoordinates(UvRect& uv) const
 
 }
 
-void Texture::ApplyTextureParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault )
+void Texture::ApplyFilterModeParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault )
 {
   GLint newFilterModeGL = FilterModeToGL( newFilterMode, daliDefault, systemDefault );
   GLint currentFilterModeGL = FilterModeToGL( currentFilterMode, daliDefault, systemDefault );
@@ -265,23 +304,47 @@ void Texture::ApplyTextureParameter( TextureUnit unit, GLint filterType, FilterM
   }
 }
 
+void Texture::ApplyWrapModeParameter( TextureUnit unit, GLint wrapType, WrapMode::Type currentWrapMode, WrapMode::Type newWrapMode )
+{
+  GLint newWrapModeGL = WrapModeToGL( newWrapMode, SYSTEM_WRAP_DEFAULT );
+  GLint currentWrapModeGL = WrapModeToGL( currentWrapMode, SYSTEM_WRAP_DEFAULT );
+
+  if( newWrapModeGL != currentWrapModeGL )
+  {
+    mContext.ActiveTexture( unit );
+    mContext.TexParameteri( GL_TEXTURE_2D, wrapType, newWrapModeGL );
+  }
+}
+
 void Texture::ApplySampler( TextureUnit unit, unsigned int samplerBitfield )
 {
   if( mSamplerBitfield != samplerBitfield && mId != 0 )
   {
-    ApplyTextureParameter( unit,
+    ApplyFilterModeParameter( unit,
                            GL_TEXTURE_MIN_FILTER,
                            ImageSampler::GetMinifyFilterMode( mSamplerBitfield ),
                            ImageSampler::GetMinifyFilterMode( samplerBitfield ),
                            DALI_MINIFY_DEFAULT,
                            SYSTEM_MINIFY_DEFAULT );
 
-    ApplyTextureParameter( unit,
-                           GL_TEXTURE_MAG_FILTER,
-                           ImageSampler::GetMagnifyFilterMode( mSamplerBitfield ),
-                           ImageSampler::GetMagnifyFilterMode( samplerBitfield ),
-                           DALI_MAGNIFY_DEFAULT,
-                           SYSTEM_MAGNIFY_DEFAULT );
+    ApplyFilterModeParameter( unit,
+                              GL_TEXTURE_MAG_FILTER,
+                              ImageSampler::GetMagnifyFilterMode( mSamplerBitfield ),
+                              ImageSampler::GetMagnifyFilterMode( samplerBitfield ),
+                              DALI_MAGNIFY_DEFAULT,
+                              SYSTEM_MAGNIFY_DEFAULT );
+
+    ApplyWrapModeParameter( unit,
+                            GL_TEXTURE_WRAP_S,
+                            ImageSampler::GetUWrapMode( mSamplerBitfield ),
+                            ImageSampler::GetUWrapMode( samplerBitfield ));
+
+    ApplyWrapModeParameter( unit,
+                            GL_TEXTURE_WRAP_T,
+                            ImageSampler::GetVWrapMode( mSamplerBitfield ),
+                            ImageSampler::GetVWrapMode( samplerBitfield ));
+
+
 
     mSamplerBitfield = samplerBitfield;
   }

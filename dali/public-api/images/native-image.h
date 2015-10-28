@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -31,8 +35,8 @@ class NativeImage;
 }
 
 /**
- * @brief NativeImage represents an image resource that can be added to ImageActors.
- * Its data is provided by native resources, such as shared bitmap memory or pixmap from X11 or ECORE-X11, etc.
+ * @brief NativeImage represents a platform specific image resource.
+ * Its data is provided by native resources, such as shared bitmap memory or pixmap.
  */
 class DALI_IMPORT_API  NativeImage : public Image
 {
@@ -105,6 +109,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_NATIVE_IMAGE_H__

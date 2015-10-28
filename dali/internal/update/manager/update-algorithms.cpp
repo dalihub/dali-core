@@ -31,7 +31,7 @@
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -83,10 +83,7 @@ void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 
   if( node.HasAttachment() )
   {
-    // @todo MESH_REWORK Remove dynamic cast.
-    // (Or, if RendererAttachment split into RendererPropertyOwner(?),
-    // do as separate pass as per other mesh objects - see also
-    // UpdateManager::ResetNodeProperty())
+    // @todo Remove dynamic cast.
     NodeAttachment& attachment = node.GetAttachment();
     PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
     if( propertyOwner != NULL )
@@ -397,12 +394,18 @@ inline int UpdateNodesAndAttachments( Node& node,
       AddRenderableToLayer( *layer, *renderable, updateBufferIndex, inheritedDrawMode );
     }
   }
-  else if( node.IsObserved() )
+  else if( node.IsObserved() || node.GetRendererCount() )
   {
     // This node is being used as a property input for an animation, constraint,
     // camera or bone. Ensure it's matrix is updated
     UpdateNodeWorldMatrix( node, nodeDirtyFlags, updateBufferIndex );
   }
+
+  if( node.ResolveVisibility(updateBufferIndex) )
+  {
+    node.PrepareRender( updateBufferIndex );
+  }
+
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items

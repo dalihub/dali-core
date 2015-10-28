@@ -24,7 +24,7 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
@@ -59,6 +59,23 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
   else
   {
     mNodeQueue1.PushBack( node );
+  }
+}
+
+void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
+{
+  DALI_ASSERT_DEBUG( NULL != renderer );
+
+  // The GL resources will now be freed in frame N
+  // The Update for frame N+1 may occur in parallel with the rendering of frame N
+  // Queue the node for destruction in frame N+2
+  if ( 0u == updateBufferIndex )
+  {
+    mRendererQueue0.PushBack( renderer );
+  }
+  else
+  {
+    mRendererQueue1.PushBack( renderer );
   }
 }
 
@@ -133,34 +150,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Sampler* sampler )
-{
-  DALI_ASSERT_DEBUG( NULL != sampler );
-
-  if ( 0u == updateBufferIndex )
-  {
-    mSamplerQueue0.PushBack( sampler );
-  }
-  else
-  {
-    mSamplerQueue1.PushBack( sampler );
-  }
-}
-
-void DiscardQueue::Add( BufferIndex updateBufferIndex, PropertyBuffer* propertyBuffer )
-{
-  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
-
-  if ( 0u == updateBufferIndex )
-  {
-    mPropertyBufferQueue0.PushBack( propertyBuffer );
-  }
-  else
-  {
-    mPropertyBufferQueue1.PushBack( propertyBuffer );
-  }
-}
-
 void DiscardQueue::Clear( BufferIndex updateBufferIndex )
 {
   // Destroy some discarded objects; these should no longer own any GL resources
@@ -172,8 +161,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mShaderQueue0.Clear();
     mGeometryQueue0.Clear();
     mMaterialQueue0.Clear();
-    mSamplerQueue0.Clear();
-    mPropertyBufferQueue0.Clear();
+    mRendererQueue0.Clear();
   }
   else
   {
@@ -182,8 +170,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mShaderQueue1.Clear();
     mGeometryQueue1.Clear();
     mMaterialQueue1.Clear();
-    mSamplerQueue1.Clear();
-    mPropertyBufferQueue1.Clear();
+    mRendererQueue1.Clear();
   }
 }
 

@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_events
+ * @{
+ */
 
 /**
  * @brief Hover events are a collection of touch points at a specific moment in time.
@@ -88,6 +92,9 @@ struct DALI_IMPORT_API HoverEvent
   const TouchPoint& GetPoint(unsigned int point) const;
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_HOVER_EVENT_H__

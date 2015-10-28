@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -162,6 +166,9 @@ public: // Not intended for use by Application developers
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_NOTIFICATION_H__

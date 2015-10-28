@@ -49,6 +49,7 @@ namespace Integration
  * Dali::Internal::ImageFactoryCache::RequestId
  */
 typedef unsigned int ResourceId;
+const ResourceId InvalidResourceId = (ResourceId)-1;
 
 /**
  * Used to inform the current loading status

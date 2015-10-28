@@ -44,14 +44,12 @@ namespace Render
  * @param[in] textureCache The texture cache used to get textures.
  * @param[in] defaultShader The default shader.
  * @param[in] buffer The current render buffer index (previous update buffer)
- * @param[in] frameTime The elapsed time between the last two updates.
  */
 void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
-                               BufferIndex bufferIndex,
-                               float frameTime );
+                               BufferIndex bufferIndex );
 
 } // namespace Render
 

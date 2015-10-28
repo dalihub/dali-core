@@ -30,59 +30,17 @@ namespace Internal
 namespace ImageSampler
 {
 
-namespace
-{
-
-// @todo MESH_REWORK Remove file after image removal
-
-// Adjust these shift sizes if the FilterMode enum grows
-const int MINIFY_BIT_SHIFT  = 0;    // Room for 16
-const int MAGNIFY_BIT_SHIFT = 4;
-
-const int MASK_MINIFY_FILTER    = 0x0000000F;
-const int MASK_MAGNIFY_FILTER   = 0x000000F0;
-
-const unsigned int FILTER_MODE_COUNT = 4;
-
-FilterMode::Type FILTER_MODE_OPTIONS[ FILTER_MODE_COUNT ] =
-  { FilterMode::NONE,
-    FilterMode::DEFAULT,
-    FilterMode::NEAREST,
-    FilterMode::LINEAR };
-
-} // namespace
-
 /**
- * Utility to store one of the FilterMode values.
+ * Utility to store one of the sampling parameters values.
  * @param[out] options A bitmask used to store the FilterMode values.
  * @param[in] factor The FilterMode value.
  * @param[in] bitshift Used to shift to the correct part of options.
  */
-void StoreFilterMode( unsigned int& options, FilterMode::Type mode, int bitShift )
+void StoreSamplingParameter( unsigned int& options, unsigned int mode, int bitShift )
 {
-  // Start shifting from 1 as 0 is the unassigned state
-  switch ( mode )
+  if( mode != 0 )
   {
-    case FilterMode::NONE:
-    {
-      // Nothing to do
-      break;
-    }
-    case FilterMode::DEFAULT:
-    {
-      options |= ( 1u << bitShift );
-      break;
-    }
-    case FilterMode::NEAREST:
-    {
-      options |= ( 2u << bitShift );
-      break;
-    }
-    case FilterMode::LINEAR:
-    {
-      options |= ( 3u << bitShift );
-      break;
-    }
+    options |= ( mode << bitShift );
   }
 }
 
@@ -93,33 +51,42 @@ void StoreFilterMode( unsigned int& options, FilterMode::Type mode, int bitShift
  * @param[in] bitshift Used to shift to the correct part of options.
  * @return Return the filter mode.
  */
-FilterMode::Type RetrieveFilterMode( unsigned int options, int mask, int bitShift )
+unsigned int RetrieveSamplingParameter( unsigned int options, int mask, int bitShift )
 {
   unsigned int index = options & mask;
 
   index = ( index >> bitShift );    // Zero based index for array
-
-  DALI_ASSERT_DEBUG( index < FILTER_MODE_COUNT );
-
-  return FILTER_MODE_OPTIONS[ index ];
+  return index;
 }
 
-unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify )
+unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap, WrapMode::Type vWrap )
 {
   unsigned int bitfield = 0;
-  StoreFilterMode( bitfield, minify, MINIFY_BIT_SHIFT );
-  StoreFilterMode( bitfield, magnify, MAGNIFY_BIT_SHIFT );
+  StoreSamplingParameter( bitfield, minify, MINIFY_BIT_SHIFT );
+  StoreSamplingParameter( bitfield, magnify, MAGNIFY_BIT_SHIFT );
+  StoreSamplingParameter( bitfield, uWrap, UWRAP_BIT_SHIFT );
+  StoreSamplingParameter( bitfield, vWrap, VWRAP_BIT_SHIFT );
   return bitfield;
 }
 
 FilterMode::Type GetMinifyFilterMode( unsigned int bitfield )
 {
-  return RetrieveFilterMode( bitfield, MASK_MINIFY_FILTER, MINIFY_BIT_SHIFT );
+  return static_cast<FilterMode::Type>( RetrieveSamplingParameter( bitfield, MASK_MINIFY_FILTER, MINIFY_BIT_SHIFT ) );
 }
 
 FilterMode::Type GetMagnifyFilterMode( unsigned int bitfield )
 {
-  return RetrieveFilterMode( bitfield, MASK_MAGNIFY_FILTER, MAGNIFY_BIT_SHIFT );
+  return static_cast<FilterMode::Type>( RetrieveSamplingParameter( bitfield, MASK_MAGNIFY_FILTER, MAGNIFY_BIT_SHIFT ) );
+}
+
+WrapMode::Type GetUWrapMode( unsigned int bitfield )
+{
+  return static_cast<WrapMode::Type>( RetrieveSamplingParameter( bitfield, MASK_UWRAP_MODE, UWRAP_BIT_SHIFT ) );
+}
+
+WrapMode::Type GetVWrapMode( unsigned int bitfield )
+{
+  return static_cast<WrapMode::Type>( RetrieveSamplingParameter( bitfield, MASK_VWRAP_MODE, VWRAP_BIT_SHIFT ) );
 }
 
 } // namespace ImageSampler

@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
-#include <dali/internal/event/images/bitmap-external.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -138,14 +137,14 @@ namespace
 TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-NinePatchImagePtr NinePatchImage::New( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
+NinePatchImagePtr NinePatchImage::New( const std::string& filename, ReleasePolicy releasePol )
 {
-  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, attributes, releasePol ) );
+  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, releasePol ) );
   internal->Initialize();
   return internal;
 }
 
-NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
+NinePatchImage::NinePatchImage( const std::string& filename, ReleasePolicy releasePol )
 : ResourceImage( IMAGE_LOAD_POLICY_DEFAULT, releasePol ),
   mParsedBorder(false)
 {
@@ -153,7 +152,7 @@ NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttribut
   mResourceClient = &tls.GetResourceClient();
 
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
-  Integration::BitmapResourceType resourceType( ImageDimensions::FromFloatVec2( attributes.GetSize() ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
+  Integration::BitmapResourceType resourceType;
 
   // Note, bitmap is only destroyed when the image is destroyed.
   Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, filename );
@@ -180,13 +179,22 @@ NinePatchImage::~NinePatchImage()
 {
 }
 
-Vector4 NinePatchImage::GetStretchBorders()
+const NinePatchImage::StretchRanges& NinePatchImage::GetStretchPixelsX()
 {
   if( ! mParsedBorder )
   {
     ParseBorders();
   }
-  return mStretchBorders;
+  return mStretchPixelsX;
+}
+
+const NinePatchImage::StretchRanges& NinePatchImage::GetStretchPixelsY()
+{
+  if( ! mParsedBorder )
+  {
+    ParseBorders();
+  }
+  return mStretchPixelsY;
 }
 
 Rect<int> NinePatchImage::GetChildRectangle()
@@ -264,140 +272,191 @@ void NinePatchImage::Disconnect()
 
 void NinePatchImage::ParseBorders()
 {
-  if( ! mBitmap )
+  if( !mBitmap )
   {
     DALI_LOG_ERROR( "NinePatchImage: Bitmap not loaded, cannot perform operation\n");
     return;
   }
 
+  mStretchPixelsX.Clear();
+  mStretchPixelsY.Clear();
+
   Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
 
-  Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
-  DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap");
+  const Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
+  DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap" );
 
   if( srcProfile )
   {
-    unsigned int pixelWidth = GetBytesPerPixel(pixelFormat);
-    PixelBuffer* srcPixels = mBitmap->GetBuffer();
-    unsigned int srcStride = srcProfile->GetBufferStride();
-
-    int alphaByte=0;
-    int alphaBits=0;
-    Pixel::GetAlphaOffsetAndMask(pixelFormat, alphaByte, alphaBits);
-    int redByte=0;
-    int redBits=0;
-    GetRedOffsetAndMask(pixelFormat, redByte, redBits);
+    int alphaByte = 0;
+    int alphaBits = 0;
+    Pixel::GetAlphaOffsetAndMask( pixelFormat, alphaByte, alphaBits );
 
     int testByte = alphaByte;
     int testBits = alphaBits;
     int testValue = alphaBits; // Opaque == stretch
     if( ! alphaBits )
     {
-      testByte = redByte;
-      testBits = redBits;
+      GetRedOffsetAndMask( pixelFormat, testByte, testBits );
       testValue = 0;           // Black == stretch
     }
 
-    int startX1=-1;
-    int endX1=-1;
-    int startY1=-1;
-    int endY1=-1;
-    int startX2=-1;
-    int endX2=-1;
-    int startY2=-1;
-    int endY2=-1;
+    unsigned int pixelWidth = GetBytesPerPixel( pixelFormat );
+    const PixelBuffer* srcPixels = mBitmap->GetBuffer();
+    unsigned int srcStride = srcProfile->GetBufferStride();
 
-    PixelBuffer* top = srcPixels + pixelWidth;
-    PixelBuffer* bottom = srcPixels + (mHeight-1)*srcStride + pixelWidth;
+    //TOP
+    const PixelBuffer* top = srcPixels + pixelWidth;
+    unsigned int index = 0;
+    unsigned int width = mBitmap->GetImageWidth();
+    unsigned int height = mBitmap->GetImageHeight();
 
-    // Read the top and bottom rows:
-    // (Also read the last column to ensure end value gets set)
-    for( unsigned int col=1; col < mWidth; ++col )
+    for(; index < width - 2; )
     {
-      if( (top[testByte] & testBits) == testValue )
+      Uint16Pair range = ParseRange( index, width - 2, top, pixelWidth, testByte, testBits, testValue );
+      if( range.GetX() != 0xFFFF )
       {
-        if(startX1 < 0)
-        {
-          startX1 = col;
-        }
-      }
-      else if(startX1 >= 0 && endX1 < 0)
-      {
-        endX1 = col;
-      }
-
-      if( (bottom[testByte] & testBits) == testValue )
-      {
-        if(startX2 < 0)
-        {
-          startX2 = col;
-        }
-      }
-      else if(startX2 >= 0 && endX2 < 0)
-      {
-        endX2 = col;
-      }
-
-      if ( ( endX2 > 0 ) && ( endX1 > 0 ) )
-      {
-        break;
-      }
-
-      top+=pixelWidth;
-      bottom+=pixelWidth;
-    }
-
-    // Read the left and right columns:
-    PixelBuffer* left  = srcPixels + srcStride;
-    PixelBuffer* right = left + (srcStride - pixelWidth);
-
-    // (Also read the last row to ensure end value gets set)
-    for( unsigned int row=1; row < mHeight; ++row )
-    {
-      if((left[testByte] & testBits) == testValue)
-      {
-        if(startY1 < 0)
-        {
-          startY1 = row;
-        }
-      }
-      else if(startY1 >= 0 && endY1 < 0)
-      {
-        endY1 = row;
-      }
-
-      if((right[testByte] & testBits) == testValue)
-      {
-        if(startY2 < 0)
-        {
-          startY2 = row;
-        }
-      }
-      else if(startY2 >= 0 && endY2 < 0)
-      {
-        endY2 = row;
-      }
-      left += srcStride;
-      right += srcStride;
-
-      if ( ( endY2 > 0 ) && ( endY1 > 0 ) )
-      {
-        break;
+        mStretchPixelsX.PushBack( range );
       }
     }
 
-    mStretchBorders.x = startX1;
-    mStretchBorders.y = startY1;
-    mStretchBorders.z = mWidth-endX1;
-    mStretchBorders.w = mHeight-endY1;
+    //LEFT
+    const PixelBuffer* left  = srcPixels + srcStride;
+    index = 0;
+    for(; index < height - 2; )
+    {
+      Uint16Pair range = ParseRange( index, height - 2, left, srcStride, testByte, testBits, testValue );
+      if( range.GetX() != 0xFFFF )
+      {
+        mStretchPixelsY.PushBack( range );
+      }
+    }
 
-    mChildRectangle.x = startX2;
-    mChildRectangle.y = startY2;
-    mChildRectangle.width = endX2-startX2;
-    mChildRectangle.height = endY2-startY2;
+    //If there are no stretch pixels then make the entire image stretchable
+    if( mStretchPixelsX.Size() == 0 )
+    {
+      mStretchPixelsX.PushBack( Uint16Pair( 0, width - 2 ) );
+    }
+    if( mStretchPixelsY.Size() == 0 )
+    {
+      mStretchPixelsY.PushBack( Uint16Pair( 0, height - 2 ) );
+    }
+
+    //Child Rectangle
+    //BOTTOM
+    const PixelBuffer* bottom = srcPixels + ( height - 1 ) * srcStride + pixelWidth;
+    index = 0;
+    Uint16Pair contentRangeX = ParseRange( index, width - 2, bottom, pixelWidth, testByte, testBits, testValue );
+    if( contentRangeX.GetX() == 0xFFFF )
+    {
+      contentRangeX = Uint16Pair();
+    }
+
+    //RIGHT
+    const PixelBuffer* right = srcPixels + srcStride + ( width - 1 ) * pixelWidth;
+    index = 0;
+    Uint16Pair contentRangeY = ParseRange( index, height - 2, right, srcStride, testByte, testBits, testValue );
+    if( contentRangeY.GetX() == 0xFFFF )
+    {
+      contentRangeY = Uint16Pair();
+    }
+
+    mChildRectangle.x = contentRangeX.GetX() + 1;
+    mChildRectangle.y = contentRangeY.GetX() + 1;
+    mChildRectangle.width = contentRangeX.GetY() - contentRangeX.GetX();
+    mChildRectangle.height = contentRangeY.GetY() - contentRangeY.GetX();
 
     mParsedBorder = true;
   }
+}
+
+Uint16Pair NinePatchImage::ParseRange( unsigned int& index, unsigned int width, const PixelBuffer* & pixel, unsigned int pixelStride, int testByte, int testBits, int testValue )
+{
+  unsigned int start = 0xFFFF;
+  for( ; index < width; ++index, pixel += pixelStride )
+  {
+    if( ( pixel[ testByte ] & testBits ) == testValue )
+    {
+        start = index;
+        ++index;
+        pixel += pixelStride;
+        break;
+    }
+  }
+
+  unsigned int end = width;
+  for( ; index < width; ++index, pixel += pixelStride )
+  {
+    if( ( pixel[ testByte ] & testBits ) != testValue )
+    {
+        end = index;
+        ++index;
+        pixel += pixelStride;
+        break;
+    }
+  }
+
+  return Uint16Pair( start, end );
+}
+
+bool NinePatchImage::IsNinePatchUrl( const std::string& url )
+{
+  bool match = false;
+
+  std::string::const_reverse_iterator iter = url.rbegin();
+  enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
+  while(iter < url.rend())
+  {
+    switch(state)
+    {
+      case SUFFIX:
+      {
+        if(*iter == '.')
+        {
+          state = HASH;
+        }
+        else if(!isalnum(*iter))
+        {
+          state = DONE;
+        }
+      }
+      break;
+      case HASH:
+      {
+        if( *iter == '#' || *iter == '9' )
+        {
+          state = HASH_DOT;
+        }
+        else
+        {
+          state = DONE;
+        }
+      }
+      break;
+      case HASH_DOT:
+      {
+        if(*iter == '.')
+        {
+          match = true;
+        }
+        state = DONE; // Stop testing characters
+      }
+      break;
+      case DONE:
+      {
+      }
+      break;
+    }
+
+    // Satisfy prevent
+    if( state == DONE )
+    {
+      break;
+    }
+
+    ++iter;
+  }
+  return match;
 }
 
 } // namespace Internal

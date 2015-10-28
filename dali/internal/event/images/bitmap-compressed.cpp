@@ -18,9 +18,8 @@
 // CLASS HEADER
 #include <dali/internal/event/images/bitmap-compressed.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/core-impl.h>
-#include <dali/integration-api/debug.h>
+// EXTERNAL INCLUDES
+#include <cstdlib>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/core-impl.h>
@@ -66,7 +65,7 @@ Dali::Integration::PixelBuffer* BitmapCompressed::ReserveBufferOfSize( Pixel::Fo
 
   Initialize(pixelFormat, width, height, bufferSize);
 
-  mData = new Dali::Integration::PixelBuffer[bufferSize];
+  mData = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
 
   return mData;
 }

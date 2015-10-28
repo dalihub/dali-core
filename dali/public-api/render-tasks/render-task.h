@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_render_tasks
+ * @{
+ */
 
 class Actor;
 class CameraActor;
@@ -414,6 +418,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL RenderTask( Internal::RenderTask* renderTask );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif //__DALI_RENDER_TASK_H__

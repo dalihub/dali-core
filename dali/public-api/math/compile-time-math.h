@@ -28,6 +28,11 @@
 namespace Dali
 {
 /**
+ * @addtogroup dali_core_math
+ * @{
+ */
+
+/**
  * @brief Compile time template to calculate base to the power of N.
  *
  * Note! values need to be compile time constants
@@ -153,6 +158,9 @@ struct Epsilon< 0 >
 #endif
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_COMPILE_TIME_MATH_H__

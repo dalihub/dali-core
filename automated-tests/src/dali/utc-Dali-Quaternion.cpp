@@ -344,7 +344,7 @@ int UtcDaliQuaternionSetEulerP(void)
   Vector4 r2( 0.0f, 0.609f, 0.0f, 0.793f );
 
   Quaternion e3;
-  e3.SetEuler( Dali::ANGLE_0, Dali::ANGLE_0, Dali::ANGLE_135 );
+  e3.SetEuler( Dali::ANGLE_0, Dali::ANGLE_0, Radian( Degree( 135 ) ) );
   Vector4 r3( 0.0f, 0.0f, 0.924f, 0.383f );
 
   Quaternion e4;

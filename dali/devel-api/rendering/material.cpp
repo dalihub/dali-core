@@ -71,27 +71,74 @@ Shader Material::GetShader() const
   return Dali::Shader( shaderPtr );
 }
 
-void Material::AddSampler( Sampler& sampler )
+int Material::AddTexture( Image image, const std::string& uniformName, Sampler sampler)
 {
-  DALI_ASSERT_ALWAYS( sampler && "Sampler handle is uninitialized" );
-  GetImplementation(*this).AddSampler( GetImplementation( sampler ) );
+  int index( -1 );
+  if( image )
+  {
+    Internal::ImagePtr imagePtr(&GetImplementation( image ));
+    Internal::SamplerPtr samplerPtr(0);
+    if( sampler )
+    {
+      samplerPtr = &GetImplementation( sampler );
+    }
+
+    index = GetImplementation(*this).AddTexture( imagePtr, uniformName, samplerPtr );
+  }
+  else
+  {
+    DALI_LOG_ERROR("Error adding invalid texture %s to material", uniformName.c_str() );
+  }
+  return index;
 }
 
-std::size_t Material::GetNumberOfSamplers() const
+void Material::RemoveTexture( size_t index )
 {
-  return GetImplementation(*this).GetNumberOfSamplers();
+  GetImplementation(*this).RemoveTexture( index );
 }
 
-void Material::RemoveSampler( std::size_t index )
+void Material::SetTextureImage( size_t index, Image image )
 {
-  GetImplementation(*this).RemoveSampler( index );
+  Internal::Image* imagePtr(0);
+  if( image )
+  {
+    imagePtr = &GetImplementation( image );
+  }
+
+  GetImplementation(*this).SetTextureImage( index, imagePtr );
 }
 
-Sampler Material::GetSamplerAt( unsigned int index ) const
+void Material::SetTextureSampler( size_t index, Sampler sampler )
 {
-  Internal::Sampler* samplerPtr( GetImplementation(*this).GetSamplerAt(index) );
-  return Dali::Sampler( samplerPtr );
+  Internal::Sampler* samplerPtr(0);
+  if( sampler )
+  {
+    samplerPtr = &GetImplementation( sampler );
+  }
+
+  GetImplementation(*this).SetTextureSampler( index, samplerPtr );
 }
+
+void Material::SetTextureUniformName( size_t index, const std::string& uniformName )
+{
+  GetImplementation(*this).SetTextureUniformName( index, uniformName );
+}
+
+int Material::GetTextureIndex( const std::string& uniformName )
+{
+  return GetImplementation(*this).GetTextureIndex( uniformName );
+}
+
+void Material::SetTextureAffectsTransparency( size_t index, bool affectsTransparency )
+{
+  GetImplementation(*this).SetTextureAffectsTransparency( index, affectsTransparency );
+}
+
+std::size_t Material::GetNumberOfTextures() const
+{
+  return GetImplementation(*this).GetNumberOfTextures();
+}
+
 
 void Material::SetFaceCullingMode( FaceCullingMode cullingMode )
 {

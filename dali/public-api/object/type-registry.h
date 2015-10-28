@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -335,6 +339,9 @@ public:
   AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // header

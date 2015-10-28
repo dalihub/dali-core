@@ -24,6 +24,7 @@
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
 {
@@ -42,9 +43,14 @@ class Context;
 class ProgramCache;
 class ShaderSaver;
 
-namespace SceneGraph
+namespace Render
 {
 class Renderer;
+class Sampler;
+}
+
+namespace SceneGraph
+{
 class RenderQueue;
 class TextureCache;
 class RenderInstruction;
@@ -142,14 +148,56 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer is owned by RenderManager
    */
-  void AddRenderer( Renderer* renderer );
+  void AddRenderer( Render::Renderer* renderer );
 
   /**
    * Remove a Renderer from the render manager.
    * @param[in] renderer The renderer to remove.
    * @post renderer is destroyed.
    */
-  void RemoveRenderer( Renderer* renderer );
+  void RemoveRenderer( Render::Renderer* renderer );
+
+  /**
+   * Add a sampler to the render manager.
+   * @param[in] sampler The sampler to add.
+   * @post sampler is owned by RenderManager
+   */
+  void AddSampler( Render::Sampler* sampler );
+
+  /**
+   * Remove a sampler from the render manager.
+   * @param[in] sampler The sampler to remove.
+   * @post sampler is destroyed.
+   */
+  void RemoveSampler( Render::Sampler* sampler );
+
+  /**
+   * Set minification and magnification filter modes for a sampler
+   * @param[in] minFilterMode Filter mode to use when the texture is minificated
+   * @param[in] magFilterMode Filter mode to use when the texture is magnified
+   */
+  void SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode );
+
+  /**
+   * Set wrapping mode for a sampler
+   * @param[in] uWrapMode Wrap mode in the x direction
+   * @param[in] vWrapMode Wrap mode in the y direction
+   */
+  void SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode );
+
+  /**
+   * Add a property buffer to the render manager.
+   * @param[in] propertyBuffer The property buffer to add.
+   * @post propertBuffer is owned by RenderManager
+   */
+  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer );
+
+  /**
+   * Remove a property buffer from the render manager.
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @post propertyBuffer is destroyed.
+   */
+  void RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Add a geometry to the render manager.
@@ -169,10 +217,9 @@ public:
    * Adds a property buffer to a RenderGeometry from the render manager.
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer to remove.
-   * @param[in] target Specifies the type of the buffer
-   * @param[in] usage Specifies how will the buffer be used
+   * @param[in] isIndexBuffer True if the property buffer is intended to be used as an index buffer
    */
-  void AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage );
+  void AddPropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
 
   /**
    * Remove a property buffer from a RenderGeometry from the render manager.
@@ -180,7 +227,28 @@ public:
    * @param[in] propertyBuffer The property buffer to remove.
    * @post property buffer is destroyed.
    */
-  void RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer );
+  void RemovePropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer );
+
+  /**
+   * Sets the format of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] format The new format of the buffer
+   */
+  void SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
+
+  /**
+   * Sets the data of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] data The new data of the buffer
+   */
+  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data);
+
+  /**
+   * Sets the size of an existing property buffer
+   * @param[in] propertyBuffer The property buffer.
+   * @param[in] size The new size of the buffer
+   */
+  void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the
@@ -223,9 +291,8 @@ private:
    * Helper to process a single RenderInstruction.
    * @param[in] instruction A description of the rendering operation.
    * @param[in] defaultShader default shader to use.
-   * @param[in] elapsedTime from previous render.
    */
-  void DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime );
+  void DoRender( RenderInstruction& instruction, Shader& defaultShader );
 
 private:
 

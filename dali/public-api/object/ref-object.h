@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 class Value;
 
@@ -92,6 +96,9 @@ private:
   volatile int mCount; ///< Reference count
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_REF_OBJECT_H__

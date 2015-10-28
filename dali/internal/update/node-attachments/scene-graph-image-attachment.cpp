@@ -33,8 +33,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/common/performance-monitor.h>
-#include <dali/internal/render/renderers/scene-graph-image-renderer.h>
-#include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
+#include <dali/internal/render/renderers/render-image-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment-debug.h>
@@ -46,8 +45,8 @@ namespace Internal
 {
 
 // value types used by messages
-template <> struct ParameterType< SceneGraph::ImageRenderer::MeshType >
-: public BasicType< SceneGraph::ImageRenderer::MeshType > {};
+template <> struct ParameterType< Render::ImageRenderer::MeshType >
+: public BasicType< Render::ImageRenderer::MeshType > {};
 
 namespace SceneGraph
 {
@@ -65,8 +64,7 @@ ImageAttachment::ImageAttachment( unsigned int textureId )
   mIsPixelAreaSet( false ),
   mPreviousRefreshHints( 0 ),
   mStyle( Dali::ImageActor::STYLE_QUAD ),
-  mCullFaceMode( CullNone ),
-  mUseBlend( false )
+  mCullFaceMode( CullNone )
 {
 }
 
@@ -75,7 +73,7 @@ void ImageAttachment::Initialize2( BufferIndex updateBufferIndex )
   DALI_ASSERT_DEBUG( NULL != mSceneController );
 
   // Create main renderer, passing ownership to the render-thread
-  mImageRenderer = ImageRenderer::New( *mParent );
+  mImageRenderer = Render::ImageRenderer::New();
 
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mImageRenderer );
 
@@ -83,17 +81,17 @@ void ImageAttachment::Initialize2( BufferIndex updateBufferIndex )
 
   if( mTextureId != 0 )
   {
-    typedef MessageValue1< ImageRenderer, ResourceId > DerivedType;
+    typedef MessageValue1< Render::ImageRenderer, ResourceId > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetTextureId, mTextureId );
+    new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetTextureId, mTextureId );
   }
 
   // After derived classes have (potentially) created their renderer
-  Renderer& renderer = GetRenderer();
+  Render::Renderer& renderer = GetRenderer();
   renderer.SetCullFace( mCullFaceMode );
 
   // set the default shader here as well
@@ -123,12 +121,12 @@ ImageAttachment::~ImageAttachment()
 {
 }
 
-Renderer& ImageAttachment::GetRenderer()
+Render::Renderer& ImageAttachment::GetRenderer()
 {
   return *mImageRenderer;
 }
 
-const Renderer& ImageAttachment::GetRenderer() const
+const Render::Renderer& ImageAttachment::GetRenderer() const
 {
   return *mImageRenderer;
 }
@@ -145,13 +143,13 @@ void ImageAttachment::SetTextureId( BufferIndex updateBufferIndex, unsigned int 
 
   if( mImageRenderer )
   {
-    typedef MessageValue1< ImageRenderer, ResourceId > DerivedType;
+    typedef MessageValue1< Render::ImageRenderer, ResourceId > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetTextureId, mTextureId );
+    new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetTextureId, mTextureId );
   }
 }
 
@@ -161,13 +159,13 @@ void ImageAttachment::SetPixelArea( BufferIndex updateBufferIndex, const PixelAr
   mIsPixelAreaSet = true;
 
   {
-    typedef MessageValue1< ImageRenderer, ImageRenderer::PixelArea > DerivedType;
+    typedef MessageValue1< Render::ImageRenderer, Render::ImageRenderer::PixelArea > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetPixelArea, pixelArea );
+    new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetPixelArea, pixelArea );
   }
 
   // we rely on attachment to not call us unless it actually did change
@@ -193,13 +191,13 @@ void ImageAttachment::SetBorder( BufferIndex updateBufferIndex, const Vector4& b
 {
   // update the 9 patch border information
 
-  typedef MessageValue2< ImageRenderer, Vector4, bool > DerivedType;
+  typedef MessageValue2< Render::ImageRenderer, Vector4, bool > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetNinePatchBorder, border, inPixels );
+  new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetNinePatchBorder, border, inPixels );
 
   if (mStyle != Dali::ImageActor::STYLE_QUAD)
   {
@@ -210,25 +208,25 @@ void ImageAttachment::SetBorder( BufferIndex updateBufferIndex, const Vector4& b
 void ImageAttachment::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
 {
   // Blending options are forwarded to renderer in render-thread
-  typedef MessageValue1< ImageRenderer, unsigned int > DerivedType;
+  typedef MessageValue1< Render::ImageRenderer, unsigned int > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetBlendingOptions, options );
+  new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetBlendingOptions, options );
 }
 
 void ImageAttachment::SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color )
 {
   // Blend color is forwarded to renderer in render-thread
-  typedef MessageValue1< ImageRenderer, Vector4 > DerivedType;
+  typedef MessageValue1< Render::ImageRenderer, Vector4 > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetBlendColor, color );
+  new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::SetBlendColor, color );
 }
 
 void ImageAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode )
@@ -238,26 +236,26 @@ void ImageAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode m
 
   mCullFaceMode = mode;
 
-  typedef MessageValue1< Renderer, CullFaceMode > DerivedType;
+  typedef MessageValue1< Render::Renderer, CullFaceMode > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetCullFace, mode );
+  new (slot) DerivedType( &GetRenderer(), &Render::Renderer::SetCullFace, mode );
 }
 
 void ImageAttachment::SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield )
 {
   DALI_ASSERT_DEBUG(mSceneController);
 
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
+  typedef MessageValue1< Render::Renderer, unsigned int > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetSampler, samplerBitfield );
+  new (slot) DerivedType( &GetRenderer(), &Render::Renderer::SetSampler, samplerBitfield );
 }
 
 void ImageAttachment::ApplyShader( BufferIndex updateBufferIndex, Shader* shader )
@@ -383,67 +381,51 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     mGeometrySize.x = actorSize.x;
     mGeometrySize.y = actorSize.y;
 
-    ImageRenderer::MeshType meshType = ImageRenderer::GRID_QUAD;
+    Render::ImageRenderer::MeshType meshType = Render::ImageRenderer::GRID_QUAD;
 
     if ( !PreviousHintEnabled( Dali::ShaderEffect::HINT_GRID ) )
     {
       if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH )
       {
-        meshType = ImageRenderer::NINE_PATCH;
+        meshType = Render::ImageRenderer::NINE_PATCH;
       }
       else if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER )
       {
-        meshType = ImageRenderer::NINE_PATCH_NO_CENTER;
+        meshType = Render::ImageRenderer::NINE_PATCH_NO_CENTER;
       }
       else
       {
-        meshType = ImageRenderer::QUAD;
+        meshType = Render::ImageRenderer::QUAD;
       }
     }
     else
     {
       if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH )
       {
-        meshType = ImageRenderer::GRID_NINE_PATCH;
+        meshType = Render::ImageRenderer::GRID_NINE_PATCH;
       }
       else if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER )
       {
-        meshType = ImageRenderer::GRID_NINE_PATCH_NO_CENTER;
+        meshType = Render::ImageRenderer::GRID_NINE_PATCH_NO_CENTER;
       }
       else
       {
-        meshType = ImageRenderer::GRID_QUAD;
+        meshType = Render::ImageRenderer::GRID_QUAD;
       }
     }
 
     // Recalculate the mesh data in the next render
     {
-      typedef MessageValue3< ImageRenderer, ImageRenderer::MeshType, Vector2, bool > DerivedType;
+      typedef MessageValue3< Render::ImageRenderer, Render::ImageRenderer::MeshType, Vector2, bool > DerivedType;
 
       // Reserve some memory inside the render queue
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
       // Construct message in the render queue memory; note that delete should not be called on the return value
-      new (slot) DerivedType( mImageRenderer, &ImageRenderer::CalculateMeshData, meshType, mGeometrySize, mIsPixelAreaSet );
+      new (slot) DerivedType( mImageRenderer, &Render::ImageRenderer::CalculateMeshData, meshType, mGeometrySize, mIsPixelAreaSet );
     }
 
     mRefreshMeshData = false;
-  }
-
-  bool blend = !IsFullyOpaque( updateBufferIndex );
-
-  if ( mUseBlend != blend )
-  {
-    mUseBlend = blend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< ImageRenderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mImageRenderer, &ImageRenderer::SetUseBlend, blend );
   }
 }
 
@@ -500,11 +482,11 @@ bool ImageAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
 
 void ImageAttachment::SendShaderChangeMessage( BufferIndex updateBufferIndex )
 {
-  typedef MessageValue1< Renderer, Shader* > DerivedType;
+  typedef MessageValue1< Render::Renderer, Shader* > DerivedType;
   // Reserve memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
   // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetShader, mShader );
+  new (slot) DerivedType( &GetRenderer(), &Render::Renderer::SetShader, mShader );
 }
 
 

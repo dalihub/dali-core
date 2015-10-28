@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -48,10 +52,9 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
 }
 
 /**
- * @brief FrameBufferImage represents a GLES Frame Buffer Object and contains the result
- * of an 'off screen' render pass of a RenderTask.
- * The FrameBufferImage can then be used with an ImageActor (with optional shader
- * effects) and rendered to the screen.
+ * @brief FrameBufferImage represents a Open GL ES Frame Buffer Object
+ * It contains the result of an 'off screen' render pass of a RenderTask.
+ * The FrameBufferImage can then be used for rendering to the screen.
  */
 class DALI_IMPORT_API FrameBufferImage : public Image
 {
@@ -67,7 +70,7 @@ public:
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * The ReleasePolicy defaults to Dali::Image::Never.
+   *
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
    * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
    * @param [in] pixelFormat The pixel format (rgba 32 bit by default)
@@ -79,6 +82,8 @@ public:
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
+   * @deprecated DALi 1.1.3 use New() instead.
+   *
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
@@ -87,9 +92,6 @@ public:
    * @param [in] pixelFormat The pixel format.
    * @param [in] releasePolicy The ReleasePolicy to apply to the FrameBufferImage.
    * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
-   *
-   * Note that there is no need for a LoadPolicy - by definition it is always OnDemand, since there is no point in the FrameBufferImage existing unless someone is rendering to
-   * it, or it is being used as an input (e.g. ShaderEffect / ImageActor).
    *
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    * @return A handle to a new instance of a FrameBufferImage.
@@ -103,23 +105,19 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] image       The native image.
    *
-   * Note that there is no need for a LoadPolicy - by definition it is always OnDemand, since there is no point in the FrameBufferImage existing unless someone is rendering to
-   * it, or it is being used as an input (e.g. ShaderEffect / ImageActor).
-   *
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
    */
   static FrameBufferImage New(NativeImageInterface& image);
 
   /**
+   * @deprecated DALi 1.1.3 use New( NativeImageInterface& ) instead.
+   *
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] image       The native image.
    * @param [in] releasePolicy The ReleasePolicy to apply to the FrameBufferImage.
-   *
-   * Note that there is no need for a LoadPolicy - by definition it is always OnDemand, since there is no point in the FrameBufferImage existing unless someone is rendering to
-   * it, or it is being used as an input (e.g. ShaderEffect / ImageActor).
    *
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
@@ -163,6 +161,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL FrameBufferImage(Internal::FrameBufferImage*);
 }; //class FrameBufferImage
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_FRAME_BUFFER_IMAGE_H__

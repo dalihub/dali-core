@@ -572,7 +572,8 @@ unsigned int Actor::GetRendererCount() const
 
 Renderer Actor::GetRendererAt( unsigned int index )
 {
-  return Renderer( &GetImplementation(*this).GetRendererAt( index ) );
+  Internal::RendererPtr renderer = GetImplementation(*this).GetRendererAt( index );
+  return Renderer( renderer.Get() );
 }
 
 void Actor::RemoveRenderer( Renderer& renderer )

@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 struct Radian;
 
@@ -67,6 +71,16 @@ public:
 
 // compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
+// useful constant angles
+DALI_EXPORT_API extern const Radian ANGLE_360; ///< 360 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_180; ///< 180 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_120; ///< 120 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_90;  ///< 90 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_60;  ///< 60 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_45;  ///< 45 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_30;  ///< 30 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_0;   ///< 0 degree turn in radians
+
 /**
  * @brief Compare equality between two degrees.
  *
@@ -103,6 +117,9 @@ inline Degree Clamp( Degree angle, float min, float max )
   return Degree( Clamp<float>( angle.degree, min, max ) );
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_DEGREE_H__

@@ -147,10 +147,14 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
     Property::Value value( Property::ARRAY );
     Property::Array* array = value.GetArray();
     Property::Array::SizeType pointCount = mPoint.Count();
-    array->Reserve( pointCount );
-    for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+
+    if( array )
     {
-      array->PushBack( mPoint[i] );
+      array->Reserve( pointCount );
+      for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+      {
+        array->PushBack( mPoint[i] );
+      }
     }
     return value;
   }
@@ -159,10 +163,14 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
     Property::Value value( Property::ARRAY );
     Property::Array* array = value.GetArray();
     Property::Array::SizeType  controlpointCount = mControlPoint.Count();
-    array->Reserve( controlpointCount );
-    for( Property::Array::SizeType i = 0; i < controlpointCount; ++i )
+
+    if( array )
     {
-      array->PushBack( mControlPoint[i] );
+      array->Reserve( controlpointCount );
+      for( Property::Array::SizeType i = 0; i < controlpointCount; ++i )
+      {
+        array->PushBack( mControlPoint[i] );
+      }
     }
     return value;
   }
@@ -308,7 +316,7 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   //Find segment and local progress
   unsigned int numSegs = GetNumberOfSegments();
 
-  if( t <= 0.0f )
+  if( t <= 0.0f || numSegs == 0 )
   {
     segment = 0;
     tLocal = 0.0f;

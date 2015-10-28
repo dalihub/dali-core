@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/render/common/render-item.h>
-#include <dali/internal/common/owner-container.h>
 
 namespace Dali
 {
@@ -31,11 +31,16 @@ typedef Rect<int> ClippingBox;
 namespace Internal
 {
 
+namespace Render
+{
+class Renderer;
+}
+
 namespace SceneGraph
 {
 
 class Layer;
-class Renderer;
+
 
 class RenderItem;
 typedef OwnerContainer< RenderItem* > RenderItemContainer;
@@ -177,7 +182,7 @@ public:
   /**
    * Get renderer from an item in the list
    */
-  const Renderer* GetRenderer( RenderItemContainer::SizeType index ) const
+  const Render::Renderer& GetRenderer( RenderItemContainer::SizeType index ) const
   {
     DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
     return mItems[ index ]->GetRenderer();

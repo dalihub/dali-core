@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_signals
+ * @{
+ */
 
 class CallbackBase;
 class SlotObserver;
@@ -78,6 +82,9 @@ private:
   Dali::Vector< SlotConnection* > mConnections; ///< Vector of connection pointers
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONNECTION_TRACKER_H__

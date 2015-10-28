@@ -19,6 +19,7 @@
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/integration-api/debug.h>
@@ -31,13 +32,13 @@ namespace Internal
 
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Context& context)
 : Texture( context,
-           width, height,
            width, height ),
   mFrameBufferName(0),
   mRenderBufferName(0),
   mStencilBufferName(0),
   mPixelFormat(Pixel::RGBA8888),
-  mBufferFormat(RenderBuffer::COLOR)
+  mBufferFormat(RenderBuffer::COLOR),
+  mNativeImage(NULL)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
@@ -45,13 +46,13 @@ FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, 
 
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, Context& context)
 : Texture( context,
-           width, height,
            width, height ),
   mFrameBufferName(0),
   mRenderBufferName(0),
   mStencilBufferName(0),
   mPixelFormat( pixelFormat ),
-  mBufferFormat(RenderBuffer::COLOR)
+  mBufferFormat(RenderBuffer::COLOR),
+  mNativeImage(NULL)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
@@ -59,15 +60,28 @@ FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, 
 
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat, Context& context)
 : Texture( context,
-           width, height,
            width, height ),
   mFrameBufferName(0),
   mRenderBufferName(0),
   mStencilBufferName(0),
   mPixelFormat( pixelFormat ),
-  mBufferFormat( bufferFormat )
+  mBufferFormat( bufferFormat ),
+  mNativeImage(NULL)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
+}
+
+FrameBufferTexture::FrameBufferTexture( NativeImageInterfacePtr nativeImage, Context& context )
+: Texture( context,
+           nativeImage->GetWidth(), nativeImage->GetHeight() ),
+  mFrameBufferName(0),
+  mRenderBufferName(0),
+  mStencilBufferName(0),
+  mPixelFormat( Pixel::RGBA8888 ), // Not really used for nativeImage
+  mBufferFormat(RenderBuffer::COLOR_DEPTH),
+  mNativeImage( nativeImage )
+{
+  DALI_LOG_INFO( Debug::Filter::gImage, Debug::General, "NativeFrameBufferTexture created 0x%x\n", &nativeImage );
 }
 
 FrameBufferTexture::~FrameBufferTexture()
@@ -79,11 +93,16 @@ FrameBufferTexture::~FrameBufferTexture()
 
 bool FrameBufferTexture::IsFullyOpaque() const
 {
-  return true;
+  return !HasAlphaChannel();
 }
 
 bool FrameBufferTexture::HasAlphaChannel() const
 {
+  if( mNativeImage )
+  {
+    return mNativeImage->RequiresBlending();
+  }
+
   return false;
 }
 
@@ -114,6 +133,13 @@ bool FrameBufferTexture::CreateGlTexture()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
+  if( mNativeImage &&
+      !mNativeImage->GlExtensionCreate() )
+  {
+    DALI_LOG_ERROR( "Error creating native image!" );
+    return false;
+  }
+
   mContext.GenTextures(1, &mId);
   mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );  // bind in unused unit so rebind works the first time
   mContext.Bind2dTexture(mId);
@@ -123,12 +149,20 @@ bool FrameBufferTexture::CreateGlTexture()
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  // Assign memory for texture in GL memory space
-  GLenum pixelFormat = GL_RGBA;
-  GLenum pixelDataType = GL_UNSIGNED_BYTE;
-  Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
+  if( mNativeImage )
+  {
+    // platform specific implementation decides on what GL extension to use
+    mNativeImage->TargetTexture();
+  }
+  else
+  {
+    // Assign memory for texture in GL memory space
+    GLenum pixelFormat = GL_RGBA;
+    GLenum pixelDataType = GL_UNSIGNED_BYTE;
+    Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
 
-  mContext.TexImage2D(GL_TEXTURE_2D, 0, pixelFormat, mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL);
+    mContext.TexImage2D(GL_TEXTURE_2D, 0, pixelFormat, mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL);
+  }
 
   // generate frame and render buffer names
   mContext.GenFramebuffers(1, &mFrameBufferName);
@@ -211,6 +245,12 @@ void FrameBufferTexture::GlCleanup()
   {
     mContext.DeleteRenderbuffers(1, &mStencilBufferName );
     mStencilBufferName = 0;
+  }
+
+  if( mNativeImage )
+  {
+    mNativeImage->GlExtensionDestroy();
+    mNativeImage.Reset();
   }
 }
 

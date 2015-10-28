@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_signals
+ * @{
+ */
 
 /**
  * @brief Interface used to track connections between signals and slots.
@@ -74,6 +78,9 @@ private:
   ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ); ///< undefined assignment operator
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONNECTION_TRACKER_INTERFACE_H__

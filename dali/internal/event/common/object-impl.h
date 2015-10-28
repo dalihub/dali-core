@@ -28,7 +28,7 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/internal/common/owner-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>

@@ -12,348 +12,245 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-#include "render-renderer.h"
+// CLASS HEADER
+#include <dali/internal/render/renderers/render-renderer.h>
 
-#include <dali/internal/common/image-sampler.h>
-#include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/gl-resources/texture.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
+
+// INTERNAL INCLUDES
+#include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/public-api/actors/blending.h>
+#include <dali/internal/common/image-sampler.h>
+#include <dali/internal/render/renderers/render-new-renderer.h>
 
 namespace Dali
 {
+
 namespace Internal
 {
-namespace SceneGraph
+
+namespace
 {
 
-NewRenderer* NewRenderer::New( NodeDataProvider& nodeDataProvider,
-                               RenderDataProvider* dataProvider,
-                               RenderGeometry* renderGeometry )
+static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it in object to reduce storage overhead
+static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it in object to reduce storage overhead
+
+/**
+ * Helper to set view and projection matrices once per program
+ * @param program to set the matrices to
+ * @param modelMatrix to set
+ * @param viewMatrix to set
+ * @param projectionMatrix to set
+ * @param modelViewMatrix to set
+ * @param modelViewProjectionMatrix to set
+ */
+inline void SetMatrices( Program& program,
+                         const Matrix& modelMatrix,
+                         const Matrix& viewMatrix,
+                         const Matrix& projectionMatrix,
+                         const Matrix& modelViewMatrix,
+                         const Matrix& modelViewProjectionMatrix )
 {
-  return new NewRenderer(nodeDataProvider, dataProvider, renderGeometry);
-}
-
-
-NewRenderer::NewRenderer( NodeDataProvider& nodeDataProvider,
-                          RenderDataProvider* dataProvider,
-                          RenderGeometry* renderGeometry )
-: Renderer( nodeDataProvider ),
-  mRenderDataProvider( dataProvider ),
-  mRenderGeometry( renderGeometry ),
-  mUpdateAttributesLocation( true )
-{
-}
-
-NewRenderer::~NewRenderer()
-{
-}
-
-void NewRenderer::SetRenderDataProvider( RenderDataProvider* dataProvider )
-{
-  mRenderDataProvider = dataProvider;
-  mUpdateAttributesLocation = true;
-}
-
-void NewRenderer::SetGeometry( RenderGeometry* renderGeometry )
-{
-  mRenderGeometry = renderGeometry;
-  mUpdateAttributesLocation = true;
-}
-
-// Note - this is currently called from UpdateThread, PrepareRenderInstructions,
-// as an optimisation.
-// @todo MESH_REWORK Should use Update thread objects only in PrepareRenderInstructions.
-bool NewRenderer::RequiresDepthTest() const
-{
-  return true;
-}
-
-bool NewRenderer::CheckResources()
-{
-  // Query material to check it has texture pointers & image has size
-  // Query geometry to check it has vertex buffers
-
-  // General point though - why would we have a render item in RenderThread with no ready
-  // resources in UpdateThread?
-  return true;
-}
-
-bool NewRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
-{
-  // @todo MESH_REWORK Add clipping
-  return false;
-}
-
-void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex )
-{
-  // Do nothing, we're going to set up the uniforms with our own code instead
-}
-
-void NewRenderer::DoSetCullFaceMode( Context& context, BufferIndex bufferIndex )
-{
-}
-
-void NewRenderer::DoSetBlending( Context& context, BufferIndex bufferIndex )
-{
-  bool blend = mRenderDataProvider->GetUseBlend( bufferIndex );
-  context.SetBlend( blend );
-  if( blend )
+  GLint loc = program.GetUniformLocation(Program::UNIFORM_MODEL_MATRIX);
+  if( Program::UNIFORM_UNKNOWN != loc )
   {
-    const MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
-
-    context.SetCustomBlendColor( material.GetBlendColor( bufferIndex ) );
-
-    // Set blend source & destination factors
-    context.BlendFuncSeparate( material.GetBlendSrcFactorRgb( bufferIndex ),
-                               material.GetBlendDestFactorRgb( bufferIndex ),
-                               material.GetBlendSrcFactorAlpha( bufferIndex ),
-                               material.GetBlendDestFactorAlpha( bufferIndex ) );
-
-    // Set blend equations
-    context.BlendEquationSeparate( material.GetBlendEquationRgb( bufferIndex ),
-                                   material.GetBlendEquationAlpha( bufferIndex ) );
+    program.SetUniformMatrix4fv( loc, 1, modelMatrix.AsFloat() );
   }
-}
-
-void NewRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
-{
-  BindTextures( textureCache, bufferIndex, program, mRenderDataProvider->GetSamplers() );
-
-  SetUniforms( bufferIndex, program );
-
-  if( mUpdateAttributesLocation || mRenderGeometry->AttributesChanged() )
+  loc = program.GetUniformLocation( Program::UNIFORM_VIEW_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
   {
-    mRenderGeometry->GetAttributeLocationFromProgram( mAttributesLocation, program, bufferIndex );
-    mUpdateAttributesLocation = false;
-  }
-
-  mRenderGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation );
-}
-
-void NewRenderer::GlContextDestroyed()
-{
-  mRenderGeometry->GlContextDestroyed();
-}
-
-void NewRenderer::GlCleanup()
-{
-}
-
-void NewRenderer::SetUniforms( BufferIndex bufferIndex, Program& program )
-{
-  // Check if the map has changed
-  DALI_ASSERT_DEBUG( mRenderDataProvider && "No Uniform map data provider available" );
-
-  const UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
-
-  if( uniformMapDataProvider.GetUniformMapChanged( bufferIndex ) )
-  {
-    const CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
-
-    unsigned int numberOfMaps = uniformMap.Count();
-    mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
-    mUniformIndexMap.Resize( numberOfMaps );
-
-    // Remap uniform indexes to property value addresses
-    for( unsigned int mapIndex = 0 ; mapIndex < numberOfMaps ; ++mapIndex )
+    if( program.GetViewMatrix() != &viewMatrix )
     {
-      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex]->propertyPtr;
-      mUniformIndexMap[mapIndex].uniformIndex = program.RegisterUniform( uniformMap[mapIndex]->uniformName );
+      program.SetViewMatrix( &viewMatrix );
+      program.SetUniformMatrix4fv( loc, 1, viewMatrix.AsFloat() );
+    }
+  }
+  // set projection matrix if program has not yet received it this frame or if it is dirty
+  loc = program.GetUniformLocation( Program::UNIFORM_PROJECTION_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    if( program.GetProjectionMatrix() != &projectionMatrix )
+    {
+      program.SetProjectionMatrix( &projectionMatrix );
+      program.SetUniformMatrix4fv( loc, 1, projectionMatrix.AsFloat() );
+    }
+  }
+  loc = program.GetUniformLocation(Program::UNIFORM_MODELVIEW_MATRIX);
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniformMatrix4fv( loc, 1, modelViewMatrix.AsFloat() );
+  }
+
+  loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniformMatrix4fv( loc, 1, modelViewProjectionMatrix.AsFloat() );
+  }
+
+  loc = program.GetUniformLocation( Program::UNIFORM_NORMAL_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    gNormalMatrix = modelViewMatrix;
+    gNormalMatrix.Invert();
+    gNormalMatrix.Transpose();
+    program.SetUniformMatrix3fv( loc, 1, gNormalMatrix.AsFloat() );
+  }
+}
+
+}
+
+namespace Render
+{
+
+void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache )
+{
+  mContext = &context;
+  mTextureCache = &textureCache;
+}
+
+Renderer::~Renderer()
+{
+}
+
+void Renderer::SetShader( SceneGraph::Shader* shader )
+{
+  mShader = shader;
+}
+
+void Renderer::SetCullFace( CullFaceMode mode )
+{
+  DALI_ASSERT_DEBUG(mode >= CullNone && mode <= CullFrontAndBack);
+  mCullFaceMode = mode;
+}
+
+void Renderer::SetSampler( unsigned int samplerBitfield )
+{
+  mSamplerBitfield = samplerBitfield;
+}
+
+void Renderer::Render( Context& context,
+                       SceneGraph::TextureCache& textureCache,
+                       BufferIndex bufferIndex,
+                       const SceneGraph::NodeDataProvider& node,
+                       SceneGraph::Shader& defaultShader,
+                       const Matrix& modelViewMatrix,
+                       const Matrix& viewMatrix,
+                       const Matrix& projectionMatrix,
+                       bool cull,
+                       bool blend )
+{
+  NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
+
+  if( renderer )
+  {
+    // Get the shader from the material:
+    mShader = &renderer->mRenderDataProvider->GetShader();
+  }
+
+  // if mShader is NULL it means we're set to default
+  if( !mShader )
+  {
+    mShader = &defaultShader;
+  }
+
+  if( !CheckResources() )
+  {
+    // CheckResources() is overriden in derived classes.
+    // Prevents modify the GL state if resources are not ready and nothing is to be rendered.
+    return;
+  }
+
+  // Calculate the MVP matrix first so we can do the culling test
+  const Matrix& modelMatrix = node.GetModelMatrix( bufferIndex );
+  Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
+
+  // Get the program to use:
+  Program* program = mShader->GetProgram();
+  if( !program )
+  {
+    // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
+    program = defaultShader.GetProgram();
+    DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
+    if( !program )
+    {
+      DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*) &*mShader );
+      return;
+    }
+
+  }
+
+  // Check culling (does not need the program to be in use)
+  if( cull && ! program->ModifiesGeometry() )
+  {
+    if( IsOutsideClipSpace( context, gModelViewProjectionMatrix ) )
+    {
+      // don't do any further gl state changes as this renderer is not visible
+      return;
     }
   }
 
-  // Set uniforms in local map
-  for( UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
-         end = mUniformIndexMap.End() ;
-       iter != end ;
-       ++iter )
+  // Take the program into use so we can send uniforms to it
+  program->Use();
+
+  DoSetCullFaceMode( context, bufferIndex );
+
+  DoSetBlending( context, bufferIndex, blend );
+
+  // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
+  // set projection and view matrix if program has not yet received them yet this frame
+  SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, gModelViewProjectionMatrix );
+
+  // set color uniform
+  GLint loc = program->GetUniformLocation( Program::UNIFORM_COLOR );
+  if( Program::UNIFORM_UNKNOWN != loc )
   {
-    SetUniformFromProperty( bufferIndex, program, *iter );
+    const Vector4& color = node.GetRenderColor( bufferIndex );
+    program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
   }
 
-  // @todo MESH_REWORK On merge, copy code from renderer to setup standard matrices and color
+  //@todo MESH_REWORK Remove after removing ImageRenderer
+  DoSetUniforms(context, bufferIndex, mShader, program );
 
-  GLint sizeLoc = program.GetUniformLocation( Program::UNIFORM_SIZE );
-  if( -1 != sizeLoc )
-  {
-    Vector3 size = mDataProvider.GetRenderSize( bufferIndex );
-    program.SetUniform3f( sizeLoc, size.x, size.y, size.z );
-  }
+  // subclass rendering and actual draw call
+  DoRender( context, textureCache, node, bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
-void NewRenderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map )
+void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const
 {
-  GLint location = program.GetUniformLocation(map.uniformIndex);
-  if( Program::UNIFORM_UNKNOWN != location )
-  {
-    // switch based on property type to use correct GL uniform setter
-    switch ( map.propertyValue->GetType() )
-    {
-      case Property::INTEGER:
-      {
-        program.SetUniform1i( location, map.propertyValue->GetInteger( bufferIndex ) );
-        break;
-      }
-      case Property::FLOAT:
-      {
-        program.SetUniform1f( location, map.propertyValue->GetFloat( bufferIndex ) );
-        break;
-      }
-      case Property::VECTOR2:
-      {
-        Vector2 value( map.propertyValue->GetVector2( bufferIndex ) );
-        program.SetUniform2f( location, value.x, value.y );
-        break;
-      }
-
-      case Property::VECTOR3:
-      {
-        Vector3 value( map.propertyValue->GetVector3( bufferIndex ) );
-        program.SetUniform3f( location, value.x, value.y, value.z );
-        break;
-      }
-
-      case Property::VECTOR4:
-      {
-        Vector4 value( map.propertyValue->GetVector4( bufferIndex ) );
-        program.SetUniform4f( location, value.x, value.y, value.z, value.w );
-        break;
-      }
-
-      case Property::ROTATION:
-      {
-        Quaternion value( map.propertyValue->GetQuaternion( bufferIndex ) );
-        program.SetUniform4f( location, value.mVector.x, value.mVector.y, value.mVector.z, value.mVector.w );
-        break;
-      }
-
-      case Property::MATRIX:
-      {
-        const Matrix& value = map.propertyValue->GetMatrix(bufferIndex);
-        program.SetUniformMatrix4fv(location, 1, value.AsFloat() );
-        break;
-      }
-
-      case Property::MATRIX3:
-      {
-        const Matrix3& value = map.propertyValue->GetMatrix3(bufferIndex);
-        program.SetUniformMatrix3fv(location, 1, value.AsFloat() );
-        break;
-      }
-
-      default:
-      {
-        // Other property types are ignored
-        break;
-      }
-    }
-  }
+  sortAttributes.shader = mShader;
+  sortAttributes.textureResourceId = Integration::InvalidResourceId;
+  sortAttributes.geometry = NULL;
 }
 
-void NewRenderer::BindTextures(
-  TextureCache& textureCache,
-  BufferIndex bufferIndex,
-  Program& program,
-  const RenderDataProvider::Samplers& samplers )
+// can be overridden by deriving class
+void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, SceneGraph::Shader* shader, Program* program )
 {
-  // @todo MESH_REWORK Write a cache of texture units to commonly used sampler textures
-  unsigned int textureUnit = 0;
-
-  for( RenderDataProvider::Samplers::Iterator iter = samplers.Begin();
-       iter != samplers.End();
-       ++iter )
-  {
-    const SamplerDataProvider* sampler = *iter;
-    ResourceId textureId = sampler->GetTextureId(bufferIndex);
-    Texture* texture = textureCache.GetTexture( textureId );
-    if( texture != NULL )
-    {
-      unsigned int textureUnitUniformIndex = GetTextureUnitUniformIndex( program, *sampler );
-      TextureUnit theTextureUnit = static_cast<TextureUnit>(textureUnit);
-      BindTexture( textureCache, program, textureId, texture, theTextureUnit, textureUnitUniformIndex );
-      ApplySampler( bufferIndex, texture, theTextureUnit, *sampler );
-    }
-
-    ++textureUnit;
-  }
+  shader->SetUniforms( context, *program, bufferIndex );
 }
 
-void NewRenderer::BindTexture(
-  TextureCache& textureCache,
-  Program& program,
-  ResourceId id,
-  Texture* texture,
-  TextureUnit textureUnit,
-  unsigned int textureUnitUniformIndex )
+// can be overridden by deriving class
+void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
 {
-  if( texture != NULL )
-  {
-    textureCache.BindTexture( texture, id, GL_TEXTURE_2D, textureUnit );
-
-    // Set sampler uniform location for the texture
-    GLint textureUnitLoc = program.GetUniformLocation( textureUnitUniformIndex );
-    if( Program::UNIFORM_UNKNOWN != textureUnitLoc )
-    {
-      program.SetUniform1i( textureUnitLoc, textureUnit );
-    }
-  }
+  // Set face culling mode
+  context.CullFace( mCullFaceMode );
 }
 
-void NewRenderer::ApplySampler(
-  BufferIndex bufferIndex,
-  Texture*    texture,
-  TextureUnit textureUnit,
-  const SamplerDataProvider& sampler )
+Renderer::Renderer()
+: mContext(NULL),
+  mTextureCache( NULL ),
+  mShader( NULL ),
+  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
+  mCullFaceMode( CullNone )
 {
-  unsigned int samplerBitfield = ImageSampler::PackBitfield(
-    static_cast< FilterMode::Type >(sampler.GetMinifyFilterMode(bufferIndex)),
-    static_cast< FilterMode::Type >(sampler.GetMagnifyFilterMode(bufferIndex)) );
-
-  texture->ApplySampler( textureUnit, samplerBitfield );
-
-  // @todo MESH_REWORK add support for wrap modes
 }
 
-unsigned int NewRenderer::GetTextureUnitUniformIndex(
-  Program& program,
-  const SamplerDataProvider& sampler )
-{
-  // Find sampler in mSamplerNameCache
-  // If it doesn't exist,
-  //   get the index by calling program.RegisterUniform and store it
-  // If it exists, it's index should be set.
-  // @todo Cache should be reset on scene change
+} // namespace SceneGraph
 
-  unsigned int uniformIndex = 0;
-  bool found = false;
+} // namespace Internal
 
-  for( unsigned int i=0; i< mTextureUnitUniforms.Count(); ++i )
-  {
-    if( mTextureUnitUniforms[i].sampler == &sampler )
-    {
-      uniformIndex = mTextureUnitUniforms[i].index;
-      found = true;
-    }
-  }
-
-  if( ! found )
-  {
-    TextureUnitUniformIndex textureUnitUniformIndex;
-    textureUnitUniformIndex.sampler = &sampler;
-    textureUnitUniformIndex.index = program.RegisterUniform( sampler.GetTextureUnitUniformName() );
-    mTextureUnitUniforms.PushBack( textureUnitUniformIndex );
-    uniformIndex = textureUnitUniformIndex.index;
-  }
-
-  return uniformIndex;
-}
-
-
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace Dali

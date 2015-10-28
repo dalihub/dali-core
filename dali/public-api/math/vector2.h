@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 struct Vector3;
 struct Vector4;
@@ -471,6 +475,9 @@ DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& 
 // Allow Vector2 to be treated as a POD type
 template <> struct TypeTraits< Vector2 > : public BasicTypes< Vector2 > { enum { IS_TRIVIAL_TYPE = true }; };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_VECTOR_2_H__

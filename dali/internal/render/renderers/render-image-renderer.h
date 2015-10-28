@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_IMAGE_RENDERER_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_IMAGE_RENDERER_H__
+#ifndef __DALI_INTERNAL_RENDER_IMAGE_RENDERER_H__
+#define __DALI_INTERNAL_RENDER_IMAGE_RENDERER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-observer.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 namespace Dali
 {
@@ -36,7 +36,11 @@ class GpuBuffer;
 namespace SceneGraph
 {
 class NodeDataProvider;
+class TextureCache;
+}
 
+namespace Render
+{
 /**
  * Used to render an image.
  */
@@ -58,10 +62,9 @@ public:
 
   /**
    * Create a new ImageRenderer.
-   * @param dataprovider to render
    * @return The newly allocated ImageRenderer.
    */
-  static ImageRenderer* New( NodeDataProvider& dataprovider );
+  static ImageRenderer* New();
 
   /**
    * Virtual destructor
@@ -136,17 +139,17 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
    */
-  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
+  virtual void DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoSetBlending()
    */
-  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex );
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex, bool blend );
 
 protected: // TextureObserver implementation
 
@@ -217,7 +220,7 @@ private:
   /**
    * Private constructor. @see New()
    */
-  ImageRenderer( NodeDataProvider& dataprovider );
+  ImageRenderer();
 
   // Undefined
   ImageRenderer( const ImageRenderer& );
@@ -254,4 +257,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_IMAGE_RENDERER_H__
+#endif // __DALI_INTERNAL_RENDER_IMAGE_RENDERER_H__

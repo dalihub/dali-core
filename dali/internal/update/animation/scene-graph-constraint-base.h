@@ -48,7 +48,7 @@ typedef PropertyOwnerContainer::Iterator PropertyOwnerIter;
  * An abstract base class for Constraints.
  * This can be used to constrain a property of a scene-object, after animations have been applied.
  */
-class ConstraintBase : public PropertyOwner, public PropertyOwner::Observer
+class ConstraintBase : public PropertyOwner::Observer
 {
 public:
 

@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_common
+ * @{
+ */
 
 /**
  * @brief ParentOrigin constants
@@ -124,6 +128,9 @@ static const float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to 
 
 } // namespace Math
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CONSTANTS_H__

@@ -353,6 +353,14 @@ public:
   void DiscardDeadResources( BufferIndex updateBufferIndex );
 
 private:
+
+  // Undefined
+  ResourceManager( const ResourceManager& resourceManager );
+
+  // Undefined
+  ResourceManager& operator=( const ResourceManager& rhs );
+
+private:
   struct ResourceManagerImpl;
   ResourceManagerImpl* mImpl;
 };

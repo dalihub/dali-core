@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_shader_effects
+ * @{
+ */
 
 /**
  * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
@@ -61,10 +65,9 @@ class ShaderEffect;
 }
 
 /**
- * @brief Shader effects provide a visual effect for image actors.
+ * @deprecated DALi 1.0.47
  *
- * @deprecated Use classes Dali::Shader, Dali::Material, and Dali::Sampler to implement
- * any new programmable shading effects.
+ * @brief Shader effects provide a visual effect for image actors.
  *
  * For a Custom shader you can provide the vertex and fragment shader code as strings.
  * These shader snippets get concatenated with the default attributes and uniforms.
@@ -334,6 +337,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ShaderEffect(Internal::ShaderEffect* effect);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SHADER_EFFECT_H__

@@ -32,6 +32,36 @@ namespace Internal
  */
 namespace ImageSampler
 {
+   /**
+    * Bitshift values
+    */
+   enum
+   {
+     MINIFY_BIT_SHIFT  = 0,
+     MAGNIFY_BIT_SHIFT = 4,
+     UWRAP_BIT_SHIFT   = 8,
+     VWRAP_BIT_SHIFT   = 12
+   };
+
+   /**
+    * Mask values
+    */
+   enum
+   {
+     MASK_MINIFY_FILTER  = 0x000F,
+     MASK_MAGNIFY_FILTER = 0x00F0,
+     MASK_UWRAP_MODE     = 0x0F00,
+     MASK_VWRAP_MODE     = 0xF000,
+   };
+
+   /**
+    * Precalculate default sampler bitfield
+    */
+   enum
+   {
+     DEFAULT_BITFIELD = (Dali::FilterMode::DEFAULT<<MINIFY_BIT_SHIFT) | (Dali::FilterMode::DEFAULT<<MAGNIFY_BIT_SHIFT) | (Dali::WrapMode::DEFAULT<<UWRAP_BIT_SHIFT) | (Dali::WrapMode::DEFAULT<<VWRAP_BIT_SHIFT)
+   };
+
   /**
    * @brief Pack the filter mode into a bitfield.
    *
@@ -39,7 +69,7 @@ namespace ImageSampler
    * @param[in] magnify The magnification filter.
    * @return Return the packed bitfield.
    */
-   unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify );
+   unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap = WrapMode::DEFAULT, WrapMode::Type vWrap = WrapMode::DEFAULT );
 
    /**
    * @brief Return the minification filter from a packed bitfield.
@@ -54,6 +84,20 @@ namespace ImageSampler
    * @return Return the magnification filter.
    */
    FilterMode::Type GetMagnifyFilterMode( unsigned int bitfield );
+
+   /**
+    * @brief Return the wrap mode in x direction from a packed bitfield.
+    *
+    * @return Return the wrap mode.
+    */
+   WrapMode::Type GetUWrapMode( unsigned int bitfield );
+
+   /**
+    * @brief Return the wrap mode in y direction from a packed bitfield.
+    *
+    * @return Return the wrap mode.
+    */
+   WrapMode::Type GetVWrapMode( unsigned int bitfield );
 
 } // namespace ImageSampler
 

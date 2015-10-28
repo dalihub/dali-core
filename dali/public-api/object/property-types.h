@@ -33,6 +33,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 /**
  * @brief Template function instances for property getters.
@@ -88,6 +92,9 @@ inline Property::Type Get<Property::Array>()  { return Property::ARRAY; }
 
 }; // namespace PropertyTypes
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_TYPES_H__

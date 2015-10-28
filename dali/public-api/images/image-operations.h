@@ -25,6 +25,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 /**
  * @brief The integer dimensions of an image or a region of an image packed into
@@ -97,6 +101,9 @@ namespace SamplingMode
   const Type DEFAULT = BOX;
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_IMAGE_OPERATIONS_H__

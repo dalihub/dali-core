@@ -44,6 +44,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_common
+ * @{
+ */
 
 /**
  * @brief Base class to handle the memory of simple vector.
@@ -98,6 +102,14 @@ public: // API
   SizeType Size() const
   {
     return Count();
+  }
+
+  /**
+   * @ return If the vector is empty
+   */
+  bool Empty() const
+  {
+    return Count() == 0u;
   }
 
   /**
@@ -693,6 +705,9 @@ public: // API
   }
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif /* __DALI_VECTOR_H__ */

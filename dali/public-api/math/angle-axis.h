@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 struct Radian;
 
@@ -73,6 +77,9 @@ inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
   return (lhs.angle == rhs.angle) && (lhs.axis == rhs.axis);
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ANGLE_AXIS_H__

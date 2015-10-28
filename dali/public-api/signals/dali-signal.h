@@ -59,6 +59,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_signals
+ * @{
+ */
 
 /**
  * @brief Base Template class to provide signals.
@@ -1365,6 +1369,9 @@ private:
   BaseSignal mImpl; ///< Implementation
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_SIGNAL_H__

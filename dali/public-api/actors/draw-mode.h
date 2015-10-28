@@ -22,6 +22,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_actors
+ * @{
+ */
 
 namespace DrawMode
 {
@@ -40,6 +44,9 @@ enum Type
 
 } // namespace DrawMode
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_DRAW_MODE_H__

@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -111,6 +115,9 @@ public: // Not intended for application developers
   CustomActor(Internal::CustomActor* actor);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CUSTOM_ACTOR_H__

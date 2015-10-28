@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_events
+ * @{
+ */
 
 /**
  * @brief A TouchPoint represents a point on the screen that is currently being touched
@@ -118,6 +122,9 @@ typedef std::vector<TouchPoint> TouchPointContainer; ///< Container of touch poi
 typedef TouchPointContainer::iterator TouchPointContainerIterator; ///< Iterator for Dali::TouchPointContainer
 typedef TouchPointContainer::const_iterator TouchPointContainerConstIterator; ///< Const iterator for Dali::TouchPointContainer
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_TOUCH_POINT_H__

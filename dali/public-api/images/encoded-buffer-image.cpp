@@ -57,6 +57,16 @@ EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage, 
   return image;
 }
 
+EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage,
+                                            std::size_t encodedImageByteCount,
+                                            ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
+                                            bool orientationCorrection )
+{
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, orientationCorrection, Dali::Image::NEVER );
+  EncodedBufferImage image(internal.Get());
+  return image;
+}
+
 EncodedBufferImage EncodedBufferImage::DownCast( BaseHandle handle )
 {
   return EncodedBufferImage( dynamic_cast<Dali::Internal::EncodedBufferImage*>(handle.GetObjectPtr()) );

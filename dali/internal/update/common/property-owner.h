@@ -22,8 +22,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -184,12 +184,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( UniformPropertyMapping* map );
+  virtual void AddUniformMapping( UniformPropertyMapping* map );
 
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const std::string& uniformName );
+  virtual void RemoveUniformMapping( const std::string& uniformName );
 
   /**
    * Get the mappings table

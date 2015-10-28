@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/renderers/scene-graph-image-renderer.h>
+#include <dali/internal/render/renderers/render-image-renderer.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -29,10 +29,10 @@
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
-#include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/controllers/scene-controller.h>
+
 
 namespace
 {
@@ -111,19 +111,19 @@ namespace Dali
 namespace Internal
 {
 
-namespace SceneGraph
+namespace Render
 {
 
-ImageRenderer* ImageRenderer::New( NodeDataProvider& dataProvider )
+ImageRenderer* ImageRenderer::New()
 {
-  return new ImageRenderer( dataProvider );
+  return new ImageRenderer();
 }
 
 ImageRenderer::~ImageRenderer()
 {
   if ( mTextureId > 0 )
   {
-    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
+    mTextureCache->RemoveObserver(mTextureId, this);
   }
 
   GlCleanup();
@@ -133,7 +133,7 @@ void ImageRenderer::SetTextureId( ResourceId textureId )
 {
   if ( mTextureId > 0 )
   {
-    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
+    mTextureCache->RemoveObserver(mTextureId, this);
   }
 
   mTextureId = textureId;
@@ -141,7 +141,7 @@ void ImageRenderer::SetTextureId( ResourceId textureId )
 
   if ( textureId > 0 )
   {
-    mTextureCacheDELETEME->AddObserver(textureId, this);
+    mTextureCache->AddObserver(textureId, this);
   }
 }
 
@@ -221,7 +221,10 @@ bool ImageRenderer::CheckResources()
 {
   if( mTexture == NULL )
   {
-    mTexture = mTextureCacheDELETEME->GetTexture( mTextureId );
+    if ( mTextureCache )
+    {
+      mTexture = mTextureCache->GetTexture( mTextureId );
+    }
   }
 
   if( mTexture == NULL )
@@ -237,7 +240,7 @@ bool ImageRenderer::CheckResources()
 
   Integration::ResourceId shaderTextureId =  mShader->GetTextureIdToRender() ;
 
-  if( shaderTextureId &&  mTextureCacheDELETEME->GetTexture( shaderTextureId ) == NULL )
+  if( shaderTextureId &&  mTextureCache->GetTexture( shaderTextureId ) == NULL )
   {
     return false;
   }
@@ -245,15 +248,13 @@ bool ImageRenderer::CheckResources()
   return true;
 }
 
-bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix )
 {
   context.IncrementRendererCount();
 
   Rect<float> boundingBox( mGeometrySize.x * -0.5f, mGeometrySize.y * -0.5f, mGeometrySize.x, mGeometrySize.y );
 
-  DEBUG_BOUNDING_BOX( *mContext, boundingBox, modelViewProjectionMatrix );
-
-  if(Is2dBoxOutsideClipSpace( modelMatrix, modelViewProjectionMatrix, boundingBox ) )
+  if(SceneGraph::Is2dBoxOutsideClipSpace( modelViewProjectionMatrix, boundingBox ) )
   {
     context.IncrementCulledCount();
     return true;
@@ -261,7 +262,7 @@ bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMat
   return false;
 }
 
-void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
+void ImageRenderer::DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   DALI_LOG_INFO( gImageRenderFilter, Debug::Verbose, "DoRender() textureId=%d  texture:%p\n", mTextureId, mTexture);
 
@@ -275,7 +276,7 @@ void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, Buff
 
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
-  mTextureCacheDELETEME->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TEXTURE_UNIT_IMAGE );
+  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TEXTURE_UNIT_IMAGE );
 
   if( mTexture->GetTextureId() == 0 )
   {
@@ -294,7 +295,7 @@ void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, Buff
 
   // make sure the vertex is bound, this has to be done before
   // we call VertexAttribPointer otherwise you get weird output on the display
-  mVertexBuffer->Bind();
+  mVertexBuffer->Bind(GpuBuffer::ARRAY_BUFFER);
 
   samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER_RECT );
   if( -1 != samplerLoc )
@@ -349,7 +350,7 @@ void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, Buff
     case GRID_NINE_PATCH_NO_CENTER:
     {
       const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
-      mIndexBuffer->Bind();
+      mIndexBuffer->Bind(GpuBuffer::ELEMENT_ARRAY_BUFFER);
       context.DrawElements( GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0 );
       break;
     }
@@ -366,10 +367,10 @@ void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, Buff
   }
 }
 
-void ImageRenderer::DoSetBlending(Context& context, BufferIndex bufferIndex )
+void ImageRenderer::DoSetBlending(Context& context, BufferIndex bufferIndex, bool blend )
 {
   // Enables/disables blending mode.
-  context.SetBlend( mUseBlend );
+  context.SetBlend( blend );
 
   // Set the blend color
   const Vector4* const customColor = mBlendingOptions.GetBlendColor();
@@ -399,7 +400,7 @@ void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const
   // create/destroy if needed/not needed.
   if ( size && !mVertexBuffer )
   {
-    mVertexBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
+    mVertexBuffer = new GpuBuffer( context );
   }
   else if ( !size && mVertexBuffer )
   {
@@ -409,7 +410,7 @@ void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const
   // update
   if ( mVertexBuffer )
   {
-    mVertexBuffer->UpdateDataBuffer( size, data );
+    mVertexBuffer->UpdateDataBuffer( size, data, GpuBuffer::DYNAMIC_DRAW);
   }
 }
 
@@ -418,7 +419,7 @@ void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const 
   // create/destroy if needed/not needed.
   if ( size && !mIndexBuffer )
   {
-    mIndexBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    mIndexBuffer = new GpuBuffer( context );
   }
   else if ( !size && mIndexBuffer )
   {
@@ -428,7 +429,7 @@ void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const 
   // update
   if ( mIndexBuffer )
   {
-    mIndexBuffer->UpdateDataBuffer(size,data);
+    mIndexBuffer->UpdateDataBuffer(size,data,GpuBuffer::STATIC_DRAW);
   }
 }
 
@@ -516,8 +517,8 @@ void ImageRenderer::SetQuadMeshData( Texture* texture, const Vector2& size, cons
 
   texture->MapUV( sizeof(verts)/sizeof(Vertex2D), verts, pixelArea );
 
-  UpdateVertexBuffer( *mContextDELETEME, sizeof(verts), verts );
-  UpdateIndexBuffer( *mContextDELETEME, 0, NULL );
+  UpdateVertexBuffer( *mContext, sizeof(verts), verts );
+  UpdateIndexBuffer( *mContext, 0, NULL );
 }
 
 void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea, bool noCenter )
@@ -657,7 +658,7 @@ void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size,
     const size_t vertsSize = sizeof( vertsWithCenter );
     const unsigned int vertexCount = vertsSize / sizeof( vertsWithCenter[0] );
     texture->MapUV( vertexCount, vertsWithCenter, pixelArea );
-    UpdateVertexBuffer( *mContextDELETEME, vertsSize, vertsWithCenter );
+    UpdateVertexBuffer( *mContext, vertsSize, vertsWithCenter );
   }
   else
   {
@@ -738,10 +739,10 @@ void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size,
     const size_t vertsSize = sizeof( vertsWithNoCenter );
     const unsigned int vertexCount = vertsSize / sizeof( vertsWithNoCenter[0] );
     texture->MapUV( vertexCount, vertsWithNoCenter, pixelArea );
-    UpdateVertexBuffer( *mContextDELETEME, vertsSize, vertsWithNoCenter );
+    UpdateVertexBuffer( *mContext, vertsSize, vertsWithNoCenter );
   }
   // not using an index buffer
-  UpdateIndexBuffer( *mContextDELETEME, 0, NULL );
+  UpdateIndexBuffer( *mContext, 0, NULL );
 
 }
 
@@ -930,8 +931,8 @@ void ImageRenderer::SetGridMeshData( Texture* texture, const Vector2& size, cons
 
   texture->MapUV( totalVertices, vertices, pixelArea );
 
-  UpdateVertexBuffer( *mContextDELETEME, totalVertices * sizeof(Vertex2D) , vertices );
-  UpdateIndexBuffer( *mContextDELETEME, totalIndices * sizeof(GLushort), indices );
+  UpdateVertexBuffer( *mContext, totalVertices * sizeof(Vertex2D) , vertices );
+  UpdateIndexBuffer( *mContext, totalIndices * sizeof(GLushort), indices );
 
   delete[] vertices;
   delete[] indices;
@@ -960,8 +961,8 @@ void ImageRenderer::GenerateMeshIndices(GLushort* indices, int rectanglesX, int 
   }
 }
 
-ImageRenderer::ImageRenderer( NodeDataProvider& dataProvider )
-: Renderer( dataProvider ),
+ImageRenderer::ImageRenderer()
+: Renderer(),
   mTexture( NULL ),
   mBorder( 0.45, 0.45, 0.1, 0.1 ),
   mPixelArea(),

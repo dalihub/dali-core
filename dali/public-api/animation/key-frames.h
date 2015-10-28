@@ -26,6 +26,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_animation
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -127,6 +131,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL KeyFrames(Internal::KeyFrames* keyFrames);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_KEY_FRAMES_H__

@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_math
+ * @{
+ */
 
 /**
  * @brief Returns the next power of two.
@@ -306,6 +310,9 @@ inline float ShortestDistanceInDomain( float a, float b, float start, float end 
   return vect;
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_MATH_UTILS_H__

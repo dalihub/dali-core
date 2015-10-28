@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
-#include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
 
 namespace Dali
@@ -45,7 +44,7 @@ PropertyBuffer::~PropertyBuffer()
 }
 
 PropertyBuffer::PropertyBuffer( const PropertyBuffer& handle )
-: Handle( handle )
+: BaseHandle( handle )
 {
 }
 
@@ -70,13 +69,13 @@ std::size_t PropertyBuffer::GetSize() const
   return  GetImplementation(*this).GetSize();
 }
 
-void PropertyBuffer::SetData( void* data )
+void PropertyBuffer::SetData( const void* data )
 {
   GetImplementation(*this).SetData( data );
 }
 
 PropertyBuffer::PropertyBuffer( Internal::PropertyBuffer* pointer )
-: Handle( pointer )
+: BaseHandle( pointer )
 {
 }
 

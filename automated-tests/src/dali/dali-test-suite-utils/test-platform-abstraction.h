@@ -131,11 +131,6 @@ public:
   virtual bool IsLoading();
 
   /**
-   * @copydoc PlatformAbstraction::GetDefaultFontFamily()
-   */
-  virtual void GetDefaultFontDescription( std::string& family, std::string& style ) const;
-
-  /**
    * @copydoc PlatformAbstraction::GetDefaultFontSize()
    */
   virtual int GetDefaultFontSize() const;

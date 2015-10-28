@@ -23,6 +23,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 struct Vector2;
 struct Vector3;
@@ -135,6 +139,9 @@ public:
   }
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_INPUT_H__

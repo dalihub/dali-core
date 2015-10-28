@@ -22,6 +22,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_actors
+ * @{
+ */
 
 /**
  * @brief Actor color mode.
@@ -120,6 +124,9 @@ enum Type
 };
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_ACTOR_ENUMERATIONS_H__

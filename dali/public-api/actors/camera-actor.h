@@ -22,12 +22,15 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_actors
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
 class CameraActor;
 }
-
 
 namespace Camera
 {
@@ -327,6 +330,9 @@ public: // Not intended for use by Application developers
   explicit DALI_INTERNAL CameraActor(Internal::CameraActor* actor);
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_CAMERA_ACTOR_H__

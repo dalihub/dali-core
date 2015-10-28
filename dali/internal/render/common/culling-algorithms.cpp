@@ -23,8 +23,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-bool Is2dBoxOutsideClipSpace(const Matrix& modelMatrix,
-                             const Matrix& modelViewProjectionMatrix,
+bool Is2dBoxOutsideClipSpace(const Matrix& modelViewProjectionMatrix,
                              const Rect<float>& boundingBox )
 {
   // First, calculate if the center is inside clip space:

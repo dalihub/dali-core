@@ -194,7 +194,9 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 
 void Animation::AddAnimator( AnimatorBase* animator )
 {
+  animator->ConnectToSceneGraph();
   animator->SetDisconnectAction( mDisconnectAction );
+
   mAnimators.PushBack( animator );
 }
 

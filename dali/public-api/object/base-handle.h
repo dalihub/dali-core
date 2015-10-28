@@ -30,6 +30,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 class BaseObject;
 class ConnectionTrackerInterface;
@@ -278,6 +282,9 @@ inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
   return lhs.GetObjectPtr() < rhs.GetObjectPtr();
 }
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // __DALI_BASE_HANDLE_H__

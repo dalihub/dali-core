@@ -21,7 +21,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/owner-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 
@@ -42,11 +42,11 @@ template< class Type >
 class ObjectOwnerContainer
 {
 public:
-  typedef typename Internal::OwnerContainer< Type* > ObjectContainer;
-  typedef typename Internal::OwnerContainer< Type* >::Iterator Iterator;
+  typedef typename Dali::OwnerContainer< Type* > ObjectContainer;
+  typedef typename Dali::OwnerContainer< Type* >::Iterator Iterator;
 
   /**
-   * @brief Constructor - createw a new object container
+   * @brief Constructor - create a new object container
    *
    * Object container own update side objects
    *
@@ -131,8 +131,13 @@ public:
     }
   }
 
+  const ObjectContainer& GetObjectContainer()
+  {
+    return mObjectContainer;
+  }
+
 private:
-  SceneController* mSceneController;      ///< SceneControler used to send messages
+  SceneController* mSceneController;      ///< SceneController used to send messages
   ObjectContainer mObjectContainer;       ///< Container for the objects owned
   SceneGraphBuffers& mSceneGraphBuffers;  ///< Reference to a SceneGraphBuffers to get the indexBuffer
   DiscardQueue& mDiscardQueue;            ///< Discard queue used for removed objects

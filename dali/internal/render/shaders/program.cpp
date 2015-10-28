@@ -95,14 +95,9 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "uViewMatrix",          // UNIFORM_VIEW_MATRIX,
   "uNormalMatrix",        // UNIFORM_NORMAL_MATRIX
   "uColor",               // UNIFORM_COLOR
-  "uCustomTextureCoords", // UNIFORM_CUSTOM_TEXTURE_COORDS
   "sTexture",             // UNIFORM_SAMPLER
   "sTextureRect",         // UNIFORM_SAMPLER_RECT
   "sEffect",              // UNIFORM_EFFECT_SAMPLER
-  "sEffectRect",          // UNIFORM_EFFECT_SAMPLER_RECT
-  "uTimeDelta",           // UNIFORM_TIME_DELTA
-  "sOpacityTexture",      // UNIFORM_SAMPLER_OPACITY
-  "sNormalMapTexture",    // UNIFORM_SAMPLER_NORMAL_MAP
   "uSize"                 // UNIFORM_SIZE
 };
 
@@ -331,6 +326,19 @@ void Program::SetUniform2f( GLint location, GLfloat value0, GLfloat value1 )
   // Not caching these as based on current analysis this is not called that often by our shaders
   LOG_GL( "Uniform2f(%d,%f,%f)\n", location, value0, value1 );
   CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
+}
+
+void Program::SetSizeUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
+{
+  if( ( fabsf(value0 - mSizeUniformCache.x) >= Math::MACHINE_EPSILON_1 )||
+      ( fabsf(value1 - mSizeUniformCache.y) >= Math::MACHINE_EPSILON_1 )||
+      ( fabsf(value2 - mSizeUniformCache.z) >= Math::MACHINE_EPSILON_1 ) )
+  {
+    mSizeUniformCache.x = value0;
+    mSizeUniformCache.y = value1;
+    mSizeUniformCache.z = value2;
+    SetUniform3f( location, value0, value1, value2 );
+  }
 }
 
 void Program::SetUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
@@ -694,7 +702,9 @@ void Program::ResetAttribsUniformCache()
     mUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
   }
 
-  // reset uniform cache
+  // reset uniform caches
+  mSizeUniformCache.x = mSizeUniformCache.y = mSizeUniformCache.z = 0.f;
+
   for( int i = 0; i < MAX_UNIFORM_CACHE_SIZE; ++i )
   {
     // GL initializes uniforms to 0

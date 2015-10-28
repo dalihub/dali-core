@@ -16,7 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/common/mutex.h>
+#include <dali/devel-api/threading/mutex.h>
+
+// INTERNAL INCLUDES
+#include <dali/internal/common/mutex-impl.h>
 
 // EXTERNAL INCLUDES
 #include <pthread.h>
@@ -53,14 +56,14 @@ bool Mutex::IsLocked()
 Mutex::ScopedLock::ScopedLock( Mutex& mutex )
 : mMutex( mutex )
 {
-  pthread_mutex_lock( &mMutex.mImpl->mutex );
+  Internal::Mutex::Lock( &mMutex.mImpl->mutex );
   mMutex.mImpl->locked = true;
 }
 
 Mutex::ScopedLock::~ScopedLock()
 {
   mMutex.mImpl->locked = false;
-  pthread_mutex_unlock( &mMutex.mImpl->mutex );
+  Internal::Mutex::Unlock( &mMutex.mImpl->mutex );
 }
 
 } // namespace Dali

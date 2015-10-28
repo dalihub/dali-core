@@ -249,7 +249,7 @@ private:
   void GetDefaultTextureCoordinates(UvRect& uv) const;
 
   /**
-   * @brief Apply the given texture parameters.
+   * @brief Apply the given texture filtering parameters.
    *
    * @param[in] texture unit to use
    * @param[in] filterType Minification or magnification.
@@ -258,7 +258,17 @@ private:
    * @param[in] daliDefault The default dali filter mode for the given filterType.
    * @param[in] systemDefault The default system filter mode for the given filterType.
    */
-  void ApplyTextureParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault );
+  void ApplyFilterModeParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault );
+
+  /**
+   * @brief Apply the given texture wrap mode.
+   *
+   * @param[in] texture unit to use
+   * @param[in] wrapType UWrap or VWrap
+   * @param[in] currentWrapMode The current wrap mode.
+   * @param[in] newWrapMode The new wrap mode.
+   */
+  void ApplyWrapModeParameter( TextureUnit unit, GLint wrapType, WrapMode::Type currentWrapMode, WrapMode::Type newWrapMode );
 
 protected:
 

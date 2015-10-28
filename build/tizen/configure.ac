@@ -54,6 +54,12 @@ AC_ARG_ENABLE([backtrace],
               [enable_backtrace=$enableval],
               [enable_backtrace=yes])
 
+AC_ARG_ENABLE([lock_backtrace],
+              [AC_HELP_STRING([--enable-lock-backtrace],
+                              [Backtrace for when more than 1 lock is held on the same thread])],
+              [enable_lock_backtrace=$enableval],
+              [enable_lock_backtrace=no])
+
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
@@ -66,9 +72,16 @@ if test "x$enable_emscripten" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
   # Automatically turn off backtrace support
   enable_backtrace="no"
+  enable_lock_backtrace="no"
 fi
 
 # Must come after Emscripten feature test
+if test "x$enable_lock_backtrace" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DLOCK_BACKTRACE_ENABLED"
+  enable_backtrace="yes"
+fi
+
+# Must come after Emscripten & locks backtrace feature test
 if test "x$enable_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DBACKTRACE_ENABLED"
 fi
@@ -114,4 +127,5 @@ Configuration
   Data Dir (Read Only):             $dataReadOnlyDir
   Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
+  ScopedLock Backtrace:             $enable_lock_backtrace
 "

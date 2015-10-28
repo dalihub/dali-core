@@ -21,10 +21,9 @@
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/material-data-provider.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-
+#include <dali/internal/render/renderers/render-texture.h>
 namespace Dali
 {
 namespace Internal
@@ -47,7 +46,7 @@ class RenderDataProvider
 {
 public:
   typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
-  typedef Dali::Vector< const SamplerDataProvider* > Samplers;
+  typedef std::vector< Render::Texture > Textures;
 
   /**
    * Constructor.
@@ -99,39 +98,19 @@ public:
   Shader& GetShader() const;
 
   /**
-   * Set the sampler data providers
-   * @param[in] samplers The sampler data providers
+   * Returns the list of textures
+   * @return The list of textures
    */
-  void SetSamplers( const Samplers& samplers );
-
-  /**
-   * Returns the list of sampler data providers
-   * @return The list of samplers
-   */
-  const Samplers& GetSamplers() const;
-
-  /**
-   * Set the use blend flag to decide if the renderer will perform blending
-   * @param[in] useBlend The flag to decide if the renderer will perform blending
-   */
-  void SetUseBlend( bool useBlend );
-
-  /**
-   * Get the use blend flag that decides if the renderer will perform blending
-   * @param[in] buffer index
-   * @return The use blend flag that decides if the renderer will perform blending
-   */
-  bool GetUseBlend( BufferIndex bufferIndex ) const;
+  const Textures& GetTextures() const;
 
 private:
   const MaterialDataProvider*   mMaterialDataProvider;
   const UniformMapDataProvider* mUniformMapDataProvider;
   Shader*                       mShader;
-  Samplers                      mSamplers;
-  bool                          mUseBlend;
+  Textures                      mTextures;
 
-// Give RendererAttachment access to our private data to reduce copying vectors on construction.
-  friend class RendererAttachment;
+// Give Renderer access to our private data to reduce copying vectors on construction.
+  friend class Renderer;
 };
 
 } // SceneGraph
