@@ -167,6 +167,12 @@ public: // Implementation of MaterialDataProvider
    */
   virtual const BlendingOptions& GetBlendingOptions() const;
 
+  /**
+   * @copydoc MaterialDataProvider::GetFaceCullingMode
+   */
+  virtual Dali::Material::FaceCullingMode GetFaceCullingMode() const;
+
+
 public: // Implementation of ObjectOwnerContainer template methods
 
   /**

@@ -25,8 +25,9 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/compile-time-assert.h>
 #include <dali/integration-api/platform-abstraction.h>
-#include <dali/internal/render/common/render-manager.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/common/render-manager.h>
+#include <dali/devel-api/rendering/material.h>
 
 namespace Dali
 {
@@ -91,7 +92,7 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
   mMaxTextureSize(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
-  mCullFaceMode(CullNone),
+  mCullFaceMode( Dali::Material::NONE ),
   mViewPort( 0, 0, 0, 0 ),
   mFrameCount( 0 ),
   mCulledCount( 0 ),
@@ -281,7 +282,7 @@ void Context::ResetGlState()
   mBlendEquationSeparateModeAlpha = GL_FUNC_ADD;
   mGlAbstraction.BlendEquationSeparate( mBlendEquationSeparateModeRGB, mBlendEquationSeparateModeAlpha);
 
-  mCullFaceMode = CullNone;
+  mCullFaceMode = Dali::Material::NONE;
   mGlAbstraction.Disable(GL_CULL_FACE);
   mGlAbstraction.FrontFace(GL_CCW);
   mGlAbstraction.CullFace(GL_BACK);

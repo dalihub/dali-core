@@ -146,6 +146,11 @@ const BlendingOptions& Material::GetBlendingOptions() const
   return mBlendingOptions;
 }
 
+Dali::Material::FaceCullingMode Material::GetFaceCullingMode() const
+{
+  return mFaceCullingMode;
+}
+
 void Material::AddTexture( const std::string& name, ResourceId id, Render::Sampler* sampler )
 {
   mTextureId.PushBack( id );

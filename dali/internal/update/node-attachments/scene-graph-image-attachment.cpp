@@ -92,7 +92,7 @@ void ImageAttachment::Initialize2( BufferIndex updateBufferIndex )
 
   // After derived classes have (potentially) created their renderer
   Render::Renderer& renderer = GetRenderer();
-  renderer.SetCullFace( mCullFaceMode );
+  renderer.SetCullFace( static_cast< Dali::Material::FaceCullingMode >( mCullFaceMode ) );
 
   // set the default shader here as well
   renderer.SetShader( mShader );
@@ -236,13 +236,13 @@ void ImageAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode m
 
   mCullFaceMode = mode;
 
-  typedef MessageValue1< Render::Renderer, CullFaceMode > DerivedType;
+  typedef MessageValue1< Render::Renderer, Dali::Material::FaceCullingMode > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Render::Renderer::SetCullFace, mode );
+  new (slot) DerivedType( &GetRenderer(), &Render::Renderer::SetCullFace, static_cast< Dali::Material::FaceCullingMode >( mode ) );
 }
 
 void ImageAttachment::SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield )

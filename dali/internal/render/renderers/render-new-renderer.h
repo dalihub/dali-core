@@ -127,7 +127,7 @@ public: // Implementation of Renderer
   /**
    * @copydoc SceneGraph::Renderer::DoSetCullFaceMode
    */
-  virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
+  virtual void DoSetCullFaceMode( Context& context );
 
   /**
    * @copydoc SceneGraph::Renderer::DoSetBlending

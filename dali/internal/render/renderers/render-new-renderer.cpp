@@ -95,8 +95,10 @@ void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Scen
   // Do nothing, we're going to set up the uniforms with our own code instead
 }
 
-void NewRenderer::DoSetCullFaceMode( Context& context, BufferIndex bufferIndex )
+void NewRenderer::DoSetCullFaceMode( Context& context )
 {
+  const SceneGraph::MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
+  context.CullFace( material.GetFaceCullingMode() );
 }
 
 void NewRenderer::DoSetBlending( Context& context )

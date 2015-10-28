@@ -51,8 +51,8 @@ public:
   enum FaceCullingMode
   {
     NONE,                     ///< None of the faces should be culled
-    CULL_BACK,                ///< Cull back face, back face should never be shown
     CULL_FRONT,               ///< Cull front face, back face should never be shown
+    CULL_BACK,                ///< Cull back face, back face should never be shown
     CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
   };
 
