@@ -40,7 +40,6 @@ namespace Render
 /**
  * The new geometry renderer.
  *
- * @todo MESH_REWORK It will be merged into the base class eventually
  */
 class NewRenderer : public Renderer
 {
@@ -62,6 +61,9 @@ public:
    */
   NewRenderer( SceneGraph::RenderDataProvider* dataProviders, SceneGraph::RenderGeometry* renderGeometry );
 
+  /**
+   * Virtual destructor
+   */
   virtual ~NewRenderer();
 
   /**
@@ -98,6 +100,15 @@ public:
   }
 
 public: // Implementation of Renderer
+
+  /**
+   * @copydoc SceneGraph::Renderer::GetNewRenderer()
+   */
+  virtual NewRenderer* GetNewRenderer()
+  {
+    return this;
+  }
+
   /**
    * @copydoc SceneGraph::Renderer::RequiresDepthTest()
    */
@@ -107,12 +118,6 @@ public: // Implementation of Renderer
    * @copydoc SceneGraph::Renderer::CheckResources()
    */
   virtual bool CheckResources();
-
-  /**
-   * @copydoc SceneGraph::Renderer::IsOutsideClipSpace()
-   */
-  virtual bool IsOutsideClipSpace( Context& context,
-                                   const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc SceneGraph::Renderer::DoSetUniforms()

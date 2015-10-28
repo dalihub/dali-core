@@ -53,10 +53,9 @@ inline void SetMatrices( Program& program,
                          const Matrix& modelMatrix,
                          const Matrix& viewMatrix,
                          const Matrix& projectionMatrix,
-                         const Matrix& modelViewMatrix,
-                         const Matrix& modelViewProjectionMatrix )
+                         const Matrix& modelViewMatrix )
 {
-  GLint loc = program.GetUniformLocation(Program::UNIFORM_MODEL_MATRIX);
+  GLint loc = program.GetUniformLocation( Program::UNIFORM_MODEL_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
     program.SetUniformMatrix4fv( loc, 1, modelMatrix.AsFloat() );
@@ -89,7 +88,8 @@ inline void SetMatrices( Program& program,
   loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
-    program.SetUniformMatrix4fv( loc, 1, modelViewProjectionMatrix.AsFloat() );
+    Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
+    program.SetUniformMatrix4fv( loc, 1, gModelViewProjectionMatrix.AsFloat() );
   }
 
   loc = program.GetUniformLocation( Program::UNIFORM_NORMAL_MATRIX );
@@ -145,7 +145,7 @@ void Renderer::Render( Context& context,
                        bool cull,
                        bool blend )
 {
-  NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
+  NewRenderer* renderer = GetNewRenderer(); // avoid a dynamic cast per item per frame
 
   if( renderer )
   {
@@ -166,10 +166,6 @@ void Renderer::Render( Context& context,
     return;
   }
 
-  // Calculate the MVP matrix first so we can do the culling test
-  const Matrix& modelMatrix = node.GetModelMatrix( bufferIndex );
-  Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
-
   // Get the program to use:
   Program* program = mShader->GetProgram();
   if( !program )
@@ -180,17 +176,6 @@ void Renderer::Render( Context& context,
     if( !program )
     {
       DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*) &*mShader );
-      return;
-    }
-
-  }
-
-  // Check culling (does not need the program to be in use)
-  if( cull && ! program->ModifiesGeometry() )
-  {
-    if( IsOutsideClipSpace( context, gModelViewProjectionMatrix ) )
-    {
-      // don't do any further gl state changes as this renderer is not visible
       return;
     }
   }
@@ -204,7 +189,8 @@ void Renderer::Render( Context& context,
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
   // set projection and view matrix if program has not yet received them yet this frame
-  SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, gModelViewProjectionMatrix );
+  const Matrix& modelMatrix = node.GetModelMatrix( bufferIndex );
+  SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix );
 
   // set color uniform
   GLint loc = program->GetUniformLocation( Program::UNIFORM_COLOR );
