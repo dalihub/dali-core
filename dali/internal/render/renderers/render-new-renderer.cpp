@@ -20,6 +20,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
+#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
@@ -71,6 +72,11 @@ void NewRenderer::SetGeometry( SceneGraph::RenderGeometry* renderGeometry )
 // @todo MESH_REWORK Should use Update thread objects only in PrepareRenderInstructions.
 bool NewRenderer::RequiresDepthTest() const
 {
+  if( mRenderGeometry )
+  {
+    return mRenderGeometry->RequiresDepthTest();
+  }
+
   return true;
 }
 
@@ -82,12 +88,6 @@ bool NewRenderer::CheckResources()
   // General point though - why would we have a render item in RenderThread with no ready
   // resources in UpdateThread?
   return true;
-}
-
-bool NewRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix )
-{
-  // @todo MESH_REWORK Add clipping
-  return false;
 }
 
 void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, SceneGraph::Shader* shader, Program* program, unsigned int programIndex )
@@ -159,7 +159,6 @@ void NewRenderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDa
 
     unsigned int maxMaps = uniformMap.Count() + uniformMapNode.Count();
     mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
-    mTextureIndexMap.Clear();
     mUniformIndexMap.Resize( maxMaps );
 
     unsigned int mapIndex(0);
@@ -202,8 +201,6 @@ void NewRenderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDa
   {
     SetUniformFromProperty( bufferIndex, program, *iter );
   }
-
-  // @todo MESH_REWORK On merge, copy code from renderer to setup standard matrices and color
 
   GLint sizeLoc = program.GetUniformLocation( Program::UNIFORM_SIZE );
   if( -1 != sizeLoc )
@@ -282,14 +279,11 @@ void NewRenderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& prog
   }
 }
 
-void NewRenderer::BindTextures(
-  SceneGraph::TextureCache& textureCache,
-  Program& program )
+void NewRenderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& program )
 {
-  // @todo MESH_REWORK Write a cache of texture units to commonly used sampler textures
   int textureUnit = 0;
 
-  const std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures());
+  std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
   for( size_t i(0); i<textures.size(); ++i )
   {
     ResourceId textureId = textures[i].GetTextureId();
@@ -298,16 +292,22 @@ void NewRenderer::BindTextures(
     {
       textureCache.BindTexture( texture, textureId, GL_TEXTURE_2D, (TextureUnit)textureUnit );
 
+      Render::Texture& textureMapping = textures[i];
       // Set sampler uniform location for the texture
-      unsigned int uniformIndex = GetTextureUniformIndex( program, textures[i].GetUniformName() );
-      GLint uniformLocation = program.GetUniformLocation( uniformIndex );
+      int32_t uniqueIndex = textureMapping.GetUniformUniqueIndex();
+      if( Render::Texture::NOT_INITIALIZED == uniqueIndex )
+      {
+        uniqueIndex = mUniformNameCache->GetSamplerUniformUniqueIndex( textureMapping.GetUniformName() );
+        textureMapping.SetUniformUniqueIndex( uniqueIndex );
+      }
+      GLint uniformLocation = program.GetSamplerUniformLocation( uniqueIndex, textureMapping.GetUniformName() );
       if( Program::UNIFORM_UNKNOWN != uniformLocation )
       {
         program.SetUniform1i( uniformLocation, textureUnit );
       }
 
       unsigned int samplerBitfield(0);
-      const Render::Sampler* sampler( textures[i].GetSampler() );
+      const Render::Sampler* sampler( textureMapping.GetSampler() );
       if( sampler )
       {
         samplerBitfield = ImageSampler::PackBitfield(
@@ -319,7 +319,7 @@ void NewRenderer::BindTextures(
       }
       else
       {
-        samplerBitfield = ImageSampler::PackBitfield(FilterMode::DEFAULT, FilterMode::DEFAULT, WrapMode::DEFAULT, WrapMode::DEFAULT);
+        samplerBitfield = ImageSampler::DEFAULT_BITFIELD;
       }
 
       texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
@@ -329,31 +329,8 @@ void NewRenderer::BindTextures(
   }
 }
 
-unsigned int NewRenderer::GetTextureUniformIndex( Program& program, const std::string& uniformName )
-{
-  unsigned int uniformIndex = 0;
-  bool found = false;
-
-  size_t uniformNameHash = Dali::CalculateHash( uniformName );
-  for( unsigned int i=0; i< mTextureIndexMap.Count(); ++i )
-  {
-    if( mTextureIndexMap[i].uniformNameHash == uniformNameHash )
-    {
-      uniformIndex = mTextureIndexMap[i].uniformIndex;
-      found = true;
-    }
-  }
-
-  if( ! found )
-  {
-    uniformIndex = program.RegisterUniform( uniformName );
-    TextureUniformIndexMap textureUniformIndexMap = {uniformNameHash,uniformIndex};
-    mTextureIndexMap.PushBack( textureUniformIndexMap );
-  }
-
-  return uniformIndex;
-}
-
 } // SceneGraph
+
 } // Internal
+
 } // Dali

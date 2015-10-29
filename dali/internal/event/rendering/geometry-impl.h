@@ -180,11 +180,6 @@ public: // Default property extensions from Object
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
-   */
-  virtual int GetPropertyComponentIndex( Property::Index index ) const;
-
 public: // Functions from Connectable
   /**
    * @copydoc Dali::Internal::Connectable::OnStage()
@@ -221,9 +216,14 @@ private: // unimplemented methods
 
 private: // data
 
-  std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
-  PropertyBufferPtr mIndexBuffer;                ///< Intrusive pointer to index buffer
   SceneGraph::Geometry* mSceneObject;
+
+  std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
+  PropertyBufferPtr              mIndexBuffer;   ///< Intrusive pointer to index buffer
+
+  Dali::Geometry::GeometryType mGeometryType;      ///< Geometry type (cached)
+  bool                         mRequiresDepthTest; ///< Establish if geometry requires depth testing (cached)
+
   bool mOnStage;
 };
 

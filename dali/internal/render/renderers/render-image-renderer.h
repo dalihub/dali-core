@@ -137,11 +137,6 @@ public:
   virtual bool CheckResources();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
-   */
-  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix );
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
   virtual void DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );

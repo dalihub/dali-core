@@ -22,7 +22,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/internal-constants.h>
-#include <dali/internal/render/common/culling-algorithms.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
@@ -246,20 +245,6 @@ bool ImageRenderer::CheckResources()
   }
 
   return true;
-}
-
-bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix )
-{
-  context.IncrementRendererCount();
-
-  Rect<float> boundingBox( mGeometrySize.x * -0.5f, mGeometrySize.y * -0.5f, mGeometrySize.x, mGeometrySize.y );
-
-  if(SceneGraph::Is2dBoxOutsideClipSpace( modelViewProjectionMatrix, boundingBox ) )
-  {
-    context.IncrementCulledCount();
-    return true;
-  }
-  return false;
 }
 
 void ImageRenderer::DoRender( Context& context, SceneGraph::TextureCache& textureCache, const SceneGraph::NodeDataProvider& node, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )

@@ -32,6 +32,36 @@ namespace Internal
  */
 namespace ImageSampler
 {
+   /**
+    * Bitshift values
+    */
+   enum
+   {
+     MINIFY_BIT_SHIFT  = 0,
+     MAGNIFY_BIT_SHIFT = 4,
+     UWRAP_BIT_SHIFT   = 8,
+     VWRAP_BIT_SHIFT   = 12
+   };
+
+   /**
+    * Mask values
+    */
+   enum
+   {
+     MASK_MINIFY_FILTER  = 0x000F,
+     MASK_MAGNIFY_FILTER = 0x00F0,
+     MASK_UWRAP_MODE     = 0x0F00,
+     MASK_VWRAP_MODE     = 0xF000,
+   };
+
+   /**
+    * Precalculate default sampler bitfield
+    */
+   enum
+   {
+     DEFAULT_BITFIELD = (Dali::FilterMode::DEFAULT<<MINIFY_BIT_SHIFT) | (Dali::FilterMode::DEFAULT<<MAGNIFY_BIT_SHIFT) | (Dali::WrapMode::DEFAULT<<UWRAP_BIT_SHIFT) | (Dali::WrapMode::DEFAULT<<VWRAP_BIT_SHIFT)
+   };
+
   /**
    * @brief Pack the filter mode into a bitfield.
    *

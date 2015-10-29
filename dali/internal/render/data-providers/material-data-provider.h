@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <dali/internal/common/buffer-index.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/blending.h>
 

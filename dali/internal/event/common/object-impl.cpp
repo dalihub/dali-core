@@ -358,7 +358,7 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   CustomPropertyMetadata* custom = FindCustomProperty( index );
   if( custom )
   {
-    return custom->type;
+    return custom->GetType();
   }
   return Property::NONE;
 }
@@ -819,7 +819,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
   {
     BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
 
-    switch ( entry->type )
+    switch ( entry->GetType() )
     {
       case Property::BOOLEAN:
       {
@@ -960,7 +960,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
 void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value )
 {
-  switch ( entry.type )
+  switch ( entry.GetType() )
   {
     case Property::BOOLEAN:
     {
@@ -1271,7 +1271,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
         if(animatableProperty)
         {
           // Create the metadata for the property component.
-          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->type, animatableProperty->GetSceneGraphProperty() ) );
+          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->GetType(), animatableProperty->GetSceneGraphProperty() ) );
         }
       }
 

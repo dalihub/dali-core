@@ -17,9 +17,12 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <string>
+
+// INTERNAL INCLUDES
 #include <dali/devel-api/rendering/sampler.h>
 #include <dali/integration-api/resource-declarations.h>
-#include <string>
 
 namespace Dali
 {
@@ -29,26 +32,39 @@ namespace Render
 {
 class Sampler;
 
+/**
+ * This class is the mapping between texture id, sampler and sampler uniform name
+ */
 class Texture
 {
 public:
 
   /**
+   * Enumeration to tell that this sampler does not have a unique index yet
+   */
+  enum
+  {
+    NOT_INITIALIZED = -1
+  };
+
+  /**
    * Constructor
    */
   Texture()
-  :mUniformName(""),
-   mTextureId(Integration::InvalidResourceId),
-   mSampler(0)
+  : mSampler( 0 ),
+    mUniformName(),
+    mTextureId( Integration::InvalidResourceId ),
+    mUniformUniqueIndex( NOT_INITIALIZED )
   {}
 
   /**
    * Constructor
    */
-  Texture( const char* samplerName, Integration::ResourceId textureId, Render::Sampler* sampler )
-  :mUniformName(samplerName),
-   mTextureId( textureId),
-   mSampler(sampler)
+  Texture( const std::string& samplerName, Integration::ResourceId textureId, Render::Sampler* sampler )
+  : mSampler( sampler ),
+    mUniformName( samplerName ),
+    mTextureId( textureId),
+    mUniformUniqueIndex( NOT_INITIALIZED )
   {}
 
   /**
@@ -66,7 +82,8 @@ public:
     return mSampler;
   }
 
-public: // SamplerDataProvider interface - called from RenderThread
+public: // called from RenderThread
+
   /**
    * Get the texture unit uniform name
    * @return the name of the texture unit uniform
@@ -78,23 +95,44 @@ public: // SamplerDataProvider interface - called from RenderThread
 
   /**
    * Get the texture ID
-   * @param[in] bufferIndex The buffer index to use
-   * @return the identity of the associated texture
+   * @return the id of the associated texture
    */
   inline Integration::ResourceId GetTextureId() const
   {
     return mTextureId;
   }
 
+  /**
+   * Get the Uniform unique index
+   * @return the identity of the associated texture
+   */
+  inline void SetUniformUniqueIndex( int32_t index )
+  {
+    mUniformUniqueIndex = index;
+  }
+
+  /**
+   * Get the Uniform unique index
+   * @return the identity of the associated texture
+   */
+  inline int32_t GetUniformUniqueIndex() const
+  {
+    return mUniformUniqueIndex;
+  }
+
 private:
-  std::string               mUniformName;
-  Integration::ResourceId   mTextureId;
-  Render::Sampler*          mSampler;
+
+  Render::Sampler*        mSampler;
+  std::string             mUniformName;
+  Integration::ResourceId mTextureId;
+  int32_t                 mUniformUniqueIndex;
+
 };
 
-} // namespace SceneGraph
+} // namespace Render
 
 } // namespace Internal
+
 } // namespace Dali
 
 

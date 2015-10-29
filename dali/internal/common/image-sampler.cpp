@@ -30,24 +30,6 @@ namespace Internal
 namespace ImageSampler
 {
 
-namespace
-{
-
-// @todo MESH_REWORK Remove file after image removal
-
-// Adjust these shift sizes if the FilterMode enum grows
-const int MINIFY_BIT_SHIFT  = 0;    // Room for 16
-const int MAGNIFY_BIT_SHIFT = 4;
-const int UWRAP_BIT_SHIFT   = 8;
-const int VWRAP_BIT_SHIFT   = 12;
-
-const int MASK_MINIFY_FILTER    = 0x0000000F;
-const int MASK_MAGNIFY_FILTER   = 0x000000F0;
-const int MASK_UWRAP_MODE       = 0x00000F00;
-const int MASK_VWRAP_MODE       = 0x0000F000;
-
-} // namespace
-
 /**
  * Utility to store one of the sampling parameters values.
  * @param[out] options A bitmask used to store the FilterMode values.

@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/set-wrapper.h>
-#include <dali/devel-api/common/mutex.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/threading/mutex.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>

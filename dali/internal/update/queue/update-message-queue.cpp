@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/devel-api/common/mutex.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/message-buffer.h>

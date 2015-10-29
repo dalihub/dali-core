@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TEXTURE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ namespace Internal
 {
 
 class Context;
-struct Vertex3D;
 struct Vertex2D;
 
 /**
@@ -144,22 +143,17 @@ public:
 
   /**
    * When creating a texture mapped object, the developer can
-   * can assume the texture u,v coordinates have a range of 0 to 1.
+   * assume the texture u,v coordinates have a range of 0 to 1.
    * They then just call MapUV which will adjust uv values depending on
    * whether a pixel area is being used or not.
    *@param[in] numVerts number of vertices
    *@param[out] verts pointer to an array of vertex objects
    *@param[in] pixelArea the area of the texture to display, null = use default image area
    */
-  void MapUV(unsigned int numVerts, Dali::Internal::Vertex3D* verts,  const PixelArea* pixelArea = NULL);
-
-  /**
-   * @copydoc MapUV(unsigned int,Dali::Internal::Vertex3D*, const PixelArea* pixelArea)
-   */
   void MapUV(unsigned int numVerts, Dali::Internal::Vertex2D* verts, const PixelArea* pixelArea = NULL);
 
   /**
-   * @copydoc MapUV(unsigned int,Dali::Internal::Vertex3D*, const PixelArea* pixelArea)
+   * @copydoc MapUV(unsigned int,Dali::Internal::Vertex2D*, const PixelArea* pixelArea)
    * @param[in] stride The number of floats on each row of the vertex object table
    */
   void MapUV(unsigned int numVerts, float* verts, unsigned int stride, const PixelArea* pixelArea = NULL);

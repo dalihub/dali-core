@@ -26,17 +26,18 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/core.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
@@ -147,6 +148,7 @@ struct RenderManager::Impl
   Context                       context;                  ///< holds the GL state
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
   TextureCache                  textureCache;             ///< Cache for all GL textures
+  Render::UniformNameCache      uniformNameCache;         ///< Cache to provide unique indices for uniforms
   ResourcePostProcessList&      resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
@@ -259,7 +261,7 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 void RenderManager::AddRenderer( Render::Renderer* renderer )
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize( mImpl->context, mImpl->textureCache );
+  renderer->Initialize( mImpl->context, mImpl->textureCache, mImpl->uniformNameCache );
 
   mImpl->rendererContainer.PushBack( renderer );
 
@@ -411,6 +413,15 @@ void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render
   }
 }
 
+void RenderManager::SetGeometryType( RenderGeometry* geometry, int type )
+{
+  geometry->SetGeometryType( static_cast<Geometry::GeometryType>(type) );
+}
+
+void RenderManager::SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest )
+{
+  geometry->SetRequiresDepthTest( requiresDepthTest );
+}
 
 void RenderManager::AddRenderTracker( RenderTracker* renderTracker )
 {

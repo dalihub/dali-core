@@ -94,6 +94,7 @@ develapiobjectdir = $(develapidir)/object
 develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 develapisignalsdir = $(develapidir)/signals
+develapithreadingdir = $(develapidir)/threading
 
 develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
@@ -106,6 +107,7 @@ develapiobject_HEADERS = $(devel_api_core_object_header_files)
 develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 develapisignals_HEADERS = $(devel_api_core_signals_header_files)
+develapithreading_HEADERS = $(devel_api_core_threading_header_files)
 
 
 #public api

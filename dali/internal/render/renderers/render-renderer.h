@@ -49,7 +49,8 @@ class NodeDataProvider;
 
 namespace Render
 {
-
+class UniformNameCache;
+class NewRenderer;
 
 /**
  * Renderers are used to render meshes
@@ -63,9 +64,11 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
+   * @param[in] context to use
    * @param[in] textureCache to use
+   * @param[in] uniformNameCache to use
    */
-  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
+  void Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache );
 
   /**
    * Virtual destructor
@@ -143,18 +146,19 @@ private:
   Renderer& operator=( const Renderer& rhs );
 
   /**
+   * @return NewRenderer or NULL if this is an old renderer
+   */
+  virtual NewRenderer* GetNewRenderer()
+  {
+    return NULL;
+  }
+
+  /**
    * Checks if renderer's resources are ready to be used.
    *
    * @return \e true if they are. Otherwise \e false.
    */
   virtual bool CheckResources() = 0;
-
-  /**
-   * Checks if renderer is culled.
-   * @param[in] modelViewProjectionMatrix The MVP matrix.
-   * @return \e true if it is. Otherwise \e false.
-   */
-  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelViewProjectionMatrix ) = 0;
 
   /**
    * Called from Render prior to DoRender().
@@ -189,6 +193,7 @@ protected:
 
   Context* mContext;
   SceneGraph::TextureCache* mTextureCache;
+  Render::UniformNameCache* mUniformNameCache;
   SceneGraph::Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
