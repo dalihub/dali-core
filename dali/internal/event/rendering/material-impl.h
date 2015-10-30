@@ -318,7 +318,7 @@ private: // Data
   Dali::Material::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
   BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
   BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
-  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its raraly used
+  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its rarely used
   bool mOnStage;
 
 };

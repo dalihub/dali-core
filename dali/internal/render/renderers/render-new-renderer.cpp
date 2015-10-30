@@ -109,6 +109,10 @@ void NewRenderer::DoSetBlending( Context& context )
   {
     context.SetCustomBlendColor( *blendColor );
   }
+  else
+  {
+    context.SetDefaultBlendColor();
+  }
 
   const BlendingOptions& blending = material.GetBlendingOptions();
   // Set blend source & destination factors

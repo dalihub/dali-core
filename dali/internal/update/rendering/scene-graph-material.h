@@ -255,26 +255,26 @@ public: // ConnectionChangePropagator::Observer
    */
   virtual void ConnectedUniformMapChanged();
 
-public: // PropertyOwner implementation
+public:
 
-  void SetIsFullyOpaque( size_t index, bool isFullyOpaque )
-  {
-    mIsFullyOpaque[index] = isFullyOpaque;
-  }
+  /**
+   * @param texturesRequireBlending, true if any of the textures requires blending
+   */
+  void SetTexturesRequireBlending( bool texturesRequireBlending );
 
 private: // Data
 
-  Shader*                     mShader;
-  Vector4*                    mBlendColor; // not double buffered as its not animateable and not frequently changed
-  Vector< Render::Sampler* >  mSamplers; // Not owned
-  Vector< ResourceId >        mTextureId;
-  std::vector< std::string >  mUniformName;
-  Vector< bool >              mIsFullyOpaque;
-  ConnectionChangePropagator  mConnectionObservers;
-  Dali::Material::FaceCullingMode  mFaceCullingMode; // not double buffered as its not animateable and not frequently changed
-  BlendingMode::Type          mBlendingMode; // not double buffered as its not animateable and not frequently changed
-  BlendingOptions             mBlendingOptions; // not double buffered as its not animateable and not frequently changed
-  BlendPolicy                 mBlendPolicy; ///< The blend policy as determined by PrepareRender
+  Shader*                         mShader;
+  Vector4*                        mBlendColor; // not double buffered as its not animateable and not frequently changed
+  Vector< Render::Sampler* >      mSamplers; // Not owned
+  Vector< ResourceId >            mTextureId;
+  std::vector< std::string >      mUniformName;
+  ConnectionChangePropagator      mConnectionObservers;
+  Dali::Material::FaceCullingMode mFaceCullingMode; // not double buffered as its not animateable and not frequently changed
+  BlendingMode::Type              mBlendingMode; // not double buffered as its not animateable and not frequently changed
+  BlendingOptions                 mBlendingOptions; // not double buffered as its not animateable and not frequently changed
+  BlendPolicy                     mBlendPolicy; ///< The blend policy as determined by PrepareRender
+  bool                            mTexturesRequireBlending;
 
 };
 

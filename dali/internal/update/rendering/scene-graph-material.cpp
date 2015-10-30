@@ -37,12 +37,12 @@ Material::Material()
   mSamplers(),
   mTextureId(),
   mUniformName(),
-  mIsFullyOpaque(),
   mConnectionObservers(),
   mFaceCullingMode( Dali::Material::NONE ),
   mBlendingMode( Dali::BlendingMode::AUTO ),
   mBlendingOptions(), // initializes to defaults
-  mBlendPolicy( OPAQUE )
+  mBlendPolicy( OPAQUE ),
+  mTexturesRequireBlending( false )
 {
   // Observe own property-owner's uniform map
   AddUniformMapObserver( *this );
@@ -96,31 +96,20 @@ void Material::PrepareRender( BufferIndex bufferIndex )
     }
     case BlendingMode::AUTO:
     {
-      bool opaque = true;
-
       // @todo: Change hints for new SceneGraphShader:
       // If shader hint OUTPUT_IS_OPAQUE is enabled, set policy to ALWAYS_OPAQUE
       // If shader hint OUTPUT_IS_TRANSPARENT is enabled, set policy to ALWAYS_TRANSPARENT
       // else test remainder, and set policy to either ALWAYS_TRANSPARENT or USE_ACTOR_COLOR
 
-      if( mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) )
+      if( mTexturesRequireBlending ||
+          mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) )
       {
-        opaque = false;
+        mBlendPolicy = Material::TRANSPARENT;
       }
-
-      if( opaque )
+      else
       {
-        size_t textureCount( GetTextureCount() );
-        for( unsigned int i(0); i<textureCount; ++i )
-        {
-          if( !mIsFullyOpaque[i] )
-          {
-            opaque = false;
-          }
-        }
+        mBlendPolicy = Material::USE_ACTOR_COLOR;
       }
-
-      mBlendPolicy = opaque ? Material::USE_ACTOR_COLOR : Material::TRANSPARENT;
     }
   }
 }
@@ -162,7 +151,6 @@ void Material::AddTexture( const std::string& name, ResourceId id, Render::Sampl
   mTextureId.PushBack( id );
   mUniformName.push_back( name );
   mSamplers.PushBack( sampler );
-  mIsFullyOpaque.PushBack( false );
 
   mConnectionObservers.ConnectionsChanged(*this);
 }
@@ -172,7 +160,6 @@ void Material::RemoveTexture( size_t index )
   mTextureId.Erase( mTextureId.Begin()+index );
   mUniformName.erase( mUniformName.begin() + index );
   mSamplers.Erase( mSamplers.Begin()+index );
-  mIsFullyOpaque.Erase( mIsFullyOpaque.Begin()+index );
   mConnectionObservers.ConnectionsChanged( *this );
 }
 
@@ -227,6 +214,11 @@ void Material::ConnectionsChanged( PropertyOwner& owner )
 void Material::ConnectedUniformMapChanged( )
 {
   mConnectionObservers.ConnectedUniformMapChanged();
+}
+
+void Material::SetTexturesRequireBlending( bool texturesRequireBlending )
+{
+  mTexturesRequireBlending = texturesRequireBlending;
 }
 
 } // namespace SceneGraph
