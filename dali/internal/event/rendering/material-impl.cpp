@@ -166,14 +166,6 @@ int Material::GetTextureIndex( const std::string& uniformName )
   return -1;
 }
 
-void Material::SetTextureAffectsTransparency( size_t index, bool affectsTransparency )
-{
-  if( index < GetNumberOfTextures() )
-  {
-    SceneGraph::SetTextureAffectsTransparencyMessage( GetEventThreadServices(), *mSceneObject, index,  affectsTransparency );
-  }
-}
-
 size_t Material::GetNumberOfTextures() const
 {
   return mTextures.size();

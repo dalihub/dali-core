@@ -128,11 +128,6 @@ int Material::GetTextureIndex( const std::string& uniformName )
   return GetImplementation(*this).GetTextureIndex( uniformName );
 }
 
-void Material::SetTextureAffectsTransparency( size_t index, bool affectsTransparency )
-{
-  GetImplementation(*this).SetTextureAffectsTransparency( index, affectsTransparency );
-}
-
 std::size_t Material::GetNumberOfTextures() const
 {
   return GetImplementation(*this).GetNumberOfTextures();

@@ -38,7 +38,6 @@ Material::Material()
   mTextureId(),
   mUniformName(),
   mIsFullyOpaque(),
-  mAffectsTransparency(),
   mConnectionObservers(),
   mFaceCullingMode( Dali::Material::NONE ),
   mBlendingMode( Dali::BlendingMode::AUTO ),
@@ -83,8 +82,6 @@ void Material::PrepareRender( BufferIndex bufferIndex )
 {
   mBlendPolicy = OPAQUE;
 
-  // @todo MESH_REWORK Add dirty flags to reduce processing.
-
   switch( mBlendingMode )
   {
     case BlendingMode::OFF:
@@ -101,7 +98,7 @@ void Material::PrepareRender( BufferIndex bufferIndex )
     {
       bool opaque = true;
 
-      //  @todo: MESH_REWORK - Change hints for new SceneGraphShader:
+      // @todo: Change hints for new SceneGraphShader:
       // If shader hint OUTPUT_IS_OPAQUE is enabled, set policy to ALWAYS_OPAQUE
       // If shader hint OUTPUT_IS_TRANSPARENT is enabled, set policy to ALWAYS_TRANSPARENT
       // else test remainder, and set policy to either ALWAYS_TRANSPARENT or USE_ACTOR_COLOR
@@ -113,21 +110,14 @@ void Material::PrepareRender( BufferIndex bufferIndex )
 
       if( opaque )
       {
-        unsigned int opaqueCount=0;
-        unsigned int affectingCount=0;
         size_t textureCount( GetTextureCount() );
         for( unsigned int i(0); i<textureCount; ++i )
         {
-          if( mAffectsTransparency[i] )
+          if( !mIsFullyOpaque[i] )
           {
-            ++affectingCount;
-            if( mIsFullyOpaque[i] )
-            {
-              ++opaqueCount;
-            }
+            opaque = false;
           }
         }
-        opaque = (opaqueCount == affectingCount);
       }
 
       mBlendPolicy = opaque ? Material::USE_ACTOR_COLOR : Material::TRANSPARENT;
@@ -173,7 +163,6 @@ void Material::AddTexture( const std::string& name, ResourceId id, Render::Sampl
   mUniformName.push_back( name );
   mSamplers.PushBack( sampler );
   mIsFullyOpaque.PushBack( false );
-  mAffectsTransparency.PushBack( true );
 
   mConnectionObservers.ConnectionsChanged(*this);
 }
@@ -184,7 +173,6 @@ void Material::RemoveTexture( size_t index )
   mUniformName.erase( mUniformName.begin() + index );
   mSamplers.Erase( mSamplers.Begin()+index );
   mIsFullyOpaque.Erase( mIsFullyOpaque.Begin()+index );
-  mAffectsTransparency.Erase( mAffectsTransparency.Begin()+index );
   mConnectionObservers.ConnectionsChanged( *this );
 }
 

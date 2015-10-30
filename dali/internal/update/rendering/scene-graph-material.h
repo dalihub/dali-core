@@ -155,17 +155,6 @@ public:
    */
   void SetTextureUniformName( size_t index, const std::string& uniformName );
 
-  /**
-   * Establish if a given texture will affect the transparency of the object ( true by default )
-   * @param[in] index The index of the texture in the array of textures
-   * @param[in] affectsTransparency True if the texture affects transparency, false otherwise
-   */
-  void SetAffectsTransparency( size_t index, bool affectsTransparency )
-  {
-    mAffectsTransparency[index] = affectsTransparency;
-    mConnectionObservers.ConnectionsChanged(*this);
-  }
-
 public: // Implementation of MaterialDataProvider
 
   /**
@@ -275,18 +264,17 @@ public: // PropertyOwner implementation
 
 private: // Data
 
-  Shader* mShader;
-  Vector4* mBlendColor; // not double buffered as its not animateable and not frequently changed
-  Vector< Render::Sampler* > mSamplers; // Not owned
-  Vector< ResourceId >  mTextureId;
-  std::vector< std::string > mUniformName;
-  Vector< bool >        mIsFullyOpaque;
-  Vector< bool >        mAffectsTransparency;
-  ConnectionChangePropagator mConnectionObservers;
+  Shader*                     mShader;
+  Vector4*                    mBlendColor; // not double buffered as its not animateable and not frequently changed
+  Vector< Render::Sampler* >  mSamplers; // Not owned
+  Vector< ResourceId >        mTextureId;
+  std::vector< std::string >  mUniformName;
+  Vector< bool >              mIsFullyOpaque;
+  ConnectionChangePropagator  mConnectionObservers;
   Dali::Material::FaceCullingMode  mFaceCullingMode; // not double buffered as its not animateable and not frequently changed
-  BlendingMode::Type  mBlendingMode; // not double buffered as its not animateable and not frequently changed
-  BlendingOptions  mBlendingOptions; // not double buffered as its not animateable and not frequently changed
-  BlendPolicy mBlendPolicy; ///< The blend policy as determined by PrepareRender
+  BlendingMode::Type          mBlendingMode; // not double buffered as its not animateable and not frequently changed
+  BlendingOptions             mBlendingOptions; // not double buffered as its not animateable and not frequently changed
+  BlendPolicy                 mBlendPolicy; ///< The blend policy as determined by PrepareRender
 
 };
 
@@ -394,17 +382,6 @@ inline void SetTextureUniformNameMessage( EventThreadServices& eventThreadServic
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetTextureUniformName, index, uniformName );
-}
-
-inline void SetTextureAffectsTransparencyMessage( EventThreadServices& eventThreadServices, const Material& material, size_t index, bool affectsTransparency )
-{
-  typedef MessageValue2< Material, size_t, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::SetAffectsTransparency, index, affectsTransparency );
 }
 
 } // namespace SceneGraph

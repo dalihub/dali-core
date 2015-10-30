@@ -100,11 +100,6 @@ public:
   int GetTextureIndex( const std::string& uniformName );
 
   /**
-   * @copydoc Dali::Material::SetTextureAffectsTransparency()
-   */
-  void SetTextureAffectsTransparency( size_t index, bool affectsTransparency );
-
-  /**
    * @copydoc Dali::Material::GetNumberOfTextures()
    */
   size_t GetNumberOfTextures() const;
@@ -323,7 +318,7 @@ private: // Data
   Dali::Material::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
   BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
   BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
-  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its reraly used
+  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its raraly used
   bool mOnStage;
 
 };

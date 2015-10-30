@@ -170,14 +170,6 @@ public:
    */
   void SetTextureUniformName( size_t index, const std::string& uniformName );
 
-  /**
-   * @brief Establish if a given texture will affect the transparency of the material ( true by default )
-   *
-   * @param[in] index The index of the texture in the array of textures
-   * @param[in] affectsTransparency True if the texture affects transparency, false otherwise
-   */
-  void SetTextureAffectsTransparency( size_t index, bool affectsTransparency );
-
   /*
    * @brief Retrive the index of a texture given its uniform name
    *

@@ -1100,50 +1100,6 @@ int UtcDaliMaterialSetTextureUniformName02(void)
   END_TEST;
 }
 
-int UtcDaliMaterialSetTextureAffectsTransparency(void)
-{
-  TestApplication application;
-
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-
-  Material material = CreateMaterial();
-  material.AddTexture( image, "sTexture" );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add( actor );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  // Test SetAffectsTransparency( false )
-  material.SetTextureAffectsTransparency( 0, false );
-
-  gl.EnableEnableDisableCallTrace(true);
-  application.SendNotification();
-  application.Render();
-
-  TraceCallStack& glEnableStack = gl.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
-  // Test SetAffectsTransparency( true )
-  material.SetTextureAffectsTransparency( 0, true );
-
-  glEnableStack.Reset();
-  gl.EnableEnableDisableCallTrace(true);
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
-  END_TEST;
-}
-
 int UtcDaliMaterialAddTexture01(void)
 {
   TestApplication application;
