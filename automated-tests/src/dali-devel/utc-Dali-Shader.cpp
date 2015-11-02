@@ -309,3 +309,64 @@ int UtcDaliShaderAnimatedProperty02(void)
 
   END_TEST;
 }
+
+int UtcDaliShaderProgramProperty(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test get/set progam property");
+
+  Shader shader = Shader::New("", "");
+  std::string hintSet = "HINT_REQUIRES_SELF_DEPTH_TEST,HINT_MODIFIES_GEOMETRY";
+
+  Property::Map map;
+  map["vertex"] = VertexSource;
+  map["fragment"] = FragmentSource;
+  map["hints"] = hintSet;
+
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK( value.GetType() == Property::MAP);
+  const Property::Map* outMap = value.GetMap();
+
+  std::string v = (*outMap)["vertex"].Get<std::string>();
+  std::string f = (*outMap)["fragment"].Get<std::string>();
+  std::string h = (*outMap)["hints"].Get<std::string>();
+
+  DALI_TEST_CHECK( v == VertexSource );
+  DALI_TEST_CHECK( f == FragmentSource );
+  DALI_TEST_CHECK( h == hintSet );
+
+  std::string hintGot;
+
+  hintSet = "HINT_REQUIRES_SELF_DEPTH_TEST,HINT_OUTPUT_IS_TRANSPARENT,HINT_OUTPUT_IS_OPAQUE,HINT_MODIFIES_GEOMETRY";
+  map["hints"] = hintSet;
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  value = shader.GetProperty(Shader::Property::PROGRAM);
+  hintGot = (*value.GetMap())["hints"].Get<std::string>();
+  DALI_TEST_CHECK( hintGot == hintSet );
+
+  hintSet = "HINT_REQUIRES_SELF_DEPTH_TEST";
+  map["hints"] = hintSet;
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  value = shader.GetProperty(Shader::Property::PROGRAM);
+  hintGot = (*value.GetMap())["hints"].Get<std::string>();
+  DALI_TEST_CHECK( hintGot == hintSet );
+
+  hintSet = "HINT_NONE";
+  map["hints"] = hintSet;
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  value = shader.GetProperty(Shader::Property::PROGRAM);
+  hintGot = (*value.GetMap())["hints"].Get<std::string>();
+  DALI_TEST_CHECK( hintGot == hintSet );
+
+  hintSet = "";
+  map["hints"] = hintSet;
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  value = shader.GetProperty(Shader::Property::PROGRAM);
+  hintGot = (*value.GetMap())["hints"].Get<std::string>();
+  DALI_TEST_CHECK( hintGot == "HINT_NONE" );
+
+  END_TEST;
+}
