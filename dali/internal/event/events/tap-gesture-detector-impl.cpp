@@ -40,7 +40,7 @@ const unsigned int DEFAULT_TAPS_REQUIRED = 1u;
 const unsigned int DEFAULT_TOUCHES_REQUIRED = 1u;
 
 // Signals
-const char* const SIGNAL_TAP_DETECTED = "tap-detected";
+const char* const SIGNAL_TAP_DETECTED = "tapDetected";
 
 BaseHandle Create()
 {

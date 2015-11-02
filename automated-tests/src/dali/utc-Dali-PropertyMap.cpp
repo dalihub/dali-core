@@ -88,7 +88,7 @@ int UtcDaliPropertyMapConstOperator(void)
   // Invalid Key
   try
   {
-    constMap[ "invalid-key" ];
+    constMap[ "invalidKey" ];
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -188,7 +188,7 @@ int UtcDaliPropertyMapFind(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 2 );
 
-  value = map.Find( "invalid-key" );
+  value = map.Find( "invalidKey" );
   DALI_TEST_CHECK( !value );
 
   END_TEST;

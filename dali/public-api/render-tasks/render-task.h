@@ -90,9 +90,9 @@ public:
   {
     enum
     {
-      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "viewport-position", type Vector2
-      VIEWPORT_SIZE,                                           ///< name "viewport-size",     type Vector2
-      CLEAR_COLOR,                                             ///< name "clear-color",       type Vector4
+      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "viewportPosition",  type Vector2
+      VIEWPORT_SIZE,                                           ///< name "viewportSize",      type Vector2
+      CLEAR_COLOR,                                             ///< name "clearColor",        type Vector4
     };
   };
 

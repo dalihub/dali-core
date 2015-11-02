@@ -150,7 +150,7 @@ int UtcDaliHandleGetPropertyCount(void)
   int defaultPropertyCount( actor.GetPropertyCount() );
 
   // Register a dynamic property
-  actor.RegisterProperty( "test-property", float(123.0f) );
+  actor.RegisterProperty( "testProperty",  float(123.0f) );
   DALI_TEST_CHECK( (defaultPropertyCount + 1u) == actor.GetPropertyCount() );
   END_TEST;
 }
@@ -161,10 +161,10 @@ int UtcDaliHandleGetPropertyName(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( "parent-origin" == actor.GetPropertyName( Actor::Property::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( "parentOrigin" == actor.GetPropertyName( Actor::Property::PARENT_ORIGIN ) );
 
   // Register a dynamic property
-  std::string name("this-name-should-match");
+  std::string name("thisNameShouldMatch");
   Property::Index index = actor.RegisterProperty( name, float(123.0f) );
   DALI_TEST_CHECK( name == actor.GetPropertyName( index ) );
 
@@ -177,10 +177,10 @@ int UtcDaliHandleGetPropertyIndex(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( Actor::Property::PARENT_ORIGIN == actor.GetPropertyIndex("parent-origin") );
+  DALI_TEST_CHECK( Actor::Property::PARENT_ORIGIN == actor.GetPropertyIndex("parentOrigin") );
 
   // Register a dynamic property
-  std::string name("this-name-should-match");
+  std::string name("thisNameShouldMatch");
   Property::Index index = actor.RegisterProperty( name, float(123.0f) );
   DALI_TEST_CHECK( index == actor.GetPropertyIndex( name ) );
   END_TEST;
@@ -355,13 +355,13 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( Actor::Property::COLOR ) );
 
   // Register some dynamic properties
-  Property::Index boolIndex     = actor.RegisterProperty( "bool-property",     bool(true) );
-  Property::Index floatIndex    = actor.RegisterProperty( "float-property",    float(123.0f) );
-  Property::Index intIndex      = actor.RegisterProperty( "int-property",      123 );
-  Property::Index vector2Index  = actor.RegisterProperty( "vector2-property",  Vector2(1.0f, 2.0f) );
-  Property::Index vector3Index  = actor.RegisterProperty( "vector3-property",  Vector3(1.0f, 2.0f, 3.0f) );
-  Property::Index vector4Index  = actor.RegisterProperty( "vector4-property",  Vector4(1.0f, 2.0f, 3.0f, 4.0f) );
-  Property::Index rotationIndex = actor.RegisterProperty( "rotation-property", AngleAxis(Degree(180.0f), Vector3::YAXIS) );
+  Property::Index boolIndex     = actor.RegisterProperty( "boolProperty",      bool(true) );
+  Property::Index floatIndex    = actor.RegisterProperty( "floatProperty",     float(123.0f) );
+  Property::Index intIndex      = actor.RegisterProperty( "intProperty",       123 );
+  Property::Index vector2Index  = actor.RegisterProperty( "vector2Property",   Vector2(1.0f, 2.0f) );
+  Property::Index vector3Index  = actor.RegisterProperty( "vector3Property",   Vector3(1.0f, 2.0f, 3.0f) );
+  Property::Index vector4Index  = actor.RegisterProperty( "vector4Property",   Vector4(1.0f, 2.0f, 3.0f, 4.0f) );
+  Property::Index rotationIndex = actor.RegisterProperty( "rotationProperty",  AngleAxis(Degree(180.0f), Vector3::YAXIS) );
 
   DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( boolIndex ) );
   DALI_TEST_CHECK( Property::FLOAT    == actor.GetPropertyType( floatIndex ) );
@@ -372,7 +372,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::ROTATION == actor.GetPropertyType( rotationIndex ) );
 
   // Non animatable properties
-  Property::Index nonAnimStringIndex = actor.RegisterProperty( "man-from-delmonte", std::string("yes"), Property::READ_WRITE);
+  Property::Index nonAnimStringIndex = actor.RegisterProperty( "manFromDelmonte",   std::string("yes"), Property::READ_WRITE);
   Property::Index nonAnimV2Index = actor.RegisterProperty( "v2", Vector2(1.f, 2.f), Property::READ_WRITE);
   Property::Index nonAnimV3Index = actor.RegisterProperty( "v3", Vector3(1.f, 2.f, 3.f), Property::READ_WRITE);
   Property::Index nonAnimV4Index = actor.RegisterProperty( "v4", Vector4(1.f, 2.f, 3.f, 4.f), Property::READ_WRITE);
@@ -422,7 +422,7 @@ int UtcDaliHandleNonAnimtableProperties(void)
 
   Actor actor = Actor::New();
 
-  Property::Index nonAnimStringIndex = actor.RegisterProperty( "man-from-delmonte", std::string("no"), Property::READ_WRITE);
+  Property::Index nonAnimStringIndex = actor.RegisterProperty( "manFromDelmonte",   std::string("no"), Property::READ_WRITE);
 
   //// modify writable?
   try
@@ -712,7 +712,7 @@ int UtcDaliHandleRegisterPropertyTypes(void)
     try
     {
       Actor actor = Actor::New();
-      actor.RegisterProperty( "man-from-delmonte", properties[i].value );
+      actor.RegisterProperty( "manFromDelmonte",   properties[i].value );
     }
     catch (Dali::DaliException& e)
     {
@@ -731,7 +731,7 @@ int UtcDaliHandleCustomProperty(void)
   Handle handle = Handle::New();
 
   float startValue(1.0f);
-  Property::Index index = handle.RegisterProperty( "test-property", startValue );
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
   DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
 
   application.SendNotification();

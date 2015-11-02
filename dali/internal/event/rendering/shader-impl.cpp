@@ -43,7 +43,7 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "program",       MAP,     true,     false,     false,  Dali::Shader::Property::PROGRAM )
-DALI_PROPERTY( "shader-hints",  INTEGER, true,     false,     true,   Dali::Shader::Property::SHADER_HINTS )
+DALI_PROPERTY( "shaderHints",   INTEGER, true,     false,     true,   Dali::Shader::Property::SHADER_HINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };

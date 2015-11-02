@@ -54,9 +54,9 @@ struct LongPressGesture;
  * @see LongPressGesture
  *
  * Signals
- * | %Signal Name        | Method                |
- * |---------------------|-----------------------|
- * | long-press-detected | @ref DetectedSignal() |
+ * | %Signal Name      | Method                |
+ * |-------------------|-----------------------|
+ * | longPressDetected | @ref DetectedSignal() |
  */
 class DALI_IMPORT_API LongPressGestureDetector : public GestureDetector
 {

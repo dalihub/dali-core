@@ -106,7 +106,7 @@ int UtcDaliSignalDelegateIsConnectedP(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   // Create the test class (this will create the delegate, but not connect to it yet.
   SignalDelegateTestClass testObject( connectActor, connectSignal );
@@ -127,7 +127,7 @@ int UtcDaliSignalDelegateIsConnectedN(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   // Create the test class (this will create the delegate, but not connect to it yet.
   SignalDelegateTestClass testObject( connectActor, connectSignal );
@@ -144,7 +144,7 @@ int UtcDaliSignalDelegateConnectToMemberP(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   gSignalReceived = false;
 
@@ -155,7 +155,7 @@ int UtcDaliSignalDelegateConnectToMemberP(void)
   // Note: It is at this point that the delegate internally makes the connection.
   testObject.ConnectToInternalMember();
 
-  // Add the actor to the stage to trigger it's "on-stage" signal.
+  // Add the actor to the stage to trigger it's "onStage" signal.
   // If the delegate connected correctly, this will call the member
   // function in the test object and set a global flag.
   Stage::GetCurrent().Add( connectActor );
@@ -173,7 +173,7 @@ int UtcDaliSignalDelegateConnectToMemberN(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   gSignalReceived = false;
 
@@ -197,7 +197,7 @@ int UtcDaliSignalDelegateConnectToFunctorP(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   // Initialise the signal delegate with the actor to connect to and it's signal.
   SignalDelegate signalDelegate( connectActor, connectSignal );
@@ -217,7 +217,7 @@ int UtcDaliSignalDelegateConnectToFunctorP(void)
   // Check the signal delegate has made the connection.
   DALI_TEST_CHECK( signalDelegate.IsConnected() );
 
-  // Add the actor to the stage to trigger it's "on-stage" signal.
+  // Add the actor to the stage to trigger it's "onStage" signal.
   // If the delegate connected correctly, this will call the () operator of our
   // passed-in functor, the functor will in turn set a global flag.
   Stage::GetCurrent().Add( connectActor );
@@ -235,7 +235,7 @@ int UtcDaliSignalDelegateConnectToFunctorN(void)
 
   // Set up an actor with a signal to connect to.
   Actor connectActor = Actor::New();
-  std::string connectSignal = "on-stage";
+  std::string connectSignal = "onStage";
 
   // Initialise the signal delegate with the actor to connect to and it's signal.
   SignalDelegate signalDelegate( connectActor, connectSignal );

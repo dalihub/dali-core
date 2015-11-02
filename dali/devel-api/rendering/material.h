@@ -63,15 +63,15 @@ public:
   {
     enum
     {
-      FACE_CULLING_MODE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "face-culling-mode",              type INTEGER
-      BLENDING_MODE,                                           ///< name "blending-mode",                  type INTEGER
-      BLEND_EQUATION_RGB,                                      ///< name "blend-equation-rgb",             type INTEGER
-      BLEND_EQUATION_ALPHA,                                    ///< name "blend-equation-alpha",           type INTEGER
-      BLENDING_SRC_FACTOR_RGB,                                 ///< name "source-blend-factor-rgb",        type INTEGER
-      BLENDING_DEST_FACTOR_RGB,                                ///< name "destination-blend-factor-rgb",   type INTEGER
-      BLENDING_SRC_FACTOR_ALPHA,                               ///< name "source-blend-factor-alpha",      type INTEGER
-      BLENDING_DEST_FACTOR_ALPHA,                              ///< name "destination-blend-factor-alpha", type INTEGER
-      BLEND_COLOR,                                             ///< name "blend-color",                    type VECTOR4
+      FACE_CULLING_MODE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "faceCullingMode",                type INTEGER
+      BLENDING_MODE,                                           ///< name "blendingMode",                   type INTEGER
+      BLEND_EQUATION_RGB,                                      ///< name "blendEquationRgb",               type INTEGER
+      BLEND_EQUATION_ALPHA,                                    ///< name "blendEquationAlpha",             type INTEGER
+      BLENDING_SRC_FACTOR_RGB,                                 ///< name "sourceBlendFactorRgb",           type INTEGER
+      BLENDING_DEST_FACTOR_RGB,                                ///< name "destinationBlendFactorRgb",      type INTEGER
+      BLENDING_SRC_FACTOR_ALPHA,                               ///< name "sourceBlendFactorAlpha",         type INTEGER
+      BLENDING_DEST_FACTOR_ALPHA,                              ///< name "destinationBlendFactorAlpha",    type INTEGER
+      BLEND_COLOR,                                             ///< name "blendColor",                     type VECTOR4
     };
   };
 

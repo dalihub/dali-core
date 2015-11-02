@@ -60,7 +60,7 @@ struct PanGesture;
  * Signals
  * | %Signal Name | Method                |
  * |--------------|-----------------------|
- * | pan-detected | @ref DetectedSignal() |
+ * | panDetected  | @ref DetectedSignal() |
  */
 class DALI_IMPORT_API PanGestureDetector : public GestureDetector
 {
@@ -73,12 +73,12 @@ public:
   {
     enum
     {
-      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screen-position",     type Vector2
-      SCREEN_DISPLACEMENT,                                             ///< name "screen-displacement", type Vector2
-      SCREEN_VELOCITY,                                                 ///< name "screen-velocity",     type Vector2
-      LOCAL_POSITION,                                                  ///< name "local-position",      type Vector2
-      LOCAL_DISPLACEMENT,                                              ///< name "local-displacement",  type Vector2
-      LOCAL_VELOCITY,                                                  ///< name "local-velocity",      type Vector2
+      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screenPosition",      type Vector2
+      SCREEN_DISPLACEMENT,                                             ///< name "screenDisplacement",  type Vector2
+      SCREEN_VELOCITY,                                                 ///< name "screenVelocity",      type Vector2
+      LOCAL_POSITION,                                                  ///< name "localPosition",       type Vector2
+      LOCAL_DISPLACEMENT,                                              ///< name "localDisplacement",   type Vector2
+      LOCAL_VELOCITY,                                                  ///< name "localVelocity",       type Vector2
       PANNING,                                                         ///< name "panning",             type bool
     };
   };

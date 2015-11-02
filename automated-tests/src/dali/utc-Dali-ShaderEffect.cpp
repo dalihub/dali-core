@@ -836,8 +836,8 @@ int UtcDaliShaderEffectFromPropertiesP(void)
   programMap->Insert("vertex", vertexShader);
   programMap->Insert("fragment", fragmentShader);
 
-  programMap->Insert("vertex-prefix", vertexShaderPrefix);
-  programMap->Insert("fragment-prefix", fragmentShaderPrefix);
+  programMap->Insert("vertexPrefix",  vertexShaderPrefix);
+  programMap->Insert("fragmentPrefix",  fragmentShaderPrefix);
 
   effect.SetProperty(effect.GetPropertyIndex("program"), programValue);
 
@@ -937,7 +937,7 @@ int UtcDaliShaderEffectFromProperties2N(void)
     DALI_TEST_CHECK( effect );
 
     // dont set unknown
-    effect.SetProperty( effect.GetPropertyIndex("geometry-hints"), "HINT_2" );
+    effect.SetProperty( effect.GetPropertyIndex("geometryHints"), "HINT_2" );
 
     tet_result( TET_FAIL );
   }

@@ -54,9 +54,9 @@ namespace // For internal properties
 
 //              Name                 Type     writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "viewport-position",  VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_POSITION )
-DALI_PROPERTY( "viewport-size",      VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
-DALI_PROPERTY( "clear-color",        VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
+DALI_PROPERTY( "viewportPosition",   VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_POSITION )
+DALI_PROPERTY( "viewportSize",       VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
+DALI_PROPERTY( "clearColor",         VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals

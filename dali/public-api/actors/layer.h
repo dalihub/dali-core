@@ -62,8 +62,8 @@ typedef Rect<int> ClippingBox;
  * |-----------------|----------------------|
  * | raise           | @ref Raise()         |
  * | lower           | @ref Lower()         |
- * | raise-to-top    | @ref RaiseToTop()    |
- * | lower-to-bottom | @ref LowerToBottom() |
+ * | raiseToTop      | @ref RaiseToTop()    |
+ * | lowerToBottom   | @ref LowerToBottom() |
  */
 class DALI_IMPORT_API Layer : public Actor
 {
@@ -77,8 +77,8 @@ public:
   {
     enum
     {
-      CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clipping-enable",  type bool
-      CLIPPING_BOX,                                                 ///< name "clipping-box",     type Rect<int>
+      CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clippingEnable",   type bool
+      CLIPPING_BOX,                                                 ///< name "clippingBox",      type Rect<int>
       BEHAVIOR,                                                     ///< name "behavior",         type String
     };
   };
@@ -94,7 +94,7 @@ public:
      * @brief Layer doesn't make use of the depth test.
      *
      * This mode is expected to have better performance than the 3D mode.
-     * When using this mode any ordering would be with respect to depth-index property of Renderers.
+     * When using this mode any ordering would be with respect to depthIndex property of Renderers.
      */
     LAYER_2D,
 
