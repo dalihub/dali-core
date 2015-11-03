@@ -3451,3 +3451,99 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskWorldToViewport(void)
+{
+  TestApplication application( static_cast<size_t>(400), static_cast<size_t>(400) ); // square surface
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetPosition( Vector3(0.0, 0.0, 0.0) );
+
+  actor.SetParentOrigin( Vector3(0.5, 0.5, 0.5) );
+  actor.SetAnchorPoint( Vector3(0.5, 0.5, 0.5) );
+
+  Stage::GetCurrent().Add(actor);
+
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  CameraActor camera = task.GetCameraActor();
+
+  Vector2 screenSize = task.GetCurrentViewportSize();
+
+  float screenX = 0.0;
+  float screenY = 0.0;
+
+  bool ok = task.WorldToViewport(actor.GetCurrentWorldPosition(), screenX, screenY);
+  DALI_TEST_CHECK(ok == true);
+
+  DALI_TEST_EQUALS(screenX, screenSize.x/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenY, screenSize.y/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  Actor actor2 = Actor::New();
+  float actor2Size = 100.f;
+  actor2.SetSize( actor2Size, actor2Size );
+  actor2.SetPosition( Vector3(0.0, 0.0, 0.0) );
+  actor2.SetParentOrigin( Vector3(0.5, 0.5, 0.0) );
+  actor2.SetAnchorPoint( Vector3(0.5, 0.5, 0.0) );
+  Stage::GetCurrent().Add( actor2 );
+  actor2.Add(actor);
+  actor.SetParentOrigin( Vector3(0,0,0) );
+
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  ok = task.WorldToViewport(actor.GetCurrentWorldPosition(), screenX, screenY);
+  DALI_TEST_CHECK(ok == true);
+
+  DALI_TEST_EQUALS(screenX, screenSize.x/2 - actor2Size/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenY, screenSize.y/2 - actor2Size/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskViewportToLocal(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetPosition(10.0f, 10.0f);
+  Stage::GetCurrent().Add(actor);
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  float localX;
+  float localY;
+
+  float rtLocalX;
+  float rtLocalY;
+
+  float screenX = 50.0f;
+  float screenY = 50.0f;
+
+  DALI_TEST_CHECK( actor.ScreenToLocal(localX, localY, screenX, screenY) );
+
+  DALI_TEST_CHECK( task.ViewportToLocal(actor, screenX, screenY, rtLocalX, rtLocalY ) );
+
+  DALI_TEST_EQUALS(localX, rtLocalX, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(localY, rtLocalY, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+
+}

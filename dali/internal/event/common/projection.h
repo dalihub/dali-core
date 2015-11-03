@@ -22,6 +22,8 @@ namespace Dali
 {
 
 struct Vector4;
+struct Vector2;
+
 class Matrix;
 
 namespace Internal
@@ -43,6 +45,15 @@ bool Unproject(const Dali::Vector4& windowPos,
                float viewportWidth,
                float viewportHeight,
                Dali::Vector4& objectPos);
+
+bool ProjectFull( const Vector4& position,
+                  const Matrix& modelView,
+                  const Matrix& projection,
+                  float viewportX,
+                  float viewportY,
+                  float viewportWidth,
+                  float viewportHeight,
+                  Vector4& windowPos );
 
 } // namespace Internal
 

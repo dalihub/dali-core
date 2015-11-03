@@ -211,6 +211,16 @@ public:
    */
   bool IsSystemLevel() const;
 
+  /**
+   * @copydoc Dali::RenderTask::WorldToViewport()
+   */
+  bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
+
+  /**
+   * @copydoc Dali::RenderTask::ViewportToLocal()
+   */
+  bool ViewportToLocal(Actor* actor, float viewportX, float viewportY, float &localX, float &localY) const;
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
 
   /**
