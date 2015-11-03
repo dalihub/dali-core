@@ -185,10 +185,18 @@ public:
     {
       if( mRenderer[i] == renderer )
       {
-        mRenderer.Erase( mRenderer.Begin()+i);
+        //Renderer already in the list
         return;
       }
     }
+
+    //If it is the first renderer added, make sure the world transform will be calculated
+    //in the next update as world transform is not computed if node has no renderers
+    if( rendererCount == 0 )
+    {
+      mDirtyFlags |= TransformFlag;
+    }
+
     mRenderer.PushBack( renderer );
   }
 
