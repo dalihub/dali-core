@@ -83,7 +83,7 @@ int UtcDaliImageActorNew02(void)
   TestApplication application;
   tet_infoline("Negative test for Dali::ImageActor::New()");
 
-  Image image = ResourceImage::New("hopefully-this-image-file-does-not-exist");
+  Image image = ResourceImage::New("hopefullyThisImageFileDoesNotExist");
   ImageActor actor = ImageActor::New(image);
 
   DALI_TEST_CHECK(actor);

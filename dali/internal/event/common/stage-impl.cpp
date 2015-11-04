@@ -55,13 +55,13 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 
 // Signals
 
-const char* const SIGNAL_KEY_EVENT =                 "key-event";
-const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
+const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
+const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
 const char* const SIGNAL_TOUCHED =                   "touched";
-const char* const SIGNAL_WHEEL_EVENT =               "wheel-event";
-const char* const SIGNAL_CONTEXT_LOST =              "context-lost";
-const char* const SIGNAL_CONTEXT_REGAINED =          "context-regained";
-const char* const SIGNAL_SCENE_CREATED =             "scene-created";
+const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
+const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
+const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
+const char* const SIGNAL_SCENE_CREATED =             "sceneCreated";
 
 TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
 

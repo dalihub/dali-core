@@ -241,9 +241,9 @@ public:
   const PropertyInputImpl* GetProjectionMatrix() const;
 
   /**
-   * Retrieve the view-matrix property querying interface.
+   * Retrieve the viewMatrix property querying interface.
    * @pre The attachment is on-stage.
-   * @return The view-matrix property querying interface.
+   * @return The viewMatrix property querying interface.
    */
   const PropertyInputImpl* GetViewMatrix() const;
 
@@ -317,8 +317,8 @@ public:  // PROPERTIES
   Vector2                       mStereoBias;
   Vector3                       mTargetPosition;
 
-  InheritedMatrix mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
-  InheritedMatrix mProjectionMatrix;     ///< The projection-matrix; this is double buffered for input handling.
+  InheritedMatrix mViewMatrix;           ///< The viewMatrix; this is double buffered for input handling.
+  InheritedMatrix mProjectionMatrix;     ///< The projectionMatrix; this is double buffered for input handling.
 
   DoubleBuffered< FrustumPlanes > mFrustum;               ///< Clipping frustum; double buffered for input handling
   DoubleBuffered< Matrix >        mInverseViewProjection; ///< Inverted viewprojection; double buffered for input handling

@@ -517,7 +517,7 @@ BaseHandle CreateNamedActorType()
 }
 
 TypeRegistration namedActorType( "MyNamedActor", typeid(Dali::Actor), CreateNamedActorType );
-PropertyRegistration namedActorPropertyOne( namedActorType, "prop-name", PROPERTY_REGISTRATION_START_INDEX, Property::BOOLEAN, &SetProperty, &GetProperty );
+PropertyRegistration namedActorPropertyOne( namedActorType, "propName",  PROPERTY_REGISTRATION_START_INDEX, Property::BOOLEAN, &SetProperty, &GetProperty );
 
 } // Anonymous namespace
 
@@ -937,7 +937,7 @@ int UtcDaliTypeRegistryTypeActionN(void)
   DALI_TEST_CHECK( handle );
 
   Property::Map attributes;
-  DALI_TEST_CHECK( !handle.DoAction( "unknown-action", attributes ) );
+  DALI_TEST_CHECK( !handle.DoAction( "unknownAction",  attributes ) );
 
   END_TEST;
 }
@@ -956,7 +956,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   DALI_TEST_CHECK( customActor );
   unsigned int initialPropertyCount( customActor.GetPropertyCount() );
 
-  std::string propertyName( "prop-1" );
+  std::string propertyName( "prop1" );
   int propertyIndex( PROPERTY_REGISTRATION_START_INDEX );
   Property::Type propertyType( Property::BOOLEAN );
   PropertyRegistration property1( customType1, propertyName, propertyIndex, propertyType, &SetProperty, &GetProperty );
@@ -966,7 +966,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   DALI_TEST_EQUALS( initialPropertyCount + 1u, postRegistrationPropertyCount, TEST_LOCATION );
 
   // Add custom property and check property count
-  customActor.RegisterProperty( "custom-prop-1", true );
+  customActor.RegisterProperty( "customProp1",   true );
   unsigned int customPropertyCount( customActor.GetPropertyCount() );
   DALI_TEST_EQUALS( postRegistrationPropertyCount + 1u, customPropertyCount, TEST_LOCATION );
 
@@ -1013,7 +1013,7 @@ int UtcDaliTypeRegistryPropertyRegistrationN(void)
   // Attempt to register a property type out-of-bounds index (less than)
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    PropertyRegistration property1( customType1, "propName",  PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN, &SetProperty, &GetProperty );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1024,7 +1024,7 @@ int UtcDaliTypeRegistryPropertyRegistrationN(void)
   // Attempt to register a property type out-of-bounds index (greater than)
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    PropertyRegistration property1( customType1, "propName",  PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN, &SetProperty, &GetProperty );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1051,7 +1051,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   unsigned int customPropertyCount( customActor.GetPropertyCount() );
 
   // Register animatable property
-  std::string animatablePropertyName( "animatable-prop-1" );
+  std::string animatablePropertyName( "animatableProp1" );
   int animatablePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
   Property::Type animatablePropertyType( Property::FLOAT );
   AnimatablePropertyRegistration animatableProperty1( customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType );
@@ -1102,7 +1102,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationN(void)
   // Attempt to register an animatable property type out-of-bounds index (less than)
   try
   {
-    AnimatablePropertyRegistration property1( customType1, "anim-prop-name", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN );
+    AnimatablePropertyRegistration property1( customType1, "animPropName",   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1113,7 +1113,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationN(void)
   // Attempt to register an animatable property type out-of-bounds index (greater than)
   try
   {
-    AnimatablePropertyRegistration property1( customType1, "anim-prop-name", ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN );
+    AnimatablePropertyRegistration property1( customType1, "animPropName",   ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1140,7 +1140,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   unsigned int customPropertyCount( customActor.GetPropertyCount() );
 
   // Register animatable property
-  std::string animatablePropertyName( "animatable-prop-1" );
+  std::string animatablePropertyName( "animatableProp1" );
   int animatablePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
   Property::Type animatablePropertyType( Property::VECTOR2 );
   AnimatablePropertyRegistration animatableProperty1( customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType );
@@ -1173,11 +1173,11 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
 
   // Register animatable property components
-  std::string animatablePropertyComponentName1( "animatable-prop-1-x" );
+  std::string animatablePropertyComponentName1( "animatableProp1X" );
   int animatablePropertyComponentIndex1( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1 );
   AnimatablePropertyComponentRegistration animatablePropertyComponent1( customType1, animatablePropertyComponentName1, animatablePropertyComponentIndex1, animatablePropertyIndex, 0 );
 
-  std::string animatablePropertyComponentName2( "animatable-prop-1-y" );
+  std::string animatablePropertyComponentName2( "animatableProp1Y" );
   int animatablePropertyComponentIndex2( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2 );
   AnimatablePropertyComponentRegistration animatablePropertyComponent2( customType1, animatablePropertyComponentName2, animatablePropertyComponentIndex2, animatablePropertyIndex, 1 );
 
@@ -1230,12 +1230,12 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
 
   // Register animatable property with the type of Vector2
   int animatablePropertyIndex1( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
-  AnimatablePropertyRegistration animatableProperty1( customType1, "animatable-prop-1", animatablePropertyIndex1, Property::VECTOR2 );
+  AnimatablePropertyRegistration animatableProperty1( customType1, "animatableProp1",   animatablePropertyIndex1, Property::VECTOR2 );
 
   // Attempt to register an animatable property component out-of-bounds index (less than)
   try
   {
-    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX - 1, animatablePropertyIndex1, 0 );
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatableProp1X",    ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX - 1, animatablePropertyIndex1, 0 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1246,7 +1246,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
   // Attempt to register an animatable property component out-of-bounds index (greater than)
   try
   {
-    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX + 1, animatablePropertyIndex1, 0 );
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatableProp1X",    ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX + 1, animatablePropertyIndex1, 0 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1255,12 +1255,12 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
   }
 
   // Register an animatable property component
-  AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, animatablePropertyIndex1, 0 );
+  AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatableProp1X",    ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, animatablePropertyIndex1, 0 );
 
   // Attempt to register another animatable property component with the same component index
   try
   {
-    AnimatablePropertyComponentRegistration propertyComponent2( customType1, "animatable-prop-1-y", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2, animatablePropertyIndex1, 0 );
+    AnimatablePropertyComponentRegistration propertyComponent2( customType1, "animatableProp1Y",    ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2, animatablePropertyIndex1, 0 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1270,12 +1270,12 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
 
   // Register animatable property with the type of boolean
   int animatablePropertyIndex2( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2 );
-  AnimatablePropertyRegistration animatableProperty2( customType1, "animatable-prop-2", animatablePropertyIndex2, Property::BOOLEAN );
+  AnimatablePropertyRegistration animatableProperty2( customType1, "animatableProp2",   animatablePropertyIndex2, Property::BOOLEAN );
 
   // Attempt to register an animatable property component for the above property with boolean type
   try
   {
-    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-2-x", animatablePropertyIndex2 + 1, animatablePropertyIndex2, 0 );
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatableProp2X",    animatablePropertyIndex2 + 1, animatablePropertyIndex2, 0 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1321,7 +1321,7 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
   application.Render(0);
   DALI_TEST_CHECK(a.IsVisible());
 
-  DALI_TEST_CHECK(!hdl.DoAction("unknown-action", attributes));
+  DALI_TEST_CHECK(!hdl.DoAction("unknownAction",  attributes));
   END_TEST;
 }
 
@@ -1333,7 +1333,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   // Attempt to register a property without a setter
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", propertyIndex++, Property::BOOLEAN, NULL, &GetProperty );
+    PropertyRegistration property1( customType1, "propName",  propertyIndex++, Property::BOOLEAN, NULL, &GetProperty );
     tet_result( TET_PASS );
   }
   catch ( DaliException& e )
@@ -1344,7 +1344,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   // Attempt to register a property without a getter
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", propertyIndex++, Property::BOOLEAN, NULL, NULL );
+    PropertyRegistration property1( customType1, "propName",  propertyIndex++, Property::BOOLEAN, NULL, NULL );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -1360,12 +1360,12 @@ int UtcDaliPropertyRegistrationAddSameIndex(void)
   int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 100;
 
   // Add one property with a valid property index
-  PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+  PropertyRegistration property1( customType1, "propName",  propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
 
   // Attempt to add another property with the same index
   try
   {
-    PropertyRegistration property2( customType1, "prop-name-2", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+    PropertyRegistration property2( customType1, "propName2",   propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
   }
   catch ( DaliException& e )
   {
@@ -1375,12 +1375,12 @@ int UtcDaliPropertyRegistrationAddSameIndex(void)
   int animatablePropertyIndex = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 100;
 
   // Add one property with a valid property index
-  AnimatablePropertyRegistration property3( customType1, "anim-prop-name", animatablePropertyIndex, Property::BOOLEAN );
+  AnimatablePropertyRegistration property3( customType1, "animPropName",   animatablePropertyIndex, Property::BOOLEAN );
 
   // Attempt to add another property with the same index
   try
   {
-    AnimatablePropertyRegistration property4( customType1, "anim-prop-name-2", animatablePropertyIndex, Property::BOOLEAN );
+    AnimatablePropertyRegistration property4( customType1, "animPropName2",    animatablePropertyIndex, Property::BOOLEAN );
   }
   catch ( DaliException& e )
   {
@@ -1396,8 +1396,8 @@ int UtcDaliPropertyRegistrationPropertyWritable(void)
   int propertyIndex2 = PROPERTY_REGISTRATION_START_INDEX + 201;
 
   // Add two properties, one with SetProperty, one without
-  PropertyRegistration property1( customType1, "prop-name-readwrite", propertyIndex1, Property::BOOLEAN, &SetProperty, &GetProperty );
-  PropertyRegistration property2( customType1, "prop-name-readonly",  propertyIndex2, Property::BOOLEAN, NULL, &GetProperty );
+  PropertyRegistration property1( customType1, "propNameReadwrite",   propertyIndex1, Property::BOOLEAN, &SetProperty, &GetProperty );
+  PropertyRegistration property2( customType1, "propNameReadonly",    propertyIndex2, Property::BOOLEAN, NULL, &GetProperty );
 
   // Create custom-actor
   TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
@@ -1420,10 +1420,10 @@ int UtcDaliPropertyRegistrationPropertyAnimatable(void)
   int animatablePropertyIndex = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 400;
 
   // These properties are not animatable
-  PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+  PropertyRegistration property1( customType1, "propName",  propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
 
   // These properties are animatable
-  AnimatablePropertyRegistration property2( customType1, "anim-prop-name", animatablePropertyIndex, Property::BOOLEAN );
+  AnimatablePropertyRegistration property2( customType1, "animPropName",   animatablePropertyIndex, Property::BOOLEAN );
 
   // Create custom-actor
   TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
@@ -1532,7 +1532,7 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, "long-press-detected", functor );
+  handle.ConnectSignal( &application, "longPressDetected",   functor );
 
   // Render and notify
   application.SendNotification();
@@ -1570,7 +1570,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, "pan-detected", functor );
+  handle.ConnectSignal( &application, "panDetected",  functor );
 
   // Render and notify
   application.SendNotification();
@@ -1608,7 +1608,7 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, "pinch-detected", functor );
+  handle.ConnectSignal( &application, "pinchDetected",  functor );
 
   // Render and notify
   application.SendNotification();
@@ -1644,7 +1644,7 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, "tap-detected", functor );
+  handle.ConnectSignal( &application, "tapDetected",  functor );
 
   // Render and notify
   application.SendNotification();

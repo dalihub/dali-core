@@ -130,10 +130,10 @@ public:
   {
     enum
     {
-      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type float
-      IMAGE,                                             ///< name "image",          type Map {"filename":"", "load-policy":...}
-      PROGRAM,                                           ///< name "program",        type Map {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
-      GEOMETRY_HINTS                                     ///< name "geometry-hints", type int (bitfield) values from enum GeometryHints
+      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "gridDensity",    type float
+      IMAGE,                                             ///< name "image",          type Map {"filename":"", "loadPolicy":...}
+      PROGRAM,                                           ///< name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""}
+      GEOMETRY_HINTS                                     ///< name "geometryHints",  type int (bitfield) values from enum GeometryHints
     };
   };
 

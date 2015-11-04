@@ -43,7 +43,7 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
+const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
 
 BaseHandle CreateImage()
 {

@@ -227,9 +227,9 @@ typedef Rect<float> Padding;      ///< Padding definition
  * |-------------------|------------------------------|
  * | touched           | @ref TouchedSignal()         |
  * | hovered           | @ref HoveredSignal()         |
- * | wheel-event       | @ref WheelEventSignal()      |
- * | on-stage          | @ref OnStageSignal()         |
- * | off-stage         | @ref OffStageSignal()        |
+ * | wheelEvent        | @ref WheelEventSignal()      |
+ * | onStage           | @ref OnStageSignal()         |
+ * | offStage          | @ref OffStageSignal()        |
  *
  * Actions
  * | %Action Name      | %Actor method called         |
@@ -249,58 +249,58 @@ public:
   {
     enum
     {
-      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
-      PARENT_ORIGIN_X,                                    ///< name "parent-origin-x",       type float
-      PARENT_ORIGIN_Y,                                    ///< name "parent-origin-y",       type float
-      PARENT_ORIGIN_Z,                                    ///< name "parent-origin-z",       type float
-      ANCHOR_POINT,                                       ///< name "anchor-point",          type Vector3
-      ANCHOR_POINT_X,                                     ///< name "anchor-point-x",        type float
-      ANCHOR_POINT_Y,                                     ///< name "anchor-point-y",        type float
-      ANCHOR_POINT_Z,                                     ///< name "anchor-point-z",        type float
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3
+      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float
+      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float
+      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float
+      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3
+      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float
+      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float
+      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float
       SIZE,                                               ///< name "size",                  type Vector3
-      SIZE_WIDTH,                                         ///< name "size-width",            type float
-      SIZE_HEIGHT,                                        ///< name "size-height",           type float
-      SIZE_DEPTH,                                         ///< name "size-depth",            type float
+      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float
+      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float
+      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float
       POSITION,                                           ///< name "position",              type Vector3
-      POSITION_X,                                         ///< name "position-x",            type float
-      POSITION_Y,                                         ///< name "position-y",            type float
-      POSITION_Z,                                         ///< name "position-z",            type float
-      WORLD_POSITION,                                     ///< name "world-position",        type Vector3    (read-only)
-      WORLD_POSITION_X,                                   ///< name "world-position-x",      type float      (read-only)
-      WORLD_POSITION_Y,                                   ///< name "world-position-y",      type float      (read-only)
-      WORLD_POSITION_Z,                                   ///< name "world-position-z",      type float      (read-only)
+      POSITION_X,                                         ///< name "positionX",             type float
+      POSITION_Y,                                         ///< name "positionY",             type float
+      POSITION_Z,                                         ///< name "positionZ",             type float
+      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3    (read-only)
+      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float      (read-only)
+      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float      (read-only)
+      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float      (read-only)
       ORIENTATION,                                        ///< name "orientation",           type Quaternion
-      WORLD_ORIENTATION,                                  ///< name "world-orientation",     type Quaternion (read-only)
+      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion (read-only)
       SCALE,                                              ///< name "scale",                 type Vector3
-      SCALE_X,                                            ///< name "scale-x",               type float
-      SCALE_Y,                                            ///< name "scale-y",               type float
-      SCALE_Z,                                            ///< name "scale-z",               type float
-      WORLD_SCALE,                                        ///< name "world-scale",           type Vector3    (read-only)
+      SCALE_X,                                            ///< name "scaleX",                type float
+      SCALE_Y,                                            ///< name "scaleY",                type float
+      SCALE_Z,                                            ///< name "scaleZ",                type float
+      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3    (read-only)
       VISIBLE,                                            ///< name "visible",               type bool
       COLOR,                                              ///< name "color",                 type Vector4
-      COLOR_RED,                                          ///< name "color-red",             type float
-      COLOR_GREEN,                                        ///< name "color-green",           type float
-      COLOR_BLUE,                                         ///< name "color-blue",            type float
-      COLOR_ALPHA,                                        ///< name "color-alpha",           type float
-      WORLD_COLOR,                                        ///< name "world-color",           type Vector4    (read-only)
-      WORLD_MATRIX,                                       ///< name "world-matrix",          type Matrix     (read-only)
+      COLOR_RED,                                          ///< name "colorRed",              type float
+      COLOR_GREEN,                                        ///< name "colorGreen",            type float
+      COLOR_BLUE,                                         ///< name "colorBlue",             type float
+      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float
+      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4    (read-only)
+      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix     (read-only)
       NAME,                                               ///< name "name",                  type std::string
       SENSITIVE,                                          ///< name "sensitive",             type bool
-      LEAVE_REQUIRED,                                     ///< name "leave-required",        type bool
-      INHERIT_ORIENTATION,                                ///< name "inherit-orientation",   type bool
-      INHERIT_SCALE,                                      ///< name "inherit-scale",         type bool
-      COLOR_MODE,                                         ///< name "color-mode",            type std::string
-      POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
-      DRAW_MODE,                                          ///< name "draw-mode",             type std::string
-      SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
-      WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
-      HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
-      SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
-      WIDTH_FOR_HEIGHT,                                   ///< name "width-for-height",      type Boolean
-      HEIGHT_FOR_WIDTH,                                   ///< name "height-for-width",      type Boolean
+      LEAVE_REQUIRED,                                     ///< name "leaveRequired",         type bool
+      INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool
+      INHERIT_SCALE,                                      ///< name "inheritScale",          type bool
+      COLOR_MODE,                                         ///< name "colorMode",             type std::string
+      POSITION_INHERITANCE,                               ///< name "positionInheritance",   type std::string
+      DRAW_MODE,                                          ///< name "drawMode",              type std::string
+      SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3
+      WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String
+      HEIGHT_RESIZE_POLICY,                               ///< name "heightResizePolicy",    type String
+      SIZE_SCALE_POLICY,                                  ///< name "sizeScalePolicy",       type String
+      WIDTH_FOR_HEIGHT,                                   ///< name "widthForHeight",        type Boolean
+      HEIGHT_FOR_WIDTH,                                   ///< name "heightForWidth",        type Boolean
       PADDING,                                            ///< name "padding",               type Vector4
-      MINIMUM_SIZE,                                       ///< name "minimum-size",          type Vector2
-      MAXIMUM_SIZE,                                       ///< name "maximum-size",          type Vector2
+      MINIMUM_SIZE,                                       ///< name "minimumSize",           type Vector2
+      MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2
     };
   };
 
@@ -1011,7 +1011,7 @@ public:
    *
    * If DrawMode::OVERLAY_2D is used, the actor and its children will be drawn as a 2D overlay.
    * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
-   * For overlay actors, the drawing order is with respect to depth-index property of Renderers,
+   * For overlay actors, the drawing order is with respect to depthIndex property of Renderers,
    * and depth-testing will not be used.
    *
    * If DrawMode::STENCIL is used, the actor and its children will be used to stencil-test other actors

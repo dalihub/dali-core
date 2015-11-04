@@ -41,15 +41,15 @@ namespace
  *            |name                              |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "face-culling-mode",               INTEGER,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
-DALI_PROPERTY( "blending-mode",                   INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
-DALI_PROPERTY( "blend-equation-rgb",              INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
-DALI_PROPERTY( "blend-equation-alpha",            INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
-DALI_PROPERTY( "source-blend-factor-rgb",         INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
-DALI_PROPERTY( "destination-blend-factor-rgb",    INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
-DALI_PROPERTY( "source-blend-factor-alpha",       INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
-DALI_PROPERTY( "destination-blend-factor-alpha",  INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
-DALI_PROPERTY( "blend-color",                     VECTOR4,   true, false,  false, Dali::Material::Property::BLEND_COLOR )
+DALI_PROPERTY( "faceCullingMode",                 INTEGER,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
+DALI_PROPERTY( "blendingMode",                    INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
+DALI_PROPERTY( "blendEquationRgb",                INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
+DALI_PROPERTY( "blendEquationAlpha",              INTEGER,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
+DALI_PROPERTY( "sourceBlendFactorRgb",            INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
+DALI_PROPERTY( "destinationBlendFactorRgb",       INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
+DALI_PROPERTY( "sourceBlendFactorAlpha",          INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
+DALI_PROPERTY( "destinationBlendFactorAlpha",     INTEGER,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
+DALI_PROPERTY( "blendColor",                      VECTOR4,   true, false,  false, Dali::Material::Property::BLEND_COLOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> MATERIAL_IMPL = { DEFAULT_PROPERTY_DETAILS };

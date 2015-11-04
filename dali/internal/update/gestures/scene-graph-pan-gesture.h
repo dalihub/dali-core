@@ -379,12 +379,12 @@ private:
 
   // Properties
   GesturePropertyBool    mPanning;            ///< panning flag
-  GesturePropertyVector2 mScreenPosition;     ///< screen-position
-  GesturePropertyVector2 mScreenDisplacement; ///< screen-displacement
-  GesturePropertyVector2 mScreenVelocity;     ///< screen-velocity
-  GesturePropertyVector2 mLocalPosition;      ///< local-position
-  GesturePropertyVector2 mLocalDisplacement;  ///< local-displacement
-  GesturePropertyVector2 mLocalVelocity;      ///< local-velocity
+  GesturePropertyVector2 mScreenPosition;     ///< screenPosition
+  GesturePropertyVector2 mScreenDisplacement; ///< screenDisplacement
+  GesturePropertyVector2 mScreenVelocity;     ///< screenVelocity
+  GesturePropertyVector2 mLocalPosition;      ///< localPosition
+  GesturePropertyVector2 mLocalDisplacement;  ///< localDisplacement
+  GesturePropertyVector2 mLocalVelocity;      ///< localVelocity
 
   PanInfoHistory mPanHistory;
   PanInfoHistory mPredictionHistory;

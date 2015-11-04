@@ -66,9 +66,9 @@ class ResourceImage;
  * Reload only takes effect if the ResourceImage has already finished loading
  *
  * Signals
- * | %Signal Name           | Method                       |
- * |------------------------|------------------------------|
- * | image-loading-finished | @ref LoadingFinishedSignal() |
+ * | %Signal Name         | Method                       |
+ * |----------------------|------------------------------|
+ * | imageLoadingFinished | @ref LoadingFinishedSignal() |
  */
 class DALI_IMPORT_API ResourceImage : public Image
 {
