@@ -22,16 +22,17 @@
 namespace Dali
 {
 
-/**
- * Constructor
- */
+namespace
+{
+const unsigned int NANOSECONDS_PER_MILLISECOND = 1000000u;
+const unsigned int NANOSECONDS_PER_SECOND = 1000000000u;
+}
+
 TestPlatformAbstraction::TestPlatformAbstraction()
 : mTrace(),
   mSeconds( 0u ),
-  mMicroSeconds( 0u ),
+  mNanoSeconds( 0u ),
   mIsLoadingResult( false ),
-  mGetDefaultFontFamilyResult(),
-  mGetDefaultFontStyleResult(),
   mGetDefaultFontSizeResult( 0 ),
   mResources(),
   mRequest( NULL ),
@@ -43,34 +44,22 @@ TestPlatformAbstraction::TestPlatformAbstraction()
   Initialize();
 }
 
-/**
- * Destructor
- */
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
 }
 
-/**
- * @copydoc PlatformAbstraction::GetTimeMicroseconds()
- */
-void TestPlatformAbstraction::GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds)
+void TestPlatformAbstraction::GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds )
 {
   seconds = mSeconds;
-  microSeconds = mMicroSeconds;
-  mTrace.PushCall("GetTimeMicroseconds", "");
+  nanoseconds = mNanoSeconds;
+  mTrace.PushCall("GetTimeNanoseconds", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::Suspend()
- */
 void TestPlatformAbstraction::Suspend()
 {
   mTrace.PushCall("Suspend", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::Resume()
- */
 void TestPlatformAbstraction::Resume()
 {
   mTrace.PushCall("Resume", "");
@@ -98,10 +87,6 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
   return closestSize;
 }
 
-
-/**
- * @copydoc PlatformAbstraction::LoadResource()
- */
 void TestPlatformAbstraction::LoadResource(const Integration::ResourceRequest& request)
 {
   std::ostringstream out;
@@ -128,17 +113,11 @@ Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration:
   return Integration::BitmapPtr();
 }
 
-/**
- * @copydoc PlatformAbstraction::CancelLoad()
- */
 void TestPlatformAbstraction::CancelLoad(Integration::ResourceId id, Integration::ResourceTypeId typeId)
 {
   mTrace.PushCall("CancelLoad", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::GetResources()
- */
 void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
 {
   mTrace.PushCall("GetResources", "");
@@ -153,35 +132,23 @@ void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
   }
 }
 
-/**
- * @copydoc PlatformAbstraction::IsLoading()
- */
 bool TestPlatformAbstraction::IsLoading()
 {
   mTrace.PushCall("IsLoading", "");
   return mIsLoadingResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::GetDefaultFontSize()
- */
 int TestPlatformAbstraction::GetDefaultFontSize() const
 {
   mTrace.PushCall("GetDefaultFontSize", "");
   return mGetDefaultFontSizeResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::SetDpi()
- */
 void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical)
 {
   mTrace.PushCall("SetDpi", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::LoadFile()
- */
 bool TestPlatformAbstraction::LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
   mTrace.PushCall("LoadFile", "");
@@ -193,9 +160,6 @@ bool TestPlatformAbstraction::LoadFile( const std::string& filename, Dali::Vecto
   return mLoadFileResult.loadResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
- */
 bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
   mTrace.PushCall("LoadShaderBinaryFile", "");
@@ -207,9 +171,6 @@ bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename,
   return mLoadFileResult.loadResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::SaveFile()
- */
 bool TestPlatformAbstraction::SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const
 {
   mTrace.PushCall("SaveFile", "");
@@ -228,7 +189,7 @@ void TestPlatformAbstraction::Initialize()
   mTrace.Enable(true);
   memset(&mResources, 0, sizeof(Resources));
   mSeconds=0;
-  mMicroSeconds=0;
+  mNanoSeconds=0;
   mIsLoadingResult=false;
 
   if(mRequest)
@@ -242,11 +203,13 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
 {
   switch(func)
   {
-    case GetTimeMicrosecondsFunc:             return mTrace.FindMethod("GetTimeMicroseconds");
+    case GetTimeNanosecondsFunc:              return mTrace.FindMethod("GetTimeNanoseconds");
     case SuspendFunc:                         return mTrace.FindMethod("Suspend");
     case ResumeFunc:                          return mTrace.FindMethod("Resume");
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
     case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
+    case LoadShaderBinaryFileFunc:            return mTrace.FindMethod("LoadShaderBinaryFile");
+    case SaveShaderBinaryFileFunc:            return mTrace.FindMethod("SaveShaderBinaryFile");
     case SaveFileFunc:                        return mTrace.FindMethod("SaveFile");
     case CancelLoadFunc:                      return mTrace.FindMethod("CancelLoad");
     case GetResourcesFunc:                    return mTrace.FindMethod("GetResources");
@@ -257,19 +220,19 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
   return false;
 }
 
-void TestPlatformAbstraction::SetGetTimeMicrosecondsResult(size_t sec, size_t usec)
+void TestPlatformAbstraction::SetGetTimeNanosecondsResult(size_t sec, size_t nsec)
 {
   mSeconds = sec;
-  mMicroSeconds = usec;
+  mNanoSeconds = nsec;
 }
 
 void TestPlatformAbstraction::IncrementGetTimeResult(size_t milliseconds)
 {
-  mMicroSeconds += milliseconds * 1000u;
-  unsigned int additionalSeconds = mMicroSeconds / 1000000u;
+  mNanoSeconds += milliseconds * NANOSECONDS_PER_MILLISECOND;
+  unsigned int additionalSeconds = mNanoSeconds / NANOSECONDS_PER_SECOND;
 
   mSeconds += additionalSeconds;
-  mMicroSeconds -= additionalSeconds * 1000000u;
+  mNanoSeconds -= additionalSeconds * NANOSECONDS_PER_SECOND;
 }
 
 void TestPlatformAbstraction::SetIsLoadingResult(bool result)

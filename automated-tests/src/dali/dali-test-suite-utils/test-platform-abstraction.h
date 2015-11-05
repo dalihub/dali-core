@@ -74,9 +74,9 @@ public:
   virtual ~TestPlatformAbstraction();
 
   /**
-   * @copydoc PlatformAbstraction::GetTimeMicroseconds()
+   * @copydoc PlatformAbstraction::GetTimeNanoseconds()
    */
-  virtual void GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds);
+  virtual void GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds );
 
   /**
    * @copydoc PlatformAbstraction::Suspend()
@@ -88,12 +88,18 @@ public:
    */
   virtual void Resume();
 
+  /**
+   * @copydoc PlatformAbstraction::GetClosestImageSize()
+   */
   virtual ImageDimensions GetClosestImageSize( const std::string& filename,
                                                  ImageDimensions size,
                                                  FittingMode::Type fittingMode,
                                                  SamplingMode::Type samplingMode,
                                                  bool orientationCorrection );
 
+  /**
+   * @copydoc PlatformAbstraction::GetClosestImageSize()
+   */
   virtual ImageDimensions GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
                                                ImageDimensions size,
                                                FittingMode::Type fittingMode,
@@ -158,7 +164,7 @@ public:
  /**
   * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
   */
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return false; }
+  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
 
   virtual void JoinLoaderThreads();
 
@@ -167,12 +173,14 @@ public: // TEST FUNCTIONS
   // Enumeration of Platform Abstraction methods
   typedef enum
   {
-    GetTimeMicrosecondsFunc,
+    GetTimeNanosecondsFunc,
     SuspendFunc,
     ResumeFunc,
     LoadResourceFunc,
     SaveFileFunc,
     LoadFileFunc,
+    LoadShaderBinaryFileFunc,
+    SaveShaderBinaryFileFunc,
     CancelLoadFunc,
     GetResourcesFunc,
     IsLoadingFunc,
@@ -189,11 +197,13 @@ public: // TEST FUNCTIONS
 
   bool WasCalled(TestFuncEnum func);
 
-  void SetGetTimeMicrosecondsResult(size_t sec, size_t usec);
+  void SetGetTimeNanosecondsResult(size_t sec, size_t nsec);
 
   void IncrementGetTimeResult(size_t milliseconds);
 
   void SetIsLoadingResult(bool result);
+
+  void SetGetDefaultFontSizeResult(float result);
 
   void ClearReadyResources();
 
@@ -216,11 +226,9 @@ public: // TEST FUNCTIONS
 
 private:
   mutable TraceCallStack        mTrace;
-  size_t                        mSeconds;
-  size_t                        mMicroSeconds;
+  uint64_t                      mSeconds;
+  uint64_t                      mNanoSeconds;
   bool                          mIsLoadingResult;
-  std::string                   mGetDefaultFontFamilyResult;
-  std::string                   mGetDefaultFontStyleResult;
   int                           mGetDefaultFontSizeResult;
   Resources                     mResources;
   Integration::ResourceRequest* mRequest;
