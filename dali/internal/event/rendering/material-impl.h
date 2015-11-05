@@ -100,6 +100,11 @@ public:
   int GetTextureIndex( const std::string& uniformName );
 
   /**
+   * @copydoc Dali::Material::GetTextureIndex()
+   */
+  Image* GetTexture( const std::string& uniformName );
+
+  /**
    * @copydoc Dali::Material::GetNumberOfTextures()
    */
   size_t GetNumberOfTextures() const;

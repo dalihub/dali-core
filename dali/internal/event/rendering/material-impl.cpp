@@ -170,6 +170,17 @@ int Material::GetTextureIndex( const std::string& uniformName )
   return -1;
 }
 
+Image* Material::GetTexture( const std::string& uniformName )
+{
+  int textureId = GetTextureIndex( uniformName );
+  if( textureId != -1 )
+  {
+    return mTextures[ textureId ].mImage.Get();
+  }
+
+  return NULL;
+}
+
 size_t Material::GetNumberOfTextures() const
 {
   return mTextures.size();

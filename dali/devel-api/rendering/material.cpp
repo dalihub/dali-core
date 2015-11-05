@@ -128,6 +128,12 @@ int Material::GetTextureIndex( const std::string& uniformName )
   return GetImplementation(*this).GetTextureIndex( uniformName );
 }
 
+Image Material::GetTexture( const std::string& uniformName )
+{
+  Internal::Image* imagePtr( GetImplementation(*this).GetTexture( uniformName ) );
+  return Dali::Image( imagePtr );
+}
+
 std::size_t Material::GetNumberOfTextures() const
 {
   return GetImplementation(*this).GetNumberOfTextures();

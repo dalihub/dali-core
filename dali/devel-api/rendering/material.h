@@ -178,6 +178,14 @@ public:
    */
   int GetTextureIndex( const std::string& uniformName );
 
+  /*
+   * @brief Retrive the texture given its uniform name
+   *
+   * @param[in] uniformName the uniform name
+   * @returns The image in the array of textures corresponding to the uniformName or an empty handle if the texture is not found
+   */
+  Image GetTexture( const std::string& uniformName );
+
   /**
    * @brief Retrieve the number of textures used by the material
    */
