@@ -122,6 +122,14 @@ public:
   virtual void Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset );
 
   /**
+   * Update part of the texture with a pixel buffer
+   * @param[in] srcPixelData The pixel data to copy from
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void Update( PixelData* srcPixelData, std::size_t xOffset, std::size_t yOffset );
+
+  /**
    * Bitmap area has been modified - update the texture appropriately.
    * @pre The bitmap hasn't been discarded (should be external type)
    * @param[in] area The updated area
@@ -162,6 +170,17 @@ private:
    * If the discard policy is not RETAIN, then discards the bitmap's pixel buffer
    */
   void DiscardBitmapBuffer();
+
+  /**
+   * Update part of the texture.
+   * @param [in] pixels The pixel buffer.
+   * @param [in] width  The buffer width in pixels
+   * @param [in] height The buffer height in pixels
+   * @param [in] pixelFormat The pixel format
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void Update( const unsigned char* pixels, std::size_t width, std::size_t height, Pixel::Format pixelFormat, std::size_t xOffset, std::size_t yOffset );
 
 private:
   Integration::BitmapPtr      mBitmap;          ///< The Bitmap the Texture was created from (may be NULL)

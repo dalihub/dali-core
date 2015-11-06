@@ -121,7 +121,7 @@ int UtcSamplerSetFilterMode(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   Sampler sampler = Sampler::New();
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image, "sTexture", sampler );
 
   Geometry geometry = CreateQuadGeometry();
@@ -248,7 +248,7 @@ int UtcSamplerSetWrapMode(void)
   TestApplication application;
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Sampler sampler = Sampler::New();
   material.AddTexture( image, "sTexture", sampler );
 

@@ -46,7 +46,7 @@ int UtcDaliRendererNew01(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
 
   DALI_TEST_EQUALS( (bool)renderer, true, TEST_LOCATION );
@@ -66,7 +66,7 @@ int UtcDaliRendererCopyConstructor(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
 
   Renderer rendererCopy( renderer );
@@ -80,7 +80,7 @@ int UtcDaliRendererAssignmentOperator(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
 
   Renderer renderer2;
@@ -96,7 +96,7 @@ int UtcDaliRendererDownCast01(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
 
   BaseHandle handle(renderer);
@@ -126,7 +126,7 @@ int UtcDaliRendererSetGetGeometry(void)
   Geometry geometry2 = CreateQuadGeometry();
   geometry2.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry1, material);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -167,10 +167,10 @@ int UtcDaliRendererSetGetMaterial(void)
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableCullFaceCallTrace(true);
 
-  Material material1 = CreateMaterial(1.0f);
+  Material material1 = CreateMaterial();
   material1.RegisterProperty( "uFadeColor", Color::RED );
 
-  Material material2 = CreateMaterial(1.0f);
+  Material material2 = CreateMaterial();
   material2.RegisterProperty( "uFadeColor", Color::GREEN );
 
   Geometry geometry = CreateQuadGeometry();
@@ -212,7 +212,7 @@ int UtcDaliRendererSetGetDepthIndex(void)
 
   tet_infoline("Test SetDepthIndex, GetDepthIndex");
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
@@ -250,7 +250,6 @@ int UtcDaliRendererConstraint01(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -295,7 +294,6 @@ int UtcDaliRendererConstraint02(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -354,7 +352,6 @@ int UtcDaliRendererAnimatedProperty01(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -398,7 +395,6 @@ int UtcDaliRendererAnimatedProperty02(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -456,7 +452,6 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
   material.AddTexture( image, "sTexture" );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -521,7 +516,6 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
   material.AddTexture( image, "sTexture" );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -588,7 +582,6 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
   material.AddTexture( image, "sTexture" );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -655,7 +648,6 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
   material.AddTexture( image, "sTexture" );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -717,7 +709,6 @@ int UtcDaliRendererUniformMapPrecendence05(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -780,7 +771,6 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
@@ -839,7 +829,6 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);

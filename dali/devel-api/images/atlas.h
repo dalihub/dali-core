@@ -25,6 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/buffer-image.h>
+#include <dali/devel-api/images/pixel-data.h>
 
 namespace Dali
 {
@@ -40,6 +41,9 @@ class Atlas;
  * Buffer image and resource image( by providing the url ) are supported for uploading.
  * Images must be uploaded at a specified position, to populate the Atlas.
  * The client is responsible for generating the appropriate geometry (UV coordinates) needed to draw images within the Atlas.
+ *
+ * @note For gles 2.0, matched pixel format is demanded to ensure the correct atlasing.
+ *       The only exception supported is uploading image of RGB888 to atlas of RGBA8888 format which is converted manually before pushing to GPU.
  *
  * For context recovery after loss:
  * By default, the atlas will re-upload the resource images automatically,
@@ -111,6 +115,17 @@ public:
    * @return True if the image has compatible pixel format and fits within the atlas at the specified offset.
    */
   bool Upload( const std::string& url,
+               SizeType xOffset,
+               SizeType yOffset );
+
+  /**
+   * @brief Upload a pixel buffer to atlas
+   *
+   * @param [in] pixelData      The pixel data.
+   * @param [in] xOffset        Specifies an offset in the x direction within the atlas.
+   * @param [in] yOffset        Specifies an offset in the y direction within the atlas.
+   */
+  bool Upload( PixelDataPtr pixelData,
                SizeType xOffset,
                SizeType yOffset );
   /**

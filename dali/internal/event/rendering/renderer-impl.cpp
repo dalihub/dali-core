@@ -39,7 +39,7 @@ namespace
  *            |name          |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "depth-index", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_INDEX )
+DALI_PROPERTY( "depthIndex",  INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_INDEX )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };

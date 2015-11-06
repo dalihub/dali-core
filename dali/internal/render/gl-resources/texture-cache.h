@@ -164,6 +164,15 @@ public:
   void UpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
+   * Update the texture with a pixel buffer
+   * @param[in] id Resource Id of the bitmap
+   * @param[in] pixelData The pixel data
+   * @param[in] xOffset Specifies an offset in the x direction within the texture
+   * @param[in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void UpdateTexture( ResourceId id, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset );
+
+  /**
    * Update the area of the texture from the associated bitmap
    * @param[in] id Resource Id of the bitmap
    * @param[in] area The area of the bitmap that has changed
@@ -295,6 +304,11 @@ protected: // Implements TextureCacheDispatcher
    * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
    */
   virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
+
+  /**
+   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
+   */
+  virtual void DispatchUpdateTexture( ResourceId destId, PixelDataPtr srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchUpdateTextureArea()

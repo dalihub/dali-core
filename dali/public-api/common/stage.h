@@ -51,15 +51,15 @@ struct WheelEvent;
  * Multiple stage/window support is not currently provided.
  *
  * Signals
- * | %Signal Name              | Method                               |
- * |---------------------------|--------------------------------------|
- * | key-event                 | @ref KeyEventSignal()                |
- * | event-processing-finished | @ref EventProcessingFinishedSignal() |
- * | touched                   | @ref TouchedSignal()                 |
- * | wheel-event               | @ref WheelEventSignal()              |
- * | context-lost              | @ref ContextLostSignal()             |
- * | context-regained          | @ref ContextRegainedSignal()         |
- * | scene-created             | @ref SceneCreatedSignal()            |
+ * | %Signal Name            | Method                               |
+ * |-------------------------|--------------------------------------|
+ * | keyEvent                | @ref KeyEventSignal()                |
+ * | eventProcessingFinished | @ref EventProcessingFinishedSignal() |
+ * | touched                 | @ref TouchedSignal()                 |
+ * | wheelEvent              | @ref WheelEventSignal()              |
+ * | contextLost             | @ref ContextLostSignal()             |
+ * | contextRegained         | @ref ContextRegainedSignal()         |
+ * | sceneCreated            | @ref SceneCreatedSignal()            |
  */
 class DALI_IMPORT_API Stage : public BaseHandle
 {

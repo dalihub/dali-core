@@ -55,7 +55,7 @@ struct PinchGesture;
  * Signals
  * | %Signal Name   | Method                |
  * |----------------|-----------------------|
- * | pinch-detected | @ref DetectedSignal() |
+ * | pinchDetected  | @ref DetectedSignal() |
  */
 class DALI_IMPORT_API PinchGestureDetector : public GestureDetector
 {

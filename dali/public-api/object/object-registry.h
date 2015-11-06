@@ -52,8 +52,8 @@ class ObjectRegistry;
  * Signals
  * | %Signal Name     | Method                       |
  * |------------------|------------------------------|
- * | object-created   | @ref ObjectCreatedSignal()   |
- * | object-destroyed | @ref ObjectDestroyedSignal() |
+ * | objectCreated    | @ref ObjectCreatedSignal()   |
+ * | objectDestroyed  | @ref ObjectDestroyedSignal() |
  */
 class DALI_IMPORT_API ObjectRegistry : public BaseHandle
 {

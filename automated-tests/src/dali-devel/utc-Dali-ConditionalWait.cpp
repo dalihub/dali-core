@@ -210,6 +210,42 @@ int UtcConditionalWait5P(void)
   END_TEST;
 }
 
+int UtcConditionalWait6P(void)
+{
+  tet_infoline("Testing ConditionalWait - scenario:  4 threads wait - notify once from 1 thread");
+
+  // initialize values
+  gConditionalWait = new ConditionalWait();
+
+  WorkerThreadWaitN thread1;
+  thread1.Start();
+  WorkerThreadWaitN thread2;
+  thread2.Start();
+  WorkerThreadWaitN thread3;
+  thread3.Start();
+  WorkerThreadWaitN thread4;
+  thread4.Start();
+  // wait till all child threads are waiting
+  while( gConditionalWait->GetWaitCount() < 4 )
+  { }
+
+  // notify once but with a scoped lock, it will resume all threads
+  {
+    ConditionalWait::ScopedLock lock( *gConditionalWait );
+    gConditionalWait->Notify( lock );
+  }
+
+  thread1.Join();
+  thread2.Join();
+  thread3.Join();
+  thread4.Join();
+
+  DALI_TEST_EQUALS( 0u, gConditionalWait->GetWaitCount(), TEST_LOCATION );
+
+  delete gConditionalWait;
+  END_TEST;
+}
+
 int UtcConditionalWaitNonCopyable(void)
 {
   // we want to make sure that ConditionalWait is not copyable (its copy constructor is not defined)

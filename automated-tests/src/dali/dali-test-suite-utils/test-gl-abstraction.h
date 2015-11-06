@@ -409,7 +409,7 @@ public:
   {
     std::stringstream out;
     out << cap;
-    mCullFaceTrace.PushCall("Disable", out.str());
+    mEnableDisableTrace.PushCall("Disable", out.str());
   }
 
   inline void DisableVertexAttribArray(GLuint index)
@@ -435,7 +435,7 @@ public:
   {
     std::stringstream out;
     out << cap;
-    mCullFaceTrace.PushCall("Enable", out.str());
+    mEnableDisableTrace.PushCall("Enable", out.str());
   }
 
   inline void EnableVertexAttribArray(GLuint index)
@@ -1583,6 +1583,11 @@ public: // TEST FUNCTIONS
   inline void ResetCullFaceCallStack() { mCullFaceTrace.Reset(); }
   inline TraceCallStack& GetCullFaceTrace() { return mCullFaceTrace; }
 
+  //Methods for Enable/Disable call verification
+  inline void EnableEnableDisableCallTrace(bool enable) { mEnableDisableTrace.Enable(enable); }
+  inline void ResetEnableDisableCallStack() { mEnableDisableTrace.Reset(); }
+  inline TraceCallStack& GetEnableDisableTrace() { return mEnableDisableTrace; }
+
   //Methods for Shader verification
   inline void EnableShaderCallTrace(bool enable) { mShaderTrace.Enable(enable); }
   inline void ResetShaderCallStack() { mShaderTrace.Reset(); }
@@ -1813,6 +1818,7 @@ private:
   ActiveTextureType mActiveTextures[ MIN_TEXTURE_UNIT_LIMIT ];
 
   TraceCallStack mCullFaceTrace;
+  TraceCallStack mEnableDisableTrace;
   TraceCallStack mShaderTrace;
   TraceCallStack mTextureTrace;
   TraceCallStack mTexParamaterTrace;

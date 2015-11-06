@@ -77,6 +77,21 @@ void ConditionalWait::Notify()
   Internal::Mutex::Unlock( &mImpl->mutex );
 }
 
+void ConditionalWait::Notify( const ScopedLock& scope )
+{
+  // Scope must be locked:
+  DALI_ASSERT_DEBUG( &scope.GetLockedWait() == this );
+
+  volatile unsigned int previousCount = mImpl->count;
+  mImpl->count = 0; // change state before broadcast as that may wake clients immediately
+  // broadcast does nothing if the thread is not waiting but still has a system call overhead
+  // broadcast all threads to continue
+  if( 0 != previousCount )
+  {
+    pthread_cond_broadcast( &mImpl->condition );
+  }
+}
+
 void ConditionalWait::Wait()
 {
   // pthread_cond_wait requires a lock to be held

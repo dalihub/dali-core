@@ -168,15 +168,16 @@ private:
 
   /**
    * Called from Render prior to DoRender(). Default method to set CullFaceMode
-   * @todo MESH_REWORK Remove after merge
+   * @param context to use
+   * @param bufferIndex to use
    */
   virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
 
   /**
    * Called from Render prior to DoRender(). Default method to set blending options
-   * @todo MESH_REWORK Remove after merge
+   * @param context to use
    */
-  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex, bool blend ) = 0;
+  virtual void DoSetBlending( Context& context ) = 0;
 
   /**
    * Called from Render; implemented in derived classes.

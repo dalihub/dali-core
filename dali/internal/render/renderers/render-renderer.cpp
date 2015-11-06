@@ -185,7 +185,12 @@ void Renderer::Render( Context& context,
 
   DoSetCullFaceMode( context, bufferIndex );
 
-  DoSetBlending( context, bufferIndex, blend );
+  // Enable/disable blending
+  context.SetBlend( blend );
+  if( blend )
+  {
+    DoSetBlending( context );
+  }
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
   // set projection and view matrix if program has not yet received them yet this frame

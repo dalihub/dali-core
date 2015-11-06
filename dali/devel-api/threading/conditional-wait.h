@@ -85,6 +85,18 @@ public:
   void Notify();
 
   /**
+   * @brief Notifies another thread to continue if it is blocked on a wait.
+   *
+   * Assumes that the ScopedLock object passed in has already locked the internal state of
+   * this object.
+   * Can be called from any thread.
+   * Does not block the current thread but may cause a rescheduling of threads.
+   *
+   * @param[in] scope A pre-existing lock on the internal state of this object.
+   */
+  void Notify( const ScopedLock& scope );
+
+  /**
    * @brief Wait for another thread to notify us when the condition is true and we can continue
    *
    * Will always block current thread until Notify is called
@@ -98,7 +110,7 @@ public:
    * Assumes that the ScopedLock object passed in has already locked the internal state of
    * this object. Releases the lock while waiting and re-acquires it when returning
    * from the wait.
-   * param[in] scope A pre-existing lock on the internal state of this object.
+   * @param[in] scope A pre-existing lock on the internal state of this object.
    * @pre scope must have been passed this ConditionalWait during its construction.
    */
   void Wait( const ScopedLock& scope );

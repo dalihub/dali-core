@@ -144,7 +144,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoSetBlending()
    */
-  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex, bool blend );
+  virtual void DoSetBlending( Context& context );
 
 protected: // TextureObserver implementation
 

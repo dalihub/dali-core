@@ -59,10 +59,10 @@ namespace
 
 //              Name             Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "grid-density",   FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GRID_DENSITY   )
+DALI_PROPERTY( "gridDensity",    FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GRID_DENSITY   )
 DALI_PROPERTY( "image",          MAP,     true,    false,   false,   Dali::ShaderEffect::Property::IMAGE          )
 DALI_PROPERTY( "program",        MAP,     true,    false,   false,   Dali::ShaderEffect::Property::PROGRAM        )
-DALI_PROPERTY( "geometry-hints", STRING,  true,    false,   false,   Dali::ShaderEffect::Property::GEOMETRY_HINTS )
+DALI_PROPERTY( "geometryHints",  STRING,  true,    false,   false,   Dali::ShaderEffect::Property::GEOMETRY_HINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 BaseHandle Create()
@@ -418,8 +418,8 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
 
     case Dali::ShaderEffect::Property::PROGRAM:
     {
-      std::string vertexPrefix   = GetShader("vertex-prefix", propertyValue);
-      std::string fragmentPrefix = GetShader("fragment-prefix", propertyValue);
+      std::string vertexPrefix   = GetShader("vertexPrefix",  propertyValue);
+      std::string fragmentPrefix = GetShader("fragmentPrefix",  propertyValue);
       std::string vertex         = GetShader("vertex", propertyValue);
       std::string fragment       = GetShader("fragment", propertyValue);
 

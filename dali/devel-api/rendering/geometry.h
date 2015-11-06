@@ -59,8 +59,8 @@ public:
   {
     enum
     {
-      GEOMETRY_TYPE = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "geometry-type",            type STRING
-      REQUIRES_DEPTH_TEST,                                  ///< name "requires-depth-testing", type BOOLEAN
+      GEOMETRY_TYPE = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "geometryType",             type STRING
+      REQUIRES_DEPTH_TEST,                                  ///< name "requiresDepthTesting",   type BOOLEAN
     };
   };
 

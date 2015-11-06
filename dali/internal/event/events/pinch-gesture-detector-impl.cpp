@@ -38,7 +38,7 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_PINCH_DETECTED = "pinch-detected";
+const char* const SIGNAL_PINCH_DETECTED = "pinchDetected";
 
 BaseHandle Create()
 {

@@ -38,8 +38,8 @@ namespace
  *            |name                    |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "geometry-type",         STRING,   true, false, true, Dali::Geometry::Property::GEOMETRY_TYPE )
-DALI_PROPERTY( "requires-depth-test",   BOOLEAN,  true, false, true, Dali::Geometry::Property::REQUIRES_DEPTH_TEST )
+DALI_PROPERTY( "geometryType",          STRING,   true, false, true, Dali::Geometry::Property::GEOMETRY_TYPE )
+DALI_PROPERTY( "requiresDepthTest",     BOOLEAN,  true, false, true, Dali::Geometry::Property::REQUIRES_DEPTH_TEST )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> GEOMETRY_IMPL = { DEFAULT_PROPERTY_DETAILS };

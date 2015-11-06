@@ -19,17 +19,19 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/sampling.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/devel-api/images/pixel-data.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/render/common/uv-rect.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
-#include <dali/public-api/images/image.h>
-#include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/native-image.h>
-#include <dali/public-api/math/rect.h>
-#include <dali/public-api/actors/sampling.h>
+
 
 namespace Dali
 {
@@ -85,6 +87,14 @@ public:
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   virtual void Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset ) {}
+
+  /**
+   * Update part of the texture with a pixel buffer
+   * @param[in] srcPixelData The pixel data to copy from
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void Update( PixelData* srcPixelData, std::size_t xOffset, std::size_t yOffset ) {}
 
   /**
    * @return Return true if the texture should be updated on GL texture creation.

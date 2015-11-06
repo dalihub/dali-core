@@ -335,7 +335,7 @@ Image NewImage( const Property::Value& property )
       }
     }
 
-    value = map->Find( "load-policy" );
+    value = map->Find( "loadPolicy" );
     if( value )
     {
       std::string policy;
@@ -344,7 +344,7 @@ Image NewImage( const Property::Value& property )
       GetEnumeration< ResourceImage::LoadPolicy >( policy.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT, loadPolicy );
     }
 
-    value = map->Find( "release-policy" );
+    value = map->Find( "releasePolicy" );
     if( value )
     {
       std::string policy;
@@ -385,7 +385,7 @@ Image NewImage( const Property::Value& property )
     attributes.SetSize( width, height );
 
     Pixel::Format pixelFormat = Pixel::RGBA8888;
-    value = map->Find( "pixel-format" );
+    value = map->Find( "pixelFormat" );
     if( value )
     {
       std::string format;
@@ -393,7 +393,7 @@ Image NewImage( const Property::Value& property )
       GetEnumeration< Pixel::Format >( format.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT, pixelFormat );
     }
 
-    value = map->Find( "fitting-mode" );
+    value = map->Find( "fittingMode" );
     if( value )
     {
       std::string fitting;
@@ -405,7 +405,7 @@ Image NewImage( const Property::Value& property )
       }
     }
 
-    value = map->Find( "sampling-mode" );
+    value = map->Find( "samplingMode" );
     if( value )
     {
       std::string sampling;
@@ -554,7 +554,7 @@ Actor NewActor( const Property::Map& map )
           actor.Add( NewActor( actorArray[i].Get< Property::Map >() ) );
         }
       }
-      else if( key ==  "parent-origin" )
+      else if( key ==  "parentOrigin" )
       {
         // Parent Origin can be a string constant as well as a Vector3
 
@@ -568,7 +568,7 @@ Actor NewActor( const Property::Map& map )
           actor.SetParentOrigin( GetAnchorConstant( value.Get< std::string >() ) );
         }
       }
-      else if( key ==  "anchor-point" )
+      else if( key ==  "anchorPoint" )
       {
         // Anchor Point can be a string constant as well as a Vector3
 
@@ -644,7 +644,7 @@ void CreatePropertyMap( Image image, Property::Map& map )
     if ( bufferImage )
     {
       imageType = "BufferImage";
-      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+      map[ "pixelFormat" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
     else if ( FrameBufferImage::DownCast( image ) )
     {
@@ -652,13 +652,13 @@ void CreatePropertyMap( Image image, Property::Map& map )
     }
 
     map[ "type" ] = imageType;
-    map[ "release-policy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
+    map[ "releasePolicy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
     ResourceImage resourceImage = ResourceImage::DownCast( image );
     if( resourceImage )
     {
       map[ "filename" ] = resourceImage.GetUrl();
-      map[ "load-policy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+      map[ "loadPolicy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     int width( image.GetWidth() );
@@ -699,7 +699,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
     {
       element->value = value;
     }
-    else if( key == "alpha-function" )
+    else if( key == "alphaFunction" )
     {
       std::string alphaFunctionValue = value.Get< std::string >();
 
@@ -756,7 +756,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
         element->alphaFunction = AlphaFunction::EASE_OUT_BACK;
       }
     }
-    else if( key == "time-period" )
+    else if( key == "timePeriod" )
     {
       Property::Array timeArray = value.Get< Property::Array >();
 

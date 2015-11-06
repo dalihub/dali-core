@@ -322,7 +322,6 @@ void Renderer::PrepareResources( BufferIndex updateBufferIndex, ResourceManager&
   CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
   mResourcesReady = false;
 
-
   mFinishedResourceAcquisition = false;
 
   // Can only be considered ready when all the scene graph objects are connected to the renderer
@@ -334,57 +333,64 @@ void Renderer::PrepareResources( BufferIndex updateBufferIndex, ResourceManager&
     unsigned int frameBufferCount = 0;
 
     size_t textureCount( mMaterial->GetTextureCount() );
-    for( unsigned int i(0); i<textureCount; ++i )
+    if( textureCount > 0 )
     {
-      ResourceId textureId = mMaterial->GetTextureId(i);
-      BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
-
-      mMaterial->SetIsFullyOpaque( i, metaData.IsFullyOpaque() );
-
-      switch( completeStatusManager.GetStatus( textureId ) )
+      unsigned int opaqueCount = 0;
+      for( unsigned int i(0); i<textureCount; ++i )
       {
-        case CompleteStatusManager::NOT_READY:
+        ResourceId textureId = mMaterial->GetTextureId(i);
+        BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
+        if( metaData.IsFullyOpaque() )
         {
+          ++opaqueCount;
+        }
+
+        switch( completeStatusManager.GetStatus( textureId ) )
+        {
+          case CompleteStatusManager::NOT_READY:
+          {
           if( metaData.GetIsFramebuffer() )
-          {
-            frameBufferCount++;
-          }
-          if( completeStatusManager.FindResourceTracker(textureId) != NULL )
-          {
-            bool found = false;
-            std::size_t numTrackedResources = mTrackedResources.Count();
-            for( size_t i=0; i < numTrackedResources; ++i )
             {
-              if(mTrackedResources[i] == textureId)
+              frameBufferCount++;
+            }
+            if( completeStatusManager.FindResourceTracker(textureId) != NULL )
+            {
+              bool found = false;
+              std::size_t numTrackedResources = mTrackedResources.Count();
+              for( size_t i=0; i < numTrackedResources; ++i )
               {
-                found = true;
-                break;
+                if(mTrackedResources[i] == textureId)
+                {
+                  found = true;
+                  break;
+                }
+              }
+              if( ! found )
+              {
+                mTrackedResources.PushBack( textureId );
               }
             }
-            if( ! found )
+            else
             {
-              mTrackedResources.PushBack( textureId );
+              mHasUntrackedResources = true;
             }
           }
-          else
+          break;
+
+          case CompleteStatusManager::COMPLETE:
           {
-            mHasUntrackedResources = true;
+            completeCount++;
           }
-        }
-        break;
+          break;
 
-        case CompleteStatusManager::COMPLETE:
-        {
-          completeCount++;
+          case CompleteStatusManager::NEVER:
+          {
+            neverCount++;
+          }
+          break;
         }
-        break;
-
-        case CompleteStatusManager::NEVER:
-        {
-          neverCount++;
-        }
-        break;
       }
+      mMaterial->SetTexturesRequireBlending( opaqueCount != textureCount );
     }
 
     // We are ready if all samplers are complete, or those that aren't are framebuffers

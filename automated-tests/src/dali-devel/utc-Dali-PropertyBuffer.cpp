@@ -143,7 +143,7 @@ int UtcDaliPropertyBufferSetData01(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( propertyBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -189,7 +189,7 @@ int UtcDaliPropertyBufferSetData02(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( propertyBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);

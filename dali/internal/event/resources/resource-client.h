@@ -23,8 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/devel-api/common/ref-counted-dali-vector.h>
 #include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/images/pixel-data.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
@@ -203,6 +204,15 @@ public:
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   void UploadBitmap( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset);
+
+  /**
+   * Upload a pixel buffer to a texture
+   * @param[in] destId The destination texture ID
+   * @param[in] bitmap The pointer pointing to the pixel data
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void UploadBitmap( ResourceId destId, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset);
 
   /**
    * @brief Trigger asynchronous creation of GL texture to back resource immediately.
