@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,17 +40,15 @@ public:
 
   /**
    * Constructor
-   * @param[in] context  dali context
    * @param[in] rendererDispatcher Used for passing ownership of renderers to the render-thread.
    * @param[in] renderQueue  The renderQueue
    * @param[in] discardQueue The discardQueue
-   * @param[in] completeStatusTracker The resource complete status tracker
+   * @param[in] textureCache
    */
   SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
                        RenderQueue& renderQueue,
                        DiscardQueue& discardQueue,
-                       TextureCache& textureCache,
-                       CompleteStatusManager& completeStatusManager );
+                       TextureCache& textureCache );
 
   /**
    * Destructor
@@ -79,11 +77,6 @@ public:  // from SceneController
    */
   virtual TextureCache& GetTextureCache() { return mTextureCache; }
 
-  /**
-   * @copydoc SceneController::GetCompleteStatusManager()
-   */
-  virtual CompleteStatusManager& GetCompleteStatusManager() { return mCompleteStatusManager;  }
-
 private:
 
   // Undefined copy constructor.
@@ -98,7 +91,6 @@ private:
   RenderQueue&             mRenderQueue;           ///< render queue
   DiscardQueue&            mDiscardQueue;          ///< discard queue
   TextureCache&            mTextureCache;          ///< texture cache
-  CompleteStatusManager&   mCompleteStatusManager; ///< Complete Status manager
 
 };
 

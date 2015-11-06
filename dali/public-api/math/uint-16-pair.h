@@ -70,10 +70,20 @@ public:
 
   /**
    * @brief Copy constructor.
+   * @param rhs to copy from
    */
   Uint16Pair( const Uint16Pair& rhs )
   {
     mData = rhs.mData;
+  }
+
+  /**
+   * @brief Sets the width
+   * @param width to set
+   */
+  void SetWidth( uint16_t width )
+  {
+    mComponents[0] = width;
   }
 
   /**
@@ -84,6 +94,14 @@ public:
     return mComponents[0];
   }
 
+  /**
+   * @brief Sets the height
+   * @param height to set
+   */
+  void SetHeight( uint16_t height )
+  {
+    mComponents[1] = height;
+  }
   /**
    * @returns the y dimension stored in this 2-tuple.
    */

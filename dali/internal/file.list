@@ -156,8 +156,4 @@ internal_src_files = \
   $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-material.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-renderer.cpp \
-  $(internal_src_dir)/update/resources/bitmap-metadata.cpp \
-  $(internal_src_dir)/update/resources/resource-manager.cpp \
-  $(internal_src_dir)/update/resources/resource-tracker.cpp \
-  $(internal_src_dir)/update/resources/sync-resource-tracker.cpp \
-  $(internal_src_dir)/update/resources/complete-status-manager.cpp
+  $(internal_src_dir)/update/resources/resource-manager.cpp

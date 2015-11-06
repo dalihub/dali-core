@@ -58,7 +58,6 @@
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
@@ -140,7 +139,6 @@ typedef GestureContainer::ConstIterator        GestureConstIter;
 struct UpdateManager::Impl
 {
   Impl( NotificationManager& notificationManager,
-        GlSyncAbstraction& glSyncAbstraction,
         CompleteNotificationInterface& animationFinishedNotifier,
         PropertyNotifier& propertyNotifier,
         ResourceManager& resourceManager,
@@ -164,11 +162,10 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
-    completeStatusManager( glSyncAbstraction, renderMessageDispatcher, resourceManager ),
     touchResampler( touchResampler ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    taskList ( completeStatusManager ),
-    systemLevelTaskList ( completeStatusManager ),
+    taskList( renderMessageDispatcher, resourceManager ),
+    systemLevelTaskList( renderMessageDispatcher, resourceManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
@@ -183,7 +180,7 @@ struct UpdateManager::Impl
     renderSortingHelper(),
     renderTaskWaiting( false )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
+    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache );
 
     renderers.SetSceneController( *sceneController );
     geometries.SetSceneController( *sceneController );
@@ -244,7 +241,6 @@ struct UpdateManager::Impl
   RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
-  CompleteStatusManager               completeStatusManager;         ///< Complete Status Manager
   TouchResampler&                     touchResampler;                ///< Used to resample touch events on every update.
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
@@ -291,7 +287,6 @@ struct UpdateManager::Impl
 };
 
 UpdateManager::UpdateManager( NotificationManager& notificationManager,
-                              GlSyncAbstraction& glSyncAbstraction,
                               CompleteNotificationInterface& animationFinishedNotifier,
                               PropertyNotifier& propertyNotifier,
                               ResourceManager& resourceManager,
@@ -304,7 +299,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
-                    glSyncAbstraction,
                     animationFinishedNotifier,
                     propertyNotifier,
                     resourceManager,
@@ -863,6 +857,16 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
   }
 }
 
+void UpdateManager::PrepareMaterials()
+{
+  ObjectOwnerContainer<Material>::Iterator iter = mImpl->materials.GetObjectContainer().Begin();
+  const ObjectOwnerContainer<Material>::Iterator end = mImpl->materials.GetObjectContainer().End();
+  for( ; iter != end; ++iter )
+  {
+    (*iter)->Prepare( mImpl->resourceManager );
+  }
+}
+
 void UpdateManager::ForwardCompiledShadersToEventThread()
 {
   DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
@@ -898,7 +902,6 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   {
     if( rendererContainer[i]->IsReferenced() )
     {
-      rendererContainer[i]->PrepareResources(bufferIndex, mImpl->resourceManager);
       rendererContainer[i]->PrepareRender( bufferIndex );
     }
   }
@@ -984,7 +987,10 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 9) Check Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
-    // 10) Clear the lists of renderable-attachments from the previous update
+    // 10) Prepare materials
+    PrepareMaterials();
+
+    // 11) Clear the lists of renderable-attachments from the previous update
     for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
     {
       mImpl->sortedLayers[i]->ClearRenderables();
@@ -995,7 +1001,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       mImpl->systemLevelSortedLayers[i]->ClearRenderables();
     }
 
-    // 11) Update node hierarchy and perform sorting / culling.
+    // 12) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
     UpdateRenderers( bufferIndex );
@@ -1008,7 +1014,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     if ( NULL != mImpl->root )
     {
       ProcessRenderTasks(  bufferIndex,
-                           mImpl->completeStatusManager,
                            mImpl->taskList,
                            *mImpl->root,
                            mImpl->sortedLayers,
@@ -1019,7 +1024,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       if ( NULL != mImpl->systemLevelRoot )
       {
         ProcessRenderTasks(  bufferIndex,
-                             mImpl->completeStatusManager,
                              mImpl->systemLevelTaskList,
                              *mImpl->systemLevelRoot,
                              mImpl->systemLevelSortedLayers,

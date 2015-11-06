@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,15 +153,17 @@ void RenderTask::SetTargetFrameBuffer( Dali::FrameBufferImage image )
       mFrameBufferImage = image;
 
       unsigned int resourceId = 0;
-      if(mFrameBufferImage)
+      bool isNativeFBO = false;
+      if( mFrameBufferImage )
       {
-        GetImplementation(mFrameBufferImage).Connect();
-
-        resourceId = GetImplementation( mFrameBufferImage ).GetResourceId();
+        Dali::Internal::FrameBufferImage& impl = GetImplementation( mFrameBufferImage );
+        impl.Connect();
+        resourceId = impl.GetResourceId();
+        isNativeFBO = impl.IsNativeFbo();
       }
 
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
+      SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId, isNativeFBO );
     }
     else
     {
@@ -423,15 +425,17 @@ SceneGraph::RenderTask* RenderTask::CreateSceneObject()
 
   // if we have a frame buffer we need to track connection status then send a message to set the frame buffer id in case it has changed since last time we were on stage
   unsigned int resourceId = 0;
-  if(mFrameBufferImage)
+  bool isNativeFBO = false;
+  if( mFrameBufferImage )
   {
-    GetImplementation(mFrameBufferImage).Connect();
-
-    resourceId = GetImplementation( mFrameBufferImage ).GetResourceId();
+    Dali::Internal::FrameBufferImage& impl = GetImplementation( mFrameBufferImage );
+    impl.Connect();
+    resourceId = impl.GetResourceId();
+    isNativeFBO = impl.IsNativeFbo();
   }
 
   // mSceneObject is being used in a separate thread; queue a message to set the value
-  SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
+  SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId, isNativeFBO );
 
   // Send messages to set other properties that may have changed since last time we were on stage
   SetExclusiveMessage( GetEventThreadServices(), *mSceneObject, mExclusive );

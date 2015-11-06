@@ -245,10 +245,11 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
-  if ( node.IsLayer() )
+  Layer* nodeIsLayer( node.GetLayer() );
+  if ( nodeIsLayer )
   {
     // all childs go to this layer
-    layer = node.GetLayer();
+    layer = nodeIsLayer;
 
     // assume layer is clean to begin with
     layer->SetReuseRenderers( updateBufferIndex, true );

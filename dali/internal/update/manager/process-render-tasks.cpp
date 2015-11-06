@@ -21,8 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/internal/update/manager/sorted-layers.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
-#include <dali/internal/update/resources/sync-resource-tracker.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
@@ -80,26 +78,25 @@ bool CheckExclusivity( const Node& node, const RenderTask& task )
 
 Layer* FindLayer( Node& node )
 {
-  if ( node.IsLayer() )
+  Node* currentNode( &node );
+  Layer* layer(NULL);
+  while( currentNode )
   {
-    return node.GetLayer();
+    if( (layer = currentNode->GetLayer()) != NULL )
+    {
+      return layer;
+    }
+
+    currentNode = currentNode->GetParent();
   }
 
-  Node* parent = node.GetParent();
-  // if the node is taken off stage we may get NULL parent
-  if( NULL == parent )
-  {
-    return NULL;
-  }
-
-
-  return FindLayer( *parent );
+  return NULL;
 }
 
 /**
  * Rebuild the Layer::colorRenderables, stencilRenderables and overlayRenderables members,
- * including only renderers which are included in the current render-task.
- * Returns true if all renderers have finshed acquiring resources.
+ * including only renderable-attachments which are included in the current render-task.
+ * Returns true if all renderable attachments have finshed acquiring resources.
  */
 bool AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,
@@ -124,11 +121,11 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   }
 
   Layer* layer = &currentLayer;
-
-  if ( node.IsLayer() )
+  Layer* nodeIsLayer( node.GetLayer() );
+  if ( nodeIsLayer )
   {
     // All children go to this layer
-    layer = node.GetLayer();
+    layer = nodeIsLayer;
 
     // Layers do not inherit the DrawMode from their parents
     inheritedDrawMode = DrawMode::NORMAL;
@@ -142,14 +139,14 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
     const unsigned int count = node.GetRendererCount();
     for( unsigned int i = 0; i < count; ++i )
     {
-      Renderer* renderer = node.GetRendererAt( i );
+      SceneGraph::Renderer* renderer = node.GetRendererAt( i );
       bool ready = false;
       bool complete = false;
-      renderer->GetReadyAndComplete(ready, complete);
+      renderer->GetReadyAndComplete( ready, complete );
 
       DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderer, ready?"T":"F", complete?"T":"F");
 
-      resourcesFinished = !complete ? complete : resourcesFinished;
+      resourcesFinished &= complete;
 
       if( ready ) // i.e. should be rendered (all resources are available)
       {
@@ -177,7 +174,7 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   {
     Node& child = **iter;
     bool childResourcesComplete = AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode );
-    resourcesFinished = !childResourcesComplete ? childResourcesComplete : resourcesFinished;
+    resourcesFinished &= childResourcesComplete;
   }
 
   return resourcesFinished;
@@ -185,7 +182,6 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
 } //Unnamed namespace
 
 void ProcessRenderTasks( BufferIndex updateBufferIndex,
-                         CompleteStatusManager& completeStatusManager,
                          RenderTaskList& renderTasks,
                          Layer& rootNode,
                          SortedLayerPointers& sortedLayers,
@@ -258,29 +254,10 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                                  renderTask,
                                                  sourceNode->GetDrawMode() );
 
-      // Set update trackers to complete, or get render trackers to pass onto render thread
-      RenderTracker* renderTracker = NULL;
-      if( resourcesFinished )
-      {
-        Integration::ResourceId id = renderTask.GetFrameBufferId();
-        ResourceTracker* resourceTracker = completeStatusManager.FindResourceTracker( id );
-        if( resourceTracker != NULL )
-        {
-          resourceTracker->SetComplete(); // Has no effect on GlResourceTracker
-
-          SyncResourceTracker* syncResourceTracker = dynamic_cast<SyncResourceTracker*>(resourceTracker);
-          if( syncResourceTracker != NULL )
-          {
-            renderTracker = syncResourceTracker->GetRenderTracker();
-          }
-        }
-      }
-
       PrepareRenderInstruction( updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
                                 sortingHelper,
-                                renderTracker,
                                 instructions );
     }
 
@@ -341,7 +318,6 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
                                 sortingHelper,
-                                NULL,
                                 instructions );
     }
 

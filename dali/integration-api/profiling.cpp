@@ -53,7 +53,7 @@
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
-#include <dali/internal/update/resources/bitmap-metadata.h>
+#include <dali/internal/update/resources/texture-metadata.h>
 
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/renderers/render-geometry.h>
@@ -122,7 +122,7 @@ const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::Image ) +
   sizeof( Internal::ImageFactoryCache::Request ) +
   sizeof( Integration::Bitmap ) +
-  sizeof( Internal::BitmapMetadata ) +
+  sizeof( Internal::TextureMetadata ) +
   sizeof( Internal::BitmapTexture ) +
   sizeof( Internal::ImageTicket ) );
 const int RENDERER_MEMORY_SIZE(

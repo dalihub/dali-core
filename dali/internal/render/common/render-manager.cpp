@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,19 +82,21 @@ typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
 typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
 typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
 
-typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
-typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
-typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
+typedef OwnerContainer< Render::RenderTracker* > RenderTrackerContainer;
+typedef RenderTrackerContainer::Iterator         RenderTrackerIter;
+typedef RenderTrackerContainer::ConstIterator    RenderTrackerConstIter;
 
 /**
  * Structure to contain internal data
  */
 struct RenderManager::Impl
 {
-  Impl( Dali::Integration::GlAbstraction& glAbstraction,
+  Impl( Integration::GlAbstraction& glAbstraction,
+        Integration::GlSyncAbstraction& glSyncAbstraction,
         ResourcePostProcessList& resourcePostProcessQ,
         PostProcessResourceDispatcher& postProcessDispatcher )
   : context( glAbstraction ),
+    glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     textureCache( renderQueue, postProcessDispatcher, context ),
     resourcePostProcessQueue( resourcePostProcessQ ),
@@ -116,13 +118,13 @@ struct RenderManager::Impl
   {
   }
 
-  void AddRenderTracker( RenderTracker* renderTracker )
+  void AddRenderTracker( Render::RenderTracker* renderTracker )
   {
     DALI_ASSERT_DEBUG( renderTracker != NULL );
     mRenderTrackers.PushBack( renderTracker );
   }
 
-  void RemoveRenderTracker( RenderTracker* renderTracker )
+  void RemoveRenderTracker( Render::RenderTracker* renderTracker )
   {
     DALI_ASSERT_DEBUG( renderTracker != NULL );
     for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
@@ -146,6 +148,7 @@ struct RenderManager::Impl
   // the order is important for destruction,
   // programs are owned by context at the moment.
   Context                       context;                  ///< holds the GL state
+  Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
   TextureCache                  textureCache;             ///< Cache for all GL textures
   Render::UniformNameCache      uniformNameCache;         ///< Cache to provide unique indices for uniforms
@@ -176,10 +179,12 @@ struct RenderManager::Impl
   ProgramController             programController;        ///< Owner of the GL programs
 };
 
-RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
+RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
+                                   Integration::GlSyncAbstraction& glSyncAbstraction,
+                                   ResourcePostProcessList& resourcePostProcessQ )
 {
   RenderManager* manager = new RenderManager;
-  manager->mImpl = new Impl( glAbstraction, resourcePostProcessQ, *manager );
+  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, resourcePostProcessQ, *manager );
   return manager;
 }
 
@@ -423,12 +428,12 @@ void RenderManager::SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool
   geometry->SetRequiresDepthTest( requiresDepthTest );
 }
 
-void RenderManager::AddRenderTracker( RenderTracker* renderTracker )
+void RenderManager::AddRenderTracker( Render::RenderTracker* renderTracker )
 {
   mImpl->AddRenderTracker(renderTracker);
 }
 
-void RenderManager::RemoveRenderTracker( RenderTracker* renderTracker )
+void RenderManager::RemoveRenderTracker( Render::RenderTracker* renderTracker )
 {
   mImpl->RemoveRenderTracker(renderTracker);
 }
@@ -639,7 +644,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   if( instruction.mRenderTracker && offscreen != NULL )
   {
-    instruction.mRenderTracker->CreateSyncObject();
+    instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
     instruction.mRenderTracker = NULL; // Only create once.
   }
 }

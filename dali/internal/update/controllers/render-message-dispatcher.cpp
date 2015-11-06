@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,9 +131,9 @@ void RenderMessageDispatcher::SetGeometryRequiresDepthTest( RenderGeometry& geom
   new (slot) DerivedType( &mRenderManager, &RenderManager::SetGeometryRequiresDepthTest, &geometry, requiresDepthTest );
 }
 
-void RenderMessageDispatcher::AddRenderTracker( RenderTracker& renderTracker )
+void RenderMessageDispatcher::AddRenderTracker( Render::RenderTracker& renderTracker )
 {
-  typedef MessageValue1< RenderManager, RenderTracker* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -142,9 +142,9 @@ void RenderMessageDispatcher::AddRenderTracker( RenderTracker& renderTracker )
   new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderTracker, &renderTracker );
 }
 
-void RenderMessageDispatcher::RemoveRenderTracker( RenderTracker& renderTracker )
+void RenderMessageDispatcher::RemoveRenderTracker( Render::RenderTracker& renderTracker )
 {
-  typedef MessageValue1< RenderManager, RenderTracker* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

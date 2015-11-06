@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,17 @@
 
 namespace Dali
 {
+
 namespace Internal
 {
-namespace SceneGraph
+
+namespace Render
 {
 
-
-RenderTracker::RenderTracker(Integration::GlSyncAbstraction& glSyncAbstraction)
-: mGlSyncAbstraction(glSyncAbstraction),
-  mSyncTrigger(0),
-  mSyncObject(NULL)
+RenderTracker::RenderTracker()
+: mGlSyncAbstraction( NULL ),
+  mSyncObject( NULL ),
+  mSyncTrigger( 0 )
 {
   TRACKER_LOG(Debug::Verbose);
 }
@@ -45,23 +46,24 @@ RenderTracker::~RenderTracker()
   TRACKER_LOG(Debug::Verbose);
   if( mSyncObject )
   {
-    mGlSyncAbstraction.DestroySyncObject( mSyncObject );
+    mGlSyncAbstraction->DestroySyncObject( mSyncObject );
     mSyncObject = NULL;
   }
 }
 
-void RenderTracker::CreateSyncObject()
+void RenderTracker::CreateSyncObject( Integration::GlSyncAbstraction& glSyncAbstraction )
 {
+  mGlSyncAbstraction = &glSyncAbstraction;
   TRACKER_LOG(Debug::General);
 
   // Destroy any previous sync object
   if( mSyncObject )
   {
-     mGlSyncAbstraction.DestroySyncObject( mSyncObject );
+     mGlSyncAbstraction->DestroySyncObject( mSyncObject );
      mSyncObject = NULL;
   }
   ResetSyncFlag();
-  mSyncObject = mGlSyncAbstraction.CreateSyncObject( );
+  mSyncObject = mGlSyncAbstraction->CreateSyncObject();
 }
 
 void RenderTracker::PollSyncObject()
@@ -69,7 +71,7 @@ void RenderTracker::PollSyncObject()
   if( mSyncObject && mSyncObject->IsSynced() )
   {
     SetSyncFlag();
-    mGlSyncAbstraction.DestroySyncObject( mSyncObject );
+    mGlSyncAbstraction->DestroySyncObject( mSyncObject );
     mSyncObject = NULL;
 
     TRACKER_LOG_FMT(Debug::General, " Synced\n");
@@ -97,6 +99,8 @@ void RenderTracker::SetSyncFlag()
   (void)__sync_lock_test_and_set(&mSyncTrigger, 0xFF);
 }
 
-} // SceneGraph
+} // Render
+
 } // Internal
+
 } // Dali

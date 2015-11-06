@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <stdio.h>
-#include <typeinfo>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/set-wrapper.h>
+
 #include <dali/public-api/math/vector2.h>
+#include <dali/public-api/common/dali-vector.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -37,7 +38,7 @@
 #include <dali/internal/event/resources/resource-client.h>
 
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/resources/bitmap-metadata.h>
+#include <dali/internal/update/resources/texture-metadata.h>
 #include <dali/internal/render/queue/render-queue.h>
 
 #include <dali/internal/render/common/texture-cache-dispatcher.h>
@@ -49,26 +50,26 @@ using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderQueue;
 using Dali::Internal::SceneGraph::TextureCacheDispatcher;
 
+
 namespace Dali
 {
+
 namespace Internal
 {
 
-typedef std::set<ResourceId>                     LiveRequestContainer;
-typedef LiveRequestContainer::iterator           LiveRequestIter;
-typedef LiveRequestContainer::size_type          LiveRequestSize;
+typedef std::set<ResourceId>                    LiveRequestContainer;
+typedef LiveRequestContainer::iterator          LiveRequestIter;
+typedef LiveRequestContainer::size_type         LiveRequestSize;
 
-typedef std::map<ResourceId, ResourceTypeId>     DeadRequestContainer;
-typedef DeadRequestContainer::iterator           DeadRequestIter;
-typedef std::pair<ResourceId, ResourceTypeId>    DeadRequestPair;
+typedef std::map<ResourceId, ResourceTypeId>    DeadRequestContainer;
+typedef DeadRequestContainer::iterator          DeadRequestIter;
+typedef std::pair<ResourceId, ResourceTypeId>   DeadRequestPair;
 
-typedef std::vector<ResourceId>                  NotifyQueue;
-typedef NotifyQueue::iterator                    NotifyQueueIter;
+typedef std::vector<ResourceId>                 NotifyQueue;
+typedef NotifyQueue::iterator                   NotifyQueueIter;
 
-typedef std::map<ResourceId, BitmapMetadata>     BitmapMetadataCache;
-typedef BitmapMetadataCache::iterator            BitmapMetadataIter;
-typedef std::pair<ResourceId, BitmapMetadata>    BitmapMetadataPair;
-
+typedef Dali::Vector<TextureMetadata>           TextureMetadataCache;
+typedef TextureMetadataCache::Iterator          TextureMetadataIter;
 
 static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
 {
@@ -95,6 +96,7 @@ struct ResourceManager::ResourceManagerImpl
     mNotificationCount(0),
     cacheUpdated(false)
   {
+    mTextureMetadata.Reserve( 256 ); // reserve size for metadata to avoid early re-allocs in application startup
   }
 
   ~ResourceManagerImpl()
@@ -132,9 +134,9 @@ struct ResourceManager::ResourceManagerImpl
   DeadRequestContainer deadRequests;
 
   /**
-   * This is the resource cache. It's filled/emptied from within Core::Update()
+   * This is the resource cache; metadata of the textures
    */
-  BitmapMetadataCache mBitmapMetadata;
+  TextureMetadataCache mTextureMetadata;
 };
 
 ResourceManager::ResourceManager( PlatformAbstraction& platformAbstraction,
@@ -273,7 +275,7 @@ void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, BitmapPtr bitm
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddBitmapImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
-  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New( bitmap.Get() )));
+  mImpl->mTextureMetadata.PushBack( TextureMetadata::New( id, bitmap.Get() ) );
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap.Get() );
 }
 
@@ -284,7 +286,7 @@ void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInte
 
   mImpl->oldCompleteRequests.insert(id);
 
-  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(nativeImage)));
+  mImpl->mTextureMetadata.PushBack( TextureMetadata::New( id, nativeImage ) );
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImage );
 }
 
@@ -295,9 +297,9 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
 
   mImpl->oldCompleteRequests.insert(id);
 
-  BitmapMetadata bitmapMetadata = BitmapMetadata::New(width, height, Pixel::HasAlpha(pixelFormat));
+  TextureMetadata bitmapMetadata = TextureMetadata::New( id, width, height, Pixel::HasAlpha(pixelFormat) );
   bitmapMetadata.SetIsFramebuffer(true);
-  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
+  mImpl->mTextureMetadata.PushBack( bitmapMetadata );
 
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat, bufferFormat );
 }
@@ -309,10 +311,10 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeIma
 
   mImpl->oldCompleteRequests.insert(id);
 
-  BitmapMetadata bitmapMetadata = BitmapMetadata::New(nativeImage);
+  TextureMetadata bitmapMetadata = TextureMetadata::New(id, nativeImage);
   bitmapMetadata.SetIsNativeImage(true);
   bitmapMetadata.SetIsFramebuffer(true);
-  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
+  mImpl->mTextureMetadata.PushBack( bitmapMetadata );
 
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, nativeImage );
 }
@@ -322,6 +324,10 @@ void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAllocateTextureRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
+  // atlas needs metadata as well
+  TextureMetadata bitmapMetadata = TextureMetadata::New( id, width, height, Pixel::HasAlpha(pixelFormat) );
+  mImpl->mTextureMetadata.PushBack( bitmapMetadata );
+
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
 }
 
@@ -438,8 +444,21 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
        typeId == ResourceNativeImage ||
        typeId == ResourceTargetImage )
     {
-       // remove the meta data
-      mImpl->mBitmapMetadata.erase( deadId );
+      // remove the meta data
+
+      TextureMetadataCache::Iterator iter = mImpl->mTextureMetadata.Begin();
+      const TextureMetadataCache::Iterator end = mImpl->mTextureMetadata.End();
+      for( ; iter != end; ++iter )
+      {
+        if( (*iter).GetId() == deadId )
+        {
+          break;
+        }
+      }
+      if( iter != end )
+      {
+        mImpl->mTextureMetadata.Erase( iter );
+      }
 
       // destroy the texture
       mImpl->mTextureCacheDispatcher.DispatchDiscardTexture( deadId );
@@ -466,7 +485,7 @@ void ResourceManager::HandleCreateGlTextureRequest(ResourceId id)
  ******************** Update thread object direct interface  ********************
  ********************************************************************************/
 
-bool ResourceManager::IsResourceLoaded(ResourceId id)
+bool ResourceManager::IsResourceLoaded( ResourceId id ) const
 {
   bool loaded = false;
 
@@ -490,7 +509,7 @@ bool ResourceManager::IsResourceLoaded(ResourceId id)
   return loaded;
 }
 
-bool ResourceManager::IsResourceLoadFailed(ResourceId id)
+bool ResourceManager::HasResourceLoadFailed( ResourceId id ) const
 {
   bool loadFailed = false;
 
@@ -514,20 +533,42 @@ bool ResourceManager::IsResourceLoadFailed(ResourceId id)
   return loadFailed;
 }
 
-BitmapMetadata ResourceManager::GetBitmapMetadata(ResourceId id)
+void ResourceManager::SetFrameBufferBeenRenderedTo( ResourceId id, bool value )
 {
-  BitmapMetadata metadata;
+  TextureMetadata* metadata = NULL;
+  if( GetTextureMetadata( id, metadata ) )
+  {
+    metadata->SetFrameBufferBeenRenderedTo( value );
+  }
+}
 
+bool ResourceManager::HasFrameBufferBeenRenderedTo( ResourceId id ) const
+{
+  bool retval( false );
+  TextureMetadata* metadata = NULL;
+  if( GetTextureMetadata( id, metadata ) )
+  {
+    retval = metadata->HasFrameBufferBeenRenderedTo();
+  }
+  return retval;
+}
+
+bool ResourceManager::GetTextureMetadata( ResourceId id, TextureMetadata*& metadata ) const
+{
   if( id > 0 )
   {
-    BitmapMetadataIter iter = mImpl->mBitmapMetadata.find(id);
-    if( iter != mImpl->mBitmapMetadata.end() )
+    const size_t count = mImpl->mTextureMetadata.Count();
+    for( size_t index = 0; index < count; ++index )
     {
-      metadata = iter->second;
+      if( id == mImpl->mTextureMetadata[ index ].GetId() )
+      {
+        metadata = &mImpl->mTextureMetadata[ index ];
+        return true;
+      }
     }
   }
 
-  return metadata;
+  return false;
 }
 
 /********************************************************************************
@@ -576,16 +617,24 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
         UpdateImageTicket (id, attrs);
 
         // Check for reloaded bitmap
-        BitmapMetadataIter iter = mImpl->mBitmapMetadata.find(id);
-        if (iter != mImpl->mBitmapMetadata.end())
+        TextureMetadataCache::Iterator iter = mImpl->mTextureMetadata.Begin();
+        const TextureMetadataCache::Iterator end = mImpl->mTextureMetadata.End();
+        for( ; iter != end; ++iter )
         {
-          iter->second.Update(bitmap);
+          if( (*iter).GetId() == id )
+          {
+            break;
+          }
+        }
+        if( iter != end )
+        {
+          iter->Update( bitmap );
           mImpl->mTextureCacheDispatcher.DispatchUpdateTexture( id, bitmap );
         }
         else
         {
           mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap );
-          mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(bitmap)));
+          mImpl->mTextureMetadata.PushBack( TextureMetadata::New( id, bitmap ) );
         }
 
         break;
@@ -597,7 +646,7 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
 
         ImageAttributes attrs = ImageAttributes::New(nativeImg->GetWidth(), nativeImg->GetHeight());
 
-        mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(nativeImg)));
+        mImpl->mTextureMetadata.PushBack( TextureMetadata::New( id, nativeImg ) );
         mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImg );
 
         UpdateImageTicket (id, attrs);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   std::vector< ResourcePostProcessRequest> init;
   mResourcePostProcessQueue = new ResourcePostProcessList(init);
 
-  mRenderManager = RenderManager::New( glAbstraction, *mResourcePostProcessQueue );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mResourcePostProcessQueue );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
@@ -137,7 +137,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mTouchResampler = TouchResampler::New();
 
   mUpdateManager = new UpdateManager( *mNotificationManager,
-                                       glSyncAbstraction,
                                       *mAnimationPlaylist,
                                       *mPropertyNotificationManager,
                                       *mResourceManager,
