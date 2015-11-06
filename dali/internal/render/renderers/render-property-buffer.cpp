@@ -165,7 +165,14 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
         data = &(ushortData[0]);
       }
 
-      mGpuBuffer->UpdateDataBuffer( GetDataSize(), data, GpuBuffer::STATIC_DRAW );
+      GpuBuffer::Target target = GpuBuffer::ARRAY_BUFFER;
+      if(isIndexBuffer)
+      {
+        target = GpuBuffer::ELEMENT_ARRAY_BUFFER;
+      }
+
+      mGpuBuffer->UpdateDataBuffer( GetDataSize(), data, GpuBuffer::STATIC_DRAW, target );
+
     }
 
     mDataChanged = false;

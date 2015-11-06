@@ -80,8 +80,9 @@ public:
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
    * @param usage How the buffer will be used
+   * @param target The target buffer to update
    */
-  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage);
+  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage, Target target);
 
   /**
    * Bind the buffer object to the target
