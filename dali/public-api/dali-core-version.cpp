@@ -28,7 +28,7 @@ namespace Dali
 
 const unsigned int CORE_MAJOR_VERSION = 1;
 const unsigned int CORE_MINOR_VERSION = 1;
-const unsigned int CORE_MICRO_VERSION = 8;
+const unsigned int CORE_MICRO_VERSION = 9;
 const char * const CORE_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED
