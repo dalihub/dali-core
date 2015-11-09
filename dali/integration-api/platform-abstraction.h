@@ -45,16 +45,6 @@ public:
    */
   virtual ~PlatformAbstraction() {}
 
-  // Time
-
-  /**
-   * Get the monotonic time since an unspecified reference point with more precision.
-   * Multi-threading note: this method may be called from any thread.
-   * @param[out] seconds The time in seconds since the reference point.
-   * @param[out] nanoseconds The remainder in nanoseconds.
-   */
-  virtual void GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds ) = 0;
-
   // DALi Lifecycle
 
   /**

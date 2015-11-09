@@ -74,11 +74,6 @@ public:
   virtual ~TestPlatformAbstraction();
 
   /**
-   * @copydoc PlatformAbstraction::GetTimeNanoseconds()
-   */
-  virtual void GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds );
-
-  /**
    * @copydoc PlatformAbstraction::Suspend()
    */
   virtual void Suspend();
@@ -173,7 +168,6 @@ public: // TEST FUNCTIONS
   // Enumeration of Platform Abstraction methods
   typedef enum
   {
-    GetTimeNanosecondsFunc,
     SuspendFunc,
     ResumeFunc,
     LoadResourceFunc,
@@ -196,10 +190,6 @@ public: // TEST FUNCTIONS
   inline TraceCallStack& GetTrace() { return mTrace; }
 
   bool WasCalled(TestFuncEnum func);
-
-  void SetGetTimeNanosecondsResult(size_t sec, size_t nsec);
-
-  void IncrementGetTimeResult(size_t milliseconds);
 
   void SetIsLoadingResult(bool result);
 
@@ -226,8 +216,6 @@ public: // TEST FUNCTIONS
 
 private:
   mutable TraceCallStack        mTrace;
-  uint64_t                      mSeconds;
-  uint64_t                      mNanoSeconds;
   bool                          mIsLoadingResult;
   int                           mGetDefaultFontSizeResult;
   Resources                     mResources;

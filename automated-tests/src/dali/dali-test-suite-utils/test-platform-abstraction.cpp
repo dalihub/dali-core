@@ -22,16 +22,8 @@
 namespace Dali
 {
 
-namespace
-{
-const unsigned int NANOSECONDS_PER_MILLISECOND = 1000000u;
-const unsigned int NANOSECONDS_PER_SECOND = 1000000000u;
-}
-
 TestPlatformAbstraction::TestPlatformAbstraction()
 : mTrace(),
-  mSeconds( 0u ),
-  mNanoSeconds( 0u ),
   mIsLoadingResult( false ),
   mGetDefaultFontSizeResult( 0 ),
   mResources(),
@@ -46,13 +38,6 @@ TestPlatformAbstraction::TestPlatformAbstraction()
 
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
-}
-
-void TestPlatformAbstraction::GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds )
-{
-  seconds = mSeconds;
-  nanoseconds = mNanoSeconds;
-  mTrace.PushCall("GetTimeNanoseconds", "");
 }
 
 void TestPlatformAbstraction::Suspend()
@@ -188,8 +173,6 @@ void TestPlatformAbstraction::Initialize()
   mTrace.Reset();
   mTrace.Enable(true);
   memset(&mResources, 0, sizeof(Resources));
-  mSeconds=0;
-  mNanoSeconds=0;
   mIsLoadingResult=false;
 
   if(mRequest)
@@ -203,7 +186,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
 {
   switch(func)
   {
-    case GetTimeNanosecondsFunc:              return mTrace.FindMethod("GetTimeNanoseconds");
     case SuspendFunc:                         return mTrace.FindMethod("Suspend");
     case ResumeFunc:                          return mTrace.FindMethod("Resume");
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
@@ -218,21 +200,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case JoinLoaderThreadsFunc:               return mTrace.FindMethod("JoinLoaderThreads");
   }
   return false;
-}
-
-void TestPlatformAbstraction::SetGetTimeNanosecondsResult(size_t sec, size_t nsec)
-{
-  mSeconds = sec;
-  mNanoSeconds = nsec;
-}
-
-void TestPlatformAbstraction::IncrementGetTimeResult(size_t milliseconds)
-{
-  mNanoSeconds += milliseconds * NANOSECONDS_PER_MILLISECOND;
-  unsigned int additionalSeconds = mNanoSeconds / NANOSECONDS_PER_SECOND;
-
-  mSeconds += additionalSeconds;
-  mNanoSeconds -= additionalSeconds * NANOSECONDS_PER_SECOND;
 }
 
 void TestPlatformAbstraction::SetIsLoadingResult(bool result)
