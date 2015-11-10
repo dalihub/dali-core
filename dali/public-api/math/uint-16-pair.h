@@ -109,6 +109,18 @@ public:
   }
 
   /**
+   * Assignment operator.
+   */
+  Uint16Pair& operator=( const Uint16Pair& rhs )
+  {
+    if( rhs != *this )
+    {
+      mData = rhs.mData;
+    }
+    return *this;
+  }
+
+  /**
    * Equality operator.
    */
   bool operator==( const Uint16Pair& rhs ) const

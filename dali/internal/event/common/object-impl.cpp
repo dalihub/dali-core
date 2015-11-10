@@ -634,7 +634,7 @@ Property::Index Object::RegisterProperty( const std::string& name, const Propert
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
 {
-  Property::Index index = Property::INVALID_INDEX;
+  Property::Index index; // No need to initialise as it's overridden anyway
 
   if(Property::ANIMATABLE == accessMode)
   {
@@ -1253,7 +1253,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
       if(basePropertyIndex == Property::INVALID_INDEX)
       {
         // If the property is not a component of a base property, register the whole property itself.
-        index = RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
+        RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
       }
       else
       {

@@ -38,9 +38,9 @@ FrameBufferImage::~FrameBufferImage()
 {
 }
 
-FrameBufferImagePtr  FrameBufferImage::New(unsigned int width, 
-                                           unsigned int height, 
-                                           Pixel::Format pixelFormat, 
+FrameBufferImagePtr  FrameBufferImage::New(unsigned int width,
+                                           unsigned int height,
+                                           Pixel::Format pixelFormat,
                                            ReleasePolicy releasePolicy,
                                            RenderBuffer::Format bufferformat)
 {
@@ -64,9 +64,10 @@ FrameBufferImagePtr  FrameBufferImage::New( NativeImageInterface& nativeImage, R
 }
 
 FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat)
-: Image(releasePolicy),
-  mPixelFormat(pixelFormat),
-  mBufferFormat(bufferformat)
+: Image( releasePolicy ),
+  mNativeImage(),
+  mPixelFormat( pixelFormat ),
+  mBufferFormat( bufferformat )
 {
   mWidth  = width;
   mHeight = height;
@@ -74,15 +75,19 @@ FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixe
 
 FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage )
 : Image(),
-  mNativeImage(&nativeImage)
+  mNativeImage( &nativeImage ),
+  mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
+  mBufferFormat( RenderBuffer::COLOR )
 {
   mWidth = nativeImage.GetWidth();
   mHeight = nativeImage.GetHeight();
 }
 
 FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage, ReleasePolicy releasePolicy )
-: Image(releasePolicy),
-  mNativeImage(&nativeImage)
+: Image( releasePolicy ),
+  mNativeImage( &nativeImage ),
+  mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
+  mBufferFormat( RenderBuffer::COLOR )
 {
   mWidth = nativeImage.GetWidth();
   mHeight = nativeImage.GetHeight();

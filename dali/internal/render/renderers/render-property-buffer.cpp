@@ -9,7 +9,7 @@ using namespace Dali;
 using Dali::Property;
 using Dali::Internal::PropertyImplementationType;
 
-Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
+Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
 {
   Dali::GLenum type = GL_BYTE;
 
@@ -50,7 +50,7 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
   return type;
 }
 
-size_t GetPropertyImplementationGlSize( Property::Type& propertyType )
+size_t GetPropertyImplementationGlSize( Property::Type propertyType )
 {
   size_t size = 1u;
 
@@ -196,9 +196,9 @@ unsigned int PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GL
     {
       context.EnableVertexAttributeArray( attributeLocation );
 
-      GLint attributeSize = mFormat->components[i].size;
+      const GLint attributeSize = mFormat->components[i].size;
       size_t attributeOffset = mFormat->components[i].offset;
-      Property::Type attributeType = mFormat->components[i].type;
+      const Property::Type attributeType = mFormat->components[i].type;
 
       context.VertexAttribPointer( attributeLocation,
                                    attributeSize  / GetPropertyImplementationGlSize(attributeType),

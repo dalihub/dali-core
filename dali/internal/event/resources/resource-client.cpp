@@ -144,7 +144,7 @@ ResourceTicketPtr ResourceClient::DecodeResource(
         const BitmapResourceType& bitmapResource = static_cast <const BitmapResourceType&> ( type );
         // Image tickets will cache the requested parameters, which are updated on successful loading
         ImageTicket* imageTicket = new ImageTicket( *this, newId, typePath );
-        imageTicket->mAttributes.Reset( bitmapResource.size, bitmapResource.scalingMode, bitmapResource.samplingMode, bitmapResource.orientationCorrection );;
+        imageTicket->mAttributes.Reset( bitmapResource.size, bitmapResource.scalingMode, bitmapResource.samplingMode, bitmapResource.orientationCorrection );
         newTicket = imageTicket;
         break;
       }

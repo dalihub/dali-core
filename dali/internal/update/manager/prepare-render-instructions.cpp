@@ -257,7 +257,7 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
       }
       return lhs.textureResourceId < rhs.textureResourceId;
     }
-    return lhs.shader < rhs.shader;;
+    return lhs.shader < rhs.shader;
   }
   return lhs.renderItem->GetDepthIndex() < rhs.renderItem->GetDepthIndex();
 }
