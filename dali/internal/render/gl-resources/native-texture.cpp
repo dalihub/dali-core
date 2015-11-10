@@ -44,27 +44,30 @@ NativeTexture::NativeTexture(NativeImageInterface* nativeImg, Context& context)
 NativeTexture::~NativeTexture()
 {
   DALI_LOG_INFO (Debug::Filter::gImage, Debug::General, "NativeTexture destroyed\n");
+
   // GlCleanup() should already have been called by TextureCache ensuring the resource is destroyed
   // on the render thread. (And avoiding a potentially problematic virtual call in the destructor)
 }
 
-bool NativeTexture::Bind(GLenum target, TextureUnit textureunit )
+bool NativeTexture::Bind( GLenum target, TextureUnit textureunit )
 {
-  bool created = false;
+  bool result = true;
 
-  if( mId==0 )
+  if( mId == 0 )
   {
-    CreateGlTexture();
-    created = true;
+    result = CreateGlTexture();
   }
 
-  // Bind the texture id
-  mContext.ActiveTexture( textureunit );
-  mContext.Bind2dTexture( mId );
+  if( result )
+  {
+    // Bind the texture id
+    mContext.ActiveTexture( textureunit );
+    mContext.Bind2dTexture(mId);
 
-  mNativeImage->PrepareTexture();
+    mNativeImage->PrepareTexture();
+  }
 
-  return created;
+  return result;
 }
 
 bool NativeTexture::IsFullyOpaque() const
@@ -79,7 +82,7 @@ bool NativeTexture::HasAlphaChannel() const
 
 bool NativeTexture::CreateGlTexture()
 {
-  if ( mId != 0 )
+  if( mId != 0 )
   {
     DALI_LOG_INFO( Debug::Filter::gImage, Debug::General, "GL texture creation duplicate for GL id: %d\n", &mId );
     return true;

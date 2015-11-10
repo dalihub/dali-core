@@ -234,3 +234,54 @@ int UtcDaliNativeImageGetCustomSamplerTypenameP(void)
   DALI_TEST_EQUALS( nativeImage.GetCustomSamplerTypename(), samplerTypename, TEST_LOCATION );
   END_TEST;
 }
+
+
+
+int UtcDaliNativeImageTestCreationFailure(void)
+{
+  TestApplication application;
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( 16, 16 );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+
+  tet_printf("Test what happens when GlExtensionCreate is called, and returns false to indicate an error\n");
+
+  nativeImageInterface->SetGlExtensionCreateResult( false );
+
+  ImageActor imageActor = ImageActor::New( nativeImage );
+  imageActor.SetParentOrigin( ParentOrigin::CENTER );
+  Stage::GetCurrent().Add( imageActor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Reset();
+  textureTrace.Enable(true);
+
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // Test that nothing was rendered
+  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( nativeImageInterface->mTargetTextureCalls, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION );
+
+  textureTrace.Reset();
+  drawTrace.Reset();
+
+  nativeImageInterface->SetGlExtensionCreateResult( true );
+  imageActor.SetPosition( 0, 0, 1 );
+  application.SendNotification();
+  application.Render();
+
+  // This time around, the bind and draw should occur following the call to nativeImage->GlExtensionCreate.
+  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( nativeImageInterface->mTargetTextureCalls, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION );
+
+  END_TEST;
+}

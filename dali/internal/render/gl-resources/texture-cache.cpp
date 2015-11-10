@@ -293,14 +293,19 @@ void TextureCache::DiscardTexture( ResourceId id )
   }
 }
 
-void TextureCache::BindTexture( Texture *texture, ResourceId id, GLenum target, TextureUnit textureunit )
+bool TextureCache::BindTexture( Texture *texture, ResourceId id, GLenum target, TextureUnit textureunit )
 {
-  bool created = texture->Bind(target, textureunit);
+  unsigned int glTextureId = texture->GetTextureId();
+
+  bool success = texture->Bind(target, textureunit);
+  bool created = ( glTextureId == 0 ) && ( texture->GetTextureId() != 0 );
+
   if( created && texture->UpdateOnCreate() ) // i.e. the pixel data was sent to GL
   {
     ResourceId ppRequest( id );
     mTextureUploadedDispatcher.DispatchTextureUploaded(ppRequest);
   }
+  return success;
 }
 
 Texture* TextureCache::GetTexture(ResourceId id)

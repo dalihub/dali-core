@@ -167,20 +167,17 @@ bool Texture::Bind(GLenum target, TextureUnit textureunit )
 {
   // This is the only supported type at the moment
   DALI_ASSERT_DEBUG( target == GL_TEXTURE_2D );
-  bool created = false;
+  bool result = true;
 
   if( mId == 0 )
   {
-    if( CreateGlTexture() )
-    {
-      created = true;
-    }
+    result = CreateGlTexture();
   }
 
   // Bind the texture id
   mContext.BindTextureForUnit(textureunit, mId );
 
-  return created;
+  return result;
 }
 
 void Texture::GlContextDestroyed()

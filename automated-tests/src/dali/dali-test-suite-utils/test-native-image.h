@@ -40,7 +40,8 @@ class DALI_IMPORT_API TestNativeImage : public Dali::NativeImageInterface
 public:
   static TestNativeImagePointer New(int width, int height);
 
-  inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return true;};
+  inline void SetGlExtensionCreateResult(bool result){ createResult = result;}
+  inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return createResult;};
   inline virtual void GlExtensionDestroy() { ++mExtensionDestroyCalls; };
   inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return 1;};
   inline virtual void PrepareTexture() {};
@@ -59,6 +60,8 @@ public:
   int mExtensionCreateCalls;
   int mExtensionDestroyCalls;
   int mTargetTextureCalls;
+
+  bool createResult;
   TestNativeImageExtension* mExtension;
 };
 
