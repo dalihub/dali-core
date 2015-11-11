@@ -30,6 +30,9 @@
 
 #endif // LOCK_BACKTRACE_ENABLED
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 #ifdef LOCK_BACKTRACE_ENABLED
@@ -104,12 +107,18 @@ void Lock( pthread_mutex_t* mutex )
 
 #endif // LOCK_BACKTRACE_ENABLED
 
-  pthread_mutex_lock( mutex );
+  if( pthread_mutex_lock( mutex ) )
+  {
+    DALI_LOG_ERROR( "Error calling pthread_mutex_lock" );
+  }
 }
 
 void Unlock( pthread_mutex_t* mutex )
 {
-  pthread_mutex_unlock( mutex );
+  if( pthread_mutex_unlock( mutex ) )
+  {
+    DALI_LOG_ERROR( "Error calling pthread_mutex_unlock" );
+  }
   --gThreadLockCount;
 }
 
