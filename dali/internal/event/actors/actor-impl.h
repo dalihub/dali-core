@@ -165,13 +165,13 @@ public:
   bool OnStage() const;
 
   /**
-   * Query whether the actor is a RenderableActor derived type.
+   * Query whether the actor has any renderers.
    * @return True if the actor is renderable.
    */
   bool IsRenderable() const
   {
     // inlined as this is called a lot in hit testing
-    return mIsRenderable;
+    return mRenderers && !mRenderers->empty();
   }
 
   /**
@@ -1473,7 +1473,7 @@ protected:
 
   enum DerivedType
   {
-    BASIC, RENDERABLE, LAYER, ROOT_LAYER
+    BASIC, LAYER, ROOT_LAYER
   };
 
   /**
@@ -1797,7 +1797,6 @@ protected:
 
   unsigned short mDepth                            :12; ///< Cached: The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
-  const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
   bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals

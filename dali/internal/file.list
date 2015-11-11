@@ -12,7 +12,6 @@ internal_src_files = \
   \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \
-  $(internal_src_dir)/event/actor-attachments/image-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderable-attachment-impl.cpp \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
@@ -153,7 +152,6 @@ internal_src_files = \
   $(internal_src_dir)/update/manager/update-manager-debug.cpp \
   $(internal_src_dir)/update/node-attachments/node-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-camera-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \

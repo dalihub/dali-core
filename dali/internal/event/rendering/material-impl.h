@@ -90,6 +90,11 @@ public:
   void SetTextureSampler( size_t index, Sampler* sampler );
 
   /**
+   * @copydoc Dali::Material::GetTextureSampler()
+   */
+  Sampler* GetTextureSampler( size_t index ) const;
+
+  /**
    * @copydoc Dali::Material::SetTextureUniformName()
    */
   void SetTextureUniformName( size_t index, const std::string& uniformName );
@@ -97,12 +102,17 @@ public:
   /**
    * @copydoc Dali::Material::GetTextureIndex()
    */
-  int GetTextureIndex( const std::string& uniformName );
+  int GetTextureIndex( const std::string& uniformName ) const;
 
   /**
-   * @copydoc Dali::Material::GetTextureIndex()
+   * @copydoc Dali::Material::GetTexture()
    */
-  Image* GetTexture( const std::string& uniformName );
+  Image* GetTexture( const std::string& uniformName ) const;
+
+  /**
+   * @copydoc Dali::Material::GetTexture()
+   */
+  Image* GetTexture( size_t index ) const;
 
   /**
    * @copydoc Dali::Material::GetNumberOfTextures()

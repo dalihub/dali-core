@@ -118,19 +118,31 @@ void Material::SetTextureSampler( size_t index, Sampler sampler )
   GetImplementation(*this).SetTextureSampler( index, samplerPtr );
 }
 
+Sampler Material::GetTextureSampler( size_t index ) const
+{
+  Internal::Sampler* samplerPtr( GetImplementation(*this).GetTextureSampler( index ) );
+  return Dali::Sampler( samplerPtr );
+}
+
 void Material::SetTextureUniformName( size_t index, const std::string& uniformName )
 {
   GetImplementation(*this).SetTextureUniformName( index, uniformName );
 }
 
-int Material::GetTextureIndex( const std::string& uniformName )
+int Material::GetTextureIndex( const std::string& uniformName ) const
 {
   return GetImplementation(*this).GetTextureIndex( uniformName );
 }
 
-Image Material::GetTexture( const std::string& uniformName )
+Image Material::GetTexture( const std::string& uniformName ) const
 {
   Internal::Image* imagePtr( GetImplementation(*this).GetTexture( uniformName ) );
+  return Dali::Image( imagePtr );
+}
+
+Image Material::GetTexture( size_t index ) const
+{
+  Internal::Image* imagePtr( GetImplementation(*this).GetTexture( index ) );
   return Dali::Image( imagePtr );
 }
 

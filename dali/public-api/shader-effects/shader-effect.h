@@ -164,8 +164,8 @@ public:
   enum UniformCoordinateType
   {
     COORDINATE_TYPE_DEFAULT,           ///< Default, No transformation to be applied
-    COORDINATE_TYPE_VIEWPORT_POSITION, ///< The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
-    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @deprecated Dali 1.1.11 The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @deprecated Dali 1.1.11 The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
   };
 
   /**

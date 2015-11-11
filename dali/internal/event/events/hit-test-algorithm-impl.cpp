@@ -218,12 +218,7 @@ HitActor HitTestWithinLayer( Actor& actor,
             hit.distance = distance;
             hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
 
-            // Is this actor an Image Actor or contains a renderer?
-            if ( ImageActor* imageActor = dynamic_cast< ImageActor* >( &actor ) )
-            {
-              hit.depth += imageActor->GetDepthIndex();
-            }
-            else if ( actor.GetRendererCount() > 0 )
+            if ( actor.GetRendererCount() > 0 )
             {
               //Get renderer with maximum depth
               int rendererMaxDepth(actor.GetRendererAt( 0 ).Get()->GetDepthIndex());

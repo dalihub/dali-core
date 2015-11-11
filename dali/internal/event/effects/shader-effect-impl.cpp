@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -89,56 +90,47 @@ WrapperStrings customImageShaderWrappers =
 };
 
 /**
- * Helper to wrap the program with our default pre and postfix if needed and then send it to update/render thread
- * @param[in] effect of the shader
+ * Helper to wrap the program with our default pre and postfix if needed
  * @param[in] vertexPrefix from application
- * @param[in] fragmentPrefix from application
  * @param[in] vertexBody from application
- * @param[in] fragmentBody from application
- * @param[in] modifiesGeometry based on flags and vertex shader
  */
-void WrapAndSetProgram( Internal::ShaderEffect& effect,
-                        const std::string& vertexPrefix, const std::string& fragmentPrefix,
-                        const std::string& vertexBody, const std::string& fragmentBody,
-                        bool modifiesGeometry )
+std::string WrapVertexShader( const std::string& vertexPrefix, const std::string& vertexBody )
 {
-  // if there is some real data in the strings
-  if( ( vertexPrefix.length()   > 0 ) ||
-      ( fragmentPrefix.length() > 0 ) ||
-      ( vertexBody.length()     > 0 ) ||
-      ( fragmentBody.length()   > 0 ) )
+  std::string vertexSource = vertexPrefix + customImageShaderWrappers.vertexShaderPrefix;
+
+  // Append the custom vertex shader code if supplied, otherwise append the default
+  if ( vertexBody.length() > 0 )
   {
-    std::string vertexSource = vertexPrefix;
-    std::string fragmentSource = fragmentPrefix;
-
-    // Create complete shader program strings:
-
-    vertexSource += customImageShaderWrappers.vertexShaderPrefix;
-
-    // Append the custom vertex shader code if supplied, otherwise append the default
-    if ( vertexBody.length() > 0 )
-    {
-      vertexSource.append( vertexBody );
-    }
-    else
-    {
-      vertexSource.append( customImageShaderWrappers.vertexShaderPostfix );
-    }
-
-    fragmentSource += customImageShaderWrappers.fragmentShaderPrefix;
-
-    // Append the custom fragment shader code if supplied, otherwise append the default
-    if ( fragmentBody.length() > 0 )
-    {
-      fragmentSource.append( fragmentBody );
-    }
-    else
-    {
-      fragmentSource.append( customImageShaderWrappers.fragmentShaderPostfix );
-    }
-
-    effect.SendProgramMessage( vertexSource, fragmentSource, modifiesGeometry );
+    vertexSource.append( vertexBody );
   }
+  else
+  {
+    vertexSource.append( customImageShaderWrappers.vertexShaderPostfix );
+  }
+
+  return vertexSource;
+}
+
+/**
+ * Helper to wrap the program with our default pre and postfix if needed
+ * @param[in] fragmentPrefix from application
+ * @param[in] fragmentBody from application
+ */
+std::string WrapFragmentShader( const std::string& fragmentPrefix, const std::string& fragmentBody )
+{
+  std::string fragmentSource = fragmentPrefix + customImageShaderWrappers.fragmentShaderPrefix;
+
+  // Append the custom fragment shader code if supplied, otherwise append the default
+  if ( fragmentBody.length() > 0 )
+  {
+    fragmentSource.append( fragmentBody );
+  }
+  else
+  {
+    fragmentSource.append( customImageShaderWrappers.fragmentShaderPostfix );
+  }
+
+  return fragmentSource;
 }
 
 std::string GetShader(const std::string& field, const Property::Value& property)
@@ -177,8 +169,8 @@ ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
 
 ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints )
 : mEventThreadServices( eventThreadServices ),
-  mConnectionCount (0),
-  mGeometryHints( hints )
+  mGeometryHints( hints ),
+  mGridDensity( Dali::ShaderEffect::DEFAULT_GRID_DENSITY )
 {
   mSceneObject = new SceneGraph::Shader( hints );
   DALI_ASSERT_DEBUG( NULL != mSceneObject );
@@ -204,55 +196,56 @@ ShaderEffect::~ShaderEffect()
 void ShaderEffect::SetEffectImage( Dali::Image image )
 {
   // if images are the same, do nothing
-  if (mImage == image)
+  if ( mEffectImage == image )
   {
     return;
   }
 
-  if (mImage && mConnectionCount > 0)
+  if ( mEffectImage && mConnectedActors.size() > 0 )
   {
     // unset previous image
-    GetImplementation(mImage).Disconnect();
+    GetImplementation( mEffectImage ).Disconnect();
   }
 
   // in case image is empty this will reset our image handle
-  mImage = image;
+  mEffectImage = image;
 
-  if (!image)
-  {
-    // mSceneShader can be in a separate thread; queue a setter message
-    SetTextureIdMessage( mEventThreadServices, *mSceneObject, 0 );
-  }
-  else
+  if( image )
   {
     // tell image that we're using it
-    if (mConnectionCount > 0)
+    if (mConnectedActors.size() > 0)
     {
-      GetImplementation(mImage).Connect();
+      GetImplementation( mEffectImage ).Connect();
     }
-    // mSceneShader can be in a separate thread; queue a setter message
-    SetTextureIdMessage( mEventThreadServices, *mSceneObject, GetImplementation(mImage).GetResourceId() );
+  }
+
+  //inform connected actors the image has been unset
+  for(std::vector< ActorPtr >::iterator it = mConnectedActors.begin(); it != mConnectedActors.end(); ++it )
+  {
+    ImageActor* imageActor = dynamic_cast< ImageActor* >( it->Get() );
+    if( imageActor )
+    {
+      imageActor->EffectImageUpdated();
+    }
   }
 }
 
 void ShaderEffect::SetUniform( const std::string& name, Property::Value value, UniformCoordinateType uniformCoordinateType )
 {
-  // Register/Set the property
+  // Register the property if it does not exist
   Property::Index index = RegisterProperty( name, value );
 
-  // RegisterProperty guarantees a positive value as index
-  DALI_ASSERT_DEBUG( static_cast<unsigned int>(index) >= CustomPropertyStartIndex() );
-  unsigned int metaIndex = index - CustomPropertyStartIndex();
-  // check if there's space in cache
-  if( mCoordinateTypes.Count() < (metaIndex + 1) )
+  Uniform uniform = { name, index, value };
+  mUniforms.push_back( uniform );
+
+  //inform any connected actors
+  for(std::vector< ActorPtr >::iterator it = mConnectedActors.begin(); it != mConnectedActors.end(); ++it)
   {
-    mCoordinateTypes.Resize( metaIndex + 1 );
-  }
-  // only send message if the value is different than current, initial value is COORDINATE_TYPE_DEFAULT (0)
-  if( uniformCoordinateType != mCoordinateTypes[ metaIndex ] )
-  {
-    mCoordinateTypes[ metaIndex ] = uniformCoordinateType;
-    SetCoordinateTypeMessage( mEventThreadServices, *mSceneObject, metaIndex, uniformCoordinateType );
+    ImageActor* imageActor = dynamic_cast< ImageActor* >( (*it).Get() );
+    if( imageActor )
+    {
+      imageActor->EffectUniformUpdated( uniform );
+    }
   }
 }
 
@@ -264,56 +257,42 @@ void ShaderEffect::SetPrograms( const string& vertexSource, const string& fragme
 void ShaderEffect::SetPrograms( const std::string& vertexPrefix, const std::string& fragmentPrefix,
                                 const std::string& vertexSource, const std::string& fragmentSource )
 {
-  bool modifiesGeometry = true;
-  // check if the vertex shader is empty (means it cannot modify geometry)
-  if( (vertexPrefix.length() == 0) && (vertexSource.length() == 0) )
-  {
-    modifiesGeometry = false;
-  }
-  // check the hint second
-  if( ( mGeometryHints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) != 0 )
-  {
-    modifiesGeometry = false;
-  }
-
-  WrapAndSetProgram( *this, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
+  mVertexSource = WrapVertexShader( vertexPrefix, vertexSource );
+  mFragmentSource = WrapFragmentShader( fragmentPrefix, fragmentSource );
 }
 
-void ShaderEffect::SendProgramMessage( const string& vertexSource, const string& fragmentSource,
-                                       bool modifiesGeometry )
+void ShaderEffect::Connect( ActorPtr actor )
 {
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  ShaderFactory& shaderFactory = tls.GetShaderFactory();
-  size_t shaderHash;
-
-  Internal::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
-  DALI_ASSERT_DEBUG( shaderHash != 0U );
-
-  // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, shaderData, modifiesGeometry );
-}
-
-void ShaderEffect::Connect()
-{
-  ++mConnectionCount;
-
-  if (mImage && mConnectionCount == 1)
+  if( !actor )
   {
-    GetImplementation(mImage).Connect();
+    return;
+  }
 
-    // Image may have changed resource due to load/release policy. Ensure correct texture ID is set on scene graph object
-    SetTextureIdMessage( mEventThreadServices, *mSceneObject, GetImplementation(mImage).GetResourceId() );
+  std::vector< ActorPtr >::const_iterator it = std::find( mConnectedActors.begin(), mConnectedActors.end(), actor );
+  if( it == mConnectedActors.end() )
+  {
+    mConnectedActors.push_back( actor );
+  }
+
+  if( mEffectImage && mConnectedActors.size() == 1 )
+  {
+    GetImplementation( mEffectImage ).Connect();
   }
 }
-
-void ShaderEffect::Disconnect()
+void ShaderEffect::Disconnect( ActorPtr actor )
 {
-  DALI_ASSERT_DEBUG(mConnectionCount > 0);
-  --mConnectionCount;
-
-  if (mImage && mConnectionCount == 0)
+  if( !actor )
   {
-     GetImplementation(mImage).Disconnect();
+    return;
+  }
+
+  DALI_ASSERT_DEBUG(mConnectedActors.size() > 0);
+  std::vector< ActorPtr >::iterator match( std::remove( mConnectedActors.begin(), mConnectedActors.end(), actor ) );
+  mConnectedActors.erase( match, mConnectedActors.end() );
+
+  if (mEffectImage && mConnectedActors.size() == 0)
+  {
+     GetImplementation(mEffectImage).Disconnect();
   }
 }
 
@@ -392,7 +371,16 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
   {
     case Dali::ShaderEffect::Property::GRID_DENSITY:
     {
-      SetGridDensityMessage( mEventThreadServices, *mSceneObject, propertyValue.Get<float>() );
+      propertyValue.Get( mGridDensity );
+      if( ( mGeometryHints & Dali::ShaderEffect::HINT_GRID_X ) ||
+          ( mGeometryHints & Dali::ShaderEffect::HINT_GRID_Y ) )
+      {
+        //inform all the connected actors
+        for(std::vector< ActorPtr >::iterator it = mConnectedActors.begin(); it != mConnectedActors.end(); ++it )
+        {
+          (*it)->RelayoutRequest();
+        }
+      }
       break;
     }
 
@@ -423,43 +411,40 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
 
     case Dali::ShaderEffect::Property::GEOMETRY_HINTS:
     {
-      Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
+      mGeometryHints = Dali::ShaderEffect::HINT_NONE;
       std::string s = propertyValue.Get<std::string>();
       if(s == "HINT_NONE")
       {
-        hint = Dali::ShaderEffect::HINT_NONE;
+        mGeometryHints = Dali::ShaderEffect::HINT_NONE;
       }
       else if(s == "HINT_GRID_X")
       {
-        hint = Dali::ShaderEffect::HINT_GRID_X;
+        mGeometryHints = Dali::ShaderEffect::HINT_GRID_X;
       }
       else if(s == "HINT_GRID_Y")
       {
-        hint = Dali::ShaderEffect::HINT_GRID_Y;
+        mGeometryHints = Dali::ShaderEffect::HINT_GRID_Y;
       }
       else if(s == "HINT_GRID")
       {
-        hint = Dali::ShaderEffect::HINT_GRID;
+        mGeometryHints = Dali::ShaderEffect::HINT_GRID;
       }
       else if(s == "HINT_DEPTH_BUFFER")
       {
-        hint = Dali::ShaderEffect::HINT_DEPTH_BUFFER;
+        mGeometryHints = Dali::ShaderEffect::HINT_DEPTH_BUFFER;
       }
       else if(s == "HINT_BLENDING")
       {
-        hint = Dali::ShaderEffect::HINT_BLENDING;
+        mGeometryHints = Dali::ShaderEffect::HINT_BLENDING;
       }
       else if(s == "HINT_DOESNT_MODIFY_GEOMETRY")
       {
-        hint = Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY;
+        mGeometryHints = Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY;
       }
       else
       {
         DALI_ASSERT_ALWAYS(!"Geometry hint unknown" );
       }
-
-      SetHintsMessage( mEventThreadServices, *mSceneObject, hint );
-
       break;
     }
 
@@ -475,16 +460,6 @@ Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) cons
 {
   // none of our properties are readable so return empty
   return Property::Value();
-}
-
-void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
-{
-  // Warning - the property is added to the Shader object in the Update thread and the meta-data is added in the Render thread (through a secondary message)
-
-  // mSceneObject requires metadata for each custom property (uniform)
-  UniformMeta* meta = UniformMeta::New( name, newProperty, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
-  // mSceneObject is being used in a separate thread; queue a message to add the property
-  InstallUniformMetaMessage( mEventThreadServices, *mSceneObject, *meta ); // Message takes ownership
 }
 
 const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
