@@ -237,14 +237,8 @@ void ShaderEffect::SetEffectImage( Dali::Image image )
 
 void ShaderEffect::SetUniform( const std::string& name, Property::Value value, UniformCoordinateType uniformCoordinateType )
 {
-  // Register the property if it does not exist
-  Property::Index index = GetPropertyIndex( name );
-  if ( Property::INVALID_INDEX == index )
-  {
-    index = RegisterProperty( name, value );
-  }
-
-  SetProperty( index, value );
+  // Register/Set the property
+  Property::Index index = RegisterProperty( name, value );
 
   // RegisterProperty guarantees a positive value as index
   DALI_ASSERT_DEBUG( static_cast<unsigned int>(index) >= CustomPropertyStartIndex() );

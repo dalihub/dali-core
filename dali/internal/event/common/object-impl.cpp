@@ -622,29 +622,34 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
   }
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
 {
-  Property::Index index = RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
-
-  /// @todo: don't keep a table of mappings per handle.
-  AddUniformMapping(index, name);
-
-  return index;
+  return RegisterProperty( name, propertyValue, Property::ANIMATABLE );
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
-  Property::Index index; // No need to initialise as it's overridden anyway
-
-  if(Property::ANIMATABLE == accessMode)
+  // If property with the required name already exists, then just set it.
+  Property::Index index = GetPropertyIndex( name );
+  if( index != Property::INVALID_INDEX )
   {
-    index = RegisterProperty(name, propertyValue);
+    SetProperty( index, propertyValue );
   }
   else
   {
-    // Add entry to the property lookup
-    index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
-    mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue, accessMode ) );
+    // Otherwise register the property
+
+    if(Property::ANIMATABLE == accessMode)
+    {
+      index = RegisterSceneGraphProperty( name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue );
+      AddUniformMapping( index, name );
+    }
+    else
+    {
+      // Add entry to the property lookup
+      index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+      mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue, accessMode ) );
+    }
   }
 
   return index;
