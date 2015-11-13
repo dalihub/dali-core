@@ -120,7 +120,11 @@ void Material::SetTextureImage( size_t index, Image* image )
     if( mTextures[index].mImage && mOnStage )
     {
       mTextures[index].mImage->Disconnect();
-      image->Connect();
+
+      if( image )
+      {
+        image->Connect();
+      }
     }
 
     mTextures[index].mImage.Reset(image);

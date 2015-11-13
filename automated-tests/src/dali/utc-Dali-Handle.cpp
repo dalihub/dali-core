@@ -597,8 +597,34 @@ int UtcDaliHandleRegisterProperty(void)
   tet_infoline("Positive Test Dali::Handle::RegisterProperty()");
   TestApplication application;
 
+  Stage stage = Stage::GetCurrent();
+
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::PARENT_ORIGIN ).Get<Vector3>() );
+  stage.Add( actor );
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index index1 = actor.RegisterProperty( "MyProperty", Vector3::ONE );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index1 ), Vector3::ONE, TEST_LOCATION );
+
+  // No new property should be registered when we call the below function
+  Property::Index index2 = actor.RegisterProperty( "MyProperty", Vector3::ZAXIS );
+
+  application.SendNotification();
+  application.Render();
+
+
+  DALI_TEST_EQUALS( index1, index2, TEST_LOCATION ); // We should have the same index as per the first registration
+  DALI_TEST_EQUALS( actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION ); // Property count should be the same
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index2 ), Vector3::ZAXIS, TEST_LOCATION ); // Value should be what we sent on second RegisterProperty call
 
   END_TEST;
 }
@@ -749,6 +775,7 @@ int UtcDaliHandleCustomProperty(void)
   DALI_TEST_CHECK( handle.GetProperty<float>(index) == 5.0f );
   END_TEST;
 }
+
 int UtcDaliHandleWeightNew(void)
 {
   TestApplication application;
@@ -758,3 +785,4 @@ int UtcDaliHandleWeightNew(void)
 
   END_TEST;
 }
+

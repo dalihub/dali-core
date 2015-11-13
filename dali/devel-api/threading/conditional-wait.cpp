@@ -18,12 +18,12 @@
 // CLASS HEADER
 #include <dali/devel-api/threading/conditional-wait.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/mutex-impl.h>
-
 // EXTERNAL INCLUDES
 #include <pthread.h>
+
+// INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/mutex-impl.h>
 
 namespace Dali
 {
@@ -50,15 +50,27 @@ ConditionalWait::ScopedLock::~ScopedLock()
 ConditionalWait::ConditionalWait()
 : mImpl( new ConditionalWaitImpl )
 {
-  pthread_mutex_init( &mImpl->mutex, NULL );
-  pthread_cond_init( &mImpl->condition, NULL );
+  if( pthread_mutex_init( &mImpl->mutex, NULL ) )
+  {
+    DALI_LOG_ERROR( "Unable to initialise mutex in ConditionalWait" );
+  }
+  if( pthread_cond_init( &mImpl->condition, NULL ) )
+  {
+    DALI_LOG_ERROR( "Unable to initialise conditional" );
+  }
   mImpl->count = 0;
 }
 
 ConditionalWait::~ConditionalWait()
 {
-  pthread_cond_destroy( &mImpl->condition );
-  pthread_mutex_destroy( &mImpl->mutex );
+  if( pthread_cond_destroy( &mImpl->condition ) )
+  {
+    DALI_LOG_ERROR( "Unable to destroy conditional" );
+  }
+  if( pthread_mutex_destroy( &mImpl->mutex ) )
+  {
+    DALI_LOG_ERROR( "Unable to destroy mutex in ConditionalWait" );
+  }
   delete mImpl;
 }
 
@@ -72,7 +84,10 @@ void ConditionalWait::Notify()
   // broadcast all threads to continue
   if( 0 != previousCount )
   {
-    pthread_cond_broadcast( &mImpl->condition );
+    if( pthread_cond_broadcast( &mImpl->condition ) )
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast" );
+    }
   }
   Internal::Mutex::Unlock( &mImpl->mutex );
 }
@@ -88,7 +103,10 @@ void ConditionalWait::Notify( const ScopedLock& scope )
   // broadcast all threads to continue
   if( 0 != previousCount )
   {
-    pthread_cond_broadcast( &mImpl->condition );
+    if( pthread_cond_broadcast( &mImpl->condition ) )
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast" );
+    }
   }
 }
 
@@ -101,7 +119,11 @@ void ConditionalWait::Wait()
   do
   {
     // wait while condition changes
-    pthread_cond_wait( &mImpl->condition, &mImpl->mutex ); // releases the lock whilst waiting
+    if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait" );
+      break;
+    }
   }
   while( 0 != mImpl->count );
   // when condition returns the mutex is locked so release the lock
@@ -120,7 +142,11 @@ void ConditionalWait::Wait( const ScopedLock& scope )
   do
   {
     // wait while condition changes
-    pthread_cond_wait( &mImpl->condition, &mImpl->mutex ); // releases the lock whilst waiting
+    if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait" );
+      break;
+    }
   }
   while( 0 != mImpl->count );
 

@@ -63,9 +63,16 @@ BufferImagePtr BufferImage::New( PixelBuffer* pixBuf,
 }
 
 BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
-: Image(releasePol),
-  mInternalBuffer(NULL),
-  mExternalBuffer(NULL)
+: Image( releasePol ),
+  mInternalBuffer( NULL ),
+  mExternalBuffer( NULL ),
+  mResourceClient( NULL ),
+  mBufferSize( 0 ),
+  mByteStride( 0 ),
+  mBytesPerPixel( 0 ),
+  mBufferWidth( 0 ),
+  mPixelFormat( pixelformat ),
+  mResourcePolicy( ResourcePolicy::OWNED_DISCARD )
 {
   SetupBuffer( width, height, pixelformat, width, releasePol );
 
@@ -79,9 +86,16 @@ BufferImage::BufferImage(PixelBuffer* pixBuf,
                          Pixel::Format pixelformat,
                          unsigned int stride,
                          ReleasePolicy releasePol )
-: Image(releasePol),
-  mInternalBuffer(NULL),
-  mExternalBuffer(pixBuf)
+: Image( releasePol ),
+  mInternalBuffer( NULL ),
+  mExternalBuffer( pixBuf ),
+  mResourceClient( NULL ),
+  mBufferSize( 0 ),
+  mByteStride( 0 ),
+  mBytesPerPixel( 0 ),
+  mBufferWidth( 0 ),
+  mPixelFormat( pixelformat ),
+  mResourcePolicy( ResourcePolicy::OWNED_DISCARD )
 {
   SetupBuffer( width, height, pixelformat, stride ? stride: width, releasePol );
 }

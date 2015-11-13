@@ -18,11 +18,12 @@
 // CLASS HEADER
 #include <dali/devel-api/threading/mutex.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/mutex-impl.h>
-
 // EXTERNAL INCLUDES
 #include <pthread.h>
+
+// INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/common/mutex-impl.h>
 
 namespace Dali
 {
@@ -36,13 +37,19 @@ struct Mutex::MutexImpl
 Mutex::Mutex()
 : mImpl( new MutexImpl )
 {
-  pthread_mutex_init( &mImpl->mutex, NULL );
+  if( pthread_mutex_init( &mImpl->mutex, NULL ) )
+  {
+    DALI_LOG_ERROR( "Unable to initialise Mutex" );
+  }
   mImpl->locked = false;
 }
 
 Mutex::~Mutex()
 {
-  pthread_mutex_destroy( &mImpl->mutex );
+  if( pthread_mutex_destroy( &mImpl->mutex ) )
+  {
+    DALI_LOG_ERROR( "Unable to destroy Mutex" );
+  }
   // nothing else to do as there is no Lock/Unlock API
   // ScopedLock destructor will always unlock the mutex
   delete mImpl;
