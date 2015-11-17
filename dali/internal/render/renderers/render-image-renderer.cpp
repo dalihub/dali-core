@@ -237,7 +237,7 @@ bool ImageRenderer::CheckResources()
     return false;
   }
 
-  Integration::ResourceId shaderTextureId =  mShader->GetTextureIdToRender() ;
+  Integration::ResourceId shaderTextureId =  mShader->GetTextureIdToRender();
 
   if( shaderTextureId &&  mTextureCache->GetTexture( shaderTextureId ) == NULL )
   {
@@ -392,7 +392,7 @@ void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const
   // update
   if ( mVertexBuffer )
   {
-    mVertexBuffer->UpdateDataBuffer( size, data, GpuBuffer::DYNAMIC_DRAW);
+    mVertexBuffer->UpdateDataBuffer( size, data, GpuBuffer::DYNAMIC_DRAW, GpuBuffer::ARRAY_BUFFER);
   }
 }
 
@@ -411,7 +411,7 @@ void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const 
   // update
   if ( mIndexBuffer )
   {
-    mIndexBuffer->UpdateDataBuffer(size,data,GpuBuffer::STATIC_DRAW);
+    mIndexBuffer->UpdateDataBuffer(size,data,GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER);
   }
 }
 
