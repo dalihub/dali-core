@@ -113,7 +113,7 @@ void Context::GlContextCreated()
   mGlContextCreated = true;
 
   // Set the initial GL state, and check it.
-  ResetGlState();
+  InitializeGlState();
 
 #ifdef DEBUG_ENABLED
   PrintCurrentState();
@@ -194,115 +194,48 @@ void Context::SetVertexAttributeLocation(unsigned int location, bool state)
   }
 }
 
-void Context::ResetVertexAttributeState()
+void Context::InitializeGlState()
 {
-  // reset attribute cache
-  for( unsigned int i=0; i < MAX_ATTRIBUTE_CACHE_SIZE; ++i )
-  {
-    mVertexAttributeCachedState[ i ] = false;
-    mVertexAttributeCurrentState[ i ] = false;
-
-    LOG_GL("DisableVertexAttribArray %d\n", i);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( i ) );
-  }
-}
-
-void Context::ResetGlState()
-{
-  DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::ResetGlState()\n");
+  DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::InitializeGlState()\n");
   DALI_ASSERT_DEBUG(mGlContextCreated);
 
   mClearColorSet = false;
-  // Render manager will call clear in next render
-
-  // Reset internal state and Synchronize it with real OpenGL context.
-  // This may seem like overkill, but the GL context is not owned by dali-core,
-  // and no assumptions should be made about the initial state.
   mColorMask = true;
-  mGlAbstraction.ColorMask( true, true, true, true );
-
   mStencilMask = 0xFF;
-  mGlAbstraction.StencilMask( 0xFF );
-
   mBlendEnabled = false;
-  mGlAbstraction.Disable(GL_BLEND);
-
   mDepthBufferEnabled = false;
-  mGlAbstraction.Disable(GL_DEPTH_TEST);
-
   mDepthMaskEnabled = false;
-  mGlAbstraction.DepthMask(GL_FALSE);
-
-  mDitherEnabled = false; // This the only GL capability which defaults to true
+  mPolygonOffsetFillEnabled = false;
+  mSampleAlphaToCoverageEnabled = false;
+  mSampleCoverageEnabled = false;
+  mScissorTestEnabled = false;
+  mStencilBufferEnabled = false;
+  mDitherEnabled = false; // This and GL_MULTISAMPLE are the only GL capability which defaults to true
   mGlAbstraction.Disable(GL_DITHER);
 
-  mPolygonOffsetFillEnabled = false;
-  mGlAbstraction.Disable(GL_POLYGON_OFFSET_FILL);
-
-  mSampleAlphaToCoverageEnabled = false;
-  mGlAbstraction.Disable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-
-  mSampleCoverageEnabled = false;
-  mGlAbstraction.Disable(GL_SAMPLE_COVERAGE);
-
-  mScissorTestEnabled = false;
-  mGlAbstraction.Disable(GL_SCISSOR_TEST);
-
-  mStencilBufferEnabled = false;
-  mGlAbstraction.Disable(GL_STENCIL_TEST);
-
   mBoundArrayBufferId = 0;
-  LOG_GL("BindBuffer GL_ARRAY_BUFFER 0\n");
-  mGlAbstraction.BindBuffer(GL_ARRAY_BUFFER, mBoundArrayBufferId);
-
   mBoundElementArrayBufferId = 0;
-  LOG_GL("BindBuffer GL_ELEMENT_ARRAY_BUFFER 0\n");
-  mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBoundElementArrayBufferId);
-
-#ifndef EMSCRIPTEN // not in WebGL
   mBoundTransformFeedbackBufferId = 0;
-  LOG_GL("BindBuffer GL_TRANSFORM_FEEDBACK_BUFFER 0\n");
-  mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, mBoundTransformFeedbackBufferId);
-#endif
+  mActiveTextureUnit = TEXTURE_UNIT_IMAGE;
 
-  mActiveTextureUnit = TEXTURE_UNIT_LAST;
-
-  mUsingDefaultBlendColor = true;
-  mGlAbstraction.BlendColor( 0.0f, 0.0f, 0.0f, 0.0f );
+  mUsingDefaultBlendColor = true; //Default blend color is (0,0,0,0)
 
   mBlendFuncSeparateSrcRGB = GL_ONE;
   mBlendFuncSeparateDstRGB = GL_ZERO;
   mBlendFuncSeparateSrcAlpha = GL_ONE;
   mBlendFuncSeparateDstAlpha = GL_ZERO;
-  mGlAbstraction.BlendFuncSeparate( mBlendFuncSeparateSrcRGB, mBlendFuncSeparateDstRGB,
-                                    mBlendFuncSeparateSrcAlpha, mBlendFuncSeparateDstAlpha );
 
   // initial state is GL_FUNC_ADD for both RGB and Alpha blend modes
   mBlendEquationSeparateModeRGB = GL_FUNC_ADD;
   mBlendEquationSeparateModeAlpha = GL_FUNC_ADD;
-  mGlAbstraction.BlendEquationSeparate( mBlendEquationSeparateModeRGB, mBlendEquationSeparateModeAlpha);
 
-  mCullFaceMode = Dali::Material::NONE;
-  mGlAbstraction.Disable(GL_CULL_FACE);
-  mGlAbstraction.FrontFace(GL_CCW);
-  mGlAbstraction.CullFace(GL_BACK);
-
-  // rebind texture units to 0
-  for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
-  {
-    mBound2dTextureId[ i ] = 0;
-    // set active texture
-    mGlAbstraction.ActiveTexture( GL_TEXTURE0 + i );
-    mGlAbstraction.BindTexture(GL_TEXTURE_2D, mBound2dTextureId[ i ] );
-  }
+  mCullFaceMode = Dali::Material::NONE; //By default cullface is disabled, front face is set to CCW and cull face is set to back
 
   // get maximum texture size
   mGlAbstraction.GetIntegerv(GL_MAX_TEXTURE_SIZE, &mMaxTextureSize);
 
   // reset viewport, this will be set to something useful when rendering
   mViewPort.x = mViewPort.y = mViewPort.width = mViewPort.height = 0;
-
-  ResetVertexAttributeState();
 
   mFrameBufferStateCache.Reset();
 }
