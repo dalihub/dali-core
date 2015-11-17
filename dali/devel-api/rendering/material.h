@@ -163,6 +163,14 @@ public:
   void SetTextureSampler( size_t index, Sampler sampler );
 
   /**
+   * @brief Retrieve the sampler of a texture given its texture index
+   *
+   * @param[in] index The index of the texture in the array of textures
+   * @return Returns the sampler of a texture given its texture index
+   */
+  Sampler GetTextureSampler( size_t index ) const;
+
+  /**
    * @brief Set the uniform name of a given texture
    *
    * @param[in] index The index of the texture in the array of textures
@@ -170,13 +178,29 @@ public:
    */
   void SetTextureUniformName( size_t index, const std::string& uniformName );
 
-  /*
+  /**
    * @brief Retrive the index of a texture given its uniform name
    *
    * @param[in] uniformName the uniform name
    * @returns The index in the array of textures or -1 if the texture is not found
    */
-  int GetTextureIndex( const std::string& uniformName );
+  int GetTextureIndex( const std::string& uniformName ) const;
+
+  /**
+   * @brief Retrive the texture given its uniform name
+   *
+   * @param[in] uniformName the uniform name
+   * @returns The image in the array of textures corresponding to the uniformName or an empty handle if the texture is not found
+   */
+  Image GetTexture( const std::string& uniformName ) const;
+
+  /**
+   * @brief Retrive the texture given its index
+   *
+   * @param[in] index The index in the array of textures
+   * @returns The image in the array of textures corresponding to the index or an empty handle if the texture is not found
+   */
+  Image GetTexture( size_t index ) const;
 
   /**
    * @brief Retrieve the number of textures used by the material

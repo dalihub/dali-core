@@ -1879,7 +1879,6 @@ Actor::Actor( DerivedType derivedType )
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mDepth( 0u ),
   mIsRoot( ROOT_LAYER == derivedType ),
-  mIsRenderable( RENDERABLE == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
   mSensitive( true ),

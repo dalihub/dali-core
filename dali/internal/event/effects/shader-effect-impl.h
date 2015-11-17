@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/resources/resource-ticket.h>
@@ -47,11 +48,14 @@ class ShaderEffect : public Object
 public:
   typedef Dali::ShaderEffect::UniformCoordinateType UniformCoordinateType;
 
-  enum GeometryState
+  struct Uniform
   {
-    DOESNT_MODIFY_GEOMETRY,
-    MODIFIES_GEOMETRY
+    std::string mName;
+    Property::Index mIndex;
+    Property::Value mValue;
   };
+
+  typedef std::vector< Uniform > UniformArray;
 
   /**
    * Create a new ShaderEffect with no programs
@@ -71,6 +75,20 @@ public:
   void SetUniform( const std::string& name,
                    Property::Value value,
                    UniformCoordinateType uniformCoordinateType );
+
+  /**
+   * Returns the uniforms set for the shaders
+   * 
+   * @return Returns and array of uniforms set for the shaders
+   */
+  const UniformArray& GetUniforms() {return mUniforms;}
+
+  /**
+   * Returns the GeometryHints used
+   * 
+   * @return Returns the GeometryHints used
+   */
+  Dali::ShaderEffect::GeometryHints  GetGeometryHints() const {return mGeometryHints;}
 
   /**
    * Add a GeometryType specific default program to this ShaderEffect
@@ -93,23 +111,41 @@ public:
                     const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
-   * Send shader program to scene-graph object.
-   * @param[in] vertexSource     The source code for the vertex shader
-   * @param[in] fragmentSource   The source code for the fragment shader
-   * @param[in] modifiesGeometry True if the shader modifies geometry
+   * @brief Notify ShaderEffect that it's being used by an Actor.
+   *
+   * @param[in] actor The Actor that is connecting to this ShaderEffect 
    */
-  void SendProgramMessage( const std::string& vertexSource, const std::string& fragmentSource,
-                           bool modifiesGeometry );
+  void Connect( ActorPtr actor );
 
   /**
-   * Notify ShaderEffect that it's being used by an Actor.
+   * @brief Notify ShaderEffect that an Actor is no longer using it.
+   *
+   * @param[in] actor The Actor that is disconnecting from this ShaderEffect 
    */
-  void Connect();
+  void Disconnect( ActorPtr actor );
+
+public:
 
   /**
-   * Notify ShaderEffect that an Actor is no longer using it.
+   * Returns the vertex shader for this ShaderEffect
+   *
+   * @return Returns the vertex shader for this ShaderEffect
    */
-  void Disconnect();
+  const std::string& GetVertexShader() const {return mVertexSource;}
+
+  /**
+   * Returns the fragment shader for this ShaderEffect
+   *
+   * @return Returns the fragment shader for this ShaderEffect
+   */
+  const std::string& GetFragmentShader() const {return mFragmentSource;}
+
+  /**
+   * Returns the fragment shader for this ShaderEffect
+   *
+   * @return Returns the fragment shader for this ShaderEffect
+   */
+  Dali::Image GetEffectImage() const {return mEffectImage;}
 
 public: // Default property extensions from Object
 
@@ -164,11 +200,6 @@ public: // Default property extensions from Object
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::Object::NotifyScenePropertyInstalled()
-   */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const;
-
-  /**
    * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
@@ -204,13 +235,18 @@ private:
   ShaderEffect& operator=( const ShaderEffect& rhs );
 
 private: // Data
-  EventThreadServices& mEventThreadServices; ///< Event thread services, for sending messages
-  SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
-  Dali::Image mImage;                       ///< Client-side handle for the effect image
-  unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
-  Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry
-  Dali::Vector< UniformCoordinateType > mCoordinateTypes; ///< cached to avoid sending tons of unnecessary messages
+  std::vector< ActorPtr > mConnectedActors;               ///< The array of actors that are currently connected to this ShaderEffect
+  UniformArray mUniforms;                                 ///< The array of uniforms set for this ShaderEffect
 
+  std::string mVertexSource;                              ///< The vertex shader source
+  std::string mFragmentSource;                            ///< The fragment shader source
+
+  EventThreadServices& mEventThreadServices;              ///< Event thread services, for sending messages
+  SceneGraph::Shader* mSceneObject;                       ///< Pointer to the scene shader, should not be changed on this thread
+
+  Dali::Image mEffectImage;                               ///< The Client-side handle to the effect image
+  Dali::ShaderEffect::GeometryHints  mGeometryHints;      ///< shader geometry hints for building the geometry
+  float mGridDensity;                                     ///< The grid denisty
 };
 
 } // namespace Internal

@@ -149,8 +149,6 @@ void ShaderFactory::SaveBinary( Internal::ShaderDataPtr shaderData )
 void ShaderFactory::LoadDefaultShaders()
 {
   mDefaultShader = ShaderEffect::New();
-
-  mDefaultShader->SendProgramMessage( ImageVertex, ImageFragment, false );
 }
 
 void ShaderFactory::MemoryCacheInsert( ShaderData& shaderData )

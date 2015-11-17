@@ -22,8 +22,10 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h> // for EqualToConstraint
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/images/image-connector.h>
@@ -55,37 +57,163 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::Actor ), Create );
 
-ImageActor::Style StyleEnum(const std::string &s)
+struct GridVertex
 {
-  if(s == "STYLE_NINE_PATCH")
+  Vector3 mPosition;
+  Vector2 mTextureCoord;
+};
+
+GeometryPtr CreateQuadGeometry( const Vector2& size, int imageWidth, int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
+{
+  const float halfWidth = size.width * 0.5f;
+  const float halfHeight = size.height * 0.5f;
+  GridVertex quadVertexData[4] =
   {
-    return Dali::ImageActor::STYLE_NINE_PATCH;
-  }
-  else if(s == "STYLE_NINE_PATCH_NO_CENTER")
-  {
-    return Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER;
-  }
-  else // if(s == "QUAD")
-  {
-    return Dali::ImageActor::STYLE_QUAD;
-  }
+      { Vector3( -halfWidth, -halfHeight, 0.f ), Vector2( ( pixelArea.x                   ) / (float)imageWidth, ( pixelArea.y                    ) / (float)imageHeight ) },
+      { Vector3( -halfWidth,  halfHeight, 0.f ), Vector2( ( pixelArea.x                   ) / (float)imageWidth, ( pixelArea.y + pixelArea.height ) / (float)imageHeight ) },
+      { Vector3(  halfWidth, -halfHeight, 0.f ), Vector2( ( pixelArea.x + pixelArea.width ) / (float)imageWidth, ( pixelArea.y                    ) / (float)imageHeight ) },
+      { Vector3(  halfWidth,  halfHeight, 0.f ), Vector2( ( pixelArea.x + pixelArea.width ) / (float)imageWidth, ( pixelArea.y + pixelArea.height ) / (float)imageHeight ) }
+  };
+
+  Property::Map quadVertexFormat;
+  quadVertexFormat["aPosition"] = Property::VECTOR3;
+  quadVertexFormat["aTexCoord"] = Property::VECTOR2;
+  PropertyBufferPtr quadVertices = PropertyBuffer::New();
+  quadVertices->SetFormat( quadVertexFormat );
+  quadVertices->SetSize( 4 );
+  quadVertices->SetData(quadVertexData);
+
+  // Create the geometry object
+  GeometryPtr geometry = Geometry::New();
+  geometry->AddVertexBuffer( *quadVertices );
+  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
+
+  return geometry;
 }
 
-std::string StyleString(const ImageActor::Style style)
+GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, unsigned int gridHeight, int imageWidth, int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
 {
-  if(style == Dali::ImageActor::STYLE_NINE_PATCH)
+  // Create vertices
+  std::vector< GridVertex > vertices;
+  vertices.reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
+
+  for( unsigned int y = 0u; y < gridHeight + 1; ++y )
   {
-    return "STYLE_NINE_PATCH";
+    float yPos = (float)y / gridHeight;
+    for( unsigned int x = 0u; x < gridWidth + 1; ++x )
+    {
+      float xPos = (float)x / gridWidth;
+      GridVertex vertex = {
+                            Vector3( size.width * ( xPos - 0.5f ), size.height * ( yPos - 0.5f ), 0.0f ),
+                            Vector2( ( pixelArea.x + pixelArea.width  * xPos ) / (float)imageWidth,
+                                     ( pixelArea.y + pixelArea.height * yPos ) / (float)imageHeight )
+                          };
+      vertices.push_back( vertex );
+    }
   }
-  else if(style == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER)
+
+  // Create indices
+  Vector< unsigned int > indices;
+  indices.Reserve( ( gridWidth + 2 ) * gridHeight * 2 - 2);
+
+  for( unsigned int row = 0u; row < gridHeight; ++row )
   {
-    return "STYLE_NINE_PATCH_NO_CENTER";
+    unsigned int rowStartIndex = row*(gridWidth+1u);
+    unsigned int nextRowStartIndex = rowStartIndex + gridWidth +1u;
+
+    if( row != 0u ) // degenerate index on non-first row
+    {
+      indices.PushBack( rowStartIndex );
+    }
+
+    for( unsigned int column = 0u; column < gridWidth+1u; column++) // main strip
+    {
+      indices.PushBack( rowStartIndex + column);
+      indices.PushBack( nextRowStartIndex + column);
+    }
+
+    if( row != gridHeight-1u ) // degenerate index on non-last row
+    {
+      indices.PushBack( nextRowStartIndex + gridWidth );
+    }
   }
-  else // if(s == "QUAD")
+
+
+  Property::Map vertexFormat;
+  vertexFormat[ "aPosition" ] = Property::VECTOR3;
+  vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
+  PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New();
+  vertexPropertyBuffer->SetFormat( vertexFormat );
+  vertexPropertyBuffer->SetSize( vertices.size() );
+  if( vertices.size() > 0 )
   {
-    return "STYLE_QUAD";
+    vertexPropertyBuffer->SetData( &vertices[ 0 ] );
   }
+
+  Property::Map indexFormat;
+  indexFormat[ "indices" ] = Property::INTEGER;
+  PropertyBufferPtr indexPropertyBuffer = PropertyBuffer::New();
+  indexPropertyBuffer->SetFormat( indexFormat );
+  indexPropertyBuffer->SetSize( indices.Size() );
+  if( indices.Size() > 0 )
+  {
+    indexPropertyBuffer->SetData( &indices[ 0 ] );
+  }
+
+  // Create the geometry object
+  GeometryPtr geometry = Geometry::New();
+  geometry->AddVertexBuffer( *vertexPropertyBuffer );
+  geometry->SetIndexBuffer( *indexPropertyBuffer );
+  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
+
+  return geometry;
+
 }
+
+
+template< typename T>
+ConstraintBase* CreateEqualConstraint(Object& target, Property::Index index, Internal::SourceContainer& sources )
+{
+  typedef typename Dali::Internal::PropertyConstraintPtr< T >::Type PropertyConstraintPtrType;
+
+  CallbackBase* callback = new Dali::Constraint::Function< T >( EqualToConstraint() );
+  PropertyConstraintPtrType funcPtr( new Internal::PropertyConstraint< T >( reinterpret_cast< Dali::Constraint::Function< T >* >( callback ) ) );
+
+  return Internal::Constraint< T >::New( target, index, sources, funcPtr );
+}
+
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec3 aPosition;\n
+  attribute mediump vec2 aTexCoord;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump vec4 uTextureRect;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 1.0);\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = aTexCoord;\n
+    gl_Position = vertexPosition;\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+  }\n
+);
+
+const size_t INVALID_TEXTURE_ID = (size_t)-1;
+const int INVALID_RENDERER_ID = -1;
+const unsigned int MAXIMUM_GRID_SIZE = 2048;
 }
 
 ImageActorPtr ImageActor::New()
@@ -95,9 +223,16 @@ ImageActorPtr ImageActor::New()
   // Second-phase construction of base class
   actor->Initialize();
 
-  // Create the attachment
-  actor->mImageAttachment = ImageAttachment::New( actor->GetEventThreadServices(), *actor->mNode );
-  actor->Attach( *actor->mImageAttachment );
+  //Create the renderer
+  actor->mRenderer = Renderer::New();
+
+  GeometryPtr quad = CreateQuadGeometry( Vector2::ONE, 1, 1, PixelArea() );
+  actor->mRenderer->SetGeometry( *quad );
+
+  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+  MaterialPtr material = Material::New();
+  material->SetShader( *shader );
+  actor->mRenderer->SetMaterial( *material );
 
   return actor;
 }
@@ -110,109 +245,84 @@ void ImageActor::OnInitialize()
 
 void ImageActor::SetImage( ImagePtr& image )
 {
-  ImagePtr currentImage = mImageAttachment->GetImage();
-  // early exit if it's the same image as we already have
-  if ( currentImage == image )
+  if( !image )
   {
-    return;
-  }
-
-  // NOTE! image might be pointing to NULL, which is fine as in that case app wants to just remove the image
-  ImagePtr newImage( image );
-  // if image is not NULL, check for 9 patch
-  if( newImage )
-  {
-    // Automatically convert nine-patch images to cropped bitmap
-    NinePatchImage* ninePatchImage = NinePatchImage::DownCast( image.Get() );
-    if( ninePatchImage )
+    if( mRendererIndex != INVALID_RENDERER_ID )
     {
-      newImage = ninePatchImage->CreateCroppedBufferImage();
-      SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
-
-      const NinePatchImage::StretchRanges& stretchPixelsX = ninePatchImage->GetStretchPixelsX();
-      const NinePatchImage::StretchRanges& stretchPixelsY = ninePatchImage->GetStretchPixelsY();
-
-      if( stretchPixelsX.Size() > 0 && stretchPixelsY.Size() > 0 )
-      {
-        Vector4 border;
-        //The NinePatchImage stretch pixels are in the cropped image space, inset by 1 to get it to uncropped image space
-        border.x = stretchPixelsX[ 0 ].GetX() + 1;
-        border.y = stretchPixelsY[ 0 ].GetX() + 1;
-        border.z = image->GetWidth() - stretchPixelsX[ 0 ].GetY() - 1;
-        border.w = image->GetHeight() - stretchPixelsY[ 0 ].GetY() - 1;
-
-        SetNinePatchBorder( border, true );
-      }
+      RemoveRenderer( mRendererIndex );
+      mRendererIndex = INVALID_RENDERER_ID;
     }
   }
-  // set the actual image (normal or 9 patch) and natural size based on that
-  mImageAttachment->SetImage( newImage );
+  else
+  {
+    SamplerPtr sampler = Sampler::New();
+    sampler->SetFilterMode( mMinFilter, mMagFilter );
 
-  RelayoutRequest();
+    mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
+
+    if( mRendererIndex == INVALID_RENDERER_ID )
+    {
+      mRendererIndex = AddRenderer( *mRenderer );
+    }
+
+    if( !mIsPixelAreaSet )
+    {
+      mPixelArea = PixelArea( 0, 0, image->GetWidth(), image->GetHeight() );
+    }
+
+    RelayoutRequest();
+  }
 }
 
-ImagePtr ImageActor::GetImage()
+ImagePtr ImageActor::GetImage() const
 {
-  return mImageAttachment->GetImage();
+  return mRenderer->GetMaterial()->GetTexture( mTextureIndex );
 }
 
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
 {
-  mImageAttachment->SetPixelArea( pixelArea );
+  mPixelArea = pixelArea;
+  mIsPixelAreaSet = true;
 
   RelayoutRequest();
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
 {
-  return mImageAttachment->GetPixelArea();
+  return mPixelArea;
 }
 
 bool ImageActor::IsPixelAreaSet() const
 {
-  return mImageAttachment->IsPixelAreaSet();
+  return mIsPixelAreaSet;
 }
 
 void ImageActor::ClearPixelArea()
 {
-  mImageAttachment->ClearPixelArea();
+  mIsPixelAreaSet = false;
+
+  int imageWidth = 0;
+  int imageHeight = 0;
+  ImagePtr image = GetImage();
+  if( image )
+  {
+    imageWidth = image->GetWidth();
+    imageHeight = image->GetHeight();
+  }
+
+  mPixelArea = PixelArea( 0, 0, imageWidth, imageHeight );
 
   RelayoutRequest();
 }
 
-void ImageActor::SetStyle( Style style )
-{
-  mImageAttachment->SetStyle( style );
-}
-
-ImageActor::Style ImageActor::GetStyle() const
-{
-  return mImageAttachment->GetStyle();
-}
-
-void ImageActor::SetNinePatchBorder( const Vector4& border, bool inPixels )
-{
-  mImageAttachment->SetNinePatchBorder( border, inPixels );
-}
-
-Vector4 ImageActor::GetNinePatchBorder() const
-{
-  return mImageAttachment->GetNinePatchBorder();
-}
-
-ImageAttachment& ImageActor::GetImageAttachment()
-{
-  return *mImageAttachment;
-}
-
-RenderableAttachment& ImageActor::GetRenderableAttachment() const
-{
-  DALI_ASSERT_DEBUG( mImageAttachment && "ImageAttachment missing from ImageActor" );
-  return *mImageAttachment;
-}
-
 ImageActor::ImageActor()
-: Actor( Actor::RENDERABLE )
+: Actor( Actor::BASIC ),
+  mRendererIndex( INVALID_RENDERER_ID ),
+  mTextureIndex( INVALID_TEXTURE_ID ),
+  mEffectTextureIndex( INVALID_TEXTURE_ID ),
+  mMinFilter( FilterMode::DEFAULT ),
+  mMagFilter( FilterMode::DEFAULT ),
+  mIsPixelAreaSet( false )
 {
 }
 
@@ -231,7 +341,7 @@ Vector2 ImageActor::CalculateNaturalSize() const
   // if no image then natural size is 0
   Vector2 size( 0.0f, 0.0f );
 
-  ImagePtr image = mImageAttachment->GetImage();
+  ImagePtr image = GetImage();
   if( image )
   {
     if( IsPixelAreaSet() )
@@ -249,12 +359,84 @@ Vector2 ImageActor::CalculateNaturalSize() const
   return size;
 }
 
-void ImageActor::OnStageConnectionInternal()
+void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-}
+  int imageWidth = 1;
+  int imageHeight = 1;
 
-void ImageActor::OnStageDisconnectionInternal()
-{
+  ImagePtr image = GetImage();
+
+  if( image )
+  {
+    imageWidth = image->GetWidth();
+    imageHeight = image->GetHeight();
+  }
+
+  unsigned int gridWidth = 1;
+  unsigned int gridHeight = 1;
+  if( mShaderEffect )
+  {
+    Dali::ShaderEffect::GeometryHints hints = mShaderEffect->GetGeometryHints();
+    Property::Value gridDensityValue = mShaderEffect->GetDefaultProperty( Dali::ShaderEffect::Property::GRID_DENSITY );
+    int gridDensity = Dali::ShaderEffect::DEFAULT_GRID_DENSITY;
+    gridDensityValue.Get( gridDensity );
+
+    if( ( hints & Dali::ShaderEffect::HINT_GRID_X ) )
+    {
+      gridWidth = size.width / gridDensity;
+    }
+    if( ( hints & Dali::ShaderEffect::HINT_GRID_Y ) )
+    {
+      gridHeight = size.height / gridDensity;
+    }
+
+    //limit the grid size
+    gridWidth = std::min( MAXIMUM_GRID_SIZE, gridWidth );
+    gridHeight = std::min( MAXIMUM_GRID_SIZE, gridHeight );
+  }
+
+  GeometryPtr quad = gridWidth <= 1 && gridHeight <= 1 ?
+                       CreateQuadGeometry( size, imageWidth, imageHeight, mPixelArea ) :
+                       CreateGridGeometry( size, gridWidth, gridHeight, imageWidth, imageHeight, mPixelArea );
+
+  mRenderer->SetGeometry( *quad );
+
+  Vector4 textureRect( 0.f, 0.f, 1.f, 1.f );
+  if( mIsPixelAreaSet )
+  {
+    ImagePtr image = GetImage();
+    if( image )
+    {
+      int imageWidth = image->GetWidth();
+      int imageHeight = image->GetHeight();;
+
+      const float uScale = 1.0f / float(imageWidth);
+      const float vScale = 1.0f / float(imageHeight);
+      const float x = uScale * float(mPixelArea.x);
+      const float y = vScale * float(mPixelArea.y);
+      const float width  = uScale * float(mPixelArea.width);
+      const float height = vScale * float(mPixelArea.height);
+
+      // bottom left
+      textureRect.x = x;
+      textureRect.y = y;
+
+      // top right
+      textureRect.z = x + width;
+      textureRect.w = y + height;
+    }
+  }
+
+  Material* material = mRenderer->GetMaterial();
+  Property::Index index = material->GetPropertyIndex( "sTextureRect" );
+  if( index != Property::INVALID_INDEX )
+  {
+    material->SetProperty( index, textureRect );
+  }
+  else
+  {
+    material->RegisterProperty( "sTextureRect", textureRect );
+  }
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -397,12 +579,12 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
       }
       case Dali::ImageActor::Property::STYLE:
       {
-        SetStyle( StyleEnum( propertyValue.Get<std::string>() ) );
+        //not supported
         break;
       }
       case Dali::ImageActor::Property::BORDER:
       {
-        SetNinePatchBorder( propertyValue.Get<Vector4>(), true /*in pixels*/ );
+        //not supported
         break;
       }
       case Dali::ImageActor::Property::IMAGE:
@@ -448,18 +630,18 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::ImageActor::Property::STYLE:
       {
-        ret = StyleString( GetStyle() );
+        //not supported
         break;
       }
       case Dali::ImageActor::Property::BORDER:
       {
-        ret = GetNinePatchBorder();
+        //not supported
         break;
       }
       case Dali::ImageActor::Property::IMAGE:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( Dali::Image( mImageAttachment->GetImage().Get() ), map );
+        Scripting::CreatePropertyMap( Dali::Image( GetImage().Get() ), map );
         ret = Property::Value( map );
         break;
       }
@@ -474,114 +656,284 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
   return ret;
 }
 
-
 void ImageActor::SetSortModifier(float modifier)
 {
-  mImageAttachment->SetSortModifier( modifier );
+  mRenderer->SetDepthIndex( modifier );
 }
 
 float ImageActor::GetSortModifier() const
 {
-  return mImageAttachment->GetSortModifier();
-}
-
-void ImageActor::SetDepthIndex( int depthIndex )
-{
-   mImageAttachment->SetSortModifier( depthIndex );
-}
-
-int ImageActor::GetDepthIndex() const
-{
-  return static_cast< int >( mImageAttachment->GetSortModifier() );
+  return mRenderer->GetDepthIndex();
 }
 
 void ImageActor::SetCullFace(CullFaceMode mode)
 {
-  mImageAttachment->SetCullFace( mode );
+  mRenderer->GetMaterial()->SetFaceCullingMode( static_cast< Dali::Material::FaceCullingMode >( mode ) );
 }
 
 CullFaceMode ImageActor::GetCullFace() const
 {
-  return mImageAttachment->GetCullFace();
+  return static_cast< CullFaceMode >( mRenderer->GetMaterial()->GetFaceCullingMode() );
 }
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
 {
-  mImageAttachment->SetBlendMode( mode );
+  mRenderer->GetMaterial()->SetBlendMode( mode );
 }
 
 BlendingMode::Type ImageActor::GetBlendMode() const
 {
-  return mImageAttachment->GetBlendMode();
+  return mRenderer->GetMaterial()->GetBlendMode();
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
 {
-  mImageAttachment->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
                                BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
 {
-  mImageAttachment->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                                    BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
+                               BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
 {
-  mImageAttachment->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->GetMaterial()->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
 {
-  mImageAttachment->SetBlendEquation( equationRgba, equationRgba );
+  mRenderer->GetMaterial()->SetBlendEquation( equationRgba, equationRgba );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
 {
-  mImageAttachment->SetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->GetMaterial()->SetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
 {
-  mImageAttachment->GetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->GetMaterial()->GetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::SetBlendColor( const Vector4& color )
 {
-  mImageAttachment->SetBlendColor( color );
+  mBlendColor = color;
+  mRenderer->GetMaterial()->SetBlendColor( mBlendColor );
 }
 
 const Vector4& ImageActor::GetBlendColor() const
 {
-  return mImageAttachment->GetBlendColor();
+  return mBlendColor;
 }
 
 void ImageActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
 {
-  mImageAttachment->SetFilterMode( minFilter, magFilter );
+  mMinFilter = minFilter;
+  mMagFilter = magFilter;
+
+  if( mTextureIndex != INVALID_TEXTURE_ID )
+  {
+    SamplerPtr sampler = Sampler::New();
+    sampler->SetFilterMode( minFilter, magFilter );
+
+    mRenderer->GetMaterial()->SetTextureSampler( mTextureIndex, sampler.Get() );
+  }
 }
 
 void ImageActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
 {
-  return mImageAttachment->GetFilterMode( minFilter, magFilter );
+  minFilter = mMinFilter;
+  magFilter = mMagFilter;
 }
 
-void ImageActor::SetShaderEffect(ShaderEffect& effect)
+void ImageActor::SetShaderEffect( ShaderEffect& effect )
 {
-  mImageAttachment->SetShaderEffect( effect );
+  if( mShaderEffect )
+  {
+    mShaderEffect->Disconnect( this );
+  }
+
+  mShaderEffect = ShaderEffectPtr( &effect );
+  effect.Connect( this );
+
+  Dali::ShaderEffect::GeometryHints hints = effect.GetGeometryHints();
+
+  int shaderHints = Dali::Shader::HINT_NONE;
+
+  if( hints & Dali::ShaderEffect::HINT_DEPTH_BUFFER )
+  {
+    shaderHints |= Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
+  }
+  if( hints & Dali::ShaderEffect::HINT_BLENDING )
+  {
+    shaderHints |= Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT;
+  }
+  if( !(hints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY) )
+  {
+    shaderHints |= Dali::Shader::HINT_MODIFIES_GEOMETRY;
+  }
+
+  ShaderPtr shader = Shader::New( effect.GetVertexShader(), effect.GetFragmentShader(), static_cast< Dali::Shader::ShaderHints >( shaderHints ) );
+  mRenderer->GetMaterial()->SetShader( *shader );
+
+  //get the uniforms and apply them to the renderer
+  const ShaderEffect::UniformArray& uniforms = mShaderEffect->GetUniforms();
+  for( ShaderEffect::UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it )
+  {
+    const ShaderEffect::Uniform& uniform = *it;
+    EffectUniformUpdated( uniform );
+  }
+
+  if( mShaderEffect->GetEffectImage() )
+  {
+    EffectImageUpdated();
+  }
+}
+
+void ImageActor::EffectUniformUpdated( const ShaderEffect::Uniform& uniform )
+{
+  if( !mShaderEffect )
+  {
+    return;
+  }
+
+  Shader* shader = mRenderer->GetMaterial()->GetShader();
+
+  Property::Index index = shader->GetPropertyIndex( uniform.mName );
+  if( index == Property::INVALID_INDEX )
+  {
+    index = shader->RegisterProperty( uniform.mName, uniform.mValue );
+
+    //Constrain the shader's uniform properties to the ShaderEffect properties
+    Internal::ConstraintBase* constraint = NULL;
+    Internal::SourceContainer sources;
+
+    switch( uniform.mValue.GetType() )
+    {
+      case Property::INTEGER:
+      case Property::FLOAT:
+      {
+        constraint = CreateEqualConstraint< float >(*shader, index, sources );
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        constraint = CreateEqualConstraint< Vector2 >(*shader, index, sources );
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        constraint = CreateEqualConstraint< Vector3 >(*shader, index, sources );
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        constraint = CreateEqualConstraint< Vector4 >(*shader, index, sources );
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        constraint = CreateEqualConstraint< Matrix3 >(*shader, index, sources );
+        break;
+      }
+      case Property::MATRIX:
+      {
+        constraint = CreateEqualConstraint< Matrix >(*shader, index, sources );
+        break;
+      }
+      case Property::BOOLEAN:
+      case Property::ARRAY:
+      case Property::ROTATION:
+      case Property::STRING:
+      case Property::RECTANGLE:
+      case Property::MAP:
+      case Property::NONE:
+        //not supported
+        break;
+    }
+
+    //constrain the renderers property to the ShaderEffect
+    if( constraint )
+    {
+      Source source;
+      source.sourceType = OBJECT_PROPERTY;
+      source.propertyIndex = uniform.mIndex;
+      source.object = mShaderEffect.Get();
+
+      constraint->AddSource( source );
+      constraint->Apply();
+    }
+  }
+  else
+  {
+    shader->SetProperty( index, uniform.mValue );
+  }
 }
 
 ShaderEffectPtr ImageActor::GetShaderEffect() const
 {
-  return mImageAttachment->GetShaderEffect();
+  return mShaderEffect;
 }
 
 void ImageActor::RemoveShaderEffect()
 {
-  return mImageAttachment->RemoveShaderEffect();
+  //if we previously had a subdivided grid then we need to reset the geometry as well
+  if( mShaderEffect )
+  {
+    mShaderEffect->Disconnect( this );
+
+    Dali::ShaderEffect::GeometryHints hints = mShaderEffect->GetGeometryHints();
+    if( ( hints & Dali::ShaderEffect::HINT_GRID_X ) ||
+        ( hints & Dali::ShaderEffect::HINT_GRID_Y ) )
+    {
+      RelayoutRequest();
+    }
+  }
+
+  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+  mRenderer->GetMaterial()->SetShader( *shader );
+  mShaderEffect.Reset();
 }
 
+void ImageActor::EffectImageUpdated()
+{
+  if( mShaderEffect )
+  {
+    Dali::Image effectImage = mShaderEffect->GetEffectImage();
+    if( effectImage )
+    {
+      Image& effectImageImpl = GetImplementation( effectImage );
+
+      if( mEffectTextureIndex == INVALID_TEXTURE_ID )
+      {
+        mEffectTextureIndex = mRenderer->GetMaterial()->AddTexture( &effectImageImpl, "sEffect", NULL );
+      }
+      else
+      {
+        mRenderer->GetMaterial()->SetTextureImage( mEffectTextureIndex, &effectImageImpl );
+      }
+    }
+    else
+    {
+      if( mEffectTextureIndex != INVALID_TEXTURE_ID )
+      {
+        mRenderer->GetMaterial()->RemoveTexture( mEffectTextureIndex );
+      }
+      mEffectTextureIndex = INVALID_TEXTURE_ID;
+    }
+
+    //ensure that the sEffectRect uniform is set
+    Shader* shader = mRenderer->GetMaterial()->GetShader();
+    Property::Index index = shader->GetPropertyIndex( "sEffectRect" );
+    if( index == Property::INVALID_INDEX )
+    {
+      shader->RegisterProperty( "sEffectRect", Vector4( 0.f, 0.f, 1.f, 1.f) );
+    }
+  }
+}
 
 } // namespace Internal
 

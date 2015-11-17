@@ -51,7 +51,6 @@
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
@@ -424,12 +423,6 @@ void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
 
   // attach node to attachment first so that parent is known by the time attachment is connected
   node->Attach( *attachment ); // node takes ownership
-
-  // @todo MESH_REWORK Remove after merge of SceneGraph::RenderableAttachment and SceneGraph::RendererAttachment
-  if( dynamic_cast<SceneGraph::ImageAttachment*>( attachment ) != NULL )
-  {
-    attachment->Initialize( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
 }
 
 void UpdateManager::AddObject( PropertyOwner* object )
