@@ -640,7 +640,6 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
   // Scene graph thread can modify this object.
   Node& parent = const_cast< Node& >( constParent );
 
-  // @todo MESH_REWORK Don't pass by owner pointer after merge with SceneGraph::RenderableAttachment ? (not needed if we split RendererAttachment to 2 objects)
   typedef MessageValue2< UpdateManager, Node*, NodeAttachmentOwner > LocalType;
 
   // Reserve some memory inside the message queue

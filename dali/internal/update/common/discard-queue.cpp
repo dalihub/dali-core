@@ -23,7 +23,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
@@ -76,23 +75,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
   else
   {
     mRendererQueue1.PushBack( renderer );
-  }
-}
-
-void DiscardQueue::Add( BufferIndex updateBufferIndex, NodeAttachment* attachment )
-{
-  DALI_ASSERT_DEBUG( NULL != attachment );
-
-  // The GL resources will now be freed in Render frame N
-  // The Update for frame N+1 may occur in parallel with the rendering of frame N
-  // Queue the attachment for destruction in Update frame N+2
-  if ( 0u == updateBufferIndex )
-  {
-    mAttachmentQueue0.PushBack( attachment );
-  }
-  else
-  {
-    mAttachmentQueue1.PushBack( attachment );
   }
 }
 
@@ -157,7 +139,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   if ( 0u == updateBufferIndex )
   {
     mNodeQueue0.Clear();
-    mAttachmentQueue0.Clear();
     mShaderQueue0.Clear();
     mGeometryQueue0.Clear();
     mMaterialQueue0.Clear();
@@ -166,7 +147,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   else
   {
     mNodeQueue1.Clear();
-    mAttachmentQueue1.Clear();
     mShaderQueue1.Clear();
     mGeometryQueue1.Clear();
     mMaterialQueue1.Clear();

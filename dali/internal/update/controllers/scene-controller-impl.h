@@ -45,7 +45,6 @@ public:
    * @param[in] renderQueue  The renderQueue
    * @param[in] discardQueue The discardQueue
    * @param[in] completeStatusTracker The resource complete status tracker
-   * @param[in] defaultShader to use for renderable attachments
    */
   SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
                        RenderQueue& renderQueue,

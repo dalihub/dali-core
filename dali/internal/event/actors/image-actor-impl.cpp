@@ -63,7 +63,7 @@ struct GridVertex
   Vector2 mTextureCoord;
 };
 
-GeometryPtr CreateQuadGeometry( const Vector2& size, int imageWidth, int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
+GeometryPtr CreateQuadGeometry( const Vector2& size, unsigned int imageWidth, unsigned int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
 {
   const float halfWidth = size.width * 0.5f;
   const float halfHeight = size.height * 0.5f;
@@ -91,7 +91,7 @@ GeometryPtr CreateQuadGeometry( const Vector2& size, int imageWidth, int imageHe
   return geometry;
 }
 
-GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, unsigned int gridHeight, int imageWidth, int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
+GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, unsigned int gridHeight, unsigned int imageWidth, unsigned int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
 {
   // Create vertices
   std::vector< GridVertex > vertices;
@@ -361,17 +361,6 @@ Vector2 ImageActor::CalculateNaturalSize() const
 
 void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  int imageWidth = 1;
-  int imageHeight = 1;
-
-  ImagePtr image = GetImage();
-
-  if( image )
-  {
-    imageWidth = image->GetWidth();
-    imageHeight = image->GetHeight();
-  }
-
   unsigned int gridWidth = 1;
   unsigned int gridHeight = 1;
   if( mShaderEffect )
@@ -395,6 +384,15 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     gridHeight = std::min( MAXIMUM_GRID_SIZE, gridHeight );
   }
 
+  unsigned int imageWidth = 1u;
+  unsigned int imageHeight = 1u;
+  ImagePtr image = GetImage();
+  if( image )
+  {
+    imageWidth = image->GetWidth();
+    imageHeight = image->GetHeight();
+  }
+
   GeometryPtr quad = gridWidth <= 1 && gridHeight <= 1 ?
                        CreateQuadGeometry( size, imageWidth, imageHeight, mPixelArea ) :
                        CreateGridGeometry( size, gridWidth, gridHeight, imageWidth, imageHeight, mPixelArea );
@@ -402,29 +400,22 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
   mRenderer->SetGeometry( *quad );
 
   Vector4 textureRect( 0.f, 0.f, 1.f, 1.f );
-  if( mIsPixelAreaSet )
+  if( mIsPixelAreaSet && image )
   {
-    ImagePtr image = GetImage();
-    if( image )
-    {
-      int imageWidth = image->GetWidth();
-      int imageHeight = image->GetHeight();
+    const float uScale = 1.0f / float(imageWidth);
+    const float vScale = 1.0f / float(imageHeight);
+    const float x = uScale * float(mPixelArea.x);
+    const float y = vScale * float(mPixelArea.y);
+    const float width  = uScale * float(mPixelArea.width);
+    const float height = vScale * float(mPixelArea.height);
 
-      const float uScale = 1.0f / float(imageWidth);
-      const float vScale = 1.0f / float(imageHeight);
-      const float x = uScale * float(mPixelArea.x);
-      const float y = vScale * float(mPixelArea.y);
-      const float width  = uScale * float(mPixelArea.width);
-      const float height = vScale * float(mPixelArea.height);
+    // bottom left
+    textureRect.x = x;
+    textureRect.y = y;
 
-      // bottom left
-      textureRect.x = x;
-      textureRect.y = y;
-
-      // top right
-      textureRect.z = x + width;
-      textureRect.w = y + height;
-    }
+    // top right
+    textureRect.z = x + width;
+    textureRect.w = y + height;
   }
 
   Material* material = mRenderer->GetMaterial();

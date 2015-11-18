@@ -43,7 +43,6 @@ template <> struct ParameterType< Dali::Camera::ProjectionMode >
 namespace SceneGraph
 {
 
-class RenderableAttachment;
 class SceneController;
 
 /**
@@ -113,12 +112,6 @@ public:
    * Virtual destructor
    */
   virtual ~CameraAttachment();
-
-  /**
-   * @copydoc NodeAttachment::GetRenderable.
-   * @return Always NULL.
-   */
-  virtual RenderableAttachment* GetRenderable();
 
   /**
    * @copydoc Dali::Internal::CameraAttachment::SetType

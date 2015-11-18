@@ -34,7 +34,6 @@ namespace SceneGraph
 {
 
 class Node;
-class RenderableAttachment;
 class SceneController;
 
 /**
@@ -101,23 +100,6 @@ public:
     DALI_ASSERT_DEBUG( mParent != NULL );
     return *mParent;
   }
-
-  // RenderableAttachment interface
-
-  /**
-   * Query whether the attachment is renderable i.e. implements the SceneGraph::RenderableAttachment interface.
-   * @return True if the attachment is renderable.
-   */
-  bool IsRenderable()
-  {
-    return (GetRenderable() != NULL);
-  }
-
-  /**
-   * Convert an attachment to a renderable attachment.
-   * @return A pointer to the renderable attachment, or NULL.
-   */
-  virtual RenderableAttachment* GetRenderable() = 0;
 
   // Update methods
 

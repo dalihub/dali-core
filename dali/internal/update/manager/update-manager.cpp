@@ -45,7 +45,6 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/manager/object-owner-container.h>
-#include <dali/internal/update/manager/prepare-render-algorithms.h>
 #include <dali/internal/update/manager/process-render-tasks.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/update-algorithms.h>
@@ -1013,8 +1012,15 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     ProcessPropertyNotifications( bufferIndex );
 
     // 10) Clear the lists of renderable-attachments from the previous update
-    ClearRenderables( mImpl->sortedLayers );
-    ClearRenderables( mImpl->systemLevelSortedLayers );
+    for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
+    {
+      mImpl->sortedLayers[i]->ClearRenderables();
+    }
+
+    for( size_t i(0); i<mImpl->systemLevelSortedLayers.size(); ++i )
+    {
+      mImpl->systemLevelSortedLayers[i]->ClearRenderables();
+    }
 
     // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
@@ -1022,16 +1028,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     UpdateRenderers( bufferIndex );
 
 
-    // 12) Prepare for the next render
-    PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
-
-    PrepareRenderables( bufferIndex, mImpl->sortedLayers );
-    PrepareRenderables( bufferIndex, mImpl->systemLevelSortedLayers );
-    PERF_MONITOR_END(PerformanceMonitor::PREPARE_RENDERABLES);
-
     PERF_MONITOR_START(PerformanceMonitor::PROCESS_RENDER_TASKS);
 
-    // 14) Process the RenderTasks; this creates the instructions for rendering the next frame.
+    // 12) Process the RenderTasks; this creates the instructions for rendering the next frame.
     // reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );

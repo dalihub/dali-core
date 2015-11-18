@@ -201,11 +201,6 @@ CameraAttachment::~CameraAttachment()
 {
 }
 
-RenderableAttachment* CameraAttachment::GetRenderable()
-{
-  return NULL;
-}
-
 void CameraAttachment::SetType( Dali::Camera::Type type )
 {
   mType = type;

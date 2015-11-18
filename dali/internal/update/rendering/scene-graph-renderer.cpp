@@ -24,7 +24,7 @@
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-new-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/nodes/node.h>
@@ -177,9 +177,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     // Tell renderer about a new provider
     // @todo MESH_REWORK Should we instead create a new renderer when these change?
 
-    typedef MessageValue1< Render::NewRenderer, OwnerPointer<RenderDataProvider> > DerivedType;
+    typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::NewRenderer::SetRenderDataProvider, dataProvider );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
     mResendDataProviders = false;
   }
 
@@ -188,10 +188,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     // The first call to GetRenderGeometry() creates the geometry and sends it in a message
     RenderGeometry* geometry = mGeometry->GetRenderGeometry( mSceneController );
 
-    typedef MessageValue1< Render::NewRenderer, RenderGeometry* > DerivedType;
+    typedef MessageValue1< Render::Renderer, RenderGeometry* > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-    new (slot) DerivedType( mRenderer, &Render::NewRenderer::SetGeometry, geometry );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, geometry );
     mResendGeometry = false;
   }
 }
@@ -240,7 +240,7 @@ void Renderer::OnStageConnect()
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
     RenderGeometry* renderGeometry = mGeometry->GetRenderGeometry(mSceneController);
-    mRenderer = Render::NewRenderer::New( dataProvider, renderGeometry );
+    mRenderer = Render::Renderer::New( dataProvider, renderGeometry );
     mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
     mResendDataProviders = false;
     mResendGeometry = false;
