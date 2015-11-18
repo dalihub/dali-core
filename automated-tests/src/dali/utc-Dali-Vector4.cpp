@@ -373,7 +373,6 @@ int UtcDaliVector4ConstOperatorSubscriptP(void)
   try
   {
     float& w = testVector[4];
-    if(w==0.0f);
     tet_result(TET_FAIL);
   }
   catch (Dali::DaliException& e)
@@ -385,7 +384,6 @@ int UtcDaliVector4ConstOperatorSubscriptP(void)
   try
   {
     const float& w = testVector2[4];
-    if(w==0.0f);
     tet_result(TET_FAIL);
   }
   catch (Dali::DaliException& e)

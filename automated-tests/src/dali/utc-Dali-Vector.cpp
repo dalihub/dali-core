@@ -717,7 +717,6 @@ int UtcDaliVectorAcidTest(void)
   int* ptr = NULL;
   for( unsigned int i = 0; i < acidCount; ++i )
   {
-    ++ptr;
     pairvector.PushBack( std::make_pair( i, i ) );
     doublevector.PushBack( (double)i );
     intptrvector.PushBack( (int*)ptr );

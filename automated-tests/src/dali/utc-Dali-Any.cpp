@@ -268,6 +268,18 @@ int UtcDaliAnyGet(void)
   MyStruct* myStruct3 = myClass.GetPointer();
   const MyStruct* myStruct4 = myClass.GetPointer();
 
+  if( myStruct3 == NULL )
+  {
+    tet_result( TET_FAIL );
+    END_TEST;
+  }
+
+  if( myStruct4 == NULL )
+  {
+    tet_result( TET_FAIL );
+    END_TEST;
+  }
+
   DALI_TEST_EQUALS( myStruct1.mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( myStruct2.mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( myStruct3->mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
