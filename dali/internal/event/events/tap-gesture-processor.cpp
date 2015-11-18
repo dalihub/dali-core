@@ -253,14 +253,17 @@ void TapGestureProcessor::UpdateDetection()
   {
     TapGestureDetector* detector(*iter);
 
-    const unsigned int minTapsRequired = detector->GetMinimumTapsRequired();
-    const unsigned int maxTapsRequired = detector->GetMaximumTapsRequired();
-    const unsigned int touchesRequired = detector->GetTouchesRequired();
+    if( detector )
+    {
+      const unsigned int minTapsRequired = detector->GetMinimumTapsRequired();
+      const unsigned int maxTapsRequired = detector->GetMaximumTapsRequired();
+      const unsigned int touchesRequired = detector->GetTouchesRequired();
 
-    minTaps = minTapsRequired < minTaps ? minTapsRequired : minTaps;
-    maxTaps = maxTapsRequired > maxTaps ? maxTapsRequired : maxTaps;
-    minTouches = touchesRequired < minTouches ? touchesRequired : minTouches;
-    maxTouches = touchesRequired > maxTouches ? touchesRequired : maxTouches;
+      minTaps = minTapsRequired < minTaps ? minTapsRequired : minTaps;
+      maxTaps = maxTapsRequired > maxTaps ? maxTapsRequired : maxTaps;
+      minTouches = touchesRequired < minTouches ? touchesRequired : minTouches;
+      maxTouches = touchesRequired > maxTouches ? touchesRequired : maxTouches;
+    }
   }
 
   if ( (minTaps != mMinTapsRequired)||(maxTaps != mMaxTapsRequired) ||

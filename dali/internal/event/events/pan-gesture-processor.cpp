@@ -373,16 +373,19 @@ void PanGestureProcessor::UpdateDetection()
   {
     PanGestureDetector* detector(*iter);
 
-    unsigned int minimum = detector->GetMinimumTouchesRequired();
-    if (minimum < minimumRequired)
+    if( detector )
     {
-      minimumRequired = minimum;
-    }
+      unsigned int minimum = detector->GetMinimumTouchesRequired();
+      if (minimum < minimumRequired)
+      {
+        minimumRequired = minimum;
+      }
 
-    unsigned int maximum = detector->GetMaximumTouchesRequired();
-    if (maximum > maximumRequired)
-    {
-      maximumRequired = maximum;
+      unsigned int maximum = detector->GetMaximumTouchesRequired();
+      if (maximum > maximumRequired)
+      {
+        maximumRequired = maximum;
+      }
     }
   }
 
