@@ -106,7 +106,11 @@ void GestureDetector::Detach(Actor& actor)
       // Unregister from gesture event processor if we do not have any actors
       if ( mAttachedActors.empty() )
       {
-        mGestureEventProcessor.RemoveGestureDetector(this);
+        // Guard to allow handle destruction after Core has been destroyed
+        if( Stage::IsInstalled() )
+        {
+          mGestureEventProcessor.RemoveGestureDetector(this);
+        }
       }
     }
   }
@@ -135,8 +139,12 @@ void GestureDetector::DetachAll()
       OnActorDetach(*actor);
     }
 
-    // Unregister from gesture event processor
-    mGestureEventProcessor.RemoveGestureDetector(this);
+    // Guard to allow handle destruction after Core has been destroyed
+    if ( Stage::IsInstalled() )
+    {
+      // Unregister from gesture event processor
+      mGestureEventProcessor.RemoveGestureDetector(this);
+    }
   }
 }
 
@@ -178,7 +186,11 @@ void GestureDetector::ObjectDestroyed(Object& object)
       // Unregister from gesture event processor if we do not have any actors
       if ( mAttachedActors.empty() )
       {
-        mGestureEventProcessor.RemoveGestureDetector(this);
+        // Guard to allow handle destruction after Core has been destroyed
+        if ( Stage::IsInstalled() )
+        {
+          mGestureEventProcessor.RemoveGestureDetector(this);
+        }
       }
     }
   }
