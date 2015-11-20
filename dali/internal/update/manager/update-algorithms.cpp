@@ -202,20 +202,10 @@ inline void UpdateNodeWorldMatrix( Node &node, int nodeDirtyFlags, BufferIndex u
   // If world-matrix needs to be recalculated
   if ( nodeDirtyFlags & TransformFlag )
   {
-    if( node.GetInhibitLocalTransform() )
-    {
-      node.SetWorldMatrix( updateBufferIndex,
-                           node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
-                           node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
-    }
-    else
-    {
-      node.SetWorldMatrix( updateBufferIndex,
-                           node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldOrientation(updateBufferIndex),
-                           node.GetWorldPosition(updateBufferIndex) );
-    }
+    node.SetWorldMatrix( updateBufferIndex,
+                         node.GetWorldScale(updateBufferIndex),
+                         node.GetWorldOrientation(updateBufferIndex),
+                         node.GetWorldPosition(updateBufferIndex) );
   }
   else
   {

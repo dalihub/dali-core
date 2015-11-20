@@ -66,7 +66,6 @@ Node::Node()
   mIsRoot( false ),
   mInheritOrientation( true ),
   mInheritScale( true ),
-  mInhibitLocalTransform( false ),
   mIsActive( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( DEFAULT_POSITION_INHERITANCE_MODE ),

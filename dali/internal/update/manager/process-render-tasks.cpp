@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ Layer* FindLayer( Node& node )
 }
 
 /**
- * Rebuild the Layer::opaqueRenderables, transparentRenderables and overlayRenderables members,
+ * Rebuild the Layer::colorRenderables, stencilRenderables and overlayRenderables members,
  * including only renderers which are included in the current render-task.
  * Returns true if all renderers have finshed acquiring resources.
  */
@@ -139,7 +139,8 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
 
   if( node.ResolveVisibility( updateBufferIndex ) )
   {
-    for( unsigned int i(0); i<node.GetRendererCount(); ++i )
+    const unsigned int count = node.GetRendererCount();
+    for( unsigned int i = 0; i < count; ++i )
     {
       Renderer* renderer = node.GetRendererAt( i );
       bool ready = false;
@@ -150,9 +151,7 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
 
       resourcesFinished = !complete ? complete : resourcesFinished;
 
-      resourcesFinished = !complete ? complete : resourcesFinished;
-
-      if( ready ) // i.e. some resources are ready
+      if( ready ) // i.e. should be rendered (all resources are available)
       {
         if( DrawMode::STENCIL == inheritedDrawMode )
         {

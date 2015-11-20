@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_NODE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -953,28 +953,6 @@ public:
     return false;
   }
 
-  /**
-   * Set the inhibit local transform flag.@n
-   * Setting this flag will stop the node's local transform (position, scale and orientation)
-   * being applied on top of its parents transformation.
-   * @param[in] flag When true, local transformation is inhibited when calculating the world matrix.
-   */
-  void SetInhibitLocalTransform( bool flag )
-  {
-    SetDirtyFlag( TransformFlag );
-    mInhibitLocalTransform = flag;
-  }
-
-  /**
-   * Get the inhibit local transform flag.@n
-   * See @ref SetInhibitLocalTransform
-   * @result A flag, when true, local transformation is inhibited when calculating the world matrix.
-   */
-  bool GetInhibitLocalTransform() const
-  {
-    return mInhibitLocalTransform;
-  }
-
   unsigned short GetDepth() const
   {
     return mDepth;
@@ -1114,7 +1092,6 @@ protected:
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
-  bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
   bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
   DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn

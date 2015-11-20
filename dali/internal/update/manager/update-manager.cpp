@@ -64,7 +64,6 @@
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-sampler.h>
@@ -671,8 +670,6 @@ bool UpdateManager::FlushQueue()
 
 void UpdateManager::ResetProperties( BufferIndex bufferIndex )
 {
-  PERF_MONITOR_START(PerformanceMonitor::RESET_PROPERTIES);
-
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
@@ -739,8 +736,6 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   {
     (*iter)->ResetToBaseValues( bufferIndex );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
 bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
@@ -762,8 +757,6 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastV
 
 void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  PERF_MONITOR_START(PerformanceMonitor::ANIMATE_NODES);
-
   AnimationContainer &animations = mImpl->animations;
   AnimationIter iter = animations.Begin();
   while ( iter != animations.End() )
@@ -789,14 +782,10 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // The application should be notified by NotificationManager, in another thread
     mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationFinishedNotifier );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
 }
 
 void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
 {
-  PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
-
   // constrain custom objects... (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
 
@@ -823,9 +812,6 @@ void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
   // constraints depend on their properties)
   // e.g. ShaderEffect uniform a function of Actor's position.
   // Mesh vertex a function of Actor's position or world position.
-
-  // TODO: refactor this code (and reset nodes) as these are all just lists of property-owners
-  // they can be all processed in a super-list of property-owners.
 
   // Constrain system-level render-tasks
   const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
@@ -858,8 +844,6 @@ void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
     Shader& shader = **iter;
     ConstrainPropertyOwner( shader, bufferIndex );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
 }
 
 void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
@@ -929,8 +913,6 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
     return;
   }
 
-  PERF_MONITOR_START( PerformanceMonitor::UPDATE_NODES );
-
   // Prepare resources, update shaders, update attachments, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
   mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
@@ -945,21 +927,12 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
                                                         mImpl->resourceManager,
                                                         mImpl->renderQueue );
   }
-
-  PERF_MONITOR_END( PerformanceMonitor::UPDATE_NODES );
 }
 
 unsigned int UpdateManager::Update( float elapsedSeconds,
                                     unsigned int lastVSyncTimeMilliseconds,
                                     unsigned int nextVSyncTimeMilliseconds )
 {
-  PERF_MONITOR_END(PerformanceMonitor::FRAME_RATE);   // Mark the End of the last frame
-  PERF_MONITOR_NEXT_FRAME();             // Prints out performance info for the last frame (if enabled)
-  PERF_MONITOR_START(PerformanceMonitor::FRAME_RATE); // Mark the start of this current frame
-
-  // Measure the time spent in UpdateManager::Update
-  PERF_MONITOR_START(PerformanceMonitor::UPDATE);
-
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // 1) Clear nodes/resources which were previously discarded
@@ -1027,10 +1000,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     UpdateNodes( bufferIndex );
     UpdateRenderers( bufferIndex );
 
-
-    PERF_MONITOR_START(PerformanceMonitor::PROCESS_RENDER_TASKS);
-
-    // 12) Process the RenderTasks; this creates the instructions for rendering the next frame.
+    // 13) Process the RenderTasks; this creates the instructions for rendering the next frame.
     // reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
@@ -1088,8 +1058,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     mImpl->notificationManager.QueueCompleteNotification( mImpl->taskList.GetCompleteNotificationInterface() );
   }
 
-  PERF_MONITOR_END(PerformanceMonitor::PROCESS_RENDER_TASKS);
-
   // Macro is undefined in release build.
   SNAPSHOT_NODE_LOGGING;
 
@@ -1099,18 +1067,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Check whether further updates are required
   unsigned int keepUpdating = KeepUpdatingCheck( elapsedSeconds );
 
-#ifdef PERFORMANCE_MONITOR_ENABLED
-  // Always keep rendering when measuring FPS
-  keepUpdating |= KeepUpdating::MONITORING_PERFORMANCE;
-#endif
-
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
-
-  PERF_MONITOR_END(PerformanceMonitor::UPDATE);
 
   return keepUpdating;
 }
