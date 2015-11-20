@@ -147,6 +147,16 @@ void Material::SetTextureSampler( size_t index, Sampler* sampler )
   }
 }
 
+Sampler* Material::GetTextureSampler( size_t index ) const
+{
+  if( index < GetNumberOfTextures() )
+  {
+    return mTextures[index].mSampler.Get();
+  }
+
+  return NULL;
+}
+
 void Material::SetTextureUniformName( size_t index, const std::string& uniformName )
 {
   if( index < GetNumberOfTextures() )
@@ -156,7 +166,7 @@ void Material::SetTextureUniformName( size_t index, const std::string& uniformNa
   }
 }
 
-int Material::GetTextureIndex( const std::string& uniformName )
+int Material::GetTextureIndex( const std::string& uniformName ) const
 {
   size_t textureCount(GetNumberOfTextures());
   for( size_t i(0); i<textureCount; ++i )
@@ -168,6 +178,27 @@ int Material::GetTextureIndex( const std::string& uniformName )
   }
 
   return -1;
+}
+
+Image* Material::GetTexture( const std::string& uniformName ) const
+{
+  int textureId = GetTextureIndex( uniformName );
+  if( textureId != -1 )
+  {
+    return GetTexture( textureId );
+  }
+
+  return NULL;
+}
+
+Image* Material::GetTexture( size_t index ) const
+{
+  if( index < GetNumberOfTextures() )
+  {
+    return mTextures[ index ].mImage.Get();
+  }
+
+  return NULL;
 }
 
 size_t Material::GetNumberOfTextures() const

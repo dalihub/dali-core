@@ -120,7 +120,7 @@ void RenderGeometry::UploadAndDraw(
 {
   if( !mHasBeenUpdated )
   {
-    //Update buffers
+    // Update buffers
     if( mIndexBuffer )
     {
       if(!mIndexBuffer->Update( context, true ) )
@@ -129,6 +129,7 @@ void RenderGeometry::UploadAndDraw(
         return;
       }
     }
+
     for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
     {
       if( !mVertexBuffers[i]->Update( context, false ) )
@@ -137,6 +138,7 @@ void RenderGeometry::UploadAndDraw(
         return;
       }
     }
+
     mHasBeenUpdated = true;
   }
 

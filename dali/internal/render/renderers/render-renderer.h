@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/effects/shader-declarations.h>
@@ -85,7 +86,7 @@ public:
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
-  void SetCullFace( CullFaceMode mode );
+  void SetCullFace( Dali::Material::FaceCullingMode mode );
 
   /**
    * Set the sampler used to render the set texture.
@@ -169,9 +170,8 @@ private:
   /**
    * Called from Render prior to DoRender(). Default method to set CullFaceMode
    * @param context to use
-   * @param bufferIndex to use
    */
-  virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
+  virtual void DoSetCullFaceMode( Context& context );
 
   /**
    * Called from Render prior to DoRender(). Default method to set blending options
@@ -200,7 +200,7 @@ protected:
 
 private:
 
-  CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
+  Dali::Material::FaceCullingMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
 };
 
 } // namespace SceneGraph

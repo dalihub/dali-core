@@ -77,6 +77,8 @@ int UtcConnectionTrackerDestructorP(void)
   // testApp out of scope it should have been disconnected
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
 
+  delete button;
+
   END_TEST;
 }
 
@@ -94,6 +96,8 @@ int UtcConnectionTrackerDisconnectAllP(void)
 
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
 
+  delete button;
+
   END_TEST;
 }
 
@@ -107,6 +111,8 @@ int UtcConnectionTrackerDisconnectAllN(void)
   testApp.DisconnectAll();
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
 
+  delete button;
+
   END_TEST;
 }
 
@@ -119,6 +125,8 @@ int UtcConnectionTrackerSignalConnectedP(void)
   button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
 
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+
+  delete button;
 
   END_TEST;
 
@@ -142,6 +150,8 @@ int UtcConnectionTrackerSignalConnectedN(void)
     tet_result(TET_PASS);
   }
 
+  delete button;
+
   END_TEST;
 }
 
@@ -159,8 +169,9 @@ int UtcConnectionTrackerSignalDisconnectP(void)
   button->DownSignal().Disconnect(&testApp,&TestApp::OnButtonPress);
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
 
-  END_TEST;
+  delete button;
 
+  END_TEST;
 }
 
 
@@ -184,8 +195,9 @@ int UtcConnectionTrackerSignalDisconnectN(void)
     tet_result( TET_PASS );
   }
 
-  END_TEST;
+  delete button;
 
+  END_TEST;
 }
 
 
@@ -197,6 +209,9 @@ int UtcConnectionTrackerGetConnectionCountP(void)
   TestApp testApp;
   button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+
+  delete button;
+
   END_TEST;
 }
 
@@ -206,5 +221,8 @@ int UtcConnectionTrackerGetConnectionCountN(void)
 
   TestButton* button = new TestButton(1);
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+
+  delete button;
+
   END_TEST;
 }

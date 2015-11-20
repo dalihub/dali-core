@@ -123,9 +123,9 @@ void Renderer::SetShader( SceneGraph::Shader* shader )
   mShader = shader;
 }
 
-void Renderer::SetCullFace( CullFaceMode mode )
+void Renderer::SetCullFace( Dali::Material::FaceCullingMode mode )
 {
-  DALI_ASSERT_DEBUG(mode >= CullNone && mode <= CullFrontAndBack);
+  DALI_ASSERT_DEBUG( mode >= Dali::Material::NONE && mode <= Dali::Material::CULL_BACK_AND_FRONT );
   mCullFaceMode = mode;
 }
 
@@ -183,7 +183,7 @@ void Renderer::Render( Context& context,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  DoSetCullFaceMode( context, bufferIndex );
+  DoSetCullFaceMode( context );
 
   // Enable/disable blending
   context.SetBlend( blend );
@@ -226,7 +226,7 @@ void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, SceneGra
 }
 
 // can be overridden by deriving class
-void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
+void Renderer::DoSetCullFaceMode( Context& context )
 {
   // Set face culling mode
   context.CullFace( mCullFaceMode );
@@ -238,7 +238,7 @@ Renderer::Renderer()
   mUniformNameCache( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
-  mCullFaceMode( CullNone )
+  mCullFaceMode( Dali::Material::NONE  )
 {
 }
 

@@ -76,16 +76,17 @@ public:
     enum
     {
       PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixelArea",   type Rect<int>
-      STYLE,                                                   ///< name "style",       type std::string
-      BORDER,                                                  ///< name "border",      type Vector4
+      STYLE,                                                   ///< @deprecated Dali 1.1.11 name "style",       type std::string
+      BORDER,                                                  ///< @deprecated Dali 1.1.11 name "border",      type Vector4
       IMAGE,                                                   ///< name "image",       type Map {"filename":"", "loadPolicy":...}
     };
   };
 
   /**
+   * @deprecated DALi 1.1.11, only quad style supported, use ImageView instead for nine patch
+   *
    * @brief Style determines how the Image is rendered.
    *
-   * @code
    * STYLE_QUAD:
    *
    *  0---------2           0-----------------2
@@ -103,53 +104,12 @@ public:
    * Image is rendered as a textured rectangle. The texture
    * is scaled uniformly as the quad is resized.
    *
-   * STYLE_NINE_PATCH:
-   *
-   *  |---|---------------|---|       |---|-----------------------------|---|
-   *  | 1 |       2       | 3 |       | 1 |              2              | 3 |
-   *  |---|---------------|---|       |---|-----------------------------|---|
-   *  |   |               |   |       |   |                             |   |
-   *  |   |               |   |       |   |                             |   |
-   *  | 4 |       5       | 6 | SCALE |   |                             |   |
-   *  |   |               |   | ----> |   |                             |   |
-   *  |   |               |   |       | 4 |              5              | 6 |
-   *  |-------------------|---|       |   |                             |   |
-   *  | 7 |       8       | 9 |       |   |                             |   |
-   *  |---|---------------|---|       |   |                             |   |
-   *                                  |---------------------------------|---|
-   *                                  | 7 |              8              | 9 |
-   *                                  |---|-----------------------------|---|
-   *
-   * Image is rendered as a textured rectangle. The texture
-   * is scaled differently over each of the 9 sections.
-   *
-   * STYLE_NINE_PATCH_NO_CENTER:
-   *
-   * Image is rendered in the same way as STYLE_NINE_PATCH,
-   * but the Center Section (5) is not rendered.
-   * @endcode
-   *
-   * Visualise a Picture Frame:
-   *
-   * - Corner sections (1,3,7,9) are not scaled, regardless
-   * of how big the Image is.
-   * - Horizontal edge sections (2,8) are scaled only in the
-   * X axis as the image increases in width.
-   * - Vertical edge sections (4,6) are scaled only in the
-   * Y axis as the image increases in height.
-   * - Center section (5) is scaled in both X and Y axes as
-   * the image increases in width and/or height.
-   *
-   * Note: If GRID hints are enabled (via a Shader that requires it),
-   * the above geometry will be further subdivided into rectangles of
-   * approx. 40x40 in size. STYLE_NINE_PATCH_NO_CENTER is not supported
-   * yet when GRID hints are enabled.
    */
   enum Style
   {
     STYLE_QUAD,                 ///< As a simple quad.
-    STYLE_NINE_PATCH,           ///< As a nine-patch.
-    STYLE_NINE_PATCH_NO_CENTER  ///< As a nine-patch without center section being rendered.
+    STYLE_NINE_PATCH,           ///< @deprecated Dali 1.1.11 As a nine-patch.
+    STYLE_NINE_PATCH_NO_CENTER  ///< @deprecated Dali 1.1.11 As a nine-patch without center section being rendered.
   };
 
   /**
@@ -276,6 +236,8 @@ public:
   PixelArea GetPixelArea() const;
 
   /**
+   * @deprecated DALi 1.1.11, use ImageView instead
+   *
    * @brief Set how the image is rendered; the default is STYLE_QUAD.
    *
    * @pre image must be initialized.
@@ -284,6 +246,8 @@ public:
   void SetStyle(Style style);
 
   /**
+   * @deprecated DALi 1.1.11, use ImageView instead
+   *
    * @brief Query how the image is rendered.
    *
    * @pre image must be initialized.
@@ -292,6 +256,8 @@ public:
   Style GetStyle() const;
 
   /**
+   * @deprecated DALi 1.1.11, use ImageView instead
+   *
    * @brief Set the border used with STYLE_NINE_PATCH.
    *
    * The values are in pixels from the left, top, right, and bottom of the image respectively.
@@ -301,6 +267,8 @@ public:
   void SetNinePatchBorder(const Vector4& border);
 
   /**
+   * @deprecated DALi 1.1.11, use ImageView instead
+   *
    * @brief Retrieve the border used with STYLE_NINE_PATCH.
    *
    * @return The nine-patch border.

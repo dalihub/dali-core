@@ -17,6 +17,7 @@
  */
 
 #include <dali/internal/common/buffer-index.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/blending.h>
 
@@ -54,6 +55,12 @@ public:
    * @return the blending options
    */
   virtual const BlendingOptions& GetBlendingOptions() const = 0;
+
+  /**
+   * Get the cull face mode
+   * @return the cull face mode
+   */
+  virtual Dali::Material::FaceCullingMode GetFaceCullingMode() const = 0;
 
 protected:
   /**

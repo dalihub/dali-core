@@ -23,10 +23,10 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/gl-resources/frame-buffer-state-cache.h>
@@ -537,7 +537,7 @@ public:
    * enables GL_CULL_FACE if in any of the face culling modes
    * otherwise disables GL_CULL_FACE
    */
-  void CullFace(CullFaceMode mode)
+  void CullFace( Dali::Material::FaceCullingMode mode )
   {
     // Avoid unnecessary calls to gl
     if(mCullFaceMode != mode)
@@ -545,14 +545,14 @@ public:
       mCullFaceMode = mode;
       switch(mode)
       {
-        case CullNone:
+        case Dali::Material::NONE:
         {
           LOG_GL("Disable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE) );
           break;
         }
 
-        case CullFront:
+        case Dali::Material::CULL_FRONT:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -561,7 +561,7 @@ public:
           break;
         }
 
-        case CullBack:
+        case Dali::Material::CULL_BACK:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -570,7 +570,7 @@ public:
           break;
         }
 
-        case CullFrontAndBack:
+        case Dali::Material::CULL_BACK_AND_FRONT:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -1794,7 +1794,7 @@ private: // Data
   Vector4 mClearColor;        ///< clear color
 
   // Face culling mode
-  CullFaceMode mCullFaceMode;
+  Dali::Material::FaceCullingMode mCullFaceMode;
 
   // cached viewport size
   Rect< int > mViewPort;

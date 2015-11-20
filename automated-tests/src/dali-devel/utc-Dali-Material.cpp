@@ -241,17 +241,58 @@ int UtcDaliMaterialSetFaceCullingMode(void)
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& cullFaceStack = gl.GetCullFaceTrace();
-  cullFaceStack.Reset();
   gl.EnableCullFaceCallTrace(true);
 
-  material.SetFaceCullingMode( Material::CULL_BACK_AND_FRONT);
-  application.SendNotification();
-  application.Render();
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_BACK_AND_FRONT );
+    application.SendNotification();
+    application.Render();
 
-  // Todo: test the glCullFace(GL_FRONT_AND_BACK) is actually been called, cannot pass this test with current implementation
-  DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 0, TEST_LOCATION);
-  //string parameter("GL_FRONT_AND_BACK" );
-  //DALI_TEST_CHECK( cullFaceStack.TestMethodAndParams(0, "CullFace", parameter) );
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_FRONT_AND_BACK;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_BACK );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_BACK;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_FRONT );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_FRONT;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::NONE );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 0, TEST_LOCATION );
+  }
 
   END_TEST;
 }
@@ -1310,3 +1351,50 @@ int UtcDaliMaterialGetTextureIndex(void)
 
   END_TEST;
 }
+
+int UtcDaliMaterialGetTextureP(void)
+{
+  TestApplication application;
+
+  Image image0 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image1 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image2 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image3 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+
+  Material material = CreateMaterial();
+  material.AddTexture( image0, "sTexture0");
+  material.AddTexture( image1, "sTexture1");
+  material.AddTexture( image2, "sTexture2");
+  material.AddTexture( image3, "sTexture3");
+
+  Image textureImage0 = material.GetTexture( "sTexture0" );
+  DALI_TEST_EQUALS( textureImage0, image0, TEST_LOCATION );
+
+  Image textureImage1 = material.GetTexture( "sTexture1" );
+  DALI_TEST_EQUALS( textureImage1, image1, TEST_LOCATION );
+
+  Image textureImage2 = material.GetTexture( "sTexture2" );
+  DALI_TEST_EQUALS( textureImage2, image2, TEST_LOCATION );
+
+  Image textureImage3 = material.GetTexture( "sTexture3" );
+  DALI_TEST_EQUALS( textureImage3, image3, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialGetTextureN(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial();
+  material.AddTexture( image, "sTexture");
+
+  Image textureImage = material.GetTexture( "sTextureTEST" );
+  DALI_TEST_CHECK( !textureImage );
+
+  END_TEST;
+}
+
