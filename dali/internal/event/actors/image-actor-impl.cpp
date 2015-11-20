@@ -408,7 +408,7 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     if( image )
     {
       int imageWidth = image->GetWidth();
-      int imageHeight = image->GetHeight();;
+      int imageHeight = image->GetHeight();
 
       const float uScale = 1.0f / float(imageWidth);
       const float vScale = 1.0f / float(imageHeight);
