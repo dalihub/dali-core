@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/internal/common/shader-saver.h>
 
 namespace Dali

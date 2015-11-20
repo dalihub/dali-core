@@ -24,19 +24,13 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/event/rendering/shader-impl.h>
 
 namespace Dali
 {
 
 namespace Internal
 {
-
-namespace SceneGraph
-{
-class UpdateManager;
-}
 
 /**
  * An abstract base class for a shader effect object.
@@ -47,15 +41,6 @@ class ShaderEffect : public Object
 {
 public:
   typedef Dali::ShaderEffect::UniformCoordinateType UniformCoordinateType;
-
-  struct Uniform
-  {
-    std::string mName;
-    Property::Index mIndex;
-    Property::Value mValue;
-  };
-
-  typedef std::vector< Uniform > UniformArray;
 
   /**
    * Create a new ShaderEffect with no programs
@@ -75,20 +60,6 @@ public:
   void SetUniform( const std::string& name,
                    Property::Value value,
                    UniformCoordinateType uniformCoordinateType );
-
-  /**
-   * Returns the uniforms set for the shaders
-   * 
-   * @return Returns and array of uniforms set for the shaders
-   */
-  const UniformArray& GetUniforms() {return mUniforms;}
-
-  /**
-   * Returns the GeometryHints used
-   * 
-   * @return Returns the GeometryHints used
-   */
-  Dali::ShaderEffect::GeometryHints  GetGeometryHints() const {return mGeometryHints;}
 
   /**
    * Add a GeometryType specific default program to this ShaderEffect
@@ -113,42 +84,121 @@ public:
   /**
    * @brief Notify ShaderEffect that it's being used by an Actor.
    *
-   * @param[in] actor The Actor that is connecting to this ShaderEffect 
+   * @param[in] actor The Actor that is connecting to this ShaderEffect
    */
   void Connect( ActorPtr actor );
 
   /**
    * @brief Notify ShaderEffect that an Actor is no longer using it.
    *
-   * @param[in] actor The Actor that is disconnecting from this ShaderEffect 
+   * @param[in] actor The Actor that is disconnecting from this ShaderEffect
    */
   void Disconnect( ActorPtr actor );
 
 public:
 
   /**
-   * Returns the vertex shader for this ShaderEffect
+   * Returns the shader for this ShaderEffect
    *
-   * @return Returns the vertex shader for this ShaderEffect
+   * @return Returns the shader for this ShaderEffect
    */
-  const std::string& GetVertexShader() const {return mVertexSource;}
+  ShaderPtr GetShader() const { return mShader; }
 
   /**
-   * Returns the fragment shader for this ShaderEffect
+   * Returns the geometry grid size.
    *
-   * @return Returns the fragment shader for this ShaderEffect
+   * @param[in] size The pixel area size.
+   * @return Returns the geometry grid size
    */
-  const std::string& GetFragmentShader() const {return mFragmentSource;}
+  Vector2 GetGridSize( const Vector2& size );
 
   /**
-   * Returns the fragment shader for this ShaderEffect
+   * Returns the effect image for this ShaderEffect
    *
-   * @return Returns the fragment shader for this ShaderEffect
+   * @return Returns the effect image for this ShaderEffect
    */
-  Dali::Image GetEffectImage() const {return mEffectImage;}
+  Dali::Image GetEffectImage() const { return mEffectImage; }
+
+public: //  override property functions from Object
+
+  /**
+   * @copydoc Dali::Handle::GetPropertyCount()
+   */
+  virtual unsigned int GetPropertyCount() const;
+
+  /**
+   * @copydoc Dali::Handle::GetPropertyName()
+   */
+  virtual std::string GetPropertyName( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::GetPropertyIndex()
+   */
+  virtual Property::Index GetPropertyIndex( const std::string& name ) const;
+
+  /**
+   * @copydoc Dali::Handle::IsPropertyWritable()
+   */
+  virtual bool IsPropertyWritable( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::IsPropertyAnimatable()
+   */
+  virtual bool IsPropertyAnimatable( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::IsPropertyAConstraintInput()
+   */
+  virtual bool IsPropertyAConstraintInput( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::GetPropertyType()
+   */
+  virtual Property::Type GetPropertyType( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::SetProperty()
+   */
+  virtual void SetProperty( Property::Index index, const Property::Value& propertyValue );
+
+  /**
+   * @copydoc Dali::Handle::GetProperty()
+   */
+  virtual Property::Value GetProperty( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::GetPropertyIndices()
+   */
+  virtual void GetPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
+   * @copydoc Dali::Handle::RegisterProperty()
+   */
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
+
+  /**
+   * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
+   */
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
+
+  /**
+   * @copydoc Dali::Handle::AddPropertyNotification()
+   */
+  virtual Dali::PropertyNotification AddPropertyNotification( Property::Index index,
+                                                              int componentIndex,
+                                                              const Dali::PropertyCondition& condition );
+
+  /**
+   * @copydoc Dali::Handle::RemovePropertyNotification()
+   */
+  virtual void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
+
+  /**
+   * @copydoc Dali::Handle::RemovePropertyNotifications()
+   */
+  virtual void RemovePropertyNotifications();
 
 public: // Default property extensions from Object
-
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
    */
@@ -214,14 +264,18 @@ public: // Default property extensions from Object
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
+  /**
+   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
+   */
+  virtual int GetPropertyComponentIndex( Property::Index index ) const;
+
 protected:
 
   /**
    * Protected constructor.
-   * @param[in] eventThreadServices the interface to use for sending messages to the update thread
    * @param[in] hints Geometry hints
    */
-  ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints );
+  ShaderEffect( Dali::ShaderEffect::GeometryHints hints );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -236,17 +290,11 @@ private:
 
 private: // Data
   std::vector< ActorPtr > mConnectedActors;               ///< The array of actors that are currently connected to this ShaderEffect
-  UniformArray mUniforms;                                 ///< The array of uniforms set for this ShaderEffect
+  ShaderPtr               mShader;                        ///< The shader pointer
+  Dali::Image             mEffectImage;                   ///< The Client-side handle to the effect image
+  float                   mGridDensity;                  ///< The grid denisty
+  Dali::ShaderEffect::GeometryHints  mGeometryHints;     ///< shader geometry hints for building the geometry
 
-  std::string mVertexSource;                              ///< The vertex shader source
-  std::string mFragmentSource;                            ///< The fragment shader source
-
-  EventThreadServices& mEventThreadServices;              ///< Event thread services, for sending messages
-  SceneGraph::Shader* mSceneObject;                       ///< Pointer to the scene shader, should not be changed on this thread
-
-  Dali::Image mEffectImage;                               ///< The Client-side handle to the effect image
-  Dali::ShaderEffect::GeometryHints  mGeometryHints;      ///< shader geometry hints for building the geometry
-  float mGridDensity;                                     ///< The grid denisty
 };
 
 } // namespace Internal

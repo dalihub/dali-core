@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/effects/shader-effect-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
@@ -27,24 +30,9 @@
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/effects/shader-declarations.h>
-#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/shaders/uniform-meta.h>
-#include <dali/internal/update/animation/scene-graph-constraint-base.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include "dali-shaders.h"
 
-using Dali::Internal::SceneGraph::UpdateManager;
-using Dali::Internal::SceneGraph::UniformMeta;
-using Dali::Internal::SceneGraph::Shader;
-using Dali::Internal::SceneGraph::AnimatableProperty;
-using Dali::Internal::SceneGraph::PropertyBase;
-using Dali::Internal::SceneGraph::RenderQueue;
 using std::string;
 
 namespace Dali
@@ -133,7 +121,7 @@ std::string WrapFragmentShader( const std::string& fragmentPrefix, const std::st
   return fragmentSource;
 }
 
-std::string GetShader(const std::string& field, const Property::Value& property)
+std::string GetStringProperty(const std::string& field, const Property::Value& property)
 {
   std::string retval;
   const Property::Map* map = property.GetMap();
@@ -149,48 +137,44 @@ std::string GetShader(const std::string& field, const Property::Value& property)
   return retval;
 }
 
+Dali::Shader::ShaderHints ConvertHints( Dali::ShaderEffect::GeometryHints hints)
+{
+  int convertedHints = Dali::Shader::HINT_NONE;
+  if( hints & Dali::ShaderEffect::HINT_DEPTH_BUFFER )
+  {
+    convertedHints |= Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
+  }
+  if( hints & Dali::ShaderEffect::HINT_BLENDING )
+  {
+    convertedHints |= Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT;
+  }
+  if( !(hints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY) )
+  {
+    convertedHints |= Dali::Shader::HINT_MODIFIES_GEOMETRY;
+  }
+
+  return Dali::Shader::ShaderHints( convertedHints );
+}
+
 } // unnamed namespace
 
 ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
 {
-  Stage* stage = Stage::GetCurrent();
-
-  if( stage )
-  {
-    ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
-    shaderEffect->RegisterObject();
-    return shaderEffect;
-  }
-  else
-  {
-    return NULL;
-  }
+  ShaderEffectPtr shaderEffect( new ShaderEffect( hints ) );
+  shaderEffect->RegisterObject();
+  return shaderEffect;
 }
 
-ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints )
-: mEventThreadServices( eventThreadServices ),
-  mGeometryHints( hints ),
-  mGridDensity( Dali::ShaderEffect::DEFAULT_GRID_DENSITY )
+ShaderEffect::ShaderEffect( Dali::ShaderEffect::GeometryHints hints )
+: mGridDensity( Dali::ShaderEffect::DEFAULT_GRID_DENSITY ),
+  mGeometryHints( hints )
 {
-  mSceneObject = new SceneGraph::Shader( hints );
-  DALI_ASSERT_DEBUG( NULL != mSceneObject );
-
-  // Transfer shader ownership to a scene message
-  AddShaderMessage( eventThreadServices.GetUpdateManager(), *mSceneObject );
 }
 
 ShaderEffect::~ShaderEffect()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if ( Stage::IsInstalled() )
-  {
-    // Remove scene-object using a message to the UpdateManager
-    if( mSceneObject )
-    {
-      RemoveShaderMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
-    }
-    UnregisterObject();
-  }
+  UnregisterObject();
 }
 
 void ShaderEffect::SetEffectImage( Dali::Image image )
@@ -233,20 +217,7 @@ void ShaderEffect::SetEffectImage( Dali::Image image )
 void ShaderEffect::SetUniform( const std::string& name, Property::Value value, UniformCoordinateType uniformCoordinateType )
 {
   // Register the property if it does not exist
-  Property::Index index = RegisterProperty( name, value );
-
-  Uniform uniform = { name, index, value };
-  mUniforms.push_back( uniform );
-
-  //inform any connected actors
-  for(std::vector< ActorPtr >::iterator it = mConnectedActors.begin(); it != mConnectedActors.end(); ++it)
-  {
-    ImageActor* imageActor = dynamic_cast< ImageActor* >( (*it).Get() );
-    if( imageActor )
-    {
-      imageActor->EffectUniformUpdated( uniform );
-    }
-  }
+  mShader->RegisterProperty( name, value );
 }
 
 void ShaderEffect::SetPrograms( const string& vertexSource, const string& fragmentSource )
@@ -257,8 +228,28 @@ void ShaderEffect::SetPrograms( const string& vertexSource, const string& fragme
 void ShaderEffect::SetPrograms( const std::string& vertexPrefix, const std::string& fragmentPrefix,
                                 const std::string& vertexSource, const std::string& fragmentSource )
 {
-  mVertexSource = WrapVertexShader( vertexPrefix, vertexSource );
-  mFragmentSource = WrapFragmentShader( fragmentPrefix, fragmentSource );
+  mShader = Shader::New( WrapVertexShader( vertexPrefix, vertexSource ),
+                         WrapFragmentShader( fragmentPrefix, fragmentSource ),
+                         ConvertHints( mGeometryHints ) );
+}
+
+Vector2 ShaderEffect::GetGridSize( const Vector2& size )
+{
+  Vector2 gridSize( 1.f, 1.f );
+
+  if( mGridDensity > 0 )
+  {
+    if( ( mGeometryHints & Dali::ShaderEffect::HINT_GRID_X ) )
+    {
+      gridSize.x = ceil( size.width / mGridDensity );
+    }
+    if( ( mGeometryHints & Dali::ShaderEffect::HINT_GRID_Y ) )
+    {
+      gridSize.y = ceil( size.height / mGridDensity );
+    }
+  }
+
+  return gridSize;
 }
 
 void ShaderEffect::Connect( ActorPtr actor )
@@ -296,6 +287,135 @@ void ShaderEffect::Disconnect( ActorPtr actor )
   }
 }
 
+unsigned int ShaderEffect::GetPropertyCount() const
+{
+  return GetDefaultPropertyCount() + mShader->GetPropertyCount();
+}
+
+std::string ShaderEffect::GetPropertyName( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return GetDefaultPropertyName( index );
+  }
+  else
+  {
+    return mShader->GetPropertyName( index );
+  }
+}
+
+Property::Index ShaderEffect::GetPropertyIndex( const std::string& name ) const
+{
+  Property::Index index = GetDefaultPropertyIndex( name );
+  if( index == Property::INVALID_INDEX )
+  {
+    return mShader->GetPropertyIndex( name );
+  }
+  else
+  {
+    return index;
+  }
+}
+
+bool ShaderEffect::IsPropertyWritable( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return IsDefaultPropertyWritable( index );
+  }
+  else
+  {
+    return mShader->IsPropertyWritable( index );
+  }
+}
+
+bool ShaderEffect::IsPropertyAnimatable( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return IsDefaultPropertyAnimatable( index );
+  }
+  else
+  {
+    return mShader->IsPropertyAnimatable( index );
+  }
+}
+
+bool ShaderEffect::IsPropertyAConstraintInput( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return IsDefaultPropertyAConstraintInput( index );
+  }
+  else
+  {
+    return mShader->IsPropertyAConstraintInput( index );
+  }
+}
+
+Property::Type ShaderEffect::GetPropertyType( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return GetDefaultPropertyType( index );
+  }
+  return mShader->GetPropertyType( index );
+}
+
+void ShaderEffect::SetProperty( Property::Index index, const Property::Value& propertyValue )
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    SetDefaultProperty( index, propertyValue );
+  }
+  else
+  {
+    mShader->SetProperty( index, propertyValue );
+  }
+}
+
+Property::Value ShaderEffect::GetProperty( Property::Index index ) const
+{
+  if ( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return GetDefaultProperty( index );
+  }
+  return mShader->GetProperty( index );
+}
+
+void ShaderEffect::GetPropertyIndices( Property::IndexContainer& indices ) const
+{
+  mShader->GetPropertyIndices( indices );
+  GetDefaultPropertyIndices( indices );
+}
+
+Property::Index ShaderEffect::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
+{
+  return mShader->RegisterProperty( name, propertyValue );
+}
+
+Property::Index ShaderEffect::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
+{
+  return mShader->RegisterProperty( name, propertyValue, accessMode );
+}
+
+Dali::PropertyNotification ShaderEffect::AddPropertyNotification( Property::Index index,
+                                                                  int componentIndex,
+                                                                  const Dali::PropertyCondition& condition )
+{
+  return mShader->AddPropertyNotification( index, componentIndex, condition );
+}
+
+void ShaderEffect::RemovePropertyNotification( Dali::PropertyNotification propertyNotification )
+{
+  mShader->RemovePropertyNotification( propertyNotification );
+}
+
+void ShaderEffect::RemovePropertyNotifications()
+{
+  mShader->RemovePropertyNotifications();
+}
+
 unsigned int ShaderEffect::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
@@ -303,7 +423,7 @@ unsigned int ShaderEffect::GetDefaultPropertyCount() const
 
 void ShaderEffect::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
   for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
@@ -400,10 +520,10 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
 
     case Dali::ShaderEffect::Property::PROGRAM:
     {
-      std::string vertexPrefix   = GetShader("vertexPrefix",  propertyValue);
-      std::string fragmentPrefix = GetShader("fragmentPrefix",  propertyValue);
-      std::string vertex         = GetShader("vertex", propertyValue);
-      std::string fragment       = GetShader("fragment", propertyValue);
+      std::string vertexPrefix   = GetStringProperty("vertexPrefix",  propertyValue);
+      std::string fragmentPrefix = GetStringProperty("fragmentPrefix",  propertyValue);
+      std::string vertex         = GetStringProperty("vertex", propertyValue);
+      std::string fragment       = GetStringProperty("fragment", propertyValue);
 
       SetPrograms( vertexPrefix, fragmentPrefix, vertex, fragment );
       break;
@@ -464,19 +584,22 @@ Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) cons
 
 const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
 {
-  return mSceneObject;
+  return mShader->GetSceneObject();
 }
 
-const PropertyBase* ShaderEffect::GetSceneObjectAnimatableProperty( Property::Index index ) const
+const SceneGraph::PropertyBase* ShaderEffect::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  PropertyMetadata* property = index >= PROPERTY_CUSTOM_START_INDEX ? static_cast<PropertyMetadata*>(FindCustomProperty( index )) : static_cast<PropertyMetadata*>(FindAnimatableProperty( index ));
-  DALI_ASSERT_ALWAYS( property && "Property index is invalid" );
-  return property->GetSceneGraphProperty();
+  return mShader->GetSceneObjectAnimatableProperty( index );
 }
 
 const PropertyInputImpl* ShaderEffect::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return GetSceneObjectAnimatableProperty( index );
+  return mShader->GetSceneObjectInputProperty( index );
+}
+
+int ShaderEffect::GetPropertyComponentIndex( Property::Index index ) const
+{
+  return mShader->GetPropertyComponentIndex( index );
 }
 
 } // namespace Internal

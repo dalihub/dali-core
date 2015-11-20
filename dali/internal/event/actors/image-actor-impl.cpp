@@ -170,18 +170,6 @@ GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, uns
 
 }
 
-
-template< typename T>
-ConstraintBase* CreateEqualConstraint(Object& target, Property::Index index, Internal::SourceContainer& sources )
-{
-  typedef typename Dali::Internal::PropertyConstraintPtr< T >::Type PropertyConstraintPtrType;
-
-  CallbackBase* callback = new Dali::Constraint::Function< T >( EqualToConstraint() );
-  PropertyConstraintPtrType funcPtr( new Internal::PropertyConstraint< T >( reinterpret_cast< Dali::Constraint::Function< T >* >( callback ) ) );
-
-  return Internal::Constraint< T >::New( target, index, sources, funcPtr );
-}
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec3 aPosition;\n
   attribute mediump vec2 aTexCoord;\n
@@ -365,23 +353,11 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
   unsigned int gridHeight = 1;
   if( mShaderEffect )
   {
-    Dali::ShaderEffect::GeometryHints hints = mShaderEffect->GetGeometryHints();
-    Property::Value gridDensityValue = mShaderEffect->GetDefaultProperty( Dali::ShaderEffect::Property::GRID_DENSITY );
-    int gridDensity = Dali::ShaderEffect::DEFAULT_GRID_DENSITY;
-    gridDensityValue.Get( gridDensity );
-
-    if( ( hints & Dali::ShaderEffect::HINT_GRID_X ) )
-    {
-      gridWidth = size.width / gridDensity;
-    }
-    if( ( hints & Dali::ShaderEffect::HINT_GRID_Y ) )
-    {
-      gridHeight = size.height / gridDensity;
-    }
+    Vector2 gridSize = mShaderEffect->GetGridSize( size );
 
     //limit the grid size
-    gridWidth = std::min( MAXIMUM_GRID_SIZE, gridWidth );
-    gridHeight = std::min( MAXIMUM_GRID_SIZE, gridHeight );
+    gridWidth = std::min( MAXIMUM_GRID_SIZE, static_cast<unsigned int>(gridSize.width) );
+    gridHeight = std::min( MAXIMUM_GRID_SIZE, static_cast<unsigned int>(gridSize.height) );
   }
 
   unsigned int imageWidth = 1u;
@@ -393,11 +369,11 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     imageHeight = image->GetHeight();
   }
 
-  GeometryPtr quad = gridWidth <= 1 && gridHeight <= 1 ?
-                       CreateQuadGeometry( size, imageWidth, imageHeight, mPixelArea ) :
-                       CreateGridGeometry( size, gridWidth, gridHeight, imageWidth, imageHeight, mPixelArea );
+  GeometryPtr geometry = gridWidth <= 1 && gridHeight <= 1 ?
+                         CreateQuadGeometry( size, imageWidth, imageHeight, mPixelArea ) :
+                         CreateGridGeometry( size, gridWidth, gridHeight, imageWidth, imageHeight, mPixelArea );
 
-  mRenderer->SetGeometry( *quad );
+  mRenderer->SetGeometry( *geometry );
 
   Vector4 textureRect( 0.f, 0.f, 1.f, 1.f );
   if( mIsPixelAreaSet && image )
@@ -419,15 +395,7 @@ void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 
   Material* material = mRenderer->GetMaterial();
-  Property::Index index = material->GetPropertyIndex( "sTextureRect" );
-  if( index != Property::INVALID_INDEX )
-  {
-    material->SetProperty( index, textureRect );
-  }
-  else
-  {
-    material->RegisterProperty( "sTextureRect", textureRect );
-  }
+  material->RegisterProperty( "sTextureRect", textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -750,118 +718,10 @@ void ImageActor::SetShaderEffect( ShaderEffect& effect )
   mShaderEffect = ShaderEffectPtr( &effect );
   effect.Connect( this );
 
-  Dali::ShaderEffect::GeometryHints hints = effect.GetGeometryHints();
-
-  int shaderHints = Dali::Shader::HINT_NONE;
-
-  if( hints & Dali::ShaderEffect::HINT_DEPTH_BUFFER )
-  {
-    shaderHints |= Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
-  }
-  if( hints & Dali::ShaderEffect::HINT_BLENDING )
-  {
-    shaderHints |= Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT;
-  }
-  if( !(hints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY) )
-  {
-    shaderHints |= Dali::Shader::HINT_MODIFIES_GEOMETRY;
-  }
-
-  ShaderPtr shader = Shader::New( effect.GetVertexShader(), effect.GetFragmentShader(), static_cast< Dali::Shader::ShaderHints >( shaderHints ) );
+  ShaderPtr shader = mShaderEffect->GetShader();
   mRenderer->GetMaterial()->SetShader( *shader );
 
-  //get the uniforms and apply them to the renderer
-  const ShaderEffect::UniformArray& uniforms = mShaderEffect->GetUniforms();
-  for( ShaderEffect::UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it )
-  {
-    const ShaderEffect::Uniform& uniform = *it;
-    EffectUniformUpdated( uniform );
-  }
-
-  if( mShaderEffect->GetEffectImage() )
-  {
-    EffectImageUpdated();
-  }
-}
-
-void ImageActor::EffectUniformUpdated( const ShaderEffect::Uniform& uniform )
-{
-  if( !mShaderEffect )
-  {
-    return;
-  }
-
-  Shader* shader = mRenderer->GetMaterial()->GetShader();
-
-  Property::Index index = shader->GetPropertyIndex( uniform.mName );
-  if( index == Property::INVALID_INDEX )
-  {
-    index = shader->RegisterProperty( uniform.mName, uniform.mValue );
-
-    //Constrain the shader's uniform properties to the ShaderEffect properties
-    Internal::ConstraintBase* constraint = NULL;
-    Internal::SourceContainer sources;
-
-    switch( uniform.mValue.GetType() )
-    {
-      case Property::INTEGER:
-      case Property::FLOAT:
-      {
-        constraint = CreateEqualConstraint< float >(*shader, index, sources );
-        break;
-      }
-      case Property::VECTOR2:
-      {
-        constraint = CreateEqualConstraint< Vector2 >(*shader, index, sources );
-        break;
-      }
-      case Property::VECTOR3:
-      {
-        constraint = CreateEqualConstraint< Vector3 >(*shader, index, sources );
-        break;
-      }
-      case Property::VECTOR4:
-      {
-        constraint = CreateEqualConstraint< Vector4 >(*shader, index, sources );
-        break;
-      }
-      case Property::MATRIX3:
-      {
-        constraint = CreateEqualConstraint< Matrix3 >(*shader, index, sources );
-        break;
-      }
-      case Property::MATRIX:
-      {
-        constraint = CreateEqualConstraint< Matrix >(*shader, index, sources );
-        break;
-      }
-      case Property::BOOLEAN:
-      case Property::ARRAY:
-      case Property::ROTATION:
-      case Property::STRING:
-      case Property::RECTANGLE:
-      case Property::MAP:
-      case Property::NONE:
-        //not supported
-        break;
-    }
-
-    //constrain the renderers property to the ShaderEffect
-    if( constraint )
-    {
-      Source source;
-      source.sourceType = OBJECT_PROPERTY;
-      source.propertyIndex = uniform.mIndex;
-      source.object = mShaderEffect.Get();
-
-      constraint->AddSource( source );
-      constraint->Apply();
-    }
-  }
-  else
-  {
-    shader->SetProperty( index, uniform.mValue );
-  }
+  EffectImageUpdated();
 }
 
 ShaderEffectPtr ImageActor::GetShaderEffect() const
@@ -876,9 +736,7 @@ void ImageActor::RemoveShaderEffect()
   {
     mShaderEffect->Disconnect( this );
 
-    Dali::ShaderEffect::GeometryHints hints = mShaderEffect->GetGeometryHints();
-    if( ( hints & Dali::ShaderEffect::HINT_GRID_X ) ||
-        ( hints & Dali::ShaderEffect::HINT_GRID_Y ) )
+    if( mShaderEffect->GetGridSize( Vector2(INFINITY, INFINITY) ) != Vector2::ONE )
     {
       RelayoutRequest();
     }
