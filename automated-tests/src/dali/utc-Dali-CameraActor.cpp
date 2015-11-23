@@ -260,7 +260,7 @@ int UtcDaliCameraActorSetGetTypeN(void)
     DALI_TEST_ASSERT( e, "camera", TEST_LOCATION );
   }
 
-  DALI_TEST_EQUALS( (int)cameraType, (int)Dali::Camera::FREE_LOOK, TEST_LOCATION );
+  DALI_TEST_EQUALS( cameraType, Dali::Camera::FREE_LOOK, TEST_LOCATION );
   END_TEST;
 }
 
@@ -786,7 +786,7 @@ int UtcDaliCameraActorSetPerspectiveProjectionP(void)
   actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get( value );
   DALI_TEST_EQUALS( 4245.f, value, FLOAT_EPSILON, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   END_TEST;
 }
@@ -809,7 +809,7 @@ int UtcDaliCameraActorSetPerspectiveProjectionN(void)
 
   DALI_TEST_EQUALS( nearClippingPlane, actor.GetNearClippingPlane(), FLOAT_EPSILON, TEST_LOCATION );
   DALI_TEST_EQUALS( farClippingPlane, actor.GetFarClippingPlane(), FLOAT_EPSILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProjectionMode(), (int)Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   END_TEST;
 }
@@ -869,7 +869,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   Vector3 pos = actor.GetCurrentPosition();
   DALI_TEST_EQUALS( defaultPos.z, pos.z, 0.001f, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
   END_TEST;
 }
 
@@ -933,7 +933,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP2(void)
   actor.GetProperty( CameraActor::Property::BOTTOM_PLANE_DISTANCE ).Get( value );
   DALI_TEST_EQUALS( 500.0f, value, FLOAT_EPSILON, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
 
   END_TEST;
 }
@@ -983,7 +983,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP3(void)
   actor.GetProperty( CameraActor::Property::BOTTOM_PLANE_DISTANCE ).Get( value );
   DALI_TEST_EQUALS( 500.0f, value, FLOAT_EPSILON, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
   std::string stringValue;
   actor.GetProperty( CameraActor::Property::PROJECTION_MODE ).Get( stringValue );
   DALI_TEST_EQUALS( stringValue, "ORTHOGRAPHIC_PROJECTION", TEST_LOCATION );
@@ -1003,20 +1003,20 @@ int UtcDaliCameraActorSetProjectionModeP(void)
 
   actor.SetProjectionMode( Dali::Camera::PERSPECTIVE_PROJECTION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetNearClippingPlane(), 200.0f, FLOAT_EPSILON, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetFarClippingPlane(), 400.0f, FLOAT_EPSILON, TEST_LOCATION );
 
   actor.SetProjectionMode( Dali::Camera::ORTHOGRAPHIC_PROJECTION );
 
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetNearClippingPlane(), 200.0f, FLOAT_EPSILON, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetFarClippingPlane(), 400.0f, FLOAT_EPSILON, TEST_LOCATION );
 
   // Check setting the property.
   Property::Value setValue = "PERSPECTIVE_PROJECTION";
   actor.SetProperty( CameraActor::Property::PROJECTION_MODE, setValue );
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1050,10 +1050,10 @@ int UtcDaliCameraActorGetProjectionModeP(void)
   CameraActor actor = CameraActor::New();
 
   actor.SetOrthographicProjection( Size::ONE );
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
 
   actor.SetPerspectiveProjection( Size( 100.f, 150.f ) );
-  DALI_TEST_EQUALS( (int)actor.GetProjectionMode(), (int)Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   // Check getting the property.
   std::string stringValue;

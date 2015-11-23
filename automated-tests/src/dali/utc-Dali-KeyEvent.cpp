@@ -199,11 +199,11 @@ int UtcDaliKeyEventANDModifer(void)
   TestApplication application; // Reset all test adapter return codes
 
   KeyEvent event("i","i", 0, SHIFT_AND_CTRL_MODIFIER, 0, KeyEvent::Down);
-  DALI_TEST_EQUALS(true, event.IsCtrlModifier() & event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() & event.IsShiftModifier()), TEST_LOCATION);
 
   event.keyModifier = SHIFT_MODIFIER;
 
-  DALI_TEST_EQUALS(false, event.IsCtrlModifier() & event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() & event.IsShiftModifier()), TEST_LOCATION);
   END_TEST;
 }
 
@@ -213,11 +213,11 @@ int UtcDaliKeyEventORModifer(void)
   TestApplication application; // Reset all test adapter return codes
 
   KeyEvent event("i","i", 0, SHIFT_AND_CTRL_MODIFIER, 0, KeyEvent::Down);
-  DALI_TEST_EQUALS(true, event.IsCtrlModifier() | event.IsAltModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() | event.IsAltModifier()), TEST_LOCATION);
 
   event.keyModifier = SHIFT_MODIFIER;
 
-  DALI_TEST_EQUALS(false, event.IsCtrlModifier() & event.IsAltModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() & event.IsAltModifier()), TEST_LOCATION);
   END_TEST;
 }
 
@@ -227,11 +227,11 @@ int UtcDaliKeyEventState(void)
   TestApplication application; // Reset all test adapter return codes
 
   KeyEvent event("i","i", 0, SHIFT_AND_CTRL_MODIFIER, 0, KeyEvent::Down);
-  DALI_TEST_EQUALS(true, event.IsCtrlModifier() | event.IsAltModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() | event.IsAltModifier()), TEST_LOCATION);
 
   event.keyModifier = SHIFT_MODIFIER;
 
-  DALI_TEST_EQUALS(false, event.IsCtrlModifier() & event.IsAltModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() & event.IsAltModifier()), TEST_LOCATION);
   END_TEST;
 }
 
@@ -246,7 +246,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_CHECK( keyEvent.keyString == std::string() );
     DALI_TEST_EQUALS( keyEvent.keyCode, -1, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.keyModifier, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( keyEvent.time, 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
   }
 

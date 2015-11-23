@@ -999,7 +999,7 @@ int UtcDaliPropertyValueGetAngleAxisN(void)
   Property::Value value;
   AngleAxis b = value.Get<AngleAxis>();
   AngleAxis result;
-  DALI_TEST_EQUALS( 0.f, b.angle, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Radian)0.f, b.angle, TEST_LOCATION );
   DALI_TEST_EQUALS( Vector3::ZERO, b.axis, TEST_LOCATION );
   DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
   DALI_TEST_EQUALS( AngleAxis(), result, TEST_LOCATION );
@@ -1087,11 +1087,11 @@ int UtcDaliPropertyValueGetArrayN(void)
   Property::Array result;
   result.PushBack( Property::Value( 10 ) );
   DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
+  DALI_TEST_EQUALS( 1u, result.Count(), TEST_LOCATION  ); // array is not modified
 
   Property::Value value2("");
   DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
+  DALI_TEST_EQUALS( 1u, result.Count(), TEST_LOCATION  ); // array is not modified
   END_TEST;
 }
 
@@ -1112,15 +1112,15 @@ int UtcDaliPropertyValueGetMapN(void)
 {
   Property::Value value;
   DALI_TEST_CHECK( NULL == value.GetMap() );
-  DALI_TEST_EQUALS( 0, value.Get<Property::Map>().Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, value.Get<Property::Map>().Count(), TEST_LOCATION );
   Property::Map result;
   result.Insert("key", "value" );
   DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, result.Count(), TEST_LOCATION );
 
   Property::Value value2("");
   DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
+  DALI_TEST_EQUALS( 1u, result.Count(), TEST_LOCATION  ); // array is not modified
   END_TEST;
 }
 

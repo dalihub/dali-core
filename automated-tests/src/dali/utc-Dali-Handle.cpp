@@ -514,7 +514,7 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   array->PushBack( "a string" );
   array->PushBack( Property::Value( Vector3(1,2,3) ) );
 
-  DALI_TEST_EQUALS( 3, array->Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, array->Count(), TEST_LOCATION );
 
   Property::Index propertyIndex = actor.RegisterProperty( "composite", value, Property::READ_WRITE );
 

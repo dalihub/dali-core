@@ -37,9 +37,6 @@ void utc_dali_framebuffer_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-static const float ROTATION_EPSILON = 0.0001f;
-
-
 int UtcDaliFrameBufferImageNew01(void)
 {
   TestApplication application;
@@ -146,9 +143,9 @@ int UtcDaliFrameBufferImageAttachments01(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -172,9 +169,9 @@ int UtcDaliFrameBufferImageAttachments02(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -198,9 +195,9 @@ int UtcDaliFrameBufferImageAttachments03(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -224,9 +221,9 @@ int UtcDaliFrameBufferImageAttachments04(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
   END_TEST;
 }

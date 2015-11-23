@@ -1233,21 +1233,21 @@ int UtcDaliMaterialRemoveTexture(void)
 
   Material material = CreateMaterial();
   material.RemoveTexture(0);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   material.RemoveTexture(1);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
   material.AddTexture( image, "sTexture", sampler );
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1u, TEST_LOCATION );
 
   material.RemoveTexture(1);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1u, TEST_LOCATION );
 
   material.RemoveTexture(0);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   END_TEST;
 }

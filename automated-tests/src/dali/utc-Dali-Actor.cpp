@@ -157,12 +157,12 @@ struct PositionComponentConstraint
 
 // OnRelayout
 
-static bool gOnRelayoutCallBackCalled = 0;
+static bool gOnRelayoutCallBackCalled = false;
 static std::vector< std::string > gActorNamesRelayout;
 
 void OnRelayoutCallback( Actor actor )
 {
-  ++gOnRelayoutCallBackCalled;
+  gOnRelayoutCallBackCalled = true;
   gActorNamesRelayout.push_back( actor.GetName() );
 }
 
@@ -2807,7 +2807,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   TestApplication application;
 
   // Clean test data
-  gOnRelayoutCallBackCalled = 0;
+  gOnRelayoutCallBackCalled = false;
   gActorNamesRelayout.clear();
 
   Actor actor = Actor::New();
@@ -2815,7 +2815,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   actor.OnRelayoutSignal().Connect( OnRelayoutCallback );
 
   // Sanity check
-  DALI_TEST_CHECK( gOnRelayoutCallBackCalled == 0 );
+  DALI_TEST_CHECK( ! gOnRelayoutCallBackCalled );
 
   // Add actor to stage
   Stage::GetCurrent().Add( actor );
@@ -2828,7 +2828,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   application.Render();
 
   // OnRelayout emitted
-  DALI_TEST_EQUALS(  gOnRelayoutCallBackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(  gOnRelayoutCallBackCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( "actor", gActorNamesRelayout[ 0 ], TEST_LOCATION );
 
   END_TEST;
