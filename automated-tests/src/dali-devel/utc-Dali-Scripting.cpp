@@ -79,7 +79,7 @@ void TestEnumStrings(
     *value = values[i].string;
     tet_printf("Checking: %s: %s\n", keyName, values[i].string );
     X instance = creator( map );
-    DALI_TEST_EQUALS( values[i].value, ( instance.*method )(), TEST_LOCATION );
+    DALI_TEST_EQUALS( values[i].value, (int)( instance.*method )(), TEST_LOCATION );
   }
 }
 
@@ -147,7 +147,7 @@ int UtcDaliScriptingGetColorMode(void)
   for ( unsigned int i = 0; i < COLOR_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", COLOR_MODE_VALUES[i].string, COLOR_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].value, GetColorMode( COLOR_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].value, (int)GetColorMode( COLOR_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].string, GetColorMode( (ColorMode) COLOR_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
@@ -160,11 +160,11 @@ int UtcDaliScriptingGetPositionInheritanceMode(void)
   for ( unsigned int i = 0; i < POSITION_INHERITANCE_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", POSITION_INHERITANCE_MODE_VALUES[i].string, POSITION_INHERITANCE_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].value, GetPositionInheritanceMode( POSITION_INHERITANCE_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].value, (int)GetPositionInheritanceMode( POSITION_INHERITANCE_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].string, GetPositionInheritanceMode( (PositionInheritanceMode) POSITION_INHERITANCE_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
-  DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[0].value, GetPositionInheritanceMode("INVALID_ARG"), TEST_LOCATION );
+  DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[0].value, (int)GetPositionInheritanceMode("INVALID_ARG"), TEST_LOCATION );
   END_TEST;
 }
 
@@ -174,11 +174,11 @@ int UtcDaliScriptingGetDrawMode(void)
   for ( unsigned int i = 0; i < DRAW_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", DRAW_MODE_VALUES[i].string, DRAW_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].value, GetDrawMode( DRAW_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].value, (int)GetDrawMode( DRAW_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].string, GetDrawMode( (DrawMode::Type) DRAW_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
-  DALI_TEST_EQUALS( DRAW_MODE_VALUES[0].value, GetDrawMode( "INVALID_ARG" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( DRAW_MODE_VALUES[0].value, (int)GetDrawMode( "INVALID_ARG" ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -287,8 +287,8 @@ int UtcDaliScriptingNewImageNegative06(void)
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
   DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetWidth(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( resImage.GetHeight(), 100, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetWidth(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetHeight(), 100u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -305,8 +305,8 @@ int UtcDaliScriptingNewImageNegative07(void)
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
   DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetWidth(), 10, TEST_LOCATION );
-  DALI_TEST_EQUALS( resImage.GetHeight(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetWidth(), 10u, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetHeight(), 0u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -475,8 +475,8 @@ int UtcDaliScriptingNewImage04P(void)
   map[ "width" ] = (float) 10.0f;
   map[ "height" ] = (float) 20.0f;
   Image image = NewImage( map );
-  DALI_TEST_EQUALS( image.GetWidth(), 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( image.GetHeight(), 20.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( image.GetWidth(), 10u, TEST_LOCATION );
+  DALI_TEST_EQUALS( image.GetHeight(), 20u, TEST_LOCATION );
   END_TEST;
 }
 

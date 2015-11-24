@@ -569,7 +569,7 @@ int UtcDaliConstraintGetTargetPropertyP(void)
 
   Actor actor = Actor::New();
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTargetProperty(), Actor::Property::POSITION, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraint.GetTargetProperty(), (Property::Index)Actor::Property::POSITION, TEST_LOCATION );
 
   END_TEST;
 }

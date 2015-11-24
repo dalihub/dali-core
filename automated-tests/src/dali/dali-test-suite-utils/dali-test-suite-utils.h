@@ -163,8 +163,8 @@ std::ostream& operator<<( std::ostream& ostream, Degree angle );
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-template<typename TypeA, typename TypeB>
-inline void DALI_TEST_EQUALS(TypeA value1, TypeB value2, const char* location)
+template<typename Type>
+inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
 {
   if (!(value1 == value2))
   {
@@ -220,6 +220,30 @@ inline void DALI_TEST_EQUALS<TimePeriod>( TimePeriod value1, TimePeriod value2, 
     tet_result(TET_PASS);
   }
 }
+
+/**
+ * Test whether two base handles are equal.
+ * @param[in] baseHandle1 The first value
+ * @param[in] baseHandle2 The second value
+ * @param[in] location The TEST_LOCATION macro should be used here
+ */
+void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location );
+
+/**
+ * Test whether a size_t value and an unsigned int are equal.
+ * @param[in] value1 The first value
+ * @param[in] value2 The second value
+ * @param[in] location The TEST_LOCATION macro should be used here
+ */
+void DALI_TEST_EQUALS( const size_t value1, const unsigned int value2, const char* location );
+
+/**
+ * Test whether an unsigned int and a size_t value and are equal.
+ * @param[in] value1 The first value
+ * @param[in] value2 The second value
+ * @param[in] location The TEST_LOCATION macro should be used here
+ */
+void DALI_TEST_EQUALS( const unsigned int value1, const size_t value2, const char* location );
 
 /**
  * Test whether two Matrix3 objects are equal.

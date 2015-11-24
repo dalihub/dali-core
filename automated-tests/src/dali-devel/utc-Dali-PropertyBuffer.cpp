@@ -268,7 +268,7 @@ int UtcDaliPropertyBufferSetGetSize02(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  int size = 5u;
+  std::size_t size = 5u;
   PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, size );
   DALI_TEST_EQUALS( propertyBuffer.GetSize(), size, TEST_LOCATION );
   DALI_TEST_EQUALS( propertyBuffer.GetSize(), size, TEST_LOCATION );

@@ -76,6 +76,21 @@ std::ostream& operator<<( std::ostream& ostream, Degree angle )
   return ostream;
 }
 
+void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location )
+{
+  DALI_TEST_EQUALS< const BaseHandle& >( baseHandle1, baseHandle2, location );
+}
+
+void DALI_TEST_EQUALS( const size_t value1, const unsigned int value2, const char* location )
+{
+  DALI_TEST_EQUALS< unsigned int>( ( unsigned int )( value1 ), value2, location );
+}
+
+void DALI_TEST_EQUALS( const unsigned int value1, const size_t value2, const char* location )
+{
+  DALI_TEST_EQUALS< unsigned int >( value1, ( unsigned int )( value2 ), location );
+}
+
 void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const char* location)
 {
   const float* m1 = matrix1.AsFloat();
