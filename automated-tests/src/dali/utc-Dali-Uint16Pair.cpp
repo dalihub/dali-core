@@ -108,6 +108,54 @@ int UtcDaliUint16PairGetYP(void)
   END_TEST;
 }
 
+int UtcDaliUint16PairSetXP(void)
+{
+  Dali::TestApplication testApp;
+
+  Uint16Pair v( 5, 5 );
+  DALI_TEST_EQUALS( v.GetX(), 5u, TEST_LOCATION );
+  v.SetX( 10 );
+  DALI_TEST_EQUALS( v.GetX(), 10u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairSetWidthP(void)
+{
+  Dali::TestApplication testApp;
+
+  Uint16Pair v( 5, 5 );
+  DALI_TEST_EQUALS( v.GetWidth(), 5u, TEST_LOCATION );
+  v.SetWidth( 10 );
+  DALI_TEST_EQUALS( v.GetWidth(), 10u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairSetYP(void)
+{
+  Dali::TestApplication testApp;
+
+  Uint16Pair v( 5, 5 );
+  DALI_TEST_EQUALS( v.GetY(), 5u, TEST_LOCATION );
+  v.SetY( 10 );
+  DALI_TEST_EQUALS( v.GetY(), 10u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairSetHeightP(void)
+{
+  Dali::TestApplication testApp;
+
+  Uint16Pair v( 5, 5 );
+  DALI_TEST_EQUALS( v.GetHeight(), 5u, TEST_LOCATION );
+  v.SetHeight( 10 );
+  DALI_TEST_EQUALS( v.GetHeight(), 10u, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliUint16PairEqualsP(void)
 {
   Dali::TestApplication testApp;
