@@ -65,10 +65,12 @@ PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::stri
 
 PropertyBuffer CreateIndexBuffer()
 {
-  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  const unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  const unsigned int numberElements = sizeof(indexData)/sizeof(indexData[0]) ;
+
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 3 );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, numberElements );
   indices.SetData(indexData);
 
   return indices;
@@ -446,7 +448,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   tet_infoline("Test SetGeometryType and GetGeometryType: with index buffer");
 
   unsigned int numVertex = 4u;
-  unsigned int numIndex = 3u; // 6 unsigned short
+  unsigned int numIndex = 6u; // 6 unsigned short
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
   PropertyBuffer indexBuffer = CreateIndexBuffer( );
 
