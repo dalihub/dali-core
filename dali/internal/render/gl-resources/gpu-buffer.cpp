@@ -145,7 +145,18 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usag
     mCapacity = size;
   }
 
-  mContext.BindArrayBuffer(0);
+  if(ARRAY_BUFFER == target)
+  {
+    mContext.BindArrayBuffer( 0 );
+  }
+  else if(ELEMENT_ARRAY_BUFFER == target)
+  {
+    mContext.BindElementArrayBuffer( 0 );
+  }
+  else if(TRANSFORM_FEEDBACK_BUFFER == target)
+  {
+    mContext.BindTransformFeedbackBuffer( 0 );
+  }
 }
 
 void GpuBuffer::Bind(Target target) const
