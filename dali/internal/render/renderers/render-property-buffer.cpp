@@ -151,6 +151,7 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
       DALI_ASSERT_DEBUG( mSize && "No data in the property buffer!" );
 
       const void *data = &((*mData)[0]);
+      std::size_t dataSize =  GetDataSize();
 
       // Index buffer needs to be unsigned short which is not supported by the property system
       Vector<unsigned short> ushortData;
@@ -163,6 +164,7 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
           ushortData[i] = unsignedData[i];
         }
         data = &(ushortData[0]);
+        dataSize = ushortData.Size() * sizeof( unsigned short );
       }
 
       GpuBuffer::Target target = GpuBuffer::ARRAY_BUFFER;
@@ -170,8 +172,7 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
       {
         target = GpuBuffer::ELEMENT_ARRAY_BUFFER;
       }
-
-      mGpuBuffer->UpdateDataBuffer( GetDataSize(), data, GpuBuffer::STATIC_DRAW, target );
+      mGpuBuffer->UpdateDataBuffer( dataSize, data, GpuBuffer::STATIC_DRAW, target );
 
     }
 
