@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
@@ -236,6 +237,13 @@ void Context::InitializeGlState()
 
   // reset viewport, this will be set to something useful when rendering
   mViewPort.x = mViewPort.y = mViewPort.width = mViewPort.height = 0;
+
+  //Initialze vertex attribute cache
+  memset( &mVertexAttributeCachedState, 0, sizeof(mVertexAttributeCachedState) );
+  memset( &mVertexAttributeCurrentState, 0, sizeof(mVertexAttributeCurrentState) );
+
+  //Initialize bound 2d texture cache
+  memset( &mBound2dTextureId, 0, sizeof(mBound2dTextureId) );
 
   mFrameBufferStateCache.Reset();
 }
