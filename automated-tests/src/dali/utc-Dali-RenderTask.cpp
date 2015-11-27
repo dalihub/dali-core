@@ -1779,12 +1779,12 @@ int UtcDaliRenderTaskSignalFinished(void)
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
   application.Render();
-  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
   application.SendNotification();
   DALI_TEST_CHECK( !finished );
 
   application.Render();
-  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
   application.SendNotification();
   DALI_TEST_CHECK( ! finished );
 
@@ -3384,12 +3384,12 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
   application.Render();
-  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
   application.SendNotification();
   DALI_TEST_CHECK( !finished );
 
   application.Render();
-  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
   application.SendNotification();
   DALI_TEST_CHECK( ! finished );
 

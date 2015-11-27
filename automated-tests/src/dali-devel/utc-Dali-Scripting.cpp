@@ -79,7 +79,7 @@ void TestEnumStrings(
     *value = values[i].string;
     tet_printf("Checking: %s: %s\n", keyName, values[i].string );
     X instance = creator( map );
-    DALI_TEST_EQUALS( values[i].value, ( instance.*method )(), TEST_LOCATION );
+    DALI_TEST_EQUALS( values[i].value, (int)( instance.*method )(), TEST_LOCATION );
   }
 }
 
@@ -147,7 +147,7 @@ int UtcDaliScriptingGetColorMode(void)
   for ( unsigned int i = 0; i < COLOR_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", COLOR_MODE_VALUES[i].string, COLOR_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].value, GetColorMode( COLOR_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].value, (int)GetColorMode( COLOR_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].string, GetColorMode( (ColorMode) COLOR_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
@@ -160,11 +160,11 @@ int UtcDaliScriptingGetPositionInheritanceMode(void)
   for ( unsigned int i = 0; i < POSITION_INHERITANCE_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", POSITION_INHERITANCE_MODE_VALUES[i].string, POSITION_INHERITANCE_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].value, GetPositionInheritanceMode( POSITION_INHERITANCE_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].value, (int)GetPositionInheritanceMode( POSITION_INHERITANCE_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].string, GetPositionInheritanceMode( (PositionInheritanceMode) POSITION_INHERITANCE_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
-  DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[0].value, GetPositionInheritanceMode("INVALID_ARG"), TEST_LOCATION );
+  DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[0].value, (int)GetPositionInheritanceMode("INVALID_ARG"), TEST_LOCATION );
   END_TEST;
 }
 
@@ -174,11 +174,11 @@ int UtcDaliScriptingGetDrawMode(void)
   for ( unsigned int i = 0; i < DRAW_MODE_VALUES_COUNT; ++i )
   {
     tet_printf( "Checking %s == %d\n", DRAW_MODE_VALUES[i].string, DRAW_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].value, GetDrawMode( DRAW_MODE_VALUES[i].string ), TEST_LOCATION );
+    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].value, (int)GetDrawMode( DRAW_MODE_VALUES[i].string ), TEST_LOCATION );
     DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].string, GetDrawMode( (DrawMode::Type) DRAW_MODE_VALUES[i].value ), TEST_LOCATION );
   }
 
-  DALI_TEST_EQUALS( DRAW_MODE_VALUES[0].value, GetDrawMode( "INVALID_ARG" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( DRAW_MODE_VALUES[0].value, (int)GetDrawMode( "INVALID_ARG" ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -287,8 +287,8 @@ int UtcDaliScriptingNewImageNegative06(void)
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
   DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetWidth(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( resImage.GetHeight(), 100, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetWidth(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetHeight(), 100u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -305,8 +305,8 @@ int UtcDaliScriptingNewImageNegative07(void)
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
   DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetWidth(), 10, TEST_LOCATION );
-  DALI_TEST_EQUALS( resImage.GetHeight(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetWidth(), 10u, TEST_LOCATION );
+  DALI_TEST_EQUALS( resImage.GetHeight(), 0u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -475,8 +475,8 @@ int UtcDaliScriptingNewImage04P(void)
   map[ "width" ] = (float) 10.0f;
   map[ "height" ] = (float) 20.0f;
   Image image = NewImage( map );
-  DALI_TEST_EQUALS( image.GetWidth(), 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( image.GetHeight(), 20.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( image.GetWidth(), 10u, TEST_LOCATION );
+  DALI_TEST_EQUALS( image.GetHeight(), 20u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1025,6 +1025,68 @@ int UtcDaliScriptingGetLinearEnumerationNameN(void)
 int UtcDaliScriptingFindEnumIndexN(void)
 {
   const Scripting::StringEnum myTable[] =
+    {
+      { "ONE",    (1<<1) },
+      { "TWO",    (1<<2) },
+      { "THREE",  (1<<3) },
+      { "FOUR",   (1<<4) },
+      { "FIVE",   (1<<5) },
+    };
+  const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
+  DALI_TEST_EQUALS( myTableCount, FindEnumIndex( "Foo", myTable, myTableCount ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliScriptingEnumStringToIntegerP(void)
+{
+  const Scripting::StringEnum myTable[] =
+    {
+      { "ONE",    (1<<1) },
+      { "TWO",    (1<<2) },
+      { "THREE",  (1<<3) },
+      { "FOUR",   (1<<4) },
+      { "FIVE",   (1<<5) },
+    };
+  const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
+
+  unsigned int integerEnum = 0;
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_EQUALS( integerEnum, (1<<1), TEST_LOCATION );
+
+  integerEnum = 0;
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,TWO", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,,TWO", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,TWO,THREE", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2) | (1<<3), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,TWO,THREE,FOUR,FIVE", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2) | (1<<3) | (1<<4) | (1<<5), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "TWO,ONE", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "TWO,ONE,FOUR,THREE,FIVE", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1) | (1<<2) | (1<<3) | (1<<4) | (1<<5), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,SEVEN", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1), TEST_LOCATION );
+
+  DALI_TEST_CHECK( EnumStringToInteger( "ONE,", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, (1<<1), TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliScriptingEnumStringToIntegerN(void)
+{
+  const Scripting::StringEnum myTable[] =
   {
     { "ONE",    1 },
     { "TWO",    2 },
@@ -1033,7 +1095,66 @@ int UtcDaliScriptingFindEnumIndexN(void)
     { "FIVE",   5 },
   };
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
-  DALI_TEST_EQUALS( myTableCount, FindEnumIndex( "Foo", myTable, myTableCount ), TEST_LOCATION );
+
+  unsigned int integerEnum = 0;
+  DALI_TEST_CHECK( !EnumStringToInteger( "Foo", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( ",", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( ",ONE,SEVEN", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( ",", myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( "ONE", myTable, 0, integerEnum ) );
+
+  DALI_TEST_EQUALS( integerEnum, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliScriptingEnumStringToIntegerInvalidEnumP(void)
+{
+  const Scripting::StringEnum myTable[] =
+  {
+    { "",    1 },
+    { "",    2 },
+    { "",    3 },
+  };
+
+  const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
+
+  unsigned int integerEnum = 0;
+  DALI_TEST_CHECK( EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
+  DALI_TEST_EQUALS( integerEnum, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliScriptingEnumStringToIntegerInvalidEnumN(void)
+{
+  const Scripting::StringEnum myTable[] =
+  {
+    { "",    1 },
+    { "",    1 },
+    { "",    1 },
+  };
+
+  const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
+
+  unsigned int integerEnum = 0;
+  DALI_TEST_CHECK( !EnumStringToInteger( NULL, NULL, 0, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( "ONE", NULL, 0, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( NULL, myTable, 0, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( NULL, myTable, myTableCount, integerEnum ) );
+
+  DALI_TEST_CHECK( !EnumStringToInteger( "ONE", NULL, myTableCount, integerEnum ) );
+
+  DALI_TEST_EQUALS( integerEnum, 0, TEST_LOCATION );
 
   END_TEST;
 }

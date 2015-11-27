@@ -74,10 +74,6 @@ int UtcDaliContextVertexAttribStartup(void)
   application.Render();
   application.Render();
 
-  // context class should initially set the vertex attrib locations to disable
-  // Make sure it has been modified
-  DALI_TEST_CHECK(application.GetGlAbstraction().GetVertexAttribArrayChanged());
-
   // check the locations
   for (unsigned int i = 0; i < TEST_MAX_ATTRIBUTE_CACHE_SIZE; i++)
   {

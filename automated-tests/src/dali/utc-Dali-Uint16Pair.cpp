@@ -23,6 +23,14 @@
 
 using namespace Dali;
 
+namespace
+{
+/// Compare a uint16_t value with an unsigned int
+void DALI_TEST_EQUALS( uint16_t value1, unsigned int value2, const char* location )
+{
+  ::DALI_TEST_EQUALS< uint16_t >( value1, static_cast< uint16_t >( value2 ), location );
+}
+} // unnamed namespace
 
 int UtcDaliUint16PairConstructor01P(void)
 {

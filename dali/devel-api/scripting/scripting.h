@@ -58,9 +58,22 @@ struct StringEnum
 DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
 
 /**
+ * @brief Find the enum as an integer from the table
+ *
+ * @since 1.1.12
+ *
+ * @param[in]  value       The string equivalent (case-insensitive, comma separate to OR values).
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ * @param[out] integerEnum The value of the enum.
+ * @return     true if one or more enums in value.
+ */
+DALI_IMPORT_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, unsigned int& integerEnum );
+
+/**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
  *
- * @param[in]  value       The string equivalent (case-insensitive).
+ * @param[in]  value       The string equivalent (case-insensitive, comma separate to OR values).
  * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
  * @param[in]  tableCount  Number of items in the array.
  * @param[out] result      The enum value
@@ -73,11 +86,11 @@ bool GetEnumeration( const char* value, const StringEnum* table, unsigned int ta
   bool retVal( false );
   if( table )
   {
-    unsigned int index = FindEnumIndex( value, table, tableCount );
+    unsigned int integerEnum = 0;
     // check to avoid crash, not asserting on purpose, error is logged instead
-    if( index < tableCount )
+    if( EnumStringToInteger( value, table, tableCount, integerEnum ) )
     {
-      result = static_cast<T>( table[ index ].value );
+      result = static_cast<T>( integerEnum );
       retVal = true;
     }
   }

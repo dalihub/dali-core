@@ -96,14 +96,14 @@ my $root_path = getcwd();
 if($exec_path =~ m!dali-env/opt/bin!)
 {
     $root_path = $exec_path;
-    while($root_path !~ m!dali-env$!)
+    while($root_path !~ m!dali-env$! && $root_path != "")
     {
         $root_path = dirname($root_path);
     }
 }
 elsif($root_path =~ m!dali-env!)
 {
-    while($root_path !~ m!dali-env$!)
+    while($root_path =~ m!dali-env$! && $root_path != "")
     {
         $root_path = dirname($root_path);
     }
@@ -163,7 +163,7 @@ sub create_setenv
     print <<"EOF";
 # To use the desktop libraries, please add the following lines to your .bashrc or
 # create a setenv script from them, e.g. by running this command as follows
-# \$ dali_env -s > setenv
+# \$ $install_path/bin/dali_env -s > setenv
 #
 # You can then source this script by using
 # \$ . setenv

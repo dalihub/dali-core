@@ -28,7 +28,6 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-new-renderer.h>
 #include <dali/internal/update/resources/resource-manager.h>
 
 namespace Dali
@@ -38,11 +37,12 @@ namespace Internal
 
 namespace Render
 {
-class NewRenderer;
+class Renderer;
 }
 
 namespace SceneGraph
 {
+class SceneController;
 
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
@@ -252,7 +252,7 @@ private:
   RenderDataProvider* NewRenderDataProvider();
 
   SceneController* mSceneController;  ///< Used for initializing renderers whilst attached
-  Render::NewRenderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
+  Render::Renderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
   Material*             mMaterial;    ///< The material this renderer uses. (Not owned)
   Geometry*             mGeometry;    ///< The geometry this renderer uses. (Not owned)
 

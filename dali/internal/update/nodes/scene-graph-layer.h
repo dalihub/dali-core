@@ -22,15 +22,12 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment-declarations.h>
 
 namespace Dali
 {
 
 namespace Internal
 {
-
-class RenderableAttachment;
 
 // value types used by messages
 template <> struct ParameterType< Dali::Layer::SortFunctionType >
@@ -44,14 +41,14 @@ namespace SceneGraph
 /**
  * Pair of node-renderer
  */
-struct NodeRenderer
+struct Renderable
 {
-  NodeRenderer()
+  Renderable()
   :mNode(0),
    mRenderer(0)
   {}
 
-  NodeRenderer( Node* node, Renderer* renderer )
+  Renderable( Node* node, Renderer* renderer )
   :mNode(node),
    mRenderer(renderer)
   {}
@@ -60,7 +57,7 @@ struct NodeRenderer
   Renderer* mRenderer;
 };
 
-typedef Dali::Vector< NodeRenderer > NodeRendererContainer;
+typedef Dali::Vector< Renderable > RenderableContainer;
 
 /**
  * Layers have a "depth" relative to all other layers in the scene-graph.
@@ -203,6 +200,11 @@ public:
     return mIsDefaultSortFunction;
   }
 
+  /**
+   * Clears all the renderable lists
+   */
+  void ClearRenderables();
+
 private:
 
   /**
@@ -219,13 +221,9 @@ private:
 
 public: // For update-algorithms
 
-  RenderableAttachmentContainer stencilRenderables;
-  RenderableAttachmentContainer colorRenderables;
-  RenderableAttachmentContainer overlayRenderables;
-
-  NodeRendererContainer stencilRenderers;
-  NodeRendererContainer colorRenderers;
-  NodeRendererContainer overlayRenderers;
+  RenderableContainer stencilRenderables;
+  RenderableContainer colorRenderables;
+  RenderableContainer overlayRenderables;
 
 private:
 

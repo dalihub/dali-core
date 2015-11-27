@@ -181,13 +181,6 @@ public:
   void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
 
   /**
-   * @brief Allows this ImageActor to respond to the event that the a shader effect's uniform has updated
-   *
-   * @param[in] uniform The shader effect uniform that has been updated
-   */
-  void EffectUniformUpdated( const ShaderEffect::Uniform& uniform );
-
-  /**
    * @brief Allows this ImageActor to respond to the eventa that the shader effect's effect texture has been changed
    */
   void EffectImageUpdated();

@@ -114,7 +114,7 @@ public:
 
   // Default Properties
   /**
-   * @brief An enumeration of properties belonging to the Path class.
+   * @brief An enumeration of properties belonging to the ShaderEffect class.
    * Grid Density defines the spacing of vertex coordinates in world units.
    * ie a larger actor will have more grids at the same spacing.
    *
