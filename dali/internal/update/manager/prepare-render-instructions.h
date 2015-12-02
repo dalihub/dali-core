@@ -79,12 +79,14 @@ class RenderInstructionContainer;
  * @param[in] sortedLayers The layers containing lists of opaque/transparent renderables.
  * @param[in] renderTask The rendering task information.
  * @param[in] sortingHelper to avoid allocating containers for sorting every frame
+ * @param[in] cull Whether frustum culling is enabled or not
  * @param[out] instructions The rendering instructions for the next frame.
  */
 void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                                SortedLayerPointers& sortedLayers,
                                RenderTask& renderTask,
                                RendererSortingHelper& sortingHelper,
+                               bool cull,
                                RenderInstructionContainer& instructions );
 
 } // namespace SceneGraph

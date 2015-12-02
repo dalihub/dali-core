@@ -311,6 +311,18 @@ inline float ShortestDistanceInDomain( float a, float b, float start, float end 
 }
 
 /**
+ * @brief Extracts the sign of a number
+ *
+ * @param[in] value The value we want to extract the sign
+ * @return -1 for negative values, +1 for positive values and 0 if value is 0
+ */
+template <typename T>
+int Sign( T value )
+{
+  return ( T(0) < value ) - ( value < T(0) );
+}
+
+/**
  * @}
  */
 } // namespace Dali

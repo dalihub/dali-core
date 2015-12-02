@@ -139,7 +139,6 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] cull Whether to frustum cull this renderer
    */
   void Render( Context& context,
                SceneGraph::TextureCache& textureCache,
@@ -149,7 +148,6 @@ public:
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
-               bool cull,
                bool blend);
 
   /**

@@ -120,7 +120,7 @@ void Material::Prepare( const ResourceManager& resourceManager )
       }
       case BlendingMode::ON:
       {
-        mBlendPolicy = TRANSPARENT;
+        mBlendPolicy = TRANSLUCENT;
         break;
       }
       case BlendingMode::AUTO:
@@ -133,7 +133,7 @@ void Material::Prepare( const ResourceManager& resourceManager )
         if( ( opaqueCount != textureCount ) ||
             ( mShader && mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) ) )
         {
-          mBlendPolicy = Material::TRANSPARENT;
+          mBlendPolicy = Material::TRANSLUCENT;
         }
         else
         {

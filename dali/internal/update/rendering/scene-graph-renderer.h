@@ -58,6 +58,13 @@ class Renderer :  public PropertyOwner,
 {
 public:
 
+  enum Opacity
+  {
+    OPAQUE,
+    TRANSPARENT,
+    TRANSLUCENT
+  };
+
   /**
    * Default constructor
    */
@@ -150,11 +157,11 @@ public:
   void GetReadyAndComplete( bool& ready, bool& complete ) const;
 
   /**
-   * Query whether the renderer is fully opaque.
+   * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @return True if fully opaque.
+   * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  bool IsFullyOpaque( BufferIndex updateBufferIndex, const Node& node ) const;
+  Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
 
   /**
    * Query whether the renderer is currently in use by an actor on the stage

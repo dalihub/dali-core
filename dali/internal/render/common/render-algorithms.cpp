@@ -111,7 +111,6 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context )
  * @param[in] buffer The current render buffer index (previous update buffer)
  * @param[in] viewMatrix The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
- * @param[in] cullMode True if the renderers should be subjected to clipspace culling
  */
 inline void ProcessRenderList(
   const RenderList& renderList,
@@ -120,8 +119,7 @@ inline void ProcessRenderList(
   SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
   const Matrix& viewMatrix,
-  const Matrix& projectionMatrix,
-  bool cullMode )
+  const Matrix& projectionMatrix )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -140,7 +138,7 @@ inline void ProcessRenderList(
       //Enable depth writes if depth buffer is enabled and item is opaque
       context.DepthMask( depthBufferEnabled && ( item.IsOpaque() || item.GetRenderer().RequiresDepthTest() ) );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, cullMode, !item.IsOpaque() );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, !item.IsOpaque() );
     }
   }
   else
@@ -151,7 +149,7 @@ inline void ProcessRenderList(
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, cullMode, !item.IsOpaque() );
+      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, !item.IsOpaque() );
     }
 
   }
@@ -185,7 +183,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix, instruction.mCullMode );
+        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix );
       }
     }
   }
