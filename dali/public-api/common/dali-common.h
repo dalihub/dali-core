@@ -76,6 +76,15 @@
 #endif
 
 /**
+ * Two macros to provide branch predictor information.
+ * DALI_LIKELY should be used when a branch is taken in almost all cases so the
+ * branch predictor can avoid pre-fetching the code for else branch
+ * DALI_UNLIKELY should be used when a branch is almost never taken
+ */
+#define DALI_LIKELY(expression)   __builtin_expect( !!(expression), 1 )
+#define DALI_UNLIKELY(expression) __builtin_expect( !!(expression), 0 )
+
+/**
  * @brief The DALi namespace
  */
 namespace Dali
@@ -152,7 +161,7 @@ public:
 #ifdef EMSCRIPTEN
 
 #define DALI_ASSERT_ALWAYS(cond)                \
-  if(!(cond)) \
+  if(DALI_UNLIKELY(!(cond))) \
   { \
     Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
     throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
@@ -161,7 +170,7 @@ public:
 #else
 
 #define DALI_ASSERT_ALWAYS(cond)                \
-  if(!(cond)) \
+  if(DALI_UNLIKELY(!(cond))) \
   { \
     Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
     throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
