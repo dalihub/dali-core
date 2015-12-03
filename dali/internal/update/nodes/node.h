@@ -866,11 +866,6 @@ public:
   }
 
   /**
-   * Check if the node is visible i.e Is not fully transparent and has valid size
-   */
-  bool ResolveVisibility( BufferIndex updateBufferIndex );
-
-  /**
    * Set the world-matrix of a node, with scale + rotation + translation.
    * Scale and rotation are centered at the origin.
    * Translation is applied independently of the scale or rotatation axis.
