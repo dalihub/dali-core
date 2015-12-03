@@ -402,6 +402,32 @@ public:
    */
   unsigned int GetRefreshRate() const;
 
+  /*
+   * @brief Get viewport coordinates for given world position
+   *
+   * @since DALi 1.1.13
+   *
+   * @param[in] position The world position.
+   * @param[out] viewportX The viewport x position.
+   * @param[out] viewportY The viewport y position.
+   * @return true if the position has a screen coordinate
+   */
+  bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
+
+  /*
+   * @brief Get actor local coordinates for given viewport coordinates
+   *
+   * @since DALi 1.1.13
+   *
+   * @param[in] actor The actor describing local coordinate system.
+   * @param[in] viewportX The viewport x position.
+   * @param[in] viewportY The viewport y position.
+   * @param[out] localX The local x position.
+   * @param[out] localY The local y position.
+   * @return true if the screen position has a local coordinate
+   */
+  bool ViewportToLocal(Actor actor, float viewportX, float viewportY, float &localX, float &localY) const;
+
 public: // Signals
 
   /**

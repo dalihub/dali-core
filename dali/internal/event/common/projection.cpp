@@ -22,7 +22,10 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/viewport.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {
@@ -109,6 +112,39 @@ bool XyPlaneIntersect( const Vector4& pointA, const Vector4& pointB, Vector4& in
 
   return true;
 }
+
+bool ProjectFull( const Vector4& position,
+                  const Matrix& modelView,
+                  const Matrix& projection,
+                  float viewportX,
+                  float viewportY,
+                  float viewportWidth,
+                  float viewportHeight,
+                  Vector4& windowPos )
+{
+  bool ok = false;
+
+  Matrix Mvp( false ); // Don't initialize.
+  Matrix::Multiply( Mvp, modelView, projection );
+
+  Vector4 p = Mvp * position;
+
+  Vector2 depthRange(0,1);
+
+  if( !EqualsZero( p.w ) )
+  {
+    float div = 1.0 / p.w;
+
+    windowPos = Vector4( (1 + p.x * div) * viewportWidth  / 2 + viewportX,
+                         (1 - p.y * div) * viewportHeight / 2 + viewportY,
+                         (p.z * div) * (depthRange.y - depthRange.x) + depthRange.x,
+                         div);
+    ok = true;
+  }
+
+  return ok;
+}
+
 
 } // namespace Internal
 
