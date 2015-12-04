@@ -80,6 +80,7 @@ public:
   struct FrustumPlanes
   {
     Plane mPlanes[ 6 ];
+    Vector3 mSign[ 6 ];
   };
 
   /**
@@ -206,11 +207,11 @@ public:
    *
    * @param bufferIndex The buffer to read from.
    * @param origin the world position center of the cubeoid to check.
-   * @param extents The half length of the cubeoid in world co-ordinates in each axis.
+   * @param halfExtents The half length of the cubeoid in world co-ordinates in each axis.
    *
-   * @return false if the cubeoid lies outside of the frustum.
+   * @return false if the cubeoid lies completely outside of the frustum, true otherwise
    */
-  bool CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& extents );
+  bool CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents );
 
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.

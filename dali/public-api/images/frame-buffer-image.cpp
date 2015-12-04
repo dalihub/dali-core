@@ -31,7 +31,7 @@ FrameBufferImage::FrameBufferImage()
 {
 }
 
-FrameBufferImage::FrameBufferImage(Internal::FrameBufferImage* internal)
+FrameBufferImage::FrameBufferImage( Internal::FrameBufferImage* internal )
 : Image(internal)
 {
 }
@@ -40,46 +40,44 @@ FrameBufferImage::~FrameBufferImage()
 {
 }
 
-FrameBufferImage::FrameBufferImage(const FrameBufferImage& handle)
+FrameBufferImage::FrameBufferImage( const FrameBufferImage& handle )
 : Image(handle)
 {
 }
 
-FrameBufferImage& FrameBufferImage::operator=(const FrameBufferImage& rhs)
+FrameBufferImage& FrameBufferImage::operator=( const FrameBufferImage& rhs )
 {
   BaseHandle::operator=(rhs);
   return *this;
 }
 
-FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, RenderBuffer::Format bufferformat)
+FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, RenderBuffer::Format bufferformat )
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
     (0 == width) ? stageSize.width : width,
     (0 == height) ? stageSize.height : height,
     pixelformat,
-    Dali::Image::NEVER,
     bufferformat);
 
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat)
+FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy /*releasePolicy*/, RenderBuffer::Format bufferformat )
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
     (0 == width) ? stageSize.width : width,
     (0 == height) ? stageSize.height : height,
     pixelformat,
-    releasePolicy,
     bufferformat);
 
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New( NativeImageInterface& image, ReleasePolicy releasePolicy )
+FrameBufferImage FrameBufferImage::New( NativeImageInterface& image, ReleasePolicy /*releasePolicy*/ )
 {
-  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image, releasePolicy );
+  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image );
   return FrameBufferImage(internal.Get());
 }
 
@@ -91,7 +89,7 @@ FrameBufferImage FrameBufferImage::New( NativeImageInterface& image )
 
 FrameBufferImage FrameBufferImage::DownCast( BaseHandle handle )
 {
-  return FrameBufferImage( dynamic_cast<Dali::Internal::FrameBufferImage*>(handle.GetObjectPtr()) );
+  return FrameBufferImage( dynamic_cast<Dali::Internal::FrameBufferImage*>( handle.GetObjectPtr() ) );
 }
 
 } // namespace Dali

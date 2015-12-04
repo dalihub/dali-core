@@ -1476,7 +1476,7 @@ bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float sc
   return false;
 }
 
-bool Actor::ScreenToLocal( RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const
+bool Actor::ScreenToLocal( const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const
 {
   bool retval = false;
   // only valid when on-stage

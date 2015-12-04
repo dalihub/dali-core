@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ class MessageBase;
 namespace Render
 {
 class Renderer;
+class RenderTracker;
 }
 namespace SceneGraph
 {
 
 class RenderManager;
 class RenderQueue;
-class RenderTracker;
 class RenderGeometry;
 class PropertyBufferDataProvider;
 /**
@@ -122,14 +122,14 @@ public:
    * @param[in] renderTracker The render tracker to add.
    * @post ownership is transferred
    */
-  void AddRenderTracker( RenderTracker& renderTracker );
+  void AddRenderTracker( Render::RenderTracker& renderTracker );
 
   /**
    * Remove a Render tracker.
    * @param[in] renderTracker The render tracker to add.
    * @post render tracker will be destroyed in the next Render pass.
    */
-  void RemoveRenderTracker( RenderTracker& renderTracker );
+  void RemoveRenderTracker( Render::RenderTracker& renderTracker );
 
 private:
 

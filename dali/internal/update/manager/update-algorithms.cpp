@@ -245,10 +245,11 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
-  if ( node.IsLayer() )
+  Layer* nodeIsLayer( node.GetLayer() );
+  if ( nodeIsLayer )
   {
     // all childs go to this layer
-    layer = node.GetLayer();
+    layer = nodeIsLayer;
 
     // assume layer is clean to begin with
     layer->SetReuseRenderers( updateBufferIndex, true );
@@ -319,14 +320,14 @@ int UpdateNodesAndAttachments( Layer& rootNode,
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
 
   // Short-circuit for invisible nodes
-  if ( !rootNode.IsVisible( updateBufferIndex ) )
+  if ( DALI_UNLIKELY( !rootNode.IsVisible( updateBufferIndex ) ) ) // almost never ever true
   {
     return 0;
   }
 
   // If the root node was not previously visible
   BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if ( !rootNode.IsVisible( previousBuffer ) )
+  if ( DALI_UNLIKELY( !rootNode.IsVisible( previousBuffer ) ) ) // almost never ever true
   {
     // The node was skipped in the previous update; it must recalculate everything
     rootNode.SetAllDirtyFlags();

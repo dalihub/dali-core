@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,40 +34,33 @@ namespace
 TypeRegistration mType( typeid( Dali::FrameBufferImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-FrameBufferImage::~FrameBufferImage()
-{
-}
-
-FrameBufferImagePtr  FrameBufferImage::New(unsigned int width,
+FrameBufferImagePtr FrameBufferImage::New( unsigned int width,
                                            unsigned int height,
                                            Pixel::Format pixelFormat,
-                                           ReleasePolicy releasePolicy,
-                                           RenderBuffer::Format bufferformat)
+                                           RenderBuffer::Format bufferformat )
 {
-  FrameBufferImagePtr image = new FrameBufferImage(width, height, pixelFormat, releasePolicy, bufferformat);
+  FrameBufferImagePtr image = new FrameBufferImage( width, height, pixelFormat, bufferformat );
   image->Initialize();
   return image;
 }
 
-FrameBufferImagePtr  FrameBufferImage::New( NativeImageInterface& nativeImage )
+FrameBufferImagePtr FrameBufferImage::New( NativeImageInterface& nativeImage )
 {
-  FrameBufferImagePtr image = new FrameBufferImage(nativeImage);
+  FrameBufferImagePtr image = new FrameBufferImage( nativeImage );
   image->Initialize();
   return image;
 }
 
-FrameBufferImagePtr  FrameBufferImage::New( NativeImageInterface& nativeImage, ReleasePolicy releasePolicy )
-{
-  FrameBufferImagePtr image = new FrameBufferImage(nativeImage, releasePolicy);
-  image->Initialize();
-  return image;
-}
 
-FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat)
-: Image( releasePolicy ),
-  mNativeImage(),
+FrameBufferImage::FrameBufferImage( unsigned int width,
+                                    unsigned int height,
+                                    Pixel::Format pixelFormat,
+                                    RenderBuffer::Format bufferformat )
+: Image(),
+  mNativeImage(0),
   mPixelFormat( pixelFormat ),
-  mBufferFormat( bufferformat )
+  mBufferFormat( bufferformat ),
+  mIsNativeFbo( false )
 {
   mWidth  = width;
   mHeight = height;
@@ -77,17 +70,8 @@ FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage )
 : Image(),
   mNativeImage( &nativeImage ),
   mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
-  mBufferFormat( RenderBuffer::COLOR )
-{
-  mWidth = nativeImage.GetWidth();
-  mHeight = nativeImage.GetHeight();
-}
-
-FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage, ReleasePolicy releasePolicy )
-: Image( releasePolicy ),
-  mNativeImage( &nativeImage ),
-  mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
-  mBufferFormat( RenderBuffer::COLOR )
+  mBufferFormat( RenderBuffer::COLOR ),
+  mIsNativeFbo( true )
 {
   mWidth = nativeImage.GetWidth();
   mHeight = nativeImage.GetHeight();
@@ -132,6 +116,14 @@ void FrameBufferImage::Disconnect()
     mTicket->RemoveObserver(*this);
     mTicket.Reset();
   }
+}
+
+bool FrameBufferImage::IsNativeFbo() const
+{
+  return mIsNativeFbo;
+}
+FrameBufferImage::~FrameBufferImage()
+{
 }
 
 } // namespace Internal

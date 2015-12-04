@@ -28,7 +28,6 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/update/resources/resource-manager.h>
 
 namespace Dali
 {
@@ -58,6 +57,13 @@ class Renderer :  public PropertyOwner,
                   public ConnectionChangePropagator::Observer
 {
 public:
+
+  enum Opacity
+  {
+    OPAQUE,
+    TRANSPARENT,
+    TRANSLUCENT
+  };
 
   /**
    * Default constructor
@@ -140,28 +146,22 @@ public:
   Render::Renderer& GetRenderer();
 
   /**
-     * Prepare the object resources.
-     * This must be called by the UpdateManager before calling PrepareRender, for each frame.
-     * @param[in] updateBufferIndex The current update buffer index.
-     * @param[in] resourceManager The resource manager.
-     */
-  void PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager );
-
-  /**
    * Check whether the renderer has been marked as ready to render
+   * ready means that renderer has all resources and should produce correct result
+   * complete means all resources have finished loading
+   * It's possible that renderer is complete but not ready,
+   * for example in case of resource load failed
    * @param[out] ready TRUE if the renderer has resources to render
    * @param[out] complete TRUE if the renderer resources are complete
-   * (e.g. image has finished loading, framebuffer is ready to render, native image
-   * framebuffer has been rendered)
    */
-  void GetReadyAndComplete(bool& ready, bool& complete) const;
+  void GetReadyAndComplete( bool& ready, bool& complete ) const;
 
   /**
-   * Query whether the renderer is fully opaque.
+   * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @return True if fully opaque.
+   * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  bool IsFullyOpaque( BufferIndex updateBufferIndex, const Node& node ) const;
+  Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
 
   /**
    * Query whether the renderer is currently in use by an actor on the stage
@@ -256,17 +256,14 @@ private:
   Material*             mMaterial;    ///< The material this renderer uses. (Not owned)
   Geometry*             mGeometry;    ///< The geometry this renderer uses. (Not owned)
 
-  Dali::Vector< Integration::ResourceId > mTrackedResources; ///< Filled during PrepareResources if there are uncomplete, tracked resources.
-
-  CollectedUniformMap mCollectedUniformMap[2];    ///< Uniform maps collected by the renderer
-  unsigned int mReferenceCount;                   ///< Number of nodes currently using this renderer
-  unsigned int mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
-  bool         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
-  bool         mResendDataProviders         : 1;  ///< True if the data providers should be resent to the renderer
-  bool         mResendGeometry              : 1;  ///< True if geometry should be resent to the renderer
-  bool         mHasUntrackedResources       : 1;  ///< Set during PrepareResources, true if have tried to follow untracked resources
-  bool         mFinishedResourceAcquisition : 1;  ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
-  bool         mResourcesReady              : 1;  ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
+  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+  unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
+  unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
+  bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
+  bool         mResendDataProviders;           ///< True if the data providers should be resent to the renderer
+  bool         mResendGeometry;                ///< True if geometry should be resent to the renderer
+  bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
+  bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
 
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions

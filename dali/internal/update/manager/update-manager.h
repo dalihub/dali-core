@@ -95,7 +95,6 @@ public:
   /**
    * Construct a new UpdateManager.
    * @param[in] notificationManager This should be notified when animations have finished.
-   * @param[in] glSyncAbstraction Used to determine when framebuffers are ready
    * @param[in] animationFinishedNotifier The CompleteNotificationInterface that handles animation completions
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] resourceManager The resource manager used to load textures etc.
@@ -107,7 +106,6 @@ public:
    * @param[in] touchResampler Used for re-sampling touch events.
    */
   UpdateManager( NotificationManager& notificationManager,
-                 Integration::GlSyncAbstraction& glSyncAbstraction,
                  CompleteNotificationInterface& animationFinishedNotifier,
                  PropertyNotifier& propertyNotifier,
                  ResourceManager& resourceManager,
@@ -533,6 +531,11 @@ private:
    * @param[in] bufferIndex to use
    */
   void ProcessPropertyNotifications( BufferIndex bufferIndex );
+
+  /**
+   * Prepare materials for rendering
+   */
+  void PrepareMaterials();
 
   /**
    * Pass shader binaries queued here on to event thread.

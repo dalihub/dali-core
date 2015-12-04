@@ -205,6 +205,18 @@ void Stage::SetSize(float width, float height)
   }
 
   SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+
+  // if single render task to screen then set its viewport parameters
+  if( 1 == mRenderTaskList->GetTaskCount() )
+  {
+    Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask(0);
+
+    if(!mDefaultRenderTask.GetTargetFrameBuffer())
+    {
+      mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+    }
+  }
+
 }
 
 Vector2 Stage::GetSize() const

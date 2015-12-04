@@ -240,6 +240,25 @@ bool RenderTask::GetInputEnabled() const
   return GetImplementation(*this).GetInputEnabled();
 }
 
+bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const
+{
+  return GetImplementation(*this).WorldToViewport(position, viewportX, viewportY);
+}
+
+bool RenderTask::ViewportToLocal(Actor actor, float viewportX, float viewportY, float &localX, float &localY) const
+{
+  if( actor )
+  {
+    Internal::Actor* actorImpl( &GetImplementation( actor ) );
+    return GetImplementation(*this).ViewportToLocal( actorImpl, viewportX, viewportY, localX, localY );
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
 RenderTask::RenderTask( Internal::RenderTask* internal )
 : Handle(internal)
 {

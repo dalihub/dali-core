@@ -34,6 +34,8 @@ namespace Dali
 {
 namespace Internal
 {
+class ResourceManager;
+
 namespace Render
 {
 class Sampler;
@@ -54,8 +56,8 @@ public:
    */
   enum BlendPolicy
   {
-    OPAQUE,          ///< If the renderer should always be opaque
-    TRANSPARENT,     ///< If the renderer should always be transparent
+    OPAQUE,          ///< If the renderer should never use blending
+    TRANSLUCENT,     ///< If the renderer should always be use blending
     USE_ACTOR_COLOR  ///< If the renderer should determine opacity using the actor color
   };
 
@@ -68,6 +70,12 @@ public:
    * Destructor
    */
   virtual ~Material();
+
+  /**
+   * Prepare material, check texture loading status, opacity etc
+   * @param resourceManager for checking texture details and loading status
+   */
+  void Prepare( const ResourceManager& resourceManager );
 
   /**
    * Set the shader effect for this material
@@ -92,14 +100,6 @@ public:
    * @param[in] blendingMode to use
    */
   void SetBlendingMode( unsigned int blendingMode );
-
-  /**
-   * Prepare the material for rendering.
-   *
-   * Determine whether blending is enabled for this material, and store the result.
-   * @param[in] bufferIndex The current buffer index
-   */
-  void PrepareRender( BufferIndex bufferIndex );
 
   /**
    * Return the blend policy ( a combination of all the different shader hints, color, samper and image properties ).
@@ -154,6 +154,16 @@ public:
    * @param[in] uniformName The new uniform name
    */
   void SetTextureUniformName( size_t index, const std::string& uniformName );
+
+  /**
+   * Get the material resource status
+   * Note, we need two values as it's possible that some resource failed to load
+   * in which case resourcesReady is false (the material is not good to be rendered)
+   * but finishedResourceAcquisition if true as there is no more loading going on
+   * @param[out] resourcesReady if the material is ready to be rendered
+   * @param[out] finishedResourceAcquisition if
+   */
+  void GetResourcesStatus( bool& resourcesReady, bool& finishedResourceAcquisition );
 
 public: // Implementation of MaterialDataProvider
 
@@ -261,13 +271,6 @@ public: // ConnectionChangePropagator::Observer
    */
   virtual void ConnectedUniformMapChanged();
 
-public:
-
-  /**
-   * @param texturesRequireBlending, true if any of the textures requires blending
-   */
-  void SetTexturesRequireBlending( bool texturesRequireBlending );
-
 private: // Data
 
   Shader*                         mShader;
@@ -280,8 +283,10 @@ private: // Data
   BlendingMode::Type              mBlendingMode; // not double buffered as its not animateable and not frequently changed
   BlendingOptions                 mBlendingOptions; // not double buffered as its not animateable and not frequently changed
   BlendPolicy                     mBlendPolicy; ///< The blend policy as determined by PrepareRender
-  bool                            mTexturesRequireBlending;
-
+  bool                            mResourcesReady; ///< if the material is ready to be rendered
+  bool                            mFinishedResourceAcquisition; ///< if resource loading is completed
+  bool                            mTexturesRequireBlending; ///< if material textures require blending
+  bool                            mMaterialChanged; ///< if the material has changed since the last frame
 };
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, Shader& shader )

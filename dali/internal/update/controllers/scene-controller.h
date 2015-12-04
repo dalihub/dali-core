@@ -23,7 +23,6 @@ namespace Dali
 
 namespace Internal
 {
-class CompleteStatusManager;
 
 namespace SceneGraph
 {
@@ -81,12 +80,6 @@ public:
    * @return A reference to the texture cache
    */
   virtual TextureCache& GetTextureCache() = 0;
-
-  /**
-   * Return the CompleteStatusManager
-   * @return a reference to the complete status manager
-   */
-  virtual CompleteStatusManager& GetCompleteStatusManager() = 0;
 
 private:
 

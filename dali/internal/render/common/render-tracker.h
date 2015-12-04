@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_H
-#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_H
+#ifndef __DALI_INTERNAL_RENDER_RENDER_TRACKER_H
+#define __DALI_INTERNAL_RENDER_RENDER_TRACKER_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Dali
 {
 namespace Internal
 {
-namespace SceneGraph
+namespace Render
 {
 
 /**
@@ -37,21 +37,18 @@ class RenderTracker
 public:
   /**
    * Constructor
-   * @param[in] glSyncAbstraction The GlSyncAbstraction
-   * @param[in] resourceId The resource ID of the framebuffer texture being tracked
    */
-  RenderTracker(Integration::GlSyncAbstraction& glSyncAbstraction);
+  RenderTracker();
 
   /**
    * Destructor
-   * Delete any outstanding sync objects?
    */
   ~RenderTracker();
 
   /**
    * Creates a sync object for this tracker. Will delete any existing sync object.
    */
-  void CreateSyncObject();
+  void CreateSyncObject( Integration::GlSyncAbstraction& glSyncAbstraction );
 
   /**
    * Check the GL Sync objects. This is called from Render Thread.
@@ -77,14 +74,18 @@ public:
   void SetSyncFlag();
 
 private:
-  Integration::GlSyncAbstraction& mGlSyncAbstraction; // The sync abstraction
-  volatile int mSyncTrigger;             // Trigger that update thread can read & reset
+
+  Integration::GlSyncAbstraction* mGlSyncAbstraction;      // The sync abstraction
   Integration::GlSyncAbstraction::SyncObject* mSyncObject; // Associated sync object
+  volatile int mSyncTrigger;                               // Trigger that update thread can read
+
 };
 
-} // SceneGraph
+} // Render
+
 } // Internal
+
 } // Dali
 
 
-#endif // __DALI_INTERNAL_RENDER_TRACKER_H
+#endif // __DALI_INTERNAL_RENDER_RENDER_TRACKER_H

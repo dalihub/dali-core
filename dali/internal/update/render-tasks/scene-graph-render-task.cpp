@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/common/render-tracker.h>
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
@@ -50,10 +51,16 @@ RenderTask::~RenderTask()
       mSourceNode->SetExclusiveRenderTask( NULL );
     }
   }
-  if( mFrameBufferResourceId )
+  if( mRenderSyncTracker )
   {
-    mCompleteStatusManager->StopTrackingResource( mFrameBufferResourceId );
+    mRenderMessageDispatcher->RemoveRenderTracker( *mRenderSyncTracker );
   }
+}
+
+void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager )
+{
+  mRenderMessageDispatcher = &renderMessageDispatcher;
+  mResourceManager = &resourceManager;
 }
 
 void RenderTask::SetSourceNode( Node* node )
@@ -116,26 +123,11 @@ void RenderTask::SetCameraNode( Node* cameraNode )
   }
 }
 
-void RenderTask::SetFrameBufferId( unsigned int resourceId )
+void RenderTask::SetFrameBufferId( unsigned int resourceId, bool isNativeFBO )
 {
-  if ( mFrameBufferResourceId != resourceId )
-  {
-    DALI_ASSERT_DEBUG(mCompleteStatusManager && "Complete status tracker is null");
-    if( mCompleteStatusManager )
-    {
-      if( resourceId && mState == RENDER_ONCE_WAITING_FOR_RESOURCES )
-      {
-        mCompleteStatusManager->TrackResource( resourceId );
-      }
-
-      if( mFrameBufferResourceId )
-      {
-        mCompleteStatusManager->StopTrackingResource( mFrameBufferResourceId );
-      }
-    }
-
-    mFrameBufferResourceId = resourceId;
-  }
+  // note that we might already have a RenderTracker
+  mTargetIsNativeFramebuffer = isNativeFBO;
+  mFrameBufferResourceId = resourceId;
 }
 
 unsigned int RenderTask::GetFrameBufferId() const
@@ -202,31 +194,14 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
   if( mRefreshRate > 0 )
   {
     mState = RENDER_CONTINUOUSLY;
-
-    if( mFrameBufferResourceId )
-    {
-      // Don't need tracking
-      DALI_ASSERT_DEBUG(mCompleteStatusManager && "Ready state tracker is null");
-      if( mCompleteStatusManager != NULL )
-      {
-        mCompleteStatusManager->StopTrackingResource( mFrameBufferResourceId );
-      }
-    }
   }
   else
   {
     mState = RENDER_ONCE_WAITING_FOR_RESOURCES;
     mWaitingToRender = true;
     mNotifyTrigger = false;
-
-    if( mFrameBufferResourceId )
-    {
-      DALI_ASSERT_DEBUG(mCompleteStatusManager && "Ready state tracker is null");
-      if( mCompleteStatusManager != NULL )
-      {
-        mCompleteStatusManager->TrackResource( mFrameBufferResourceId );
-      }
-    }
+    // need at least on other render on the FBO
+    mResourceManager->SetFrameBufferBeenRenderedTo( mFrameBufferResourceId, false );
   }
 
   mFrameCounter = 0u;
@@ -274,16 +249,20 @@ bool RenderTask::IsRenderRequired()
   switch( mState )
   {
     case RENDER_CONTINUOUSLY:
+    {
       required = (mFrameCounter == 0);
       break;
-
+    }
     case RENDER_ONCE_WAITING_FOR_RESOURCES:
+    {
       required = true;
       break;
-
+    }
     default:
+    {
       required = false;
       break;
+    }
   }
 
   TASK_LOG_FMT( Debug::General, " State:%s = %s\n", STATE_STRING(mState), required?"T":"F" );
@@ -293,7 +272,12 @@ bool RenderTask::IsRenderRequired()
 
 void RenderTask::SetResourcesFinished( bool resourcesFinished )
 {
+  // resourcesFinished tells us that this render task will render to its FBO
   mResourcesFinished = resourcesFinished;
+  if( mResourcesFinished )
+  {
+    mResourceManager->SetFrameBufferBeenRenderedTo( mFrameBufferResourceId, true );
+  }
 }
 
 // Called every frame regardless of whether render was required.
@@ -339,27 +323,30 @@ void RenderTask::UpdateState()
 
     case RENDERED_ONCE:
     {
+      mWaitingToRender = true;
+      mNotifyTrigger = false;
       if( mFrameBufferResourceId > 0 )
       {
-        // Query if the framebuffer is complete:
-        DALI_ASSERT_DEBUG(mCompleteStatusManager && "Complete status tracker is null");
-        if( mCompleteStatusManager != NULL &&
-            CompleteStatusManager::COMPLETE == mCompleteStatusManager->GetStatus( mFrameBufferResourceId ) )
+        if( mTargetIsNativeFramebuffer )
+        {
+          if( mRenderSyncTracker && mRenderSyncTracker->IsSynced() )
+          {
+            mWaitingToRender = false;
+            mNotifyTrigger = true;
+          }
+        }
+        else if( mResourceManager->HasFrameBufferBeenRenderedTo( mFrameBufferResourceId ) )
         {
           mWaitingToRender = false;
           mNotifyTrigger = true;
         }
-        else
-        {
-          mWaitingToRender = true;
-        }
       }
       else
       {
-        mWaitingToRender = false;
         mNotifyTrigger = true;
       }
     }
+
     break;
 
     default:
@@ -429,6 +416,23 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
                      GetFrameBufferId(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
+
+  // if using native framebuffer, add a tracker
+  if( mTargetIsNativeFramebuffer )
+  {
+    // create tracker if not yet exists. if we switch to on-screen fbo, we still keep the tracker in case we need it again
+    if( !mRenderSyncTracker )
+    {
+      mRenderSyncTracker = new Render::RenderTracker();
+      mRenderMessageDispatcher->AddRenderTracker( *mRenderSyncTracker );
+    }
+    instruction.mRenderTracker = mRenderSyncTracker;
+  }
+  else
+  {
+    // no sync needed, texture FBOs are "ready" the same frame they are rendered to
+    instruction.mRenderTracker = NULL;
+  }
 }
 
 bool RenderTask::ViewMatrixUpdated()
@@ -439,11 +443,6 @@ bool RenderTask::ViewMatrixUpdated()
     retval = mCameraAttachment->ViewMatrixUpdated();
   }
   return retval;
-}
-
-void RenderTask::SetCompleteStatusManager(CompleteStatusManager* completeStatusManager)
-{
-  mCompleteStatusManager = completeStatusManager;
 }
 
 void RenderTask::SetViewportPosition( BufferIndex updateBufferIndex, const Vector2& value )
@@ -506,7 +505,9 @@ RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),
   mViewportSize( Vector2::ZERO),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
-  mCompleteStatusManager( NULL ),
+  mRenderMessageDispatcher( NULL ),
+  mResourceManager( NULL ),
+  mRenderSyncTracker( NULL ),
   mSourceNode( NULL ),
   mCameraNode( NULL ),
   mCameraAttachment( NULL ),
@@ -523,7 +524,8 @@ RenderTask::RenderTask()
           : RENDER_ONCE_WAITING_FOR_RESOURCES ),
   mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
   mFrameCounter( 0u ),
-  mRenderedOnceCounter( 0u )
+  mRenderedOnceCounter( 0u ),
+  mTargetIsNativeFramebuffer( false )
 {
 }
 
