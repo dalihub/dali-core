@@ -95,8 +95,8 @@ Layer* FindLayer( Node& node )
 
 /**
  * Rebuild the Layer::colorRenderables, stencilRenderables and overlayRenderables members,
- * including only renderable-attachments which are included in the current render-task.
- * Returns true if all renderable attachments have finshed acquiring resources.
+ * including only renderers which are included in the current render-task.
+ * Returns true if all renderers have finshed acquiring resources.
  */
 bool AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,

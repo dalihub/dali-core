@@ -1642,70 +1642,6 @@ public:
    */
   const Rect< int >& GetViewport();
 
-  /**
-   * Set the frame count of render thread
-   */
-  inline void SetFrameCount(unsigned int frameCount)
-  {
-    mFrameCount = frameCount;
-  }
-
-  /**
-   * Get the frame count
-   */
-  inline unsigned int GetFrameCount()
-  {
-    return mFrameCount;
-  }
-
-  /**
-   * Increment the count of culled renderers
-   */
-  inline void IncrementCulledCount()
-  {
-    mCulledCount++;
-  }
-
-  /**
-   * Clear the count of culled renderers
-   */
-  inline void ClearCulledCount()
-  {
-    mCulledCount = 0;
-  }
-
-  /**
-   * Get the count of culled renderers in this frame
-   */
-  inline unsigned int GetCulledCount()
-  {
-    return mCulledCount;
-  }
-
-  /**
-   * Increment the count of culled renderers
-   */
-  inline void IncrementRendererCount()
-  {
-    mRendererCount++;
-  }
-
-  /**
-   * Clear the count of image renderers
-   */
-  inline void ClearRendererCount()
-  {
-    mRendererCount = 0;
-  }
-
-  /**
-   * Get the count of image renderers in this frame
-   */
-  inline unsigned int GetRendererCount()
-  {
-    return mRendererCount;
-  }
-
 private: // Implementation
 
   /**
@@ -1798,9 +1734,6 @@ private: // Data
   bool mVertexAttributeCachedState[ MAX_ATTRIBUTE_CACHE_SIZE ];    ///< Value cache for Enable Vertex Attribute
   bool mVertexAttributeCurrentState[ MAX_ATTRIBUTE_CACHE_SIZE ];   ///< Current state on the driver for Enable Vertex Attribute
 
-  unsigned int mFrameCount;       ///< Number of render frames
-  unsigned int mCulledCount;      ///< Number of culled renderers per frame
-  unsigned int mRendererCount;    ///< Number of image renderers per frame
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 };
 
