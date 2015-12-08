@@ -301,28 +301,6 @@ void Node::ResetDefaultProperties( BufferIndex updateBufferIndex )
   mDirtyFlags = NothingFlag;
 }
 
-bool Node::IsFullyVisible( BufferIndex updateBufferIndex ) const
-{
-  if( !IsVisible( updateBufferIndex ) )
-  {
-    return false;
-  }
-
-  Node* parent = mParent;
-
-  while( NULL != parent )
-  {
-    if( !parent->IsVisible( updateBufferIndex ) )
-    {
-      return false;
-    }
-
-    parent = parent->GetParent();
-  }
-
-  return true;
-}
-
 void Node::SetParent(Node& parentNode)
 {
   DALI_ASSERT_ALWAYS(this != &parentNode);

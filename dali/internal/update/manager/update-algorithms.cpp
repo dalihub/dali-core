@@ -193,7 +193,6 @@ inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIn
     node.CopyPreviousWorldOrientation( updateBufferIndex );
     node.CopyPreviousWorldScale( updateBufferIndex );
     node.CopyPreviousWorldPosition( updateBufferIndex );
-    node.CopyPreviousSize( updateBufferIndex );
   }
 }
 
