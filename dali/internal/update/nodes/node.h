@@ -716,15 +716,6 @@ public:
   }
 
   /**
-   * Copies the previously used size, if this changed in the previous frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void CopyPreviousSize( BufferIndex updateBufferIndex )
-  {
-    SetSize( updateBufferIndex, GetSize( 1u - updateBufferIndex ) );
-  }
-
-  /**
    * Retrieve the visibility of the node.
    * @param[in] bufferIndex The buffer to read from.
    * @return True if the node is visible.
@@ -733,14 +724,6 @@ public:
   {
     return mVisible[bufferIndex];
   }
-
-  /**
-   * Retrieves whether a node is fully visible.
-   * A node is fully visible if is visible and all its ancestors are visible.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @return True if the node is fully visible.
-   */
-  bool IsFullyVisible( BufferIndex updateBufferIndex ) const;
 
   /**
    * Retrieve the opacity of the node.
@@ -843,16 +826,6 @@ public:
   ColorMode GetColorMode() const
   {
     return mColorMode;
-  }
-
-  /**
-   * Sets the size of the node.
-   * @param[in] bufferIndex The buffer to write to.
-   * @param[in] size The size to write.
-   */
-  void SetSize( BufferIndex bufferIndex, const Vector3& size )
-  {
-    mSize[bufferIndex] = size;
   }
 
   /**
