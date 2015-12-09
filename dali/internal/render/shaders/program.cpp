@@ -92,7 +92,7 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "uNormalMatrix",        // UNIFORM_NORMAL_MATRIX
   "uColor",               // UNIFORM_COLOR
   "sTexture",             // UNIFORM_SAMPLER
-  "sTextureRect",         // UNIFORM_SAMPLER_RECT
+  "uTextureRect",         // UNIFORM_SAMPLER_RECT
   "sEffect",              // UNIFORM_EFFECT_SAMPLER
   "uSize"                 // UNIFORM_SIZE
 };

@@ -857,7 +857,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
 
   // Set task to non-exclusive - actor1 should render twice:
   drawTrace.Reset();
@@ -865,7 +865,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION );
 
   END_TEST;
 }
