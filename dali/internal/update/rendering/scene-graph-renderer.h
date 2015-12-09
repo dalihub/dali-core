@@ -20,11 +20,7 @@
 
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/double-buffered.h>
-#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
