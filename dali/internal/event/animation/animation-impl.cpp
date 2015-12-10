@@ -467,8 +467,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::FLOAT:
     {
-      if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex )||
-           ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) )
+      if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex ) ||
+           ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) ||
+           ( Dali::Actor::Property::SIZE_DEPTH == targetPropertyIndex ) )
       {
         // Test whether this is actually an Actor
         Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
@@ -478,6 +479,19 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
           maybeActor->NotifySizeAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
         }
       }
+      else if ( ( Dali::Actor::Property::POSITION_X == targetPropertyIndex ) ||
+                 ( Dali::Actor::Property::POSITION_Y == targetPropertyIndex ) ||
+                 ( Dali::Actor::Property::POSITION_Z == targetPropertyIndex ) )
+      {
+        // Test whether this is actually an Actor
+        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
+        if ( maybeActor )
+        {
+          // Notify the actor that its position is being animated
+          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
+        }
+      }
+
       AddAnimatorConnector( AnimatorConnector<float>::New( targetObject,
                                                            targetPropertyIndex,
                                                            componentIndex,
@@ -508,6 +522,16 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
         {
           // Notify the actor that its size is being animated
           maybeActor->NotifySizeAnimation( *this, destinationValue.Get<Vector3>() );
+        }
+      }
+      else if ( Dali::Actor::Property::POSITION == targetPropertyIndex )
+      {
+        // Test whether this is actually an Actor
+        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
+        if ( maybeActor )
+        {
+          // Notify the actor that its position is being animated
+          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<Vector3>() );
         }
       }
 

@@ -1454,10 +1454,11 @@ public:
   void NotifySizeAnimation( Animation& animation, const Vector3& targetSize );
 
   /**
-   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT property is animated.
+   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT or SIZE_DEPTH property is animated.
    *
    * @param[in] animation The animation that resized the actor
    * @param[in] targetSize The new target size of the actor
+   * @param[in] property The index of the property being animated
    */
   void NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property );
 
@@ -1468,6 +1469,23 @@ public:
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize )
   {
   }
+
+  /**
+   * This should only be called by Animation, when the actors POSITION property is animated.
+   *
+   * @param[in] animation The animation that repositioned the actor
+   * @param[in] targetPosition The new target position of the actor
+   */
+  void NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition );
+
+  /**
+   * This should only be called by Animation, when the actors POSITION_X or POSITION_Y or POSITION_Z property is animated.
+   *
+   * @param[in] animation The animation that repositioned the actor
+   * @param[in] targetPosition The new target position of the actor
+   * @param[in] property The index of the property being animated
+   */
+  void NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property );
 
 protected:
 
