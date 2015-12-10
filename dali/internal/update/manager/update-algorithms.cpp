@@ -70,39 +70,6 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
   }
 }
 
-/**
- * Recursively apply the constraints on the nodes
- * @param node to constraint
- * @param updateBufferIndex buffer index to use
- * @return number of active constraints
- */
-void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
-{
-  ConstrainPropertyOwner( node, updateBufferIndex );
-
-  if( node.HasAttachment() )
-  {
-    // @todo Remove dynamic cast.
-    NodeAttachment& attachment = node.GetAttachment();
-    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
-    if( propertyOwner != NULL )
-    {
-      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
-    }
-  }
-
-  /**
-   *  Constrain the children next
-   */
-  NodeContainer& children = node.GetChildren();
-  const NodeIter endIter = children.End();
-  for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
-  {
-    Node& child = **iter;
-    ConstrainNodes( child, updateBufferIndex );
-  }
-}
-
 /******************************************************************************
  ************************** Update node hierarchy *****************************
  ******************************************************************************/
@@ -223,7 +190,8 @@ inline int UpdateNodesAndAttachments( Node& node,
                                       Layer& currentLayer,
                                       int inheritedDrawMode )
 {
-  Layer* layer = &currentLayer;
+  //Apply constraints to the node
+  ConstrainPropertyOwner( node, updateBufferIndex );
 
   // Short-circuit for invisible nodes
   if ( !node.IsVisible( updateBufferIndex ) )
@@ -244,8 +212,9 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
+  Layer* layer = &currentLayer;
   Layer* nodeIsLayer( node.GetLayer() );
-  if ( nodeIsLayer )
+  if( nodeIsLayer )
   {
     // all childs go to this layer
     layer = nodeIsLayer;
@@ -266,9 +235,18 @@ inline int UpdateNodesAndAttachments( Node& node,
   // Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
   inheritedDrawMode |= node.GetDrawMode();
 
-  if ( node.HasAttachment() )
+  if ( DALI_UNLIKELY( node.HasAttachment() ) )
   {
-    node.GetAttachment().Update( updateBufferIndex, node, nodeDirtyFlags );
+    //Apply constraints to the attachement
+    NodeAttachment& attachment = node.GetAttachment();
+    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
+    if( propertyOwner != NULL )
+    {
+      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
+    }
+
+    //Update the attachment
+    attachment.Update( updateBufferIndex, node, nodeDirtyFlags );
   }
   else if( node.IsObserved() || node.GetRendererCount() )
   {
