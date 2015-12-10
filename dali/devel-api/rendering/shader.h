@@ -87,8 +87,8 @@ public:
   {
     enum
     {
-      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "program",      type MAP; {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""}
-      SHADER_HINTS,                                   ///< name "shaderHints",  type INTEGER; (bitfield) values from enum Shader::Hints
+      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX  ///< name "program",      type MAP; {"vertex":"","fragment":"",hints:"",
+                                                     ///                                  "vertexPrefix":"","fragmentPrefix":""}
     };
   };
 
