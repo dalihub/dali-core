@@ -94,10 +94,7 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mMaxTextureSize(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode( Dali::Material::NONE ),
-  mViewPort( 0, 0, 0, 0 ),
-  mFrameCount( 0 ),
-  mCulledCount( 0 ),
-  mRendererCount( 0 )
+  mViewPort( 0, 0, 0, 0 )
 {
 }
 

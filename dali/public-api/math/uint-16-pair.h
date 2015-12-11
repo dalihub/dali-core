@@ -38,7 +38,6 @@ namespace Dali
  * Use this for integer dimensions and points with limited range such as image
  * sizes and pixel coordinates where a pair of floating point numbers is
  * inefficient and illogical (i.e. the data is inherently integer).
- * These are immutable. If you want to change a value, make a whole new object.
  * One of these can be passed in a single 32 bit integer register on
  * common architectures.
  */
@@ -46,14 +45,14 @@ class Uint16Pair
 {
 public:
   /**
-   * @brief Default constructor for the (0, 0) vector.
+   * @brief Default constructor for the (0, 0) tuple.
    */
   Uint16Pair() : mData(0) {}
 
   /**
    * @brief Constructor taking separate x and y (width and height) parameters.
-   * @param[in] width The width or X dimension of the vector. Make sure it is less than 65536,
-   * @param[in] height The height or Y dimension of the vector. Make sure it is less than 65536,
+   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536,
+   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536,
    */
   Uint16Pair( uint32_t width, uint32_t height )
   {
@@ -78,8 +77,9 @@ public:
   }
 
   /**
-   * @brief Sets the width
-   * @param width to set
+   * @brief Sets the width.
+   * @since DALi version 1.1.13
+   * @param[in] width The x dimension to be stored in this 2-tuple.
    */
   void SetWidth( uint16_t width )
   {
@@ -95,13 +95,15 @@ public:
   }
 
   /**
-   * @brief Sets the height
-   * @param height to set
+   * @brief Sets the height.
+   * @since DALi version 1.1.13
+   * @param[in] height The y dimension to be stored in this 2-tuple.
    */
   void SetHeight( uint16_t height )
   {
     mComponents[1] = height;
   }
+
   /**
    * @returns the y dimension stored in this 2-tuple.
    */
@@ -111,11 +113,31 @@ public:
   }
 
   /**
+   * @brief Sets the x dimension (same as width).
+   * @since DALi version 1.1.14
+   * @param[in] x The x dimension to be stored in this 2-tuple.
+   */
+  void SetX( uint16_t x )
+  {
+    mComponents[0] = x;
+  }
+
+  /**
    * @returns the x dimension stored in this 2-tuple.
    */
   uint16_t GetX()  const
   {
     return mComponents[0];
+  }
+
+  /**
+   * @brief Sets the y dimension (same as height).
+   * @since DALi version 1.1.14
+   * @param[in] y The y dimension to be stored in this 2-tuple.
+   */
+  void SetY( uint16_t y )
+  {
+    mComponents[1] = y;
   }
 
   /**

@@ -23,7 +23,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <string>
 
@@ -218,87 +217,6 @@ private:
   AnimatableProperty<P>* mProperty;
   MemberFunction mMemberFunction;
   float mParam;
-};
-
-
-/**
- * Template class for sending messages to double buffered properties in a PropertyOwner
- */
-template< typename P >
-class DoubleBufferedPropertyMessage : public PropertyOwnerMessageBase
-{
-public:
-
-  typedef void(DoubleBufferedProperty<P>::*MemberFunction)( BufferIndex, typename ParameterType< P >::PassingType );
-
-  /**
-   * Create a message.
-   * @note The scene object is expected to be const in the thread which sends this message.
-   * However it can be modified when Process() is called in a different thread.
-   * @param[in] eventThreadServices The object used to send messages to the scene graph
-   * @param[in] sceneObject The property owner scene object
-   * @param[in] property The property to set.
-   * @param[in] member The member function of the object.
-   * @param[in] value The new value of the property.
-   */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const PropertyOwner* sceneObject,
-                    const DoubleBufferedProperty<P>* property,
-                    MemberFunction member,
-                    typename ParameterType< P >::PassingType value )
-  {
-    // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( DoubleBufferedPropertyMessage ) );
-
-    // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) DoubleBufferedPropertyMessage( sceneObject, property, member, value );
-  }
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~DoubleBufferedPropertyMessage()
-  {
-  }
-
-  /**
-   * @copydoc MessageBase::Process
-   */
-  virtual void Process( BufferIndex updateBufferIndex )
-  {
-    DALI_ASSERT_DEBUG( mProperty && "Message does not have an object" );
-    (mProperty->*mMemberFunction)( updateBufferIndex,
-                                   ParameterType< P >::PassObject( mParam ) );
-  }
-
-private:
-
-  /**
-   * Create a message.
-   * @note The property owner is expected to be const in the thread which sends this message.
-   * However it can be modified when Process() is called in a different thread.
-   * @param[in] sceneObject the property owner scene object
-   * @param[in] property The property to set.
-   * @param[in] member The member function of the object.
-   * @param[in] value The new value of the property.
-   */
-  DoubleBufferedPropertyMessage( const PropertyOwner* sceneObject,
-                                 const DoubleBufferedProperty<P>* property,
-                                 MemberFunction member,
-                                 typename ParameterType< P >::PassingType value )
-  : PropertyOwnerMessageBase(),
-    mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
-    mProperty( const_cast< DoubleBufferedProperty<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
-  {
-  }
-
-private:
-  PropertyOwner* mSceneObject;
-  DoubleBufferedProperty<P>* mProperty;
-  MemberFunction mMemberFunction;
-  typename ParameterType< P >::HolderType mParam;
 };
 
 

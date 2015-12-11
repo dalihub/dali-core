@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,16 +140,6 @@ void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount )
     Debug::LogMessage( Debug::DebugInfo, "Renderer Total # renderers: %u\n", rendererCount );
   }
 }
-
-void PrintCullCount( unsigned int frameCount, unsigned int culledCount )
-{
-  if( frameCount % 120 == 30 ) // Print every 2 seconds reg
-  {
-    Debug::LogMessage( Debug::DebugInfo, "Renderer # Culled renderers: %u\n", culledCount );
-  }
-}
-
-
 
 } // Render
 

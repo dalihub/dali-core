@@ -74,28 +74,6 @@ public:
   }
 
   /**
-   * Query whether the constraint needs to be applied. If a constraint depends on a set of properties,
-   * then it should be applied when any of those properties have changed.
-   */
-  bool ApplyNeeded()
-  {
-    if ( mFirstApply )
-    {
-      mFirstApply = false;
-      return true;
-    }
-
-    if ( ! mTargetProperty.IsClean() ||
-           mFunc->InputsChanged() )
-    {
-      return true;
-    }
-
-    // We don't need to reapply constraint if none of the properties changed
-    return false;
-  }
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::Apply()
    */
   virtual void Apply( BufferIndex updateBufferIndex )
@@ -105,8 +83,7 @@ public:
       return; // Early-out when property owners have been disconnected
     }
 
-    if ( mFunc->InputsInitialized() &&
-         ApplyNeeded() )
+    if ( mFunc->InputsInitialized() )
     {
       PropertyType current = mTargetProperty.Get( updateBufferIndex );
       mFunc->Apply( updateBufferIndex, current );

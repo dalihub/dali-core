@@ -778,38 +778,22 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
   }
 }
 
-void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
+void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
 {
-  // constrain custom objects... (in construction order)
+  //Constrain custom objects (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
-
   const OwnerContainer< PropertyOwner* >::Iterator endIter = customObjects.End();
   for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
   {
     PropertyOwner& object = **iter;
     ConstrainPropertyOwner( object, bufferIndex );
   }
+}
 
-  // constrain nodes... (in Depth First traversal order)
-  if ( mImpl->root )
-  {
-    ConstrainNodes( *(mImpl->root), bufferIndex );
-  }
-
-  if ( mImpl->systemLevelRoot )
-  {
-    ConstrainNodes( *(mImpl->systemLevelRoot), bufferIndex );
-  }
-
-  // constrain other property-owners after nodes as they are more likely to depend on a node's
-  // current frame property than vice versa. They tend to be final constraints (no further
-  // constraints depend on their properties)
-  // e.g. ShaderEffect uniform a function of Actor's position.
-  // Mesh vertex a function of Actor's position or world position.
-
+void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
+{
   // Constrain system-level render-tasks
   const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
-
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
   {
     RenderTask& task = **iter;
@@ -818,21 +802,17 @@ void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
 
   // Constrain render-tasks
   const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
   {
     RenderTask& task = **iter;
     ConstrainPropertyOwner( task, bufferIndex );
   }
+}
 
-  // Constrain Materials and geometries
-  mImpl->materials.ConstrainObjects( bufferIndex );
-  mImpl->geometries.ConstrainObjects( bufferIndex );
-  mImpl->renderers.ConstrainObjects( bufferIndex );
-
+void UpdateManager::ConstrainShaders( BufferIndex bufferIndex )
+{
   // constrain shaders... (in construction order)
   ShaderContainer& shaders = mImpl->shaders;
-
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
@@ -857,12 +837,16 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
   }
 }
 
-void UpdateManager::PrepareMaterials()
+void UpdateManager::PrepareMaterials( BufferIndex bufferIndex )
 {
   ObjectOwnerContainer<Material>::Iterator iter = mImpl->materials.GetObjectContainer().Begin();
   const ObjectOwnerContainer<Material>::Iterator end = mImpl->materials.GetObjectContainer().End();
   for( ; iter != end; ++iter )
   {
+    //Apply constraints
+    ConstrainPropertyOwner( *(*iter), bufferIndex );
+
+    //Prepare material
     (*iter)->Prepare( mImpl->resourceManager );
   }
 }
@@ -900,6 +884,9 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   unsigned int rendererCount( rendererContainer.Size() );
   for( unsigned int i(0); i<rendererCount; ++i )
   {
+    //Apply constraints
+    ConstrainPropertyOwner( *rendererContainer[i], bufferIndex );
+
     if( rendererContainer[i]->IsReferenced() )
     {
       rendererContainer[i]->PrepareRender( bufferIndex );
@@ -938,13 +925,13 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 {
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
-  // 1) Clear nodes/resources which were previously discarded
+  //Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear( bufferIndex );
 
-  // 2) Grab any loaded resources
+  //Grab any loaded resources
   bool resourceChanged = mImpl->resourceManager.UpdateCache( bufferIndex );
 
-  // 3) Process Touches & Gestures
+  //Process Touches & Gestures
   mImpl->touchResampler.Update();
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
@@ -960,17 +947,17 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 4) Reset properties from the previous update
+    //Reset properties from the previous update
     ResetProperties( bufferIndex );
   }
 
-  // 5) Process the queued scene messages
+  //Process the queued scene messages
   mImpl->messageQueue.ProcessMessages( bufferIndex );
 
-  // 6) Post Process Ids of resources updated by renderer
+  //Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
 
-  // 6.1) Forward compiled shader programs to event thread for saving
+  //Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -978,19 +965,16 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 7) Animate
+    //Animate
     Animate( bufferIndex, elapsedSeconds );
 
-    // 8) Apply Constraints
-    ApplyConstraints( bufferIndex );
+    //Constraint custom objects
+    ConstrainCustomObjects( bufferIndex );
 
-    // 9) Check Property Notifications
-    ProcessPropertyNotifications( bufferIndex );
+    //Prepare materials and apply constraints to them
+    PrepareMaterials( bufferIndex );
 
-    // 10) Prepare materials
-    PrepareMaterials();
-
-    // 11) Clear the lists of renderable-attachments from the previous update
+    //Clear the lists of renderable-attachments from the previous update
     for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
     {
       mImpl->sortedLayers[i]->ClearRenderables();
@@ -1001,13 +985,23 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       mImpl->systemLevelSortedLayers[i]->ClearRenderables();
     }
 
-    // 12) Update node hierarchy and perform sorting / culling.
-    //     This will populate each Layer with a list of renderers which are ready.
+    //Update node hierarchy, apply constraints and perform sorting / culling.
+    //This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
+
+    //Apply constraints to RenderTasks, shaders and geometries
+    ConstrainRenderTasks( bufferIndex );
+    ConstrainShaders( bufferIndex );
+    mImpl->geometries.ConstrainObjects( bufferIndex );
+
+    //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
 
-    // 13) Process the RenderTasks; this creates the instructions for rendering the next frame.
-    // reset the update buffer index and make sure there is enough room in the instruction container
+    //Process Property Notifications
+    ProcessPropertyNotifications( bufferIndex );
+
+    //Process the RenderTasks; this creates the instructions for rendering the next frame.
+    //reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
 

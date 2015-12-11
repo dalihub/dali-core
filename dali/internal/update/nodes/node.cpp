@@ -113,32 +113,6 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-bool Node::ResolveVisibility( BufferIndex updateBufferIndex )
-{
-  bool result = false;
-  const Vector4& color = GetWorldColor( updateBufferIndex );
-  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-  {
-    const float MAX_NODE_SIZE = float(1u<<30);
-    const Vector3& size = GetSize( updateBufferIndex );
-    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
-        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-    {
-      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
-          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
-      {
-        result = true;
-      }
-      else
-      {
-        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
-        DALI_LOG_ACTOR_TREE( mParent );
-      }
-    }
-  }
-  return result;
-}
-
 void Node::AddUniformMapping( UniformPropertyMapping* map )
 {
   PropertyOwner::AddUniformMapping( map );
@@ -299,28 +273,6 @@ void Node::ResetDefaultProperties( BufferIndex updateBufferIndex )
   mColor.ResetToBaseValue( updateBufferIndex );
 
   mDirtyFlags = NothingFlag;
-}
-
-bool Node::IsFullyVisible( BufferIndex updateBufferIndex ) const
-{
-  if( !IsVisible( updateBufferIndex ) )
-  {
-    return false;
-  }
-
-  Node* parent = mParent;
-
-  while( NULL != parent )
-  {
-    if( !parent->IsVisible( updateBufferIndex ) )
-    {
-      return false;
-    }
-
-    parent = parent->GetParent();
-  }
-
-  return true;
 }
 
 void Node::SetParent(Node& parentNode)
