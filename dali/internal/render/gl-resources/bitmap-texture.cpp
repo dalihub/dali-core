@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 
+// EXTERNAL INCLUDES
+#include <cstring>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/integration-api/debug.h>

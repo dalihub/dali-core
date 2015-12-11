@@ -2720,7 +2720,7 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
       break;
     }
-  }
+  } // entry.GetType
 }
 
 Property::Value Actor::GetDefaultProperty( Property::Index index ) const

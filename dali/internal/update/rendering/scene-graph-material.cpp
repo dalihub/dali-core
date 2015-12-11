@@ -48,7 +48,6 @@ Material::Material()
   mBlendPolicy( OPAQUE ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
-  mTexturesRequireBlending( false ),
   mMaterialChanged( true )
 {
   // Observe own property-owner's uniform map

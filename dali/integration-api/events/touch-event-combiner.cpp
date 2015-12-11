@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <cmath> // abs<float>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -215,8 +216,8 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
               break;
             }
 
-            if ( ( abs( point.screen.x - iter->point.screen.x ) < mMinMotionDistance.x ) &&
-                 ( abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
+            if ( ( std::abs( point.screen.x - iter->point.screen.x ) < mMinMotionDistance.x ) &&
+                 ( std::abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
             {
               // Not enough positional change from last event so ignore
               ignore = true;
@@ -269,8 +270,8 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
               break;
             }
 
-            if ( ( abs( point.screen.x - iter->point.screen.x ) < mMinMotionDistance.x ) &&
-                 ( abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
+            if ( ( std::abs( point.screen.x - iter->point.screen.x ) < mMinMotionDistance.x ) &&
+                 ( std::abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
             {
               // Not enough positional change from last event so ignore
               ignore = true;

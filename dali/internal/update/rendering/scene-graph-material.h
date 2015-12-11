@@ -284,7 +284,6 @@ private: // Data
   BlendPolicy                     mBlendPolicy; ///< The blend policy as determined by PrepareRender
   bool                            mResourcesReady; ///< if the material is ready to be rendered
   bool                            mFinishedResourceAcquisition; ///< if resource loading is completed
-  bool                            mTexturesRequireBlending; ///< if material textures require blending
   bool                            mMaterialChanged; ///< if the material has changed since the last frame
 };
 
