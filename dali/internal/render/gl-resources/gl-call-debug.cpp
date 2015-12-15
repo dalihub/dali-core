@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,11 +70,13 @@ Debug::Filter* gGlLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CON
 
 void CheckGlError( Integration::GlAbstraction& glAbstraction, const char* operation )
 {
-  for( GLint error = glAbstraction.GetError(); error; error = glAbstraction.GetError() )
+  bool foundError = false;
+  while( GLint error = glAbstraction.GetError() )
   {
-    DALI_LOG_ERROR( "glError (0x%x) %s - after %s\n",  error, ErrorToString(error), operation );
-    DALI_ASSERT_ALWAYS( !error && "GL ERROR"); // if errors are being checked we should assert
+    DALI_LOG_ERROR( "glError (0x%x) %s - after %s\n",  error, ErrorToString( error ), operation );
+    foundError = true;
   }
+  DALI_ASSERT_ALWAYS( !foundError && "GL ERROR" ); // if errors are being checked we should assert
 }
 
 }

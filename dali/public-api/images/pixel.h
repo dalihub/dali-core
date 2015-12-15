@@ -2,7 +2,7 @@
 #define __DALI_PIXEL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,20 +41,21 @@ namespace Pixel
 enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
 {
   // Start at > 0 to distinguish null data:
-  A8 = 1,          ///< color depth 8-bit, alpha
-  L8,              ///< color depth 8-bit, luminance
-  LA88,            ///< color depth 16-bit, luminance with 8 bit alpha
-  RGB565,          ///< color depth 16 bit, 5-6-5
-  BGR565,          ///< color depth 16 bit, 5-6-5
-  RGBA4444,        ///< color depth 16 bit with alpha, 4-4-4-4
-  BGRA4444,        ///< color depth 16 bit with alpha, 4-4-4-4
-  RGBA5551,        ///< color depth 16 bit with alpha, 5-5-5-1
-  BGRA5551,        ///< color depth 16 bit with alpha, 5-5-5-1
-  RGB888,          ///< color depth 24 bit, 8-8-8
-  RGB8888,         ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
-  BGR8888,         ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
-  RGBA8888,        ///< color depth 32 bit with alpha, 8-8-8-8
-  BGRA8888,        ///< color depth 32 bit with alpha, 8-8-8-8
+  A8 = 1,                                   ///< color depth 8-bit, alpha
+  L8,                                       ///< color depth 8-bit, luminance
+  LA88,                                     ///< color depth 16-bit, luminance with 8 bit alpha
+  RGB565,                                   ///< color depth 16 bit, 5-6-5
+  BGR565,                                   ///< color depth 16 bit, 5-6-5
+  RGBA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4
+  BGRA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4
+  RGBA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1
+  BGRA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1
+  RGB888,                                   ///< color depth 24 bit, 8-8-8
+  RGB8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
+  BGR8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
+  RGBA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8
+  BGRA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8
+
   // GLES 3 Standard compressed formats:
   COMPRESSED_R11_EAC,                       ///< ETC2 / EAC single-channel, unsigned
   COMPRESSED_SIGNED_R11_EAC,                ///< ETC2 / EAC single-channel, signed
@@ -66,9 +67,41 @@ enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
   COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,///< ETC2 / EAC RGB using sRGB colourspace, with single bit per pixel alpha mask.
   COMPRESSED_RGBA8_ETC2_EAC,                ///< ETC2 / EAC RGB plus separate alpha channel.
   COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,         ///< ETC2 / EAC RGB using sRGB colourspace, plus separate alpha channel.
+
   // GLES 2 extension compressed formats:
   COMPRESSED_RGB8_ETC1,                     ///< ETC1 RGB as defined by GLES 2 extension OES_compressed_ETC1_RGB8_texture: http://www.khronos.org/registry/gles/extensions/OES/OES_compressed_ETC1_RGB8_texture.txt
-  COMPRESSED_RGB_PVRTC_4BPPV1               ///< PowerVR 4bpp RGB format (v1) as defined by extension IMG_texture_compression_pvrtc: http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
+  COMPRESSED_RGB_PVRTC_4BPPV1,              ///< PowerVR 4bpp RGB format (v1) as defined by extension IMG_texture_compression_pvrtc: http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
+
+  // GLES 3.1 compressed formats:
+  COMPRESSED_RGBA_ASTC_4x4_KHR,             ///< ASTC Linear color space with a 4x4 block-size.
+  COMPRESSED_RGBA_ASTC_5x4_KHR,             ///< ASTC Linear color space with a 5x4 block-size.
+  COMPRESSED_RGBA_ASTC_5x5_KHR,             ///< ASTC Linear color space with a 5x5 block-size.
+  COMPRESSED_RGBA_ASTC_6x5_KHR,             ///< ASTC Linear color space with a 6x5 block-size.
+  COMPRESSED_RGBA_ASTC_6x6_KHR,             ///< ASTC Linear color space with a 6x6 block-size.
+  COMPRESSED_RGBA_ASTC_8x5_KHR,             ///< ASTC Linear color space with a 8x5 block-size.
+  COMPRESSED_RGBA_ASTC_8x6_KHR,             ///< ASTC Linear color space with a 8x6 block-size.
+  COMPRESSED_RGBA_ASTC_8x8_KHR,             ///< ASTC Linear color space with a 8x8 block-size.
+  COMPRESSED_RGBA_ASTC_10x5_KHR,            ///< ASTC Linear color space with a 10x5 block-size.
+  COMPRESSED_RGBA_ASTC_10x6_KHR,            ///< ASTC Linear color space with a 10x6 block-size.
+  COMPRESSED_RGBA_ASTC_10x8_KHR,            ///< ASTC Linear color space with a 10x8 block-size.
+  COMPRESSED_RGBA_ASTC_10x10_KHR,           ///< ASTC Linear color space with a 10x10 block-size.
+  COMPRESSED_RGBA_ASTC_12x10_KHR,           ///< ASTC Linear color space with a 12x10 block-size.
+  COMPRESSED_RGBA_ASTC_12x12_KHR,           ///< ASTC Linear color space with a 12x12 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 4x4 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x4 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x5 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x5 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x6 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x5 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x6 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x8 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x5 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x6 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x8 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 10x10 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size.
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size.
+
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
@@ -84,7 +117,7 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
  *
  * Sync it to the last value above.
  */
-const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_RGB_PVRTC_4BPPV1;
+const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
 
 /**
  * @brief Whether specified pixel format contains an alpha value.

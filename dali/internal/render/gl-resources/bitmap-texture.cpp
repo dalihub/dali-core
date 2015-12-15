@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ BitmapTexture::BitmapTexture(
            bitmap->GetImageWidth(),
            bitmap->GetImageHeight()),
   mBitmap(bitmap),
-  mClearPixels(false),
+  mPixelFormat(bitmap->GetPixelFormat()),
   mDiscardPolicy(policy),
-  mPixelFormat(bitmap->GetPixelFormat())
+  mClearPixels(false)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
   DALI_LOG_SET_OBJECT_STRING(this, DALI_LOG_GET_OBJECT_STRING(bitmap));
@@ -65,9 +65,9 @@ BitmapTexture::BitmapTexture(
            width, height,
            width, height),
   mBitmap(NULL),
-  mClearPixels(clearPixels),
+  mPixelFormat( pixelFormat ),
   mDiscardPolicy(policy),
-  mPixelFormat( pixelFormat )
+  mClearPixels(clearPixels)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 }
@@ -259,7 +259,7 @@ void BitmapTexture::Update( PixelData* srcPixelData, std::size_t xOffset, std::s
 void BitmapTexture::Update( const unsigned char* pixels, std::size_t width, std::size_t height, Pixel::Format pixelFormat, std::size_t xOffset, std::size_t yOffset )
 {
 
-  GLenum pixelGLFormat   = GL_RGBA;
+  GLenum pixelGLFormat = GL_RGBA;
   GLenum pixelDataType = GL_UNSIGNED_BYTE;
   Integration::ConvertToGlFormat( mPixelFormat, pixelDataType, pixelGLFormat );
 
@@ -283,10 +283,10 @@ void BitmapTexture::Update( const unsigned char* pixels, std::size_t width, std:
   }
 
 #if DALI_GLES_VERSION >= 30
-// for gles 3.0, uploading sub-image with different format is a valid operation
-  Integration::ConvertToGlFormat( srcBitmap->GetPixelFormat(), pixelDataType, pixelGLFormat );
+  // For GLES 3.0, uploading sub-image with different format is a valid operation.
+  Integration::ConvertToGlFormat( pixelFormat, pixelDataType, pixelGLFormat );
 #else
-  // allows RGB888 source bitmap to be added to RGBA8888 texture, need to convert the bitmap format manually
+  // Allows RGB888 source bitmap to be added to RGBA8888 texture, need to convert the bitmap format manually.
   if(pixelFormat == Pixel::RGB888 && mPixelFormat == Pixel::RGBA8888 )
   {
     std::size_t size = width * height;
