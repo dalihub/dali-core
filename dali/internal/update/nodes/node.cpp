@@ -19,11 +19,18 @@
 #include <dali/internal/update/nodes/node.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/internal-constants.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/internal/common/internal-constants.h>
+
+namespace //Unnamed namespace
+{
+//Memory pool used to allocate new nodes. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
+}
 
 namespace Dali
 {
@@ -39,7 +46,7 @@ const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 Node* Node::New()
 {
-  return new Node();
+  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node();
 }
 
 Node::Node()
@@ -77,6 +84,11 @@ Node::Node()
 
 Node::~Node()
 {
+}
+
+void Node::operator delete( void* ptr )
+{
+  gNodeMemoryPool.FreeThreadSafe( static_cast<Node*>( ptr ) );
 }
 
 void Node::OnDestroy()

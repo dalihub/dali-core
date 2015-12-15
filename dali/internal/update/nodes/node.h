@@ -112,6 +112,12 @@ public:
   virtual ~Node();
 
   /**
+   * Overriden delete operator
+   * Deletes the node from its global memory pool
+   */
+  void operator delete( void* ptr );
+
+  /**
    * When a Node is marked "active" it has been disconnected, but its properties have been modified.
    * @note An inactive Node will be skipped during the UpdateManager ResetProperties stage.
    * @param[in] isActive True if the Node is active.

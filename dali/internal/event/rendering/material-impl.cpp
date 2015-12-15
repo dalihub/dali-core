@@ -638,7 +638,7 @@ void Material::Initialize()
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  mSceneObject = new SceneGraph::Material();
+  mSceneObject = SceneGraph::Material::New();
   AddMessage( updateManager, updateManager.GetMaterialOwner(), *mSceneObject );
 
   eventThreadServices.RegisterObject( this );

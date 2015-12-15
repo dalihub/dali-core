@@ -61,14 +61,20 @@ public:
   };
 
   /**
-   * Constructor
+   * Construct a new Material.
    */
-  Material();
+  static Material* New();
 
   /**
    * Destructor
    */
   virtual ~Material();
+
+  /**
+   * Overriden delete operator
+   * Deletes the material from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Prepare material, check texture loading status, opacity etc
@@ -269,6 +275,13 @@ public: // ConnectionChangePropagator::Observer
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
   virtual void ConnectedUniformMapChanged();
+
+private:
+
+  /**
+   * Protected constructor; See also Material::New()
+   */
+   Material();
 
 private: // Data
 

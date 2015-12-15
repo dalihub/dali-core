@@ -25,6 +25,13 @@
 #include <dali/internal/update/resources/texture-metadata.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
+
+namespace //Unnamed namespace
+{
+//Memory pool used to allocate new materials. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Material> gMaterialMemoryPool;
+}
 
 namespace Dali
 {
@@ -34,6 +41,11 @@ namespace Internal
 
 namespace SceneGraph
 {
+
+Material* Material::New()
+{
+  return new ( gMaterialMemoryPool.AllocateRawThreadSafe() ) Material();
+}
 
 Material::Material()
 : mShader( NULL ),
@@ -57,6 +69,11 @@ Material::Material()
 Material::~Material()
 {
   mConnectionObservers.Destroy( *this );
+}
+
+void Material::operator delete( void* ptr )
+{
+  gMaterialMemoryPool.FreeThreadSafe( static_cast<Material*>( ptr ) );
 }
 
 void Material::Prepare( const ResourceManager& resourceManager )

@@ -19,6 +19,7 @@
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
 // INTERNAL HEADERS
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -74,7 +75,8 @@ struct FixedSizeMemoryPool::Impl
    * @brief Constructor
    */
   Impl( SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity )
-  :  mFixedSize( fixedSize ),
+  :  mMutex(),
+     mFixedSize( fixedSize ),
      mMemoryBlocks( initialCapacity * mFixedSize ),
      mMaximumBlockCapacity( maximumBlockCapacity ),
      mCurrentBlock( &mMemoryBlocks ),
@@ -123,6 +125,8 @@ struct FixedSizeMemoryPool::Impl
     mCurrentBlockSize = 0;
   }
 
+  Mutex mMutex;                       ///< Mutex for thread-safe allocation and deallocation
+
   SizeType mFixedSize;                ///< The size of each allocation in bytes
 
   Block mMemoryBlocks;                ///< Linked list of allocated memory blocks
@@ -147,6 +151,8 @@ FixedSizeMemoryPool::~FixedSizeMemoryPool()
 
 void* FixedSizeMemoryPool::Allocate()
 {
+  Mutex::ScopedLock( mImpl->mMutex );
+
   // First, recycle deleted objects
   if( mImpl->mDeletedObjects )
   {
@@ -171,10 +177,25 @@ void* FixedSizeMemoryPool::Allocate()
 
 void FixedSizeMemoryPool::Free( void* memory )
 {
+  Mutex::ScopedLock( mImpl->mMutex );
+
   // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
   *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
   mImpl->mDeletedObjects = memory;
 }
+
+void* FixedSizeMemoryPool::AllocateThreadSafe()
+{
+  Mutex::ScopedLock( mImpl->mMutex );
+  return Allocate();
+}
+
+void FixedSizeMemoryPool::FreeThreadSafe( void* memory )
+{
+  Mutex::ScopedLock( mImpl->mMutex );
+  Free( memory );
+}
+
 
 } // namespace Internal
 

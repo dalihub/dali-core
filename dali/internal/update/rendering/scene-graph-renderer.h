@@ -62,14 +62,20 @@ public:
   };
 
   /**
-   * Default constructor
+   * Construct a new Renderer
    */
-  Renderer();
+  static Renderer* New();
 
   /**
    * Destructor
    */
   virtual ~Renderer();
+
+  /**
+   * Overriden delete operator
+   * Deletes the renderer from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Set the material for the renderer
@@ -240,6 +246,11 @@ public: // From UniformMapDataProvider
   virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
 
 private:
+
+  /**
+   * Protected constructor; See also Renderer::New()
+   */
+  Renderer();
 
   /**
    * Helper function to create a new render data provider

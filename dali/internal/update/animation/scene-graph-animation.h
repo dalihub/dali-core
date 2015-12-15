@@ -71,15 +71,18 @@ public:
    * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @return A new Animation
    */
-  static Animation* New( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction disconnectAction )
-  {
-    return new Animation( durationSeconds, speedFactor, playRange, isLooping, endAction, disconnectAction );
-  }
+  static Animation* New( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction disconnectAction );
 
   /**
    * Virtual destructor
    */
   virtual ~Animation();
+
+  /**
+   * Overriden delete operator
+   * Deletes the animation from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Set the duration of an animation.
