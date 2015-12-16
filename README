@@ -10,8 +10,9 @@ T.O.C.
  2.3. Building the Repository
  2.4. Build target options
  2.5. Building and executing test cases
-
-
+ 3.   Building DALi as Javascript using Emscripten
+ 3.1. Creating a DALi Environment for Emscripten Javascript builds
+ 3.2. Building the repository as Javascript using Emscripten
 
 1. GBS Builds
 =============
@@ -62,6 +63,7 @@ Next source these variables:
 
 You will have to source these variables every time you open up a new terminal (or you can add to .bashrc if you prefer).
 
+
 2.3. Building the Repository
 ----------------------------
 
@@ -74,6 +76,7 @@ Then run the following commands:
  autoreconf --install
  ./configure --prefix=$DESKTOP_PREFIX
  make install -j8
+
 
 2.4. Build target options
 -------------------------
@@ -95,4 +98,53 @@ Add to the gbs build line: --define "%target_gles_version X"
 --------------------------------------
 
 See the README.md in dali-core/automated-tests.
+
+
+3. Building DALi as Javascript using Emscripten
+-----------------------------------------------
+
+
+3.1. Environment for Emscripten Javascript builds
+--------------------------------------------------
+
+To build the Javascript version of DALi, the Emscripten SDK is required.
+Installation of this is built in to the main dali_env script.
+
+First create a directory for the environment:
+
+# mkdir -p ~/dali-env-emscripten
+
+Now run the dali_env script. This will download and build the Emscripten SDK, which may take several minutes.
+The script may ask for your password as it will need to install any package prerequisites.
+Note the "-e" option for Emscripten.
+
+# cd ~/dali-env-emscripten
+# PATH-TO-DALI-CORE/build/scripts/dali_env -c -e
+
+Create the setenv script. A new section for Emscripten will be created at the top.
+
+# ./dali-env/dali-env -s > setenv
+
+Run the setenv script to setup environment variables.
+
+# . ./setenv
+
+Warning: As of 19/01/2015 with a userID > 6 digits there was a bug in llvm that caused
+the build to fail. So I've used the incoming branches of the emscripten sdk and not latest.
+
+
+3.2. Building the repository as Javascript using Emscripten
+-----------------------------------------------------------
+
+Clean the build first:
+
+# cd ./dali-core/build/tizen
+# git clean -dxf
+# autoreconf --install
+
+Use llvm's drop in replacements for configure & make:
+
+# emconfigure ./configure --verbose --prefix=$DESKTOP_PREFIX --enable-emscripten=yes --enable-debug=yes --enable-profile=UBUNTU --enable-gles=20
+# emmake make install -j8
+
 
