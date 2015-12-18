@@ -151,8 +151,6 @@ FixedSizeMemoryPool::~FixedSizeMemoryPool()
 
 void* FixedSizeMemoryPool::Allocate()
 {
-  Mutex::ScopedLock( mImpl->mMutex );
-
   // First, recycle deleted objects
   if( mImpl->mDeletedObjects )
   {
@@ -177,8 +175,6 @@ void* FixedSizeMemoryPool::Allocate()
 
 void FixedSizeMemoryPool::Free( void* memory )
 {
-  Mutex::ScopedLock( mImpl->mMutex );
-
   // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
   *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
   mImpl->mDeletedObjects = memory;
@@ -186,13 +182,13 @@ void FixedSizeMemoryPool::Free( void* memory )
 
 void* FixedSizeMemoryPool::AllocateThreadSafe()
 {
-  Mutex::ScopedLock( mImpl->mMutex );
+  Mutex::ScopedLock lock( mImpl->mMutex );
   return Allocate();
 }
 
 void FixedSizeMemoryPool::FreeThreadSafe( void* memory )
 {
-  Mutex::ScopedLock( mImpl->mMutex );
+  Mutex::ScopedLock lock( mImpl->mMutex );
   Free( memory );
 }
 
