@@ -61,14 +61,20 @@ public:
   };
 
   /**
-   * Constructor
+   * Construct a new Material.
    */
-  Material();
+  static Material* New();
 
   /**
    * Destructor
    */
   virtual ~Material();
+
+  /**
+   * Overriden delete operator
+   * Deletes the material from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Prepare material, check texture loading status, opacity etc
@@ -270,6 +276,13 @@ public: // ConnectionChangePropagator::Observer
    */
   virtual void ConnectedUniformMapChanged();
 
+private:
+
+  /**
+   * Protected constructor; See also Material::New()
+   */
+   Material();
+
 private: // Data
 
   Shader*                         mShader;
@@ -284,7 +297,6 @@ private: // Data
   BlendPolicy                     mBlendPolicy; ///< The blend policy as determined by PrepareRender
   bool                            mResourcesReady; ///< if the material is ready to be rendered
   bool                            mFinishedResourceAcquisition; ///< if resource loading is completed
-  bool                            mTexturesRequireBlending; ///< if material textures require blending
   bool                            mMaterialChanged; ///< if the material has changed since the last frame
 };
 

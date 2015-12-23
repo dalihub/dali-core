@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
@@ -282,9 +283,14 @@ private:
   Vector2 CalculateNaturalSize() const;
 
   /**
-   * @copydoc Dali::Actor::OnRelayout()
+   * Update the grid geometry.
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void UpdateGeometry();
+
+  /**
+   * Update the texture rect uniform
+   */
+  void UpdateTexureRect();
 
 private:
 
@@ -292,8 +298,9 @@ private:
   RendererPtr        mRenderer;                ///< The renderer used to render the image
   PixelArea          mPixelArea;               ///< The pixel area of the image to render
   Vector4            mBlendColor;              ///< The blend color for this ImageActor
+  Uint16Pair         mGridSize;                ///< The geometry grid size
   int                mRendererIndex;           ///< The index location of mRenderer
-  size_t             mTextureIndex;			   ///< The texture index for this ImageActor's texture
+  size_t             mTextureIndex;            ///< The texture index for this ImageActor's texture
   size_t             mEffectTextureIndex;      ///< The texture index for this ImageActor's effect texture
   FilterMode::Type   mMinFilter;               ///< The minification filter currently set
   FilterMode::Type   mMagFilter;               ///< The magnification filter currently set

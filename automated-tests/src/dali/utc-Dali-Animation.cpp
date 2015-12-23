@@ -5472,7 +5472,6 @@ int UtcDaliAnimationAnimateToActorSizeWidthP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().width, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5517,7 +5516,6 @@ int UtcDaliAnimationAnimateToActorSizeHeightP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().height, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5562,7 +5560,6 @@ int UtcDaliAnimationAnimateToActorSizeDepthP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().depth, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5760,9 +5757,6 @@ int UtcDaliAnimationAnimateToActorPositionXP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5811,9 +5805,6 @@ int UtcDaliAnimationAnimateToActorPositionYP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().y, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5862,9 +5853,6 @@ int UtcDaliAnimationAnimateToActorPositionZP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().z, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);

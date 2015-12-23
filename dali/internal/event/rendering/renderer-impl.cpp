@@ -267,7 +267,7 @@ void Renderer::Initialize()
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  mSceneObject = new SceneGraph::Renderer();
+  mSceneObject = SceneGraph::Renderer::New();
   AddMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
 
   eventThreadServices.RegisterObject( this );

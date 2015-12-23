@@ -63,38 +63,10 @@ struct GridVertex
   Vector2 mTextureCoord;
 };
 
-GeometryPtr CreateQuadGeometry( const Vector2& size, unsigned int imageWidth, unsigned int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
-{
-  const float halfWidth = size.width * 0.5f;
-  const float halfHeight = size.height * 0.5f;
-  GridVertex quadVertexData[4] =
-  {
-      { Vector3( -halfWidth, -halfHeight, 0.f ), Vector2( ( pixelArea.x                   ) / (float)imageWidth, ( pixelArea.y                    ) / (float)imageHeight ) },
-      { Vector3( -halfWidth,  halfHeight, 0.f ), Vector2( ( pixelArea.x                   ) / (float)imageWidth, ( pixelArea.y + pixelArea.height ) / (float)imageHeight ) },
-      { Vector3(  halfWidth, -halfHeight, 0.f ), Vector2( ( pixelArea.x + pixelArea.width ) / (float)imageWidth, ( pixelArea.y                    ) / (float)imageHeight ) },
-      { Vector3(  halfWidth,  halfHeight, 0.f ), Vector2( ( pixelArea.x + pixelArea.width ) / (float)imageWidth, ( pixelArea.y + pixelArea.height ) / (float)imageHeight ) }
-  };
-
-  Property::Map quadVertexFormat;
-  quadVertexFormat["aPosition"] = Property::VECTOR3;
-  quadVertexFormat["aTexCoord"] = Property::VECTOR2;
-  PropertyBufferPtr quadVertices = PropertyBuffer::New();
-  quadVertices->SetFormat( quadVertexFormat );
-  quadVertices->SetSize( 4 );
-  quadVertices->SetData(quadVertexData);
-
-  // Create the geometry object
-  GeometryPtr geometry = Geometry::New();
-  geometry->AddVertexBuffer( *quadVertices );
-  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
-
-  return geometry;
-}
-
-GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, unsigned int gridHeight, unsigned int imageWidth, unsigned int imageHeight, const Dali::ImageActor::PixelArea& pixelArea )
+GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
 {
   // Create vertices
-  std::vector< GridVertex > vertices;
+  std::vector< Vector2 > vertices;
   vertices.reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
 
   for( unsigned int y = 0u; y < gridHeight + 1; ++y )
@@ -103,12 +75,7 @@ GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, uns
     for( unsigned int x = 0u; x < gridWidth + 1; ++x )
     {
       float xPos = (float)x / gridWidth;
-      GridVertex vertex = {
-                            Vector3( size.width * ( xPos - 0.5f ), size.height * ( yPos - 0.5f ), 0.0f ),
-                            Vector2( ( pixelArea.x + pixelArea.width  * xPos ) / (float)imageWidth,
-                                     ( pixelArea.y + pixelArea.height * yPos ) / (float)imageHeight )
-                          };
-      vertices.push_back( vertex );
+      vertices.push_back( Vector2( xPos - 0.5f, yPos - 0.5f ) );
     }
   }
 
@@ -140,8 +107,7 @@ GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, uns
 
 
   Property::Map vertexFormat;
-  vertexFormat[ "aPosition" ] = Property::VECTOR3;
-  vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
+  vertexFormat[ "aPosition" ] = Property::VECTOR2;
   PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New();
   vertexPropertyBuffer->SetFormat( vertexFormat );
   vertexPropertyBuffer->SetSize( vertices.size() );
@@ -171,8 +137,7 @@ GeometryPtr CreateGridGeometry( const Vector2& size, unsigned int gridWidth, uns
 }
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec3 aPosition;\n
-  attribute mediump vec2 aTexCoord;\n
+  attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
@@ -180,11 +145,8 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 1.0);\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = aTexCoord;\n
-    gl_Position = vertexPosition;\n
+    gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);\n
+    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
   }\n
 );
 
@@ -201,7 +163,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 const size_t INVALID_TEXTURE_ID = (size_t)-1;
 const int INVALID_RENDERER_ID = -1;
-const unsigned int MAXIMUM_GRID_SIZE = 2048;
+const uint16_t MAXIMUM_GRID_SIZE = 2048;
 }
 
 ImageActorPtr ImageActor::New()
@@ -214,7 +176,7 @@ ImageActorPtr ImageActor::New()
   //Create the renderer
   actor->mRenderer = Renderer::New();
 
-  GeometryPtr quad = CreateQuadGeometry( Vector2::ONE, 1, 1, PixelArea() );
+  GeometryPtr quad  = CreateGeometry( 1u, 1u );
   actor->mRenderer->SetGeometry( *quad );
 
   ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
@@ -259,6 +221,7 @@ void ImageActor::SetImage( ImagePtr& image )
     }
 
     RelayoutRequest();
+    UpdateTexureRect();
   }
 }
 
@@ -273,6 +236,7 @@ void ImageActor::SetPixelArea( const PixelArea& pixelArea )
   mIsPixelAreaSet = true;
 
   RelayoutRequest();
+  UpdateTexureRect();
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
@@ -301,10 +265,12 @@ void ImageActor::ClearPixelArea()
   mPixelArea = PixelArea( 0, 0, imageWidth, imageHeight );
 
   RelayoutRequest();
+  UpdateTexureRect();
 }
 
 ImageActor::ImageActor()
 : Actor( Actor::BASIC ),
+  mGridSize( 1u, 1u ),
   mRendererIndex( INVALID_RENDERER_ID ),
   mTextureIndex( INVALID_TEXTURE_ID ),
   mEffectTextureIndex( INVALID_TEXTURE_ID ),
@@ -347,55 +313,48 @@ Vector2 ImageActor::CalculateNaturalSize() const
   return size;
 }
 
-void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void ImageActor::UpdateGeometry()
 {
-  unsigned int gridWidth = 1;
-  unsigned int gridHeight = 1;
+  uint16_t gridWidth = 1u;
+  uint16_t gridHeight = 1u;
+
   if( mShaderEffect )
   {
-    Vector2 gridSize = mShaderEffect->GetGridSize( size );
+    Vector2 gridSize = mShaderEffect->GetGridSize( Vector2(mPixelArea.width, mPixelArea.height) );
 
     //limit the grid size
-    gridWidth = std::min( MAXIMUM_GRID_SIZE, static_cast<unsigned int>(gridSize.width) );
-    gridHeight = std::min( MAXIMUM_GRID_SIZE, static_cast<unsigned int>(gridSize.height) );
+    gridWidth = std::min( MAXIMUM_GRID_SIZE, static_cast<uint16_t>(gridSize.width) );
+    gridHeight = std::min( MAXIMUM_GRID_SIZE, static_cast<uint16_t>(gridSize.height) );
   }
 
-  unsigned int imageWidth = 1u;
-  unsigned int imageHeight = 1u;
-  ImagePtr image = GetImage();
-  if( image )
+  if( gridWidth != mGridSize.GetWidth() || gridHeight != mGridSize.GetHeight() )
   {
-    imageWidth = image->GetWidth();
-    imageHeight = image->GetHeight();
+    mGridSize.SetWidth( gridWidth );
+    mGridSize.SetHeight( gridHeight );
+
+    GeometryPtr geometry = CreateGeometry( gridWidth, gridHeight );
+    mRenderer->SetGeometry( *geometry );
   }
-
-  GeometryPtr geometry = gridWidth <= 1 && gridHeight <= 1 ?
-                         CreateQuadGeometry( size, imageWidth, imageHeight, mPixelArea ) :
-                         CreateGridGeometry( size, gridWidth, gridHeight, imageWidth, imageHeight, mPixelArea );
-
-  mRenderer->SetGeometry( *geometry );
-
+}
+void ImageActor::UpdateTexureRect()
+{
   Vector4 textureRect( 0.f, 0.f, 1.f, 1.f );
+
+  ImagePtr image = GetImage();
   if( mIsPixelAreaSet && image )
   {
-    const float uScale = 1.0f / float(imageWidth);
-    const float vScale = 1.0f / float(imageHeight);
-    const float x = uScale * float(mPixelArea.x);
-    const float y = vScale * float(mPixelArea.y);
-    const float width  = uScale * float(mPixelArea.width);
-    const float height = vScale * float(mPixelArea.height);
-
+    const float uScale = 1.0f / float(image->GetWidth());
+    const float vScale = 1.0f / float(image->GetHeight());
     // bottom left
-    textureRect.x = x;
-    textureRect.y = y;
-
+    textureRect.x = uScale * float(mPixelArea.x);
+    textureRect.y = vScale * float(mPixelArea.y);
     // top right
-    textureRect.z = x + width;
-    textureRect.w = y + height;
+    textureRect.z  = uScale * float(mPixelArea.x + mPixelArea.width);
+    textureRect.w = vScale * float(mPixelArea.y + mPixelArea.height);
   }
 
   Material* material = mRenderer->GetMaterial();
-  material->RegisterProperty( "sTextureRect", textureRect );
+  material->RegisterProperty( "uTextureRect", textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -722,6 +681,8 @@ void ImageActor::SetShaderEffect( ShaderEffect& effect )
   mRenderer->GetMaterial()->SetShader( *shader );
 
   EffectImageUpdated();
+
+  UpdateGeometry();
 }
 
 ShaderEffectPtr ImageActor::GetShaderEffect() const
@@ -731,20 +692,16 @@ ShaderEffectPtr ImageActor::GetShaderEffect() const
 
 void ImageActor::RemoveShaderEffect()
 {
-  //if we previously had a subdivided grid then we need to reset the geometry as well
   if( mShaderEffect )
   {
     mShaderEffect->Disconnect( this );
+    // change to the standard shader and quad geometry
+    ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+    mRenderer->GetMaterial()->SetShader( *shader );
+    mShaderEffect.Reset();
 
-    if( mShaderEffect->GetGridSize( Vector2(INFINITY, INFINITY) ) != Vector2::ONE )
-    {
-      RelayoutRequest();
-    }
+    UpdateGeometry();
   }
-
-  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
-  mRenderer->GetMaterial()->SetShader( *shader );
-  mShaderEffect.Reset();
 }
 
 void ImageActor::EffectImageUpdated()
@@ -774,13 +731,6 @@ void ImageActor::EffectImageUpdated()
       mEffectTextureIndex = INVALID_TEXTURE_ID;
     }
 
-    //ensure that the sEffectRect uniform is set
-    Shader* shader = mRenderer->GetMaterial()->GetShader();
-    Property::Index index = shader->GetPropertyIndex( "sEffectRect" );
-    if( index == Property::INVALID_INDEX )
-    {
-      shader->RegisterProperty( "sEffectRect", Vector4( 0.f, 0.f, 1.f, 1.f) );
-    }
   }
 }
 

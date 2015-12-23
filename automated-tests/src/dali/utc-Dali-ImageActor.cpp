@@ -923,7 +923,7 @@ int UtcDaliImageActorNinePatch01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() > 0 );
@@ -970,7 +970,7 @@ int UtcDaliImageActorNinePatch02(void)
   application.Render();
 
   // Check that nothing was drawn.
-  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() == 0u );
@@ -1018,7 +1018,7 @@ int UtcDaliImageActorNinePatch03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() > 0 );
@@ -1067,7 +1067,7 @@ int UtcDaliImageActorNinePatch04(void)
   application.Render();
 
   // Check that nothing was drawn.
-  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() == 0u );

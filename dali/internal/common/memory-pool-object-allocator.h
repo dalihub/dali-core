@@ -67,6 +67,16 @@ public:
   }
 
   /**
+   * @brief Thread-safe version of Allocate()
+   *
+   * @return Return the allocated object
+   */
+  T* AllocateThreadSafe()
+  {
+    return new ( mPool->AllocateThreadSafe() ) T();
+  }
+
+  /**
    * @brief Allocate a block of memory from the memory pool of the appropriate size to
    *        store an object of type T. This is usually so the memory can be used in a
    *        placement new for an object of type T with a constructor that takes multiple
@@ -80,6 +90,16 @@ public:
   }
 
   /**
+   * @brief Thread-safe version of AllocateRaw()
+   *
+   * @return Return the allocated memory block
+   */
+  void* AllocateRawThreadSafe()
+  {
+    return mPool->AllocateThreadSafe();
+  }
+
+  /**
    * @brief Return the object to the memory pool
    *
    * @param object Pointer to the object to delete
@@ -89,6 +109,18 @@ public:
     object->~T();
 
     mPool->Free( object );
+  }
+
+  /**
+   * @brief Thread-safe version of Free()
+   *
+   * @param object Pointer to the object to delete
+   */
+  void FreeThreadSafe( T* object )
+  {
+    object->~T();
+
+    mPool->FreeThreadSafe( object );
   }
 
   /**

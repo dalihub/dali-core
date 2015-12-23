@@ -1143,8 +1143,33 @@ void Actor::NotifySizeAnimation( Animation& animation, float targetSize, Propert
   {
     mTargetSize.height = targetSize;
   }
+  else if ( Dali::Actor::Property::SIZE_DEPTH == property )
+  {
+    mTargetSize.depth = targetSize;
+  }
   // Notify deriving classes
   OnSizeAnimation( animation, mTargetSize );
+}
+
+void Actor::NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition )
+{
+  mTargetPosition = targetPosition;
+}
+
+void Actor::NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property )
+{
+  if ( Dali::Actor::Property::POSITION_X == property )
+  {
+    mTargetPosition.x = targetPosition;
+  }
+  else if ( Dali::Actor::Property::POSITION_Y == property )
+  {
+    mTargetPosition.y = targetPosition;
+  }
+  else if ( Dali::Actor::Property::POSITION_Z == property )
+  {
+    mTargetPosition.z = targetPosition;
+  }
 }
 
 void Actor::SetWidth( float width )
@@ -2695,7 +2720,7 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
       break;
     }
-  }
+  } // entry.GetType
 }
 
 Property::Value Actor::GetDefaultProperty( Property::Index index ) const
@@ -2754,49 +2779,49 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::SIZE:
     {
-      value = GetCurrentSize();
+      value = GetTargetSize();
       break;
     }
 
     case Dali::Actor::Property::SIZE_WIDTH:
     {
-      value = GetCurrentSize().width;
+      value = GetTargetSize().width;
       break;
     }
 
     case Dali::Actor::Property::SIZE_HEIGHT:
     {
-      value = GetCurrentSize().height;
+      value = GetTargetSize().height;
       break;
     }
 
     case Dali::Actor::Property::SIZE_DEPTH:
     {
-      value = GetCurrentSize().depth;
+      value = GetTargetSize().depth;
       break;
     }
 
     case Dali::Actor::Property::POSITION:
     {
-      value = GetCurrentPosition();
+      value = GetTargetPosition();
       break;
     }
 
     case Dali::Actor::Property::POSITION_X:
     {
-      value = GetCurrentPosition().x;
+      value = GetTargetPosition().x;
       break;
     }
 
     case Dali::Actor::Property::POSITION_Y:
     {
-      value = GetCurrentPosition().y;
+      value = GetTargetPosition().y;
       break;
     }
 
     case Dali::Actor::Property::POSITION_Z:
     {
-      value = GetCurrentPosition().z;
+      value = GetTargetPosition().z;
       break;
     }
 

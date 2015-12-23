@@ -313,12 +313,12 @@ bool ImageFactory::CompareAttributes( const ImageAttributes& requested,
   // do not load image resource again if there is a similar resource loaded:
   // see explanation in image.h of what is deemed compatible
   return (requested.GetScalingMode() ==  actual.GetScalingMode()) &&
-          (
-            (requested.GetFilterMode() == actual.GetFilterMode()) ||
-            (requested.GetFilterMode() == SamplingMode::DONT_CARE)
-          ) &&
-          (fabsf(requested.GetWidth()  -  actual.GetWidth())  <= actual.GetWidth()  * mMaxScale) &&
-          (fabsf(requested.GetHeight() -  actual.GetHeight()) <= actual.GetHeight() * mMaxScale);
+    (
+      (requested.GetFilterMode() == actual.GetFilterMode()) ||
+      (requested.GetFilterMode() == SamplingMode::DONT_CARE)
+      ) &&
+    (fabsf(static_cast<float>(requested.GetWidth())  -  static_cast<float>(actual.GetWidth()))  <= actual.GetWidth()  * mMaxScale) &&
+    (fabsf(static_cast<float>(requested.GetHeight()) -  static_cast<float>(actual.GetHeight())) <= actual.GetHeight() * mMaxScale);
 }
 
 Request* ImageFactory::InsertNewRequest( ResourceId resourceId, const std::string& filename, std::size_t urlHash, const ImageAttributes* attr )
