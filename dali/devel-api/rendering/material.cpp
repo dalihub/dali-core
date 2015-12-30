@@ -99,12 +99,13 @@ void Material::RemoveTexture( size_t index )
 
 void Material::SetTextureImage( size_t index, Image image )
 {
+  Internal::Image* imagePtr(0);
   if( image )
   {
-    Internal::Image* imagePtr(0);
     imagePtr = &GetImplementation( image );
-    GetImplementation(*this).SetTextureImage( index, imagePtr );
   }
+
+  GetImplementation(*this).SetTextureImage( index, imagePtr );
 }
 
 void Material::SetTextureSampler( size_t index, Sampler sampler )
