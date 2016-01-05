@@ -73,7 +73,11 @@ public:
 
 // useful constant angles
 DALI_EXPORT_API extern const Radian ANGLE_360; ///< 360 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_315; ///< 315 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_270; ///< 270 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_225; ///< 225 degree turn in radians
 DALI_EXPORT_API extern const Radian ANGLE_180; ///< 180 degree turn in radians
+DALI_EXPORT_API extern const Radian ANGLE_135; ///< 135 degree turn in radians
 DALI_EXPORT_API extern const Radian ANGLE_120; ///< 120 degree turn in radians
 DALI_EXPORT_API extern const Radian ANGLE_90;  ///< 90 degree turn in radians
 DALI_EXPORT_API extern const Radian ANGLE_60;  ///< 60 degree turn in radians
