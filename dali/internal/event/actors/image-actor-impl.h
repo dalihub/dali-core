@@ -100,6 +100,26 @@ public:
   void ClearPixelArea();
 
   /**
+   * @copydoc Dali::ImageActor::SetStyle()
+   */
+  void SetStyle( Dali::ImageActor::Style style );
+
+  /**
+   * @copydoc Dali::ImageActor::GetStyle()
+   */
+  Dali::ImageActor::Style GetStyle() const;
+
+  /**
+   * @copydoc Dali::ImageActor::SetNinePatchBorder()
+   */
+  void SetNinePatchBorder( const Vector4& border );
+
+  /**
+   * @copydoc Dali::ImageActor::GetNinePatchBorder()
+   */
+  Vector4 GetNinePatchBorder() const;
+
+  /**
    * @copydoc Dali::RenderableActor::SetSortModifier()
    */
   void SetSortModifier(float modifier);
@@ -294,17 +314,19 @@ private:
 
 private:
 
-  ShaderEffectPtr    mShaderEffect;            ///< Optional referenced shader effect
-  RendererPtr        mRenderer;                ///< The renderer used to render the image
-  PixelArea          mPixelArea;               ///< The pixel area of the image to render
-  Vector4            mBlendColor;              ///< The blend color for this ImageActor
-  Uint16Pair         mGridSize;                ///< The geometry grid size
-  int                mRendererIndex;           ///< The index location of mRenderer
-  size_t             mTextureIndex;            ///< The texture index for this ImageActor's texture
-  size_t             mEffectTextureIndex;      ///< The texture index for this ImageActor's effect texture
-  FilterMode::Type   mMinFilter;               ///< The minification filter currently set
-  FilterMode::Type   mMagFilter;               ///< The magnification filter currently set
-  bool               mIsPixelAreaSet;          ///< Flag indicating if the pixel area has been set
+  ShaderEffectPtr         mShaderEffect;            ///< Optional referenced shader effect
+  RendererPtr             mRenderer;                ///< The renderer used to render the image
+  PixelArea               mPixelArea;               ///< The pixel area of the image to render
+  Vector4                 mBlendColor;              ///< The blend color for this ImageActor
+  Vector4                 mNinePatchBorder;         ///< Nine-patch not supported, but this is used to store what is set so it can be returned for backwards compatibility.
+  Uint16Pair              mGridSize;                ///< The geometry grid size
+  int                     mRendererIndex;           ///< The index location of mRenderer
+  size_t                  mTextureIndex;            ///< The texture index for this ImageActor's texture
+  size_t                  mEffectTextureIndex;      ///< The texture index for this ImageActor's effect texture
+  FilterMode::Type        mMinFilter;               ///< The minification filter currently set
+  FilterMode::Type        mMagFilter;               ///< The magnification filter currently set
+  Dali::ImageActor::Style mStyle;                   ///< The style set by SetStyle. Not used internally, only used to store what is set so it can be returned for backwards compatibility.
+  bool                    mIsPixelAreaSet;          ///< Flag indicating if the pixel area has been set
 };
 
 } // namespace Internal
