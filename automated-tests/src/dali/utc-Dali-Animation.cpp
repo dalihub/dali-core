@@ -8134,7 +8134,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int P(void)
+int UtcDaliAnimationAnimateBetweenActorColorCubicWithDelayP(void)
 {
   TestApplication application;
 
@@ -8910,4 +8910,3 @@ int UtcDaliAnimationCustomIntProperty(void)
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), 20, TEST_LOCATION );
   END_TEST;
 }
-
