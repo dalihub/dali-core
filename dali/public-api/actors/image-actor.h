@@ -242,6 +242,8 @@ public:
    *
    * @pre image must be initialized.
    * @param [in] style The new style.
+   *
+   * @note The style specified is set (so GetStyle will return what's set) but ignored internally.
    */
   void SetStyle(Style style);
 
@@ -252,6 +254,8 @@ public:
    *
    * @pre image must be initialized.
    * @return The rendering style.
+   *
+   * @note This just returns the style set by SetStyle. In reality, only STYLE_QUAD is supported.
    */
   Style GetStyle() const;
 

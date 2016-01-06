@@ -151,16 +151,15 @@ int UtcDaliImageActor9Patch(void)
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
-  DALI_TEST_EQUALS( ImageActor::STYLE_QUAD, actor.GetStyle(), TEST_LOCATION ); //nine patch is deprecated
+  DALI_TEST_EQUALS( ImageActor::STYLE_NINE_PATCH, actor.GetStyle(), TEST_LOCATION );
 
   Vector4 border(0.1,0.2,0.3,0.4);
   actor.SetNinePatchBorder(border);
 
-  //nine patch is deprecated
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().x, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().y, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().z, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().w, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.1f, actor.GetNinePatchBorder().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.2f, actor.GetNinePatchBorder().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.3f, actor.GetNinePatchBorder().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.4f, actor.GetNinePatchBorder().w, TEST_LOCATION );
   END_TEST;
 }
 
@@ -782,7 +781,7 @@ int UtcDaliImageActorUseImageAlpha05(void)
   END_TEST;
 }
 
-int UtcDaliImageGetStyle(void)
+int UtcDaliImageActorGetStyle(void)
 {
   TestApplication application;
 
@@ -795,11 +794,11 @@ int UtcDaliImageGetStyle(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( ImageActor::STYLE_QUAD, actor.GetStyle(), TEST_LOCATION ); //nine patch is deprecated
+  DALI_TEST_EQUALS( ImageActor::STYLE_NINE_PATCH, actor.GetStyle(), TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliImageSetNinePatchBorder(void)
+int UtcDaliImageActorSetNinePatchBorder(void)
 {
   TestApplication application;
 
@@ -807,15 +806,14 @@ int UtcDaliImageSetNinePatchBorder(void)
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
-  DALI_TEST_EQUALS( ImageActor::STYLE_QUAD, actor.GetStyle(), TEST_LOCATION ); //nine patch is deprecated
+  DALI_TEST_EQUALS( ImageActor::STYLE_NINE_PATCH, actor.GetStyle(), TEST_LOCATION );
 
   actor.SetNinePatchBorder(Vector4( 1.0f, 2.0f, 3.0f, 4.0f));
 
-  //nine patch is deprecated
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().x, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().y, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().z, TEST_LOCATION );
-  DALI_TEST_EQUALS( 0.0f, actor.GetNinePatchBorder().w, TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, actor.GetNinePatchBorder().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( 2.0f, actor.GetNinePatchBorder().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( 3.0f, actor.GetNinePatchBorder().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( 4.0f, actor.GetNinePatchBorder().w, TEST_LOCATION );
   END_TEST;
 }
 

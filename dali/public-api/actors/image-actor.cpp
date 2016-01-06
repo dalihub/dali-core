@@ -104,24 +104,22 @@ ImageActor::PixelArea ImageActor::GetPixelArea() const
 
 void ImageActor::SetStyle(Style style)
 {
-  //deprecated - use ImageView instead for nine patch
+  GetImplementation(*this).SetStyle( style );
 }
 
 ImageActor::Style ImageActor::GetStyle() const
 {
-  //deprecated - use ImageView instead for nine patch
-  return ImageActor::STYLE_QUAD;
+  return GetImplementation(*this).GetStyle();
 }
 
 void ImageActor::SetNinePatchBorder(const Vector4& border)
 {
-  //deprecated - use ImageView instead for nine patch
+  GetImplementation(*this).SetNinePatchBorder( border );
 }
 
 Vector4 ImageActor::GetNinePatchBorder() const
 {
-  //deprecated - use ImageView instead for nine patch
-  return Vector4::ZERO;
+  return GetImplementation(*this).GetNinePatchBorder();
 }
 
 void ImageActor::SetSortModifier(float modifier)
