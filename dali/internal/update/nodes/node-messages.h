@@ -49,13 +49,6 @@ public:
    */
   virtual ~NodePropertyMessageBase();
 
-protected:
-
-  /**
-   * Inform UpdateManager that the Node is now active
-   */
-  void NotifyUpdateManager( Node* node );
-
 private:
 
   // Undefined
@@ -113,12 +106,6 @@ public:
   virtual void Process( BufferIndex updateBufferIndex )
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
-
-    if( ! mNode->IsActive() )
-    {
-      // Inform UpdateManager that the Node is now active
-      NotifyUpdateManager( mNode );
-    }
   }
 
 private:
@@ -200,12 +187,6 @@ public:
   virtual void Process( BufferIndex updateBufferIndex )
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
-
-    if( ! mNode->IsActive() )
-    {
-      // Inform UpdateManager that the Node is now active
-      NotifyUpdateManager( mNode );
-    }
   }
 
 private:
