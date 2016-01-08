@@ -8,6 +8,7 @@ T.O.C.
  2.1. Minimum Requirements
  2.2. Creating a DALi Environment
  2.3. Building the Repository
+ 2.4. Building and executing test cases
 
 
 
@@ -73,3 +74,7 @@ Then run the following commands:
  ./configure --prefix=$DESKTOP_PREFIX
  make install -j8
 
+2.4. Building and executing test cases
+--------------------------------------
+
+See the README.md in dali-core/automated-tests.

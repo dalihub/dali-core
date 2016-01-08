@@ -30,7 +30,11 @@ Degree::Degree( Radian radian )
 }
 
 const Radian ANGLE_360 = Radian( Math::PI * 2.f     ); ///< 360 degree turn in radians
+const Radian ANGLE_315 = Radian( Math::PI * 1.75f   ); ///< 315 degree turn in radians
+const Radian ANGLE_270 = Radian( Math::PI * 1.5f    ); ///< 270 degree turn in radians
+const Radian ANGLE_225 = Radian( Math::PI * 1.25f   ); ///< 225 degree turn in radians
 const Radian ANGLE_180 = Radian( Math::PI           ); ///< 180 degree turn in radians
+const Radian ANGLE_135 = Radian( Math::PI * 0.75f   ); ///< 135 degree turn in radians
 const Radian ANGLE_120 = Radian( Math::PI * 2.f/3.f ); ///< 120 degree turn in radians
 const Radian ANGLE_90  = Radian( Math::PI_2         ); ///< 90 degree turn in radians
 const Radian ANGLE_60  = Radian( Math::PI / 3.f     ); ///< 60 degree turn in radians
