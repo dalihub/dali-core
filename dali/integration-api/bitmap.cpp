@@ -407,6 +407,13 @@ void ConvertToGlFormat( Format pixelformat, unsigned& pixelDataType, unsigned& i
       internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
       break;
     }
+
+    case INVALID:
+    {
+      DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
+      internalFormat = 0;
+      break;
+    }
   }
 }
 

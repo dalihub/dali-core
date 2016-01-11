@@ -52,6 +52,8 @@ int UtcDaliPixelHasAlpha(void)
 
   TestPixelEnumSize( 54 );
 
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::INVALID ) == false ); // For completeness
+
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::L8 ) == false );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB565 ) == false );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB888 ) == false );
@@ -123,6 +125,8 @@ int UtcDaliPixelGetBytesPerPixel(void)
   TestApplication application;
 
   tet_infoline("UtcDaliPixelGetBytesPerPixel");
+
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::INVALID ) == 0 ); // For completeness
 
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::L8 ) == 1 );
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::A8 ) == 1 );
@@ -206,6 +210,9 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
 
   // Be sure that the number of cases tested below is correct:
   TestPixelEnumSize( 54 );
+
+  Pixel::GetAlphaOffsetAndMask( Pixel::INVALID, byteOffset, bitMask ); // For completeness
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
 
   Pixel::GetAlphaOffsetAndMask( Pixel::L8, byteOffset, bitMask );
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
