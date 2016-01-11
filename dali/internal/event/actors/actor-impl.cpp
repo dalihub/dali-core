@@ -238,6 +238,7 @@ const char* const SIGNAL_HOVERED = "hovered";
 const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
 const char* const SIGNAL_ON_STAGE = "onStage";
 const char* const SIGNAL_OFF_STAGE = "offStage";
+const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
 
 // Actions
 
@@ -253,8 +254,10 @@ TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor )
 
 SignalConnectorType signalConnector1( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector3( mType, SIGNAL_ON_STAGE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_OFF_STAGE, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector4( mType, SIGNAL_ON_STAGE, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector5( mType, SIGNAL_OFF_STAGE, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
 
 TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
 TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
@@ -1174,6 +1177,8 @@ void Actor::NotifyPositionAnimation( Animation& animation, float targetPosition,
 
 void Actor::SetWidth( float width )
 {
+  mTargetSize.width = width;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1183,6 +1188,8 @@ void Actor::SetWidth( float width )
 
 void Actor::SetHeight( float height )
 {
+  mTargetSize.height = height;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1192,6 +1199,8 @@ void Actor::SetHeight( float height )
 
 void Actor::SetDepth( float depth )
 {
+  mTargetSize.depth = depth;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1879,6 +1888,10 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if( 0 == signalName.compare( SIGNAL_OFF_STAGE ) )
   {
     actor->OffStageSignal().Connect( tracker, functor );
+  }
+  else if( 0 == signalName.compare( SIGNAL_ON_RELAYOUT ) )
+  {
+    actor->OnRelayoutSignal().Connect( tracker, functor );
   }
   else
   {
