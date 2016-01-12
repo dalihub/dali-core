@@ -41,7 +41,7 @@ struct PrintVersion
 {
   PrintVersion()
   {
-    std::cout << "DALi Core:      " << CORE_MAJOR_VERSION << "." << CORE_MINOR_VERSION << "." << CORE_MICRO_VERSION << " (" << CORE_BUILD_DATE << ")" << std::endl;
+    std::cerr << "DALi Core:      " << CORE_MAJOR_VERSION << "." << CORE_MINOR_VERSION << "." << CORE_MICRO_VERSION << " (" << CORE_BUILD_DATE << ")" << std::endl;
   }
 };
 PrintVersion CORE_VERSION;
