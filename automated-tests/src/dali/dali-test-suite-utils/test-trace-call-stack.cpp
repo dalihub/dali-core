@@ -84,7 +84,6 @@ int TraceCallStack::CountMethod(std::string method) const
   return numCalls;
 }
 
-
 /**
  * Search for a method in the stack with the given parameter list
  * @param[in] method The name of the method
@@ -93,16 +92,27 @@ int TraceCallStack::CountMethod(std::string method) const
  */
 bool TraceCallStack::FindMethodAndParams(std::string method, std::string params) const
 {
-  bool found = false;
+  return FindIndexFromMethodAndParams( method, params ) > -1;
+}
+
+/**
+ * Search for a method in the stack with the given parameter list
+ * @param[in] method The name of the method
+ * @param[in] params A comma separated list of parameter values
+ * @return index in the stack where the method was found or -1 otherwise
+ */
+int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string params) const
+{
+  int index = -1;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
     if( 0 == mCallStack[i][0].compare(method) && 0 == mCallStack[i][1].compare(params) )
     {
-      found = true;
+      index = i;
       break;
     }
   }
-  return found;
+  return index;
 }
 
 /**
