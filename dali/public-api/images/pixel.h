@@ -40,6 +40,8 @@ namespace Pixel
  */
 enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
 {
+  INVALID = 0,
+
   // Start at > 0 to distinguish null data:
   A8 = 1,                                   ///< color depth 8-bit, alpha
   L8,                                       ///< color depth 8-bit, luminance
