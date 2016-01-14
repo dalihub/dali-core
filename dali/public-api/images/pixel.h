@@ -40,7 +40,7 @@ namespace Pixel
  */
 enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
 {
-  INVALID = 0,
+  INVALID = 0,                              ///< Used to represent an unsupported format. @since 1.1.17
 
   // Start at > 0 to distinguish null data:
   A8 = 1,                                   ///< color depth 8-bit, alpha
@@ -75,34 +75,34 @@ enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
   COMPRESSED_RGB_PVRTC_4BPPV1,              ///< PowerVR 4bpp RGB format (v1) as defined by extension IMG_texture_compression_pvrtc: http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
 
   // GLES 3.1 compressed formats:
-  COMPRESSED_RGBA_ASTC_4x4_KHR,             ///< ASTC Linear color space with a 4x4 block-size.
-  COMPRESSED_RGBA_ASTC_5x4_KHR,             ///< ASTC Linear color space with a 5x4 block-size.
-  COMPRESSED_RGBA_ASTC_5x5_KHR,             ///< ASTC Linear color space with a 5x5 block-size.
-  COMPRESSED_RGBA_ASTC_6x5_KHR,             ///< ASTC Linear color space with a 6x5 block-size.
-  COMPRESSED_RGBA_ASTC_6x6_KHR,             ///< ASTC Linear color space with a 6x6 block-size.
-  COMPRESSED_RGBA_ASTC_8x5_KHR,             ///< ASTC Linear color space with a 8x5 block-size.
-  COMPRESSED_RGBA_ASTC_8x6_KHR,             ///< ASTC Linear color space with a 8x6 block-size.
-  COMPRESSED_RGBA_ASTC_8x8_KHR,             ///< ASTC Linear color space with a 8x8 block-size.
-  COMPRESSED_RGBA_ASTC_10x5_KHR,            ///< ASTC Linear color space with a 10x5 block-size.
-  COMPRESSED_RGBA_ASTC_10x6_KHR,            ///< ASTC Linear color space with a 10x6 block-size.
-  COMPRESSED_RGBA_ASTC_10x8_KHR,            ///< ASTC Linear color space with a 10x8 block-size.
-  COMPRESSED_RGBA_ASTC_10x10_KHR,           ///< ASTC Linear color space with a 10x10 block-size.
-  COMPRESSED_RGBA_ASTC_12x10_KHR,           ///< ASTC Linear color space with a 12x10 block-size.
-  COMPRESSED_RGBA_ASTC_12x12_KHR,           ///< ASTC Linear color space with a 12x12 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 4x4 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x4 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x5 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x5 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x6 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x5 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x6 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x8 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x5 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x6 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x8 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 10x10 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size.
-  COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size.
+  COMPRESSED_RGBA_ASTC_4x4_KHR,             ///< ASTC Linear color space with a 4x4 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_5x4_KHR,             ///< ASTC Linear color space with a 5x4 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_5x5_KHR,             ///< ASTC Linear color space with a 5x5 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_6x5_KHR,             ///< ASTC Linear color space with a 6x5 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_6x6_KHR,             ///< ASTC Linear color space with a 6x6 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_8x5_KHR,             ///< ASTC Linear color space with a 8x5 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_8x6_KHR,             ///< ASTC Linear color space with a 8x6 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_8x8_KHR,             ///< ASTC Linear color space with a 8x8 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_10x5_KHR,            ///< ASTC Linear color space with a 10x5 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_10x6_KHR,            ///< ASTC Linear color space with a 10x6 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_10x8_KHR,            ///< ASTC Linear color space with a 10x8 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_10x10_KHR,           ///< ASTC Linear color space with a 10x10 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_12x10_KHR,           ///< ASTC Linear color space with a 12x10 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_12x12_KHR,           ///< ASTC Linear color space with a 12x12 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 4x4 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x4 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x5 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x5 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x6 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x5 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x6 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x8 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x5 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x6 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x8 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 10x10 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size. @since 1.1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size. @since 1.1.17
 
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
