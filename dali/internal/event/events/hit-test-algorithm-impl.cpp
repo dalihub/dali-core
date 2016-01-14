@@ -170,6 +170,7 @@ HitActor HitTestWithinLayer( Actor& actor,
                              HitTestInterface& hitCheck,
                              bool& stencilOnLayer,
                              bool& stencilHit,
+                             bool& overlayHit,
                              bool parentIsStencil,
                              bool layerIs3d )
 {
@@ -212,25 +213,38 @@ HitActor HitTestWithinLayer( Actor& actor,
           }
           else
           {
-            hit.actor = &actor;
-            hit.x = hitPointLocal.x;
-            hit.y = hitPointLocal.y;
-            hit.distance = distance;
-            hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
-
-            if ( actor.GetRendererCount() > 0 )
+            if( overlayHit && !actor.IsOverlay() )
             {
-              //Get renderer with maximum depth
-              int rendererMaxDepth(actor.GetRendererAt( 0 ).Get()->GetDepthIndex());
-              for( unsigned int i(1); i<actor.GetRendererCount(); ++i)
+              //If we have already hit an overlay and current actor is not an overlay
+              //ignore current actor
+            }
+            else
+            {
+              if( actor.IsOverlay() )
               {
-                int depth = actor.GetRendererAt( i ).Get()->GetDepthIndex();
-                if( depth > rendererMaxDepth )
-                {
-                  rendererMaxDepth = depth;
-                }
+                overlayHit = true;
               }
-              hit.depth += rendererMaxDepth;
+
+              hit.actor = &actor;
+              hit.x = hitPointLocal.x;
+              hit.y = hitPointLocal.y;
+              hit.distance = distance;
+              hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
+
+              if ( actor.GetRendererCount() > 0 )
+              {
+                //Get renderer with maximum depth
+                int rendererMaxDepth(actor.GetRendererAt( 0 ).Get()->GetDepthIndex());
+                for( unsigned int i(1); i<actor.GetRendererCount(); ++i)
+                {
+                  int depth = actor.GetRendererAt( i ).Get()->GetDepthIndex();
+                  if( depth > rendererMaxDepth )
+                  {
+                    rendererMaxDepth = depth;
+                  }
+                }
+                hit.depth += rendererMaxDepth;
+              }
             }
           }
         }
@@ -271,6 +285,7 @@ HitActor HitTestWithinLayer( Actor& actor,
                                                   hitCheck,
                                                   stencilOnLayer,
                                                   stencilHit,
+                                                  overlayHit,
                                                   isStencil,
                                                   layerIs3d) );
 
@@ -425,6 +440,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
         HitActor hit;
         bool stencilOnLayer = false;
         bool stencilHit = false;
+        bool overlayHit = false;
         bool layerConsumesHit = false;
 
         const Vector2& stageSize = stage.GetSize();
@@ -435,6 +451,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
           HitActor previousHit = hit;
           stencilOnLayer = false;
           stencilHit = false;
+          overlayHit = false;
 
           // Ensure layer is touchable (also checks whether ancestors are also touchable)
           if ( IsActuallyHittable ( *layer, screenCoordinates, stageSize, hitCheck ) )
@@ -453,6 +470,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
+                                        overlayHit,
                                         false,
                                         layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
@@ -469,6 +487,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
+                                        overlayHit,
                                         false,
                                         layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
