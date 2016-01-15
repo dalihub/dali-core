@@ -65,10 +65,12 @@ PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::stri
 
 PropertyBuffer CreateIndexBuffer()
 {
-  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  const unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  const unsigned int numberElements = sizeof(indexData)/sizeof(indexData[0]) ;
+
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 3 );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, numberElements );
   indices.SetData(indexData);
 
   return indices;
@@ -154,7 +156,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -232,7 +234,7 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -266,7 +268,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -323,7 +325,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -446,7 +448,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   tet_infoline("Test SetGeometryType and GetGeometryType: with index buffer");
 
   unsigned int numVertex = 4u;
-  unsigned int numIndex = 3u; // 6 unsigned short
+  unsigned int numIndex = 6u; // 6 unsigned short
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
   PropertyBuffer indexBuffer = CreateIndexBuffer( );
 
@@ -454,7 +456,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   geometry.AddVertexBuffer( vertexBuffer );
   geometry.SetIndexBuffer( indexBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -565,6 +567,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
 
   END_TEST;
 }
+
 int UtcDaliGeometrySetGetRequireDepthTesting(void)
 {
   TestApplication application;
@@ -587,11 +590,11 @@ int UtcDaliGeometrySetGetRequireDepthTesting(void)
   geometry.SetRequiresDepthTesting(true);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
   application.SendNotification();
   application.Render();
 //  TODO: Not supported yes
-//  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+//  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
 //  std::ostringstream out;
 //  out << GL_DEPTH_TEST;
 //  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
@@ -623,11 +626,11 @@ int UtcDaliGeometryPropertyRequiresDepthTest(void)
   geometry.SetProperty(Geometry::Property::REQUIRES_DEPTH_TEST, true );
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
   application.SendNotification();
   application.Render();
-//  TODO: Not supported yes
-//  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+//  TODO: Not supported yet
+//  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
 //  std::ostringstream out;
 //  out << GL_DEPTH_TEST;
 //  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
@@ -645,7 +648,6 @@ int UtcDaliGeometryConstraint(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -690,7 +692,6 @@ int UtcDaliGeometryConstraint02(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -749,7 +750,6 @@ int UtcDaliGeometryAnimatedProperty01(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -793,7 +793,6 @@ int UtcDaliGeometryAnimatedProperty02(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );

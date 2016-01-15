@@ -54,7 +54,7 @@ public:
     {
       FORWARD   =  DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "forward" type Vector3
       POINTS,                                           ///< name "points" type Array of Vector3
-      CONTROL_POINTS                                    ///< name "control-points" type Array of Vector3
+      CONTROL_POINTS                                    ///< name "controlPoints" type Array of Vector3
     };
   };
 

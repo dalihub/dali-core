@@ -26,7 +26,6 @@ namespace Dali
 {
 namespace Internal
 {
-class CompleteStatusManager;
 
 namespace SceneGraph
 {
@@ -38,7 +37,6 @@ class RenderTaskList;
  * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque attachments which are ready to render.
  * If there is only one default render-task, then no further processing is required.
  * @param[in] updateBufferIndex The current update buffer index.
- * @param[in] completeStatusManager The resource complete state manager
  * @param[in] renderTasks The list of render-tasks.
  * @param[in] rootNode The root node of the scene-graph.
  * @param[in] sortedLayers The layers containing lists of opaque/transparent renderables.
@@ -46,7 +44,6 @@ class RenderTaskList;
  * @param[out] instructions The instructions for rendering the next frame.
  */
 void ProcessRenderTasks( BufferIndex updateBufferIndex,
-                         CompleteStatusManager& completeStatusManager,
                          RenderTaskList& renderTasks,
                          Layer& rootNode,
                          SortedLayerPointers& sortedLayers,

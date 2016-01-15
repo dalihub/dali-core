@@ -35,12 +35,30 @@
 #include <new>
 #include <stdexcept>
 
+#if defined(__clang__)
+
+#undef _LIBCPP_INLINE_VISIBILITY
+#define _LIBCPP_INLINE_VISIBILITY
+#undef _LIBCPP_EXTERN_TEMPLATE
+#define _LIBCPP_EXTERN_TEMPLATE(...)
+
+#include <vector>
+
+#undef _LIBCPP_INLINE_VISIBILITY
+#define _LIBCPP_INLINE_VISIBILITY __attribute__ ((__visibility__("hidden"), __always_inline__))
+#undef _LIBCPP_EXTERN_TEMPLATE
+#define _LIBCPP_EXTERN_TEMPLATE(...) extern template __VA_ARGS__;
+
+#else
+
 #include <bits/c++config.h>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
 #include <vector>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+
+#endif //ifdef __clang__
 
 #endif //ifndef HIDE_DALI_INTERNALS
 

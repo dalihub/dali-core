@@ -27,7 +27,20 @@ using namespace Dali;
 namespace
 {
 const Dali::VectorBase::SizeType ZERO(0);
+
+/// Compare a short with an int
+void DALI_TEST_EQUALS( short value1, int value2, const char* location )
+{
+  ::DALI_TEST_EQUALS< short >( value1, static_cast< short >( value2 ), location );
 }
+
+/// Compare a char with an int
+void DALI_TEST_EQUALS( char value1, int value2, const char* location )
+{
+  ::DALI_TEST_EQUALS< char >( value1, static_cast< char >( value2 ), location );
+}
+
+} // unnamed namespace
 
 int UtcDaliEmptyVectorInt(void)
 {
@@ -717,7 +730,6 @@ int UtcDaliVectorAcidTest(void)
   int* ptr = NULL;
   for( unsigned int i = 0; i < acidCount; ++i )
   {
-    ++ptr;
     pairvector.PushBack( std::make_pair( i, i ) );
     doublevector.PushBack( (double)i );
     intptrvector.PushBack( (int*)ptr );

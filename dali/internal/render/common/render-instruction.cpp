@@ -37,7 +37,6 @@ RenderInstruction::RenderInstruction()
   mClearColor(),
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
-  mCullMode(false),
   mOffscreenTextureId( 0 ),
   mCameraAttachment( 0 ),
   mNextFreeRenderList( 0 )
@@ -115,7 +114,6 @@ void RenderInstruction::Reset( CameraAttachment* cameraAttachment,
   mIsViewportSet = NULL != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;
   mIsClearColorSet = NULL != clearColor;
-  mCullMode = false;
   mOffscreenTextureId = offscreenTextureId;
   mRenderTracker = NULL;
   mNextFreeRenderList = 0;

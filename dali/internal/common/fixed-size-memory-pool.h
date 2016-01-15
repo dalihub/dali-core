@@ -81,11 +81,25 @@ public:
   void* Allocate();
 
   /**
+   * @brief Thread-safe version of Allocate()
+   *
+   * @return Return the newly allocated memory
+   */
+  void* AllocateThreadSafe();
+
+  /**
    * @brief Delete a block of memory for the allocation that has been allocated by this memory pool
    *
    * @param memory The memory to be deleted. Must have been allocated by this memory pool
    */
   void Free( void* memory );
+
+  /**
+   * @brief Thread-safe version of Free()
+   *
+   * @param memory The memory to be deleted. Must have been allocated by this memory pool
+   */
+  void FreeThreadSafe( void* memory );
 
 private:
 

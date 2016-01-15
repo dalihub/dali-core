@@ -47,8 +47,8 @@ namespace Dali
  * const string VERTEX_SHADER_SOURCE = DALI_COMPOSE_SHADER (
  *   void main()
  *   {
- *     gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
- *     vTexCoord = aTexCoord;
+ *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
+ *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
  *   }
  * );
  */
@@ -90,8 +90,8 @@ class ShaderEffect;
  * <pre>
  * void main()
  * {
- *   gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
- *   vTexCoord = aTexCoord;
+ *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
+ *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
  * }
  * </pre>
  * For fragment shader the default part for images contains the following code:
@@ -114,7 +114,7 @@ public:
 
   // Default Properties
   /**
-   * @brief An enumeration of properties belonging to the Path class.
+   * @brief An enumeration of properties belonging to the ShaderEffect class.
    * Grid Density defines the spacing of vertex coordinates in world units.
    * ie a larger actor will have more grids at the same spacing.
    *
@@ -130,10 +130,10 @@ public:
   {
     enum
     {
-      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type float
-      IMAGE,                                             ///< name "image",          type Map {"filename":"", "load-policy":...}
-      PROGRAM,                                           ///< name "program",        type Map {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
-      GEOMETRY_HINTS                                     ///< name "geometry-hints", type int (bitfield) values from enum GeometryHints
+      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "gridDensity",    type float
+      IMAGE,                                             ///< name "image",          type Map {"filename":"", "loadPolicy":...}
+      PROGRAM,                                           ///< name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""}
+      GEOMETRY_HINTS                                     ///< name "geometryHints",  type int (bitfield) values from enum GeometryHints
     };
   };
 
@@ -164,8 +164,8 @@ public:
   enum UniformCoordinateType
   {
     COORDINATE_TYPE_DEFAULT,           ///< Default, No transformation to be applied
-    COORDINATE_TYPE_VIEWPORT_POSITION, ///< The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
-    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @deprecated Dali 1.1.11 The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @deprecated Dali 1.1.11 The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
   };
 
   /**

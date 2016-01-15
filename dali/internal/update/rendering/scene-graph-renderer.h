@@ -20,17 +20,10 @@
 
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/double-buffered.h>
-#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-new-renderer.h>
-#include <dali/internal/update/resources/resource-manager.h>
 
 namespace Dali
 {
@@ -39,11 +32,12 @@ namespace Internal
 
 namespace Render
 {
-class NewRenderer;
+class Renderer;
 }
 
 namespace SceneGraph
 {
+class SceneController;
 
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
@@ -60,15 +54,28 @@ class Renderer :  public PropertyOwner,
 {
 public:
 
+  enum Opacity
+  {
+    OPAQUE,
+    TRANSPARENT,
+    TRANSLUCENT
+  };
+
   /**
-   * Default constructor
+   * Construct a new Renderer
    */
-  Renderer();
+  static Renderer* New();
 
   /**
    * Destructor
    */
   virtual ~Renderer();
+
+  /**
+   * Overriden delete operator
+   * Deletes the renderer from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Set the material for the renderer
@@ -141,28 +148,22 @@ public:
   Render::Renderer& GetRenderer();
 
   /**
-     * Prepare the object resources.
-     * This must be called by the UpdateManager before calling PrepareRender, for each frame.
-     * @param[in] updateBufferIndex The current update buffer index.
-     * @param[in] resourceManager The resource manager.
-     */
-  void PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager );
-
-  /**
    * Check whether the renderer has been marked as ready to render
+   * ready means that renderer has all resources and should produce correct result
+   * complete means all resources have finished loading
+   * It's possible that renderer is complete but not ready,
+   * for example in case of resource load failed
    * @param[out] ready TRUE if the renderer has resources to render
    * @param[out] complete TRUE if the renderer resources are complete
-   * (e.g. image has finished loading, framebuffer is ready to render, native image
-   * framebuffer has been rendered)
    */
-  void GetReadyAndComplete(bool& ready, bool& complete) const;
+  void GetReadyAndComplete( bool& ready, bool& complete ) const;
 
   /**
-   * Query whether the renderer is fully opaque.
+   * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @return True if fully opaque.
+   * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  bool IsFullyOpaque( BufferIndex updateBufferIndex, const Node& node ) const;
+  Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
 
   /**
    * Query whether the renderer is currently in use by an actor on the stage
@@ -247,27 +248,29 @@ public: // From UniformMapDataProvider
 private:
 
   /**
+   * Protected constructor; See also Renderer::New()
+   */
+  Renderer();
+
+  /**
    * Helper function to create a new render data provider
    * @return the new (initialized) data provider
    */
   RenderDataProvider* NewRenderDataProvider();
 
   SceneController* mSceneController;  ///< Used for initializing renderers whilst attached
-  Render::NewRenderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
+  Render::Renderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
   Material*             mMaterial;    ///< The material this renderer uses. (Not owned)
   Geometry*             mGeometry;    ///< The geometry this renderer uses. (Not owned)
 
-  Dali::Vector< Integration::ResourceId > mTrackedResources; ///< Filled during PrepareResources if there are uncomplete, tracked resources.
-
-  CollectedUniformMap mCollectedUniformMap[2];    ///< Uniform maps collected by the renderer
-  unsigned int mReferenceCount;                   ///< Number of nodes currently using this renderer
-  unsigned int mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
-  bool         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
-  bool         mResendDataProviders         : 1;  ///< True if the data providers should be resent to the renderer
-  bool         mResendGeometry              : 1;  ///< True if geometry should be resent to the renderer
-  bool         mHasUntrackedResources       : 1;  ///< Set during PrepareResources, true if have tried to follow untracked resources
-  bool         mFinishedResourceAcquisition : 1;  ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
-  bool         mResourcesReady              : 1;  ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
+  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+  unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
+  unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
+  bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
+  bool         mResendDataProviders;           ///< True if the data providers should be resent to the renderer
+  bool         mResendGeometry;                ///< True if geometry should be resent to the renderer
+  bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
+  bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
 
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions

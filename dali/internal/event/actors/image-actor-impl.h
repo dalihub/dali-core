@@ -21,11 +21,12 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
 namespace Dali
@@ -53,7 +54,6 @@ class ImageActor : public Actor
 {
 public:
 
-  typedef Dali::ImageActor::Style Style;
   typedef Dali::ImageActor::PixelArea PixelArea;
 
   /**
@@ -77,7 +77,7 @@ public:
    * Retrieve the image rendered by the actor's attachment.
    * @return smart pointer to the image or an empty one if no image is assigned
    */
-  ImagePtr GetImage();
+  ImagePtr GetImage() const;
 
   /**
    * @copydoc Dali::ImageActor::SetPixelArea()
@@ -102,29 +102,22 @@ public:
   /**
    * @copydoc Dali::ImageActor::SetStyle()
    */
-  void SetStyle( Style style );
+  void SetStyle( Dali::ImageActor::Style style );
 
   /**
    * @copydoc Dali::ImageActor::GetStyle()
    */
-  Style GetStyle() const;
+  Dali::ImageActor::Style GetStyle() const;
 
   /**
-   * @copydoc Dali::ImageActor::SetNinePatchBorder
+   * @copydoc Dali::ImageActor::SetNinePatchBorder()
    */
-  void SetNinePatchBorder( const Vector4& border, bool inPixels = false );
+  void SetNinePatchBorder( const Vector4& border );
 
   /**
-   * @copydoc Dali::ImageActor::GetNinePatchBorder
+   * @copydoc Dali::ImageActor::GetNinePatchBorder()
    */
   Vector4 GetNinePatchBorder() const;
-
-  /**
-   * Retrieve the attachment which renders the image.
-   * @return The attachment.
-   */
-  ImageAttachment& GetImageAttachment();
-
 
   /**
    * @copydoc Dali::RenderableActor::SetSortModifier()
@@ -135,16 +128,6 @@ public:
    * @copydoc Dali::RenderableActor::GetSortModifier()
    */
   float GetSortModifier() const;
-
-  /**
-   * @copydoc Dali::RenderableActor::SetDepthIndex()
-   */
-  void SetDepthIndex( int depthIndex );
-
-  /**
-   * @copydoc Dali::RenderableActor::GetDepthIndex()
-   */
-  int GetDepthIndex() const;
 
   /**
    * @copydoc Dali::RenderableActor::SetCullFace()
@@ -217,6 +200,11 @@ public:
    * @copydoc Dali::RenderableActor::GetFilterMode()
    */
   void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
+
+  /**
+   * @brief Allows this ImageActor to respond to the eventa that the shader effect's effect texture has been changed
+   */
+  void EffectImageUpdated();
 
 public:
   /**
@@ -293,13 +281,6 @@ public: // From Actor
    */
   virtual Vector3 GetNaturalSize() const;
 
-private: // From RenderableActor
-
-  /**
-   * @copydoc RenderableActor::GetRenderableAttachment
-   */
-  virtual RenderableAttachment& GetRenderableAttachment() const;
-
 protected:
 
   /**
@@ -322,19 +303,30 @@ private:
   Vector2 CalculateNaturalSize() const;
 
   /**
-   * From Actor; used to trigger fade-in animations.
+   * Update the grid geometry.
    */
-  virtual void OnStageConnectionInternal();
+  void UpdateGeometry();
 
   /**
-   * From Actor; used to notify Image.
+   * Update the texture rect uniform
    */
-  virtual void OnStageDisconnectionInternal();
+  void UpdateTexureRect();
 
 private:
 
-  ImageAttachmentPtr mImageAttachment; ///< Used to display the image (holds a pointer to currently showed Image)
-
+  ShaderEffectPtr         mShaderEffect;            ///< Optional referenced shader effect
+  RendererPtr             mRenderer;                ///< The renderer used to render the image
+  PixelArea               mPixelArea;               ///< The pixel area of the image to render
+  Vector4                 mBlendColor;              ///< The blend color for this ImageActor
+  Vector4                 mNinePatchBorder;         ///< Nine-patch not supported, but this is used to store what is set so it can be returned for backwards compatibility.
+  Uint16Pair              mGridSize;                ///< The geometry grid size
+  int                     mRendererIndex;           ///< The index location of mRenderer
+  size_t                  mTextureIndex;            ///< The texture index for this ImageActor's texture
+  size_t                  mEffectTextureIndex;      ///< The texture index for this ImageActor's effect texture
+  FilterMode::Type        mMinFilter;               ///< The minification filter currently set
+  FilterMode::Type        mMagFilter;               ///< The magnification filter currently set
+  Dali::ImageActor::Style mStyle;                   ///< The style set by SetStyle. Not used internally, only used to store what is set so it can be returned for backwards compatibility.
+  bool                    mIsPixelAreaSet;          ///< Flag indicating if the pixel area has been set
 };
 
 } // namespace Internal

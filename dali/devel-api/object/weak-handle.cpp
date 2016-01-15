@@ -132,4 +132,11 @@ Handle WeakHandleBase::GetBaseHandle() const
   return Handle( mImpl->mObject );
 }
 
+void WeakHandleBase::Reset()
+{
+  delete mImpl;
+  mImpl = NULL;
+}
+
+
 } // Dali

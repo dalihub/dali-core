@@ -23,10 +23,10 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/gl-resources/frame-buffer-state-cache.h>
@@ -537,7 +537,7 @@ public:
    * enables GL_CULL_FACE if in any of the face culling modes
    * otherwise disables GL_CULL_FACE
    */
-  void CullFace(CullFaceMode mode)
+  void CullFace( Dali::Material::FaceCullingMode mode )
   {
     // Avoid unnecessary calls to gl
     if(mCullFaceMode != mode)
@@ -545,14 +545,14 @@ public:
       mCullFaceMode = mode;
       switch(mode)
       {
-        case CullNone:
+        case Dali::Material::NONE:
         {
           LOG_GL("Disable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE) );
           break;
         }
 
-        case CullFront:
+        case Dali::Material::CULL_FRONT:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -561,7 +561,7 @@ public:
           break;
         }
 
-        case CullBack:
+        case Dali::Material::CULL_BACK:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -570,7 +570,7 @@ public:
           break;
         }
 
-        case CullFrontAndBack:
+        case Dali::Material::CULL_BACK_AND_FRONT:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -1642,70 +1642,6 @@ public:
    */
   const Rect< int >& GetViewport();
 
-  /**
-   * Set the frame count of render thread
-   */
-  inline void SetFrameCount(unsigned int frameCount)
-  {
-    mFrameCount = frameCount;
-  }
-
-  /**
-   * Get the frame count
-   */
-  inline unsigned int GetFrameCount()
-  {
-    return mFrameCount;
-  }
-
-  /**
-   * Increment the count of culled renderers
-   */
-  inline void IncrementCulledCount()
-  {
-    mCulledCount++;
-  }
-
-  /**
-   * Clear the count of culled renderers
-   */
-  inline void ClearCulledCount()
-  {
-    mCulledCount = 0;
-  }
-
-  /**
-   * Get the count of culled renderers in this frame
-   */
-  inline unsigned int GetCulledCount()
-  {
-    return mCulledCount;
-  }
-
-  /**
-   * Increment the count of culled renderers
-   */
-  inline void IncrementRendererCount()
-  {
-    mRendererCount++;
-  }
-
-  /**
-   * Clear the count of image renderers
-   */
-  inline void ClearRendererCount()
-  {
-    mRendererCount = 0;
-  }
-
-  /**
-   * Get the count of image renderers in this frame
-   */
-  inline unsigned int GetRendererCount()
-  {
-    return mRendererCount;
-  }
-
 private: // Implementation
 
   /**
@@ -1730,11 +1666,6 @@ private: // Implementation
   void FlushVertexAttributeLocations();
 
   /**
-   * Reset the cached internal vertex attribute state
-   */
-  void ResetVertexAttributeState();
-
-  /**
    * Either enables or disables a vertex attribute location in the cache
    * The cahnges won't take affect until FlushVertexAttributeLocations is called
    * @param location attribute location
@@ -1745,7 +1676,7 @@ private: // Implementation
   /**
    * Sets the initial GL state.
    */
-  void ResetGlState();
+  void InitializeGlState();
 
 private: // Data
 
@@ -1794,7 +1725,7 @@ private: // Data
   Vector4 mClearColor;        ///< clear color
 
   // Face culling mode
-  CullFaceMode mCullFaceMode;
+  Dali::Material::FaceCullingMode mCullFaceMode;
 
   // cached viewport size
   Rect< int > mViewPort;
@@ -1803,9 +1734,6 @@ private: // Data
   bool mVertexAttributeCachedState[ MAX_ATTRIBUTE_CACHE_SIZE ];    ///< Value cache for Enable Vertex Attribute
   bool mVertexAttributeCurrentState[ MAX_ATTRIBUTE_CACHE_SIZE ];   ///< Current state on the driver for Enable Vertex Attribute
 
-  unsigned int mFrameCount;       ///< Number of render frames
-  unsigned int mCulledCount;      ///< Number of culled renderers per frame
-  unsigned int mRendererCount;    ///< Number of image renderers per frame
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 };
 

@@ -196,7 +196,7 @@ int UtcDaliMaterialGetNumberOfTextures(void)
   tet_infoline("Test GetNumberOfTextures()");
 
   Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -231,7 +231,7 @@ int UtcDaliMaterialSetFaceCullingMode(void)
 
   tet_infoline("Test SetFaceCullingMode(cullingMode)");
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -241,17 +241,58 @@ int UtcDaliMaterialSetFaceCullingMode(void)
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& cullFaceStack = gl.GetCullFaceTrace();
-  cullFaceStack.Reset();
   gl.EnableCullFaceCallTrace(true);
 
-  material.SetFaceCullingMode( Material::CULL_BACK_AND_FRONT);
-  application.SendNotification();
-  application.Render();
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_BACK_AND_FRONT );
+    application.SendNotification();
+    application.Render();
 
-  // Todo: test the glCullFace(GL_FRONT_AND_BACK) is actually been called, cannot pass this test with current implementation
-  DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 0, TEST_LOCATION);
-  //string parameter("GL_FRONT_AND_BACK" );
-  //DALI_TEST_CHECK( cullFaceStack.TestMethodAndParams(0, "CullFace", parameter) );
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_FRONT_AND_BACK;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_BACK );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_BACK;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::CULL_FRONT );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 1, TEST_LOCATION );
+
+    std::ostringstream cullModeString;
+    cullModeString << GL_FRONT;
+
+    DALI_TEST_CHECK( cullFaceStack.FindMethodAndParams( "CullFace", cullModeString.str() ) );
+  }
+
+  {
+    cullFaceStack.Reset();
+    material.SetFaceCullingMode( Material::NONE );
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 0, TEST_LOCATION );
+  }
 
   END_TEST;
 }
@@ -263,10 +304,12 @@ int UtcDaliMaterialBlendingOptions01(void)
   tet_infoline("Test SetBlendFunc(src, dest) ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  // set a transparent actor color so that blending is enabled
+  actor.SetOpacity( 0.5f );
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -274,18 +317,16 @@ int UtcDaliMaterialBlendingOptions01(void)
   material.SetBlendFunc(BlendingFactor::ONE_MINUS_SRC_COLOR, BlendingFactor::SRC_ALPHA_SATURATE);
 
   // Test that Set was successful:
-  {
-    BlendingFactor::Type srcFactorRgb( BlendingFactor::ZERO );
-    BlendingFactor::Type destFactorRgb( BlendingFactor::ZERO );
-    BlendingFactor::Type srcFactorAlpha( BlendingFactor::ZERO );
-    BlendingFactor::Type destFactorAlpha( BlendingFactor::ZERO );
-    material.GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  BlendingFactor::Type srcFactorRgb( BlendingFactor::ZERO );
+  BlendingFactor::Type destFactorRgb( BlendingFactor::ZERO );
+  BlendingFactor::Type srcFactorAlpha( BlendingFactor::ZERO );
+  BlendingFactor::Type destFactorAlpha( BlendingFactor::ZERO );
+  material.GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 
-    DALI_TEST_EQUALS( BlendingFactor::ONE_MINUS_SRC_COLOR, srcFactorRgb,    TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingFactor::SRC_ALPHA_SATURATE,  destFactorRgb,   TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingFactor::ONE_MINUS_SRC_COLOR, srcFactorAlpha,  TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingFactor::SRC_ALPHA_SATURATE,  destFactorAlpha, TEST_LOCATION );
-  }
+  DALI_TEST_EQUALS( BlendingFactor::ONE_MINUS_SRC_COLOR, srcFactorRgb,    TEST_LOCATION );
+  DALI_TEST_EQUALS( BlendingFactor::SRC_ALPHA_SATURATE,  destFactorRgb,   TEST_LOCATION );
+  DALI_TEST_EQUALS( BlendingFactor::ONE_MINUS_SRC_COLOR, srcFactorAlpha,  TEST_LOCATION );
+  DALI_TEST_EQUALS( BlendingFactor::SRC_ALPHA_SATURATE,  destFactorAlpha, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -307,10 +348,11 @@ int UtcDaliMaterialBlendingOptions02(void)
   tet_infoline("Test SetBlendFunc(srcRgb, destRgb, srcAlpha, destAlpha) ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  actor.SetOpacity( 0.5f ); // enable blending
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -353,7 +395,7 @@ int UtcDaliMaterialBlendingOptions03(void)
   tet_infoline("Test GetBlendEquation() defaults ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -362,13 +404,11 @@ int UtcDaliMaterialBlendingOptions03(void)
   Stage::GetCurrent().Add(actor);
 
   // Test the defaults as documented in blending.h
-  {
-    BlendingEquation::Type equationRgb( BlendingEquation::SUBTRACT );
-    BlendingEquation::Type equationAlpha( BlendingEquation::SUBTRACT );
-    material.GetBlendEquation( equationRgb, equationAlpha );
-    DALI_TEST_EQUALS( BlendingEquation::ADD, equationRgb, TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingEquation::ADD, equationAlpha, TEST_LOCATION );
-  }
+  BlendingEquation::Type equationRgb( BlendingEquation::SUBTRACT );
+  BlendingEquation::Type equationAlpha( BlendingEquation::SUBTRACT );
+  material.GetBlendEquation( equationRgb, equationAlpha );
+  DALI_TEST_EQUALS( BlendingEquation::ADD, equationRgb, TEST_LOCATION );
+  DALI_TEST_EQUALS( BlendingEquation::ADD, equationAlpha, TEST_LOCATION );
 
   END_TEST;
 }
@@ -381,10 +421,11 @@ int UtcDaliMaterialBlendingOptions04(void)
   tet_infoline("Test SetBlendEquation() ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  actor.SetOpacity( 0.1f );
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -426,10 +467,11 @@ int UtcDaliMaterialSetBlendMode01(void)
   tet_infoline("Test setting the blend mode to on with an opaque color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  actor.SetOpacity( 0.98f );
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -437,12 +479,12 @@ int UtcDaliMaterialSetBlendMode01(void)
   material.SetBlendMode(BlendingMode::ON);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -458,10 +500,11 @@ int UtcDaliMaterialSetBlendMode02(void)
   tet_infoline("Test setting the blend mode to off with a transparent color renders with blending disabled (and not enabled)");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  actor.SetOpacity( 0.15f );
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -469,12 +512,12 @@ int UtcDaliMaterialSetBlendMode02(void)
   material.SetBlendMode(BlendingMode::OFF);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -489,10 +532,11 @@ int UtcDaliMaterialSetBlendMode03(void)
   tet_infoline("Test setting the blend mode to auto with a transparent material color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(0.5f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
+  actor.SetOpacity( 0.75f );
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add(actor);
@@ -500,12 +544,12 @@ int UtcDaliMaterialSetBlendMode03(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -520,7 +564,7 @@ int UtcDaliMaterialSetBlendMode04(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color renders with blending disabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -531,12 +575,12 @@ int UtcDaliMaterialSetBlendMode04(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -551,7 +595,7 @@ int UtcDaliMaterialSetBlendMode04b(void)
   tet_infoline("Test setting the blend mode to auto with an opaque material color and a transparent actor color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -563,12 +607,12 @@ int UtcDaliMaterialSetBlendMode04b(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -583,7 +627,7 @@ int UtcDaliMaterialSetBlendMode04c(void)
   tet_infoline("Test setting the blend mode to auto with an opaque material color and an opaque actor color renders with blending disabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -595,12 +639,12 @@ int UtcDaliMaterialSetBlendMode04c(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -616,7 +660,7 @@ int UtcDaliMaterialSetBlendMode05(void)
 
   Geometry geometry = CreateQuadGeometry();
   BufferImage image = BufferImage::New( 40, 40, Pixel::RGBA8888 );
-  Material material = CreateMaterial(1.0f, image);
+  Material material = CreateMaterial( image );
   Renderer renderer = Renderer::New( geometry, material );
 
   Actor actor = Actor::New();
@@ -627,12 +671,12 @@ int UtcDaliMaterialSetBlendMode05(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -648,7 +692,6 @@ int UtcDaliMaterialSetBlendMode06(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
   Material material = Material::New(shader);
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Renderer renderer = Renderer::New( geometry, material );
 
@@ -660,12 +703,12 @@ int UtcDaliMaterialSetBlendMode06(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -682,7 +725,6 @@ int UtcDaliMaterialSetBlendMode06(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
   Material material = Material::New(shader);
-  material.SetProperty(Material::Property::COLOR, Color::TRANSPARENT);
 
   Renderer renderer = Renderer::New( geometry, material );
 
@@ -694,12 +736,12 @@ int UtcDaliMaterialSetBlendMode06(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
@@ -715,7 +757,6 @@ int UtcDaliMaterialSetBlendMode08(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
   Material material = Material::New(shader);
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
   material.AddTexture( image, "sTexture" );
   Renderer renderer = Renderer::New( geometry, material );
@@ -728,12 +769,12 @@ int UtcDaliMaterialSetBlendMode08(void)
   material.SetBlendMode(BlendingMode::AUTO);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableCullFaceCallTrace(true);
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", "GL_BLEND" ) );
 
   END_TEST;
@@ -749,10 +790,6 @@ int UtcDaliMaterialGetBlendMode(void)
   Material material = Material::New(shader);
 
   // default value
-  DALI_TEST_EQUALS( material.GetBlendMode(), BlendingMode::OFF, TEST_LOCATION );
-
-  // AUTO
-  material.SetBlendMode(BlendingMode::AUTO);
   DALI_TEST_EQUALS( material.GetBlendMode(), BlendingMode::AUTO, TEST_LOCATION );
 
   // ON
@@ -775,7 +812,6 @@ int UtcDaliMaterialSetBlendColor(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
   Material material = Material::New(shader);
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
   material.AddTexture( image, "sTexture" );
   Renderer renderer = Renderer::New( geometry, material );
@@ -787,6 +823,7 @@ int UtcDaliMaterialSetBlendColor(void)
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
 
+  material.SetBlendColor( Color::TRANSPARENT );
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( glAbstraction.GetLastBlendColor(), Color::TRANSPARENT, TEST_LOCATION );
@@ -838,7 +875,6 @@ int UtcDaliMaterialConstraint(void)
 
   Shader shader = Shader::New( "VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -883,7 +919,6 @@ int UtcDaliMaterialConstraint02(void)
 
   Shader shader = Shader::New( "VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -940,7 +975,6 @@ int UtcDaliMaterialAnimatedProperty01(void)
 
   Shader shader = Shader::New( "VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -984,7 +1018,6 @@ int UtcDaliMaterialAnimatedProperty02(void)
 
   Shader shader = Shader::New( "VertexSource", "FragmentSource");
   Material material = Material::New( shader );
-  material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, material );
@@ -1035,7 +1068,7 @@ int UtcDaliMaterialSetTextureUniformName01(void)
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image, "sTexture" );
 
   int textureIndex = material.GetTextureIndex( "sTexture" );
@@ -1073,7 +1106,7 @@ int UtcDaliMaterialSetTextureUniformName02(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   Image image2 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image, "sTexture");
   material.SetTextureUniformName( 0, "sEffectTexture" );
   material.AddTexture( image2, "sTexture2");
@@ -1108,57 +1141,13 @@ int UtcDaliMaterialSetTextureUniformName02(void)
   END_TEST;
 }
 
-int UtcDaliMaterialSetTextureAffectsTransparency(void)
-{
-  TestApplication application;
-
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-
-  Material material = CreateMaterial(1.0f);
-  material.AddTexture( image, "sTexture" );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add( actor );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  // Test SetAffectsTransparency( false )
-  material.SetTextureAffectsTransparency( 0, false );
-
-  gl.EnableCullFaceCallTrace(true);
-  application.SendNotification();
-  application.Render();
-
-  TraceCallStack& glEnableStack = gl.GetCullFaceTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
-  // Test SetAffectsTransparency( true )
-  material.SetTextureAffectsTransparency( 0, true );
-
-  glEnableStack.Reset();
-  gl.EnableCullFaceCallTrace(true);
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
-  END_TEST;
-}
-
 int UtcDaliMaterialAddTexture01(void)
 {
   TestApplication application;
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image, "sTexture");
 
   Geometry geometry = CreateQuadGeometry();
@@ -1198,7 +1187,7 @@ int UtcDaliMaterialAddTexture02(void)
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
 
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
@@ -1242,23 +1231,23 @@ int UtcDaliMaterialRemoveTexture(void)
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.RemoveTexture(0);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   material.RemoveTexture(1);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
   material.AddTexture( image, "sTexture", sampler );
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1u, TEST_LOCATION );
 
   material.RemoveTexture(1);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 1u, TEST_LOCATION );
 
   material.RemoveTexture(0);
-  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( material.GetNumberOfTextures(), 0u, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1269,7 +1258,7 @@ int UtcDaliMaterialSetSampler(void)
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image, "sTexture");
 
   Geometry geometry = CreateQuadGeometry();
@@ -1331,7 +1320,7 @@ int UtcDaliMaterialGetTextureIndex(void)
   Image image3 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
 
-  Material material = CreateMaterial(1.0f);
+  Material material = CreateMaterial();
   material.AddTexture( image0, "sTexture0");
   material.AddTexture( image1, "sTexture1");
   material.AddTexture( image2, "sTexture2");
@@ -1362,3 +1351,50 @@ int UtcDaliMaterialGetTextureIndex(void)
 
   END_TEST;
 }
+
+int UtcDaliMaterialGetTextureP(void)
+{
+  TestApplication application;
+
+  Image image0 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image1 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image2 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Image image3 = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+
+  Material material = CreateMaterial();
+  material.AddTexture( image0, "sTexture0");
+  material.AddTexture( image1, "sTexture1");
+  material.AddTexture( image2, "sTexture2");
+  material.AddTexture( image3, "sTexture3");
+
+  Image textureImage0 = material.GetTexture( "sTexture0" );
+  DALI_TEST_EQUALS( textureImage0, image0, TEST_LOCATION );
+
+  Image textureImage1 = material.GetTexture( "sTexture1" );
+  DALI_TEST_EQUALS( textureImage1, image1, TEST_LOCATION );
+
+  Image textureImage2 = material.GetTexture( "sTexture2" );
+  DALI_TEST_EQUALS( textureImage2, image2, TEST_LOCATION );
+
+  Image textureImage3 = material.GetTexture( "sTexture3" );
+  DALI_TEST_EQUALS( textureImage3, image3, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialGetTextureN(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+
+  Material material = CreateMaterial();
+  material.AddTexture( image, "sTexture");
+
+  Image textureImage = material.GetTexture( "sTextureTEST" );
+  DALI_TEST_CHECK( !textureImage );
+
+  END_TEST;
+}
+

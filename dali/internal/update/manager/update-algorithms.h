@@ -38,13 +38,6 @@ class PropertyOwner;
 class RenderQueue;
 
 /**
- * Recursively apply the constraints on the nodes.
- * @param[in] node to constraint.
- * @param[in] updateBufferIndex The current update buffer index.
-  */
-void ConstrainNodes( Node& node, BufferIndex updateBufferIndex );
-
-/**
  * Constrain the local properties of the PropertyOwner.
  * @param[in] propertyOwner The PropertyOwner to constrain
  * @param[in] updateBufferIndex The current update buffer index.

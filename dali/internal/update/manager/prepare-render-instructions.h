@@ -78,14 +78,15 @@ class RenderInstructionContainer;
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] sortedLayers The layers containing lists of opaque/transparent renderables.
  * @param[in] renderTask The rendering task information.
- * @param[in] renderTracker A tracker object if we need to know when this render instruction has actually rendered, or NULL if tracking is not required
+ * @param[in] sortingHelper to avoid allocating containers for sorting every frame
+ * @param[in] cull Whether frustum culling is enabled or not
  * @param[out] instructions The rendering instructions for the next frame.
  */
 void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                                SortedLayerPointers& sortedLayers,
                                RenderTask& renderTask,
                                RendererSortingHelper& sortingHelper,
-                               RenderTracker* renderTracker,
+                               bool cull,
                                RenderInstructionContainer& instructions );
 
 } // namespace SceneGraph

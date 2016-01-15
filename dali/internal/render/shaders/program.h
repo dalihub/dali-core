@@ -74,11 +74,7 @@ public:
   {
     ATTRIB_UNKNOWN = -1,
     ATTRIB_POSITION,
-    ATTRIB_NORMAL,
     ATTRIB_TEXCOORD,
-    ATTRIB_COLOR,
-    ATTRIB_BONE_WEIGHTS,
-    ATTRIB_BONE_INDICES,
     ATTRIB_TYPE_LAST
   };
 
@@ -159,6 +155,13 @@ public:
    * @return the index of the uniform in the GL program
    */
   GLint GetUniformLocation( unsigned int uniformIndex );
+
+  /**
+   * Gets the uniform location for a sampler
+   * @param [in] uniqueIndex of the sampler uniform in local cache
+   * @return the index of the uniform in the GL program
+   */
+  GLint GetSamplerUniformLocation( int32_t uniqueIndex, const std::string& samplerName );
 
   /**
    * Sets the uniform value
@@ -363,11 +366,13 @@ private:  // Data
   // location caches
   std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache
   std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
+  Dali::Vector< GLint > mSamplerUniformLocations; ///< sampler uniform location cache
 
   // uniform value caching
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
-  GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
+  GLfloat mUniformCacheFloat2[ MAX_UNIFORM_CACHE_SIZE ][2]; ///< Value cache for uniforms of two floats
+  GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four floats
   Vector3 mSizeUniformCache;                                ///< Cache value for size uniform
   bool mModifiesGeometry;  ///< True if the program changes geometry
 

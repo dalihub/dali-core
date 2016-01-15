@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,11 @@ namespace SceneGraph
 SceneControllerImpl::SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
                                           RenderQueue& renderQueue,
                                           DiscardQueue& discardQueue,
-                                          TextureCache& textureCache,
-                                          CompleteStatusManager& completeStatusManager )
+                                          TextureCache& textureCache )
 : mRenderMessageDispatcher( renderMessageDispatcher ),
   mRenderQueue( renderQueue ),
   mDiscardQueue( discardQueue ),
-  mTextureCache( textureCache ),
-  mCompleteStatusManager( completeStatusManager )
+  mTextureCache( textureCache )
 {
 }
 

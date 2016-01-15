@@ -154,8 +154,7 @@ void PropertyOwner::RemoveConstraint( ConstraintBase* constraint )
     }
   }
 
-  // Should not come here
-  DALI_ASSERT_DEBUG( false && "Constraint missing in RemoveConstraint" );
+  //it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
 }
 
 PropertyOwner::PropertyOwner()

@@ -40,7 +40,7 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "forward",       VECTOR3,   true,    false,       false,        Dali::PathConstrainer::Property::FORWARD )
 DALI_PROPERTY( "points",         ARRAY,    true,    false,       false,        Dali::PathConstrainer::Property::POINTS )
-DALI_PROPERTY( "control-points", ARRAY,    true,    false,       false,        Dali::PathConstrainer::Property::CONTROL_POINTS )
+DALI_PROPERTY( "controlPoints",  ARRAY,    true,    false,       false,        Dali::PathConstrainer::Property::CONTROL_POINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 } //Unnamed namespace

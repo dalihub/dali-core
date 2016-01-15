@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/common/image-sampler.h>
 
@@ -107,7 +106,6 @@ GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )
 }
 
 using Dali::Internal::Vertex2D;
-using Dali::Internal::Vertex3D;
 
 using namespace Dali::Pixel;
 
@@ -203,33 +201,6 @@ void Texture::GlCleanup()
   }
 }
 
-void Texture::MapUV(unsigned int numVerts,Vertex2D *verts, const PixelArea* pixelArea)
-{
-  MapUV(numVerts, (float*)(&verts->mU), sizeof(Vertex2D)/sizeof(float), pixelArea);
-}
-
-void Texture::MapUV(unsigned int numVerts,Vertex3D *verts, const PixelArea* pixelArea)
-{
-  MapUV(numVerts, (float*)(&verts->mU), sizeof(Vertex3D)/sizeof(float), pixelArea);
-}
-
-void Texture::MapUV(unsigned int numVerts, float* verts, unsigned int stride, const PixelArea* pixelArea)
-{
-  UvRect uv;
-
-  GetTextureCoordinates(uv, pixelArea);
-
-  float uScale = fabsf(uv.u2 - uv.u0);
-  float vScale = fabsf(uv.v2 - uv.v0);
-
-  for (unsigned int i = 0; i < numVerts; ++i)
-  {
-    verts[0] = uv.u0 + verts[0] * uScale;
-    verts[1] = uv.v0 + verts[1] * vScale;
-    verts += stride;
-  }
-}
-
 unsigned int Texture::GetWidth() const
 {
   return mWidth;
@@ -238,58 +209,6 @@ unsigned int Texture::GetWidth() const
 unsigned int Texture::GetHeight() const
 {
   return mHeight;
-}
-
-void Texture::GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea)
-{
-  if( pixelArea == NULL )
-  {
-     GetDefaultTextureCoordinates(uv);
-     return;
-  }
-
-  // pre-calulate the normalized values
-
-  const float uScale = 1.0f / float(mWidth);
-  const float vScale = 1.0f / float(mHeight);
-  const float x = uScale * float(pixelArea->x);
-  const float y = vScale * float(pixelArea->y);
-  const float width  = uScale * float(pixelArea->width);
-  const float height = vScale * float(pixelArea->height);
-
-
-  // bottom left
-  uv.u0 = x;
-  uv.v0 = y;
-
-  // top right
-  uv.u2 = x + width;
-  uv.v2 = y + height;
-
-};
-
-void Texture::GetDefaultTextureCoordinates(UvRect& uv) const
-{
-  if ((mWidth == mImageWidth) && (mHeight == mImageHeight))
-  {
-    // set the uv's to display 0,0 to 1,1
-    uv.Reset();
-    return;
-  }
-
-  // the texture co-ordinates go from 0 to 1. But the image is smaller than the
-  // texture, so we need to adjust the uv values.
-  float uScale = float(mImageWidth)  / float(mWidth);
-  float vScale = float(mImageHeight) / float(mHeight);
-
-  // bottom left
-  uv.u0 = 0.0f;
-  uv.v0 = 0.0f;
-
-  // top right
-  uv.u2 = uScale;
-  uv.v2 = vScale;
-
 }
 
 void Texture::ApplyFilterModeParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault )

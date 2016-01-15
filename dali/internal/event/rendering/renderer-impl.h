@@ -27,7 +27,6 @@
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
-#include <dali/internal/update/nodes/node.h>
 
 namespace Dali
 {

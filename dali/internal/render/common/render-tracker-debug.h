@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_DEBUG_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace Dali
 {
 namespace Internal
 {
-namespace SceneGraph
+namespace Render
 {
 
 #if defined(DEBUG_ENABLED)
@@ -41,8 +41,10 @@ Debug::Filter* gRenderTrackerLogFilter = Debug::Filter::New(Debug::NoLogging, fa
 #define TRACKER_LOG_FMT(level, format, args...)
 #endif
 
-} // SceneGraph
+} // Render
+
 } // Internal
+
 } // Dali
 
 #endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_DEBUG_H__

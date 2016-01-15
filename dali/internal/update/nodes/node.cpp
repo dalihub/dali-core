@@ -19,11 +19,18 @@
 #include <dali/internal/update/nodes/node.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/internal-constants.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/internal/common/internal-constants.h>
+
+namespace //Unnamed namespace
+{
+//Memory pool used to allocate new nodes. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
+}
 
 namespace Dali
 {
@@ -39,7 +46,7 @@ const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 Node* Node::New()
 {
-  return new Node();
+  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node();
 }
 
 Node::Node()
@@ -66,7 +73,6 @@ Node::Node()
   mIsRoot( false ),
   mInheritOrientation( true ),
   mInheritScale( true ),
-  mInhibitLocalTransform( false ),
   mIsActive( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( DEFAULT_POSITION_INHERITANCE_MODE ),
@@ -78,6 +84,11 @@ Node::Node()
 
 Node::~Node()
 {
+}
+
+void Node::operator delete( void* ptr )
+{
+  gNodeMemoryPool.FreeThreadSafe( static_cast<Node*>( ptr ) );
 }
 
 void Node::OnDestroy()
@@ -112,32 +123,6 @@ void Node::SetRoot(bool isRoot)
   DALI_ASSERT_DEBUG(!isRoot || mParent == NULL); // Root nodes cannot have a parent
 
   mIsRoot = isRoot;
-}
-
-bool Node::ResolveVisibility( BufferIndex updateBufferIndex )
-{
-  bool result = false;
-  const Vector4& color = GetWorldColor( updateBufferIndex );
-  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-  {
-    const float MAX_NODE_SIZE = float(1u<<30);
-    const Vector3& size = GetSize( updateBufferIndex );
-    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
-        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-    {
-      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
-          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
-      {
-        result = true;
-      }
-      else
-      {
-        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
-        DALI_LOG_ACTOR_TREE( mParent );
-      }
-    }
-  }
-  return result;
 }
 
 void Node::AddUniformMapping( UniformPropertyMapping* map )
@@ -300,28 +285,6 @@ void Node::ResetDefaultProperties( BufferIndex updateBufferIndex )
   mColor.ResetToBaseValue( updateBufferIndex );
 
   mDirtyFlags = NothingFlag;
-}
-
-bool Node::IsFullyVisible( BufferIndex updateBufferIndex ) const
-{
-  if( !IsVisible( updateBufferIndex ) )
-  {
-    return false;
-  }
-
-  Node* parent = mParent;
-
-  while( NULL != parent )
-  {
-    if( !parent->IsVisible( updateBufferIndex ) )
-    {
-      return false;
-    }
-
-    parent = parent->GetParent();
-  }
-
-  return true;
 }
 
 void Node::SetParent(Node& parentNode)

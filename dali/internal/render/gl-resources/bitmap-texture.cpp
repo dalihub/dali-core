@@ -18,12 +18,16 @@
 // CLASS HEADER
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 
+// EXTERNAL INCLUDES
+#include <cstring>
+
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/integration-api/debug.h>
-#include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
+
 
 namespace Dali
 {
@@ -238,34 +242,82 @@ void BitmapTexture::Update( Integration::Bitmap* srcBitmap, std::size_t xOffset,
 {
   if( NULL != srcBitmap )
   {
-    GLenum pixelFormat   = GL_RGBA;
-    GLenum pixelDataType = GL_UNSIGNED_BYTE;
-    Integration::ConvertToGlFormat( mPixelFormat, pixelDataType, pixelFormat );
+    Update( srcBitmap->GetBuffer(), srcBitmap->GetImageWidth(), srcBitmap->GetImageHeight(),
+            srcBitmap->GetPixelFormat(), xOffset, yOffset);
+  }
+}
 
-    if( !mId )
+void BitmapTexture::Update( PixelData* srcPixelData, std::size_t xOffset, std::size_t yOffset )
+{
+  if( NULL != srcPixelData )
+  {
+    Update( srcPixelData->GetBuffer(), srcPixelData->GetWidth(), srcPixelData->GetHeight(),
+            srcPixelData->GetPixelFormat(), xOffset, yOffset);
+  }
+}
+
+void BitmapTexture::Update( const unsigned char* pixels, std::size_t width, std::size_t height, Pixel::Format pixelFormat, std::size_t xOffset, std::size_t yOffset )
+{
+
+  GLenum pixelGLFormat   = GL_RGBA;
+  GLenum pixelDataType = GL_UNSIGNED_BYTE;
+  Integration::ConvertToGlFormat( mPixelFormat, pixelDataType, pixelGLFormat );
+
+  if( !mId )
+  {
+    mContext.GenTextures( 1, &mId );
+
+    mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
+    mContext.Bind2dTexture( mId );
+    mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+    mContext.TexImage2D( GL_TEXTURE_2D, 0, pixelGLFormat, mWidth, mHeight, 0, pixelGLFormat, pixelDataType, NULL );
+    mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  }
+  else
+  {
+    mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
+    mContext.Bind2dTexture( mId );
+    mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  }
+
+#if DALI_GLES_VERSION >= 30
+// for gles 3.0, uploading sub-image with different format is a valid operation
+  Integration::ConvertToGlFormat( srcBitmap->GetPixelFormat(), pixelDataType, pixelGLFormat );
+#else
+  // allows RGB888 source bitmap to be added to RGBA8888 texture, need to convert the bitmap format manually
+  if(pixelFormat == Pixel::RGB888 && mPixelFormat == Pixel::RGBA8888 )
+  {
+    std::size_t size = width * height;
+
+    Vector<PixelBuffer> tempBuffer;
+    tempBuffer.Reserve( size*4u );
+    PixelBuffer* data = tempBuffer.Begin();
+
+    for( std::size_t i=0u; i<size; i++ )
     {
-      mContext.GenTextures( 1, &mId );
-
-      mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
-      mContext.Bind2dTexture( mId );
-      mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
-      mContext.TexImage2D( GL_TEXTURE_2D, 0, pixelFormat, mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL );
-      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    }
-    else
-    {
-      mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
-      mContext.Bind2dTexture( mId );
-      mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+      data[i*4u] = pixels[i*3u];
+      data[i*4u+1] = pixels[i*3u+1];
+      data[i*4u+2] = pixels[i*3u+2];
+      data[i*4u+3] = 0xFF;
     }
 
     mContext.TexSubImage2D( GL_TEXTURE_2D, 0,
                             xOffset, yOffset,
-                            srcBitmap->GetImageWidth(), srcBitmap->GetImageHeight(),
-                            pixelFormat, pixelDataType, srcBitmap->GetBuffer() );
+                            width, height,
+                            pixelGLFormat, pixelDataType,
+                            data );
+
+    return;
   }
+#endif
+
+  mContext.TexSubImage2D( GL_TEXTURE_2D, 0,
+                          xOffset, yOffset,
+                          width, height,
+                          pixelGLFormat, pixelDataType,
+                          pixels );
 }
 
 void BitmapTexture::UpdateArea( const RectArea& updateArea )

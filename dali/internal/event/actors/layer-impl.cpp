@@ -53,8 +53,8 @@ namespace
 
 //              Name                Type      writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "clipping-enable",   BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
-DALI_PROPERTY( "clipping-box",      RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
+DALI_PROPERTY( "clippingEnable",    BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
+DALI_PROPERTY( "clippingBox",       RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
 DALI_PROPERTY( "behavior",          STRING,     true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
@@ -62,8 +62,8 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 const char* const ACTION_RAISE =           "raise";
 const char* const ACTION_LOWER =           "lower";
-const char* const ACTION_RAISE_TO_TOP =    "raise-to-top";
-const char* const ACTION_LOWER_TO_BOTTOM = "lower-to-bottom";
+const char* const ACTION_RAISE_TO_TOP =    "raiseToTop";
+const char* const ACTION_LOWER_TO_BOTTOM = "lowerToBottom";
 
 BaseHandle Create()
 {

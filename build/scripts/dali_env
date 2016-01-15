@@ -93,25 +93,40 @@ if($0 !~ m!^/!)
 $exec_path = dirname($exec_path);
 
 my $root_path = getcwd();
+
+# Search for the root dali-env directory
 if($exec_path =~ m!dali-env/opt/bin!)
 {
+    # We are using the installed dali_env script
+
     $root_path = $exec_path;
-    while($root_path !~ m!dali-env$!)
+    while(basename($root_path) ne "dali-env" && $root_path ne "")
     {
         $root_path = dirname($root_path);
     }
 }
-elsif($root_path =~ m!dali-env!)
+elsif($root_path =~ m!dali-env$! or $root_path =~ m!dali-env/!)
 {
-    while($root_path !~ m!dali-env$!)
+    # We are NOT using the installed dali_env script
+    # Find dali-env root from current directory
+
+    while(basename($root_path) ne "dali-env" && $root_path ne "")
     {
         $root_path = dirname($root_path);
     }
 }
 else
 {
-    $new_env = 1;
+    # dali-env root dir should be in the current directory
+
     $root_path .= "/dali-env";
+
+    if(! -e $root_path)
+    {
+      # Creating a new dali-env
+
+      $new_env = 1;
+    }
 }
 
 my $src_path     = "$root_path/src-packages";
@@ -163,7 +178,7 @@ sub create_setenv
     print <<"EOF";
 # To use the desktop libraries, please add the following lines to your .bashrc or
 # create a setenv script from them, e.g. by running this command as follows
-# \$ dali_env -s > setenv
+# \$ $install_path/bin/dali_env -s > setenv
 #
 # You can then source this script by using
 # \$ . setenv
@@ -526,6 +541,10 @@ if($opt_create)
     {
         die "Already in a dali-env directory\n";
         # Could query if user wants to re-create?
+    }
+    elsif(-e $root_path)
+    {
+        die "$root_path already exists\n";
     }
     elsif(-e $new_root)
     {

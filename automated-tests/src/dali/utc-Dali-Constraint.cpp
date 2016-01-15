@@ -365,11 +365,10 @@ int UtcDaliConstraintCloneP(void)
   // Reset
   calledCount = 0;
 
-  // Ensure constraint isn't called again if scene doesn't change
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( calledCount, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( calledCount, 1, TEST_LOCATION );
 
   // Apply the clone constraint
   constraintClone.Apply();
@@ -377,8 +376,8 @@ int UtcDaliConstraintCloneP(void)
   application.SendNotification();
   application.Render();
 
-  // Should only be called once for the new constraint clone ONLY
-  DALI_TEST_EQUALS( calledCount, 1, TEST_LOCATION );
+  // Should be called once for the new constraint clone and once for the original constraint
+  DALI_TEST_EQUALS( calledCount, 3, TEST_LOCATION );
 
   // Reset
   calledCount = 0;
@@ -569,7 +568,7 @@ int UtcDaliConstraintGetTargetPropertyP(void)
 
   Actor actor = Actor::New();
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTargetProperty(), Actor::Property::POSITION, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraint.GetTargetProperty(), (Property::Index)Actor::Property::POSITION, TEST_LOCATION );
 
   END_TEST;
 }
@@ -997,8 +996,7 @@ int UtcDaliConstraintApplySeveralTimes(void)
   application.SendNotification();
   application.Render();
 
-  // Constraint should not have been called as the input-properties (none) have not changed for the constraint
-  DALI_TEST_EQUALS( count, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( count, 1, TEST_LOCATION );
 
   // Reset
   count = 0;

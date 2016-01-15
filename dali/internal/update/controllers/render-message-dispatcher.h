@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ class MessageBase;
 namespace Render
 {
 class Renderer;
+class RenderTracker;
 }
 namespace SceneGraph
 {
 
 class RenderManager;
 class RenderQueue;
-class RenderTracker;
 class RenderGeometry;
 class PropertyBufferDataProvider;
 /**
@@ -104,18 +104,32 @@ public:
   void RemovePropertyBuffer( RenderGeometry& renderGeometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
+   * Set the geometry type of an existing render geometry
+   * @param[in] geometry The render geometry
+   * @param[in] geometryType The new geometry type
+   */
+  void SetGeometryType( RenderGeometry& geometry, int geometryType );
+
+  /**
+   * Set if an existing geometry requires depth testing
+   * @param[in] geometry The render geometry
+   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
+   */
+  void SetGeometryRequiresDepthTest( RenderGeometry& geometry, bool requiresDepthTest );
+
+  /**
    * Add a Render tracker.
    * @param[in] renderTracker The render tracker to add.
    * @post ownership is transferred
    */
-  void AddRenderTracker( RenderTracker& renderTracker );
+  void AddRenderTracker( Render::RenderTracker& renderTracker );
 
   /**
    * Remove a Render tracker.
    * @param[in] renderTracker The render tracker to add.
    * @post render tracker will be destroyed in the next Render pass.
    */
-  void RemoveRenderTracker( RenderTracker& renderTracker );
+  void RemoveRenderTracker( Render::RenderTracker& renderTracker );
 
 private:
 

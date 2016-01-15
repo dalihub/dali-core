@@ -24,13 +24,12 @@
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-new-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/resources/resource-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/common/internal-constants.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 
 
 namespace // unnamed namespace
@@ -39,6 +38,9 @@ namespace // unnamed namespace
 const unsigned int UNIFORM_MAP_READY      = 0;
 const unsigned int COPY_UNIFORM_MAP       = 1;
 const unsigned int REGENERATE_UNIFORM_MAP = 2;
+
+//Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Renderer> gRendererMemoryPool;
 
 void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, const Dali::Internal::SceneGraph::UniformMap& uniformMap )
 {
@@ -94,6 +96,11 @@ namespace Internal
 namespace SceneGraph
 {
 
+Renderer* Renderer::New()
+{
+  return new ( gRendererMemoryPool.AllocateRawThreadSafe() ) Renderer();
+}
+
 Renderer::Renderer()
 :mSceneController(0),
  mRenderer(NULL),
@@ -103,9 +110,8 @@ Renderer::Renderer()
  mRegenerateUniformMap(0),
  mResendDataProviders(false),
  mResendGeometry(false),
- mHasUntrackedResources(false),
- mFinishedResourceAcquisition(false),
  mResourcesReady(false),
+ mFinishedResourceAcquisition(false),
  mDepthIndex(0)
 {
   mUniformMapChanged[0]=false;
@@ -129,9 +135,23 @@ Renderer::~Renderer()
   }
 }
 
+void Renderer::operator delete( void* ptr )
+{
+  gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
+}
+
+
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  mMaterial->PrepareRender( updateBufferIndex );
+  mResourcesReady = false;
+  mFinishedResourceAcquisition = false;
+
+  // Can only be considered ready when all the scene graph objects are connected to the renderer
+  if( ( mGeometry ) && ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
+      ( mMaterial ) && ( mMaterial->GetShader() != NULL ) )
+  {
+    mMaterial->GetResourcesStatus( mResourcesReady, mFinishedResourceAcquisition );
+  }
 
   if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
@@ -174,12 +194,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-    // Tell renderer about a new provider
-    // @todo MESH_REWORK Should we instead create a new renderer when these change?
-
-    typedef MessageValue1< Render::NewRenderer, OwnerPointer<RenderDataProvider> > DerivedType;
+    typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::NewRenderer::SetRenderDataProvider, dataProvider );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
     mResendDataProviders = false;
   }
 
@@ -188,10 +205,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     // The first call to GetRenderGeometry() creates the geometry and sends it in a message
     RenderGeometry* geometry = mGeometry->GetRenderGeometry( mSceneController );
 
-    typedef MessageValue1< Render::NewRenderer, RenderGeometry* > DerivedType;
+    typedef MessageValue1< Render::Renderer, RenderGeometry* > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-    new (slot) DerivedType( mRenderer, &Render::NewRenderer::SetGeometry, geometry );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, geometry );
     mResendGeometry = false;
   }
 }
@@ -240,7 +257,7 @@ void Renderer::OnStageConnect()
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
     RenderGeometry* renderGeometry = mGeometry->GetRenderGeometry(mSceneController);
-    mRenderer = Render::NewRenderer::New( dataProvider, renderGeometry );
+    mRenderer = Render::Renderer::New( dataProvider, renderGeometry );
     mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
     mResendDataProviders = false;
     mResendGeometry = false;
@@ -312,148 +329,37 @@ const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) co
   return mCollectedUniformMap[bufferIndex];
 };
 
-void Renderer::PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager )
-{
-  mHasUntrackedResources = false;
-  mTrackedResources.Clear(); // Resource trackers are only needed if not yet completea
-
-  DALI_ASSERT_DEBUG( mSceneController );
-
-  CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
-  mResourcesReady = false;
-
-
-  mFinishedResourceAcquisition = false;
-
-  // Can only be considered ready when all the scene graph objects are connected to the renderer
-  if( ( mGeometry ) && ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
-      ( mMaterial ) && ( mMaterial->GetShader() != NULL ) )
-  {
-    unsigned int completeCount = 0;
-    unsigned int neverCount = 0;
-    unsigned int frameBufferCount = 0;
-
-    size_t textureCount( mMaterial->GetTextureCount() );
-    for( unsigned int i(0); i<textureCount; ++i )
-    {
-      ResourceId textureId = mMaterial->GetTextureId(i);
-      BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
-
-      mMaterial->SetIsFullyOpaque( i, metaData.IsFullyOpaque() );
-
-      switch( completeStatusManager.GetStatus( textureId ) )
-      {
-        case CompleteStatusManager::NOT_READY:
-        {
-          if( metaData.GetIsFramebuffer() )
-          {
-            frameBufferCount++;
-          }
-          if( completeStatusManager.FindResourceTracker(textureId) != NULL )
-          {
-            bool found = false;
-            std::size_t numTrackedResources = mTrackedResources.Count();
-            for( size_t i=0; i < numTrackedResources; ++i )
-            {
-              if(mTrackedResources[i] == textureId)
-              {
-                found = true;
-                break;
-              }
-            }
-            if( ! found )
-            {
-              mTrackedResources.PushBack( textureId );
-            }
-          }
-          else
-          {
-            mHasUntrackedResources = true;
-          }
-        }
-        break;
-
-        case CompleteStatusManager::COMPLETE:
-        {
-          completeCount++;
-        }
-        break;
-
-        case CompleteStatusManager::NEVER:
-        {
-          neverCount++;
-        }
-        break;
-      }
-    }
-
-    // We are ready if all samplers are complete, or those that aren't are framebuffers
-    // We are complete if all samplers are either complete or will nmResendGeometryever complete
-    mResourcesReady = ( completeCount + frameBufferCount >= textureCount ) ;
-    mFinishedResourceAcquisition = ( completeCount + neverCount >= textureCount );
-  }
-}
-
-void Renderer::GetReadyAndComplete(bool& ready, bool& complete) const
+void Renderer::GetReadyAndComplete( bool& ready, bool& complete ) const
 {
   ready = mResourcesReady;
-  complete = false;
-
-  CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
-
-  std::size_t numTrackedResources = mTrackedResources.Count();
-  if( mHasUntrackedResources || numTrackedResources == 0 )
-  {
-    complete = mFinishedResourceAcquisition;
-  }
-  else
-  {
-    // If there are tracked resources and no untracked resources, test the trackers
-    bool trackersComplete = true;
-    for( size_t i=0; i < numTrackedResources; ++i )
-    {
-      ResourceId id = mTrackedResources[i];
-      ResourceTracker* tracker = completeStatusManager.FindResourceTracker(id);
-      if( tracker  && ! tracker->IsComplete() )
-      {
-        trackersComplete = false;
-        break;
-      }
-    }
-
-    complete = mFinishedResourceAcquisition || trackersComplete;
-  }
+  complete = mFinishedResourceAcquisition;
 }
 
-// Called by ProcessRenderTasks after DoPrepareRender
-bool Renderer::IsFullyOpaque( BufferIndex updateBufferIndex, const Node& node ) const
+Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const
 {
-  bool opaque = false;
+  Renderer::Opacity opacity = Renderer::OPAQUE;
 
-  if( mMaterial != NULL )
+  if( mMaterial )
   {
-    Material::BlendPolicy blendPolicy = mMaterial->GetBlendPolicy();
-    switch( blendPolicy )
+    if( mMaterial->GetBlendPolicy() == Material::TRANSLUCENT )
     {
-      case Material::OPAQUE:
+      opacity = Renderer::TRANSLUCENT;
+    }
+    else if( mMaterial->GetBlendPolicy() == Material::USE_ACTOR_COLOR  )
+    {
+      float alpha = node.GetWorldColor( updateBufferIndex ).a;
+      if( alpha <= FULLY_TRANSPARENT )
       {
-        opaque = true;
-        break;
+        opacity = TRANSPARENT;
       }
-      case Material::TRANSPARENT:
+      else if( alpha <= FULLY_OPAQUE )
       {
-        opaque = false;
-        break;
-      }
-      case Material::USE_ACTOR_COLOR:
-      {
-        opaque = node.GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
-        break;
+        opacity = TRANSLUCENT;
       }
     }
   }
 
-  return opaque;
+  return opacity;
 }
 
 void Renderer::ConnectionsChanged( PropertyOwner& object )

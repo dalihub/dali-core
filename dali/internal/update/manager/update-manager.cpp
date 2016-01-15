@@ -45,13 +45,11 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/manager/object-owner-container.h>
-#include <dali/internal/update/manager/prepare-render-algorithms.h>
 #include <dali/internal/update/manager/process-render-tasks.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
@@ -60,13 +58,11 @@
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-sampler.h>
@@ -143,7 +139,6 @@ typedef GestureContainer::ConstIterator        GestureConstIter;
 struct UpdateManager::Impl
 {
   Impl( NotificationManager& notificationManager,
-        GlSyncAbstraction& glSyncAbstraction,
         CompleteNotificationInterface& animationFinishedNotifier,
         PropertyNotifier& propertyNotifier,
         ResourceManager& resourceManager,
@@ -167,11 +162,10 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
-    completeStatusManager( glSyncAbstraction, renderMessageDispatcher, resourceManager ),
     touchResampler( touchResampler ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    taskList ( completeStatusManager ),
-    systemLevelTaskList ( completeStatusManager ),
+    taskList( renderMessageDispatcher, resourceManager ),
+    systemLevelTaskList( renderMessageDispatcher, resourceManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
@@ -186,7 +180,7 @@ struct UpdateManager::Impl
     renderSortingHelper(),
     renderTaskWaiting( false )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
+    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache );
 
     renderers.SetSceneController( *sceneController );
     geometries.SetSceneController( *sceneController );
@@ -247,7 +241,6 @@ struct UpdateManager::Impl
   RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
-  CompleteStatusManager               completeStatusManager;         ///< Complete Status Manager
   TouchResampler&                     touchResampler;                ///< Used to resample touch events on every update.
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
@@ -294,7 +287,6 @@ struct UpdateManager::Impl
 };
 
 UpdateManager::UpdateManager( NotificationManager& notificationManager,
-                              GlSyncAbstraction& glSyncAbstraction,
                               CompleteNotificationInterface& animationFinishedNotifier,
                               PropertyNotifier& propertyNotifier,
                               ResourceManager& resourceManager,
@@ -307,7 +299,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
-                    glSyncAbstraction,
                     animationFinishedNotifier,
                     propertyNotifier,
                     resourceManager,
@@ -424,12 +415,6 @@ void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
 
   // attach node to attachment first so that parent is known by the time attachment is connected
   node->Attach( *attachment ); // node takes ownership
-
-  // @todo MESH_REWORK Remove after merge of SceneGraph::RenderableAttachment and SceneGraph::RendererAttachment
-  if( dynamic_cast<SceneGraph::ImageAttachment*>( attachment ) != NULL )
-  {
-    attachment->Initialize( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
 }
 
 void UpdateManager::AddObject( PropertyOwner* object )
@@ -679,8 +664,6 @@ bool UpdateManager::FlushQueue()
 
 void UpdateManager::ResetProperties( BufferIndex bufferIndex )
 {
-  PERF_MONITOR_START(PerformanceMonitor::RESET_PROPERTIES);
-
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
@@ -747,8 +730,6 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   {
     (*iter)->ResetToBaseValues( bufferIndex );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
 bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
@@ -770,8 +751,6 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastV
 
 void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  PERF_MONITOR_START(PerformanceMonitor::ANIMATE_NODES);
-
   AnimationContainer &animations = mImpl->animations;
   AnimationIter iter = animations.Begin();
   while ( iter != animations.End() )
@@ -797,47 +776,24 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // The application should be notified by NotificationManager, in another thread
     mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationFinishedNotifier );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
 }
 
-void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
+void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
 {
-  PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
-
-  // constrain custom objects... (in construction order)
+  //Constrain custom objects (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
-
   const OwnerContainer< PropertyOwner* >::Iterator endIter = customObjects.End();
   for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
   {
     PropertyOwner& object = **iter;
     ConstrainPropertyOwner( object, bufferIndex );
   }
+}
 
-  // constrain nodes... (in Depth First traversal order)
-  if ( mImpl->root )
-  {
-    ConstrainNodes( *(mImpl->root), bufferIndex );
-  }
-
-  if ( mImpl->systemLevelRoot )
-  {
-    ConstrainNodes( *(mImpl->systemLevelRoot), bufferIndex );
-  }
-
-  // constrain other property-owners after nodes as they are more likely to depend on a node's
-  // current frame property than vice versa. They tend to be final constraints (no further
-  // constraints depend on their properties)
-  // e.g. ShaderEffect uniform a function of Actor's position.
-  // Mesh vertex a function of Actor's position or world position.
-
-  // TODO: refactor this code (and reset nodes) as these are all just lists of property-owners
-  // they can be all processed in a super-list of property-owners.
-
+void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
+{
   // Constrain system-level render-tasks
   const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
-
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
   {
     RenderTask& task = **iter;
@@ -846,28 +802,22 @@ void UpdateManager::ApplyConstraints( BufferIndex bufferIndex )
 
   // Constrain render-tasks
   const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
   {
     RenderTask& task = **iter;
     ConstrainPropertyOwner( task, bufferIndex );
   }
+}
 
-  // Constrain Materials and geometries
-  mImpl->materials.ConstrainObjects( bufferIndex );
-  mImpl->geometries.ConstrainObjects( bufferIndex );
-  mImpl->renderers.ConstrainObjects( bufferIndex );
-
+void UpdateManager::ConstrainShaders( BufferIndex bufferIndex )
+{
   // constrain shaders... (in construction order)
   ShaderContainer& shaders = mImpl->shaders;
-
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
     ConstrainPropertyOwner( shader, bufferIndex );
   }
-
-  PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
 }
 
 void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
@@ -884,6 +834,20 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
       mImpl->notificationManager.QueueMessage( PropertyChangedMessage( mImpl->propertyNotifier, notification, notification->GetValidity() ) );
     }
     ++iter;
+  }
+}
+
+void UpdateManager::PrepareMaterials( BufferIndex bufferIndex )
+{
+  ObjectOwnerContainer<Material>::Iterator iter = mImpl->materials.GetObjectContainer().Begin();
+  const ObjectOwnerContainer<Material>::Iterator end = mImpl->materials.GetObjectContainer().End();
+  for( ; iter != end; ++iter )
+  {
+    //Apply constraints
+    ConstrainPropertyOwner( *(*iter), bufferIndex );
+
+    //Prepare material
+    (*iter)->Prepare( mImpl->resourceManager );
   }
 }
 
@@ -920,9 +884,11 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   unsigned int rendererCount( rendererContainer.Size() );
   for( unsigned int i(0); i<rendererCount; ++i )
   {
+    //Apply constraints
+    ConstrainPropertyOwner( *rendererContainer[i], bufferIndex );
+
     if( rendererContainer[i]->IsReferenced() )
     {
-      rendererContainer[i]->PrepareResources(bufferIndex, mImpl->resourceManager);
       rendererContainer[i]->PrepareRender( bufferIndex );
     }
   }
@@ -936,8 +902,6 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
   {
     return;
   }
-
-  PERF_MONITOR_START( PerformanceMonitor::UPDATE_NODES );
 
   // Prepare resources, update shaders, update attachments, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
@@ -953,30 +917,21 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
                                                         mImpl->resourceManager,
                                                         mImpl->renderQueue );
   }
-
-  PERF_MONITOR_END( PerformanceMonitor::UPDATE_NODES );
 }
 
 unsigned int UpdateManager::Update( float elapsedSeconds,
                                     unsigned int lastVSyncTimeMilliseconds,
                                     unsigned int nextVSyncTimeMilliseconds )
 {
-  PERF_MONITOR_END(PerformanceMonitor::FRAME_RATE);   // Mark the End of the last frame
-  PERF_MONITOR_NEXT_FRAME();             // Prints out performance info for the last frame (if enabled)
-  PERF_MONITOR_START(PerformanceMonitor::FRAME_RATE); // Mark the start of this current frame
-
-  // Measure the time spent in UpdateManager::Update
-  PERF_MONITOR_START(PerformanceMonitor::UPDATE);
-
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
-  // 1) Clear nodes/resources which were previously discarded
+  //Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear( bufferIndex );
 
-  // 2) Grab any loaded resources
+  //Grab any loaded resources
   bool resourceChanged = mImpl->resourceManager.UpdateCache( bufferIndex );
 
-  // 3) Process Touches & Gestures
+  //Process Touches & Gestures
   mImpl->touchResampler.Update();
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
@@ -992,17 +947,17 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 4) Reset properties from the previous update
+    //Reset properties from the previous update
     ResetProperties( bufferIndex );
   }
 
-  // 5) Process the queued scene messages
+  //Process the queued scene messages
   mImpl->messageQueue.ProcessMessages( bufferIndex );
 
-  // 6) Post Process Ids of resources updated by renderer
+  //Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
 
-  // 6.1) Forward compiled shader programs to event thread for saving
+  //Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -1010,43 +965,49 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 7) Animate
+    //Animate
     Animate( bufferIndex, elapsedSeconds );
 
-    // 8) Apply Constraints
-    ApplyConstraints( bufferIndex );
+    //Constraint custom objects
+    ConstrainCustomObjects( bufferIndex );
 
-    // 9) Check Property Notifications
-    ProcessPropertyNotifications( bufferIndex );
+    //Prepare materials and apply constraints to them
+    PrepareMaterials( bufferIndex );
 
-    // 10) Clear the lists of renderable-attachments from the previous update
-    ClearRenderables( mImpl->sortedLayers );
-    ClearRenderables( mImpl->systemLevelSortedLayers );
+    //Clear the lists of renderable-attachments from the previous update
+    for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
+    {
+      mImpl->sortedLayers[i]->ClearRenderables();
+    }
 
-    // 11) Update node hierarchy and perform sorting / culling.
-    //     This will populate each Layer with a list of renderers which are ready.
+    for( size_t i(0); i<mImpl->systemLevelSortedLayers.size(); ++i )
+    {
+      mImpl->systemLevelSortedLayers[i]->ClearRenderables();
+    }
+
+    //Update node hierarchy, apply constraints and perform sorting / culling.
+    //This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
+
+    //Apply constraints to RenderTasks, shaders and geometries
+    ConstrainRenderTasks( bufferIndex );
+    ConstrainShaders( bufferIndex );
+    mImpl->geometries.ConstrainObjects( bufferIndex );
+
+    //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
 
+    //Process Property Notifications
+    ProcessPropertyNotifications( bufferIndex );
 
-    // 12) Prepare for the next render
-    PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
-
-    PrepareRenderables( bufferIndex, mImpl->sortedLayers );
-    PrepareRenderables( bufferIndex, mImpl->systemLevelSortedLayers );
-    PERF_MONITOR_END(PerformanceMonitor::PREPARE_RENDERABLES);
-
-    PERF_MONITOR_START(PerformanceMonitor::PROCESS_RENDER_TASKS);
-
-    // 14) Process the RenderTasks; this creates the instructions for rendering the next frame.
-    // reset the update buffer index and make sure there is enough room in the instruction container
+    //Process the RenderTasks; this creates the instructions for rendering the next frame.
+    //reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
 
     if ( NULL != mImpl->root )
     {
       ProcessRenderTasks(  bufferIndex,
-                           mImpl->completeStatusManager,
                            mImpl->taskList,
                            *mImpl->root,
                            mImpl->sortedLayers,
@@ -1057,7 +1018,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       if ( NULL != mImpl->systemLevelRoot )
       {
         ProcessRenderTasks(  bufferIndex,
-                             mImpl->completeStatusManager,
                              mImpl->systemLevelTaskList,
                              *mImpl->systemLevelRoot,
                              mImpl->systemLevelSortedLayers,
@@ -1096,8 +1056,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     mImpl->notificationManager.QueueCompleteNotification( mImpl->taskList.GetCompleteNotificationInterface() );
   }
 
-  PERF_MONITOR_END(PerformanceMonitor::PROCESS_RENDER_TASKS);
-
   // Macro is undefined in release build.
   SNAPSHOT_NODE_LOGGING;
 
@@ -1107,18 +1065,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Check whether further updates are required
   unsigned int keepUpdating = KeepUpdatingCheck( elapsedSeconds );
 
-#ifdef PERFORMANCE_MONITOR_ENABLED
-  // Always keep rendering when measuring FPS
-  keepUpdating |= KeepUpdating::MONITORING_PERFORMANCE;
-#endif
-
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
-
-  PERF_MONITOR_END(PerformanceMonitor::UPDATE);
 
   return keepUpdating;
 }

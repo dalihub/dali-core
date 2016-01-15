@@ -154,10 +154,12 @@ const char* ImageTypeName[] = { "ResourceImage", "FrameBufferImage", "BufferImag
 enum ImageType                { RESOURCE_IMAGE,  FRAME_BUFFER_IMAGE, BUFFER_IMAGE };
 const unsigned int imageTypeCount = sizeof( ImageTypeName ) / sizeof( const char* );
 
-bool CompareEnums( const char * a, const char * b )
+bool CompareEnums( const char * a, const char * b, size_t& size )
 {
-  while( ( *a != '\0' ) && ( *b != '\0' ) )
+  size = 0;
+  while( ( *a != '\0' ) && ( *b != '\0' ) && ( *a != ',') && ( *b != ',') )
   {
+    ++size;
     char ca = *a;
     char cb = *b;
 
@@ -188,7 +190,10 @@ bool CompareEnums( const char * a, const char * b )
     ++b;
   }
 
-  if( ( *a == '\0' ) && ( *b == '\0' ) )
+  // enums can be comma separated so check ends and comma
+  if( ( ( *a == '\0' ) && ( *b == '\0' ) ) ||
+      ( ( *a == '\0' ) && ( *b == ','  ) ) ||
+      ( ( *a == ','  ) && ( *b == '\0' ) ) )
   {
     return true;
   }
@@ -198,13 +203,66 @@ bool CompareEnums( const char * a, const char * b )
 
 } // unnamed namespace
 
+bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, unsigned int tableCount, unsigned int& integerEnum )
+{
+  unsigned int ret = 0;
+
+  bool found = false;
+  bool done = false;
+
+  if( value && enumTable && tableCount )
+  {
+    const char* pValue = value;
+
+    while(!done)
+    {
+      size_t size = 0;
+
+      const StringEnum* table = enumTable;
+
+      for ( unsigned int i = 0; i < tableCount; ++i )
+      {
+        if( CompareEnums( pValue, table->string, size ) )
+        {
+          found = true;
+          ret |= table->value;
+          break;
+        }
+        table++;
+      }
+
+      done = true;
+
+      if(found)
+      {
+        // allow comma separated or'd value
+        if( *(pValue+size) == ',' )
+        {
+          pValue += size + 1;
+          done = false;
+        }
+      }
+
+    }
+
+    integerEnum = ret;
+  }
+
+  if ( !found )
+  {
+    DALI_LOG_ERROR( "Unknown enumeration string %s\n", value );
+  }
+  return found;
+}
+
 unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount )
 {
   unsigned int index = 0;
   bool found = false;
   for ( unsigned int i = 0; i < tableCount; ++i, ++index )
   {
-    if( CompareEnums( value, table->string ) )
+    size_t sizeIgnored = 0;
+    if( CompareEnums( value, table->string, sizeIgnored ) )
     {
       found = true;
       break;
@@ -281,7 +339,8 @@ Vector3 GetAnchorConstant( const std::string& value )
 {
   for( unsigned int i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
   {
-    if( CompareEnums( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name ) )
+    size_t sizeIgnored = 0;
+    if( CompareEnums( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name, sizeIgnored ) )
     {
       return ANCHOR_CONSTANT_TABLE[ i ].value;
     }
@@ -335,7 +394,7 @@ Image NewImage( const Property::Value& property )
       }
     }
 
-    value = map->Find( "load-policy" );
+    value = map->Find( "loadPolicy" );
     if( value )
     {
       std::string policy;
@@ -344,7 +403,7 @@ Image NewImage( const Property::Value& property )
       GetEnumeration< ResourceImage::LoadPolicy >( policy.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT, loadPolicy );
     }
 
-    value = map->Find( "release-policy" );
+    value = map->Find( "releasePolicy" );
     if( value )
     {
       std::string policy;
@@ -385,7 +444,7 @@ Image NewImage( const Property::Value& property )
     attributes.SetSize( width, height );
 
     Pixel::Format pixelFormat = Pixel::RGBA8888;
-    value = map->Find( "pixel-format" );
+    value = map->Find( "pixelFormat" );
     if( value )
     {
       std::string format;
@@ -393,7 +452,7 @@ Image NewImage( const Property::Value& property )
       GetEnumeration< Pixel::Format >( format.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT, pixelFormat );
     }
 
-    value = map->Find( "fitting-mode" );
+    value = map->Find( "fittingMode" );
     if( value )
     {
       std::string fitting;
@@ -405,7 +464,7 @@ Image NewImage( const Property::Value& property )
       }
     }
 
-    value = map->Find( "sampling-mode" );
+    value = map->Find( "samplingMode" );
     if( value )
     {
       std::string sampling;
@@ -554,7 +613,7 @@ Actor NewActor( const Property::Map& map )
           actor.Add( NewActor( actorArray[i].Get< Property::Map >() ) );
         }
       }
-      else if( key ==  "parent-origin" )
+      else if( key ==  "parentOrigin" )
       {
         // Parent Origin can be a string constant as well as a Vector3
 
@@ -568,7 +627,7 @@ Actor NewActor( const Property::Map& map )
           actor.SetParentOrigin( GetAnchorConstant( value.Get< std::string >() ) );
         }
       }
-      else if( key ==  "anchor-point" )
+      else if( key ==  "anchorPoint" )
       {
         // Anchor Point can be a string constant as well as a Vector3
 
@@ -644,7 +703,7 @@ void CreatePropertyMap( Image image, Property::Map& map )
     if ( bufferImage )
     {
       imageType = "BufferImage";
-      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+      map[ "pixelFormat" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
     else if ( FrameBufferImage::DownCast( image ) )
     {
@@ -652,13 +711,13 @@ void CreatePropertyMap( Image image, Property::Map& map )
     }
 
     map[ "type" ] = imageType;
-    map[ "release-policy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
+    map[ "releasePolicy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
     ResourceImage resourceImage = ResourceImage::DownCast( image );
     if( resourceImage )
     {
       map[ "filename" ] = resourceImage.GetUrl();
-      map[ "load-policy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+      map[ "loadPolicy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     int width( image.GetWidth() );
@@ -699,7 +758,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
     {
       element->value = value;
     }
-    else if( key == "alpha-function" )
+    else if( key == "alphaFunction" )
     {
       std::string alphaFunctionValue = value.Get< std::string >();
 
@@ -756,7 +815,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
         element->alphaFunction = AlphaFunction::EASE_OUT_BACK;
       }
     }
-    else if( key == "time-period" )
+    else if( key == "timePeriod" )
     {
       Property::Array timeArray = value.Get< Property::Array >();
 

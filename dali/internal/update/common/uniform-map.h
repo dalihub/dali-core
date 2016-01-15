@@ -64,7 +64,7 @@ public:
 /**
  * The UniformMap class is used to map uniform names to property values. It is available
  * in all of the classes responsible for rendering:
- * Actor, Renderer, Geometry, PropertyBuffer, Material, Sampler, Shader.
+ * Actor, Renderer, Geometry, Material, Shader.
  *
  * It can be observed for changes to the mapping table.
  */

@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
@@ -31,14 +30,13 @@ namespace Dali
 namespace Internal
 {
 
-CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable discardPolicy)
+CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable /*discardPolicy*/)
 : Texture(context,
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight(),
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight()),
   mBitmap(bitmap),
-  mDiscardPolicy(discardPolicy),
   mPixelFormat( bitmap->GetPixelFormat() )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);

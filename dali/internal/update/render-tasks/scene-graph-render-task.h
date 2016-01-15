@@ -33,13 +33,19 @@ namespace Dali
 namespace Internal
 {
 class FrameBufferTexture;
-class CompleteStatusManager;
+class ResourceManager;
+
+namespace Render
+{
+class RenderTracker;
+}
 
 namespace SceneGraph
 {
 class Node;
 class CameraAttachment;
 class RenderInstruction;
+class RenderMessageDispatcher;
 
 /**
  * RenderTasks describe how the Dali scene should be rendered.
@@ -47,6 +53,7 @@ class RenderInstruction;
 class RenderTask : public PropertyOwner
 {
 public:
+
   enum State
   {
     RENDER_CONTINUOUSLY,               ///< mRefreshRate > 0
@@ -64,6 +71,13 @@ public:
    * Virtual destructor
    */
   virtual ~RenderTask();
+
+  /**
+   * Initialize the render task. Called in update thread
+   * @param[in] renderMessageDispatcher to send messages to render thread
+   * @param[in] resourceManager to check and update status of FBOs
+   */
+  void Initialize( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager );
 
   /**
    * Set the nodes to be rendered.
@@ -98,8 +112,9 @@ public:
   /**
    * Set the frame-buffer used as a render target.
    * @param[in] resourceId The resource ID of the frame-buffer, or zero if not rendering off-screen.
+   * @param[in] isNativeFBO if this render task is targeting a native FBO
    */
-  void SetFrameBufferId( unsigned int resourceId );
+  void SetFrameBufferId( unsigned int resourceId, bool isNativeFBO );
 
   /**
    * Retrieve the resource ID of the frame-buffer.
@@ -108,7 +123,7 @@ public:
   unsigned int GetFrameBufferId() const;
 
   /**
-   * Set the value of property viewport-position
+   * Set the value of property viewportPosition
    * This value will persist only for the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
@@ -116,7 +131,7 @@ public:
   void SetViewportPosition( BufferIndex updateBufferIndex, const Vector2& value );
 
   /**
-   * Get the value of property viewport-position
+   * Get the value of property viewportPosition
    * @warning Should only be called from the Update thread
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
@@ -124,7 +139,7 @@ public:
   const Vector2& GetViewportPosition( BufferIndex bufferIndex ) const;
 
   /**
-   * Bake the value of the property viewport-position
+   * Bake the value of the property viewportPosition
    * This will also set the base value
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
@@ -132,7 +147,7 @@ public:
   void BakeViewportPosition( BufferIndex updateBufferIndex, const Vector2& value );
 
   /**
-   * Set the value of property viewport-size
+   * Set the value of property viewportSize
    * This value will persist only for the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
@@ -140,7 +155,7 @@ public:
   void SetViewportSize( BufferIndex updateBufferIndex, const Vector2& value );
 
   /**
-   * Get the value of property viewport-size
+   * Get the value of property viewportSize
    * @warning Should only be called from the Update thread
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
@@ -148,7 +163,7 @@ public:
   const Vector2& GetViewportSize( BufferIndex bufferIndex ) const;
 
   /**
-   * Bake the value of the property viewport-size
+   * Bake the value of the property viewportSize
    * This will also set the base value
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
@@ -156,7 +171,7 @@ public:
   void BakeViewportSize( BufferIndex updateBufferIndex, const Vector2& value );
 
   /**
-   * Get the value of property viewport-enabled
+   * Get the value of property viewportEnabled
    * @warning Should only be called from the Update thread
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
@@ -172,7 +187,7 @@ public:
   bool QueryViewport( BufferIndex bufferIndex, Viewport& viewport ) const;
 
   /**
-   * Set the value of property clear-color
+   * Set the value of property clearColor
    * This value will persist only for the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
@@ -180,7 +195,7 @@ public:
   void SetClearColor( BufferIndex updateBufferIndex, const Vector4& value );
 
   /**
-   * Get the value of property clear-color
+   * Get the value of property clearColor
    * @warning Should only be called from the Update thread
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
@@ -188,7 +203,7 @@ public:
   const Vector4& GetClearColor( BufferIndex bufferIndex ) const;
 
   /**
-   * Bake the value of the property clear-color
+   * Bake the value of the property clearColor
    * This will also set the base value
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
@@ -309,12 +324,6 @@ public:
   bool ViewMatrixUpdated();
 
   /**
-   * Set the complete status tracker.
-   * @param[in] completeStatusManager The complete status Tracker (not owned)
-   */
-  void SetCompleteStatusManager( CompleteStatusManager* completeStatusManager );
-
-  /**
    * @return A pointer to the camera used by the RenderTask
    */
   Node* GetCamera() const;
@@ -337,12 +346,14 @@ private: // PropertyOwner
   virtual void ResetDefaultProperties( BufferIndex currentBufferIndex );
 
 public: // Animatable Properties
-  AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewport-position
-  AnimatableProperty< Vector2 >   mViewportSize;        ///< viewport-size
-  AnimatableProperty< Vector4 >   mClearColor;          ///< clear-color
+  AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewportPosition
+  AnimatableProperty< Vector2 >   mViewportSize;        ///< viewportSize
+  AnimatableProperty< Vector4 >   mClearColor;          ///< clearColor
 
 private:
-  CompleteStatusManager* mCompleteStatusManager;
+  RenderMessageDispatcher* mRenderMessageDispatcher;
+  ResourceManager* mResourceManager;
+  Render::RenderTracker* mRenderSyncTracker;
   Node* mSourceNode;
   Node* mCameraNode;
   CameraAttachment* mCameraAttachment;
@@ -363,20 +374,21 @@ private:
   unsigned int mFrameCounter;       ///< counter for rendering every N frames
 
   unsigned int mRenderedOnceCounter;  ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
+  bool mTargetIsNativeFramebuffer; ///< Tells if our target is a native framebuffer
 
 };
 
 // Messages for RenderTask
 
-inline void SetFrameBufferIdMessage( EventThreadServices& eventThreadServices, RenderTask& task, unsigned int resourceId )
+inline void SetFrameBufferIdMessage( EventThreadServices& eventThreadServices, RenderTask& task, unsigned int resourceId, bool isNativeFBO )
 {
-  typedef MessageValue1< RenderTask, unsigned int > LocalType;
+  typedef MessageValue2< RenderTask, unsigned int, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetFrameBufferId, resourceId );
+  new (slot) LocalType( &task, &RenderTask::SetFrameBufferId, resourceId, isNativeFBO );
 }
 
 inline void SetClearColorMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Vector4& value )

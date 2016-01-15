@@ -28,7 +28,6 @@
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
@@ -68,39 +67,6 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
   {
     ConstraintBase& constraint = **iter;
     constraint.Apply( updateBufferIndex );
-  }
-}
-
-/**
- * Recursively apply the constraints on the nodes
- * @param node to constraint
- * @param updateBufferIndex buffer index to use
- * @return number of active constraints
- */
-void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
-{
-  ConstrainPropertyOwner( node, updateBufferIndex );
-
-  if( node.HasAttachment() )
-  {
-    // @todo Remove dynamic cast.
-    NodeAttachment& attachment = node.GetAttachment();
-    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
-    if( propertyOwner != NULL )
-    {
-      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
-    }
-  }
-
-  /**
-   *  Constrain the children next
-   */
-  NodeContainer& children = node.GetChildren();
-  const NodeIter endIter = children.End();
-  for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
-  {
-    Node& child = **iter;
-    ConstrainNodes( child, updateBufferIndex );
   }
 }
 
@@ -194,7 +160,6 @@ inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIn
     node.CopyPreviousWorldOrientation( updateBufferIndex );
     node.CopyPreviousWorldScale( updateBufferIndex );
     node.CopyPreviousWorldPosition( updateBufferIndex );
-    node.CopyPreviousSize( updateBufferIndex );
   }
 }
 
@@ -203,120 +168,15 @@ inline void UpdateNodeWorldMatrix( Node &node, int nodeDirtyFlags, BufferIndex u
   // If world-matrix needs to be recalculated
   if ( nodeDirtyFlags & TransformFlag )
   {
-    if( node.GetInhibitLocalTransform() )
-    {
-      node.SetWorldMatrix( updateBufferIndex,
-                           node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
-                           node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
-    }
-    else
-    {
-      node.SetWorldMatrix( updateBufferIndex,
-                           node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldOrientation(updateBufferIndex),
-                           node.GetWorldPosition(updateBufferIndex) );
-    }
+    node.SetWorldMatrix( updateBufferIndex,
+                         node.GetWorldScale(updateBufferIndex),
+                         node.GetWorldOrientation(updateBufferIndex),
+                         node.GetWorldPosition(updateBufferIndex) );
   }
   else
   {
     node.CopyPreviousWorldMatrix( updateBufferIndex );
   }
-}
-
-inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRenderable, int nodeDirtyFlags, BufferIndex updateBufferIndex )
-{
-  /**
-   * If world-matrix needs to be recalculated.
-   */
-  if ( ( nodeDirtyFlags & TransformFlag ) ||
-         updatedRenderable.IsScaleForSizeDirty() )
-  {
-    if( updatedRenderable.UsesGeometryScaling() )
-    {
-      // TODO: MESH_REWORK : remove scale for size
-      Vector3 scaling;
-      updatedRenderable.GetScaleForSize( node.GetSize( updateBufferIndex ), scaling );
-      if( node.GetInhibitLocalTransform() )
-      {
-        node.SetWorldMatrix( updateBufferIndex,
-                             node.GetWorldScale(updateBufferIndex) * scaling,
-                             node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
-                             node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
-      }
-      else
-      {
-        node.SetWorldMatrix( updateBufferIndex,
-                             node.GetWorldScale(updateBufferIndex) * scaling,
-                             node.GetWorldOrientation(updateBufferIndex),
-                             node.GetWorldPosition(updateBufferIndex) );
-      }
-    }
-    else
-    {
-      // no scaling, i.e. Image
-      if( node.GetInhibitLocalTransform() )
-      {
-        node.SetWorldMatrix( updateBufferIndex,
-                             node.GetWorldScale(updateBufferIndex),
-                             node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
-                             node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
-      }
-      else
-      {
-        node.SetWorldMatrix( updateBufferIndex,
-                             node.GetWorldScale(updateBufferIndex),
-                             node.GetWorldOrientation(updateBufferIndex),
-                             node.GetWorldPosition(updateBufferIndex) );
-      }
-    }
-  }
-  else
-  {
-    node.CopyPreviousWorldMatrix( updateBufferIndex );
-  }
-}
-
-/**
- * Update an attachment.
- * @return An updated renderable attachment if one was ready.
- */
-inline RenderableAttachment* UpdateAttachment( NodeAttachment& attachment,
-                                               Node& node,
-                                               BufferIndex updateBufferIndex,
-                                               ResourceManager& resourceManager,
-                                               int nodeDirtyFlags )
-{
-  // Allow attachments to do specialised processing during updates
-  attachment.Update( updateBufferIndex, node, nodeDirtyFlags );
-
-  RenderableAttachment* renderable = attachment.GetRenderable(); // not all scene objects render
-  if( renderable )
-  {
-    // Notify renderables when size has changed
-    // Size can change while node was invisible so we need to check size again if we were previously invisible
-    if( nodeDirtyFlags & (SizeFlag|VisibleFlag) )
-    {
-      renderable->SizeChanged( updateBufferIndex );
-    }
-
-    // check if node is visible
-    if( renderable->ResolveVisibility( updateBufferIndex ) )
-    {
-      renderable->PrepareResources( updateBufferIndex, resourceManager );
-    }
-  }
-  return renderable;
-}
-
-inline void AddRenderableToLayer( Layer& layer,
-                                  RenderableAttachment& renderable,
-                                  BufferIndex updateBufferIndex,
-                                  int inheritedDrawMode )
-{
-  // The renderables are stored into the opaque list temporarily for PrepareRenderables()
-  // step. The list is cleared by ProcessRenderTasks().
-  layer.colorRenderables.push_back( &renderable );
 }
 
 /**
@@ -330,7 +190,8 @@ inline int UpdateNodesAndAttachments( Node& node,
                                       Layer& currentLayer,
                                       int inheritedDrawMode )
 {
-  Layer* layer = &currentLayer;
+  //Apply constraints to the node
+  ConstrainPropertyOwner( node, updateBufferIndex );
 
   // Short-circuit for invisible nodes
   if ( !node.IsVisible( updateBufferIndex ) )
@@ -351,10 +212,12 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
-  if ( node.IsLayer() )
+  Layer* layer = &currentLayer;
+  Layer* nodeIsLayer( node.GetLayer() );
+  if( nodeIsLayer )
   {
     // all childs go to this layer
-    layer = node.GetLayer();
+    layer = nodeIsLayer;
 
     // assume layer is clean to begin with
     layer->SetReuseRenderers( updateBufferIndex, true );
@@ -366,33 +229,24 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
 
-  // Note: nodeDirtyFlags are passed in by reference and may be modified by the following function.
-  // It is important that the modified version of these flags are used by the RenderableAttachment.
+  // Note: nodeDirtyFlags are passed in by reference and may be modified by the following function
   UpdateNodeTransformValues( node, nodeDirtyFlags, updateBufferIndex );
 
   // Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
   inheritedDrawMode |= node.GetDrawMode();
 
-  if ( node.HasAttachment() )
+  if ( DALI_UNLIKELY( node.HasAttachment() ) )
   {
-    /*
-     * Add renderables for the children into the current Layer
-     */
-    RenderableAttachment* renderable = UpdateAttachment( node.GetAttachment(),
-                                                         node,
-                                                         updateBufferIndex,
-                                                         resourceManager,
-                                                         nodeDirtyFlags );
-
-
-    if( NULL != renderable )
+    //Apply constraints to the attachement
+    NodeAttachment& attachment = node.GetAttachment();
+    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
+    if( propertyOwner != NULL )
     {
-      // Update the world matrix after renderable update; the ScaleForSize property should now be calculated
-      UpdateNodeWorldMatrix( node, *renderable, nodeDirtyFlags, updateBufferIndex );
-
-      // The attachment is ready to render, so it is added to a set of renderables.
-      AddRenderableToLayer( *layer, *renderable, updateBufferIndex, inheritedDrawMode );
+      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
     }
+
+    //Update the attachment
+    attachment.Update( updateBufferIndex, node, nodeDirtyFlags );
   }
   else if( node.IsObserved() || node.GetRendererCount() )
   {
@@ -401,10 +255,7 @@ inline int UpdateNodesAndAttachments( Node& node,
     UpdateNodeWorldMatrix( node, nodeDirtyFlags, updateBufferIndex );
   }
 
-  if( node.ResolveVisibility(updateBufferIndex) )
-  {
-    node.PrepareRender( updateBufferIndex );
-  }
+  node.PrepareRender( updateBufferIndex );
 
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
@@ -443,14 +294,14 @@ int UpdateNodesAndAttachments( Layer& rootNode,
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
 
   // Short-circuit for invisible nodes
-  if ( !rootNode.IsVisible( updateBufferIndex ) )
+  if ( DALI_UNLIKELY( !rootNode.IsVisible( updateBufferIndex ) ) ) // almost never ever true
   {
     return 0;
   }
 
   // If the root node was not previously visible
   BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if ( !rootNode.IsVisible( previousBuffer ) )
+  if ( DALI_UNLIKELY( !rootNode.IsVisible( previousBuffer ) ) ) // almost never ever true
   {
     // The node was skipped in the previous update; it must recalculate everything
     rootNode.SetAllDirtyFlags();

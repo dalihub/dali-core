@@ -35,48 +35,6 @@ void mesh_material_test_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
-namespace
-{
-
-Material ConstructMaterial( const std::string& vertexShader,
-                            const std::string& fragmentShader,
-                            float opacity )
-{
-  Shader shader = Shader::New( vertexShader, fragmentShader );
-  Material customMaterial = Material::New(shader);
-  Vector4 color = Color::WHITE;
-  color.a = opacity;
-  customMaterial.SetProperty(Material::Property::COLOR, color);
-  return customMaterial;
-}
-
-void TestBlending( TestApplication& application, Material material, float actorOpacity, BlendingMode::Type blendingMode, bool expectedBlend )
-{
-  // Generate geometry & renderers
-  //Mesh mesh = Mesh::New(meshData);
-
-  application.SendNotification();
-  application.Render(0);
-  application.Render();
-  application.SendNotification();
-
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
-
-  //material.SetBlendMode(blendingMode);
-  actor.SetOpacity(actorOpacity);
-
-  TraceCallStack& cullFaceTrace = application.GetGlAbstraction().GetCullFaceTrace();
-  cullFaceTrace.Enable(true);
-  application.SendNotification();
-  application.Render();
-  //DALI_TEST_EQUALS( BlendEnabled( cullFaceTrace ), expectedBlend, TEST_LOCATION );
-}
-
-} // anonymous namespace
-
-
 /**
  * Test cases
  *

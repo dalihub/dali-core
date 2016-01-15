@@ -50,14 +50,20 @@ class RenderItem
 public:
 
   /**
-   * Create a new render-item.
+   * Construct a new RenderItem
    */
-  RenderItem();
+  static RenderItem* New();
 
   /**
    * Non-virtual destructor; RenderItem is not suitable as a base class.
    */
   ~RenderItem();
+
+  /**
+   * Overriden delete operator.
+   * Deletes the RenderItem from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Reset the render-item.
@@ -131,6 +137,11 @@ public:
   }
 
 private:
+
+  /**
+   * Private constructor. See RenderItem::New
+   */
+  RenderItem();
 
   // RenderItems should not be copied as they are heavy
   RenderItem( const RenderItem& item );

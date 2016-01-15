@@ -95,7 +95,6 @@ public:
   /**
    * Construct a new UpdateManager.
    * @param[in] notificationManager This should be notified when animations have finished.
-   * @param[in] glSyncAbstraction Used to determine when framebuffers are ready
    * @param[in] animationFinishedNotifier The CompleteNotificationInterface that handles animation completions
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] resourceManager The resource manager used to load textures etc.
@@ -107,7 +106,6 @@ public:
    * @param[in] touchResampler Used for re-sampling touch events.
    */
   UpdateManager( NotificationManager& notificationManager,
-                 Integration::GlSyncAbstraction& glSyncAbstraction,
                  CompleteNotificationInterface& animationFinishedNotifier,
                  PropertyNotifier& propertyNotifier,
                  ResourceManager& resourceManager,
@@ -521,18 +519,33 @@ private:
   void Animate( BufferIndex bufferIndex, float elapsedSeconds );
 
   /**
-   * Perform constraint updates.
-   * @note Applies constraints to nodes first (depth first search order).
-   * Then shader constraints second (construction order)
+   * Applies constraints to CustomObjects
    * @param[in] bufferIndex to use
    */
-  void ApplyConstraints( BufferIndex bufferIndex );
+  void ConstrainCustomObjects( BufferIndex bufferIndex );
+
+  /**
+   * Applies constraints to RenderTasks
+   * @param[in] bufferIndex to use
+   */
+  void ConstrainRenderTasks( BufferIndex bufferIndex );
+
+  /**
+   * Applies constraints to Shaders
+   * @param[in] bufferIndex to use
+   */
+  void ConstrainShaders( BufferIndex bufferIndex );
 
   /**
    * Perform property notification updates
    * @param[in] bufferIndex to use
    */
   void ProcessPropertyNotifications( BufferIndex bufferIndex );
+
+  /**
+   * Prepare materials for rendering
+   */
+  void PrepareMaterials( BufferIndex bufferIndex );
 
   /**
    * Pass shader binaries queued here on to event thread.
@@ -640,7 +653,6 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
   // Scene graph thread can modify this object.
   Node& parent = const_cast< Node& >( constParent );
 
-  // @todo MESH_REWORK Don't pass by owner pointer after merge with SceneGraph::RenderableAttachment ? (not needed if we split RendererAttachment to 2 objects)
   typedef MessageValue2< UpdateManager, Node*, NodeAttachmentOwner > LocalType;
 
   // Reserve some memory inside the message queue

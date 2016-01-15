@@ -379,7 +379,7 @@ int UtcDaliVector3ConstOperatorSubscriptP(void)
   try
   {
     float& w = testVector[4];
-    if(w==0.0f);
+    (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
   catch (Dali::DaliException& e)
@@ -391,7 +391,7 @@ int UtcDaliVector3ConstOperatorSubscriptP(void)
   try
   {
     const float& w = testVector2[4];
-    if(w==0.0f);
+    (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
   catch (Dali::DaliException& e)

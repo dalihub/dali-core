@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/internal/common/shader-saver.h>
 
 namespace Dali
@@ -67,7 +68,7 @@ public:
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Internal::ShaderDataPtr Load( const std::string& vertexSource, const std::string& fragmentSource, size_t& shaderHash );
+  Internal::ShaderDataPtr Load( const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::ShaderHints hints, size_t& shaderHash );
 
   /**
    * @brief Saves shader to memory cache and filesystem.

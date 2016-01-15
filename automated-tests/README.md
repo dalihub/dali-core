@@ -86,11 +86,11 @@ To execute tests, cd into automated-tests and run
 
 This will execute dali and dali-internal test sets. Note that the output summary for the first will be printed before running the second.
 
-By default the tests execute in parallel, which is faster but does not produce a single output file (summary.xml).  Use this to execute the tests in series:
+By default the tests execute in parallel, which is faster but does not produce any test case output files.  Use this to execute the tests in series:
 
     ./execute.sh -s
 
-To see the summary.xml results, execute the tests in series and open as follows:
+To see the results, copy the style folder from web-tct_2.2.1_r1/tools/tct-mgr/style into automated-tests and run
 
     firefox --new-window summary.xml
 

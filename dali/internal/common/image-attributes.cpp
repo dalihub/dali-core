@@ -72,7 +72,6 @@ struct ImageAttributes::ImageAttributesImpl
   ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
   FilterMode    filtering : 3;    ///< filtering option. Box is the default
   bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
-  bool          isDistanceField : 1;  ///< true, if the image is a distancefield. Default is false.
 };
 
 
@@ -184,12 +183,6 @@ ImageAttributes ImageAttributes::New(unsigned int imageWidth, unsigned int image
  */
 bool operator<(const ImageAttributes& a, const ImageAttributes& b)
 {
-  // Bail out if one is distance field and the other is not.
-  if (a.impl->isDistanceField != b.impl->isDistanceField)
-  {
-    return a.impl->isDistanceField < b.impl->isDistanceField;
-  }
-
   if (a.impl->width != b.impl->width)
   {
     return a.impl->width < b.impl->width;

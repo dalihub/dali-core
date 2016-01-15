@@ -32,12 +32,11 @@ namespace BlendingMode
 {
 /**
  * @brief Blending mode.
- * @see Dali::RenderableActor::SetBlendMode() and Dali::RenderableActor::GetBlendMode()
  */
 enum Type
 {
   OFF,  ///< Blending is disabled.
-  AUTO, ///< Blending is enabled if there is alpha channel.
+  AUTO, ///< Blending is enabled if there is alpha channel. This is the default mode.
   ON    ///< Blending is enabled.
 };
 

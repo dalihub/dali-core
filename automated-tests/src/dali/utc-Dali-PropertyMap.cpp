@@ -88,7 +88,7 @@ int UtcDaliPropertyMapConstOperator(void)
   // Invalid Key
   try
   {
-    constMap[ "invalid-key" ];
+    constMap[ "invalidKey" ];
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -188,7 +188,7 @@ int UtcDaliPropertyMapFind(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 2 );
 
-  value = map.Find( "invalid-key" );
+  value = map.Find( "invalidKey" );
   DALI_TEST_CHECK( !value );
 
   END_TEST;
@@ -197,14 +197,14 @@ int UtcDaliPropertyMapFind(void)
 int UtcDaliPropertyMapInsertP(void)
 {
   Property::Map map;
-  DALI_TEST_EQUALS( 0, map.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, map.Count(), TEST_LOCATION );
   map.Insert( "foo", "bar");
-  DALI_TEST_EQUALS( 1, map.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, map.Count(), TEST_LOCATION );
   Property::Value* value = map.Find( "foo" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
   map.Insert( std::string("foo2"), "testing" );
-  DALI_TEST_EQUALS( 2, map.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2u, map.Count(), TEST_LOCATION );
   value = map.Find( "foo2" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RESOURCE_MANAGER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/images/pixel-data.h>
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -38,7 +39,6 @@
 #include <dali/internal/event/resources/resource-type-path.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
-#include <dali/internal/update/resources/bitmap-metadata.h>
 
 namespace Dali
 {
@@ -52,7 +52,7 @@ struct ResourceType;
 
 namespace Internal
 {
-
+class TextureMetadata;
 class ImageAttributes;
 
 // value types used by messages
@@ -264,6 +264,15 @@ public: // Used by ResourceClient
   void HandleUploadBitmapRequest( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
+   * Upload a pixel buffer to a position within a specified texture
+   * @param[in] destId The destination texture ID
+   * @param[in] pixelData pointer pointing to the pixel data to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void HandleUploadBitmapRequest( ResourceId destId, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset );
+
+  /**
    * Request reloading a resource from the native filesystem.
    * @param[in] id The resource id
    * @param[in] typePath The type & path of the resource
@@ -292,24 +301,39 @@ public: // Used by ResourceClient
    * @param[in] id The ID of a bitmap/texture resource.
    * @return true if the bitmap or texture has finished loading
    */
-  bool IsResourceLoaded(ResourceId id);
+  bool IsResourceLoaded( ResourceId id ) const;
 
   /**
    * Check if a resource has failed to load, e.g. file not found, etc.
    * @param[in] id The ID of a bitmap/texture resource.
    * @return true if the bitmap or texture has failed to load
    */
-  bool IsResourceLoadFailed(ResourceId id);
+  bool HasResourceLoadFailed( ResourceId id ) const;
 
   /**
-   * Get bitmap metadata. This stores meta data about the resource, but
-   * doesn't keep track of the resource
+   * @param[in] id The ID of a texture resource.
+   * @param[in] value if the FBO has been rendered to
    */
-  BitmapMetadata GetBitmapMetadata(ResourceId id);
+  void SetFrameBufferBeenRenderedTo( ResourceId id, bool value );
 
-    /********************************************************************************
-   ************************* ResourceCache Implementation  ************************
-   ********************************************************************************/
+  /**
+   * @param[in] id The ID of a texture resource.
+   * @return true if the FBO has been rendered to
+   */
+  bool HasFrameBufferBeenRenderedTo( ResourceId id ) const;
+
+  /**
+   * Get texture metadata. This stores meta data about the resource, but
+   * doesn't keep track of the resource
+   * @param id of the texture
+   * @param metadata reference
+   * @return false if metadata does not exist
+   */
+  bool GetTextureMetadata( ResourceId id, TextureMetadata*& metadata ) const;
+
+   /********************************************************************************
+    ************************* ResourceCache Implementation  ************************
+    ********************************************************************************/
 public:
 
   /**
@@ -522,6 +546,22 @@ inline void RequestUploadBitmapMessage( EventThreadServices& eventThreadServices
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, srcId, xOffset, yOffset );
+}
+
+inline void RequestUploadBitmapMessage(EventThreadServices& eventThreadServices,
+                                       ResourceManager& manager,
+                                       ResourceId destId,
+                                       PixelDataPtr pixelData,
+                                       std::size_t xOffset,
+                                       std::size_t yOffset)
+{
+  typedef MessageValue4< ResourceManager, ResourceId, PixelDataPtr , std::size_t, std::size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, pixelData, xOffset, yOffset );
 }
 
 inline void RequestReloadResourceMessage( EventThreadServices& eventThreadServices,

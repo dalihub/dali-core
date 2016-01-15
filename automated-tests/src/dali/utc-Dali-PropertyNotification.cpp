@@ -344,7 +344,7 @@ int UtcDaliPropertyNotificationGetProperty(void)
                                                                     GreaterThanCondition(100.0f));
   Property::Index targetProperty = notification.GetTargetProperty();
 
-  DALI_TEST_EQUALS( targetProperty, Actor::Property::POSITION_X, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetProperty, (Property::Index)Actor::Property::POSITION_X, TEST_LOCATION );
   END_TEST;
 }
 

@@ -60,6 +60,14 @@ AC_ARG_ENABLE([lock_backtrace],
               [enable_lock_backtrace=$enableval],
               [enable_lock_backtrace=no])
 
+AC_ARG_ENABLE([gles],
+              [AC_HELP_STRING([--enable-gles],
+                              [Specify the OpenGL ES version for backwards compatibility])],
+              [enable_gles=$enableval],
+              [enable_gles=20])
+
+DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
+
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
@@ -70,7 +78,7 @@ fi
 
 if test "x$enable_emscripten" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
-  # Automatically turn off backtrace support
+  # Automatically turn off backtrace support and mutex locks
   enable_backtrace="no"
   enable_lock_backtrace="no"
 fi

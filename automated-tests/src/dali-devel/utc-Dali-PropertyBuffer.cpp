@@ -143,7 +143,7 @@ int UtcDaliPropertyBufferSetData01(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( propertyBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -189,7 +189,7 @@ int UtcDaliPropertyBufferSetData02(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( propertyBuffer );
 
-  Material material = CreateMaterial(1.f);
+  Material material = CreateMaterial();
   Renderer renderer = Renderer::New(geometry, material);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
@@ -268,7 +268,7 @@ int UtcDaliPropertyBufferSetGetSize02(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  int size = 5u;
+  std::size_t size = 5u;
   PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, size );
   DALI_TEST_EQUALS( propertyBuffer.GetSize(), size, TEST_LOCATION );
   DALI_TEST_EQUALS( propertyBuffer.GetSize(), size, TEST_LOCATION );

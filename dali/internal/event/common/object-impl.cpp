@@ -358,7 +358,7 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   CustomPropertyMetadata* custom = FindCustomProperty( index );
   if( custom )
   {
-    return custom->type;
+    return custom->GetType();
   }
   return Property::NONE;
 }
@@ -622,29 +622,34 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
   }
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
 {
-  Property::Index index = RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
-
-  /// @todo: don't keep a table of mappings per handle.
-  AddUniformMapping(index, name);
-
-  return index;
+  return RegisterProperty( name, propertyValue, Property::ANIMATABLE );
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
-  Property::Index index = Property::INVALID_INDEX;
-
-  if(Property::ANIMATABLE == accessMode)
+  // If property with the required name already exists, then just set it.
+  Property::Index index = GetPropertyIndex( name );
+  if( index != Property::INVALID_INDEX )
   {
-    index = RegisterProperty(name, propertyValue);
+    SetProperty( index, propertyValue );
   }
   else
   {
-    // Add entry to the property lookup
-    index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
-    mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue, accessMode ) );
+    // Otherwise register the property
+
+    if(Property::ANIMATABLE == accessMode)
+    {
+      index = RegisterSceneGraphProperty( name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue );
+      AddUniformMapping( index, name );
+    }
+    else
+    {
+      // Add entry to the property lookup
+      index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+      mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue, accessMode ) );
+    }
   }
 
   return index;
@@ -819,7 +824,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
   {
     BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
 
-    switch ( entry->type )
+    switch ( entry->GetType() )
     {
       case Property::BOOLEAN:
       {
@@ -960,7 +965,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
 void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value )
 {
-  switch ( entry.type )
+  switch ( entry.GetType() )
   {
     case Property::BOOLEAN:
     {
@@ -1253,7 +1258,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
       if(basePropertyIndex == Property::INVALID_INDEX)
       {
         // If the property is not a component of a base property, register the whole property itself.
-        index = RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
+        RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
       }
       else
       {
@@ -1271,7 +1276,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
         if(animatableProperty)
         {
           // Create the metadata for the property component.
-          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->type, animatableProperty->GetSceneGraphProperty() ) );
+          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->GetType(), animatableProperty->GetSceneGraphProperty() ) );
         }
       }
 

@@ -165,13 +165,13 @@ public:
   bool OnStage() const;
 
   /**
-   * Query whether the actor is a RenderableActor derived type.
+   * Query whether the actor has any renderers.
    * @return True if the actor is renderable.
    */
   bool IsRenderable() const
   {
     // inlined as this is called a lot in hit testing
-    return mIsRenderable;
+    return mRenderers && !mRenderers->empty();
   }
 
   /**
@@ -1199,7 +1199,7 @@ public:
    * @copydoc Dali::Actor::GetMaximumSize
    */
   float GetMaximumSize( Dimension::Type dimension ) const;
-  
+
   /**
    * @copydoc Dali::Actor::AddRenderer()
    */
@@ -1248,7 +1248,7 @@ public:
    * @param[in] screenY The screen Y-coordinate.
    * @return True if the conversion succeeded.
    */
-  bool ScreenToLocal( RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const;
+  bool ScreenToLocal( const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const;
 
   /**
    * Converts from the actor's coordinate system to screen coordinates.
@@ -1454,10 +1454,11 @@ public:
   void NotifySizeAnimation( Animation& animation, const Vector3& targetSize );
 
   /**
-   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT property is animated.
+   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT or SIZE_DEPTH property is animated.
    *
    * @param[in] animation The animation that resized the actor
    * @param[in] targetSize The new target size of the actor
+   * @param[in] property The index of the property being animated
    */
   void NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property );
 
@@ -1469,11 +1470,28 @@ public:
   {
   }
 
+  /**
+   * This should only be called by Animation, when the actors POSITION property is animated.
+   *
+   * @param[in] animation The animation that repositioned the actor
+   * @param[in] targetPosition The new target position of the actor
+   */
+  void NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition );
+
+  /**
+   * This should only be called by Animation, when the actors POSITION_X or POSITION_Y or POSITION_Z property is animated.
+   *
+   * @param[in] animation The animation that repositioned the actor
+   * @param[in] targetPosition The new target position of the actor
+   * @param[in] property The index of the property being animated
+   */
+  void NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property );
+
 protected:
 
   enum DerivedType
   {
-    BASIC, RENDERABLE, LAYER, ROOT_LAYER
+    BASIC, LAYER, ROOT_LAYER
   };
 
   /**
@@ -1797,7 +1815,6 @@ protected:
 
   unsigned short mDepth                            :12; ///< Cached: The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
-  const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
   bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals

@@ -40,19 +40,12 @@ class PlatformAbstraction
 {
 public:
 
+  /**
+   * Virtual destructor.
+   */
   virtual ~PlatformAbstraction() {}
 
-  // Dali Lifecycle
-
-  /**
-   * Get the monotonic time since an unspecified reference point.
-   * This is used by Dali to calculate time intervals during animations; the interval is
-   * recalculated when Dali is resumed with Dali::Integration::Core::Resume().
-   * Multi-threading note: this method may be called from either the main or rendering thread.
-   * @param[out] seconds The time in seconds since the reference point.
-   * @param[out] microSeconds The remainder in microseconds.
-   */
-  virtual void GetTimeMicroseconds(unsigned int& seconds, unsigned int& microSeconds) = 0;
+  // DALi Lifecycle
 
   /**
    * Tell the platform abstraction that Dali is ready to pause, such as when the

@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/devel-api/rendering/shader.h> // ShaderHints
 
 namespace Dali
 {
@@ -47,10 +48,11 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    */
-  ShaderData(const std::string& vertexSource, const std::string& fragmentSource)
+  ShaderData(const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::ShaderHints hints)
   : mShaderHash( -1 ),
     mVertexShader(vertexSource),
-    mFragmentShader(fragmentSource)
+    mFragmentShader(fragmentSource),
+    mHints(hints)
   { }
 
 protected:
@@ -101,6 +103,13 @@ public: // API
     return mFragmentShader.c_str();
   }
 
+  /**
+   * @return the hints
+   */
+  Dali::Shader::ShaderHints GetHints() const
+  {
+    return mHints;
+  }
   /**
    * Check whether there is a compiled binary available
    * @return true if this objects contains a compiled binary
@@ -157,6 +166,7 @@ private: // Data
   size_t                      mShaderHash;     ///< hash key created with vertex and fragment shader code
   std::string                 mVertexShader;   ///< source code for vertex program
   std::string                 mFragmentShader; ///< source code for fragment program
+  Dali::Shader::ShaderHints   mHints;    ///< take a hint
   Dali::Vector<unsigned char> mBuffer;         ///< buffer containing compiled binary bytecode
 };
 

@@ -100,6 +100,13 @@ bool Layer::IsDepthTestDisabled() const
   return ( mBehavior == Dali::Layer::LAYER_2D ) || mDepthTestDisabled;
 }
 
+void Layer::ClearRenderables()
+{
+  stencilRenderables.Clear();
+  colorRenderables.Clear();
+  overlayRenderables.Clear();
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

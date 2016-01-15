@@ -55,13 +55,13 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 
 // Signals
 
-const char* const SIGNAL_KEY_EVENT =                 "key-event";
-const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
+const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
+const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
 const char* const SIGNAL_TOUCHED =                   "touched";
-const char* const SIGNAL_WHEEL_EVENT =               "wheel-event";
-const char* const SIGNAL_CONTEXT_LOST =              "context-lost";
-const char* const SIGNAL_CONTEXT_REGAINED =          "context-regained";
-const char* const SIGNAL_SCENE_CREATED =             "scene-created";
+const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
+const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
+const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
+const char* const SIGNAL_SCENE_CREATED =             "sceneCreated";
 
 TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
 
@@ -205,6 +205,18 @@ void Stage::SetSize(float width, float height)
   }
 
   SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+
+  // if single render task to screen then set its viewport parameters
+  if( 1 == mRenderTaskList->GetTaskCount() )
+  {
+    Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask(0);
+
+    if(!mDefaultRenderTask.GetTargetFrameBuffer())
+    {
+      mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+    }
+  }
+
 }
 
 Vector2 Stage::GetSize() const

@@ -104,7 +104,7 @@ ImageActor::PixelArea ImageActor::GetPixelArea() const
 
 void ImageActor::SetStyle(Style style)
 {
-  GetImplementation(*this).SetStyle(style);
+  GetImplementation(*this).SetStyle( style );
 }
 
 ImageActor::Style ImageActor::GetStyle() const
@@ -114,7 +114,7 @@ ImageActor::Style ImageActor::GetStyle() const
 
 void ImageActor::SetNinePatchBorder(const Vector4& border)
 {
-  GetImplementation(*this).SetNinePatchBorder(border, true/*in pixels*/);
+  GetImplementation(*this).SetNinePatchBorder( border );
 }
 
 Vector4 ImageActor::GetNinePatchBorder() const

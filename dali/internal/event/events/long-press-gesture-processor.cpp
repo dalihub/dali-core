@@ -270,16 +270,19 @@ void LongPressGestureProcessor::UpdateDetection()
   {
     LongPressGestureDetector* current(*iter);
 
-    unsigned int minimum = current->GetMinimumTouchesRequired();
-    if (minimum < minimumRequired)
+    if( current )
     {
-      minimumRequired = minimum;
-    }
+      unsigned int minimum = current->GetMinimumTouchesRequired();
+      if (minimum < minimumRequired)
+      {
+        minimumRequired = minimum;
+      }
 
-    unsigned int maximum = current->GetMaximumTouchesRequired();
-    if ( maximum > maximumRequired )
-    {
-      maximumRequired = maximum;
+      unsigned int maximum = current->GetMaximumTouchesRequired();
+      if ( maximum > maximumRequired )
+      {
+        maximumRequired = maximum;
+      }
     }
   }
 

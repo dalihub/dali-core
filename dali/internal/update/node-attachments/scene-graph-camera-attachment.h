@@ -43,7 +43,6 @@ template <> struct ParameterType< Dali::Camera::ProjectionMode >
 namespace SceneGraph
 {
 
-class RenderableAttachment;
 class SceneController;
 
 /**
@@ -81,6 +80,7 @@ public:
   struct FrustumPlanes
   {
     Plane mPlanes[ 6 ];
+    Vector3 mSign[ 6 ];
   };
 
   /**
@@ -113,12 +113,6 @@ public:
    * Virtual destructor
    */
   virtual ~CameraAttachment();
-
-  /**
-   * @copydoc NodeAttachment::GetRenderable.
-   * @return Always NULL.
-   */
-  virtual RenderableAttachment* GetRenderable();
 
   /**
    * @copydoc Dali::Internal::CameraAttachment::SetType
@@ -213,11 +207,11 @@ public:
    *
    * @param bufferIndex The buffer to read from.
    * @param origin the world position center of the cubeoid to check.
-   * @param extents The half length of the cubeoid in world co-ordinates in each axis.
+   * @param halfExtents The half length of the cubeoid in world co-ordinates in each axis.
    *
-   * @return false if the cubeoid lies outside of the frustum.
+   * @return false if the cubeoid lies completely outside of the frustum, true otherwise
    */
-  bool CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& extents );
+  bool CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents );
 
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
@@ -241,9 +235,9 @@ public:
   const PropertyInputImpl* GetProjectionMatrix() const;
 
   /**
-   * Retrieve the view-matrix property querying interface.
+   * Retrieve the viewMatrix property querying interface.
    * @pre The attachment is on-stage.
-   * @return The view-matrix property querying interface.
+   * @return The viewMatrix property querying interface.
    */
   const PropertyInputImpl* GetViewMatrix() const;
 
@@ -317,8 +311,8 @@ public:  // PROPERTIES
   Vector2                       mStereoBias;
   Vector3                       mTargetPosition;
 
-  InheritedMatrix mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
-  InheritedMatrix mProjectionMatrix;     ///< The projection-matrix; this is double buffered for input handling.
+  InheritedMatrix mViewMatrix;           ///< The viewMatrix; this is double buffered for input handling.
+  InheritedMatrix mProjectionMatrix;     ///< The projectionMatrix; this is double buffered for input handling.
 
   DoubleBuffered< FrustumPlanes > mFrustum;               ///< Clipping frustum; double buffered for input handling
   DoubleBuffered< Matrix >        mInverseViewProjection; ///< Inverted viewprojection; double buffered for input handling

@@ -301,7 +301,8 @@ Dali::TypeInfo TypeRegistry::GetTypeInfo(const Dali::BaseObject * const pBaseObj
 
   if(pCustom)
   {
-    type = GetTypeInfo( typeid( pCustom->GetImplementation() ) );
+    const Dali::CustomActorImpl& custom = pCustom->GetImplementation();
+    type = GetTypeInfo( typeid( custom ) );
   }
   else
   {

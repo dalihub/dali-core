@@ -563,7 +563,7 @@ int UtcDaliLayerClippingGLCalls(void)
   application.Render();
 
   DALI_TEST_EQUALS( testBox.x, glScissorParams.x, TEST_LOCATION );
-  DALI_TEST_EQUALS( testBox.y, stage.GetSize().height - glScissorParams.y - testBox.height, TEST_LOCATION ); // GL Coordinates are from bottom left
+  DALI_TEST_EQUALS( testBox.y, (int)(stage.GetSize().height - glScissorParams.y - testBox.height), TEST_LOCATION ); // GL Coordinates are from bottom left
   DALI_TEST_EQUALS( testBox.width, glScissorParams.width, TEST_LOCATION );
   DALI_TEST_EQUALS( testBox.height, glScissorParams.height, TEST_LOCATION );
   END_TEST;

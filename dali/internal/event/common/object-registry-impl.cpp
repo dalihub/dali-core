@@ -38,8 +38,8 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_OBJECT_CREATED =   "object-created";
-const char* const SIGNAL_OBJECT_DESTROYED = "object-destroyed";
+const char* const SIGNAL_OBJECT_CREATED =   "objectCreated";
+const char* const SIGNAL_OBJECT_DESTROYED = "objectDestroyed";
 
 TypeRegistration mType( typeid( Dali::ObjectRegistry ), typeid( Dali::BaseHandle ), NULL );
 

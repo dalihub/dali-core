@@ -59,6 +59,13 @@ bool Atlas::Upload( const std::string& url,
   return GetImplementation(*this).Upload( url, xOffset, yOffset );
 }
 
+bool Atlas::Upload( PixelDataPtr pixelData,
+                    SizeType xOffset,
+                    SizeType yOffset )
+{
+  return GetImplementation(*this).Upload( pixelData, xOffset, yOffset );
+}
+
 Atlas Atlas::DownCast( BaseHandle handle )
 {
   return Atlas( dynamic_cast<Dali::Internal::Atlas*>(handle.GetObjectPtr()) );

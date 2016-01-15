@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/image-factory.h>
+#include <dali/internal/event/images/bitmap-packed-pixel.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -61,9 +62,7 @@ bool Atlas::Upload( BufferImage& bufferImage,
 {
   bool uploadSuccess( false );
 
-  if( Compatible(bufferImage.GetPixelFormat(),
-                 xOffset + bufferImage.GetWidth(),
-                 yOffset + bufferImage.GetHeight() ) )
+  if( IsInside( xOffset + bufferImage.GetWidth(),  yOffset + bufferImage.GetHeight() ) )
   {
     AllocateAtlas();
     ResourceId destId = GetResourceId();
@@ -86,7 +85,7 @@ bool Atlas::Upload( const std::string& url,
 
   Integration::BitmapPtr bitmap = LoadBitmap( url );
 
-  if( bitmap && Compatible(bitmap->GetPixelFormat(), xOffset + bitmap->GetImageWidth(), yOffset + bitmap->GetImageHeight()) )
+  if( bitmap && IsInside( xOffset + bitmap->GetImageWidth(), yOffset + bitmap->GetImageHeight()) )
   {
     AllocateAtlas();
     ResourceId destId = GetResourceId();
@@ -101,6 +100,26 @@ bool Atlas::Upload( const std::string& url,
       }
     }
   }
+  return uploadSuccess;
+}
+
+bool Atlas::Upload( PixelDataPtr pixelData,
+                    SizeType xOffset,
+                    SizeType yOffset )
+{
+  bool uploadSuccess( false );
+  if( IsInside( xOffset + pixelData->GetWidth(),  yOffset + pixelData->GetHeight() ) )
+  {
+    AllocateAtlas();
+    ResourceId destId = GetResourceId();
+
+    if( destId )
+    {
+      mResourceClient.UploadBitmap( destId, pixelData, xOffset, yOffset  );
+      uploadSuccess = true;
+    }
+  }
+
   return uploadSuccess;
 }
 
@@ -171,29 +190,20 @@ void Atlas::Disconnect()
   }
 }
 
-bool Atlas::Compatible( Pixel::Format pixelFormat,
-                        SizeType x,
-                        SizeType y )
+bool Atlas::IsInside( SizeType x, SizeType y )
 {
-  bool Compatible(false);
+  bool fit(false);
 
-  if( mPixelFormat != pixelFormat )
+  if( x <= mWidth  && y <= mHeight )
   {
-    DALI_LOG_ERROR( "Pixel format %d does not match Atlas format %d\n", pixelFormat, mPixelFormat );
+    fit = true;
   }
   else
   {
-    if( x <= mWidth  && y <= mHeight )
-    {
-      Compatible = true;
-    }
-    else
-    {
-      DALI_LOG_ERROR( "image does not fit within the atlas \n" );
-    }
+    DALI_LOG_ERROR( "image does not fit within the atlas \n" );
   }
 
-  return Compatible;
+  return fit;
 }
 
 void Atlas::AllocateAtlas()
@@ -256,12 +266,10 @@ void Atlas::ClearBackground(const Vector4& color )
       }
     }
 
-    RectArea area;
-    imageData->Update(area);
-
     mClearColor = color;
     mClear = true;
-    mResourceClient.UploadBitmap( destId, imageData->GetResourceId(), 0, 0 );
+
+    imageData->UploadBitmap( destId, 0, 0 );
   }
 }
 

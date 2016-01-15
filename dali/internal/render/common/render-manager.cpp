@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,39 +26,20 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/core.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
-
-// Uncomment the next line to enable frame snapshot logging
-//#define FRAME_SNAPSHOT_LOGGING
-
-#ifdef FRAME_SNAPSHOT_LOGGING
-
-
-namespace // unnamed namespace
-{
-unsigned int SNAPSHOT_FRAME_FREQUENCY = 1200; // dump every 20-30 seconds
-} // unnamed namespace
-
-#define SET_SNAPSHOT_FRAME_LOG_LEVEL \
-  DALI_LOG_FILTER_SET_LEVEL(Context::gGlLogFilter, ((GetFrameCount() % SNAPSHOT_FRAME_FREQUENCY)==5 ? Debug::General : Debug::Concise));
-
-#else // FRAME_SNAPSHOT_LOGGING
-
-#define SET_SNAPSHOT_FRAME_LOG_LEVEL
-
-#endif // FRAME_SNAPSHOT_LOGGING
 
 namespace Dali
 {
@@ -81,19 +62,21 @@ typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
 typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
 typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
 
-typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
-typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
-typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
+typedef OwnerContainer< Render::RenderTracker* > RenderTrackerContainer;
+typedef RenderTrackerContainer::Iterator         RenderTrackerIter;
+typedef RenderTrackerContainer::ConstIterator    RenderTrackerConstIter;
 
 /**
  * Structure to contain internal data
  */
 struct RenderManager::Impl
 {
-  Impl( Dali::Integration::GlAbstraction& glAbstraction,
+  Impl( Integration::GlAbstraction& glAbstraction,
+        Integration::GlSyncAbstraction& glSyncAbstraction,
         ResourcePostProcessList& resourcePostProcessQ,
         PostProcessResourceDispatcher& postProcessDispatcher )
   : context( glAbstraction ),
+    glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     textureCache( renderQueue, postProcessDispatcher, context ),
     resourcePostProcessQueue( resourcePostProcessQ ),
@@ -115,13 +98,13 @@ struct RenderManager::Impl
   {
   }
 
-  void AddRenderTracker( RenderTracker* renderTracker )
+  void AddRenderTracker( Render::RenderTracker* renderTracker )
   {
     DALI_ASSERT_DEBUG( renderTracker != NULL );
     mRenderTrackers.PushBack( renderTracker );
   }
 
-  void RemoveRenderTracker( RenderTracker* renderTracker )
+  void RemoveRenderTracker( Render::RenderTracker* renderTracker )
   {
     DALI_ASSERT_DEBUG( renderTracker != NULL );
     for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
@@ -145,8 +128,10 @@ struct RenderManager::Impl
   // the order is important for destruction,
   // programs are owned by context at the moment.
   Context                       context;                  ///< holds the GL state
+  Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
   TextureCache                  textureCache;             ///< Cache for all GL textures
+  Render::UniformNameCache      uniformNameCache;         ///< Cache to provide unique indices for uniforms
   ResourcePostProcessList&      resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
@@ -174,10 +159,12 @@ struct RenderManager::Impl
   ProgramController             programController;        ///< Owner of the GL programs
 };
 
-RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
+RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
+                                   Integration::GlSyncAbstraction& glSyncAbstraction,
+                                   ResourcePostProcessList& resourcePostProcessQ )
 {
   RenderManager* manager = new RenderManager;
-  manager->mImpl = new Impl( glAbstraction, resourcePostProcessQ, *manager );
+  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, resourcePostProcessQ, *manager );
   return manager;
 }
 
@@ -259,7 +246,7 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 void RenderManager::AddRenderer( Render::Renderer* renderer )
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize( mImpl->context, mImpl->textureCache );
+  renderer->Initialize( mImpl->context, mImpl->textureCache, mImpl->uniformNameCache );
 
   mImpl->rendererContainer.PushBack( renderer );
 
@@ -411,13 +398,22 @@ void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render
   }
 }
 
+void RenderManager::SetGeometryType( RenderGeometry* geometry, int type )
+{
+  geometry->SetGeometryType( static_cast<Geometry::GeometryType>(type) );
+}
 
-void RenderManager::AddRenderTracker( RenderTracker* renderTracker )
+void RenderManager::SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest )
+{
+  geometry->SetRequiresDepthTest( requiresDepthTest );
+}
+
+void RenderManager::AddRenderTracker( Render::RenderTracker* renderTracker )
 {
   mImpl->AddRenderTracker(renderTracker);
 }
 
-void RenderManager::RemoveRenderTracker( RenderTracker* renderTracker )
+void RenderManager::RemoveRenderTracker( Render::RenderTracker* renderTracker )
 {
   mImpl->RemoveRenderTracker(renderTracker);
 }
@@ -443,13 +439,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   // Increment the frame count at the beginning of each frame
   ++(mImpl->frameCount);
-  mImpl->context.SetFrameCount(mImpl->frameCount);
-  mImpl->context.ClearRendererCount();
-  mImpl->context.ClearCulledCount();
-
-  PERF_MONITOR_START(PerformanceMonitor::DRAW_NODES);
-
-  SET_SNAPSHOT_FRAME_LOG_LEVEL;
 
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
@@ -511,8 +500,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     }
   }
 
-  PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
-
   // check if anything has been posted to the update thread
   bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
 
@@ -530,9 +517,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
-
-  DALI_PRINT_RENDERER_COUNT(mImpl->frameCount, mImpl->context.GetRendererCount());
-  DALI_PRINT_CULL_COUNT(mImpl->frameCount, mImpl->context.GetCulledCount());
 
   return updateRequired;
 }
@@ -628,7 +612,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   if( instruction.mRenderTracker && offscreen != NULL )
   {
-    instruction.mRenderTracker->CreateSyncObject();
+    instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
     instruction.mRenderTracker = NULL; // Only create once.
   }
 }

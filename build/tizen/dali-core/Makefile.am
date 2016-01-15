@@ -17,8 +17,6 @@
 # These files define <module>_src_files & <module>_header_files,
 # where <module> is the subdirectory from core_src_dir
 
-emoticons_dir = /usr/share/emoticons/
-
 internal_src_dir = ../../../dali/internal
 include ../../../dali/internal/file.list
 
@@ -37,7 +35,6 @@ include ../../../doc/file.list
 # Build the Dali libtool library
 
 src_files = $(internal_src_files) \
-            $(effects_src_files) \
             $(platform_abstraction_src_files) \
             $(public_api_src_files) \
             $(devel_api_src_files)
@@ -66,7 +63,6 @@ cxx_flags = -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
-                           -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            $(cxx_flags) \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS)

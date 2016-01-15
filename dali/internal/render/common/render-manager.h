@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ namespace Dali
 namespace Integration
 {
 class GlAbstraction;
+class GlSyncAbstraction;
 class RenderStatus;
 }
 
@@ -47,6 +48,7 @@ namespace Render
 {
 class Renderer;
 class Sampler;
+class RenderTracker;
 }
 
 namespace SceneGraph
@@ -55,7 +57,6 @@ class RenderQueue;
 class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
-class RenderTracker;
 class Shader;
 class RenderGeometry;
 class PropertyBufferDataProvider;
@@ -71,9 +72,12 @@ public:
   /**
    * Construct a new RenderManager.
    * @param[in]  glAbstraction The GL abstraction used for rendering.
+   * @param[in]  glSyncAbstraction The GL sync abstraction used fence sync creation/deletion.
    * @param[out] resourcePostProcessQueue A queue for sending rendered texture ids to the update-thread.
    */
-  static RenderManager* New( Dali::Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQueue );
+  static RenderManager* New( Integration::GlAbstraction& glAbstraction,
+                             Integration::GlSyncAbstraction& glSyncAbstraction,
+                             ResourcePostProcessList& resourcePostProcessQueue );
 
   /**
    * Non-virtual destructor; not intended as a base class
@@ -251,18 +255,32 @@ public:
   void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
 
   /**
+   * Set the geometry type of an existing render geometry
+   * @param[in] geometry The render geometry
+   * @param[in] geometryType The new geometry type
+   */
+  void SetGeometryType( RenderGeometry* geometry, int geometryType );
+
+  /**
+   * Set if an existing geometry requires depth testing
+   * @param[in] geometry The render geometry
+   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
+   */
+  void SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest );
+
+  /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the
    * tracker. The lifetime of the tracker is related to the lifetime of the tracked
    * object, usually an offscreen render task.
    * @param[in] renderTracker The render tracker
    */
-  void AddRenderTracker( RenderTracker* renderTracker );
+  void AddRenderTracker( Render::RenderTracker* renderTracker );
 
   /**
    * Removes a render tracker from the RenderManager.
    * @param[in] renderTracker The render tracker to remove.
    */
-  void RemoveRenderTracker( RenderTracker* renderTracker );
+  void RemoveRenderTracker( Render::RenderTracker* renderTracker );
 
   /**
    * Set the default shader that is to be used in absence of custom shader

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_NODE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,12 @@ public:
   virtual ~Node();
 
   /**
+   * Overriden delete operator
+   * Deletes the node from its global memory pool
+   */
+  void operator delete( void* ptr );
+
+  /**
    * When a Node is marked "active" it has been disconnected, but its properties have been modified.
    * @note An inactive Node will be skipped during the UpdateManager ResetProperties stage.
    * @param[in] isActive True if the Node is active.
@@ -185,10 +191,18 @@ public:
     {
       if( mRenderer[i] == renderer )
       {
-        mRenderer.Erase( mRenderer.Begin()+i);
+        //Renderer already in the list
         return;
       }
     }
+
+    //If it is the first renderer added, make sure the world transform will be calculated
+    //in the next update as world transform is not computed if node has no renderers
+    if( rendererCount == 0 )
+    {
+      mDirtyFlags |= TransformFlag;
+    }
+
     mRenderer.PushBack( renderer );
   }
 
@@ -708,15 +722,6 @@ public:
   }
 
   /**
-   * Copies the previously used size, if this changed in the previous frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void CopyPreviousSize( BufferIndex updateBufferIndex )
-  {
-    SetSize( updateBufferIndex, GetSize( 1u - updateBufferIndex ) );
-  }
-
-  /**
    * Retrieve the visibility of the node.
    * @param[in] bufferIndex The buffer to read from.
    * @return True if the node is visible.
@@ -725,14 +730,6 @@ public:
   {
     return mVisible[bufferIndex];
   }
-
-  /**
-   * Retrieves whether a node is fully visible.
-   * A node is fully visible if is visible and all its ancestors are visible.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @return True if the node is fully visible.
-   */
-  bool IsFullyVisible( BufferIndex updateBufferIndex ) const;
 
   /**
    * Retrieve the opacity of the node.
@@ -838,16 +835,6 @@ public:
   }
 
   /**
-   * Sets the size of the node.
-   * @param[in] bufferIndex The buffer to write to.
-   * @param[in] size The size to write.
-   */
-  void SetSize( BufferIndex bufferIndex, const Vector3& size )
-  {
-    mSize[bufferIndex] = size;
-  }
-
-  /**
    * Retrieve the size of the node.
    * @param[in] bufferIndex The buffer to read from.
    * @return The size.
@@ -856,11 +843,6 @@ public:
   {
     return mSize[bufferIndex];
   }
-
-  /**
-   * Check if the node is visible i.e Is not fully transparent and has valid size
-   */
-  bool ResolveVisibility( BufferIndex updateBufferIndex );
 
   /**
    * Set the world-matrix of a node, with scale + rotation + translation.
@@ -943,28 +925,6 @@ public:
       return true;
     }
     return false;
-  }
-
-  /**
-   * Set the inhibit local transform flag.@n
-   * Setting this flag will stop the node's local transform (position, scale and orientation)
-   * being applied on top of its parents transformation.
-   * @param[in] flag When true, local transformation is inhibited when calculating the world matrix.
-   */
-  void SetInhibitLocalTransform( bool flag )
-  {
-    SetDirtyFlag( TransformFlag );
-    mInhibitLocalTransform = flag;
-  }
-
-  /**
-   * Get the inhibit local transform flag.@n
-   * See @ref SetInhibitLocalTransform
-   * @result A flag, when true, local transformation is inhibited when calculating the world matrix.
-   */
-  bool GetInhibitLocalTransform() const
-  {
-    return mInhibitLocalTransform;
   }
 
   unsigned short GetDepth() const
@@ -1106,7 +1066,6 @@ protected:
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
-  bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
   bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
   DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn

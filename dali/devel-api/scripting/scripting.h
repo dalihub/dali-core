@@ -58,9 +58,22 @@ struct StringEnum
 DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
 
 /**
+ * @brief Find the enum as an integer from the table
+ *
+ * @since 1.1.12
+ *
+ * @param[in]  value       The string equivalent (case-insensitive, comma separate to OR values).
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ * @param[out] integerEnum The value of the enum.
+ * @return     true if one or more enums in value.
+ */
+DALI_IMPORT_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, unsigned int& integerEnum );
+
+/**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
  *
- * @param[in]  value       The string equivalent (case-insensitive).
+ * @param[in]  value       The string equivalent (case-insensitive, comma separate to OR values).
  * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
  * @param[in]  tableCount  Number of items in the array.
  * @param[out] result      The enum value
@@ -73,11 +86,11 @@ bool GetEnumeration( const char* value, const StringEnum* table, unsigned int ta
   bool retVal( false );
   if( table )
   {
-    unsigned int index = FindEnumIndex( value, table, tableCount );
+    unsigned int integerEnum = 0;
     // check to avoid crash, not asserting on purpose, error is logged instead
-    if( index < tableCount )
+    if( EnumStringToInteger( value, table, tableCount, integerEnum ) )
     {
-      result = static_cast<T>( table[ index ].value );
+      result = static_cast<T>( integerEnum );
       retVal = true;
     }
   }
@@ -194,16 +207,16 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  *
  * @param[in] property The property value map with the following valid fields:
  * @code
- * "filename":       type std::string
- * "load-policy"     type std::string (enum)
- * "release-policy"  type std::string (enum)
- * "width"           type float
- * "height"          type float
- * "pixel-format"    type std::string (enum)
- * "fitting-mode"    type std::string (enum)
- * "sampling-mode"   type std::string (enum)
- * "orientation"     type bool
- * "type"            type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
+ * "filename":      type std::string
+ * "loadPolicy"     type std::string (enum)
+ * "releasePolicy"  type std::string (enum)
+ * "width"          type float
+ * "height"         type float
+ * "pixelFormat"    type std::string (enum)
+ * "fittingMode"    type std::string (enum)
+ * "samplingMode"   type std::string (enum)
+ * "orientation"    type bool
+ * "type"           type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
  * @endcode
  * Some fields are optional and some only pertain to a specific type.
  *
@@ -220,20 +233,20 @@ DALI_IMPORT_API Image NewImage( const Property::Value& property );
  * // some fields may be ignored depending on the geometry-type
  * "program":        type Map
  * {
- *   "vertex":                   type std::string
- *   "fragment":                 type std::string
- *   "vertex-prefix":            type std::string
- *   "fragment-prefix":          type std::string
- *   "text-vertex":              type std::string
- *   "text-fragment":            type std::string
- *   "vertex-filename":          type std::string
- *   "fragment-filename":        type std::string
- *   "vertex-prefix-filename":   type std::string
- *   "fragment-prefix-filename": type std::string
- *   "text-vertex-filename":     type std::string
- *   "text-fragment-filename":   type std::string
- *   "geometry-type":            type std::string (enum)
- *   "geometry-hints":           type std::string (enum)
+ *   "vertex":                 type std::string
+ *   "fragment":               type std::string
+ *   "vertexPrefix":           type std::string
+ *   "fragmentPrefix":         type std::string
+ *   "textVertex":             type std::string
+ *   "textFragment":           type std::string
+ *   "vertexFilename":         type std::string
+ *   "fragmentFilename":       type std::string
+ *   "vertexPrefixFilename":   type std::string
+ *   "fragmentPrefixFilename": type std::string
+ *   "textVertexFilename":     type std::string
+ *   "textFragmentFilename":   type std::string
+ *   "geometryType":           type std::string (enum)
+ *   "geometryHints":          type std::string (enum)
  * }
  * // uniforms must be specified to be registered
  * "uUniform1":       type float,

@@ -205,7 +205,7 @@ int UtcDaliAlphaFunctionBezier(void)
 
   // Register a float property
   float startValue(0.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -216,7 +216,7 @@ int UtcDaliAlphaFunctionBezier(void)
 
   Vector2 controlPoint0 = Vector2(0.25f,0.5f);
   Vector2 controlPoint1 = Vector2(0.75f,0.5f);
-  animation.AnimateTo(Property(actor, "test-property"), targetValue, AlphaFunction(controlPoint0,controlPoint1));
+  animation.AnimateTo(Property(actor, "testProperty"), targetValue, AlphaFunction(controlPoint0,controlPoint1));
 
   // Start the animation
   animation.Play();

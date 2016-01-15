@@ -29,34 +29,6 @@ namespace Internal
 
 namespace
 {
-/**
- * Helper to get our type enum as GL enum
- * @param type to convert
- * @return the corresponding GL enum or -1
- */
-inline GLenum TypeAsGlEnum( GpuBuffer::Target type )
-{
-  GLenum retval( -1 );
-  switch( type )
-  {
-    case GpuBuffer::ARRAY_BUFFER :
-    {
-      retval = GL_ARRAY_BUFFER;
-      break;
-    }
-    case GpuBuffer::ELEMENT_ARRAY_BUFFER :
-    {
-      retval = GL_ELEMENT_ARRAY_BUFFER;
-      break;
-    }
-    case GpuBuffer::TRANSFORM_FEEDBACK_BUFFER :
-    {
-      retval = GL_TRANSFORM_FEEDBACK_BUFFER;
-      break;
-    }
-  }
-  return retval;
-}
 
 /**
  * Helper to get our drawmode enum as GL enum
@@ -113,7 +85,7 @@ GpuBuffer::~GpuBuffer()
  * Creates or updates the buffer data depending on whether it
  * already exists or not.
  */
-void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data, Usage usage)
+void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage, Target target)
 {
   DALI_ASSERT_DEBUG( size > 0 );
   mSize = size;
@@ -124,8 +96,30 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data, Usage usage
     DALI_ASSERT_DEBUG(mBufferId);
   }
 
+  GLenum glTargetEnum = GL_ARRAY_BUFFER;
+
+  if(ELEMENT_ARRAY_BUFFER == target)
+  {
+    glTargetEnum = GL_ELEMENT_ARRAY_BUFFER;
+  }
+  else if(TRANSFORM_FEEDBACK_BUFFER == target)
+  {
+    glTargetEnum = GL_TRANSFORM_FEEDBACK_BUFFER;
+  }
+
   // make sure the buffer is bound, don't perform any checks because size may be zero
-  mContext.BindArrayBuffer( mBufferId );
+  if(ARRAY_BUFFER == target)
+  {
+    mContext.BindArrayBuffer( mBufferId );
+  }
+  else if(ELEMENT_ARRAY_BUFFER == target)
+  {
+    mContext.BindElementArrayBuffer( mBufferId );
+  }
+  else if(TRANSFORM_FEEDBACK_BUFFER == target)
+  {
+    mContext.BindTransformFeedbackBuffer( mBufferId );
+  }
 
   // if the buffer has already been created, just update the data providing it fits
   if (mBufferCreated )
@@ -133,25 +127,36 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data, Usage usage
     // if the data will fit in the existing buffer, just update it
     if (size <= mCapacity )
     {
-      mContext.BufferSubData( GL_ARRAY_BUFFER, 0, size, data );
+      mContext.BufferSubData( glTargetEnum, 0, size, data );
     }
     else
     {
       // create a new buffer of the larger size,
       // gl should automatically deallocate the old buffer
-      mContext.BufferData( GL_ARRAY_BUFFER, size, data, ModeAsGlEnum( usage ) );
+      mContext.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
       mCapacity = size;
     }
   }
   else
   {
     // create the buffer
-    mContext.BufferData( GL_ARRAY_BUFFER, size, data, ModeAsGlEnum( usage ) );
+    mContext.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
     mBufferCreated = true;
     mCapacity = size;
   }
 
-  mContext.BindArrayBuffer(0);
+  if(ARRAY_BUFFER == target)
+  {
+    mContext.BindArrayBuffer( 0 );
+  }
+  else if(ELEMENT_ARRAY_BUFFER == target)
+  {
+    mContext.BindElementArrayBuffer( 0 );
+  }
+  else if(TRANSFORM_FEEDBACK_BUFFER == target)
+  {
+    mContext.BindTransformFeedbackBuffer( 0 );
+  }
 }
 
 void GpuBuffer::Bind(Target target) const
@@ -162,9 +167,13 @@ void GpuBuffer::Bind(Target target) const
   {
     mContext.BindArrayBuffer(mBufferId);
   }
-  else
+  else if (target == ELEMENT_ARRAY_BUFFER)
   {
     mContext.BindElementArrayBuffer(mBufferId);
+  }
+  else if (target == TRANSFORM_FEEDBACK_BUFFER)
+  {
+    mContext.BindTransformFeedbackBuffer(mBufferId);
   }
 }
 

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <dali/internal/common/buffer-index.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/blending.h>
 
@@ -23,6 +25,8 @@ namespace Dali
 {
 namespace Internal
 {
+struct BlendingOptions;
+
 namespace SceneGraph
 {
 
@@ -40,43 +44,23 @@ public:
   {
   }
 
-  virtual const Vector4& GetBlendColor( BufferIndex bufferIndex ) const = 0;
+  /**
+   * Get the blend color
+   * @return blend color of NULL if blend color is not set
+   */
+  virtual Vector4* GetBlendColor() const = 0;
 
   /**
-   * Get the RGB source factor
-   * @return the RGB source factor
+   * Get the blending options
+   * @return the blending options
    */
-  virtual BlendingFactor::Type GetBlendSrcFactorRgb( BufferIndex bufferIndex ) const = 0;
+  virtual const BlendingOptions& GetBlendingOptions() const = 0;
 
   /**
-   * Get the Alpha source factor
-   * @return the Alpha source factor
+   * Get the cull face mode
+   * @return the cull face mode
    */
-  virtual BlendingFactor::Type GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const = 0;
-
-  /**
-   * Get the RGB destination factor
-   * @return the RGB destination factor
-   */
-  virtual BlendingFactor::Type GetBlendDestFactorRgb( BufferIndex bufferIndex ) const = 0;
-
-  /**
-   * Get the Alpha destination factor
-   * @return the Alpha destination factor
-   */
-  virtual BlendingFactor::Type GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const = 0;
-
-  /**
-   * Get the RGB blending equation
-   * @return the RGB blending equation
-   */
-  virtual BlendingEquation::Type GetBlendEquationRgb( BufferIndex bufferIndex ) const = 0;
-
-  /**
-   * Get the Alpha blending equation
-   * @return the Alpha blending equation
-   */
-  virtual BlendingEquation::Type GetBlendEquationAlpha( BufferIndex bufferIndex ) const = 0;
+  virtual Dali::Material::FaceCullingMode GetFaceCullingMode() const = 0;
 
 protected:
   /**
@@ -88,7 +72,9 @@ protected:
 };
 
 } // namespace SceneGraph
+
 } // namespace Internal
+
 } // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_MATERIAL_DATA_PROVIDER_H

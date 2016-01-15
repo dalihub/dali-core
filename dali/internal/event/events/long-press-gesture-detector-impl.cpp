@@ -37,7 +37,7 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_LONG_PRESS_DETECTED = "long-press-detected";
+const char* const SIGNAL_LONG_PRESS_DETECTED = "longPressDetected";
 
 BaseHandle Create()
 {

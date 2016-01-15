@@ -19,8 +19,14 @@
 #include <dali/internal/render/common/render-item.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 
+namespace
+{
+//Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool;
+}
 namespace Dali
 {
 
@@ -30,16 +36,27 @@ namespace Internal
 namespace SceneGraph
 {
 
+RenderItem* RenderItem::New()
+{
+  return new ( gRenderItemPool.AllocateRaw() ) RenderItem();
+}
+
 RenderItem::RenderItem()
 : mModelViewMatrix( false ),
   mRenderer( NULL ),
-  mDepthIndex(0),
-  mIsOpaque(true)
+  mNode( NULL ),
+  mDepthIndex( 0 ),
+  mIsOpaque( true )
 {
 }
 
 RenderItem::~RenderItem()
 {
+}
+
+void RenderItem::operator delete( void* ptr )
+{
+  gRenderItemPool.Free( static_cast<RenderItem*>( ptr ) );
 }
 
 void RenderItem::Reset()

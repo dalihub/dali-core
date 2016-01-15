@@ -46,18 +46,18 @@ namespace
 
 //              Name                  Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "screen-position",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_POSITION     )
-DALI_PROPERTY( "screen-displacement", VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT )
-DALI_PROPERTY( "screen-velocity",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_VELOCITY     )
-DALI_PROPERTY( "local-position",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_POSITION      )
-DALI_PROPERTY( "local-displacement",  VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT  )
-DALI_PROPERTY( "local-velocity",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_VELOCITY      )
+DALI_PROPERTY( "screenPosition",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_POSITION     )
+DALI_PROPERTY( "screenDisplacement",  VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT )
+DALI_PROPERTY( "screenVelocity",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_VELOCITY     )
+DALI_PROPERTY( "localPosition",       VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_POSITION      )
+DALI_PROPERTY( "localDisplacement",   VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT  )
+DALI_PROPERTY( "localVelocity",       VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_VELOCITY      )
 DALI_PROPERTY( "panning",             BOOLEAN, false, false, true,   Dali::PanGestureDetector::Property::PANNING             )
 DALI_PROPERTY_TABLE_END( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX )
 
 // Signals
 
-const char* const SIGNAL_PAN_DETECTED = "pan-detected";
+const char* const SIGNAL_PAN_DETECTED = "panDetected";
 
 BaseHandle Create()
 {

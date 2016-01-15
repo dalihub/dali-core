@@ -162,7 +162,7 @@ public:
     // check if we have enough items, we can only be one behind at worst
     if( mItems.Count() <= mNextFree )
     {
-      mItems.PushBack( new RenderItem ); // Push a new empty render item
+      mItems.PushBack( RenderItem::New() ); // Push a new empty render item
     }
     // get the item mNextFree points to and increase by one
     RenderItem& item = *mItems[ mNextFree++ ];

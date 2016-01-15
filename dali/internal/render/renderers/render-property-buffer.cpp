@@ -9,7 +9,7 @@ using namespace Dali;
 using Dali::Property;
 using Dali::Internal::PropertyImplementationType;
 
-Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
+Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
 {
   Dali::GLenum type = GL_BYTE;
 
@@ -50,7 +50,7 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
   return type;
 }
 
-size_t GetPropertyImplementationGlSize( Property::Type& propertyType )
+size_t GetPropertyImplementationGlSize( Property::Type propertyType )
 {
   size_t size = 1u;
 
@@ -151,6 +151,7 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
       DALI_ASSERT_DEBUG( mSize && "No data in the property buffer!" );
 
       const void *data = &((*mData)[0]);
+      std::size_t dataSize =  GetDataSize();
 
       // Index buffer needs to be unsigned short which is not supported by the property system
       Vector<unsigned short> ushortData;
@@ -163,9 +164,16 @@ bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
           ushortData[i] = unsignedData[i];
         }
         data = &(ushortData[0]);
+        dataSize = ushortData.Size() * sizeof( unsigned short );
       }
 
-      mGpuBuffer->UpdateDataBuffer( GetDataSize(), data, GpuBuffer::STATIC_DRAW );
+      GpuBuffer::Target target = GpuBuffer::ARRAY_BUFFER;
+      if(isIndexBuffer)
+      {
+        target = GpuBuffer::ELEMENT_ARRAY_BUFFER;
+      }
+      mGpuBuffer->UpdateDataBuffer( dataSize, data, GpuBuffer::STATIC_DRAW, target );
+
     }
 
     mDataChanged = false;
@@ -196,9 +204,9 @@ unsigned int PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GL
     {
       context.EnableVertexAttributeArray( attributeLocation );
 
-      GLint attributeSize = mFormat->components[i].size;
+      const GLint attributeSize = mFormat->components[i].size;
       size_t attributeOffset = mFormat->components[i].offset;
-      Property::Type attributeType = mFormat->components[i].type;
+      const Property::Type attributeType = mFormat->components[i].type;
 
       context.VertexAttribPointer( attributeLocation,
                                    attributeSize  / GetPropertyImplementationGlSize(attributeType),

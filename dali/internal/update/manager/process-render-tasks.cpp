@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/prepare-render-instructions.h>
-#include <dali/internal/update/manager/prepare-render-algorithms.h>
 #include <dali/internal/update/manager/sorted-layers.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
-#include <dali/internal/update/resources/sync-resource-tracker.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-tracker.h>
@@ -45,11 +41,15 @@ namespace Dali
 namespace Internal
 {
 
+
 namespace SceneGraph
 {
 
+namespace //Unnamed namespace
+{
+
 // Return false if the node or it's parents are exclusive to another render-task
-static bool CheckExclusivity( const Node& node, const RenderTask& task )
+bool CheckExclusivity( const Node& node, const RenderTask& task )
 {
   const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
   if ( exclusiveTo )
@@ -76,34 +76,33 @@ static bool CheckExclusivity( const Node& node, const RenderTask& task )
   return true;
 }
 
-static Layer* FindLayer( Node& node )
+Layer* FindLayer( Node& node )
 {
-  if ( node.IsLayer() )
+  Node* currentNode( &node );
+  Layer* layer(NULL);
+  while( currentNode )
   {
-    return node.GetLayer();
+    if( (layer = currentNode->GetLayer()) != NULL )
+    {
+      return layer;
+    }
+
+    currentNode = currentNode->GetParent();
   }
 
-  Node* parent = node.GetParent();
-  // if the node is taken off stage we may get NULL parent
-  if( NULL == parent )
-  {
-    return NULL;
-  }
-
-
-  return FindLayer( *parent );
+  return NULL;
 }
 
 /**
- * Rebuild the Layer::opaqueRenderables, transparentRenderables and overlayRenderables members,
- * including only renderable-attachments which are included in the current render-task.
- * Returns true if all renderable attachments have finshed acquiring resources.
+ * Rebuild the Layer::colorRenderables, stencilRenderables and overlayRenderables members,
+ * including only renderers which are included in the current render-task.
+ * Returns true if all renderers have finshed acquiring resources.
  */
-static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
-                                   Node& node,
-                                   Layer& currentLayer,
-                                   RenderTask& renderTask,
-                                   int inheritedDrawMode )
+bool AddRenderablesForTask( BufferIndex updateBufferIndex,
+                            Node& node,
+                            Layer& currentLayer,
+                            RenderTask& renderTask,
+                            int inheritedDrawMode )
 {
   bool resourcesFinished = true;
 
@@ -116,17 +115,17 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   // Check whether node is exclusive to a different render-task
   const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
   if ( exclusiveTo &&
-       exclusiveTo != &renderTask )
+      exclusiveTo != &renderTask )
   {
     return resourcesFinished;
   }
 
   Layer* layer = &currentLayer;
-
-  if ( node.IsLayer() )
+  Layer* nodeIsLayer( node.GetLayer() );
+  if ( nodeIsLayer )
   {
     // All children go to this layer
-    layer = node.GetLayer();
+    layer = nodeIsLayer;
 
     // Layers do not inherit the DrawMode from their parents
     inheritedDrawMode = DrawMode::NORMAL;
@@ -135,80 +134,35 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
 
   inheritedDrawMode |= node.GetDrawMode();
 
-
-  if ( node.HasAttachment() )
+  const unsigned int count = node.GetRendererCount();
+  for( unsigned int i = 0; i < count; ++i )
   {
-    RenderableAttachment* renderable = node.GetAttachment().GetRenderable(); // not all attachments render
-    if ( renderable )
+    SceneGraph::Renderer* renderer = node.GetRendererAt( i );
+    bool ready = false;
+    bool complete = false;
+    renderer->GetReadyAndComplete( ready, complete );
+
+    DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderer, ready?"T":"F", complete?"T":"F");
+
+    resourcesFinished &= complete;
+
+    if( ready ) // i.e. should be rendered (all resources are available)
     {
-      bool visible = renderable->HasVisibleSizeAndColor();
-      // if its not potentially visible, then don't consider this renderable for render complete checking
-      // note that whilst visibility is inherited (if parent is insible, skip the sub-tree),
-      // size and color may not be so this needs to be done per renderable
-      if( visible ) // i.e. some resources are ready
+      if( DrawMode::STENCIL == inheritedDrawMode )
       {
-        bool ready = false;
-        bool complete = false;
-        renderable->GetReadyAndComplete(ready, complete);
-
-        DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderable, ready?"T":"F", complete?"T":"F");
-
-        resourcesFinished = !complete ? complete : resourcesFinished;
-
-        if( ready ) // i.e. some resources are ready
-        {
-          if( DrawMode::STENCIL == inheritedDrawMode )
-          {
-            layer->stencilRenderables.push_back( renderable );
-          }
-          else if( DrawMode::OVERLAY_2D == inheritedDrawMode )
-          {
-            layer->overlayRenderables.push_back( renderable );
-          }
-          else
-          {
-            layer->colorRenderables.push_back( renderable );
-          }
-        }
+        layer->stencilRenderables.PushBack( Renderable(&node, renderer ) );
+      }
+      else if( DrawMode::OVERLAY_2D == inheritedDrawMode )
+      {
+        layer->overlayRenderables.PushBack( Renderable(&node, renderer ) );
+      }
+      else
+      {
+        layer->colorRenderables.PushBack( Renderable(&node, renderer ) );
       }
     }
   }
 
-  if( node.ResolveVisibility( updateBufferIndex ) )
-  {
-    for( unsigned int i(0); i<node.GetRendererCount(); ++i )
-    {
-      Renderer* renderer = node.GetRendererAt( i );
-      bool ready = false;
-      bool complete = false;
-      renderer->GetReadyAndComplete(ready, complete);
-
-      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderer, ready?"T":"F", complete?"T":"F");
-
-      resourcesFinished = !complete ? complete : resourcesFinished;
-
-      resourcesFinished = !complete ? complete : resourcesFinished;
-
-      if( ready ) // i.e. some resources are ready
-      {
-        if( DrawMode::STENCIL == inheritedDrawMode )
-        {
-          layer->stencilRenderers.PushBack( NodeRenderer(&node, renderer ) );
-        }
-        else if( DrawMode::OVERLAY_2D == inheritedDrawMode )
-        {
-          layer->overlayRenderers.PushBack( NodeRenderer(&node, renderer ) );
-        }
-        else
-        {
-          layer->colorRenderers.PushBack( NodeRenderer(&node, renderer ) );
-        }
-      }
-
-
-
-    }
-  }
 
 
   // Recurse children
@@ -218,14 +172,14 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   {
     Node& child = **iter;
     bool childResourcesComplete = AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode );
-    resourcesFinished = !childResourcesComplete ? childResourcesComplete : resourcesFinished;
+    resourcesFinished &= childResourcesComplete;
   }
 
   return resourcesFinished;
 }
+} //Unnamed namespace
 
 void ProcessRenderTasks( BufferIndex updateBufferIndex,
-                         CompleteStatusManager& completeStatusManager,
                          RenderTaskList& renderTasks,
                          Layer& rootNode,
                          SortedLayerPointers& sortedLayers,
@@ -286,7 +240,11 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
     bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
-      ClearRenderables( sortedLayers );
+      size_t layerCount( sortedLayers.size() );
+      for( size_t i(0); i<layerCount; ++i )
+      {
+        sortedLayers[i]->ClearRenderables();
+      }
 
       resourcesFinished = AddRenderablesForTask( updateBufferIndex,
                                                  *sourceNode,
@@ -294,29 +252,11 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                                  renderTask,
                                                  sourceNode->GetDrawMode() );
 
-      // Set update trackers to complete, or get render trackers to pass onto render thread
-      RenderTracker* renderTracker = NULL;
-      if( resourcesFinished )
-      {
-        Integration::ResourceId id = renderTask.GetFrameBufferId();
-        ResourceTracker* resourceTracker = completeStatusManager.FindResourceTracker( id );
-        if( resourceTracker != NULL )
-        {
-          resourceTracker->SetComplete(); // Has no effect on GlResourceTracker
-
-          SyncResourceTracker* syncResourceTracker = dynamic_cast<SyncResourceTracker*>(resourceTracker);
-          if( syncResourceTracker != NULL )
-          {
-            renderTracker = syncResourceTracker->GetRenderTracker();
-          }
-        }
-      }
-
       PrepareRenderInstruction( updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
                                 sortingHelper,
-                                renderTracker,
+                                renderTask.GetCullMode(),
                                 instructions );
     }
 
@@ -361,7 +301,11 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
     bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
-      ClearRenderables( sortedLayers );
+      size_t layerCount( sortedLayers.size() );
+      for( size_t i(0); i<layerCount; ++i )
+      {
+        sortedLayers[i]->ClearRenderables();
+      }
 
       resourcesFinished = AddRenderablesForTask( updateBufferIndex,
                                                  *sourceNode,
@@ -373,7 +317,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
                                 sortingHelper,
-                                NULL,
+                                renderTask.GetCullMode(),
                                 instructions );
     }
 

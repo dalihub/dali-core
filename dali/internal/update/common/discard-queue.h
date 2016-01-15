@@ -23,7 +23,6 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/node-attachments/node-attachment-declarations.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-material.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
@@ -81,15 +80,6 @@ public:
   void Add( BufferIndex updateBufferIndex, Node* node );
 
   /**
-   * Adds an unwanted NodeAttachment to the discard queue.
-   * If necessary, a message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] attachment The discarded attachment; DiscardQueue takes ownership.
-   */
-  void Add( BufferIndex updateBufferIndex, NodeAttachment* attachment );
-
-  /**
    * Adds an unwanted geometry to the discard queue.
    * A message will be sent to clean up GL resources in the next Render
    */
@@ -139,7 +129,6 @@ private:
 
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
-  NodeAttachmentOwnerContainer mAttachmentQueue0;
   ShaderQueue                  mShaderQueue0;
   GeometryQueue                mGeometryQueue0;
   MaterialQueue                mMaterialQueue0;
@@ -147,7 +136,6 @@ private:
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
-  NodeAttachmentOwnerContainer mAttachmentQueue1;
   ShaderQueue                  mShaderQueue1;
   GeometryQueue                mGeometryQueue1;
   MaterialQueue                mMaterialQueue1;

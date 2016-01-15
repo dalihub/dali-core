@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TEXTURE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
-#include <dali/integration-api/bitmap.h>
-#include <dali/internal/render/common/uv-rect.h>
-#include <dali/integration-api/gl-abstraction.h>
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
-#include <dali/internal/render/gl-resources/texture-units.h>
+#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/actors/sampling.h>
+#include <dali/public-api/object/ref-object.h>
+#include <dali/devel-api/images/pixel-data.h>
+#include <dali/integration-api/bitmap.h>
+#include <dali/integration-api/gl-abstraction.h>
+#include <dali/internal/render/gl-resources/gl-resource-owner.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
+
 
 namespace Dali
 {
@@ -40,7 +41,6 @@ namespace Internal
 {
 
 class Context;
-struct Vertex3D;
 struct Vertex2D;
 
 /**
@@ -86,6 +86,14 @@ public:
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   virtual void Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset ) {}
+
+  /**
+   * Update part of the texture with a pixel buffer
+   * @param[in] srcPixelData The pixel data to copy from
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void Update( PixelData* srcPixelData, std::size_t xOffset, std::size_t yOffset ) {}
 
   /**
    * @return Return true if the texture should be updated on GL texture creation.
@@ -141,38 +149,6 @@ public:
    * @param id OpenGL texture id
    */
   void SetTextureId(GLuint id);
-
-  /**
-   * When creating a texture mapped object, the developer can
-   * can assume the texture u,v coordinates have a range of 0 to 1.
-   * They then just call MapUV which will adjust uv values depending on
-   * whether a pixel area is being used or not.
-   *@param[in] numVerts number of vertices
-   *@param[out] verts pointer to an array of vertex objects
-   *@param[in] pixelArea the area of the texture to display, null = use default image area
-   */
-  void MapUV(unsigned int numVerts, Dali::Internal::Vertex3D* verts,  const PixelArea* pixelArea = NULL);
-
-  /**
-   * @copydoc MapUV(unsigned int,Dali::Internal::Vertex3D*, const PixelArea* pixelArea)
-   */
-  void MapUV(unsigned int numVerts, Dali::Internal::Vertex2D* verts, const PixelArea* pixelArea = NULL);
-
-  /**
-   * @copydoc MapUV(unsigned int,Dali::Internal::Vertex3D*, const PixelArea* pixelArea)
-   * @param[in] stride The number of floats on each row of the vertex object table
-   */
-  void MapUV(unsigned int numVerts, float* verts, unsigned int stride, const PixelArea* pixelArea = NULL);
-
-  /**
-   * Gets the texture coordinates for the texture.
-   * The texture maybe in an atlas or may only be part of a texture (that's been padded to be a power of 2).
-   * Why do we specify u,v coordinates for all 4 points of a texture, instead of just having bottom left u,v and top right u,v?
-   * If the texture is an atlas it maybe rotated, to encode that information we need to use all 4 u,v points.
-   * @param[out] uv coordinates.
-   * @param[in] pixelArea the area of the texture to display, null = use default image area
-   */
-  void GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea = NULL);
 
   /**
    * @brief Apply the given sampler to the texture.
@@ -238,15 +214,6 @@ private:
 
   // Undefined
   Texture& operator=(const Texture& rhs);
-
-  /**
-   * Helper function for GetTextureCoordinates.
-   * Gets the texture co-ordinates without using a pixel area.
-   * It is possible the image is smaller than the texture
-   * so the texture co-ordinates have to be adjusted.
-   * @param uv texture co-ordinates
-   */
-  void GetDefaultTextureCoordinates(UvRect& uv) const;
 
   /**
    * @brief Apply the given texture filtering parameters.

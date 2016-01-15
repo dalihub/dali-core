@@ -1795,7 +1795,7 @@ int UtcDaliAnimationAnimateByBooleanP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -1878,7 +1878,7 @@ int UtcDaliAnimationAnimateByBooleanAlphaFunctionP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -1955,7 +1955,7 @@ int UtcDaliAnimationAnimateByBooleanTimePeriodP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -2018,7 +2018,7 @@ int UtcDaliAnimationAnimateByBooleanAlphaFunctionTimePeriodP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -2082,7 +2082,7 @@ int UtcDaliAnimationAnimateByFloatP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -2134,7 +2134,7 @@ int UtcDaliAnimationAnimateByFloatAlphaFunctionP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -2189,7 +2189,7 @@ int UtcDaliAnimationAnimateByFloatTimePeriodP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -2250,7 +2250,7 @@ int UtcDaliAnimationAnimateByFloatAlphaFunctionTimePeriodP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -2312,7 +2312,7 @@ int UtcDaliAnimationAnimateByIntegerP(void)
 
   // Register an integer property
   int startValue(1);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -2364,7 +2364,7 @@ int UtcDaliAnimationAnimateByIntegerAlphaFunctionP(void)
 
   // Register an integer property
   int startValue(1);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -2419,7 +2419,7 @@ int UtcDaliAnimationAnimateByIntegerTimePeriodP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -2480,7 +2480,7 @@ int UtcDaliAnimationAnimateByIntegerAlphaFunctionTimePeriodP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -2542,7 +2542,7 @@ int UtcDaliAnimationAnimateByVector2P(void)
 
   // Register a Vector2 property
   Vector2 startValue(10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -2594,7 +2594,7 @@ int UtcDaliAnimationAnimateByVector2AlphaFunctionP(void)
 
   // Register a Vector2 property
   Vector2 startValue(100.0f, 100.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -2650,7 +2650,7 @@ int UtcDaliAnimationAnimateByVector2TimePeriodP(void)
 
   // Register a Vector2 property
   Vector2 startValue(10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -2711,7 +2711,7 @@ int UtcDaliAnimationAnimateByVector2AlphaFunctionTimePeriodP(void)
 
   // Register a Vector2 property
   Vector2 startValue(5.0f, 5.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -2773,7 +2773,7 @@ int UtcDaliAnimationAnimateByVector3P(void)
 
   // Register a Vector3 property
   Vector3 startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -2825,7 +2825,7 @@ int UtcDaliAnimationAnimateByVector3AlphaFunctionP(void)
 
   // Register a Vector3 property
   Vector3 startValue(100.0f, 100.0f, 100.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -2882,7 +2882,7 @@ int UtcDaliAnimationAnimateByVector3TimePeriodP(void)
 
   // Register a Vector3 property
   Vector3 startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -2943,7 +2943,7 @@ int UtcDaliAnimationAnimateByVector3AlphaFunctionTimePeriodP(void)
 
   // Register a Vector3 property
   Vector3 startValue(5.0f, 5.0f, 5.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -3005,7 +3005,7 @@ int UtcDaliAnimationAnimateByVector4P(void)
 
   // Register a Vector4 property
   Vector4 startValue(10.0f, 10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -3057,7 +3057,7 @@ int UtcDaliAnimationAnimateByVector4AlphaFunctionP(void)
 
   // Register a Vector4 property
   Vector4 startValue(100.0f, 100.0f, 100.0f, 100.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -3115,7 +3115,7 @@ int UtcDaliAnimationAnimateByVector4TimePeriodP(void)
 
   // Register a Vector4 property
   Vector4 startValue(10.0f, 10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -3176,7 +3176,7 @@ int UtcDaliAnimationAnimateByVector4AlphaFunctionTimePeriodP(void)
 
   // Register a Vector4 property
   Vector4 startValue(5.0f, 5.0f, 5.0f, 5.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -3743,7 +3743,7 @@ int UtcDaliAnimationAnimateToBooleanP(void)
 
   // Register a boolean property
   const bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -3825,7 +3825,7 @@ int UtcDaliAnimationAnimateToBooleanAlphaFunctionP(void)
 
   // Register a boolean property
   const bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -3833,7 +3833,7 @@ int UtcDaliAnimationAnimateToBooleanAlphaFunctionP(void)
   float durationSeconds(2.0f);
   Animation animation = Animation::New(durationSeconds);
   const bool targetValue( !startValue );
-  animation.AnimateTo(Property(actor, "test-property"), targetValue, AlphaFunction::EASE_OUT);
+  animation.AnimateTo(Property(actor, "testProperty"), targetValue, AlphaFunction::EASE_OUT);
 
   // Start the animation
   animation.Play();
@@ -3907,7 +3907,7 @@ int UtcDaliAnimationAnimateToBooleanTimePeriodP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -3969,7 +3969,7 @@ int UtcDaliAnimationAnimateToBooleanAlphaFunctionTimePeriodP(void)
 
   // Register a boolean property
   bool startValue(false);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_CHECK( actor.GetProperty<bool>(index) == startValue );
 
@@ -4032,7 +4032,7 @@ int UtcDaliAnimationAnimateToFloatP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -4041,7 +4041,7 @@ int UtcDaliAnimationAnimateToFloatP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetValue(50.0f);
   float relativeValue(targetValue - startValue);
-  animation.AnimateTo(Property(actor, "test-property"), targetValue);
+  animation.AnimateTo(Property(actor, "testProperty"), targetValue);
 
   float ninetyFivePercentProgress(startValue + relativeValue*0.95f);
 
@@ -4078,7 +4078,7 @@ int UtcDaliAnimationAnimateToFloatAlphaFunctionP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -4127,7 +4127,7 @@ int UtcDaliAnimationAnimateToFloatTimePeriodP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -4182,7 +4182,7 @@ int UtcDaliAnimationAnimateToFloatAlphaFunctionTimePeriodP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -4238,7 +4238,7 @@ int UtcDaliAnimationAnimateToIntegerP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -4247,7 +4247,7 @@ int UtcDaliAnimationAnimateToIntegerP(void)
   Animation animation = Animation::New(durationSeconds);
   int targetValue(50);
   int relativeValue(targetValue - startValue);
-  animation.AnimateTo(Property(actor, "test-property"), targetValue);
+  animation.AnimateTo(Property(actor, "testProperty"), targetValue);
 
   int ninetyFivePercentProgress(static_cast<int>(startValue + relativeValue*0.95f + 0.5f));
 
@@ -4284,7 +4284,7 @@ int UtcDaliAnimationAnimateToIntegerAlphaFunctionP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -4333,7 +4333,7 @@ int UtcDaliAnimationAnimateToIntegerTimePeriodP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -4388,7 +4388,7 @@ int UtcDaliAnimationAnimateToIntegerAlphaFunctionTimePeriodP(void)
 
   // Register an integer property
   int startValue(10);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
@@ -4444,7 +4444,7 @@ int UtcDaliAnimationAnimateToVector2P(void)
 
   // Register a Vector2 property
   Vector2 startValue(-50.0f, -50.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -4490,7 +4490,7 @@ int UtcDaliAnimationAnimateToVector2AlphaFunctionP(void)
 
   // Register a Vector2 property
   Vector2 startValue(1000.0f, 1000.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -4499,7 +4499,7 @@ int UtcDaliAnimationAnimateToVector2AlphaFunctionP(void)
   Animation animation = Animation::New(durationSeconds);
   Vector2 targetValue(9000.0f, 9000.0f);
   Vector2 relativeValue(targetValue - startValue);
-  animation.AnimateTo(Property(actor, "test-property"), targetValue, AlphaFunction::EASE_OUT);
+  animation.AnimateTo(Property(actor, "testProperty"), targetValue, AlphaFunction::EASE_OUT);
 
   Vector2 ninetyFivePercentProgress(startValue + relativeValue*0.95f);
 
@@ -4540,7 +4540,7 @@ int UtcDaliAnimationAnimateToVector2TimePeriodP(void)
 
   // Register a Vector2 property
   Vector2 startValue(10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -4595,7 +4595,7 @@ int UtcDaliAnimationAnimateToVector2AlphaFunctionTimePeriodP(void)
 
   // Register a Vector2 property
   Vector2 startValue(10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
 
@@ -4651,7 +4651,7 @@ int UtcDaliAnimationAnimateToVector3P(void)
 
   // Register a Vector3 property
   Vector3 startValue(-50.0f, -50.0f, -50.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -4697,7 +4697,7 @@ int UtcDaliAnimationAnimateToVector3AlphaFunctionP(void)
 
   // Register a Vector3 property
   Vector3 startValue(1000.0f, 1000.0f, 1000.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -4748,7 +4748,7 @@ int UtcDaliAnimationAnimateToVector3TimePeriodP(void)
 
   // Register a Vector3 property
   Vector3 startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -4803,7 +4803,7 @@ int UtcDaliAnimationAnimateToVector3AlphaFunctionTimePeriodP(void)
 
   // Register a Vector3 property
   Vector3 startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -4813,7 +4813,7 @@ int UtcDaliAnimationAnimateToVector3AlphaFunctionTimePeriodP(void)
   Vector3 targetValue(30.0f, 30.0f, 30.0f);
   Vector3 relativeValue(targetValue - startValue);
   float delay = 0.5f;
-  animation.AnimateTo(Property(actor, "test-property"),
+  animation.AnimateTo(Property(actor, "testProperty"),
                       targetValue,
                       AlphaFunction::LINEAR,
                       TimePeriod(delay, durationSeconds - delay));
@@ -4859,7 +4859,7 @@ int UtcDaliAnimationAnimateToVector3ComponentP(void)
 
   // Register a Vector3 property
   Vector3 startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION );
 
@@ -4869,7 +4869,7 @@ int UtcDaliAnimationAnimateToVector3ComponentP(void)
   Vector3 targetValue(30.0f, 30.0f, 10.0f);
   Vector3 relativeValue(targetValue - startValue);
   float delay = 0.5f;
-  animation.AnimateTo(Property(actor, "test-property", 0),
+  animation.AnimateTo(Property(actor, "testProperty",  0),
                       30.0f,
                       AlphaFunction::LINEAR,
                       TimePeriod(delay, durationSeconds - delay));
@@ -4919,7 +4919,7 @@ int UtcDaliAnimationAnimateToVector4P(void)
 
   // Register a Vector4 property
   Vector4 startValue(-50.0f, -40.0f, -30.0f, -20.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -4965,7 +4965,7 @@ int UtcDaliAnimationAnimateToVector4AlphaFunctionP(void)
 
   // Register a Vector4 property
   Vector4 startValue(1000.0f, 1000.0f, 1000.0f, 1000.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -5017,7 +5017,7 @@ int UtcDaliAnimationAnimateToVector4TimePeriodP(void)
 
   // Register a Vector4 property
   Vector4 startValue(10.0f, 10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, VECTOR4_EPSILON, TEST_LOCATION );
 
@@ -5072,7 +5072,7 @@ int UtcDaliAnimationAnimateToVector4AlphaFunctionTimePeriodP(void)
 
   // Register a Vector4 property
   Vector4 startValue(10.0f, 10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>(index), startValue, TEST_LOCATION );
 
@@ -5472,7 +5472,6 @@ int UtcDaliAnimationAnimateToActorSizeWidthP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().width, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5517,7 +5516,6 @@ int UtcDaliAnimationAnimateToActorSizeHeightP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().height, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5562,7 +5560,6 @@ int UtcDaliAnimationAnimateToActorSizeDepthP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().depth, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5760,9 +5757,6 @@ int UtcDaliAnimationAnimateToActorPositionXP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5811,9 +5805,6 @@ int UtcDaliAnimationAnimateToActorPositionYP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().y, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5862,9 +5853,6 @@ int UtcDaliAnimationAnimateToActorPositionZP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().z, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -8146,7 +8134,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int P(void)
+int UtcDaliAnimationAnimateBetweenActorColorCubicWithDelayP(void)
 {
   TestApplication application;
 
@@ -8747,7 +8735,7 @@ int UtcDaliAnimationUpdateManagerP(void)
   animation.FinishedSignal().Connect( &application, finishCheck );
 
   Vector3 startValue(1.0f, 1.0f, 1.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Constraint constraint = Constraint::New<Vector3>( actor, index, UpdateManagerTestConstraint( application ) );
   constraint.Apply();
 
@@ -8829,7 +8817,7 @@ int UtcDaliAnimationExtendDurationP(void)
 
   // Register a float property
   float startValue(10.0f);
-  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
@@ -8890,7 +8878,7 @@ int UtcDaliAnimationCustomIntProperty(void)
   Stage::GetCurrent().Add(actor);
   int startValue(0u);
 
-  Property::Index index = actor.RegisterProperty("an-index", startValue);
+  Property::Index index = actor.RegisterProperty("anIndex",  startValue);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
   // Build the animation
@@ -8922,4 +8910,3 @@ int UtcDaliAnimationCustomIntProperty(void)
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), 20, TEST_LOCATION );
   END_TEST;
 }
-

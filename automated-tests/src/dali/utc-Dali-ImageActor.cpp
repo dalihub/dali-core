@@ -83,7 +83,7 @@ int UtcDaliImageActorNew02(void)
   TestApplication application;
   tet_infoline("Negative test for Dali::ImageActor::New()");
 
-  Image image = ResourceImage::New("hopefully-this-image-file-does-not-exist");
+  Image image = ResourceImage::New("hopefullyThisImageFileDoesNotExist");
   ImageActor actor = ImageActor::New(image);
 
   DALI_TEST_CHECK(actor);
@@ -151,6 +151,8 @@ int UtcDaliImageActor9Patch(void)
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
+  DALI_TEST_EQUALS( ImageActor::STYLE_NINE_PATCH, actor.GetStyle(), TEST_LOCATION );
+
   Vector4 border(0.1,0.2,0.3,0.4);
   actor.SetNinePatchBorder(border);
 
@@ -666,13 +668,13 @@ int UtcDaliImageActorUseImageAlpha01(void)
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::ON );
   actor.SetSize(100, 50);
-  application.GetGlAbstraction().EnableCullFaceCallTrace(true); // For Enable(GL_BLEND)
+  application.GetGlAbstraction().EnableEnableDisableCallTrace(true); // For Enable(GL_BLEND)
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
+  const TraceCallStack& callTrace = application.GetGlAbstraction().GetEnableDisableTrace();
   DALI_TEST_EQUALS( BlendEnabled( callTrace), true, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   END_TEST;
@@ -688,13 +690,13 @@ int UtcDaliImageActorUseImageAlpha02(void)
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::OFF );
   actor.SetSize(100, 50);
-  application.GetGlAbstraction().EnableCullFaceCallTrace(true); // For Enable(GL_BLEND)
+  application.GetGlAbstraction().EnableEnableDisableCallTrace(true); // For Enable(GL_BLEND)
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
+  const TraceCallStack& callTrace = application.GetGlAbstraction().GetEnableDisableTrace();
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendEnabled( callTrace), false, TEST_LOCATION );
   END_TEST;
@@ -711,13 +713,13 @@ int UtcDaliImageActorUseImageAlpha03(void)
   actor.SetBlendMode( BlendingMode::AUTO );
   actor.SetColor(Vector4(1.0, 1.0, 1.0, 0.5));
   actor.SetSize(100, 50);
-  application.GetGlAbstraction().EnableCullFaceCallTrace(true); // For Enable(GL_BLEND)
+  application.GetGlAbstraction().EnableEnableDisableCallTrace(true); // For Enable(GL_BLEND)
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
+  const TraceCallStack& callTrace = application.GetGlAbstraction().GetEnableDisableTrace();
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendEnabled( callTrace), true, TEST_LOCATION );
   END_TEST;
@@ -744,13 +746,13 @@ int UtcDaliImageActorUseImageAlpha04(void)
   actor.SetBlendMode( BlendingMode::ON );
   actor.SetColor(Vector4(1.0, 1.0, 1.0, 1.0));
   actor.SetSize(100, 50);
-  application.GetGlAbstraction().EnableCullFaceCallTrace(true); // For Enable(GL_BLEND)
+  application.GetGlAbstraction().EnableEnableDisableCallTrace(true); // For Enable(GL_BLEND)
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
+  const TraceCallStack& callTrace = application.GetGlAbstraction().GetEnableDisableTrace();
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendEnabled( callTrace), true, TEST_LOCATION );
   END_TEST;
@@ -767,19 +769,19 @@ int UtcDaliImageActorUseImageAlpha05(void)
   actor.SetBlendMode( BlendingMode::AUTO );
   actor.SetColor(Vector4(1.0, 1.0, 1.0, 1.0));
   actor.SetSize(100, 50);
-  application.GetGlAbstraction().EnableCullFaceCallTrace(true); // For Enable(GL_BLEND)
+  application.GetGlAbstraction().EnableEnableDisableCallTrace(true); // For Enable(GL_BLEND)
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
+  const TraceCallStack& callTrace = application.GetGlAbstraction().GetEnableDisableTrace();
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendEnabled( callTrace), false, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliImageGetStyle(void)
+int UtcDaliImageActorGetStyle(void)
 {
   TestApplication application;
 
@@ -796,7 +798,7 @@ int UtcDaliImageGetStyle(void)
   END_TEST;
 }
 
-int UtcDaliImageSetNinePatchBorder(void)
+int UtcDaliImageActorSetNinePatchBorder(void)
 {
   TestApplication application;
 
@@ -804,6 +806,8 @@ int UtcDaliImageSetNinePatchBorder(void)
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
+  DALI_TEST_EQUALS( ImageActor::STYLE_NINE_PATCH, actor.GetStyle(), TEST_LOCATION );
+
   actor.SetNinePatchBorder(Vector4( 1.0f, 2.0f, 3.0f, 4.0f));
 
   DALI_TEST_EQUALS( 1.0f, actor.GetNinePatchBorder().x, TEST_LOCATION );
@@ -917,7 +921,7 @@ int UtcDaliImageActorNinePatch01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() > 0 );
@@ -964,7 +968,7 @@ int UtcDaliImageActorNinePatch02(void)
   application.Render();
 
   // Check that nothing was drawn.
-  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() == 0u );
@@ -1012,7 +1016,7 @@ int UtcDaliImageActorNinePatch03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() > 0 );
@@ -1061,7 +1065,7 @@ int UtcDaliImageActorNinePatch04(void)
   application.Render();
 
   // Check that nothing was drawn.
-  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawElements" ) );
   typedef std::vector<GLuint> TexVec;
   const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
   DALI_TEST_CHECK( textures.size() == 0u );
@@ -1641,7 +1645,7 @@ int UtcDaliImageActorTestClearCache(void)
   application.Render();
 
   // There should be a single call to Clear
-  DALI_TEST_EQUALS( application.GetGlAbstraction().GetClearCountCalled() , 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().GetClearCountCalled(), 1u, TEST_LOCATION );
 
   // the last set clear mask should be COLOR, DEPTH & STENCIL which occurs at the start of each frame
   GLbitfield mask = application.GetGlAbstraction().GetLastClearMask();

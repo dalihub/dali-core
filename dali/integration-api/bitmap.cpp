@@ -279,6 +279,13 @@ Bitmap::Bitmap( ResourcePolicy::Discardable discardable, Dali::Integration::Pixe
 {
 }
 
+PixelBuffer* Bitmap::GetBufferOwnership()
+{
+  PixelBuffer* buffer = mData;
+  mData = NULL;
+  return buffer;
+}
+
 void Bitmap::DiscardBuffer()
 {
   if( mDiscardable == ResourcePolicy::OWNED_DISCARD )

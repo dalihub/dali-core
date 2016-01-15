@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,13 @@ namespace Dali
 namespace Internal
 {
 
-namespace SceneGraph
+namespace Render
 {
 class RenderTracker;
+}
+
+namespace SceneGraph
+{
 class CameraAttachment;
 
 /**
@@ -129,13 +133,12 @@ private:
 
 public: // Data, TODO hide these
 
-  RenderTracker* mRenderTracker;        ///< Pointer to an optional tracker object (not owned)
+  Render::RenderTracker* mRenderTracker;        ///< Pointer to an optional tracker object (not owned)
 
   Viewport mViewport;                   ///< Optional viewport
   Vector4  mClearColor;                 ///< Optional color to clear with
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet:1;          ///< Flag to determine whether the clear-color is set
-  bool     mCullMode:1;                 ///< True if renderers should be frustum culled
+  bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
 
   unsigned int mOffscreenTextureId;     ///< Optional offscreen target
 

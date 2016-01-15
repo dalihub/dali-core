@@ -59,7 +59,7 @@ struct TapGesture;
  * Signals
  * | %Signal Name | Method                |
  * |--------------|-----------------------|
- * | tap-detected | @ref DetectedSignal() |
+ * | tapDetected  | @ref DetectedSignal() |
  */
 class DALI_IMPORT_API TapGestureDetector : public GestureDetector
 {

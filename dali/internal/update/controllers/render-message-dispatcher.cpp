@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,9 +109,31 @@ void RenderMessageDispatcher::RemovePropertyBuffer( RenderGeometry& renderGeomet
   new (slot) DerivedType( &mRenderManager, &RenderManager::RemovePropertyBuffer, &renderGeometry, propertyBuffer );
 }
 
-void RenderMessageDispatcher::AddRenderTracker( RenderTracker& renderTracker )
+void RenderMessageDispatcher::SetGeometryType( RenderGeometry& geometry, int geometryType )
 {
-  typedef MessageValue1< RenderManager, RenderTracker* > DerivedType;
+  typedef MessageValue2< RenderManager, RenderGeometry*, int > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mRenderManager, &RenderManager::SetGeometryType, &geometry, geometryType );
+}
+
+void RenderMessageDispatcher::SetGeometryRequiresDepthTest( RenderGeometry& geometry, bool requiresDepthTest )
+{
+  typedef MessageValue2< RenderManager, RenderGeometry*, bool > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mRenderManager, &RenderManager::SetGeometryRequiresDepthTest, &geometry, requiresDepthTest );
+}
+
+void RenderMessageDispatcher::AddRenderTracker( Render::RenderTracker& renderTracker )
+{
+  typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -120,9 +142,9 @@ void RenderMessageDispatcher::AddRenderTracker( RenderTracker& renderTracker )
   new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderTracker, &renderTracker );
 }
 
-void RenderMessageDispatcher::RemoveRenderTracker( RenderTracker& renderTracker )
+void RenderMessageDispatcher::RemoveRenderTracker( Render::RenderTracker& renderTracker )
 {
-  typedef MessageValue1< RenderManager, RenderTracker* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

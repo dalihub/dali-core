@@ -51,12 +51,9 @@ public:
   enum FaceCullingMode
   {
     NONE,                     ///< None of the faces should be culled
-    CULL_BACK,                ///< Cull back face, back face should never be shown
-    CULL_BACK_HINT,           ///< Cull back face hinting, will still display correctly if no culling is done
     CULL_FRONT,               ///< Cull front face, back face should never be shown
-    CULL_FRONT_HINT,          ///< Cull front face hinting, will still display correctly if no culling is done
+    CULL_BACK,                ///< Cull back face, back face should never be shown
     CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
-    CULL_BACK_AND_FRONT_HINT, ///< Cull back and front hint, will still display correctly if no culling is done
   };
 
   /**
@@ -66,23 +63,17 @@ public:
   {
     enum
     {
-      COLOR = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "color",                          type VECTOR4
-      FACE_CULLING_MODE,                            ///< name "face-culling-mode",              type STRING
-      BLENDING_MODE,                                ///< name "blending-mode",                  type STRING
-      BLEND_EQUATION_RGB,                           ///< name "blend-equation-rgb",             type STRING
-      BLEND_EQUATION_ALPHA,                         ///< name "blend-equation-alpha",           type STRING
-      BLENDING_SRC_FACTOR_RGB,                      ///< name "source-blend-factor-rgb",        type STRING
-      BLENDING_DEST_FACTOR_RGB,                     ///< name "destination-blend-factor-rgb",   type STRING
-      BLENDING_SRC_FACTOR_ALPHA,                    ///< name "source-blend-factor-alpha",      type STRING
-      BLENDING_DEST_FACTOR_ALPHA,                   ///< name "destination-blend-factor-alpha", type STRING
-      BLEND_COLOR,                                  ///< name "blend-color",                    type VECTOR4
+      FACE_CULLING_MODE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "faceCullingMode",                type INTEGER
+      BLENDING_MODE,                                           ///< name "blendingMode",                   type INTEGER
+      BLEND_EQUATION_RGB,                                      ///< name "blendEquationRgb",               type INTEGER
+      BLEND_EQUATION_ALPHA,                                    ///< name "blendEquationAlpha",             type INTEGER
+      BLENDING_SRC_FACTOR_RGB,                                 ///< name "sourceBlendFactorRgb",           type INTEGER
+      BLENDING_DEST_FACTOR_RGB,                                ///< name "destinationBlendFactorRgb",      type INTEGER
+      BLENDING_SRC_FACTOR_ALPHA,                               ///< name "sourceBlendFactorAlpha",         type INTEGER
+      BLENDING_DEST_FACTOR_ALPHA,                              ///< name "destinationBlendFactorAlpha",    type INTEGER
+      BLEND_COLOR,                                             ///< name "blendColor",                     type VECTOR4
     };
   };
-
-  /// @name Uniform Mapping
-  /** @{ */
-       ///< property "COLOR", uniform "uMaterialColor"
-  /** @} */
 
   /**
    * @brief Creates a new Material object
@@ -172,6 +163,14 @@ public:
   void SetTextureSampler( size_t index, Sampler sampler );
 
   /**
+   * @brief Retrieve the sampler of a texture given its texture index
+   *
+   * @param[in] index The index of the texture in the array of textures
+   * @return Returns the sampler of a texture given its texture index
+   */
+  Sampler GetTextureSampler( size_t index ) const;
+
+  /**
    * @brief Set the uniform name of a given texture
    *
    * @param[in] index The index of the texture in the array of textures
@@ -180,20 +179,28 @@ public:
   void SetTextureUniformName( size_t index, const std::string& uniformName );
 
   /**
-   * @brief Establish if a given texture will affect the transparency of the material ( true by default )
-   *
-   * @param[in] index The index of the texture in the array of textures
-   * @param[in] affectsTransparency True if the texture affects transparency, false otherwise
-   */
-  void SetTextureAffectsTransparency( size_t index, bool affectsTransparency );
-
-  /*
    * @brief Retrive the index of a texture given its uniform name
    *
    * @param[in] uniformName the uniform name
    * @returns The index in the array of textures or -1 if the texture is not found
    */
-  int GetTextureIndex( const std::string& uniformName );
+  int GetTextureIndex( const std::string& uniformName ) const;
+
+  /**
+   * @brief Retrive the texture given its uniform name
+   *
+   * @param[in] uniformName the uniform name
+   * @returns The image in the array of textures corresponding to the uniformName or an empty handle if the texture is not found
+   */
+  Image GetTexture( const std::string& uniformName ) const;
+
+  /**
+   * @brief Retrive the texture given its index
+   *
+   * @param[in] index The index in the array of textures
+   * @returns The image in the array of textures corresponding to the index or an empty handle if the texture is not found
+   */
+  Image GetTexture( size_t index ) const;
 
   /**
    * @brief Retrieve the number of textures used by the material
@@ -203,11 +210,18 @@ public:
   /**
    * @brief Set the culling mode for this material
    *
-   * Calling this function sets the properties CULLING_MODE
+   * Calling this function sets the property CULLING_MODE
    *
    * @param[in] cullingMode The culling mode for this material
    */
   void SetFaceCullingMode( FaceCullingMode cullingMode );
+
+  /**
+   * @brief Get the face culling mode for this material
+   *
+   * @return The face culling mode for this material
+   */
+  FaceCullingMode GetFaceCullingMode();
 
   /**
    * @brief Sets the blending mode.
@@ -318,7 +332,7 @@ public:
    *
    * @return The blend color.
    */
-  const Vector4& GetBlendColor() const;
+  Vector4 GetBlendColor() const;
 
 public:
   /**
