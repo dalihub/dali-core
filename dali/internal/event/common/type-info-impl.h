@@ -147,6 +147,14 @@ public:
   void AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type );
 
   /**
+   * Adds an animatable property with the given default value.
+   * @param[in] name The name of the property.
+   * @param[in] index The index of the property
+   * @param[in] type The Property::Type.
+   */
+  void AddAnimatableProperty( const std::string& name, Property::Index index, const Property::Value& defaultValue );
+
+  /**
    * Adds a component of an animatable property to the type.
    * The animatable property must have been type-registered and must be a Vector2, Vector3 or Vector4 type.
    * @param[in] name The name of the component.
@@ -210,6 +218,13 @@ public:
    * @return The Property::Type at that index.
    */
   Property::Type GetPropertyType( Property::Index index ) const;
+
+  /**
+   * Retrieve the default value of the property at the given index.
+   * @param[in] index The property index.
+   * @return The default property value at that index.
+   */
+  Property::Value GetPropertyDefaultValue( Property::Index index ) const;
 
   /**
    * Sets the value of a property at the index specified for the given object.
@@ -278,10 +293,12 @@ private:
   typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction > ConnectionPair;
   typedef std::pair<std::string, Dali::TypeInfo::ActionFunction > ActionPair;
   typedef std::pair<Property::Index, RegisteredProperty> RegisteredPropertyPair;
+  typedef std::pair<Property::Index, Property::Value> PropertyDefaultValuePair;
 
   typedef std::vector< ActionPair > ActionContainer;
   typedef std::vector< ConnectionPair > ConnectorContainer;
   typedef std::vector< RegisteredPropertyPair > RegisteredPropertyContainer;
+  typedef std::vector< PropertyDefaultValuePair > PropertyDefaultValueContainer;
 
   std::string mTypeName;
   std::string mBaseTypeName;
@@ -289,6 +306,7 @@ private:
   ActionContainer mActions;
   ConnectorContainer mSignalConnectors;
   RegisteredPropertyContainer mRegisteredProperties;
+  PropertyDefaultValueContainer mPropertyDefaultValues;
 };
 
 } // namespace Internal

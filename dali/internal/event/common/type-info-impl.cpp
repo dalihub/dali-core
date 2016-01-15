@@ -415,6 +415,22 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
   }
 }
 
+void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index index, const Property::Value& defaultValue )
+{
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                        PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+  if ( iter == mRegisteredProperties.end() )
+  {
+    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( defaultValue.GetType(), NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mPropertyDefaultValues.push_back( PropertyDefaultValuePair( index, defaultValue ) );
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
+  }
+}
+
 void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
 {
   Property::Type type = GetPropertyType( baseIndex );
@@ -584,6 +600,20 @@ Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
   }
 
   return type;
+}
+
+Property::Value TypeInfo::GetPropertyDefaultValue( Property::Index index ) const
+{
+  PropertyDefaultValueContainer::const_iterator iter = find_if( mPropertyDefaultValues.begin(), mPropertyDefaultValues.end(),
+                                                    PairFinder< Property::Index, PropertyDefaultValuePair >( index ) );
+  if( iter !=  mPropertyDefaultValues.end() )
+  {
+    return iter->second;
+  }
+  else
+  {
+    return Property::Value( GetPropertyType( index ) );
+  }
 }
 
 void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const

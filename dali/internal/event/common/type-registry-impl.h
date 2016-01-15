@@ -127,6 +127,16 @@ public:
   bool RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
 
   /**
+   * Register a scene graph only property with a default value
+   * @param [in] registered TypeRegistration object used to register the type
+   * @param [in] name Property name
+   * @param [in] index Property index
+   * @param [in] value Property default value
+   * @return true if registered
+   */
+  bool RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& defaultValue );
+
+  /**
    * Register a component of a scene graph only property that supports components (i.e. Vector2, Vector3 and Vector4)
    * @param [in] registered TypeRegistration object used to register the type
    * @param [in] name Component name
