@@ -39,11 +39,6 @@ NodePropertyMessageBase::~NodePropertyMessageBase()
 {
 }
 
-void NodePropertyMessageBase::NotifyUpdateManager( Node* node )
-{
-  mUpdateManager.SetNodeActive( node );
-}
-
 } // namespace SceneGraph
 
 } // namespace Internal

@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.1.16
+Version:    1.1.17
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -67,6 +67,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 export DALI_DATA_RW_DIR
 export DALI_DATA_RO_DIR
 
+# Default to GLES 2.0 if not specified.
+%{!?target_gles_version: %define target_gles_version 20}
+
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
 LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
@@ -84,6 +87,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --localstatedir=%{_localstatedir} \
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
+      --enable-gles=%{target_gles_version} \
       --infodir=%{_infodir}
 
 make %{?jobs:-j%jobs}

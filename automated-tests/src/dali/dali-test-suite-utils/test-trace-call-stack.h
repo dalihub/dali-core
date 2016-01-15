@@ -78,6 +78,14 @@ public:
   bool FindMethodAndParams(std::string method, std::string params) const;
 
   /**
+   * Search for a method in the stack with the given parameter list
+   * @param[in] method The name of the method
+   * @param[in] params A comma separated list of parameter values
+   * @return index in the stack where the method was found or -1 otherwise
+   */
+  int FindIndexFromMethodAndParams(std::string method, std::string params) const;
+
+  /**
    * Test if the given method and parameters are at a given index in the stack
    * @param[in] index Index in the call stack
    * @param[in] method Name of method to test

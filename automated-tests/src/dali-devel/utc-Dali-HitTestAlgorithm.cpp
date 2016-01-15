@@ -415,3 +415,61 @@ int UtcDaliHitTestAlgorithmStencil(void)
   }
   END_TEST;
 }
+
+int UtcDaliHitTestAlgorithmOverlay(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with overlay actors");
+
+  Stage stage = Stage::GetCurrent();
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor cameraActor = defaultRenderTask.GetCameraActor();
+
+  Vector2 stageSize ( stage.GetSize() );
+  cameraActor.SetOrthographicProjection( stageSize );
+  cameraActor.SetPosition(0.0f, 0.0f, 1600.0f);
+
+  Vector2 actorSize( stageSize * 0.5f );
+  // Create two actors with half the size of the stage and set them to be partially overlapping
+  Actor blue = Actor::New();
+  blue.SetDrawMode( DrawMode::OVERLAY_2D );
+  blue.SetName( "Blue" );
+  blue.SetAnchorPoint( AnchorPoint::CENTER );
+  blue.SetParentOrigin( Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
+  blue.SetSize( actorSize );
+  blue.SetZ(30.0f);
+
+  Actor green = Actor::New( );
+  green.SetName( "Green" );
+  green.SetAnchorPoint( AnchorPoint::CENTER );
+  green.SetParentOrigin( Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
+  green.SetSize( actorSize );
+
+  // Add the actors to the view
+  stage.Add( blue );
+  stage.Add( green );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+
+  //Hit in the intersection. Should pick the blue actor since it is an overlay.
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == blue );
+  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 5.0f/6.0f, TEST_LOCATION );
+
+  //Hit in the blue actor
+  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == blue );
+  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION );
+
+  //Hit in the green actor
+  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == green );
+  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION );
+  END_TEST;
+}
