@@ -477,7 +477,7 @@ int UtcDaliLayerDefaultProperties(void)
 
 
   Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
-  DALI_TEST_CHECK( std::strcmp( behavior.Get<std::string>().c_str(), "LAYER_2D") );
+  DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_2D", TEST_LOCATION );
 
   END_TEST;
 }
@@ -491,6 +491,9 @@ int UtcDaliLayerSetDepthTestDisabled(void)
   DALI_TEST_CHECK( actor.IsDepthTestDisabled() );
 
   actor.SetBehavior( Layer::LAYER_3D );
+
+  Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
+  DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_3D", TEST_LOCATION );
   DALI_TEST_CHECK( !actor.IsDepthTestDisabled() );
 
   actor.SetDepthTestDisabled( true );
