@@ -81,7 +81,7 @@ public:
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * @deprecated DALi 1.1.3, use New( unsigned int width, unsigned int height ) instead.
+   * @DEPRECATED_1_1.3. Use New( unsigned int width, unsigned int height ) instead.
    *
    * @brief Create a new BufferImage.
    *
@@ -132,7 +132,7 @@ public:
                          unsigned int  stride=0);
 
   /**
-   * @deprecated DALi 1.1.3, use New( PixelBuffer* pixelBuffer, unsigned int width, unsigned int height ) instead.
+   * @DEPRECATED_1_1.3. Use New( PixelBuffer* pixelBuffer, unsigned int width, unsigned int height ) instead.
    *
    * @brief Create a new BufferImage, which uses an external data source.
    *

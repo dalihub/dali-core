@@ -78,7 +78,7 @@ public:
   EncodedBufferImage();
 
   /**
-   * @deprecated DALi 1.1.3 use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
+   * @DEPRECATED_1_1.3. Use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
    *
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *

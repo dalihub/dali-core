@@ -116,7 +116,7 @@ public:
   NinePatchImage& operator=(const NinePatchImage& rhs);
 
   /**
-   * @deprecated DALi 1.1.4 use GetStretchPixelsX and GetStretchPixelsY instead
+   * @DEPRECATED_1_1.4. Use GetStretchPixelsX and GetStretchPixelsY instead.
    *
    * @brief Get the stretch borders
    *

@@ -42,6 +42,7 @@ class ImageActor;
 }
 
 /**
+ * @DEPRECATED_1_1.11
  * @brief An actor for displaying images.
  *
  * Allows the developer to add an actor to stage which displays the content of an Image object.
@@ -77,15 +78,33 @@ public:
   {
     enum
     {
-      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixelArea",   type Rect<int> @SINCE_1_0.0
-      STYLE,                                                   ///< @deprecated Dali 1.1.11 name "style",       type std::string @SINCE_1_0.0
-      BORDER,                                                  ///< @deprecated Dali 1.1.11 name "border",      type Vector4 @SINCE_1_0.0
-      IMAGE,                                                   ///< name "image",       type Map {"filename":"", "loadPolicy":...} @SINCE_1_0.0
+      /**
+       * @brief name "pixelArea",   type Rect<int>
+       * @SINCE_1_0.0
+       */
+      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,
+      /**
+       * @DEPRECATED_1_1.11
+       * @brief name "style",       type std::string
+       * @SINCE_1_0.0
+       */
+      STYLE,
+      /**
+       * @DEPRECATED_1_1.11
+       * @brief name "border",      type Vector4
+       * @SINCE_1_0.0
+       */
+      BORDER,
+      /**
+       * @brief name "image",       type Map {"filename":"", "loadPolicy":...}
+       * @SINCE_1_0.0
+       */
+      IMAGE,
     };
   };
 
   /**
-   * @deprecated DALi 1.1.11, only quad style supported, use ImageView instead for nine patch
+   * @DEPRECATED_1_1.11. Only quad style supported, use ImageView instead for nine patch.
    *
    * @brief Style determines how the Image is rendered.
    *
@@ -111,8 +130,18 @@ public:
   enum Style
   {
     STYLE_QUAD,                 ///< As a simple quad. @SINCE_1_0.0
-    STYLE_NINE_PATCH,           ///< @deprecated Dali 1.1.11 As a nine-patch. @SINCE_1_0.0
-    STYLE_NINE_PATCH_NO_CENTER  ///< @deprecated Dali 1.1.11 As a nine-patch without center section being rendered. @SINCE_1_0.0
+    /**
+     * @DEPRECATED_1_1.11
+     * @brief As a nine-patch.
+     * @SINCE_1_0.0
+     */
+    STYLE_NINE_PATCH,
+    /**
+     * @DEPRECATED_1_1.11
+     * @brief As a nine-patch without center section being rendered.
+     * @SINCE_1_0.0
+     */
+    STYLE_NINE_PATCH_NO_CENTER
   };
 
   /**
@@ -252,7 +281,7 @@ public:
   PixelArea GetPixelArea() const;
 
   /**
-   * @deprecated DALi 1.1.11, use ImageView instead
+   * @DEPRECATED_1_1.11. Use ImageView instead.
    *
    * @brief Set how the image is rendered; the default is STYLE_QUAD.
    *
@@ -265,7 +294,7 @@ public:
   void SetStyle(Style style);
 
   /**
-   * @deprecated DALi 1.1.11, use ImageView instead
+   * @DEPRECATED_1_1.11. Use ImageView instead.
    *
    * @brief Query how the image is rendered.
    *
@@ -278,7 +307,7 @@ public:
   Style GetStyle() const;
 
   /**
-   * @deprecated DALi 1.1.11, use ImageView instead
+   * @DEPRECATED_1_1.11. Use ImageView instead.
    *
    * @brief Set the border used with STYLE_NINE_PATCH.
    *
@@ -290,7 +319,7 @@ public:
   void SetNinePatchBorder(const Vector4& border);
 
   /**
-   * @deprecated DALi 1.1.11, use ImageView instead
+   * @DEPRECATED_1_1.11. Use ImageView instead.
    *
    * @brief Retrieve the border used with STYLE_NINE_PATCH.
    *

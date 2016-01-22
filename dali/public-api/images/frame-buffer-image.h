@@ -85,7 +85,7 @@ public:
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
-   * @deprecated DALi 1.1.3 use New() instead.
+   * @DEPRECATED_1_1.3. Use New() instead.
    *
    * @brief Create a new FrameBufferImage.
    *
@@ -116,7 +116,7 @@ public:
   static FrameBufferImage New(NativeImageInterface& image);
 
   /**
-   * @deprecated DALi 1.1.3 use New( NativeImageInterface& ) instead.
+   * @DEPRECATED_1_1.3. Use New( NativeImageInterface& ) instead.
    *
    * @brief Create a new FrameBufferImage.
    *
