@@ -314,6 +314,8 @@ public:
   /**
    * @brief This constructor registers the animatable property with the registered default value.
    *
+   * @since DALi 1.1.18
+   *
    * This constructor is for scene-graph only properties where the
    * value of the property can be retrieved and set via specified
    * functions.
