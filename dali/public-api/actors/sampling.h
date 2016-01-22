@@ -32,14 +32,15 @@ namespace FilterMode
 {
 /**
  * @brief Texture filtering mode.
+ * @SINCE_1_0.0
  * @see Dali::RenderableActor::SetFilterMode() and Dali::RenderableActor::GetFilterMode()
  */
 enum Type
 {
-  NONE = 0,   ///< Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR)
-  DEFAULT,    ///< Use Dali defaults (minification LINEAR, magnification LINEAR)
-  NEAREST,    ///< Filter nearest
-  LINEAR      ///< Filter linear
+  NONE = 0,   ///< Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR) @SINCE_1_0.0
+  DEFAULT,    ///< Use Dali defaults (minification LINEAR, magnification LINEAR) @SINCE_1_0.0
+  NEAREST,    ///< Filter nearest @SINCE_1_0.0
+  LINEAR      ///< Filter linear @SINCE_1_0.0
 };
 
 } //namespace FilterMode
@@ -49,7 +50,7 @@ namespace WrapMode
 
 enum Type
 {
-  DEFAULT = 0,    ///< Clamp to edge
+  DEFAULT = 0,    ///< Clamp to edge @SINCE_1_0.0
   CLAMP_TO_EDGE,
   REPEAT,
   MIRRORED_REPEAT

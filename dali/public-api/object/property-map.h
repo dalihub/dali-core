@@ -37,6 +37,7 @@ typedef std::pair<std::string, Property::Value> StringValuePair;
 
 /**
  * @brief A Map of property values.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Property::Map
 {
@@ -46,24 +47,28 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Map();
 
   /**
    * @brief Copy Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] other The Map to copy from.
    */
   Map( const Map& other );
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Map();
 
   /**
    * @brief Retrieve the number of elements in the map.
    *
+   * @SINCE_1_0.0
    * @return The number of elements in the map.
    */
   SizeType Count() const;
@@ -71,6 +76,7 @@ public:
   /**
    * @brief Returns whether the map is empty.
    *
+   * @SINCE_1_0.0
    * @return true if empty, false otherwise
    */
   bool Empty() const;
@@ -79,6 +85,7 @@ public:
    * @brief Inserts the key-value pair in the Map.
    *
    * Does not check for duplicates
+   * @SINCE_1_0.0
    * @param key to insert
    * @param value to insert
    */
@@ -88,6 +95,7 @@ public:
    * @brief Inserts the key-value pair in the Map.
    *
    * Does not check for duplicates
+   * @SINCE_1_0.0
    * @param key to insert
    * @param value to insert
    */
@@ -96,6 +104,7 @@ public:
   /**
    * @brief Retrieve the value at the specified position.
    *
+   * @SINCE_1_0.0
    * @return A reference to the value at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -105,6 +114,7 @@ public:
   /**
    * @brief Retrieve the key at the specified position.
    *
+   * @SINCE_1_0.0
    * @return A const reference to the key at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -114,6 +124,7 @@ public:
   /**
    * @brief Retrieve the key & the value at the specified position.
    *
+   * @SINCE_1_0.0
    * @return A reference to the pair of key and value at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -123,6 +134,7 @@ public:
   /**
    * @brief Finds the value for the specified key if it exists.
    *
+   * @SINCE_1_0.0
    * @param[in]  key   The key to find.
    *
    * @return A const pointer to the value if it exists, NULL otherwise
@@ -132,6 +144,7 @@ public:
   /**
    * @brief Finds the value for the specified key if it exists.
    *
+   * @SINCE_1_0.0
    * @param[in]  key   The key to find.
    *
    * @return A const pointer to the value if it exists, NULL otherwise
@@ -141,6 +154,7 @@ public:
   /**
    * @brief Finds the value for the specified key if it exists and its type is type
    *
+   * @SINCE_1_0.0
    * @param[in]  key   The key to find.
    * @param[in]  type  The type to check.
    *
@@ -150,6 +164,7 @@ public:
 
   /**
    * @brief Clears the map.
+   * @SINCE_1_0.0
    */
   void Clear();
 
@@ -158,6 +173,7 @@ public:
    *
    * Any values in 'from' will overwrite the values in the current map.
    *
+   * @SINCE_1_0.0
    * @param[in]  from  The map to merge from.
    */
   void Merge( const Map& from );
@@ -165,6 +181,7 @@ public:
   /**
    * @brief Const operator to access element with the specified key.
    *
+   * @SINCE_1_0.0
    * @param[in] key The key whose value to access.
    *
    * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned.
@@ -176,6 +193,7 @@ public:
   /**
    * @brief Operator to access the element with the specified key.
    *
+   * @SINCE_1_0.0
    * @param[in] key The key whose value to access.
    *
    * @return A reference to the value for the element with the specified key.
@@ -187,6 +205,7 @@ public:
   /**
    * @brief Assignment Operator
    *
+   * @SINCE_1_0.0
    * @param[in] other The map to copy from.
    *
    * @return The copied map.

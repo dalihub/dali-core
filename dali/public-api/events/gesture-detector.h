@@ -45,6 +45,7 @@ class Actor;
  * This is the base class for different gesture detectors available and provides functionality that is common
  * to all the gesture detectors.
  *
+ * @SINCE_1_0.0
  * @see Gesture
  */
 class DALI_IMPORT_API GestureDetector : public Handle
@@ -55,6 +56,7 @@ public: // Creation & Destruction
    * @brief Create an uninitialized GestureDetector; this can be initialized with one of the derived gestures' New() methods.
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   GestureDetector();
 
@@ -63,6 +65,7 @@ public: // Creation & Destruction
    *
    * If handle points to a GestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a GestureDetector object or an uninitialized handle
    */
@@ -72,12 +75,14 @@ public: // Creation & Destruction
    * @brief Dali::GestureDetector is intended as a base class
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~GestureDetector();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   GestureDetector(const GestureDetector& handle);
@@ -85,6 +90,7 @@ public: // Creation & Destruction
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -97,15 +103,17 @@ public: // Actor related
    *
    * The detected signal will be dispatched when the gesture occurs on
    * the attached actor.
-   * @note You can attach several actors to a gesture detector.
+   * @SINCE_1_0.0
    * @param[in]  actor  The actor to attach to the gesture detector
    * @pre The gesture detector has been initialized.
+   * @note You can attach several actors to a gesture detector.
    */
   void Attach(Actor actor);
 
   /**
    * @brief Detaches the attached actor from the gesture detector.
    *
+   * @SINCE_1_0.0
    * @param[in]  actor  The actor to detach from the gesture detector.
    * @pre The gesture detector has been initialized.
    * @pre The specified actor has been attached to the gesture detector.
@@ -115,6 +123,7 @@ public: // Actor related
   /**
    * @brief Detaches all the actors that have been attached to the gesture detector.
    *
+   * @SINCE_1_0.0
    * @pre The gesture detector has been initialized.
    * @pre At least one actor has been attached to the gesture detector.
    */
@@ -123,6 +132,7 @@ public: // Actor related
   /**
    * @brief Returns the number of actors attached to the gesture detector.
    *
+   * @SINCE_1_0.0
    * @return The count
    * @pre The gesture detector has been initialized.
    */
@@ -131,6 +141,7 @@ public: // Actor related
   /**
    * @brief Returns an actor by index. An empty handle if the index is not valid.
    *
+   * @SINCE_1_0.0
    * @return The attached actor or an empty handle.
    * @pre The gesture detector has been initialized.
    */
@@ -141,6 +152,7 @@ protected:
   /**
    * @brief This constructor is used by Dali New() methods of derived classes.
    *
+   * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL GestureDetector(Internal::GestureDetector* internal);

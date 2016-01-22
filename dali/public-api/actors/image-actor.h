@@ -62,6 +62,7 @@ class ImageActor;
  *
  * Clearing the pixel area on an Image actor with a set size will cause the actor to show the
  * whole image again, but will not change the image size.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ImageActor : public Actor
 {
@@ -70,15 +71,16 @@ public:
   /**
    * @brief An enumeration of properties belonging to the ImageActor class.
    * Properties additional to RenderableActor.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixelArea",   type Rect<int>
-      STYLE,                                                   ///< @deprecated Dali 1.1.11 name "style",       type std::string
-      BORDER,                                                  ///< @deprecated Dali 1.1.11 name "border",      type Vector4
-      IMAGE,                                                   ///< name "image",       type Map {"filename":"", "loadPolicy":...}
+      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixelArea",   type Rect<int> @SINCE_1_0.0
+      STYLE,                                                   ///< @deprecated Dali 1.1.11 name "style",       type std::string @SINCE_1_0.0
+      BORDER,                                                  ///< @deprecated Dali 1.1.11 name "border",      type Vector4 @SINCE_1_0.0
+      IMAGE,                                                   ///< name "image",       type Map {"filename":"", "loadPolicy":...} @SINCE_1_0.0
     };
   };
 
@@ -104,16 +106,18 @@ public:
    * Image is rendered as a textured rectangle. The texture
    * is scaled uniformly as the quad is resized.
    *
+   * @SINCE_1_0.0
    */
   enum Style
   {
-    STYLE_QUAD,                 ///< As a simple quad.
-    STYLE_NINE_PATCH,           ///< @deprecated Dali 1.1.11 As a nine-patch.
-    STYLE_NINE_PATCH_NO_CENTER  ///< @deprecated Dali 1.1.11 As a nine-patch without center section being rendered.
+    STYLE_QUAD,                 ///< As a simple quad. @SINCE_1_0.0
+    STYLE_NINE_PATCH,           ///< @deprecated Dali 1.1.11 As a nine-patch. @SINCE_1_0.0
+    STYLE_NINE_PATCH_NO_CENTER  ///< @deprecated Dali 1.1.11 As a nine-patch without center section being rendered. @SINCE_1_0.0
   };
 
   /**
    * @brief Pixel area is relative to the top-left (0,0) of the image.
+   * @SINCE_1_0.0
    */
   typedef Rect<int> PixelArea;
 
@@ -124,12 +128,14 @@ public:
    *
    * This can be initialized with ImageActor::New(...)
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   ImageActor();
 
   /**
    * @brief Create an empty image actor object.
    *
+   * @SINCE_1_0.0
    * @return A handle to a newly allocated actor.
    */
   static ImageActor New();
@@ -140,9 +146,10 @@ public:
    * The actor will take the image's natural size unless a custom size
    * is chosen, e.g. via Actor:SetSize().
    * If the handle is empty, ImageActor will display nothing
-   * @pre ImageActor must be initialized.
+   * @SINCE_1_0.0
    * @param[in] image The image to display.
    * @return A handle to a newly allocated actor.
+   * @pre ImageActor must be initialized.
    */
   static ImageActor New(Image image);
 
@@ -152,11 +159,12 @@ public:
    * The actor will take the image's natural size unless a custom size
    * is chosen, e.g. via Actor:SetSize()
    * If the handle is empty, ImageActor will display nothing
-   * @pre ImageActor must be initialized.
+   * @SINCE_1_0.0
    * @param [in] image The image to display.
    * @param [in] pixelArea The area of the image to display.
    * This in pixels, relative to the top-left (0,0) of the image.
    * @return A handle to a newly allocated actor.
+   * @pre ImageActor must be initialized.
    */
   static ImageActor New(Image image, PixelArea pixelArea);
 
@@ -167,6 +175,7 @@ public:
    * If handle points to a ImageActor the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a ImageActor or an uninitialized handle
    */
@@ -176,12 +185,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~ImageActor();
 
   /**
    * @brief Copy constructor
    *
+   * @SINCE_1_0.0
    * @param [in] copy The actor to copy.
    */
   ImageActor(const ImageActor& copy);
@@ -189,6 +200,7 @@ public:
   /**
    * @brief Assignment operator
    *
+   * @SINCE_1_0.0
    * @param [in] rhs The actor to copy.
    */
   ImageActor& operator=(const ImageActor& rhs);
@@ -202,8 +214,9 @@ public:
    * The actor will take the image's natural size unless a custom size
    * is chosen, e.g. via Actor:SetSize()
    *
-   * @pre ImageActor must be initialized.
+   * @SINCE_1_0.0
    * @param [in] image The image to display.
+   * @pre ImageActor must be initialized.
    */
   void SetImage(Image image);
 
@@ -211,6 +224,7 @@ public:
    * @brief Retrieve the image rendered by the actor.
    *
    * If no image is assigned, an empty handle is returned
+   * @SINCE_1_0.0
    * @return The image.
    */
   Image GetImage();
@@ -221,17 +235,19 @@ public:
    * When the image is loaded the actor's size will be reset to the pixelArea,
    * unless a custom size was chosen, e.g. via Actor:SetSize().
    * Note! PixelArea should be inside the image data size. It gets clamped by GL
-   * @pre image must be initialized.
+   * @SINCE_1_0.0
    * @param [in] pixelArea The area of the image to display.
    * This in pixels, relative to the top-left (0,0) of the image.
+   * @pre image must be initialized.
    */
   void SetPixelArea(const PixelArea& pixelArea);
 
   /**
    * @brief Retrieve the region of the image to display, in pixels.
    *
-   * @pre image must be initialized.
+   * @SINCE_1_0.0
    * @return The pixel area, or a default-constructed area if none was set.
+   * @pre image must be initialized.
    */
   PixelArea GetPixelArea() const;
 
@@ -240,9 +256,10 @@ public:
    *
    * @brief Set how the image is rendered; the default is STYLE_QUAD.
    *
-   * @pre image must be initialized.
+   * @SINCE_1_0.0
    * @param [in] style The new style.
    *
+   * @pre image must be initialized.
    * @note The style specified is set (so GetStyle will return what's set) but ignored internally.
    */
   void SetStyle(Style style);
@@ -252,9 +269,10 @@ public:
    *
    * @brief Query how the image is rendered.
    *
-   * @pre image must be initialized.
+   * @SINCE_1_0.0
    * @return The rendering style.
    *
+   * @pre image must be initialized.
    * @note This just returns the style set by SetStyle. In reality, only STYLE_QUAD is supported.
    */
   Style GetStyle() const;
@@ -266,6 +284,7 @@ public:
    *
    * The values are in pixels from the left, top, right, and bottom of the image respectively.
    * i.e. SetNinePatchBorder( Vector4(1,2,3,4) ) sets the left-border to 1, top-border to 2, right-border to 3, and bottom-border to 4 pixels.
+   * @SINCE_1_0.0
    * @param [in] border The new nine-patch border.
    */
   void SetNinePatchBorder(const Vector4& border);
@@ -275,6 +294,7 @@ public:
    *
    * @brief Retrieve the border used with STYLE_NINE_PATCH.
    *
+   * @SINCE_1_0.0
    * @return The nine-patch border.
    */
   Vector4 GetNinePatchBorder() const;
@@ -284,8 +304,9 @@ public:
    * @brief Allows modification of an actors position in the depth sort algorithm.
    *
    * The offset can be altered for each coplanar actor hence allowing an order of painting.
-   * @pre The Actor has been initialized.
+   * @SINCE_1_0.0
    * @param [in] depthOffset the offset to be given to the actor. Positive values pushing it further back.
+   * @pre The Actor has been initialized.
    */
   void SetSortModifier(float depthOffset);
 
@@ -293,8 +314,9 @@ public:
    * @brief Retrieves the offset used to modify an actors position in the depth sort algorithm.
    *
    * The offset can be altered for each coplanar actor hence allowing an order of painting.
-   * @pre The Actor has been initialized.
+   * @SINCE_1_0.0
    * @return  the offset that has been given to the actor. Positive values pushing it further back.
+   * @pre The Actor has been initialized.
    */
   float GetSortModifier() const;
 
@@ -311,6 +333,7 @@ public:
    *   <li> \e ON Blending is enabled.
    * </ul>
    *
+   * @SINCE_1_0.0
    * @param[in] mode The blending mode.
    */
   void SetBlendMode( BlendingMode::Type mode );
@@ -318,6 +341,7 @@ public:
   /**
    * @brief Retrieves the blending mode.
    *
+   * @SINCE_1_0.0
    * @return The blending mode, one of BlendingMode::OFF, BlendingMode::AUTO or BlendingMode::ON.
    */
   BlendingMode::Type GetBlendMode() const;
@@ -325,6 +349,7 @@ public:
   /**
    * @brief Specify the pixel arithmetic used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @param[in] srcFactorRgba Specifies how the red, green, blue, and alpha source blending factors are computed.
    * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
    * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
@@ -340,6 +365,7 @@ public:
   /**
    * @brief Specify the pixel arithmetic used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @param[in] srcFactorRgb Specifies how the red, green, and blue source blending factors are computed.
    * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
    * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
@@ -362,6 +388,7 @@ public:
   /**
    * @brief Query the pixel arithmetic used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @param[out] srcFactorRgb Specifies how the red, green, blue, and alpha source blending factors are computed.
    * @param[out] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
    * @param[out] srcFactorAlpha Specifies how the red, green, blue, and alpha source blending factors are computed.
@@ -374,6 +401,7 @@ public:
    * @brief Specify the equation used when the actor is blended.
    *
    * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
+   * @SINCE_1_0.0
    * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
    */
   void SetBlendEquation( BlendingEquation::Type equationRgba );
@@ -381,6 +409,7 @@ public:
   /**
    * @brief Specify the equation used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @param[in] equationRgb The equation used for combining red, green, and blue components.
    * @param[in] equationAlpha The equation used for combining the alpha component.
    * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
@@ -390,6 +419,7 @@ public:
   /**
    * @brief Query the equation used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @param[out] equationRgb The equation used for combining red, green, and blue components.
    * @param[out] equationAlpha The equation used for combining the alpha component.
    */
@@ -398,6 +428,7 @@ public:
   /**
    * @brief Specify the color used when the actor is blended; the default is Vector4::ZERO.
    *
+   * @SINCE_1_0.0
    * @param[in] color The blend color.
    */
   void SetBlendColor( const Vector4& color );
@@ -405,6 +436,7 @@ public:
   /**
    * @brief Query the color used when the actor is blended.
    *
+   * @SINCE_1_0.0
    * @return The blend color.
    */
   const Vector4& GetBlendColor() const;
@@ -419,6 +451,7 @@ public:
    *   <li> \e LINEAR Use linear filtering
    * </ul>
    *
+   * @SINCE_1_0.0
    * @param[in] minFilter The minification filtering mode.
    * @param[in] magFilter The magnification filtering mode.
    */
@@ -427,6 +460,7 @@ public:
   /**
    * @brief Retrieves the filtering mode.
    *
+   * @SINCE_1_0.0
    * @param[out] minFilter The return minification value
    * @param[out] magFilter The return magnification value
    */
@@ -437,9 +471,10 @@ public:
    *
    * Shader effects provide special effects like ripple and bend.
    * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
+   * @SINCE_1_0.0
+   * @param [in] effect The shader effect.
    * @pre The actor has been initialized.
    * @pre effect has been initialized.
-   * @param [in] effect The shader effect.
    */
   void SetShaderEffect( ShaderEffect effect );
 
@@ -447,14 +482,16 @@ public:
    * @brief Retrieve the custom shader effect for the RenderableActor.
    * If default shader is used an empty handle is returned.
    *
-   * @pre The Actor has been initialized.
+   * @SINCE_1_0.0
    * @return The shader effect
+   * @pre The Actor has been initialized.
    */
   ShaderEffect GetShaderEffect() const;
 
   /**
    * @brief Removes the current shader effect.
    *
+   * @SINCE_1_0.0
    * @pre The Actor has been initialized.
    */
   void RemoveShaderEffect();
@@ -469,19 +506,21 @@ public: // Not intended for application developers
 /**
  * @brief Sets the shader effect for all ImageActors in a tree of Actors.
  *
- * @see ImageActor::SetShaderEffect
- *
+ * @SINCE_1_0.0
  * @param [in] actor root of a tree of actors.
  * @param [in] effect The shader effect.
+ * @see ImageActor::SetShaderEffect
+ *
  */
 DALI_IMPORT_API void SetShaderEffectRecursively( Actor actor, ShaderEffect effect );
 
 /**
  * @brief Removes the shader effect from all ImageActors in a tree of Actors.
  *
+ * @SINCE_1_0.0
+ * @param [in] actor root of a tree of actors.
  * @see ImageActor::RemoveShaderEffect
  *
- * @param [in] actor root of a tree of actors.
  */
 DALI_IMPORT_API void RemoveShaderEffectRecursively( Actor actor );
 

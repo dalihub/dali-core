@@ -37,6 +37,7 @@ namespace Dali
  *
  * Note! values need to be compile time constants
  * Usage: <code>Power< 10, 2 >::value; // value=100</code>
+ * @SINCE_1_0.0
  * @param mantissa to raise to exponent
  * @param N exponent to use for mantissa
  */
@@ -50,6 +51,7 @@ struct Power
  * @brief Compile time template to calculate base to the power of N.
  *
  * Specialisation for power of 1
+ * @SINCE_1_0.0
  * @param mantissa to raise to exponent
  */
 template< size_t mantissa >
@@ -62,6 +64,7 @@ struct Power< mantissa, 1 >
  * @brief Compile time template to calculate base to the power of N.
  *
  * Specialisation for power of 0
+ * @SINCE_1_0.0
  * @param mantissa to raise to exponent
  */
 template< size_t mantissa >
@@ -75,6 +78,7 @@ struct Power< mantissa, 0 >
  *
  * Note! values need to be compile time constants
  * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
+ * @SINCE_1_0.0
  * @param number for which to calculate the logarithm
  * @param base logarithm to calculate
  */
@@ -88,6 +92,7 @@ struct Log
  * @brief Compile time template to calculate base logarithm of N.
  *
  * Specialisation for logarithm of 1
+ * @SINCE_1_0.0
  * @param base logarithm to calculate
  */
 template< size_t base >
@@ -100,6 +105,7 @@ struct Log< 1, base >
  * @brief Compile time template to calculate base logarithm of N.
  *
  * Specialisation for logarithm of 0
+ * @SINCE_1_0.0
  * @param base logarithm to calculate
  */
 template< size_t base >
@@ -114,6 +120,7 @@ struct Log< 0, base >
  *
  * Note! value needs to be compile time constant
  * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
+ * @SINCE_1_0.0
  * @param N the number for which to calculate the machine epsilon
  */
 template< size_t N >
@@ -132,6 +139,7 @@ struct Epsilon
  * @brief Compile time template to calculate the machine epsilon for a given floating point number.
  *
  * Specialisation for epsilon of 1
+ * @SINCE_1_0.0
  */
 template<>
 struct Epsilon< 1 >
@@ -147,6 +155,7 @@ struct Epsilon< 1 >
  * @brief Compile time template to calculate the machine epsilon for a given floating point number.
  *
  * Specialisation for epsilon of 0
+ * @SINCE_1_0.0
  */
 template<>
 struct Epsilon< 0 >

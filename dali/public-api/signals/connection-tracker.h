@@ -36,6 +36,7 @@ class SlotConnection;
 
 /**
  * @brief Connection tracker concrete implementation
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ConnectionTracker : public ConnectionTrackerInterface
 {
@@ -43,16 +44,19 @@ public:
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   ConnectionTracker();
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~ConnectionTracker();
 
   /**
    * @brief Disconnect all signals from this object.
+   * @SINCE_1_0.0
    */
   void DisconnectAll();
 
@@ -68,14 +72,15 @@ public:
 
   /**
    * @brief returns the connection count
+   * @SINCE_1_0.0
    * @return the connection count
    */
   std::size_t GetConnectionCount() const;
 
 private:
 
-  ConnectionTracker( const ConnectionTracker& );            ///< undefined copy constructor
-  ConnectionTracker& operator=( const ConnectionTracker& ); ///< undefined assignment operator
+  ConnectionTracker( const ConnectionTracker& );            ///< undefined copy constructor @SINCE_1_0.0
+  ConnectionTracker& operator=( const ConnectionTracker& ); ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 

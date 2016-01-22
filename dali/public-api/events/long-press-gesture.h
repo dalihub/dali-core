@@ -37,6 +37,7 @@ namespace Dali
  *
  * Long press gesture finishes when all touches have been released.
  *
+ * @SINCE_1_0.0
  * @see LongPressGestureDetector
  */
 struct DALI_IMPORT_API LongPressGesture : public Gesture
@@ -46,22 +47,26 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
   /**
    * @brief Constructor
    *
+   * @SINCE_1_0.0
    * @param[in] state  The state of the gesture
    */
   LongPressGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor
+   * @SINCE_1_0.0
    */
   LongPressGesture( const LongPressGesture& rhs );
 
   /**
    * @brief Assignment operator
+   * @SINCE_1_0.0
    */
   LongPressGesture& operator=( const LongPressGesture& rhs );
 
   /**
    * @brief Virtual destructor
+   * @SINCE_1_0.0
    */
   virtual ~LongPressGesture();
 

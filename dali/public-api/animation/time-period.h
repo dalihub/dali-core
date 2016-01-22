@@ -30,12 +30,14 @@ namespace Dali
 
 /**
  * @brief A value-type representing a period of time within an animation.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API TimePeriod
 {
   /**
    * @brief Create a time period.
    *
+   * @SINCE_1_0.0
    * @param [in] durationSeconds The duration of the time period in seconds.
    */
   explicit TimePeriod(float durationSeconds);
@@ -43,6 +45,7 @@ struct DALI_IMPORT_API TimePeriod
   /**
    * @brief Create a time period.
    *
+   * @SINCE_1_0.0
    * @param [in] delaySeconds A delay before the time period in seconds.
    * @param [in] durationSeconds The duration of the time period in seconds.
    */
@@ -50,6 +53,7 @@ struct DALI_IMPORT_API TimePeriod
 
   /**
    * @brief Non-virtual destructor; TimePeriod is not intended as a base class.
+   * @SINCE_1_0.0
    */
   ~TimePeriod();
 

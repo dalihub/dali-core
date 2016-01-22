@@ -32,12 +32,13 @@ namespace BlendingMode
 {
 /**
  * @brief Blending mode.
+ * @SINCE_1_0.0
  */
 enum Type
 {
-  OFF,  ///< Blending is disabled.
-  AUTO, ///< Blending is enabled if there is alpha channel. This is the default mode.
-  ON    ///< Blending is enabled.
+  OFF,  ///< Blending is disabled. @SINCE_1_0.0
+  AUTO, ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_0.0
+  ON    ///< Blending is enabled. @SINCE_1_0.0
 };
 
 } //namespace BlendingMode
@@ -47,6 +48,7 @@ namespace BlendingFactor
 /**
  * @brief Blending Factor.
  *
+ * @SINCE_1_0.0
  * @see Dali::RenderableActor::SetBlendFunc() and Dali::RenderableActor::GetBlendFunc()
  */
 enum Type
@@ -75,6 +77,7 @@ namespace BlendingEquation
 /**
  * @brief Blending Equation.
  *
+ * @SINCE_1_0.0
  * @see Dali::RenderableActor::SetBlendEquation() and Dali::RenderableActor::GetBlendEquation()
  */
 enum Type

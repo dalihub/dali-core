@@ -55,6 +55,7 @@ struct PanGesture;
  * detector.SetMaximumTouchesRequired(2);
  * @endcode
  *
+ * @SINCE_1_0.0
  * @see PanGesture
  *
  * Signals
@@ -68,26 +69,27 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the PanGestureDetector class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screenPosition",      type Vector2
-      SCREEN_DISPLACEMENT,                                             ///< name "screenDisplacement",  type Vector2
-      SCREEN_VELOCITY,                                                 ///< name "screenVelocity",      type Vector2
-      LOCAL_POSITION,                                                  ///< name "localPosition",       type Vector2
-      LOCAL_DISPLACEMENT,                                              ///< name "localDisplacement",   type Vector2
-      LOCAL_VELOCITY,                                                  ///< name "localVelocity",       type Vector2
-      PANNING,                                                         ///< name "panning",             type bool
+      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screenPosition",      type Vector2 @SINCE_1_0.0
+      SCREEN_DISPLACEMENT,                                             ///< name "screenDisplacement",  type Vector2 @SINCE_1_0.0
+      SCREEN_VELOCITY,                                                 ///< name "screenVelocity",      type Vector2 @SINCE_1_0.0
+      LOCAL_POSITION,                                                  ///< name "localPosition",       type Vector2 @SINCE_1_0.0
+      LOCAL_DISPLACEMENT,                                              ///< name "localDisplacement",   type Vector2 @SINCE_1_0.0
+      LOCAL_VELOCITY,                                                  ///< name "localVelocity",       type Vector2 @SINCE_1_0.0
+      PANNING,                                                         ///< name "panning",             type bool @SINCE_1_0.0
     };
   };
 
   // Typedefs
-  typedef Signal< void ( Actor, const PanGesture& ) > DetectedSignalType; ///< Pan gesture detected signal type
+  typedef Signal< void ( Actor, const PanGesture& ) > DetectedSignalType; ///< Pan gesture detected signal type @SINCE_1_0.0
 
   // Directional Pan
-  typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction
+  typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction @SINCE_1_0.0
 
   static const Radian DIRECTION_LEFT;       ///< For a left pan (-PI Radians).
   static const Radian DIRECTION_RIGHT;      ///< For a right pan (0 Radians).
@@ -104,12 +106,14 @@ public: // Creation & Destruction
    * @brief Create an uninitialized PanGestureDetector; this can be initialized with PanGestureDetector::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   PanGestureDetector();
 
   /**
    * @brief Create an initialized PanGestureDetector.
    *
+   * @SINCE_1_0.0
    * @return A handle to a newly allocated Dali resource.
    */
   static PanGestureDetector New();
@@ -119,6 +123,7 @@ public: // Creation & Destruction
    *
    * If handle points to a PanGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a PanGestureDetector object or an uninitialized handle
    */
@@ -128,12 +133,14 @@ public: // Creation & Destruction
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~PanGestureDetector();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   PanGestureDetector(const PanGestureDetector& handle);
@@ -141,6 +148,7 @@ public: // Creation & Destruction
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -151,6 +159,7 @@ public: // Setters
   /**
    * @brief This is the minimum number of touches required for the pan gesture to be detected.
    *
+   * @SINCE_1_0.0
    * @param[in]  minimum  Minimum touches required.
    * @pre The gesture detector has been initialized.
    * @note The default minimum is '1'.
@@ -160,6 +169,7 @@ public: // Setters
   /**
    * @brief This is the maximum number of touches required for the pan gesture to be detected.
    *
+   * @SINCE_1_0.0
    * @param[in]  maximum  Maximum touches required.
    * @pre The gesture detector has been initialized.
    * @note The default maximum is '1'.
@@ -171,6 +181,7 @@ public: // Getters
   /**
    * @brief Retrieves the minimum number of touches required for the pan gesture to be detected.
    *
+   * @SINCE_1_0.0
    * @return The minimum touches required.
    * @pre The gesture detector has been initialized.
    */
@@ -179,6 +190,7 @@ public: // Getters
   /**
    * @brief Retrieves the maximum number of touches required for the pan gesture to be detected.
    *
+   * @SINCE_1_0.0
    * @return The maximum touches required.
    * @pre The gesture detector has been initialized.
    */
@@ -204,9 +216,11 @@ public: // Directional Panning
    * If an angle of 0.0 degrees is specified and the threshold is 45 degrees then the acceptable
    * direction range is from -45 to 45 degrees.
    *
+   * @SINCE_1_0.0
    * @param[in]  angle      The angle that pan should be allowed.
    * @param[in]  threshold  The threshold around that angle.
    *
+   * @pre The gesture detector has been initialized.
    * @note The angle added using this API is only checked when the gesture first starts, after that,
    *       this detector will emit the gesture regardless of what angle the pan is moving.
    * @note The user can add as many angles as they require.
@@ -216,7 +230,6 @@ public: // Directional Panning
    * @note If no threshold is provided, then the default threshold (PI * 0.25) is used.
    * @note If the threshold is greater than PI, then PI will be used as the threshold.
    *
-   * @pre The gesture detector has been initialized.
    */
   void AddAngle( Radian angle, Radian threshold = DEFAULT_THRESHOLD );
 
@@ -226,16 +239,17 @@ public: // Directional Panning
    * In other words, if 0 is requested, then PI will also be added so that we have both left and
    * right scrolling.
    *
+   * @SINCE_1_0.0
    * @param[in]  direction  The direction of panning required.
    * @param[in]  threshold  The threshold.
+   *
+   * @pre The gesture detector has been initialized.
    *
    * @note If a direction outside the range above is given, then it is wrapped within the range, i.e.
    *       190 degrees becomes -170 degrees and 370 degrees becomes 10 degrees.
    * @note If no threshold is provided, then the default threshold (PI * 0.25) is used.
    * @note If the threshold is greater than PI, then PI will be used as the threshold.
    * @note As long as you specify the type, you can also pass in a Dali::Degree to this method.
-   *
-   * @pre The gesture detector has been initialized.
    *
    * @see AddAngle
    */
@@ -244,6 +258,7 @@ public: // Directional Panning
   /**
    * @brief Returns the count of angles that this pan gesture detector emits a signal.
    *
+   * @SINCE_1_0.0
    * @return The count.
    * @pre The gesture detector has been initialized.
    */
@@ -252,6 +267,7 @@ public: // Directional Panning
   /**
    * @brief Returns the angle by index that this pan gesture detector emits a signal.
    *
+   * @SINCE_1_0.0
    * @return an angle threshold pair, or a zero valued angle pair when index is invalid.
    * @pre The gesture detector has been initialized.
    * @pre The index is less than GetAngleCount()
@@ -263,6 +279,7 @@ public: // Directional Panning
    *
    * After this, the pan gesture
    * will be emitted for a pan in ANY direction.
+   * @SINCE_1_0.0
    * @pre The gesture detector has been initialized.
    */
   void ClearAngles();
@@ -270,6 +287,7 @@ public: // Directional Panning
   /**
    * @brief Removes the angle specified from the container.
    *
+   * @SINCE_1_0.0
    * @param[in]  angle  The angle to remove.
    * @pre The gesture detector has been initialized.
    * @note This will only remove the first instance of the angle found from the container.
@@ -281,6 +299,7 @@ public: // Directional Panning
   /**
    * @brief Removes the two angles that make up the direction from the container.
    *
+   * @SINCE_1_0.0
    * @param[in]  direction  The direction to remove.
    * @pre The gesture detector has been initialized.
    * @note If a direction outside the range in AddAngle() is given, then the value is wrapped within
@@ -297,8 +316,9 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, const PanGesture& gesture );
    * @endcode
-   * @pre The gesture detector has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The gesture detector has been initialized.
    */
   DetectedSignalType& DetectedSignal();
 
@@ -307,8 +327,9 @@ public: // Pan Properties Setters
   /**
    * @brief Allows setting of the pan properties that are returned in constraints.
    *
+   * @SINCE_1_0.0
    * @param[in]  pan  The pan gesture to set.
-   *@note If a normal pan is taking place, then any value set is ignored.
+   * @note If a normal pan is taking place, then any value set is ignored.
    */
   static void SetPanGestureProperties( const PanGesture& pan );
 
@@ -317,6 +338,7 @@ public: // Not intended for Application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);

@@ -42,12 +42,12 @@ namespace RenderBuffer
  * The default format for framebuffer creation is COLOR, so If a depth buffer for 3D rendering is required use
  * COLOR_DEPTH instead
  */
-enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alpha
+enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alpha @SINCE_1_0.0
 {
-  COLOR,                ///< Framebuffer will be created with color buffer.
-  COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer
-  COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer
-  COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. NOTE: May be not supported in all devices
+  COLOR,                ///< Framebuffer will be created with color buffer. @SINCE_1_0.0
+  COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer @SINCE_1_0.0
+  COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer @SINCE_1_0.0
+  COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. NOTE: May be not supported in all devices @SINCE_1_0.0
 };
 }
 
@@ -55,6 +55,7 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
  * @brief FrameBufferImage represents a Open GL ES Frame Buffer Object
  * It contains the result of an 'off screen' render pass of a RenderTask.
  * The FrameBufferImage can then be used for rendering to the screen.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API FrameBufferImage : public Image
 {
@@ -63,6 +64,7 @@ public:
    * @brief Constructor which creates an uninitialized FrameBufferImage object.
    *
    * Use Image::New(...) to create an initialised object.
+   * @SINCE_1_0.0
    */
   FrameBufferImage();
 
@@ -71,12 +73,13 @@ public:
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
+   * @SINCE_1_0.0
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
    * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
    * @param [in] pixelFormat The pixel format (rgba 32 bit by default)
    * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
-   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    */
   static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
@@ -87,14 +90,15 @@ public:
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
+   * @SINCE_1_0.0
    * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
    * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
    * @param [in] pixelFormat The pixel format.
    * @param [in] releasePolicy The ReleasePolicy to apply to the FrameBufferImage.
    * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
    *
-   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    */
   static FrameBufferImage New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy,
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
@@ -103,10 +107,11 @@ public:
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
+   * @SINCE_1_0.0
    * @param [in] image       The native image.
    *
-   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    */
   static FrameBufferImage New(NativeImageInterface& image);
 
@@ -116,11 +121,12 @@ public:
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
+   * @SINCE_1_0.0
    * @param [in] image       The native image.
    * @param [in] releasePolicy The ReleasePolicy to apply to the FrameBufferImage.
    *
-   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    */
   static FrameBufferImage New(NativeImageInterface& image, ReleasePolicy releasePolicy);
 
@@ -129,6 +135,7 @@ public:
    *
    * If handle points to a FrameBufferImage object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a FrameBufferImage object or an uninitialized handle
    */
@@ -138,12 +145,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~FrameBufferImage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   FrameBufferImage(const FrameBufferImage& handle);
@@ -151,6 +160,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */

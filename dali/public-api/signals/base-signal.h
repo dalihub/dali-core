@@ -73,6 +73,7 @@ namespace Dali
  * Signals implement the Slot Observer interface, to be told when a slot has disconnected
  * Connection tracker implements the Signal Observer interface, to be told when a signal has disconnected (died)
  *
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API BaseSignal : public SlotObserver
 {
@@ -80,17 +81,20 @@ public:
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   BaseSignal();
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~BaseSignal();
 
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const;
@@ -98,6 +102,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const;
@@ -106,12 +111,14 @@ public:
 
   /**
    * @brief Used to guard against nested Emit() calls.
+   * @SINCE_1_0.0
    */
   struct EmitGuard
   {
     /**
      * @brief Create the guard.
      *
+     * @SINCE_1_0.0
      * @param[in,out] flag This flag will be set to true during Emit() calls.
      */
     EmitGuard( bool& flag );
@@ -119,12 +126,14 @@ public:
     /**
      * @brief Non-virtual destructor.
      *
+     * @SINCE_1_0.0
      */
     ~EmitGuard();
 
     /**
      * @brief  Determine if an error occured.
      *
+     * @SINCE_1_0.0
      * @return True if an error occurred i.e. if Emit() was called during Emit()
      */
     bool ErrorOccurred();
@@ -135,6 +144,7 @@ public:
   /**
    * @brief Emit a signal with no parameters.
    *
+   * @SINCE_1_0.0
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   void Emit();
@@ -142,8 +152,9 @@ public:
   /**
    * @brief Emit a signal with no parameters.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @return The value returned by the last callback.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Ret >
   Ret EmitReturn()
@@ -182,8 +193,9 @@ public:
   /**
    * @brief Emit a signal with 1 parameter.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Arg0 >
   void Emit( Arg0 arg0 )
@@ -218,9 +230,10 @@ public:
   /**
    * @brief Emit a signal with 1 parameter.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
    * @return The value returned by the last callback.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Ret, typename Arg0 >
   Ret EmitReturn( Arg0 arg0 )
@@ -259,9 +272,10 @@ public:
   /**
    * @brief Emit a signal with 2 parameters.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Arg0, typename Arg1 >
   void Emit( Arg0 arg0, Arg1 arg1 )
@@ -296,10 +310,11 @@ public:
   /**
    * @brief Emit a signal with 2 parameters.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
    * @return The value returned by the last callback.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Ret, typename Arg0, typename Arg1 >
   Ret EmitReturn( Arg0 arg0, Arg1 arg1 )
@@ -338,10 +353,11 @@ public:
   /**
    * @brief Emit a signal with 3 parameters.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
    * @param[in] arg2 The third parameter.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Arg0, typename Arg1, typename Arg2 >
   void Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
@@ -376,11 +392,12 @@ public:
   /**
    * @brief Emit a signal with 3 parameters.
    *
-   * @pre Cannot be called from inside the same Signal's Emit methods.
+   * @SINCE_1_0.0
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
    * @param[in] arg2 The third parameter.
    * @return The value returned by the last callback.
+   * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   template< typename Ret, typename Arg0, typename Arg1, typename Arg2 >
   Ret EmitReturn( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
@@ -421,6 +438,7 @@ public:
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Connect( ... )
    *
+   * @SINCE_1_0.0
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
   void OnConnect( CallbackBase* callback );
@@ -428,6 +446,7 @@ public:
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... )
    *
+   * @SINCE_1_0.0
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
   void OnDisconnect( CallbackBase* callback );
@@ -435,6 +454,7 @@ public:
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Connect( ... )
    *
+   * @SINCE_1_0.0
    * @param[in] tracker The connection tracker.
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
@@ -443,6 +463,7 @@ public:
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... )
    *
+   * @SINCE_1_0.0
    * @param[in] tracker The connection tracker.
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
@@ -460,6 +481,7 @@ private:
   /**
    * @brief Returns a callback given an index in to the connection array.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionIndex The index of the callback.
    * @return The callback, or NULL if the connection has been deleted.
    */
@@ -468,6 +490,7 @@ private:
   /**
    * @brief Helper to find whether a callback is connected.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The call back object.
    * @return A valid index if the callback is connected.
    */
@@ -476,6 +499,7 @@ private:
   /**
    * @brief Deletes a connection object from the list of connections.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionIndex The index of the callback.
    */
   void DeleteConnection( std::size_t connectionIndex );
@@ -483,11 +507,12 @@ private:
   /**
    * @brief Helper to remove NULL items from mSignalConnections, which is only safe at the end of Emit()
    * i.e. not from methods which can be called during a signal Emit(), such as Disconnect().
+   * @SINCE_1_0.0
    */
   void CleanupConnections();
 
-  BaseSignal( const BaseSignal& );                   ///< undefined copy constructor, signals don't support copying.
-  BaseSignal& operator=( const BaseSignal& );        ///< undefined assignment operator
+  BaseSignal( const BaseSignal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  BaseSignal& operator=( const BaseSignal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 

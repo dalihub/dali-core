@@ -36,6 +36,7 @@ class CallbackBase;
 
 /**
  * @brief Callback base class to hold the data for callback function and member function calls.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API CallbackBase
 {
@@ -43,22 +44,26 @@ public:
 
   /**
    * @brief Default constructor
+   * @SINCE_1_0.0
    */
   CallbackBase();
 
   /**
    * @brief Destructor
+   * @SINCE_1_0.0
    */
   ~CallbackBase();
 
   /**
    * @brief Resets the object pointer so that we know not to call methods of this object any more.
+   * @SINCE_1_0.0
    */
   void Reset();
 
   /**
    * @brief Function to call the function or member function dispatcher
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    */
   static void Execute( CallbackBase& callback )
@@ -87,6 +92,7 @@ public:
   /**
    * @brief Function to call the function or member function dispatcher.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @return value from the function
    */
@@ -117,6 +123,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    */
@@ -145,6 +152,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    * @return the value from the function
@@ -177,6 +185,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site.
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    * @param[in] param2 The second parameter to pass into the function.
@@ -206,6 +215,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    * @param[in] param2 The second parameter to pass into the function.
@@ -239,6 +249,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site.
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    * @param[in] param2 The second parameter to pass into the function.
@@ -269,6 +280,7 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site
+   * @SINCE_1_0.0
    * @param[in] callback The callback to call.
    * @param[in] param1 The first parameter to pass into the function.
    * @param[in] param2 The second parameter to pass into the function.
@@ -303,36 +315,43 @@ protected: // Constructors for deriving classes
 
   /**
    * @brief Function with static linkage
+   * @SINCE_1_0.0
    */
   typedef void(*Function)(void);
 
   /**
    * @brief Member function
+   * @SINCE_1_0.0
    */
   typedef void (CallbackBase::*MemberFunction)( void );
 
   /**
    * @brief Used to call the correct member function
+   * @SINCE_1_0.0
    */
   typedef void (*Dispatcher)( CallbackBase& base );
 
   /**
    * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned)
+   * @SINCE_1_0.0
    */
   typedef void(*Destructor)(void* object);
 
   /**
    * @brief Copy constructor operator not declared.
+   * @SINCE_1_0.0
    */
   CallbackBase( const CallbackBase& rhs );
   /**
    * @brief assignment operator not declared.
+   * @SINCE_1_0.0
    */
   const CallbackBase& operator=( const CallbackBase& rhs );
 
   /**
    * @brief Constructor for function with static linkage.
    *
+   * @SINCE_1_0.0
    * @param[in] function The function to call.
    */
   CallbackBase( Function function );
@@ -340,6 +359,7 @@ protected: // Constructors for deriving classes
   /**
    * @brief Constructor for member function.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to call (not owned).
    * @param[in] function The member function of the object.
    * @param[in] dispatcher Used to call the actual object.
@@ -349,6 +369,7 @@ protected: // Constructors for deriving classes
   /**
    * @brief Constructor for member function.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to call (owned).
    * @param[in] function The member function of the object.
    * @param dispatcher Used to call the actual object.
@@ -360,10 +381,11 @@ public: // Data for deriving classes & Dispatchers
 
   /**
    * @brief struct to hold the extra data needed for member functions.
+   * @SINCE_1_0.0
    */
   struct Impl
   {
-    Impl();                               ///< Default constructor
+    Impl();                               ///< Default constructor @SINCE_1_0.0
 
     void* mObjectPointer;                 ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
     Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
@@ -380,17 +402,20 @@ public: // Data for deriving classes & Dispatchers
 
 /**
  * @brief Non-member equality operator
+ * @SINCE_1_0.0
  */
 bool operator==( const CallbackBase& lhs, const CallbackBase& rhs );
 
 /**
  * @brief Dispatcher to delete an object.
+ * @SINCE_1_0.0
  */
 template< class T >
 struct Destroyer
 {
   /**
    * @brief Dispatcher to delete an object.
+   * @SINCE_1_0.0
    */
   static void Delete( void* object )
   {
@@ -402,6 +427,7 @@ struct Destroyer
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T >
 struct Dispatcher0
@@ -409,6 +435,7 @@ struct Dispatcher0
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    */
   static void Dispatch( CallbackBase& callback )
@@ -423,6 +450,7 @@ struct Dispatcher0
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1 >
 struct Dispatcher1
@@ -430,6 +458,7 @@ struct Dispatcher1
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    */
@@ -445,6 +474,7 @@ struct Dispatcher1
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2 >
 struct Dispatcher2
@@ -452,6 +482,7 @@ struct Dispatcher2
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -468,6 +499,7 @@ struct Dispatcher2
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename P3 >
 struct Dispatcher3
@@ -475,6 +507,7 @@ struct Dispatcher3
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -492,6 +525,7 @@ struct Dispatcher3
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename R >
 struct DispatcherReturn0
@@ -499,6 +533,7 @@ struct DispatcherReturn0
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @return the value.
    */
@@ -514,6 +549,7 @@ struct DispatcherReturn0
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1 >
 struct DispatcherReturn1
@@ -521,6 +557,7 @@ struct DispatcherReturn1
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @return The return value from the function
@@ -537,6 +574,7 @@ struct DispatcherReturn1
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2 >
 struct DispatcherReturn2
@@ -544,6 +582,7 @@ struct DispatcherReturn2
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -561,6 +600,7 @@ struct DispatcherReturn2
 
 /**
  * @brief Dispatcher to call the actual member function.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2, typename P3 >
 struct DispatcherReturn3
@@ -568,6 +608,7 @@ struct DispatcherReturn3
   /**
    * @brief Call an actual member function.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -586,6 +627,7 @@ struct DispatcherReturn3
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T >
 struct FunctorDispatcher0
@@ -593,6 +635,7 @@ struct FunctorDispatcher0
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    */
   static void Dispatch( CallbackBase& callback )
@@ -605,6 +648,7 @@ struct FunctorDispatcher0
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1 >
 struct FunctorDispatcher1
@@ -612,6 +656,7 @@ struct FunctorDispatcher1
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    */
@@ -625,6 +670,7 @@ struct FunctorDispatcher1
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2 >
 struct FunctorDispatcher2
@@ -632,6 +678,7 @@ struct FunctorDispatcher2
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -646,6 +693,7 @@ struct FunctorDispatcher2
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename P3 >
 struct FunctorDispatcher3
@@ -653,6 +701,7 @@ struct FunctorDispatcher3
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -668,6 +717,7 @@ struct FunctorDispatcher3
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename R >
 struct FunctorDispatcherReturn0
@@ -675,6 +725,7 @@ struct FunctorDispatcherReturn0
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @return the value.
    */
@@ -688,6 +739,7 @@ struct FunctorDispatcherReturn0
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1 >
 struct FunctorDispatcherReturn1
@@ -695,6 +747,7 @@ struct FunctorDispatcherReturn1
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @return The return value from the function
@@ -709,6 +762,7 @@ struct FunctorDispatcherReturn1
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2 >
 struct FunctorDispatcherReturn2
@@ -716,6 +770,7 @@ struct FunctorDispatcherReturn2
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -731,6 +786,7 @@ struct FunctorDispatcherReturn2
 
 /**
  * @brief Dispatcher to call a functor.
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2, typename P3 >
 struct FunctorDispatcherReturn3
@@ -738,6 +794,7 @@ struct FunctorDispatcherReturn3
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -755,6 +812,7 @@ struct FunctorDispatcherReturn3
 /**
  * @brief Dispatcher to call a functor.
  * This variant calls a specific void() member function.
+ * @SINCE_1_0.0
  */
 template< class T >
 struct VoidFunctorDispatcher0
@@ -762,6 +820,7 @@ struct VoidFunctorDispatcher0
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    */
   static void Dispatch( CallbackBase& callback )
@@ -778,6 +837,7 @@ struct VoidFunctorDispatcher0
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, ignoring any signal parameters
+ * @SINCE_1_0.0
  */
 template< class T, typename P1 >
 struct VoidFunctorDispatcher1
@@ -785,6 +845,7 @@ struct VoidFunctorDispatcher1
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    */
@@ -802,6 +863,7 @@ struct VoidFunctorDispatcher1
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, ignoring any signal parameters
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2 >
 struct VoidFunctorDispatcher2
@@ -809,6 +871,7 @@ struct VoidFunctorDispatcher2
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -827,6 +890,7 @@ struct VoidFunctorDispatcher2
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, ignoring any signal parameters
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename P3 >
 struct VoidFunctorDispatcher3
@@ -834,6 +898,7 @@ struct VoidFunctorDispatcher3
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -853,6 +918,7 @@ struct VoidFunctorDispatcher3
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, and returns a default-constructed value
+ * @SINCE_1_0.0
  */
 template< class T, typename R >
 struct VoidFunctorDispatcherReturn0
@@ -860,6 +926,7 @@ struct VoidFunctorDispatcherReturn0
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @return the value.
    */
@@ -878,6 +945,7 @@ struct VoidFunctorDispatcherReturn0
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, and returns a default-constructed value
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1 >
 struct VoidFunctorDispatcherReturn1
@@ -885,6 +953,7 @@ struct VoidFunctorDispatcherReturn1
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @return The return value from the function
@@ -904,6 +973,7 @@ struct VoidFunctorDispatcherReturn1
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, and returns a default-constructed value
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2 >
 struct VoidFunctorDispatcherReturn2
@@ -911,6 +981,7 @@ struct VoidFunctorDispatcherReturn2
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -931,6 +1002,7 @@ struct VoidFunctorDispatcherReturn2
  * @brief Dispatcher to call a functor.
  *
  * This variant calls a void() member, and returns a default-constructed value
+ * @SINCE_1_0.0
  */
 template< class T, typename R, typename P1, typename P2, typename P3 >
 struct VoidFunctorDispatcherReturn3
@@ -938,6 +1010,7 @@ struct VoidFunctorDispatcherReturn3
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback information.
    * @param[in] param1 The first parameter to pass to the real member function.
    * @param[in] param2 The second parameter to pass to the real member function.
@@ -959,6 +1032,7 @@ struct VoidFunctorDispatcherReturn3
  * @brief Thin template to provide type safety for member function callbacks.
  *
  * version with two parameters and return value
+ * @SINCE_1_0.0
  */
 template< class T >
 class Callback : public CallbackBase
@@ -968,6 +1042,7 @@ public:
   /**
    * @brief Default constructor.
    *
+   * @SINCE_1_0.0
    */
   Callback()
   : CallbackBase()
@@ -978,6 +1053,7 @@ public:
    * @brief Constructor for member function.
    *
    * Copies the function object.
+   * @SINCE_1_0.0
    * @param[in] object The object to call.
    * @param[in] memberFunction The member function of the object.
    */
@@ -1025,6 +1101,7 @@ public:
 
 /**
  * @brief Specializations for static function callbacks.
+ * @SINCE_1_0.0
  */
 class CallbackFunction : public CallbackBase
 {
@@ -1032,6 +1109,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   CallbackFunction()
   : CallbackBase()
@@ -1041,6 +1119,7 @@ public:
   /**
    * @brief Constructors for functions with static linkage.
    *
+   * @SINCE_1_0.0
    * @param[in] function The function to call.
    */
   CallbackFunction( void(*function)() )
@@ -1079,6 +1158,7 @@ public:
 
 /**
  * @brief Specializations for function object callbacks.
+ * @SINCE_1_0.0
  */
 template< class T >
 class CallbackFunctor0 : public CallbackBase
@@ -1088,6 +1168,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctor0( const T& object )
@@ -1099,6 +1180,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 class CallbackFunctorDelegate0 : public CallbackBase
 {
@@ -1108,6 +1190,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object A newly allocated object (ownership is transferred).
    */
   CallbackFunctorDelegate0( FunctorDelegate* object )
@@ -1119,6 +1202,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
+ * @SINCE_1_0.0
  */
 template< class T, typename P1 >
 class CallbackFunctor1 : public CallbackBase
@@ -1128,6 +1212,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctor1( const T& object )
@@ -1139,6 +1224,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods.
+ * @SINCE_1_0.0
  */
 template< typename P1 >
 class CallbackFunctorDelegate1 : public CallbackBase
@@ -1149,6 +1235,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegate1( FunctorDelegate* object )
@@ -1160,6 +1247,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2 >
 class CallbackFunctor2 : public CallbackBase
@@ -1169,6 +1257,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctor2( const T& object )
@@ -1180,6 +1269,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename P1, typename P2 >
 class CallbackFunctorDelegate2 : public CallbackBase
@@ -1190,6 +1280,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegate2( FunctorDelegate* object )
@@ -1201,6 +1292,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename P3 >
 class CallbackFunctor3 : public CallbackBase
@@ -1210,6 +1302,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctor3( const T& object )
@@ -1221,6 +1314,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename P1, typename P2, typename P3 >
 class CallbackFunctorDelegate3 : public CallbackBase
@@ -1232,6 +1326,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegate3( FunctorDelegate* object )
@@ -1243,6 +1338,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename R >
 class CallbackFunctorReturn0 : public CallbackBase
@@ -1252,6 +1348,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorReturn0( const T& object )
@@ -1263,6 +1360,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename R >
 class CallbackFunctorDelegateReturn0 : public CallbackBase
@@ -1273,6 +1371,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegateReturn0( FunctorDelegate* object )
@@ -1284,6 +1383,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename R >
 class CallbackFunctorReturn1 : public CallbackBase
@@ -1293,6 +1393,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorReturn1( const T& object )
@@ -1304,6 +1405,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename P1, typename R >
 class CallbackFunctorDelegateReturn1 : public CallbackBase
@@ -1314,6 +1416,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegateReturn1( FunctorDelegate* object )
@@ -1325,6 +1428,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename R >
 class CallbackFunctorReturn2 : public CallbackBase
@@ -1334,6 +1438,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorReturn2( const T& object )
@@ -1345,6 +1450,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename P1, typename P2, typename R >
 class CallbackFunctorDelegateReturn2 : public CallbackBase
@@ -1355,6 +1461,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegateReturn2( FunctorDelegate* object )
@@ -1366,6 +1473,7 @@ public:
 
 /**
  * @brief Function object callback for matching callbacks to signal signature
+ * @SINCE_1_0.0
  */
 template< class T, typename P1, typename P2, typename P3, typename R >
 class CallbackFunctorReturn3 : public CallbackBase
@@ -1375,6 +1483,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorReturn3( const T& object )
@@ -1386,6 +1495,7 @@ public:
 
 /**
  * @brief Function object callback for connecting void() methods
+ * @SINCE_1_0.0
  */
 template< typename P1, typename P2, typename P3, typename R >
 class CallbackFunctorDelegateReturn3 : public CallbackBase
@@ -1396,6 +1506,7 @@ public:
    * @brief Constructor which copies a function object.
    *
    * This variant calls a void() member, ignoring any signal parameters.
+   * @SINCE_1_0.0
    * @param[in] object The object to copy.
    */
   CallbackFunctorDelegateReturn3( FunctorDelegate* object )
@@ -1410,6 +1521,7 @@ public:
 /**
  * @brief Creates a callback from a C function or static member function with no parameters.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1421,6 +1533,7 @@ inline CallbackBase* MakeCallback( void(*function)(void) )
 /**
  * @brief Creates a callback from a C function or static member function with one parameter.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1433,6 +1546,7 @@ inline CallbackBase* MakeCallback( void(*function)(P1) )
 /**
  * @brief Creates a callback from a C function or static member function with no parameters and a return type.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1445,6 +1559,7 @@ inline CallbackBase* MakeCallback( R(*function)(void) )
 /**
  * @brief Creates a callback from a C function or static member function with one parameter and a return type.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1457,6 +1572,7 @@ inline CallbackBase* MakeCallback( R(*function)(P1) )
 /**
  * @brief Creates a callback from a C function or static member function with two parameters.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1469,6 +1585,7 @@ inline CallbackBase* MakeCallback( void(*function)(P1,P2) )
 /**
  * @brief Creates a callback from a C function or static member function with two parameters and a return type.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1481,6 +1598,7 @@ inline CallbackBase* MakeCallback( R(*function)(P1,P2) )
 /**
  * @brief Creates a callback from a C function or static member function with three parameters.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1493,6 +1611,7 @@ inline CallbackBase* MakeCallback( void(*function)(P1,P2,P3) )
 /**
  * @brief Creates a callback from a C function or static member function with three parameters and a return type.
  *
+ * @SINCE_1_0.0
  * @param[in] function The function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
  */
@@ -1506,6 +1625,7 @@ inline CallbackBase* MakeCallback( R(*function)(P1,P2,P3) )
  * @brief Creates a callback from a class member function with no parameters.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1520,6 +1640,7 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(void) )
  * @brief Creates a callback from a class member function with one parameter.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1534,6 +1655,7 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1) )
  * @brief Creates a callback from a class member function with two parameters.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1548,6 +1670,7 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2) )
  * @brief Creates a callback from a class member function with three parameters.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1562,6 +1685,7 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2,P3) )
  * @brief Creates a callback from a class member function with no parameters and a return type.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1576,6 +1700,7 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)() )
  * @brief Creates a callback from a class member function with one parameter and a return type.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1590,6 +1715,7 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1) )
  * @brief Creates a callback from a class member function with two parameters and a return type.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1604,6 +1730,7 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2) )
  * @brief Creates a callback from a class member function with three parameters and a return type.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1618,6 +1745,7 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2,P3) )
  * @brief Creates a callback from a class's parent member function with no parameters.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller
@@ -1631,6 +1759,7 @@ inline CallbackBase* MakeCallback( T* object, void(Base::*function)(void) )
  * @brief Creates a callback from a class's parent member function with no parameters.
  *
  * requires the function to be member of the same class
+ * @SINCE_1_0.0
  * @param[in] object The object to call.
  * @param[in] function The member function to call.
  * @return a newly allocated Callback object, ownership transferred to caller

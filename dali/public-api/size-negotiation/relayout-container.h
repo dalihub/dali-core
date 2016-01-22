@@ -31,6 +31,7 @@ typedef RelayoutContainer* RelayoutContainerPtr;
 
 /**
  * @brief Interface to encapsulate information required for relayout
+ * @SINCE_1_0.0
  */
 class RelayoutContainer
 {
@@ -39,17 +40,20 @@ public:
   /**
    * @brief Default constructor
    *
+   * @SINCE_1_0.0
    */
   RelayoutContainer() {}
 
   /**
    * @brief Virtual destructor
+   * @SINCE_1_0.0
    */
   virtual ~RelayoutContainer() {}
 
   /**
    * @brief Add relayout information to the container if it does'nt already exist
    *
+   * @SINCE_1_0.0
    * @param actor The actor to relayout
    * @param size The size to relayout
    */

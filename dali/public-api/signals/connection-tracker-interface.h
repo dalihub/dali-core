@@ -49,6 +49,7 @@ namespace Dali
  * When MyApp is destroyed, it automatically disconnects from Button.ClickSignal.
  * It provides a signal observer interface, to observer when signals are destroyed
  * e.g. if Button object is destroyed while it is still connected.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ConnectionTrackerInterface : public SignalObserver
 {
@@ -56,17 +57,20 @@ public:
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   ConnectionTrackerInterface();
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~ConnectionTrackerInterface();
 
   /**
    * @brief Called when a signal is connected.
    *
+   * @SINCE_1_0.0
    * @param[in] slotObserver The slot observer i.e. a signal. Ownership is not passed.
    * @param[in] callback The call back. Ownership is not passed.
    */
@@ -74,8 +78,8 @@ public:
 
 private:
 
-  ConnectionTrackerInterface( const ConnectionTrackerInterface& );            ///< undefined copy constructor
-  ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ); ///< undefined assignment operator
+  ConnectionTrackerInterface( const ConnectionTrackerInterface& );            ///< undefined copy constructor @SINCE_1_0.0
+  ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ); ///< undefined assignment operator @SINCE_1_0.0
 };
 
 /**

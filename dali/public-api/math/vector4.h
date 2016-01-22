@@ -39,6 +39,7 @@ struct Vector3;
  * @brief A four dimensional vector.
  *
  * Components can be used as position or offset (x,y,z,w); color (r,g,b,a) or texture coords(s,t,p,q)
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API Vector4
 {
@@ -51,6 +52,7 @@ struct DALI_IMPORT_API Vector4
 
   /**
    * @brief Default constructor, initializes the vector to 0.
+   * @SINCE_1_0.0
    */
   Vector4()
   : x(0.0f),
@@ -63,6 +65,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Conversion constructor from four floats.
    *
+   * @SINCE_1_0.0
    * @param [in] x (or r/s) component
    * @param [in] y (or g/t) component
    * @param [in] z (or b/p) component
@@ -80,6 +83,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Conversion constructor from an array of four floats.
    *
+   * @SINCE_1_0.0
    * @param [in] array of either xyzw/rgba/stpq
    */
   explicit Vector4(const float* array)
@@ -93,6 +97,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Conversion constructor from Vector2.
    *
+   * @SINCE_1_0.0
    * @param [in] vec2 to copy from, z and w are initialized to 0
    */
   explicit Vector4( const Vector2& vec2 );
@@ -100,6 +105,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Conversion constructor from Vector3.
    *
+   * @SINCE_1_0.0
    * @param [in] vec3 to copy from, w is initialized to 0
    */
   explicit Vector4( const Vector3& vec3 );
@@ -116,6 +122,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param [in] array of floats
    * @return itself
    */
@@ -133,6 +140,7 @@ struct DALI_IMPORT_API Vector4
    * @brief Assignment operator.
    *
    * Only sets x and y. z and w are left as they were
+   * @SINCE_1_0.0
    * @param [in] vec2 to assign from.
    * @return itself
    */
@@ -142,6 +150,7 @@ struct DALI_IMPORT_API Vector4
    * @brief Assignment operator.
    *
    * Only sets x and y and z. w is left as it was
+   * @SINCE_1_0.0
    * @param [in] vec3 to assign from
    * @return itself
    */
@@ -150,6 +159,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Addition operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to add.
    * @return A vector containing the result of the addition
    */
@@ -163,6 +173,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Addition assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to add.
    * @return itself
    */
@@ -179,6 +190,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Subtraction operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs  the vector to subtract
    * @return A vector containing the result of the subtraction
    */
@@ -194,6 +206,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Subtraction assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to subtract
    * @return itself
    */
@@ -210,6 +223,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Multiplication operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to multiply
    * @return A vector containing the result of the multiplication
    */
@@ -223,6 +237,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Multiplication operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector
    * @return A vector containing the result of the scaling
    */
@@ -234,6 +249,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Multiplication assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to multiply
    * @return itself
    */
@@ -250,6 +266,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Multiplication assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector
    * @return itself
    */
@@ -266,6 +283,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Division operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to divide
    * @return A vector containing the result of the division
    */
@@ -279,6 +297,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Division operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
@@ -291,6 +310,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Division assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to divide
    * @return itself
    */
@@ -307,6 +327,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Division assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector by
    * @return itself
    */
@@ -324,6 +345,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Unary negation operator.
    *
+   * @SINCE_1_0.0
    * @return the negative value
    */
   Vector4 operator-() const
@@ -338,6 +360,7 @@ struct DALI_IMPORT_API Vector4
    *
    * Utilises appropriate machine epsilon values.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The vector to test against
    * @return true if the vectors are equal
    */
@@ -348,6 +371,7 @@ struct DALI_IMPORT_API Vector4
    *
    * Utilises appropriate machine epsilon values.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The vector to test against
    * @return true if the vectors are not equal
    */
@@ -360,6 +384,7 @@ struct DALI_IMPORT_API Vector4
    * @brief Const array subscript operator overload.
    *
    * Asserts if index is out of range. Should be 0, 1, 2 or 3
+   * @SINCE_1_0.0
    * @param[in] index Subscript
    * @return    The float at the given index
    */
@@ -374,6 +399,7 @@ struct DALI_IMPORT_API Vector4
    * @brief Mutable array subscript operator overload.
    *
    * Asserts if index is out of range. Should be 0, 1, 2 or 3
+   * @SINCE_1_0.0
    * @param[in] index Subscript index
    * @return    The float at the given index
    */
@@ -390,6 +416,7 @@ struct DALI_IMPORT_API Vector4
    * The dot product is the length of one vector in the direction of another vector.
    * This is great for lighting, threshold testing the angle between two unit vectors,
    * calculating the distance between two points in a particular direction.
+   * @SINCE_1_0.0
    * @param [in] other     the other vector
    * @return               the dot product
    */
@@ -401,6 +428,7 @@ struct DALI_IMPORT_API Vector4
    * The dot product is the length of one vector in the direction of another vector.
    * This is great for lighting, threshold testing the angle between two unit vectors,
    * calculating the distance between two points in a particular direction.
+   * @SINCE_1_0.0
    * @param [in] other     the other vector
    * @return               the dot product
    */
@@ -409,6 +437,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Returns the 4d dot product of this vector and another vector.
    *
+   * @SINCE_1_0.0
    * @param [in] other     the other vector
    * @return          the dot product
    */
@@ -420,6 +449,7 @@ struct DALI_IMPORT_API Vector4
    * The cross produce of two vectors is a vector which is perpendicular to the plane of the
    * two vectors. This is great for calculating normals and making matrices orthogonal.
    *
+   * @SINCE_1_0.0
    * @param [in] other    the other vector
    * @return A vector containing the cross product
    */
@@ -428,6 +458,7 @@ struct DALI_IMPORT_API Vector4
   /**
    * @brief Returns the length of the vector.
    *
+   * @SINCE_1_0.0
    * @return the length.
    */
   float Length() const;
@@ -437,6 +468,7 @@ struct DALI_IMPORT_API Vector4
    *
    * This is faster than using Length() when performing
    * threshold checks as it avoids use of the square root.
+   * @SINCE_1_0.0
    * @return the length of the vector squared.
    */
   float LengthSquared() const;
@@ -445,12 +477,14 @@ struct DALI_IMPORT_API Vector4
    * @brief Normalizes the vector.
    *
    * Sets the vector to unit length whilst maintaining its direction.
+   * @SINCE_1_0.0
    */
   void Normalize();
 
   /**
    * @brief Clamps the vector between minimum and maximum vectors.
    *
+   * @SINCE_1_0.0
    * @param [in] min the minimum vector
    * @param [in] max the maximum vector
    */
@@ -464,8 +498,9 @@ struct DALI_IMPORT_API Vector4
    * 1: y (or g, or t)
    * 2: z (or b, or p)
    * 3: w (or a, or q)
-   * @note inlined for performance reasons (generates less code than a function call)
+   * @SINCE_1_0.0
    * @return the vector contents as an array of 4 floats.
+   * @note inlined for performance reasons (generates less code than a function call)
    */
   const float* AsFloat() const {return &x;}
 
@@ -477,8 +512,9 @@ struct DALI_IMPORT_API Vector4
    * 1: y (or g, or t)
    * 2: z (or b, or p)
    * 3: w (or a, or q)
-   * @note inlined for performance reasons (generates less code than a function call)
+   * @SINCE_1_0.0
    * @return the vector contents as an array of 4 floats.
+   * @note inlined for performance reasons (generates less code than a function call)
    */
   float* AsFloat() {return &x;}
 
@@ -518,6 +554,7 @@ struct DALI_IMPORT_API Vector4
 /**
  * @brief Print a Vector4.
  *
+ * @SINCE_1_0.0
  * @param [in] o The output stream operator.
  * @param [in] vector The vector to print.
  * @return The output stream operator.
@@ -528,6 +565,7 @@ DALI_IMPORT_API std::ostream& operator<<(std::ostream& o, const Vector4& vector)
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
  *
  * If a=0,1,2,3 and b=4,0,1,2  returns a vector of 0,0,1,2
+ * @SINCE_1_0.0
  * @param [in] a     a vector
  * @param [in] b     a vector
  * @return      a vector containing the minimum of each component from a and b
@@ -544,6 +582,7 @@ inline Vector4 Min( const Vector4& a, const Vector4& b )
  * @brief Returns a vector with components set to the maximum of the corresponding component in a and b.
  *
  * If a=0,1,2,3 and b=4,0,1,2  returns a vector of 4,1,2,3
+ * @SINCE_1_0.0
  * @param [in] a     a vector
  * @param [in] b     a vector
  * @return      a vector containing the maximum of each component from a and b
@@ -559,6 +598,7 @@ inline Vector4 Max( const Vector4& a, const Vector4& b )
 /**
  * @brief Clamps each of vector v's components between minimum and maximum values.
  *
+ * @SINCE_1_0.0
  * @param [in] v     a vector
  * @param [in] min the minimum value
  * @param [in] max the maximum value

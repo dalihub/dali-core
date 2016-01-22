@@ -32,6 +32,7 @@ namespace Dali
 /**
  * @brief A TouchPoint represents a point on the screen that is currently being touched
  * or where touch has stopped.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API TouchPoint
 {
@@ -39,6 +40,7 @@ struct DALI_IMPORT_API TouchPoint
 
   /**
    * @brief Touch state
+   * @SINCE_1_0.0
    */
   enum State
   {
@@ -60,6 +62,7 @@ struct DALI_IMPORT_API TouchPoint
   /**
    * @brief Constructor
    *
+   * @SINCE_1_0.0
    * @param[in]  id       The touch device ID.
    * @param[in]  state    The state.
    * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
@@ -70,6 +73,7 @@ struct DALI_IMPORT_API TouchPoint
   /**
    * @brief Constructor
    *
+   * @SINCE_1_0.0
    * @param[in]  id       The touch device ID.
    * @param[in]  state    The state.
    * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
@@ -81,6 +85,7 @@ struct DALI_IMPORT_API TouchPoint
 
   /**
    * @brief Destructor
+   * @SINCE_1_0.0
    */
   ~TouchPoint();
 
@@ -118,9 +123,9 @@ struct DALI_IMPORT_API TouchPoint
   Vector2 screen;
 };
 
-typedef std::vector<TouchPoint> TouchPointContainer; ///< Container of touch points.
-typedef TouchPointContainer::iterator TouchPointContainerIterator; ///< Iterator for Dali::TouchPointContainer
-typedef TouchPointContainer::const_iterator TouchPointContainerConstIterator; ///< Const iterator for Dali::TouchPointContainer
+typedef std::vector<TouchPoint> TouchPointContainer; ///< Container of touch points. @SINCE_1_0.0
+typedef TouchPointContainer::iterator TouchPointContainerIterator; ///< Iterator for Dali::TouchPointContainer @SINCE_1_0.0
+typedef TouchPointContainer::const_iterator TouchPointContainerConstIterator; ///< Const iterator for Dali::TouchPointContainer @SINCE_1_0.0
 
 /**
  * @}

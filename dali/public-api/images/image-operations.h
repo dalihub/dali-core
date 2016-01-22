@@ -35,6 +35,7 @@ namespace Dali
  *        16 bits per component.
  *
  * This can only be used for images of up to 65535 x 65535 pixels.
+ * @SINCE_1_0.0
  */
 typedef Uint16Pair ImageDimensions;
 
@@ -44,21 +45,22 @@ typedef Uint16Pair ImageDimensions;
  * A fitting mode controls the region of a loaded image to be mapped to the
  * desired image rectangle.
  * All fitting modes preserve the aspect ratio of the image contents.
+ * @SINCE_1_0.0
  */
 namespace FittingMode
 {
   enum Type
   {
-    SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not
+    SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not @SINCE_1_0.0
                    ///  filling one of either the desired image width or height with
                    ///  pixels.
-    SCALE_TO_FILL, ///< Image fills whole desired width & height with image data. The
+    SCALE_TO_FILL, ///< Image fills whole desired width & height with image data. The @SINCE_1_0.0
                    ///  image is centred in the desired dimensions, exactly touching
                    ///  in one dimension, with image regions outside the other desired
                    ///  dimension cropped away.
-    FIT_WIDTH,     ///< Image fills whole width. Height is scaled proportionately to
+    FIT_WIDTH,     ///< Image fills whole width. Height is scaled proportionately to @SINCE_1_0.0
                    ///  maintain aspect ratio.
-    FIT_HEIGHT     ///< Image fills whole height. Width is scaled proportionately to
+    FIT_HEIGHT     ///< Image fills whole height. Width is scaled proportionately to @SINCE_1_0.0
                    ///  maintain aspect ratio.
   };
   const Type DEFAULT = SHRINK_TO_FIT;
@@ -74,28 +76,29 @@ namespace FittingMode
  * exactly matches the rectangle specified by the desired dimensions and
  * FittingMode, but all other filter modes do if the desired dimensions are
  * `<=` the raw dimensions of the input image file.
+ * @SINCE_1_0.0
  */
 namespace SamplingMode
 {
   enum Type
   {
-    BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4,
+    BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4, @SINCE_1_0.0
                       ///  1/8, etc width and height and approximately the desired
                       ///  size. This is the default.
-    NEAREST,          ///< For each output pixel, read one input pixel.
-    LINEAR,           ///< For each output pixel, read a quad of four input pixels
+    NEAREST,          ///< For each output pixel, read one input pixel. @SINCE_1_0.0
+    LINEAR,           ///< For each output pixel, read a quad of four input pixels @SINCE_1_0.0
                       ///  and write a weighted average of them.
-    BOX_THEN_NEAREST, ///< Iteratively box filter to generate an image of 1/2, 1/4,
+    BOX_THEN_NEAREST, ///< Iteratively box filter to generate an image of 1/2, 1/4, @SINCE_1_0.0
                       ///  1/8 etc width and height and approximately the desired
                       ///  size, then for each output pixel, read one pixel from the
                       ///  last level of box filtering.
-    BOX_THEN_LINEAR,  ///< Iteratively box filter to almost the right size, then for
+    BOX_THEN_LINEAR,  ///< Iteratively box filter to almost the right size, then for @SINCE_1_0.0
                       ///  each output pixel, read four pixels from the last level of
                       ///  box filtering and write their weighted average.
-    NO_FILTER,        ///< No filtering is performed. If the SCALE_TO_FILL scaling mode
+    NO_FILTER,        ///< No filtering is performed. If the SCALE_TO_FILL scaling mode @SINCE_1_0.0
                       ///  is enabled, the borders of the image may be trimmed to
                       ///  match the aspect ratio of the desired dimensions.
-    DONT_CARE         ///< For caching algorithms where a client strongly prefers a
+    DONT_CARE         ///< For caching algorithms where a client strongly prefers a @SINCE_1_0.0
                       ///  cache-hit to reuse a cached image.
   };
   const Type DEFAULT = BOX;

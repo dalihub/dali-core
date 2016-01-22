@@ -30,6 +30,7 @@ namespace Dali
 
 /**
  * @brief Dispatcher to call a functor
+ * @SINCE_1_0.0
  */
 template< typename T >
 struct FunctorDispatcher
@@ -37,6 +38,7 @@ struct FunctorDispatcher
   /**
    * @brief Call a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] functorPtr The functor to call.
    */
   static void Dispatch( void* functorPtr )
@@ -49,12 +51,14 @@ struct FunctorDispatcher
 
 /**
  * @brief Dispatcher to delete a functor object
+ * @SINCE_1_0.0
  */
 template< typename T >
 struct FunctorDestroyer
 {
   /**
    * @brief Dispatcher to delete an object
+   * @SINCE_1_0.0
    */
   static void Delete( void* functorPtr )
   {
@@ -66,6 +70,7 @@ struct FunctorDestroyer
 
 /**
  * @brief Used to connect a void() functor to a signal via BaseObject::SignalConnect()
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API FunctorDelegate
 {
@@ -74,6 +79,7 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] functor The functor object to copy, either a class with operator() or a C function
    * @return A pointer to the new function object
    */
@@ -87,11 +93,13 @@ public:
 
   /**
    * @brief Non-virtual destructor; not intended as a base class.
+   * @SINCE_1_0.0
    */
   ~FunctorDelegate();
 
   /**
    * @brief Function to call the function or member function dispatcher
+   * @SINCE_1_0.0
    */
   void Execute();
 
@@ -99,27 +107,32 @@ private:
 
   /**
    * @brief Used to call the correct function.
+   * @SINCE_1_0.0
    */
   typedef void (*Dispatcher)( void* objectPtr );
 
   /**
    * @brief Used to destroy mObjectPointer.
+   * @SINCE_1_0.0
    */
   typedef void(*Destructor)( void* objectPtr );
 
   /**
    * @brief Not defined
+   * @SINCE_1_0.0
    */
   FunctorDelegate( const FunctorDelegate& rhs );
 
   /**
    * @brief Not defined
+   * @SINCE_1_0.0
    */
   const FunctorDelegate& operator=( const FunctorDelegate& rhs );
 
   /**
    * @brief Private constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] functorPtr A newly allocated functor object (takes ownership)
    * @param dispatcher Used to call the actual function.
    * @param destructor Used to delete the owned functor object.

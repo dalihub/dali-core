@@ -36,6 +36,7 @@ struct Vector2;
 /**
  * @brief A 3x3 matrix.
  *
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Matrix3
 {
@@ -50,12 +51,14 @@ public:
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   Matrix3();
 
   /**
    * @brief Copy Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] m Another 3x3 matrix
    */
   Matrix3(const Matrix3& m);
@@ -63,6 +66,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] m A 4x4 matrix. The translation and shear components are ignored.
    */
   Matrix3(const Matrix& m);
@@ -70,6 +74,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] s00 First element
    * @param[in] s01 Second element
    * @param[in] s02 Third element
@@ -84,6 +89,7 @@ public:
 
   /**
    * @brief Assignment Operator
+   * @SINCE_1_0.0
    * @param matrix from which to copy values
    * @return reference to this object
    */
@@ -91,6 +97,7 @@ public:
 
   /**
    * @brief Assignment Operator
+   * @SINCE_1_0.0
    * @param matrix from which to copy values
    * @return reference to this object
    */
@@ -101,6 +108,7 @@ public:
    *
    * Utilises appropriate machine epsilon values.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs    the Matrix to compare this to
    * @return true if the matrices are equal
    */
@@ -111,6 +119,7 @@ public:
    *
    * Utilises appropriate machine epsilon values.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs    the Matrix to compare this to
    * @return true if the matrices are equal
    */
@@ -118,6 +127,7 @@ public:
 
   /**
    * @brief Destructor.
+   * @SINCE_1_0.0
    */
   ~Matrix3()
   {
@@ -125,6 +135,7 @@ public:
 
   /**
    * @brief Sets the matrix to the identity matrix.
+   * @SINCE_1_0.0
    */
   void SetIdentity();
 
@@ -135,6 +146,7 @@ public:
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
    *   xAxis.z yAxis.z zAxis.z
+   * @SINCE_1_0.0
    * @return the matrix contents as an array of 9 floats.
    */
   const float* AsFloat() const {return &mElements[0];}
@@ -146,6 +158,7 @@ public:
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
    *   xAxis.z yAxis.z zAxis.z
+   * @SINCE_1_0.0
    * @return the matrix contents as an array of 9 floats.
    */
   float* AsFloat() {return &mElements[0];}
@@ -153,12 +166,14 @@ public:
   /**
    * @brief Inverts the matrix.
    *
+   * @SINCE_1_0.0
    * @return true if successful
    */
   bool Invert();
 
   /**
    * @brief Swaps the rows to columns
+   * @SINCE_1_0.0
    * @return true
    */
   bool Transpose();
@@ -166,8 +181,9 @@ public:
   /**
    * @brief Multiplies all elements of the matrix by the scale value.
    *
+   * @SINCE_1_0.0
    * @param scale - the value by which to scale the whole matrix.
-
+   *
    */
   void Scale(float scale);
 
@@ -176,6 +192,7 @@ public:
    * elements * 3.
    *
    * (The Magnitude of the unit matrix is therefore 1)
+   * @SINCE_1_0.0
    * @return the magnitude - always positive.
    */
   float Magnitude() const;
@@ -186,7 +203,8 @@ public:
    * average 1.
    *
    * If the matrix is not invertible, then the matrix is left unchanged.
-
+   *
+   * @SINCE_1_0.0
    * @return true if the matrix is invertible, otherwise false
    */
   bool ScaledInverseTranspose();
@@ -195,6 +213,7 @@ public:
    * @brief Function to multiply two matrices and store the result onto third.
    *
    * Use this method in time critical path as it does not require temporaries
+   * @SINCE_1_0.0
    * @param result of the multiplication
    * @param lhs matrix, this can be same matrix as result
    * @param rhs matrix, this cannot be same matrix as result
@@ -209,6 +228,7 @@ private:
 /**
  * @brief Print a 3x3 matrix.
  *
+ * @SINCE_1_0.0
  * @param [in] o The output stream operator.
  * @param [in] matrix The matrix to print.
  * @return The output stream operator.

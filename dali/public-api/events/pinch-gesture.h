@@ -39,6 +39,7 @@ namespace Dali
  *
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch
  * until the pinch ends.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API PinchGesture: public Gesture
 {
@@ -47,22 +48,26 @@ struct DALI_IMPORT_API PinchGesture: public Gesture
   /**
    * @brief Default Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in]  state  The state of the gesture
    */
   PinchGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
    */
   PinchGesture( const PinchGesture& rhs );
 
   /**
    * @brief Assignment operator.
+   * @SINCE_1_0.0
    */
   PinchGesture& operator=( const PinchGesture& rhs );
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~PinchGesture();
 

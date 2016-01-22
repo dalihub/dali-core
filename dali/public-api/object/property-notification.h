@@ -40,6 +40,7 @@ class PropertyNotification;
  * @brief This is used to issue a notification upon a condition of the property being met.
  *
  * For example checking if Actor::POSITION_X > 100.0.
+ * @SINCE_1_0.0
  * @see Dali::PropertyCondition
  */
 class DALI_IMPORT_API PropertyNotification : public BaseHandle
@@ -47,13 +48,14 @@ class DALI_IMPORT_API PropertyNotification : public BaseHandle
 public:
   /**
    * @brief Enumeration to describe how to check condition
+   * @SINCE_1_0.0
    */
   enum NotifyMode
   {
-    Disabled,                             ///< Don't notify, regardless of result of Condition
-    NotifyOnTrue,                         ///< Notify whenever condition changes from false to true.
-    NotifyOnFalse,                        ///< Notify whenever condition changes from true to false.
-    NotifyOnChanged                       ///< Notify whenever condition changes (false to true, and true to false)
+    Disabled,                             ///< Don't notify, regardless of result of Condition @SINCE_1_0.0
+    NotifyOnTrue,                         ///< Notify whenever condition changes from false to true. @SINCE_1_0.0
+    NotifyOnFalse,                        ///< Notify whenever condition changes from true to false. @SINCE_1_0.0
+    NotifyOnChanged                       ///< Notify whenever condition changes (false to true, and true to false) @SINCE_1_0.0
   };
 
 public:
@@ -62,6 +64,7 @@ public:
    * @brief Create an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   PropertyNotification();
 
@@ -72,6 +75,7 @@ public:
    * produces valid handle. If not the returned handle is left
    * uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a PropertyNotification object or an uninitialized handle
    */
@@ -81,12 +85,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~PropertyNotification();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   PropertyNotification(const PropertyNotification& handle);
@@ -94,6 +100,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -102,6 +109,7 @@ public:
   /**
    * @brief Get the condition of this notification
    *
+   * @SINCE_1_0.0
    * @return The condition is returned
    */
   PropertyCondition GetCondition();
@@ -109,12 +117,14 @@ public:
   /**
    * @brief Get the condition of this notification
    *
+   * @SINCE_1_0.0
    * @return The condition is returned
    */
   const PropertyCondition& GetCondition() const;
 
   /**
    * @brief Get the target handle that this notification is observing.
+   * @SINCE_1_0.0
    */
   Dali::Handle GetTarget() const;
 
@@ -122,6 +132,7 @@ public:
    * @brief Get the target handle's property index that this notification
    * is observing.
    *
+   * @SINCE_1_0.0
    * @return The target property.
    */
   Property::Index GetTargetProperty() const;
@@ -130,6 +141,7 @@ public:
    * @brief Sets the Notification mode. This determines how the property
    * notification should respond to the result of a condition.
    *
+   * @SINCE_1_0.0
    * @param[in] mode Notification mode (Default is PropertyNotification::NotifyOnTrue)
    */
   void SetNotifyMode( NotifyMode mode );
@@ -137,6 +149,7 @@ public:
   /**
    * @brief Retrieves the current Notification mode.
    *
+   * @SINCE_1_0.0
    * @return Notification mode.
    */
   NotifyMode GetNotifyMode();
@@ -145,6 +158,7 @@ public:
    * @brief Gets the result of the last condition check that caused a signal emit,
    * useful when using NotifyOnChanged mode and need to know what it changed to.
    *
+   * @SINCE_1_0.0
    * @return whether condition result that triggered last emit was true or false
    */
   bool GetNotifyResult() const;
@@ -152,6 +166,7 @@ public:
   /**
    * @brief Connect to this signal to be notified when the notification has occurred.
    *
+   * @SINCE_1_0.0
    * @return A signal object to Connect() with.
    */
   PropertyNotifySignalType& NotifySignal();
@@ -161,6 +176,7 @@ public: // Not intended for use by Application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in] propertyNotification A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);

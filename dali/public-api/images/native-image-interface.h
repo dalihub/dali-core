@@ -35,6 +35,7 @@ namespace Dali
  * @brief Abstract interface to provide platform-specific support for handling image data.
  *
  * For example, an implementation could use EGL extensions, etc.
+ * @SINCE_1_0.0
  */
 class NativeImageInterface : public Dali::RefObject
 {
@@ -46,8 +47,9 @@ public:
    * @brief Create the GL resource for the NativeImage.
    *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR()
-   * @pre There is a GL context for the current thread.
+   * @SINCE_1_0.0
    * @return false If the initialization fails.
+   * @pre There is a GL context for the current thread.
    */
   virtual bool GlExtensionCreate() = 0;
 
@@ -55,6 +57,7 @@ public:
    * @brief Destroy the GL resource for the NativeImage.
    *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR()
+   * @SINCE_1_0.0
    * @pre There is a GL context for the current thread.
    */
   virtual void GlExtensionDestroy() = 0;
@@ -62,8 +65,9 @@ public:
   /**
    * @brief Use the NativeImage as a texture for rendering.
    *
-   * @pre There is a GL context for the current thread.
+   * @SINCE_1_0.0
    * @return A GL error code
+   * @pre There is a GL context for the current thread.
    */
   virtual unsigned int TargetTexture() = 0;
 
@@ -71,6 +75,7 @@ public:
    * @brief Called in each NativeTexture::Bind() call to allow implementation specific operations.
    *
    * The correct texture sampler has already been bound before the function gets called.
+   * @SINCE_1_0.0
    * @pre glAbstraction is being used by context in current thread
    */
   virtual void PrepareTexture() = 0;
@@ -78,6 +83,7 @@ public:
   /**
    * @brief Returns the width of the NativeImage.
    *
+   * @SINCE_1_0.0
    * @return width
    */
   virtual unsigned int GetWidth() const = 0;
@@ -85,18 +91,21 @@ public:
   /**
    * @brief Returns the height of the NativeImage.
    *
+   * @SINCE_1_0.0
    * @return height
    */
   virtual unsigned int GetHeight() const = 0;
 
  /**
-  * Query whether blending is required
+  * @brief Query whether blending is required
+  * @SINCE_1_0.0
   */
   virtual bool RequiresBlending() const = 0;
 
   /**
    * @brief Retrieve the extension for the interface.
    *
+   * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
    */
   virtual Extension* GetExtension()
@@ -110,6 +119,7 @@ protected:
    * @brief A reference counted object may only be deleted by calling Unreference().
    *
    * The implementation should destroy the NativeImage resources.
+   * @SINCE_1_0.0
    */
   virtual ~NativeImageInterface()
   {
@@ -119,6 +129,7 @@ protected:
 
 /**
  * @brief Pointer to Dali::NativeImageInterface
+ * @SINCE_1_0.0
  */
 typedef IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;
 
