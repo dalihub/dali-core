@@ -310,6 +310,22 @@ public:
    * @pre "registered" must be registered with the TypeRegistry.
    */
   AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+
+  /**
+   * @brief This constructor registers the animatable property with the registered default value.
+   *
+   * This constructor is for scene-graph only properties where the
+   * value of the property can be retrieved and set via specified
+   * functions.
+   *
+   * @param [in] registered The TypeRegistration object
+   * @param [in] name The name of the property
+   * @param [in] index The property index. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive.
+   * @param [in] value The property default value.
+   *
+   * @pre "registered" must be registered with the TypeRegistry.
+   */
+  AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value );
 };
 
 /**

@@ -95,6 +95,12 @@ struct PropertyDetails
 #define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##TableCount = sizeof( t##Table ) / sizeof( t##Table[0] );
 #define DALI_ENUM_TO_STRING( s ) { #s, s },
 
+/**
+ * DALI_ENUM_TO_STRING_INSIDE_CLASS
+ * Example converts ( Layer, LAYER_2D) to ( "LAYER_2D", Layer::Layer2D)
+ */
+#define DALI_ENUM_TO_STRING_INSIDE_CLASS( className, enumName) { #enumName, className::enumName },
+
 
 } // namespace Internal
 

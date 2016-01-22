@@ -217,7 +217,7 @@ public:
   /**
    * @copydoc Dali::Handle::AddUniformMapping()
    */
-  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
+  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const;
 
   /**
    * @copydoc Dali::Handle::RemoveUniformMapping( )
