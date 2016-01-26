@@ -104,11 +104,16 @@ public:
     LAYER_2D,
 
     /**
-     * @brief Layer will use depth test and do several clears.
+     * @brief Layer will use depth test.
      *
-     * When using this mode depth depth test will be used. A depth clear will happen for each distinct
-     * depth-index value in the layer, opaque renderers are drawn first and write to the depth buffer.
-     * Then transparent renderers are drawn with depth test enabled but depth write switched off.
+     * When using this mode depth depth test will be used. Opaque renderers are drawn first
+     * and write to the depth buffer. Then transparent renderers are drawn with depth test
+     * enabled but depth write switched off.
+     * Transparent renderers are drawn based on their distance from the camera (painter's algorithm).
+     * A renderers DEPTH_INDEX property is used to offset the distance to the camera when ordering transparent renderers.
+     * This is useful if you want to define the draw order of two or more transparent renderers that are
+     * equal distance from the camera.
+     *
      * @SINCE_1_0.0
      */
     LAYER_3D,
