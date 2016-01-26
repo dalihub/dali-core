@@ -76,15 +76,33 @@ public:
    * Create a new renderer instance
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] blendingBitmask A bitmask of blending options.
+   * @param[in] blendColor The blend color to pass to GL
+   * @param[in] faceCullingMode The face-culling mode.
+   * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
-  static Renderer* New( SceneGraph::RenderDataProvider* dataProviders, SceneGraph::RenderGeometry* renderGeometry );
+  static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
+                        SceneGraph::RenderGeometry* renderGeometry,
+                        unsigned int blendingBitmask,
+                        const Vector4* blendColor,
+                        Dali::Renderer::FaceCullingMode faceCullingMode,
+                        bool preMultipliedAlphaEnabled);
 
   /**
    * Constructor.
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] blendingBitmask A bitmask of blending options.
+   * @param[in] blendColor The blend color to pass to GL
+   * @param[in] faceCullingMode The face-culling mode.
+   * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
-  Renderer( SceneGraph::RenderDataProvider* dataProviders, SceneGraph::RenderGeometry* renderGeometry );
+  Renderer( SceneGraph::RenderDataProvider* dataProviders,
+            SceneGraph::RenderGeometry* renderGeometry,
+            unsigned int blendingBitmask,
+            const Vector4* blendColor,
+            Dali::Renderer::FaceCullingMode faceCullingMode,
+            bool preMultipliedAlphaEnabled);
 
   /**
    * Change the data providers of the renderer
@@ -115,7 +133,26 @@ public:
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
-  void SetCullFace( Dali::Material::FaceCullingMode mode );
+  void SetFaceCullingMode( Dali::Renderer::FaceCullingMode mode );
+
+  /**
+   * Set the bitmask for blending options
+   * @param[in] bitmask A bitmask of blending options.
+   */
+  void SetBlendingBitMask( unsigned int bitmask );
+
+  /**
+   * Set the blend color for blending options
+   * @param[in] blendColor The blend color to pass to GL
+   */
+  void SetBlendColor( const Vector4* color );
+
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
    * Set the sampler used to render the set texture.
@@ -216,9 +253,12 @@ private:
 
   Vector<GLint> mAttributesLocation;
 
+  BlendingOptions                 mBlendingOptions; /// Blending options including blend color, blend func and blend equation
+  Dali::Renderer::FaceCullingMode mFaceCullingMode; /// Mode of face culling
+
   unsigned int mSamplerBitfield;                    ///< Sampler options used for texture filtering
   bool mUpdateAttributesLocation:1;                 ///< Indicates attribute locations have changed
-  Dali::Material::FaceCullingMode mCullFaceMode:2;  ///< cullface enum, 3 bits is enough
+  bool mPremultipledAlphaEnabled:1;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace SceneGraph

@@ -110,13 +110,21 @@ namespace Render
 {
 
 Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
-                         SceneGraph::RenderGeometry* renderGeometry )
+                         SceneGraph::RenderGeometry* renderGeometry,
+                         unsigned int blendingBitmask,
+                         const Vector4* blendColor,
+                         Dali::Renderer::FaceCullingMode faceCullingMode,
+                         bool preMultipliedAlphaEnabled )
 {
-  return new Renderer( dataProvider, renderGeometry);
+  return new Renderer( dataProvider, renderGeometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
-                    SceneGraph::RenderGeometry* renderGeometry )
+                    SceneGraph::RenderGeometry* renderGeometry,
+                    unsigned int blendingBitmask,
+                    const Vector4* blendColor,
+                    Dali::Renderer::FaceCullingMode faceCullingMode,
+                    bool preMultipliedAlphaEnabled)
 : mRenderDataProvider( dataProvider ),
   mContext(NULL),
   mTextureCache( NULL ),
@@ -124,10 +132,21 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mRenderGeometry( renderGeometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
+  mBlendingOptions(),
+  mFaceCullingMode( faceCullingMode  ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUpdateAttributesLocation( true ),
-  mCullFaceMode( Dali::Material::NONE  )
+  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
+  if(  blendingBitmask != 0u )
+  {
+    mBlendingOptions.SetBitmask( blendingBitmask );
+  }
+
+  if( blendColor )
+  {
+    mBlendingOptions.SetBlendColor( *blendColor );
+  }
 }
 
 void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache )
@@ -166,10 +185,8 @@ void Renderer::SetBlending( Context& context, bool blend )
   context.SetBlend( blend );
   if( blend )
   {
-    const SceneGraph::MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
-
     // Blend color is optional and rarely used
-    Vector4* blendColor = material.GetBlendColor();
+    const Vector4* blendColor = mBlendingOptions.GetBlendColor();
     if( blendColor )
     {
       context.SetCustomBlendColor( *blendColor );
@@ -179,16 +196,15 @@ void Renderer::SetBlending( Context& context, bool blend )
       context.SetDefaultBlendColor();
     }
 
-    const BlendingOptions& blending = material.GetBlendingOptions();
     // Set blend source & destination factors
-    context.BlendFuncSeparate( blending.GetBlendSrcFactorRgb(),
-                               blending.GetBlendDestFactorRgb(),
-                               blending.GetBlendSrcFactorAlpha(),
-                               blending.GetBlendDestFactorAlpha() );
+    context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
+                               mBlendingOptions.GetBlendDestFactorRgb(),
+                               mBlendingOptions.GetBlendSrcFactorAlpha(),
+                               mBlendingOptions.GetBlendDestFactorAlpha() );
 
     // Set blend equations
-    context.BlendEquationSeparate( blending.GetBlendEquationRgb(),
-                                   blending.GetBlendEquationAlpha() );
+    context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
+                                   mBlendingOptions.GetBlendEquationAlpha() );
   }
 }
 
@@ -386,10 +402,24 @@ void Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& pr
   }
 }
 
-void Renderer::SetCullFace( Dali::Material::FaceCullingMode mode )
+void Renderer::SetFaceCullingMode( Dali::Renderer::FaceCullingMode mode )
 {
-  DALI_ASSERT_DEBUG( mode >= Dali::Material::NONE && mode <= Dali::Material::CULL_BACK_AND_FRONT );
-  mCullFaceMode = mode;
+  mFaceCullingMode =  mode;
+}
+
+void Renderer::SetBlendingBitMask( unsigned int bitmask )
+{
+  mBlendingOptions.SetBitmask( bitmask );
+}
+
+void Renderer::SetBlendColor( const Vector4* color )
+{
+  mBlendingOptions.SetBlendColor( *color );
+}
+
+void Renderer::EnablePreMultipliedAlpha( bool enable )
+{
+  mPremultipledAlphaEnabled = enable;
 }
 
 void Renderer::SetSampler( unsigned int samplerBitfield )
@@ -422,7 +452,7 @@ void Renderer::Render( Context& context,
   }
 
   //Set cull face  mode
-  context.CullFace( mRenderDataProvider->GetMaterial().GetFaceCullingMode() );
+  context.CullFace( mFaceCullingMode );
 
   //Set blending mode
   SetBlending( context, blend );
@@ -438,7 +468,14 @@ void Renderer::Render( Context& context,
   if( Program::UNIFORM_UNKNOWN != loc )
   {
     const Vector4& color = node.GetRenderColor( bufferIndex );
-    program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
+    if( mPremultipledAlphaEnabled )
+    {
+      program->SetUniform4f( loc, color.r*color.a, color.g*color.a, color.b*color.a, color.a );
+    }
+    else
+    {
+      program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
+    }
   }
 
   //Bind textures

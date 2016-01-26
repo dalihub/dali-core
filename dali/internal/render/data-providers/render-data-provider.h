@@ -18,15 +18,19 @@
  *
  */
 
-#include <dali/internal/render/data-providers/material-data-provider.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/devel-api/rendering/renderer.h>
+
 namespace Dali
 {
 namespace Internal
 {
+
+struct BlendingOptions;
+
 namespace SceneGraph
 {
 class PropertyBuffer;
@@ -62,18 +66,6 @@ public:
 public:
 
   /**
-   * Set the material data provider
-   * @param[in] materialDataProvider The material data provider
-   */
-  void SetMaterial( const MaterialDataProvider& materialDataProvider );
-
-  /**
-   * Get the material data provider
-   * @return the material data provider
-   */
-  const MaterialDataProvider& GetMaterial() const;
-
-  /**
    * Set the uniform map data provider
    * @param[in] uniformMapDataProvider The uniform map data provider
    */
@@ -103,12 +95,12 @@ public:
   Textures& GetTextures();
 
 private:
-  const MaterialDataProvider*   mMaterialDataProvider;
-  const UniformMapDataProvider* mUniformMapDataProvider;
-  Shader*                       mShader;
-  Textures                      mTextures;
 
-// Give Renderer access to our private data to reduce copying vectors on construction.
+  const UniformMapDataProvider*       mUniformMapDataProvider;
+  Shader*                             mShader;
+  Textures                            mTextures;
+
+  // Give Renderer access to our private data to reduce copying vectors on construction.
   friend class Renderer;
 };
 

@@ -49,15 +49,10 @@ Material* Material::New()
 
 Material::Material()
 : mShader( NULL ),
-  mBlendColor( NULL ),
   mSamplers(),
   mTextureId(),
   mUniformName(),
   mConnectionObservers(),
-  mFaceCullingMode( Dali::Material::NONE ),
-  mBlendingMode( Dali::BlendingMode::AUTO ),
-  mBlendingOptions(), // initializes to defaults
-  mBlendPolicy( OPAQUE ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mMaterialChanged( true )
@@ -126,37 +121,9 @@ void Material::Prepare( const ResourceManager& resourceManager )
         }
       }
     }
-    mBlendPolicy = OPAQUE;
-    switch( mBlendingMode )
-    {
-      case BlendingMode::OFF:
-      {
-        mBlendPolicy = OPAQUE;
-        break;
-      }
-      case BlendingMode::ON:
-      {
-        mBlendPolicy = TRANSLUCENT;
-        break;
-      }
-      case BlendingMode::AUTO:
-      {
-        // @todo: Change hints for new SceneGraphShader:
-        // If shader hint OUTPUT_IS_OPAQUE is enabled, set policy to ALWAYS_OPAQUE
-        // If shader hint OUTPUT_IS_TRANSPARENT is enabled, set policy to ALWAYS_TRANSPARENT
-        // else test remainder, and set policy to either ALWAYS_TRANSPARENT or USE_ACTOR_COLOR
 
-        if( ( opaqueCount != textureCount ) ||
-            ( mShader && mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) ) )
-        {
-          mBlendPolicy = Material::TRANSLUCENT;
-        }
-        else
-        {
-          mBlendPolicy = Material::USE_ACTOR_COLOR;
-        }
-      }
-    }
+    //  whether the textures or the shader require the opacity to be translucent
+    mIsTranslucent = ( opaqueCount != textureCount ) || ( mShader && mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) );
 
     // ready for rendering when all textures are either successfully loaded or they are FBOs
     mResourcesReady = (completeCount + frameBufferCount >= textureCount);
@@ -188,51 +155,9 @@ Shader* Material::GetShader() const
   return mShader;
 }
 
-void Material::SetFaceCullingMode( unsigned int faceCullingMode )
+bool Material::IsTranslucent() const
 {
-  mFaceCullingMode = static_cast< Dali::Material::FaceCullingMode >( faceCullingMode );
-}
-
-void Material::SetBlendingMode( unsigned int blendingMode )
-{
-  mBlendingMode = static_cast< BlendingMode::Type >( blendingMode );
-}
-
-Material::BlendPolicy Material::GetBlendPolicy() const
-{
-  return mBlendPolicy;
-}
-
-void Material::SetBlendingOptions( unsigned int options )
-{
-  mBlendingOptions.SetBitmask( options );
-}
-
-void Material::SetBlendColor( const Vector4& blendColor )
-{
-  if( mBlendColor )
-  {
-    *mBlendColor = blendColor;
-  }
-  else
-  {
-    mBlendColor = new Vector4( blendColor );
-  }
-}
-
-Vector4* Material::GetBlendColor() const
-{
-  return mBlendColor;
-}
-
-const BlendingOptions& Material::GetBlendingOptions() const
-{
-  return mBlendingOptions;
-}
-
-Dali::Material::FaceCullingMode Material::GetFaceCullingMode() const
-{
-  return mFaceCullingMode;
+  return mIsTranslucent;
 }
 
 void Material::AddTexture( const std::string& name, ResourceId id, Render::Sampler* sampler )

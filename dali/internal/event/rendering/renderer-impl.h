@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -83,6 +84,82 @@ public:
    * @copydoc Dali::Renderer::GetDepthIndex()
    */
   int GetDepthIndex() const;
+
+  /**
+    * @copydoc Dali::Renderer::SetFaceCullingMode()
+    */
+   void SetFaceCullingMode( Dali::Renderer::FaceCullingMode cullingMode );
+
+   /**
+    * @copydoc Dali::Renderer::GetFaceCullingMode()
+    */
+   Dali::Renderer::FaceCullingMode GetFaceCullingMode();
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendMode()
+    */
+   void SetBlendMode( BlendingMode::Type mode );
+
+   /**
+    * @copydoc Dali::Renderer::GetBlendMode()
+    */
+   BlendingMode::Type GetBlendMode() const;
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendFunc()
+    */
+   void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendFunc()
+    */
+   void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                      BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
+
+   /**
+    * @copydoc Dali::Renderer::GetBlendFunc()
+    */
+   void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                      BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendEquation()
+    */
+   void SetBlendEquation( BlendingEquation::Type equationRgba );
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendEquation()
+    */
+   void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+
+   /**
+    * @copydoc Dali::Renderer::GetBlendEquation()
+    */
+   void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
+
+   /**
+    * @copydoc Dali::Renderer::SetBlendColor()
+    */
+   void SetBlendColor( const Vector4& color );
+
+   /**
+    * @copydoc Dali::Renderer::GetBlendColor()
+    */
+   Vector4 GetBlendColor() const;
+
+   /**
+    * @brief Set whether the Pre-multiplied Alpha Blending is required
+    *
+    * @param[in] preMultipled whether alpha is pre-multiplied.
+    */
+   void EnablePreMultipliedAlpha( bool preMultipled );
+
+   /**
+    * @brief Query whether alpha is pre-multiplied.
+    *
+    * @return True is alpha is pre-multiplied, false otherwise.
+    */
+   bool IsPreMultipliedAlphaEnabled() const;
 
   /**
    * @brief Get the scene graph object ( the node attachment )
@@ -206,10 +283,18 @@ private: // unimplemented methods
 
 private: // data
   SceneGraph::Renderer* mSceneObject;
+  Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
+
   int mDepthIndex;
   int mOnStageCount;
+
+  Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
+  BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
+  BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
+  bool mPremultipledAlphaEnabled;                   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+
 };
 
 } // namespace Internal
