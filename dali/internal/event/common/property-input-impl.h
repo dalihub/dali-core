@@ -307,6 +307,16 @@ public:
   }
 
   /**
+   * Query whether the property belongs to the
+   * transform manager or not.
+   * @return True if it is a transform manager property, false otherwise
+   */
+  virtual bool IsTransformManagerProperty() const
+  {
+    return false;
+  }
+
+  /**
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @param[in] bufferIndex The buffer to read from.

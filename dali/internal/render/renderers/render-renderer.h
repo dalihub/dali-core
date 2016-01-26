@@ -185,6 +185,7 @@ public:
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
+               const Vector3& size,
                bool blend);
 
   /**
@@ -214,10 +215,12 @@ private:
 
   /**
    * Set the uniforms from properties according to the uniform map
+   * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
+   * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
    */
-  void SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program );
+  void SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program );
 
   /**
    * Set the program uniform in the map from the mapped property

@@ -230,13 +230,15 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
   // Check camera node
   if ( NULL == mCameraNode ||
        NULL == mCameraNode->GetParent() ||
-       !mCameraNode->HasAttachment() )
+       NULL == mCameraAttachment )
   {
     // Camera node is missing or disconnected
     TASK_LOG_FMT(Debug::General, " =F  No Camera  FC:%d\n", mFrameCounter );
 
     return false;
   }
+
+  mCameraAttachment->Update( updateBufferIndex, *mCameraNode );
 
   TASK_LOG_FMT(Debug::General, " =T (FBO ID:%d) FC:%d\n", mFrameBufferResourceId , mFrameCounter );
   return true;
