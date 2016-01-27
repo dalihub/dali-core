@@ -30,6 +30,7 @@ namespace Dali
  */
 
 /**
+ * @DEPRECATED_1_0.47
  * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
  *
  * We normally use double quotation marks to write a string such as "Hello World".
@@ -116,6 +117,7 @@ public:
 
   // Default Properties
   /**
+   * @DEPRECATED_1_0.47
    * @brief An enumeration of properties belonging to the ShaderEffect class.
    * Grid Density defines the spacing of vertex coordinates in world units.
    * ie a larger actor will have more grids at the same spacing.
@@ -133,31 +135,33 @@ public:
   {
     enum
     {
-      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "gridDensity",    type float @SINCE_1_0.0
-      IMAGE,                                             ///< name "image",          type Map {"filename":"", "loadPolicy":...} @SINCE_1_0.0
-      PROGRAM,                                           ///< name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""} @SINCE_1_0.0
-      GEOMETRY_HINTS                                     ///< name "geometryHints",  type int (bitfield) values from enum GeometryHints @SINCE_1_0.0
+      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< @DEPRECATED_1_0.47 @brief name "gridDensity",    type float @SINCE_1_0.0
+      IMAGE,                                             ///< @DEPRECATED_1_0.47 @brief name "image",          type Map {"filename":"", "loadPolicy":...} @SINCE_1_0.0
+      PROGRAM,                                           ///< @DEPRECATED_1_0.47 @brief name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""} @SINCE_1_0.0
+      GEOMETRY_HINTS                                     ///< @DEPRECATED_1_0.47 @brief name "geometryHints",  type int (bitfield) values from enum GeometryHints @SINCE_1_0.0
     };
   };
 
   static const float DEFAULT_GRID_DENSITY;              ///< The default density is 40 pixels
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Hints for rendering/subdividing geometry.
    * @SINCE_1_0.0
    */
   enum GeometryHints
   {
-    HINT_NONE           = 0x00,   ///< no hints @SINCE_1_0.0
-    HINT_GRID_X         = 0x01,   ///< Geometry must be subdivided in X @SINCE_1_0.0
-    HINT_GRID_Y         = 0x02,   ///< Geometry must be subdivided in Y @SINCE_1_0.0
-    HINT_GRID           = (HINT_GRID_X | HINT_GRID_Y),
-    HINT_DEPTH_BUFFER   = 0x04,   ///< Needs depth buffering turned on @SINCE_1_0.0
-    HINT_BLENDING       = 0x08,   ///< Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO @SINCE_1_0.0
-    HINT_DOESNT_MODIFY_GEOMETRY = 0x10 ///< Notifies that the vertex shader will not change geometry (enables bounding box culling) @SINCE_1_0.0
+    HINT_NONE           = 0x00,   ///< @DEPRECATED_1_0.47 @brief no hints @SINCE_1_0.0
+    HINT_GRID_X         = 0x01,   ///< @DEPRECATED_1_0.47 @brief Geometry must be subdivided in X @SINCE_1_0.0
+    HINT_GRID_Y         = 0x02,   ///< @DEPRECATED_1_0.47 @brief Geometry must be subdivided in Y @SINCE_1_0.0
+    HINT_GRID           = (HINT_GRID_X | HINT_GRID_Y),  ///< @DEPRECATED_1_0.47 @brief HINT_GRID_X | HINT_GRID_Y @SINCE_1_0.0
+    HINT_DEPTH_BUFFER   = 0x04,   ///< @DEPRECATED_1_0.47 @brief Needs depth buffering turned on @SINCE_1_0.0
+    HINT_BLENDING       = 0x08,   ///< @DEPRECATED_1_0.47 @brief Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO @SINCE_1_0.0
+    HINT_DOESNT_MODIFY_GEOMETRY = 0x10 ///< @DEPRECATED_1_0.47 @brief Notifies that the vertex shader will not change geometry (enables bounding box culling) @SINCE_1_0.0
   };
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Coordinate type of the shader uniform.
    *
    * Viewport coordinate types will convert from viewport to view space.
@@ -168,12 +172,13 @@ public:
    */
   enum UniformCoordinateType
   {
-    COORDINATE_TYPE_DEFAULT,           ///< @brief Default, No transformation to be applied @SINCE_1_0.0
-    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @DEPRECATED_1_1.11 @brief The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
-    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @DEPRECATED_1_1.11 @brief The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
+    COORDINATE_TYPE_DEFAULT,           ///< @DEPRECATED_1_0.47 @brief Default, No transformation to be applied @SINCE_1_0.0
+    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @DEPRECATED_1_0.47 @brief The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
+    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @DEPRECATED_1_0.47 @brief The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
   };
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create an empty ShaderEffect.
    *
    * This can be initialised with ShaderEffect::New(...)
@@ -182,6 +187,7 @@ public:
   ShaderEffect();
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create ShaderEffect.
    *
    * @SINCE_1_0.0
@@ -195,6 +201,7 @@ public:
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create ShaderEffect.
    * @SINCE_1_0.0
    * @param vertexShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
@@ -211,6 +218,7 @@ public:
                                     GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Downcast an Object handle to ShaderEffect.
    *
    * If handle points to a ShaderEffect the downcast produces valid
@@ -223,6 +231,7 @@ public:
   static ShaderEffect DownCast( BaseHandle handle );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
@@ -231,6 +240,7 @@ public:
   ~ShaderEffect();
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Copy constructor
    *
    * @SINCE_1_0.0
@@ -239,6 +249,7 @@ public:
   ShaderEffect(const ShaderEffect& object);
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
@@ -248,6 +259,7 @@ public:
   ShaderEffect& operator=(const ShaderEffect& rhs);
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Sets image for using as effect texture.
    *
    * This image texture will be bound to the "sEffect" sampler
@@ -259,7 +271,9 @@ public:
   void SetEffectImage( Image image );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
+   *
    * This will register a property of type Property::FLOAT; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @SINCE_1_0.0
@@ -273,6 +287,7 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR2; see Object::RegisterProperty() for more details.
@@ -288,6 +303,7 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR3; see Object::RegisterProperty() for more details.
@@ -303,6 +319,7 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR4; see Object::RegisterProperty() for more details.
@@ -318,6 +335,7 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::MATRIX; see Object::RegisterProperty() for more details.
@@ -333,6 +351,7 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::MATRIX3; see Object::RegisterProperty() for more details.
@@ -350,6 +369,7 @@ public:
 public: // Not intended for application developers
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param [in] effect A pointer to a newly allocated Dali resource.
