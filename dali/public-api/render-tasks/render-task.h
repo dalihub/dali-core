@@ -27,7 +27,7 @@
 namespace Dali
 {
 /**
- * @addtogroup dali_core_render_tasks
+ * @addtogroup dali_core_rendering_effects
  * @{
  */
 
