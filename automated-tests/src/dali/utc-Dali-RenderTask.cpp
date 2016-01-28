@@ -28,6 +28,7 @@
 
 #define BOOLSTR(x) ((x)?"T":"F")
 
+//& set: DaliRenderTask
 
 using namespace Dali;
 
@@ -261,6 +262,9 @@ bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool 
 {
   finishedSig = false;
   callStack.Reset();
+
+  tet_printf("TestApplication::UpdateRender().\n");
+
   application.Render(16);
   application.SendNotification();
 
@@ -1795,9 +1799,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   DALI_TEST_CHECK( finished );
   finished = false;
 
-  application.Render(); // Double check no more finished signal
-  application.SendNotification();
-  DALI_TEST_CHECK( ! finished );
+  DALI_TEST_EQUALS( application.GetUpdateStatus(), 0, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2475,6 +2477,7 @@ int UtcDaliRenderTaskOnce08(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
   TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  sync.GetTrace().Enable(true);
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
@@ -2492,7 +2495,7 @@ int UtcDaliRenderTaskOnce08(void)
 
   Stage::GetCurrent().Add(secondRootActor);
 
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, /*GL-SYNC*/ true);
   bool finished = false;
 
   ConnectionTracker connectionTracker;
@@ -2504,6 +2507,9 @@ int UtcDaliRenderTaskOnce08(void)
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj == NULL );
+  DALI_TEST_EQUALS( sync.GetTrace().CountMethod( "CreateSyncObject" ), 0, TEST_LOCATION );
+
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -2511,9 +2517,19 @@ int UtcDaliRenderTaskOnce08(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
   lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
+  DALI_TEST_EQUALS( sync.GetNumberOfSyncObjects(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( sync.GetTrace().CountMethod( "CreateSyncObject" ), 1, TEST_LOCATION );
 
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
+
+
+  DALI_TEST_EQUALS( sync.GetNumberOfSyncObjects(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( sync.GetTrace().CountMethod( "CreateSyncObject" ), 1, TEST_LOCATION );
+
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
+
+  DALI_TEST_EQUALS( sync.GetNumberOfSyncObjects(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( sync.GetTrace().CountMethod( "CreateSyncObject" ), 1, TEST_LOCATION );
 
   sync.SetObjectSynced( lastSyncObj, true );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
@@ -2834,15 +2850,26 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
 
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj == NULL );
+
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
   application.GetPlatform().ClearReadyResources();
 
+  lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj == NULL );
+
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification(); //         Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__ ) );
+
+  lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj == NULL );
+
   END_TEST;
 }
 
@@ -2876,6 +2903,10 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   RenderTaskFinished renderTaskFinished( finished );
   newTask.FinishedSignal().Connect( &application, renderTaskFinished );
   application.SendNotification();
+
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj == NULL );
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true, __LINE__ ) );
@@ -3325,7 +3356,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::SignalFinished()");
+  tet_infoline("Testing RenderTask::FinishInvisibleSourceActor()");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
@@ -3461,7 +3492,6 @@ int UtcDaliRenderTaskWorldToViewport(void)
 
   Stage::GetCurrent().Add(actor);
 
-  application.Render();
   application.SendNotification();
   application.Render();
   application.SendNotification();
@@ -3491,7 +3521,6 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor2.Add(actor);
   actor.SetParentOrigin( Vector3(0,0,0) );
 
-  application.Render();
   application.SendNotification();
   application.Render();
   application.SendNotification();
@@ -3519,6 +3548,8 @@ int UtcDaliRenderTaskViewportToLocal(void)
   RenderTask task = taskList.GetTask( 0u );
 
   // flush the queue and render once
+  application.SendNotification();
+  application.Render();
   application.SendNotification();
   application.Render();
 

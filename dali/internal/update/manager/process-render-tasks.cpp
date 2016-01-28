@@ -252,6 +252,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                                  renderTask,
                                                  sourceNode->GetDrawMode() );
 
+      renderTask.SetResourcesFinished( resourcesFinished );
       PrepareRenderInstruction( updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
@@ -259,8 +260,10 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 renderTask.GetCullMode(),
                                 instructions );
     }
-
-    renderTask.SetResourcesFinished( resourcesFinished );
+    else
+    {
+      renderTask.SetResourcesFinished( resourcesFinished );
+    }
   }
 
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "ProcessRenderTasks() Onscreen\n");

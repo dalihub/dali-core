@@ -417,10 +417,11 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
-  // if using native framebuffer, add a tracker
-  if( mTargetIsNativeFramebuffer )
+  if( mTargetIsNativeFramebuffer &&
+      mRefreshRate == Dali::RenderTask::REFRESH_ONCE &&
+      mResourcesFinished )
   {
-    // create tracker if not yet exists. if we switch to on-screen fbo, we still keep the tracker in case we need it again
+    // create tracker if one doesn't yet exist.
     if( !mRenderSyncTracker )
     {
       mRenderSyncTracker = new Render::RenderTracker();

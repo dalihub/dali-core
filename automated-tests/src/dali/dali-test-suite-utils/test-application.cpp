@@ -59,6 +59,9 @@ TestApplication::TestApplication( bool   initialize,
 
 void TestApplication::Initialize()
 {
+  // We always need the first update!
+  mStatus.keepUpdating = Integration::KeepUpdating::STAGE_KEEP_RENDERING;
+
   mCore = Dali::Integration::Core::New(
     mRenderController,
     mPlatformAbstraction,
@@ -153,10 +156,19 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
 
 void TestApplication::DoUpdate( unsigned int intervalMilliseconds )
 {
+  if( GetUpdateStatus() == 0 &&
+      mRenderStatus.NeedsUpdate() == false &&
+      ! GetRenderController().WasCalled(TestRenderController::RequestUpdateFunc) )
+  {
+    fprintf(stderr, "WARNING - Update not required\n");
+  }
+
   unsigned int nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
   float elapsedSeconds = intervalMilliseconds / 1e3f;
 
   mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus );
+
+  GetRenderController().Initialize();
 
   mLastVSyncTime = nextVSyncTime;
 }
@@ -180,6 +192,15 @@ bool TestApplication::UpdateOnly( unsigned int intervalMilliseconds  )
 {
   DoUpdate( intervalMilliseconds );
   return mStatus.KeepUpdating();
+}
+
+bool TestApplication::GetRenderNeedsUpdate()
+{
+  return mRenderStatus.NeedsUpdate();
+}
+bool TestApplication::GetRenderHasRendered()
+{
+  return mRenderStatus.HasRendered();
 }
 
 bool TestApplication::RenderOnly( )

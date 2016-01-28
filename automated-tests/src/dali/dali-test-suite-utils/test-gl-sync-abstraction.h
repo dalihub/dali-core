@@ -100,6 +100,13 @@ public: // TEST FUNCTIONS
    */
   TraceCallStack& GetTrace();
 
+  /**
+   * Get the number of sync objects
+   *
+   * @return the number of sync objects
+   */
+  int GetNumberOfSyncObjects();
+
 private:
   typedef std::vector<TestSyncObject*>   SyncContainer;
   typedef SyncContainer::iterator SyncIter;

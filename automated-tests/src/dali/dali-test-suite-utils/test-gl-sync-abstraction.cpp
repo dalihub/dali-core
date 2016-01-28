@@ -132,5 +132,10 @@ void TestGlSyncAbstraction::ResetTrace() { mTrace.Reset(); }
  */
 TraceCallStack& TestGlSyncAbstraction::GetTrace() { return mTrace; }
 
+int TestGlSyncAbstraction::GetNumberOfSyncObjects()
+{
+  return mSyncObjects.size();
+}
+
 
 } // Dali

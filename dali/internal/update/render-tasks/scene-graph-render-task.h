@@ -313,6 +313,11 @@ public:
 
   /**
    * Prepares the render-instruction buffer to be populated with instructions.
+   *
+   * If the render task is a render-once framebuffer backed by a native image,
+   * then this method will ensure that a GL sync object is created to track
+   * when the rendering has finished.
+   *
    * @param[out] instruction to prepare
    * @param[in] updateBufferIndex The current update buffer index.
    */
