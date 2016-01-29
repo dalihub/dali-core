@@ -30,6 +30,7 @@ namespace Dali
 
 /**
  * @brief Pixel format types and their properties.
+ * @SINCE_1_0.0
  */
 namespace Pixel
 {
@@ -38,71 +39,71 @@ namespace Pixel
  *
  * @note: BufferImage::Update might not work with BGR/BGRA formats!
  */
-enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
+enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha @SINCE_1_0.0
 {
-  INVALID = 0,                              ///< Used to represent an unsupported format. @since 1.1.17
+  INVALID = 0,                              ///< Used to represent an unsupported format. @SINCE_1_1.17
 
   // Start at > 0 to distinguish null data:
-  A8 = 1,                                   ///< color depth 8-bit, alpha
-  L8,                                       ///< color depth 8-bit, luminance
-  LA88,                                     ///< color depth 16-bit, luminance with 8 bit alpha
-  RGB565,                                   ///< color depth 16 bit, 5-6-5
-  BGR565,                                   ///< color depth 16 bit, 5-6-5
-  RGBA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4
-  BGRA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4
-  RGBA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1
-  BGRA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1
-  RGB888,                                   ///< color depth 24 bit, 8-8-8
-  RGB8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
-  BGR8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8#
-  RGBA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8
-  BGRA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8
+  A8 = 1,                                   ///< color depth 8-bit, alpha @SINCE_1_0.0
+  L8,                                       ///< color depth 8-bit, luminance @SINCE_1_0.0
+  LA88,                                     ///< color depth 16-bit, luminance with 8 bit alpha @SINCE_1_0.0
+  RGB565,                                   ///< color depth 16 bit, 5-6-5 @SINCE_1_0.0
+  BGR565,                                   ///< color depth 16 bit, 5-6-5 @SINCE_1_0.0
+  RGBA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4 @SINCE_1_0.0
+  BGRA4444,                                 ///< color depth 16 bit with alpha, 4-4-4-4 @SINCE_1_0.0
+  RGBA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1 @SINCE_1_0.0
+  BGRA5551,                                 ///< color depth 16 bit with alpha, 5-5-5-1 @SINCE_1_0.0
+  RGB888,                                   ///< color depth 24 bit, 8-8-8 @SINCE_1_0.0
+  RGB8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8# @SINCE_1_0.0
+  BGR8888,                                  ///< color depth 32 bit, alpha is reserved but not used, 8-8-8-8# @SINCE_1_0.0
+  RGBA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8 @SINCE_1_0.0
+  BGRA8888,                                 ///< color depth 32 bit with alpha, 8-8-8-8 @SINCE_1_0.0
 
   // GLES 3 Standard compressed formats:
-  COMPRESSED_R11_EAC,                       ///< ETC2 / EAC single-channel, unsigned
-  COMPRESSED_SIGNED_R11_EAC,                ///< ETC2 / EAC single-channel, signed
-  COMPRESSED_RG11_EAC,                      ///< ETC2 / EAC dual-channel, unsigned
-  COMPRESSED_SIGNED_RG11_EAC,               ///< ETC2 / EAC dual-channel, signed
-  COMPRESSED_RGB8_ETC2,                     ///< ETC2 / EAC RGB
-  COMPRESSED_SRGB8_ETC2,                    ///< ETC2 / EAC RGB using sRGB colourspace.
-  COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, ///< ETC2 / EAC RGB with single bit per pixel alpha mask.
-  COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,///< ETC2 / EAC RGB using sRGB colourspace, with single bit per pixel alpha mask.
-  COMPRESSED_RGBA8_ETC2_EAC,                ///< ETC2 / EAC RGB plus separate alpha channel.
-  COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,         ///< ETC2 / EAC RGB using sRGB colourspace, plus separate alpha channel.
+  COMPRESSED_R11_EAC,                       ///< ETC2 / EAC single-channel, unsigned @SINCE_1_0.0
+  COMPRESSED_SIGNED_R11_EAC,                ///< ETC2 / EAC single-channel, signed @SINCE_1_0.0
+  COMPRESSED_RG11_EAC,                      ///< ETC2 / EAC dual-channel, unsigned @SINCE_1_0.0
+  COMPRESSED_SIGNED_RG11_EAC,               ///< ETC2 / EAC dual-channel, signed @SINCE_1_0.0
+  COMPRESSED_RGB8_ETC2,                     ///< ETC2 / EAC RGB @SINCE_1_0.0
+  COMPRESSED_SRGB8_ETC2,                    ///< ETC2 / EAC RGB using sRGB colourspace. @SINCE_1_0.0
+  COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, ///< ETC2 / EAC RGB with single bit per pixel alpha mask. @SINCE_1_0.0
+  COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,///< ETC2 / EAC RGB using sRGB colourspace, with single bit per pixel alpha mask. @SINCE_1_0.0
+  COMPRESSED_RGBA8_ETC2_EAC,                ///< ETC2 / EAC RGB plus separate alpha channel. @SINCE_1_0.0
+  COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,         ///< ETC2 / EAC RGB using sRGB colourspace, plus separate alpha channel. @SINCE_1_0.0
 
   // GLES 2 extension compressed formats:
-  COMPRESSED_RGB8_ETC1,                     ///< ETC1 RGB as defined by GLES 2 extension OES_compressed_ETC1_RGB8_texture: http://www.khronos.org/registry/gles/extensions/OES/OES_compressed_ETC1_RGB8_texture.txt
-  COMPRESSED_RGB_PVRTC_4BPPV1,              ///< PowerVR 4bpp RGB format (v1) as defined by extension IMG_texture_compression_pvrtc: http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
+  COMPRESSED_RGB8_ETC1,                     ///< ETC1 RGB as defined by GLES 2 extension OES_compressed_ETC1_RGB8_texture: http://www.khronos.org/registry/gles/extensions/OES/OES_compressed_ETC1_RGB8_texture.txt @SINCE_1_0.0
+  COMPRESSED_RGB_PVRTC_4BPPV1,              ///< PowerVR 4bpp RGB format (v1) as defined by extension IMG_texture_compression_pvrtc: http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt @SINCE_1_0.0
 
   // GLES 3.1 compressed formats:
-  COMPRESSED_RGBA_ASTC_4x4_KHR,             ///< ASTC Linear color space with a 4x4 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_5x4_KHR,             ///< ASTC Linear color space with a 5x4 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_5x5_KHR,             ///< ASTC Linear color space with a 5x5 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_6x5_KHR,             ///< ASTC Linear color space with a 6x5 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_6x6_KHR,             ///< ASTC Linear color space with a 6x6 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_8x5_KHR,             ///< ASTC Linear color space with a 8x5 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_8x6_KHR,             ///< ASTC Linear color space with a 8x6 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_8x8_KHR,             ///< ASTC Linear color space with a 8x8 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_10x5_KHR,            ///< ASTC Linear color space with a 10x5 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_10x6_KHR,            ///< ASTC Linear color space with a 10x6 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_10x8_KHR,            ///< ASTC Linear color space with a 10x8 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_10x10_KHR,           ///< ASTC Linear color space with a 10x10 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_12x10_KHR,           ///< ASTC Linear color space with a 12x10 block-size. @since 1.1.17
-  COMPRESSED_RGBA_ASTC_12x12_KHR,           ///< ASTC Linear color space with a 12x12 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 4x4 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x4 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x5 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x5 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x6 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x5 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x6 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x8 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x5 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x6 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x8 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 10x10 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size. @since 1.1.17
-  COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size. @since 1.1.17
+  COMPRESSED_RGBA_ASTC_4x4_KHR,             ///< ASTC Linear color space with a 4x4 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_5x4_KHR,             ///< ASTC Linear color space with a 5x4 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_5x5_KHR,             ///< ASTC Linear color space with a 5x5 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_6x5_KHR,             ///< ASTC Linear color space with a 6x5 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_6x6_KHR,             ///< ASTC Linear color space with a 6x6 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_8x5_KHR,             ///< ASTC Linear color space with a 8x5 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_8x6_KHR,             ///< ASTC Linear color space with a 8x6 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_8x8_KHR,             ///< ASTC Linear color space with a 8x8 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_10x5_KHR,            ///< ASTC Linear color space with a 10x5 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_10x6_KHR,            ///< ASTC Linear color space with a 10x6 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_10x8_KHR,            ///< ASTC Linear color space with a 10x8 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_10x10_KHR,           ///< ASTC Linear color space with a 10x10 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_12x10_KHR,           ///< ASTC Linear color space with a 12x10 block-size. @SINCE_1_1.17
+  COMPRESSED_RGBA_ASTC_12x12_KHR,           ///< ASTC Linear color space with a 12x12 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 4x4 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x4 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 5x5 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x5 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 6x6 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x5 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x6 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,     ///< ASTC Non-linear (gamma-corrected) color space with a 8x8 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x5 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x6 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,    ///< ASTC Non-linear (gamma-corrected) color space with a 10x8 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 10x10 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size. @SINCE_1_1.17
+  COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size. @SINCE_1_1.17
 
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
@@ -124,6 +125,7 @@ const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
 /**
  * @brief Whether specified pixel format contains an alpha value.
  *
+ * @SINCE_1_0.0
  * @param [in] pixelformat pixel format
  * @return true if format has alpha, false otherwise
  */
@@ -132,6 +134,7 @@ DALI_IMPORT_API bool HasAlpha(Format pixelformat);
 /**
  * @brief Returns The number of bytes per pixel for the specified pixel format.
  *
+ * @SINCE_1_0.0
  * @param [in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
@@ -144,6 +147,7 @@ DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
  * It means the second byte contains the alpha value and the last 4 bits of the byte is the alpha value.
  *
  * Bitmask is zero if the pixelFormat does not support alpha
+ * @SINCE_1_0.0
  * @param[in]  pixelFormat the pixel format
  * @param[out] byteOffset the byte offset of the byte containing the alpha value
  * @param[out] bitMask the bitmask of the byte to get the alpha value

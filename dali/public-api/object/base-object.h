@@ -35,6 +35,7 @@ class BaseHandle;
 
 /**
  * @brief A base class for objects.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API BaseObject : public Dali::RefObject
 {
@@ -43,11 +44,12 @@ public:
   /**
    * @brief Connects a void() functor to a specified signal.
    *
-   * @pre The signal must be available in this object.
+   * @SINCE_1_0.0
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
    * @param [in] functor The functor to copy.
    * @return True if the signal was available.
+   * @pre The signal must be available in this object.
    */
   template <class T>
   bool ConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor )
@@ -81,21 +83,25 @@ protected:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   BaseObject();
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
+   * @SINCE_1_0.0
    */
   virtual ~BaseObject();
 
   /**
    * @brief Registers the object as created with the Object registry.
+   * @SINCE_1_0.0
    */
   void RegisterObject();
 
   /**
    * @brief Unregisters the object from Object registry.
+   * @SINCE_1_0.0
    */
   void UnregisterObject();
 
@@ -113,6 +119,7 @@ private:
 /**
  * @brief Get the implementation of a handle.
  *
+ * @SINCE_1_0.0
  * @param[in] handle The handle
  * @return A reference to the object the handle points at.
  */
@@ -126,6 +133,7 @@ inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
 /**
  * @brief Get the implementation of a handle.
  *
+ * @SINCE_1_0.0
  * @param[in] handle The handle
  * @return A reference to the object the handle points at.
  */

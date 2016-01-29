@@ -36,11 +36,13 @@ struct Radian;
  * @brief An angle in degrees.
  *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
+ * @SINCE_1_0.0
  */
 struct Degree
 {
   /**
    * @brief default constructor, initialises to 0.
+   * @SINCE_1_0.0
    */
   Degree()
   : degree( 0.f )
@@ -49,6 +51,7 @@ struct Degree
   /**
    * @brief Create an angle in degrees.
    *
+   * @SINCE_1_0.0
    * @param[in] value The initial value in degrees.
    */
   explicit Degree( float value )
@@ -58,6 +61,7 @@ struct Degree
   /**
    * @brief Create an angle in degrees from a Radian.
    *
+   * @SINCE_1_0.0
    * @param[in] value The initial value in Radians.
    */
   DALI_EXPORT_API Degree( Radian value );
@@ -88,6 +92,7 @@ DALI_EXPORT_API extern const Radian ANGLE_0;   ///< 0 degree turn in radians
 /**
  * @brief Compare equality between two degrees.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Degree to compare to
  * @return true if the values are identical
@@ -100,6 +105,7 @@ inline bool operator==( const Degree& lhs, const Degree& rhs )
 /**
  * @brief Compare inequality between two degrees.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Degree to compare to
  * @return true if the values are not identical
@@ -111,6 +117,7 @@ inline bool operator!=( const Degree& lhs, const Degree& rhs )
 
 /**
  * @brief Clamp a radian value
+ * @SINCE_1_0.0
  * @param angle to clamp
  * @param min value
  * @param max value

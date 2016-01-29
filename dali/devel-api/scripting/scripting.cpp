@@ -817,14 +817,18 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
     }
     else if( key == "timePeriod" )
     {
-      Property::Array timeArray = value.Get< Property::Array >();
-
-      // TODO: Builder treats "{" within a Property::Map as a Property::Array.
-      // This means there is no key to determine what the values belong to.
-      if( timeArray.Size() >= 2 )
+      Property::Map timeMap = value.Get< Property::Map >();
+      for( unsigned int i = 0; i < timeMap.Count(); ++i )
       {
-        element->timePeriodDelay = timeArray[0].Get< float >();
-        element->timePeriodDuration = timeArray[1].Get< float >();
+        const StringValuePair& pair( timeMap.GetPair( i ) );
+        if( pair.first == "delay" )
+        {
+          element->timePeriodDelay = pair.second.Get< float >();
+        }
+        else if( pair.first == "duration" )
+        {
+          element->timePeriodDuration = pair.second.Get< float >();
+        }
       }
     }
   }

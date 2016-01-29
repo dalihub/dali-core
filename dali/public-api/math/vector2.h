@@ -37,6 +37,7 @@ struct Vector4;
 
 /**
  * @brief A two dimensional vector.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API Vector2
 {
@@ -48,6 +49,7 @@ public:
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   Vector2()
   : x(0.0f),
@@ -58,6 +60,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] x x or width component
    * @param[in] y y or height component
    */
@@ -69,6 +72,7 @@ public:
   /**
    * @brief Conversion constructor from an array of two floats.
    *
+   * @SINCE_1_0.0
    * @param [in] array of xy
    */
   explicit Vector2(const float* array)
@@ -80,6 +84,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param [in] vec3 Vector3 to create this vector from
    */
   explicit Vector2(const Vector3& vec3);
@@ -87,6 +92,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param [in] vec4 Vector4 to create this vector from
    */
   explicit Vector2(const Vector4& vec4);
@@ -105,6 +111,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] array of floats
    * @return itself
    */
@@ -119,6 +126,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to assign.
    * @return itself
    */
@@ -127,6 +135,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to assign.
    * @return itself
    */
@@ -135,6 +144,7 @@ public:
   /**
    * @brief Addition operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to add.
    * @return A vector containing the result of the addition
    */
@@ -148,6 +158,7 @@ public:
   /**
    * @brief Addition assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs vector to add.
    * @return itself
    */
@@ -162,6 +173,7 @@ public:
   /**
    * @brief Subtraction operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs  the vector to subtract
    * @return A vector containing the result of the subtraction
    */
@@ -175,6 +187,7 @@ public:
   /**
    * @brief Subtraction assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to subtract
    * @return itself
    */
@@ -189,6 +202,7 @@ public:
   /**
    * @brief Multiplication operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to multiply
    * @return A vector containing the result of the multiplication
    */
@@ -200,6 +214,7 @@ public:
   /**
    * @brief Multiplication operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector
    * @return A vector containing the result of the scaling
    */
@@ -211,6 +226,7 @@ public:
   /**
    * @brief Multiplication assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to multiply
    * @return itself
    */
@@ -225,6 +241,7 @@ public:
   /**
    * @brief Multiplication assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector
    * @return itself
    */
@@ -239,6 +256,7 @@ public:
   /**
    * @brief Division operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to divide
    * @return A vector containing the result of the division
    */
@@ -250,6 +268,7 @@ public:
   /**
    * @brief Division operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
@@ -262,6 +281,7 @@ public:
   /**
    * @brief Division assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the vector to divide
    * @return itself
    */
@@ -276,6 +296,7 @@ public:
   /**
    * @brief Division assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs the float value to scale the vector by
    * @return itself
    */
@@ -290,6 +311,7 @@ public:
   /**
    * @brief Unary negation operator.
    *
+   * @SINCE_1_0.0
    * @return A vector containg the negation
    */
   Vector2 operator-() const
@@ -304,6 +326,7 @@ public:
    *
    * utilises appropriate machine epsilon values;
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The vector to test against
    * @return true if the vectors are equal
    */
@@ -314,6 +337,7 @@ public:
    *
    * utilises appropriate machine epsilon values;
    *
+   * @SINCE_1_0.0
    * @param[in] rhs The vector to test against
    * @return true if the vectors are not equal
    */
@@ -326,6 +350,7 @@ public:
    * @brief Const array subscript operator overload.
    *
    * Asserts if index is out of range. Should be 0 or 1
+   * @SINCE_1_0.0
    * @param[in] index Subscript
    * @return    The float at the given index
    */
@@ -340,6 +365,7 @@ public:
    * @brief Mutable array subscript operator overload.
    *
    * Asserts if index is out of range. Should be 0 or 1
+   * @SINCE_1_0.0
    * @param[in] index Subscript index
    * @return    The float at the given index.
    */
@@ -353,6 +379,7 @@ public:
   /**
    * @brief Returns the length of the vector.
    *
+   * @SINCE_1_0.0
    * @return the length of the vector
    */
   float Length() const;
@@ -362,6 +389,7 @@ public:
    *
    * This is more efficient than Length() for threshold
    * testing as it avoids the use of a square root.
+   * @SINCE_1_0.0
    * @return the length of the vector squared.
    */
   float LengthSquared() const;
@@ -369,12 +397,14 @@ public:
   /**
    * @brief Sets the vector to be unit length, whilst maintaining its direction.
    *
+   * @SINCE_1_0.0
    */
   void Normalize();
 
   /**
     * @brief Clamps the vector between minimum and maximum vectors.
     *
+    * @SINCE_1_0.0
     * @param [in] min the minimum vector
     * @param [in] max the maximum vector
    */
@@ -386,8 +416,9 @@ public:
    * The order of the values in this array are as follows:
    * 0: x (or width)
    * 1: y (or height)
-   * @note inlined for performance reasons (generates less code than a function call)
+   * @SINCE_1_0.0
    * @return the vector contents as an array of 2 floats.
+   * @note inlined for performance reasons (generates less code than a function call)
    */
   const float* AsFloat() const {return &x;}
 
@@ -397,8 +428,9 @@ public:
    * The order of the values in this array are as follows:
    * 0: x (or width)
    * 1: y (or height)
-   * @note inlined for performance reasons (generates less code than a function call)
+   * @SINCE_1_0.0
    * @return the vector contents as an array of 2 floats.
+   * @note inlined for performance reasons (generates less code than a function call)
    */
   float* AsFloat() {return &x;}
 
@@ -424,12 +456,14 @@ public: // Data
 
 /**
  * @brief Size is an alias of Dali::Vector2
+ * @SINCE_1_0.0
  */
 typedef Vector2 Size;
 
 /**
  * @brief Print a Vector2.
  *
+ * @SINCE_1_0.0
  * @param [in] o The output stream operator.
  * @param [in] vector The vector to print.
  * @return The output stream operator.
@@ -440,6 +474,7 @@ DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Vector2& vector
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
  *
  * If a=0,1 and b=1,0  returns a vector of 0,0.
+ * @SINCE_1_0.0
  * @param [in] a     a vector
  * @param [in] b     a vector
  * @return      a vector containing the minimum of each component from a and b
@@ -453,6 +488,7 @@ inline Vector2 Min( const Vector2& a, const Vector2& b )
  * @brief Returns a vector with components set to the maximum of the corresponding component in a and b.
  *
  * If a=0,1 and b=1,0  returns a vector of 1,1
+ * @SINCE_1_0.0
  * @param [in] a     a vector
  * @param [in] b     a vector
  * @return      a vector containing the maximum of each component from a and b
@@ -465,6 +501,7 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
 /**
  * @brief Clamps each of vector v's components between minimum and maximum values.
  *
+ * @SINCE_1_0.0
  * @param [in] v     a vector
  * @param [in] min the minimum value
  * @param [in] max the maximum value

@@ -30,6 +30,7 @@ namespace Dali
 
 /**
  * @brief Provides methods to generate and use random values.
+ * @SINCE_1_0.0
  */
 namespace Random
 {
@@ -38,6 +39,7 @@ namespace Random
  * @brief Returns a random number between f0 and f1.
  *
  * Note, uses a limited number of values.
+ * @SINCE_1_0.0
  * @param[in] f0 the lower bound
  * @param[in] f1 the upper bound
  * @return a random value between the lower and upper bound
@@ -52,6 +54,7 @@ inline float Range(float f0, float f1)
 /**
  * @brief Function to return a normalized axis in a random direction.
  *
+ * @SINCE_1_0.0
  * @return the axis
  */
 inline Vector4 Axis()

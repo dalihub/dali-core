@@ -37,6 +37,7 @@ class PropertyCondition;
 
 /**
  * @brief This represents a condition that can be evaluated on a Property::Value.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API PropertyCondition : public BaseHandle
 {
@@ -44,17 +45,20 @@ public:
 
   /**
    * @brief Constructor for condition clause.
+   * @SINCE_1_0.0
    */
   PropertyCondition();
 
   /**
    * @brief Destructor.
+   * @SINCE_1_0.0
    */
   ~PropertyCondition();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   PropertyCondition( const PropertyCondition& handle );
@@ -62,6 +66,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -72,6 +77,7 @@ public:
   /**
    * @brief Retrieve the arguments that this condition uses.
    *
+   * @SINCE_1_0.0
    * @return The arguments used for this condition
    */
   std::size_t GetArgumentCount() const;
@@ -79,6 +85,7 @@ public:
   /**
    * @brief Retrieve the arguments that this condition uses.
    *
+   * @SINCE_1_0.0
    * @return The arguments used for this condition
    * @note The container will only be valid as long PropertyCondition is valid.
    */
@@ -95,6 +102,7 @@ public:
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] arg The argument for the condition
  * @return A property condition function object
  */
@@ -109,6 +117,7 @@ DALI_IMPORT_API PropertyCondition LessThanCondition( float arg );
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] arg The argument for the condition
  * @return A property condition function object
  */
@@ -123,6 +132,7 @@ DALI_IMPORT_API PropertyCondition GreaterThanCondition( float arg );
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] arg0 The first argument for the condition
  * @param[in] arg1 The second argument for the condition
  * @return A property condition function object
@@ -138,6 +148,7 @@ DALI_IMPORT_API PropertyCondition InsideCondition( float arg0, float arg1 );
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] arg0 The first argument for the condition
  * @param[in] arg1 The second argument for the condition
  * @return A property condition function object
@@ -152,6 +163,7 @@ DALI_IMPORT_API PropertyCondition OutsideCondition( float arg0, float arg1 );
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] stepAmount The step size required to trigger condition
  * @param[in] initialValue The initial value to step from
  * @return A property condition function object
@@ -166,6 +178,7 @@ DALI_IMPORT_API PropertyCondition StepCondition( float stepAmount, float initial
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * @SINCE_1_0.0
  * @param[in] steps List of values to receive notifications for as a property crosses them
  * @return A property condition function object
  */

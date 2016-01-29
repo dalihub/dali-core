@@ -35,11 +35,13 @@ namespace Dali
  * @brief An angle in radians.
  *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
+ * @SINCE_1_0.0
  */
 struct Radian
 {
   /**
    * @brief default constructor, initialises to 0.
+   * @SINCE_1_0.0
    */
   Radian()
   : radian( 0.f )
@@ -48,6 +50,7 @@ struct Radian
   /**
    * @brief Create an angle in radians.
    *
+   * @SINCE_1_0.0
    * @param[in] value The initial value in radians.
    */
   explicit Radian( float value )
@@ -57,6 +60,7 @@ struct Radian
   /**
    * @brief Create an angle in radians from an angle in degrees.
    *
+   * @SINCE_1_0.0
    * @param[in] degree The initial value in degrees.
    */
   Radian( Degree degree )
@@ -66,6 +70,7 @@ struct Radian
   /**
    * @brief Assign an angle from a float value.
    *
+   * @SINCE_1_0.0
    * @param[in] value Float value in radians
    * @return a reference to this object
    */
@@ -78,6 +83,7 @@ struct Radian
   /**
    * @brief Assign an angle from a Degree value.
    *
+   * @SINCE_1_0.0
    * @param[in] degree The value in degrees.
    * @return a reference to this object
    */
@@ -89,6 +95,7 @@ struct Radian
 
   /**
    * @brief Conversion to float
+   * @SINCE_1_0.0
    * @return the float value of this Radian
    */
   operator float() const
@@ -108,6 +115,7 @@ public:
 /**
  * @brief Compare equality between two radians.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Radian to compare to
  * @return true if the values are identical
@@ -120,6 +128,7 @@ inline bool operator==( Radian lhs, Radian rhs )
 /**
  * @brief Compare inequality between two radians.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Radian to compare to
  * @return true if the values are not identical
@@ -132,6 +141,7 @@ inline bool operator!=( Radian lhs, Radian rhs )
 /**
  * @brief Compare equality between a radian and degree.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Degree to compare to
  * @return true if the values are identical
@@ -144,6 +154,7 @@ inline bool operator==( Radian lhs, Degree rhs )
 /**
  * @brief Compare inequality between a radian and a degree.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Degree to compare to
  * @return true if the values are not identical
@@ -156,6 +167,7 @@ inline bool operator!=( Radian lhs, Degree rhs )
 /**
  * @brief Compare equality between a degree and a radian.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Radian to compare to
  * @return true if the values are identical
@@ -168,6 +180,7 @@ inline bool operator==( Degree lhs, Radian rhs )
 /**
  * @brief Compare inequality between a degree and a radian.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Radian to compare to
  * @return true if the values are not identical
@@ -180,6 +193,7 @@ inline bool operator!=( Degree lhs, Radian rhs )
 /**
  * @brief Compare greater than between two radians
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Radian to compare to
  * @return true if lhs is greater than rhs
@@ -192,6 +206,7 @@ inline bool operator>( Radian lhs, Radian rhs )
 /**
  * @brief Compare greater than between a radian and a degree.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Degree to compare to
  * @return true if lhs is greater than rhs
@@ -204,6 +219,7 @@ inline bool operator>( Radian lhs, Degree rhs )
 /**
  * @brief Compare greater than between a radian and a degree.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Degree to compare to
  * @return true if lhs is greater than rhs
@@ -216,6 +232,7 @@ inline bool operator>( Degree lhs, Radian rhs )
 /**
  * @brief Compare less than between two radians.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Radian to compare to
  * @return true if lhs is less than rhs
@@ -228,6 +245,7 @@ inline bool operator<( Radian lhs, Radian rhs )
 /**
  * @brief Compare less than between a radian and a degree.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to compare
  * @param[in] rhs Degree to compare to
  * @return true if lhs is less than rhs
@@ -240,6 +258,7 @@ inline bool operator<( Radian lhs, Degree rhs )
 /**
  * @brief Compare less than between a degree and a radian.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Radian to compare to
  * @return true if lhs is less than rhs
@@ -252,6 +271,7 @@ inline bool operator<( Degree lhs, Radian rhs )
 /**
  * @brief Multiply Radian with a float
  *
+ * @SINCE_1_0.0
  * @param[in] lhs Radian to multiply
  * @param[in] rhs float to multiply
  * @return result of the multiplication
@@ -263,6 +283,7 @@ inline Radian operator*( Radian lhs, float rhs )
 
 /**
  * @brief Negate the radian
+ * @SINCE_1_0.0
  * @return The negative angle
  */
 inline Radian operator-( Radian in )
@@ -272,6 +293,7 @@ inline Radian operator-( Radian in )
 
 /**
  * @brief Clamp a radian value
+ * @SINCE_1_0.0
  * @param angle to clamp
  * @param min value
  * @param max value

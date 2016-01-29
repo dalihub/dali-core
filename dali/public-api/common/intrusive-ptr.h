@@ -33,6 +33,7 @@ namespace Dali
  *
  * Uses the Dali:Refobject type supply actual reference counting
  * The object is responsible for destroying itself
+ * @SINCE_1_0.0
  */
 template<typename T>
 class IntrusivePtr
@@ -42,12 +43,14 @@ public:
 
   /**
    * @brief Standard constructor to unassigned object.
+   * @SINCE_1_0.0
    */
   IntrusivePtr() : mPtr( 0 ) {}
 
   /**
    * @brief Constructor to attach existing object.
    *
+   * @SINCE_1_0.0
    * @param p pointer to object,
    */
   IntrusivePtr( T* p ) : mPtr( p )
@@ -61,6 +64,7 @@ public:
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_0.0
    * @param rhs const reference to an IntrusivePtr
    * @tparam U reference counter object type
    */
@@ -75,6 +79,7 @@ public:
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
    */
   IntrusivePtr( IntrusivePtr const& rhs ) : mPtr( rhs.mPtr )
   {
@@ -88,6 +93,7 @@ public:
    * @brief Destructor.
    *
    * Object will self-destruct if reference count is zero
+   * @SINCE_1_0.0
    */
   ~IntrusivePtr()
   {
@@ -100,6 +106,7 @@ public:
   /**
    * @brief Get pointer to reference counted object.
    *
+   * @SINCE_1_0.0
    * @return pointer to reference counted object
    */
   T* Get() const
@@ -110,6 +117,7 @@ public:
   /**
    * @brief Pointer operator override.
    *
+   * @SINCE_1_0.0
    * @return pointer to reference counted object
    */
   T* operator->() const
@@ -120,6 +128,7 @@ public:
   /**
    * @brief Dereference operator override.
    *
+   * @SINCE_1_0.0
    * @return reference to reference counted object
    */
   T& operator*() const
@@ -130,6 +139,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param rhs const reference to intrusive pointer
    * @return reference to reference counted object
    */
@@ -142,6 +152,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param rhs pointer to object to wrap
    * @return A reference to this object
    */
@@ -153,6 +164,7 @@ public:
 
   /**
    * @brief Reset intrusive pointer.
+   * @SINCE_1_0.0
    */
   void Reset()
   {
@@ -162,6 +174,7 @@ public:
   /**
    * @brief Reset intrusive pointer with reference counted object.
    *
+   * @SINCE_1_0.0
    * @param rhs pointer to object
    */
   void Reset( T* rhs )
@@ -182,6 +195,7 @@ public:
    * @brief Converts an object handle to a BooleanType.
    *
    * This is useful for checking whether the handle is NULL.
+   * @SINCE_1_0.0
    */
   operator BooleanType() const
   {
@@ -192,6 +206,7 @@ public:
    * @brief Detach pointer from intrusive ptr counting.
    *
    * Use with care.
+   * @SINCE_1_0.0
    */
   T* Detach()
   {
@@ -204,11 +219,13 @@ private:
 
   /**
    * @brief Used by the safe bool idiom.
+   * @SINCE_1_0.0
    */
   void ThisIsSaferThanReturningVoidStar() const {}
 
   /**
    * @brief Internal swap function
+   * @SINCE_1_0.0
    */
   void Swap( IntrusivePtr& rhs )
   {
@@ -223,6 +240,7 @@ private:
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
+ * @SINCE_1_0.0
  * @param lhs intrusive pointer to compare with
  * @param rhs intrusive pointer to compare against
  * @return true if the pointers point at the same object
@@ -236,6 +254,7 @@ inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
+ * @SINCE_1_0.0
  * @param lhs intrusive pointer to compare with
  * @param rhs intrusive pointer to compare against
  * @return true if the pointers point at different objects
@@ -249,6 +268,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
+ * @SINCE_1_0.0
  * @param lhs intrusive pointer to compare with
  * @param rhs object to compare against
  * @return true if the intrusive pointer points at the specified object
@@ -262,6 +282,7 @@ inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
+ * @SINCE_1_0.0
  * @param lhs intrusive pointer to compare with
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer doesn't point at the specified object
@@ -275,6 +296,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
+ * @SINCE_1_0.0
  * @param lhs object to compare with
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer points at the specified object
@@ -288,6 +310,7 @@ inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
 /**
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
+ * @SINCE_1_0.0
  * @param lhs object to compare with
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer doesn't point at the specified object

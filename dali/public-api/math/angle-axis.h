@@ -36,11 +36,13 @@ struct Radian;
  *
  * This is slightly easier to understand than quaternions for handling rotations
  * of objects. Both elements should be non-zero to correctly describe a rotation.
+ * @SINCE_1_0.0
  */
 struct AngleAxis
 {
   /**
    * @brief Create an angle-axis pair.
+   * @SINCE_1_0.0
    */
   AngleAxis()
   : angle(0.0f),
@@ -50,6 +52,7 @@ struct AngleAxis
   /**
    * @brief Create an angle-axis pair.
    *
+   * @SINCE_1_0.0
    * @param[in] initialAngle The initial angle in radians.
    * @param[in] initialAxis The initial axis.
    */
@@ -68,6 +71,7 @@ struct AngleAxis
 /**
  * @brief Compare two angle axis for equality
  *
+ * @SINCE_1_0.0
  * @param lhs angle axis
  * @param rhs angle axis
  * @return true if they are equal

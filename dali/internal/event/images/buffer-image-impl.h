@@ -62,7 +62,7 @@ public:
                              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
-   * @deprecated Support for externally owned Pixel Buffers is due to be removed TBA. It is recommended that a BufferImage owned Buffer be used instead.
+   * @DEPRECATED_1_1.5. Support for externally owned Pixel Buffers is due to be removed TBA. It is recommended that a BufferImage owned Buffer be used instead.
    *
    * @brief Create a new BufferImage, which uses external data source.
    *

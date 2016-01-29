@@ -60,7 +60,7 @@ DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum*
 /**
  * @brief Find the enum as an integer from the table
  *
- * @since 1.1.12
+ * @SINCE_1_1.12
  *
  * @param[in]  value       The string equivalent (case-insensitive, comma separate to OR values).
  * @param[in]  table       A pointer to an array with the enumeration to string equivalents.

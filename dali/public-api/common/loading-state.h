@@ -30,12 +30,13 @@ namespace Dali
 
 /**
  * @brief The status during resource loading operations.
+ * @SINCE_1_0.0
  */
 enum LoadingState
 {
-  ResourceLoading,          ///< The resource is loading
-  ResourceLoadingSucceeded, ///< The resource loaded successfully
-  ResourceLoadingFailed     ///< The resource failed to load
+  ResourceLoading,          ///< The resource is loading @SINCE_1_0.0
+  ResourceLoadingSucceeded, ///< The resource loaded successfully @SINCE_1_0.0
+  ResourceLoadingFailed     ///< The resource failed to load @SINCE_1_0.0
 };
 
 /**

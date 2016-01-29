@@ -50,6 +50,7 @@ struct PinchGesture;
  * detector.DetectedSignal().Connect(this, &MyApplication::OnPinch);
  * @endcode
  *
+ * @SINCE_1_0.0
  * @see PinchGesture
  *
  * Signals
@@ -63,6 +64,7 @@ public: // Typedefs
 
   /**
    * @brief Signal type.
+   * @SINCE_1_0.0
    */
   typedef Signal< void ( Actor, const PinchGesture& ) > DetectedSignalType;
 
@@ -72,12 +74,14 @@ public: // Creation & Destruction
    * @brief Create an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   PinchGestureDetector();
 
   /**
    * @brief Create an initialized PinchGestureDetector.
    *
+   * @SINCE_1_0.0
    * @return A handle to a newly allocated Dali resource.
    */
   static PinchGestureDetector New();
@@ -87,6 +91,7 @@ public: // Creation & Destruction
    *
    * If handle points to a PinchGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a PinchGestureDetector object or an uninitialized handle
    */
@@ -96,12 +101,14 @@ public: // Creation & Destruction
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~PinchGestureDetector();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   PinchGestureDetector(const PinchGestureDetector& handle);
@@ -109,6 +116,7 @@ public: // Creation & Destruction
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -123,8 +131,9 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, const PinchGesture& gesture );
    * @endcode
-   * @pre The gesture detector has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The gesture detector has been initialized.
    */
   DetectedSignalType& DetectedSignal();
 
@@ -133,6 +142,7 @@ public: // Not intended for Application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PinchGestureDetector(Internal::PinchGestureDetector* internal);

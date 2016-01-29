@@ -36,20 +36,22 @@ namespace Camera
 {
 /**
  * @brief Type determines how camera operates.
+ * @SINCE_1_0.0
  */
 enum Type
 {
-  FREE_LOOK,      ///< Camera orientation is taken from CameraActor
-  LOOK_AT_TARGET, ///< Camera is oriented to always look at a target
+  FREE_LOOK,      ///< Camera orientation is taken from CameraActor @SINCE_1_0.0
+  LOOK_AT_TARGET, ///< Camera is oriented to always look at a target @SINCE_1_0.0
 };
 
 /**
  * @brief Projection modes.
+ * @SINCE_1_0.0
  */
 enum ProjectionMode
 {
-  PERSPECTIVE_PROJECTION,    ///< Distance causes foreshortening; objects further from the camera appear smaller
-  ORTHOGRAPHIC_PROJECTION,    ///< Relative distance from the camera does not affect the size of objects
+  PERSPECTIVE_PROJECTION,    ///< Distance causes foreshortening; objects further from the camera appear smaller @SINCE_1_0.0
+  ORTHOGRAPHIC_PROJECTION,    ///< Relative distance from the camera does not affect the size of objects @SINCE_1_0.0
 };
 
 } // namespace Camera
@@ -68,6 +70,7 @@ enum ProjectionMode
  * For LOOK_AT_TARGET the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
  * in world coordinates.
  *
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API CameraActor : public Actor
 {
@@ -76,25 +79,26 @@ public:
   /**
    * @brief An enumeration of properties belonging to the CameraActor class.
    * Properties additional to Actor.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string
-      PROJECTION_MODE,                                   ///< name "projectionMode",        type std::string
-      FIELD_OF_VIEW,                                     ///< name "fieldOfView",           type float
-      ASPECT_RATIO,                                      ///< name "aspectRatio",           type float
-      NEAR_PLANE_DISTANCE,                               ///< name "nearPlaneDistance",     type float
-      FAR_PLANE_DISTANCE,                                ///< name "farPlaneDistance",      type float
-      LEFT_PLANE_DISTANCE,                               ///< name "leftPlaneDistance",     type float
-      RIGHT_PLANE_DISTANCE,                              ///< name "rightPlaneDistance",    type float
-      TOP_PLANE_DISTANCE,                                ///< name "topPlaneDistance",      type float
-      BOTTOM_PLANE_DISTANCE,                             ///< name "bottomPlaneDistance",   type float
-      TARGET_POSITION,                                   ///< name "targetPosition",        type Vector3
-      PROJECTION_MATRIX,                                 ///< name "projectionMatrix",      type Matrix
-      VIEW_MATRIX,                                       ///< name "viewMatrix",            type Matrix
-      INVERT_Y_AXIS,                                     ///< name "invertYAxis",           type bool
+      TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string @SINCE_1_0.0
+      PROJECTION_MODE,                                   ///< name "projectionMode",        type std::string @SINCE_1_0.0
+      FIELD_OF_VIEW,                                     ///< name "fieldOfView",           type float @SINCE_1_0.0
+      ASPECT_RATIO,                                      ///< name "aspectRatio",           type float @SINCE_1_0.0
+      NEAR_PLANE_DISTANCE,                               ///< name "nearPlaneDistance",     type float @SINCE_1_0.0
+      FAR_PLANE_DISTANCE,                                ///< name "farPlaneDistance",      type float @SINCE_1_0.0
+      LEFT_PLANE_DISTANCE,                               ///< name "leftPlaneDistance",     type float @SINCE_1_0.0
+      RIGHT_PLANE_DISTANCE,                              ///< name "rightPlaneDistance",    type float @SINCE_1_0.0
+      TOP_PLANE_DISTANCE,                                ///< name "topPlaneDistance",      type float @SINCE_1_0.0
+      BOTTOM_PLANE_DISTANCE,                             ///< name "bottomPlaneDistance",   type float @SINCE_1_0.0
+      TARGET_POSITION,                                   ///< name "targetPosition",        type Vector3 @SINCE_1_0.0
+      PROJECTION_MATRIX,                                 ///< name "projectionMatrix",      type Matrix @SINCE_1_0.0
+      VIEW_MATRIX,                                       ///< name "viewMatrix",            type Matrix @SINCE_1_0.0
+      INVERT_Y_AXIS,                                     ///< name "invertYAxis",           type bool @SINCE_1_0.0
     };
   };
 
@@ -103,6 +107,7 @@ public:
    *
    * Initialise it using CameraActor::New().  Calling member functions
    * with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   CameraActor();
 
@@ -110,6 +115,7 @@ public:
    * @brief Create a CameraActor object.
    *
    * Sets the default camera perspective projection for the stage's size. @see SetPerspectiveProjection().
+   * @SINCE_1_0.0
    * @return the newly created camera actor.
    */
   static CameraActor New();
@@ -119,6 +125,7 @@ public:
    *
    * Sets the default camera perspective projection for the given canvas size. @see SetPerspectiveProjection().
    *
+   * @SINCE_1_0.0
    * @param[in] size The canvas size.
    * @return the newly created camera actor.
    */
@@ -129,6 +136,7 @@ public:
    *
    * If handle points to a CameraActor the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a CameraActor or an uninitialized handle
    */
@@ -138,12 +146,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~CameraActor();
 
   /**
    * @brief Copy constructor
    *
+   * @SINCE_1_0.0
    * @param [in] copy The actor to copy.
    */
   CameraActor(const CameraActor& copy);
@@ -151,6 +161,7 @@ public:
   /**
    * @brief Assignment operator
    *
+   * @SINCE_1_0.0
    * @param [in] rhs The actor to copy.
    */
   CameraActor& operator=(const CameraActor& rhs);
@@ -158,6 +169,7 @@ public:
   /**
    * @brief Set the camera type.
    * The default type is Dali::Camera::FREE_LOOK
+   * @SINCE_1_0.0
    * @param[in] type The camera type
    */
   void SetType( Dali::Camera::Type type );
@@ -165,6 +177,7 @@ public:
   /**
    * @brief Get the type of the camera.
    *
+   * @SINCE_1_0.0
    * @return the type of camera
    */
   Dali::Camera::Type GetType() const;
@@ -172,6 +185,7 @@ public:
   /**
    * @brief Set the projection mode.
    *
+   * @SINCE_1_0.0
    * @param[in] mode One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
    */
   void SetProjectionMode( Dali::Camera::ProjectionMode mode );
@@ -179,6 +193,7 @@ public:
   /**
    * @brief Get the projection mode.
    *
+   * @SINCE_1_0.0
    * @return One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
    */
   Dali::Camera::ProjectionMode GetProjectionMode() const;
@@ -186,6 +201,7 @@ public:
   /**
    * @brief Set the field of view.
    *
+   * @SINCE_1_0.0
    * @param[in] fieldOfView The field of view in radians
    */
   void SetFieldOfView( float fieldOfView );
@@ -194,6 +210,7 @@ public:
    * @brief Get the field of view in Radians.
    *
    * The default field of view is 45 degrees
+   * @SINCE_1_0.0
    * @return The field of view in radians
    */
   float GetFieldOfView( );
@@ -201,6 +218,7 @@ public:
   /**
    * @brief Set the aspect ratio.
    *
+   * @SINCE_1_0.0
    * @param[in] aspectRatio The aspect ratio
    */
   void SetAspectRatio( float aspectRatio );
@@ -209,6 +227,7 @@ public:
    * @brief Get the aspect ratio of the camera.
    *
    * The default aspect ratio is 4.0f/3.0f
+   * @SINCE_1_0.0
    * @return the aspect ratio
    */
   float GetAspectRatio( );
@@ -216,6 +235,7 @@ public:
   /**
    * @brief Sets the near clipping plane distance.
    *
+   * @SINCE_1_0.0
    * @param[in] nearClippingPlane distance of the near clipping plane
    */
   void SetNearClippingPlane( float nearClippingPlane );
@@ -225,6 +245,7 @@ public:
    *
    * The default near clipping plane is 800.0f, to match the default screen height
    * Reduce this value to see objects closer to the camera
+   * @SINCE_1_0.0
    * @return the near clipping plane value
    */
   float GetNearClippingPlane( );
@@ -232,6 +253,7 @@ public:
   /**
    * @brief Sets the far clipping plane distance.
    *
+   * @SINCE_1_0.0
    * @param[in] farClippingPlane distance of the far clipping plane
    */
   void SetFarClippingPlane( float farClippingPlane );
@@ -240,6 +262,7 @@ public:
    * @brief Get the far clipping plane distance.
    *
    * The default value is the default near clipping plane + (0xFFFF>>4)
+   * @SINCE_1_0.0
    * @return the far clipping plane value
    */
   float GetFarClippingPlane( );
@@ -247,8 +270,9 @@ public:
   /**
    * @brief Set the target position of the camera.
    *
-   * @pre Camera type is LOOK_AT_TARGET
+   * @SINCE_1_0.0
    * @param[in] targetPosition The position of the target to look at
+   * @pre Camera type is LOOK_AT_TARGET
    */
   void SetTargetPosition( const Vector3& targetPosition );
 
@@ -256,8 +280,9 @@ public:
    * @brief Get Camera Target position.
    *
    * The target position is Vector3::ZERO
-   * @pre Camera type is LOOK_AT_TARGET
+   * @SINCE_1_0.0
    * @return The target position of the camera
+   * @pre Camera type is LOOK_AT_TARGET
    */
   Vector3 GetTargetPosition() const;
 
@@ -265,6 +290,7 @@ public:
    * @brief Request for an inversion on the Y axis on the projection calculation.
    *
    * The default value is not inverted.
+   * @SINCE_1_0.0
    * @param[in] invertYAxis True if the Y axis should be inverted
    */
   void SetInvertYAxis(bool invertYAxis);
@@ -272,6 +298,7 @@ public:
   /**
    * @brief Get whether the Y axis is inverted.
    *
+   * @SINCE_1_0.0
    * @return True if the Y axis is inverted, false otherwise
    */
   bool GetInvertYAxis();
@@ -286,9 +313,10 @@ public:
    * If the canvas size is ZERO, it sets the default camera perspective
    * projection for the stage's size.
    *
+   * @SINCE_1_0.0
+   * @param[in] size The canvas size.
    * @pre If size is non ZERO, \e width and \e height must be greater than zero.
    *
-   * @param[in] size The canvas size.
    */
   void SetPerspectiveProjection( const Size& size );
 
@@ -303,6 +331,7 @@ public:
    * bounding box match those that would be created by using
    * SetPerspectiveProjection with the same size.
    *
+   * @SINCE_1_0.0
    * @param[in] size Size of XY plane (normal to camera axis)
    */
   void SetOrthographicProjection( const Size& size );
@@ -312,6 +341,7 @@ public:
    *
    * This does not change the Z value of the camera actor.
    *
+   * @SINCE_1_0.0
    * @param[in] left Distance to left clip plane (normal to camera axis)
    * @param[in] right Distance to right clip plane (normal to camera axis)
    * @param[in] top Distance to top clip plane (normal to camera axis)
@@ -325,6 +355,7 @@ public: // Not intended for use by Application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL CameraActor(Internal::CameraActor* actor);

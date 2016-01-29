@@ -34,6 +34,7 @@ namespace Dali
  *
  * When a multi-touch event occurs, each touch point represents the points that are currently being
  * hovered or the points where a hover has stopped.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API HoverEvent
 {
@@ -41,17 +42,20 @@ struct DALI_IMPORT_API HoverEvent
 
   /**
    * @brief Default constructor
+   * @SINCE_1_0.0
    */
   HoverEvent();
 
   /**
    * @brief Constructor
+   * @SINCE_1_0.0
    * @param[in]  time  The time the event occurred
    */
   HoverEvent(unsigned long time);
 
   /**
    * @brief Destructor
+   * @SINCE_1_0.0
    */
   ~HoverEvent();
 
@@ -75,6 +79,7 @@ struct DALI_IMPORT_API HoverEvent
   /**
    * @brief Returns the total number of points in this HoverEvent.
    *
+   * @SINCE_1_0.0
    * @return Total number of Points.
    */
   unsigned int GetPointCount() const;
@@ -84,10 +89,11 @@ struct DALI_IMPORT_API HoverEvent
    *
    * The first point in the set is always the primary
    * touch point (i.e. the first point touched in a multi-touch event).
-   * @note "point" should be less than the value returned by GetPointCount().
-   *       If out of range, then program asserts.
+   * @SINCE_1_0.0
    * @param[in] point The index of the required Point.
    * @return Point requested
+   * @note "point" should be less than the value returned by GetPointCount().
+   *       If out of range, then program asserts.
    */
   const TouchPoint& GetPoint(unsigned int point) const;
 };

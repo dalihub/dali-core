@@ -30,6 +30,7 @@ namespace Dali
 
 /**
  * @brief Typedef for a viewport ( a rectangle representing a screen area ).
+ * @SINCE_1_0.0
  */
 typedef Rect<int> Viewport;
 

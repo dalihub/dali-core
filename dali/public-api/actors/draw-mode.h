@@ -33,13 +33,14 @@ namespace DrawMode
 /**
  * @brief How the actor and it's children will be drawn.
  *
+ * @SINCE_1_0.0
  * @see Dali::Actor::SetDrawMode()
  */
 enum Type
 {
-  NORMAL     = 0, ///< binary 00. The default draw-mode
-  OVERLAY_2D = 1, ///< binary 01. Draw the actor and its children as an overlay
-  STENCIL    = 3  ///< binary 11. Draw the actor and its children into the stencil buffer
+  NORMAL     = 0, ///< binary 00. The default draw-mode @SINCE_1_0.0
+  OVERLAY_2D = 1, ///< binary 01. Draw the actor and its children as an overlay @SINCE_1_0.0
+  STENCIL    = 3  ///< binary 11. Draw the actor and its children into the stencil buffer @SINCE_1_0.0
 };
 
 } // namespace DrawMode

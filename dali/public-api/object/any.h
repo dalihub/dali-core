@@ -44,23 +44,27 @@ namespace Dali
  * unsigned int variable = AnyCast< unsigned int >( uintVariable );
  * if ( typeid( int ) == uintVariable.GetType() )
  * \endcode
+ * @SINCE_1_0.0
  */
 class Any
 {
 public:
   /**
-   * Default constructor.
+   * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   DALI_IMPORT_API Any();
 
   /**
-   * Destructor. Free resources.
+   * @brief Destructor. Free resources.
+   * @SINCE_1_0.0
    */
   DALI_IMPORT_API ~Any();
 
   /**
    * @brief Pass Assert message
    *
+   * @SINCE_1_0.0
    * @param assertMessage Assert message to report
    */
   DALI_IMPORT_API static void AssertAlways( const char* assertMessage );
@@ -68,6 +72,7 @@ public:
   /**
    * @brief Constructs a Any type with the given value.
    *
+   * @SINCE_1_0.0
    * @param[in] value The given value.
    */
   template<typename Type>
@@ -77,7 +82,8 @@ public:
   }
 
   /**
-   * Copy Constructor.
+   * @brief Copy Constructor.
+   * @SINCE_1_0.0
    * @param [in] any Any to be copied.
    */
   Any( const Any& any )
@@ -97,9 +103,10 @@ public:
   /**
    * @brief Assigns a given value to the Any type.
    *
+   * @SINCE_1_0.0
+   * @param[in] value The given value.
    * @note If the types are different, then the current container will be re-created.
    *
-   * @param[in] value The given value.
    */
   template<typename Type>
   Any& operator=( const Type& value )
@@ -130,15 +137,17 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
+   * @param [in] any Any to be assigned which contains a value of identical type to current contents.
    * @exception DaliException If parameter any is of a different type.
    *
-   * @param [in] any Any to be assigned which contains a value of identical type to current contents.
    */
   DALI_IMPORT_API Any& operator=( const Any& any );
 
   /**
    * @brief Get a value of type Type from container
    *
+   * @SINCE_1_0.0
    * @param type destination of type Type to write to
    */
   template<typename Type>
@@ -150,6 +159,7 @@ public:
   /**
    * @brief Returns the type info of the stored value.
    *
+   * @SINCE_1_0.0
    * @return The std::type_info of the stored value or the type info of the void
    * type if there is no value stored.
    */
@@ -158,6 +168,7 @@ public:
   /**
    * @brief Retrieves the stored value in the Any type.
    *
+   * @SINCE_1_0.0
    * @return The stored value.
    */
   template<typename Type>
@@ -180,6 +191,7 @@ public:
   /**
    * @brief Return pointer of Type to the value stored
    *
+   * @SINCE_1_0.0
    * @return pointer to the value or NULL if no value is contained
    */
   template<typename Type>
@@ -200,6 +212,7 @@ public:
   /**
    * @brief Return pointer of Type to the value stored
    *
+   * @SINCE_1_0.0
    * @return pointer to the value or NULL if no value is contained
    */
   template<typename Type>
@@ -220,6 +233,7 @@ public:
   /**
    * @brief Returns whether container holds a value
    *
+   * @SINCE_1_0.0
    * @return true if the container is empty, else false.
    */
   bool Empty() const
@@ -232,14 +246,16 @@ public:
   typedef void (*DeleteFunc)( const AnyContainerBase* base );
 
   /**
-   * Base container to hold type for match verification and instance cloning function
+   * @brief Base container to hold type for match verification and instance cloning function
    *
+   * @SINCE_1_0.0
    */
   struct AnyContainerBase
   {
     /**
      * @brief Constructor of base container
      *
+     * @SINCE_1_0.0
      * @param type typeid of container
      * @param cloneFunc Cloning function to replicate this container type
      * @param deleteFunc Deleting function to destroy this container type
@@ -253,6 +269,7 @@ public:
     /**
      * @brief Get the typeid of this container
      *
+     * @SINCE_1_0.0
      * @return type
      */
     const std::type_info& GetType() const
@@ -269,6 +286,7 @@ public:
   /**
    * @brief Templated Clone function from container base
    *
+   * @SINCE_1_0.0
    * @param base reference to container
    */
   template<typename Type>
@@ -283,6 +301,7 @@ public:
   /**
    * @brief Templated Delete function from container base
    *
+   * @SINCE_1_0.0
    * @param base pointer to container
    */
   template<typename Type>
@@ -297,6 +316,7 @@ public:
   /**
    * @brief Templated class to hold value for type
    *
+   * @SINCE_1_0.0
    */
   template<typename Type>
   class AnyContainerImpl : public AnyContainerBase
@@ -306,6 +326,7 @@ public:
     /**
      * @brief Constructor to create container holding value of type Type
      *
+     * @SINCE_1_0.0
      * @param value Value of Type
      */
     AnyContainerImpl( const Type& value )
@@ -318,6 +339,7 @@ public:
     /**
      * @brief Constructor to create new container of type from and existing container (cloning)
      *
+     * @SINCE_1_0.0
      * @param base reference to base container to copy from
      */
     AnyContainerImpl( const AnyContainerBase& base )
@@ -331,6 +353,7 @@ public:
     /**
      * @brief Get the container's stored value
      *
+     * @SINCE_1_0.0
      * @return value of type Type
      */
     const Type& GetValue() const
@@ -341,6 +364,7 @@ public:
     /**
      * @brief Set the container's stored value
      *
+     * @SINCE_1_0.0
      * @param value of type Type
      */
     void SetValue( const Type& value )
@@ -351,6 +375,7 @@ public:
     /**
      * @brief Get a pointer to the value held
      *
+     * @SINCE_1_0.0
      * @return pointer to the value of type Type
      */
     Type* GetPointerToValue()
@@ -361,6 +386,7 @@ public:
     /**
      * @brief Get a pointer to the value held
      *
+     * @SINCE_1_0.0
      * @return pointer to the value of type Type
      */
     const Type* GetPointerToValue() const
@@ -383,6 +409,7 @@ public:
 /**
  * @brief Extract a pointer to the held type of an Any object from a pointer to that Any object (NULL if empty )
  *
+ * @SINCE_1_0.0
  * @param any Pointer to an Any object
  *
  * @return Pointer to the Type held
@@ -396,6 +423,7 @@ inline Type* AnyCast( Any* any )
 /**
  * @brief Extract a const pointer to the held type of an Any object from a pointer to that Any object (NULL if empty )
  *
+ * @SINCE_1_0.0
  * @param any const Pointer to an Any object
  *
  * @return const Pointer to the Type held
@@ -409,6 +437,7 @@ inline const Type* AnyCast( const Any* any )
 /**
  * @brief Extract a held value of type Type from an Any object from a reference to that Any object
  *
+ * @SINCE_1_0.0
  * @param any reference to an Any object
  *
  * @return Type value of type Type
@@ -422,6 +451,7 @@ inline Type AnyCast( Any& any )
 /**
  * @brief Extract a held value of type Type from an Any object from a const reference to that Any object
  *
+ * @SINCE_1_0.0
  * @param any reference to an Any object
  *
  * @return Type value of type Type
@@ -435,6 +465,7 @@ inline Type AnyCast( const Any& any )
 /**
  * @brief Extract a reference to the held value of type Type from an Any object from a reference to that Any object
  *
+ * @SINCE_1_0.0
  * @param any reference to an Any object
  *
  * @return A reference to the Type value of type Type
@@ -448,6 +479,7 @@ inline Type& AnyCastReference( Any& any )
 /**
  * @brief Extract a const reference to the held value of type Type from an Any object from a const reference to that Any object
  *
+ * @SINCE_1_0.0
  * @param any reference to an Any object
  *
  * @return A const reference to the Type value of type Type

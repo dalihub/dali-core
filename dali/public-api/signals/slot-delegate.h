@@ -70,6 +70,7 @@ namespace Dali
  * };
  *
  * @endcode
+ * @SINCE_1_0.0
  */
 template <typename Slot>
 class SlotDelegate
@@ -79,6 +80,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] slot The object with a callback.
    */
   SlotDelegate( Slot* slot )
@@ -89,6 +91,7 @@ public:
   /**
    * @brief Non-virtual destructor.
    *
+   * @SINCE_1_0.0
    */
   ~SlotDelegate()
   {
@@ -97,6 +100,7 @@ public:
   /**
    * @brief Disconnect all signals from this object.
    *
+   * @SINCE_1_0.0
    */
   void DisconnectAll()
   {
@@ -114,6 +118,7 @@ public:
   /**
    * @brief Retrieve the slot object.
    *
+   * @SINCE_1_0.0
    * @return The object with a callback.
    */
   Slot* GetSlot()
@@ -124,6 +129,7 @@ public:
   /**
    * @brief Retrieve the connection tracker component.
    *
+   * @SINCE_1_0.0
    * @return The connection tracker component.
    */
   ConnectionTracker* GetConnectionTracker()
@@ -133,8 +139,8 @@ public:
 
 private:
 
-  SlotDelegate( const SlotDelegate& );            ///< undefined copy constructor
-  SlotDelegate& operator=( const SlotDelegate& ); ///< undefined assignment operator
+  SlotDelegate( const SlotDelegate& );            ///< undefined copy constructor @SINCE_1_0.0
+  SlotDelegate& operator=( const SlotDelegate& ); ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 

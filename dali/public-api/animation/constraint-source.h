@@ -33,23 +33,26 @@ namespace Dali
  * @brief Constraint source types.
  *
  * This specifies the location of a property, which is used as an input for a constraint function.
+ * @SINCE_1_0.0
  */
 enum SourceType
 {
-  OBJECT_PROPERTY, ///< The property comes from an arbitrary object.
-  LOCAL_PROPERTY,  ///< The property comes from the object which the constraint is applied to.
-  PARENT_PROPERTY  ///< The property comes from the parent of the object, which the constraint is applied to.
+  OBJECT_PROPERTY, ///< The property comes from an arbitrary object. @SINCE_1_0.0
+  LOCAL_PROPERTY,  ///< The property comes from the object which the constraint is applied to. @SINCE_1_0.0
+  PARENT_PROPERTY  ///< The property comes from the parent of the object, which the constraint is applied to. @SINCE_1_0.0
 };
 
 
 /**
  * @brief Identifies a property from an object.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API LocalSource
 {
   /**
    * @brief Create a local constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] index The index of a property provided by the constrained object.
    */
   LocalSource( Property::Index index );
@@ -59,12 +62,14 @@ struct DALI_IMPORT_API LocalSource
 
 /**
  * @brief Identifies a property from the parent of an object.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API ParentSource
 {
   /**
    * @brief Create a local constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] index The index of a property, provided by the parent of the constrained object.
    */
   ParentSource( Property::Index index );
@@ -74,12 +79,14 @@ struct DALI_IMPORT_API ParentSource
 
 /**
  * @brief Identifies a property from any object.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API Source
 {
   /**
    * @brief Create a constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] object The object providing the property.
    * @param [in] index The index of a property provided by object.
    */
@@ -92,12 +99,14 @@ struct DALI_IMPORT_API Source
 
 /**
  * @brief The source of an input property for a constraint.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API ConstraintSource
 {
   /**
    * @brief Create a constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] source A constraint source from an arbitrary object.
    */
   ConstraintSource( Source source );
@@ -105,6 +114,7 @@ struct DALI_IMPORT_API ConstraintSource
   /**
    * @brief Create a constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] local A local constraint source.
    */
   ConstraintSource( LocalSource local );
@@ -112,6 +122,7 @@ struct DALI_IMPORT_API ConstraintSource
   /**
    * @brief Create a constraint source.
    *
+   * @SINCE_1_0.0
    * @param [in] parent A parent constraint source.
    */
   ConstraintSource( ParentSource parent );
