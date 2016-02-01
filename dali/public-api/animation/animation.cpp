@@ -145,6 +145,11 @@ void Animation::Pause()
   GetImplementation(*this).Pause();
 }
 
+Dali::Animation::State Animation::GetState() const
+{
+  return GetImplementation(*this).GetState();
+}
+
 void Animation::Stop()
 {
   GetImplementation(*this).Stop();

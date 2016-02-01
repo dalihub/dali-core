@@ -2015,7 +2015,101 @@ int UtcDaliAnimationPauseP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationStoP(void)
+
+int UtcDaliAnimationGetStateP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  DALI_TEST_EQUALS( animation.GetState(), Animation::STOPPED, TEST_LOCATION );
+
+  Vector3 fiftyPercentProgress(targetPosition * 0.5f);
+
+  // Start the animation
+  animation.Play();
+
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), fiftyPercentProgress, TEST_LOCATION );
+
+  // Pause the animation
+  animation.Pause();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PAUSED, TEST_LOCATION );
+  application.SendNotification();
+  application.Render(0.f);
+
+  // Loop 5 times
+  for (int i=0; i<5; ++i)
+  {
+    application.Render(static_cast<unsigned int>(durationSeconds*500.0f));
+
+    // We didn't expect the animation to finish yet
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), fiftyPercentProgress/* Still 50% progress when paused */, TEST_LOCATION );
+    DALI_TEST_EQUALS( animation.GetState(), Animation::PAUSED, TEST_LOCATION );
+  }
+
+  // Keep going
+  finishCheck.Reset();
+  animation.Play();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*490.0f)/*slightly less than the animation duration*/);
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*10.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.GetState(), Animation::STOPPED, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.GetState(), Animation::STOPPED, TEST_LOCATION );
+
+  // re-play
+  finishCheck.Reset();
+  animation.Play();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*490.0f)/*slightly less than the animation duration*/);
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliAnimationStopP(void)
 {
   TestApplication application;
 
