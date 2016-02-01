@@ -48,3 +48,6 @@ else
     fi
   done
 fi
+
+echo "Build succeeded"
+exit 0

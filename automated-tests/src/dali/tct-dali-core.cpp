@@ -8,8 +8,9 @@ int main(int argc, char * const argv[])
 {
   int result = TestHarness::EXIT_STATUS_BAD_ARGUMENT;
 
-  const char* optString = "r";
-  bool optRerunFailed(false);
+  const char* optString = "rs";
+  bool optRerunFailed(true);
+  bool optRunSerially(false);
 
   int nextOpt = 0;
   do
@@ -20,6 +21,9 @@ int main(int argc, char * const argv[])
       case 'r':
         optRerunFailed = true;
         break;
+      case 's':
+        optRunSerially = true;
+        break;
       case '?':
         TestHarness::Usage(argv[0]);
         exit(TestHarness::EXIT_STATUS_BAD_ARGUMENT);
@@ -29,7 +33,14 @@ int main(int argc, char * const argv[])
 
   if( optind == argc ) // no testcase name in argument list
   {
-    result = TestHarness::RunAllInParallel(argv[0], tc_array, optRerunFailed);
+    if( optRunSerially )
+    {
+      result = TestHarness::RunAll( argv[0], tc_array );
+    }
+    else
+    {
+      result = TestHarness::RunAllInParallel( argv[0], tc_array, optRerunFailed );
+    }
   }
   else
   {
