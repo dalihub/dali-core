@@ -63,7 +63,7 @@ FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height,
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy /*releasePolicy*/, RenderBuffer::Format bufferformat )
+FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy, RenderBuffer::Format bufferformat )
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
@@ -72,12 +72,14 @@ FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height,
     pixelformat,
     bufferformat);
 
+  internal->SetReleasePolicy( releasePolicy );
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New( NativeImageInterface& image, ReleasePolicy /*releasePolicy*/ )
+FrameBufferImage FrameBufferImage::New( NativeImageInterface& image, ReleasePolicy releasePolicy )
 {
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image );
+  internal->SetReleasePolicy( releasePolicy );
   return FrameBufferImage(internal.Get());
 }
 
