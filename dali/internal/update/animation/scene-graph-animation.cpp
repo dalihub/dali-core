@@ -29,6 +29,19 @@ namespace //Unnamed namespace
 {
 //Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
+
+inline void WrapInPlayRange( float& elapsed, const Dali::Vector2& playRangeSeconds)
+{
+  if (elapsed > playRangeSeconds.y )
+  {
+    elapsed = playRangeSeconds.x + fmod(elapsed, playRangeSeconds.y);
+  }
+  else if( elapsed < playRangeSeconds.x )
+  {
+    elapsed = playRangeSeconds.y - fmod(elapsed, playRangeSeconds.y);
+  }
+}
+
 }
 
 namespace Dali
@@ -40,20 +53,21 @@ namespace Internal
 namespace SceneGraph
 {
 
-Animation* Animation::New( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction disconnectAction )
+Animation* Animation::New( float durationSeconds, float speedFactor, const Vector2& playRange, int loopCount, EndAction endAction, EndAction disconnectAction )
 {
-  return new ( gAnimationMemoryPool.AllocateRawThreadSafe() ) Animation( durationSeconds, speedFactor, playRange, isLooping, endAction, disconnectAction );
+  return new ( gAnimationMemoryPool.AllocateRawThreadSafe() ) Animation( durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction );
 }
 
-Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
+Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, int loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
 : mDurationSeconds(durationSeconds),
   mSpeedFactor( speedFactor ),
-  mLooping(isLooping),
   mEndAction(endAction),
   mDisconnectAction(disconnectAction),
   mState(Stopped),
   mElapsedSeconds(playRange.x*mDurationSeconds),
-  mPlayCount(0),
+  mPlayedCount(0),
+  mLoopCount(loopCount),
+  mCurrentLoop(0),
   mPlayRange( playRange )
 {
 }
@@ -72,9 +86,10 @@ void Animation::SetDuration(float durationSeconds)
   mDurationSeconds = durationSeconds;
 }
 
-void Animation::SetLooping(bool looping)
+void Animation::SetLoopCount(int loopCount)
 {
-  mLooping = looping;
+  mLoopCount = loopCount;
+  mCurrentLoop = 0;
 }
 
 void Animation::SetEndAction(Dali::Animation::EndAction action)
@@ -113,6 +128,8 @@ void Animation::Play()
   }
 
   SetAnimatorsActive( true );
+
+  mCurrentLoop = 0;
 }
 
 void Animation::PlayFrom( float progress )
@@ -180,7 +197,8 @@ bool Animation::Stop(BufferIndex bufferIndex)
     }
 
     // The animation has now been played to completion
-    ++mPlayCount;
+    ++mPlayedCount;
+    mCurrentLoop = 0;
   }
 
   mElapsedSeconds = mPlayRange.x*mDurationSeconds;
@@ -216,12 +234,15 @@ void Animation::AddAnimator( AnimatorBase* animator )
   mAnimators.PushBack( animator );
 }
 
-bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
+void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished )
 {
+  looped = false;
+  finished = false;
+
   if (mState == Stopped || mState == Destroyed)
   {
     // Short circuit when animation isn't running
-    return false;
+    return;
   }
 
   // The animation must still be applied when Paused/Stopping
@@ -231,35 +252,60 @@ bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
   }
 
   Vector2 playRangeSeconds = mPlayRange * mDurationSeconds;
-  if (mLooping)
+
+  if( 0 == mLoopCount )
   {
-    if (mElapsedSeconds > playRangeSeconds.y )
+    // loop forever
+    WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
+
+    UpdateAnimators(bufferIndex, false, false);
+
+    // don't increment mPlayedCount as event loop tracks this to indicate animation finished (end of all loops)
+  }
+  else if( mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
+  {
+    // looping
+    looped =  (mState == Playing                                                 &&
+               (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
+                ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
+
+    WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
+
+    UpdateAnimators(bufferIndex, false, false);
+
+    if(looped)
     {
-      mElapsedSeconds = playRangeSeconds.x + fmod(mElapsedSeconds, playRangeSeconds.y);
+      ++mCurrentLoop;
+      // don't increment mPlayedCount until the finished final loop
     }
-    else if( mElapsedSeconds < playRangeSeconds.x )
+  }
+  else
+  {
+    // playing once (and last mCurrentLoop)
+    finished = (mState == Playing                                                 &&
+                (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
+                 ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
+
+    // update with bake if finished
+    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished);
+
+    if(finished)
     {
-      mElapsedSeconds = playRangeSeconds.y - fmod(mElapsedSeconds, playRangeSeconds.y);
+      // The animation has now been played to completion
+      ++mPlayedCount;
+
+      // loop iterations come to this else branch for their final iterations
+      if( mCurrentLoop < mLoopCount)
+      {
+        ++mCurrentLoop;
+        DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
+      }
+
+      mElapsedSeconds = playRangeSeconds.x;
+      mState = Stopped;
     }
   }
 
-  const bool animationFinished(mState == Playing                                                &&
-                              (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
-                               ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x ))
-                              );
-
-  UpdateAnimators(bufferIndex, animationFinished && (mEndAction != Dali::Animation::Discard), animationFinished);
-
-  if (animationFinished)
-  {
-    // The animation has now been played to completion
-    ++mPlayCount;
-
-    mElapsedSeconds = playRangeSeconds.x;
-    mState = Stopped;
-  }
-
-  return animationFinished;
 }
 
 void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished )

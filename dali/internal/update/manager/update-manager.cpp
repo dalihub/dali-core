@@ -715,12 +715,16 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
   AnimationContainer &animations = mImpl->animations;
   AnimationIter iter = animations.Begin();
+  bool animationLooped = false;
   while ( iter != animations.End() )
   {
     Animation* animation = *iter;
-    bool finished = animation->Update( bufferIndex, elapsedSeconds );
+    bool finished = false;
+    bool looped = false;
+    animation->Update( bufferIndex, elapsedSeconds, looped, finished );
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
+    animationLooped = animationLooped || looped;
 
     // Remove animations that had been destroyed but were still waiting for an update
     if (animation->GetState() == Animation::Destroyed)
@@ -733,7 +737,8 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     }
   }
 
-  if ( mImpl->animationFinishedDuringUpdate )
+  // queue the notification on finished or looped (to update loop count)
+  if ( mImpl->animationFinishedDuringUpdate || animationLooped )
   {
     // The application should be notified by NotificationManager, in another thread
     mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationFinishedNotifier );
