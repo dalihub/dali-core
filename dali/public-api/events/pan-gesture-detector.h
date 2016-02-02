@@ -105,7 +105,7 @@ public: // Creation & Destruction
   /**
    * @brief Create an uninitialized PanGestureDetector; this can be initialized with PanGestureDetector::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized PanGestureDetector handle is not allowed.
    * @SINCE_1_0.0
    */
   PanGestureDetector();
@@ -119,13 +119,13 @@ public: // Creation & Destruction
   static PanGestureDetector New();
 
   /**
-   * @brief Downcast an Object handle to PanGestureDetector handle.
+   * @brief Downcast a handle to PanGestureDetector handle.
    *
    * If handle points to a PanGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a PanGestureDetector object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a PanGestureDetector object or an uninitialized handle
    */
   static PanGestureDetector DownCast( BaseHandle handle );
 
@@ -268,7 +268,7 @@ public: // Directional Panning
    * @brief Returns the angle by index that this pan gesture detector emits a signal.
    *
    * @SINCE_1_0.0
-   * @return an angle threshold pair, or a zero valued angle pair when index is invalid.
+   * @return An angle threshold pair, or a zero valued angle pair when index is invalid.
    * @pre The gesture detector has been initialized.
    * @pre The index is less than GetAngleCount()
    */
@@ -336,10 +336,10 @@ public: // Pan Properties Setters
 public: // Not intended for Application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods.
+   * @brief This constructor is used by PanGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in]  internal  A pointer to a newly allocated Dali resource.
+   * @param [in] internal A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
 
