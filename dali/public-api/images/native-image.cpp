@@ -64,4 +64,14 @@ NativeImage NativeImage::DownCast( BaseHandle handle )
   return NativeImage( dynamic_cast<Internal::NativeImage*>( handle.GetObjectPtr()) );
 }
 
+const char* NativeImage::GetCustomSamplerTypename()
+{
+  return GetImplementation(*this).GetCustomSamplerTypename();
+}
+
+const char* NativeImage::GetCustomFragmentPreFix()
+{
+  return GetImplementation(*this).GetCustomFragmentPreFix();
+}
+
 } // namespace Dali

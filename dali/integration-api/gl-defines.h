@@ -854,4 +854,10 @@
 #endif
 
 
+/* GL_OES_EGL_image_external */
+#ifndef GL_TEXTURE_EXTERNAL_OES
+#define GL_TEXTURE_EXTERNAL_OES                                 0x8D65
+#endif
+
+
 #endif // __DALI_INTERNAL_GL_DEFINES_H__
