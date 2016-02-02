@@ -88,7 +88,7 @@ public:
    * @brief Get the current Stage.
    *
    * @SINCE_1_0.0
-   * @return The current stage or an empty handle if Core has not been created or has been already destroyed.
+   * @return The current stage or an empty handle if the internal core has not been created or has been already destroyed.
    */
   static Stage GetCurrent();
 
@@ -186,7 +186,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] depth The depth.
    * @return The layer found at the given depth.
-   * @pre depth is less than layer count; see GetLayerCount().
+   * @pre Depth is less than layer count; see GetLayerCount().
    */
   Layer GetLayer(unsigned int depth) const;
 
@@ -220,7 +220,7 @@ public:
    * @brief Retrieve the DPI of the display device to which the stage is connected.
    *
    * @SINCE_1_0.0
-   * @return the horizontal and vertical DPI
+   * @return The horizontal and vertical DPI
    */
   Vector2 GetDpi() const;
 
@@ -240,7 +240,7 @@ public:
    * By default Dali will stop rendering when no Actor positions are being set, and when no animations are running etc.
    * This method is useful to force screen refreshes e.g. when updating a NativeImage.
    * @SINCE_1_0.0
-   * @param durationSeconds to keep rendering, 0 means render at least one more frame
+   * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
    */
   void KeepRendering( float durationSeconds );
 
@@ -302,7 +302,7 @@ public:
    * If the application is responsible for handling context loss, it should listen to
    * this signal and tear down UI components when recieved.
    * @SINCE_1_0.0
-   * @return The ContextLost signal to connect to.
+   * @return The context lost signal to connect to.
    */
   ContextStatusSignal& ContextLostSignal();
 
@@ -313,12 +313,14 @@ public:
    * If the application is responsible for handling context loss, it should listen to
    * this signal and rebuild UI components on receipt.
    * @SINCE_1_0.0
-   * @return The ContextRegained signal to connect to.
+   * @return The context regained signal to connect to.
    */
   ContextStatusSignal& ContextRegainedSignal();
 
   /**
-   * @brief This signal is emitted after the initial scene is created. It will be triggered after the
+   * @brief This signal is emitted after the initial scene is created.
+   *
+   * It will be triggered after the
    * application init signal.
    *
    * A callback of the following type may be connected:
@@ -333,7 +335,7 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @brief This constructor is used by Dali GetCurrent() methods.
+   * @brief This constructor is used by Stage::GetCurrent() methods.
    *
    * @SINCE_1_0.0
    * @param [in] stage A pointer to a Dali resource

@@ -31,8 +31,8 @@ namespace Dali
 /**
  * @brief Templated intrusive pointer class
  *
- * Uses the Dali:Refobject type supply actual reference counting
- * The object is responsible for destroying itself
+ * Uses the Dali:RefObject type with actual reference counting.
+ * The object is responsible for destroying itself.
  * @SINCE_1_0.0
  */
 template<typename T>
@@ -51,7 +51,7 @@ public:
    * @brief Constructor to attach existing object.
    *
    * @SINCE_1_0.0
-   * @param p pointer to object,
+   * @param[in] p Pointer to object,
    */
   IntrusivePtr( T* p ) : mPtr( p )
   {
@@ -65,8 +65,8 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param rhs const reference to an IntrusivePtr
-   * @tparam U reference counter object type
+   * @param[in] rhs Const reference to an IntrusivePtr
+   * @tparam U Reference counter object type
    */
   template<typename U>
   IntrusivePtr( IntrusivePtr<U> const& rhs ) : mPtr( rhs.Get() )
@@ -107,7 +107,7 @@ public:
    * @brief Get pointer to reference counted object.
    *
    * @SINCE_1_0.0
-   * @return pointer to reference counted object
+   * @return Pointer to reference counted object
    */
   T* Get() const
   {
@@ -118,7 +118,7 @@ public:
    * @brief Pointer operator override.
    *
    * @SINCE_1_0.0
-   * @return pointer to reference counted object
+   * @return Pointer to reference counted object
    */
   T* operator->() const
   {
@@ -129,7 +129,7 @@ public:
    * @brief Dereference operator override.
    *
    * @SINCE_1_0.0
-   * @return reference to reference counted object
+   * @return Reference to reference counted object
    */
   T& operator*() const
   {
@@ -140,8 +140,8 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param rhs const reference to intrusive pointer
-   * @return reference to reference counted object
+   * @param rhs Const reference to intrusive pointer
+   * @return Reference to reference counted object
    */
   IntrusivePtr& operator=( IntrusivePtr const& rhs )
   {
@@ -153,8 +153,8 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param rhs pointer to object to wrap
-   * @return A reference to this object
+   * @param rhs Pointer to object to wrap
+   * @return A Reference to this object
    */
   IntrusivePtr& operator=( T* rhs )
   {
@@ -175,7 +175,7 @@ public:
    * @brief Reset intrusive pointer with reference counted object.
    *
    * @SINCE_1_0.0
-   * @param rhs pointer to object
+   * @param[in] rhs Pointer to object
    */
   void Reset( T* rhs )
   {
@@ -241,9 +241,9 @@ private:
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
- * @param lhs intrusive pointer to compare with
- * @param rhs intrusive pointer to compare against
- * @return true if the pointers point at the same object
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers point at the same object
  */
 template<typename T, typename U>
 inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
@@ -255,9 +255,9 @@ inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
- * @param lhs intrusive pointer to compare with
- * @param rhs intrusive pointer to compare against
- * @return true if the pointers point at different objects
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers point at different objects
  */
 template<typename T, typename U>
 inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
@@ -269,9 +269,9 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
  * @SINCE_1_0.0
- * @param lhs intrusive pointer to compare with
- * @param rhs object to compare against
- * @return true if the intrusive pointer points at the specified object
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Object to compare against
+ * @return True if the intrusive pointer points at the specified object
  */
 template<typename T, typename U>
 inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
@@ -283,9 +283,9 @@ inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
  * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
- * @param lhs intrusive pointer to compare with
- * @param rhs intrusive pointer to compare against
- * @return true if the intrusive pointer doesn't point at the specified object
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the intrusive pointer doesn't point at the specified object
  */
 template<typename T, typename U>
 inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
@@ -297,9 +297,9 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
  * @SINCE_1_0.0
- * @param lhs object to compare with
- * @param rhs intrusive pointer to compare against
- * @return true if the intrusive pointer points at the specified object
+ * @param[in] lhs Object to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the intrusive pointer points at the specified object
  */
 template<typename T, typename U>
 inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
@@ -311,9 +311,9 @@ inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
  * @brief Comparison overrides of objects wrapped by intrusive pointers
  *
  * @SINCE_1_0.0
- * @param lhs object to compare with
- * @param rhs intrusive pointer to compare against
- * @return true if the intrusive pointer doesn't point at the specified object
+ * @param[in] lhs Object to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the intrusive pointer doesn't point at the specified object
  */
 template<typename T, typename U>
 inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
