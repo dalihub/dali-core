@@ -38,12 +38,20 @@ namespace Internal DALI_INTERNAL
 }
 
 /**
- * @brief
+ * @brief LinearConstrainer applies constraints to objects given a linear map.
  *
- * LinearConstrainer applies constraints to objects given a linear map.
  * A linear map is defined by a set of value-progress pairs.
  * Progress must be normalized between [0,1]. If no progress is defined, the values
  * are considered to be equally spaced along the x axis.
+ *
+ * Basically, a linear constrainer allows constraining a property to another property
+ * with the changes mapped over a certain range. For example, if you want to change the
+ * opacity of an actor depending on its position along the X-axis, so that it’s fully
+ * transparent on the edges and fully opaque in the center. To do this, an array with
+ * values, 0.0f, 1.0f, 0.0f, is created, which means that there are 3 control points.
+ * You can add as many control points as you want, but they will be linearly spaced.
+ * Then you can apply the linear constrainer by using the alpha of the actor as the
+ * target and the source as the actor’s position.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API LinearConstrainer : public Handle
@@ -67,26 +75,26 @@ public:
    * @brief Create an initialized LinearConstrainer handle.
    *
    * @SINCE_1_0.0
-   * @return a handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource.
    */
   static LinearConstrainer New();
 
   /**
-   * @brief Downcast an Object handle to LinearConstrainer handle.
+   * @brief Downcast a handle to LinearConstrainer handle.
    *
    * If handle points to a LinearConstrainer object the downcast produces
    * valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a LinearConstrainer object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a LinearConstrainer object or an uninitialized handle
    */
   static LinearConstrainer DownCast( BaseHandle handle );
 
   /**
    * @brief Create an uninitialized LinearConstrainer handle.
    *
-   * This can be initialized with PathConstrainer::New(). Calling member
-   * functions with an uninitialized Dali::Object is not allowed.
+   * This can be initialized with @ref LinearConstrainer::New
+   * Calling member functions with an uninitialized LinearConstrainer handle is not allowed.
    * @SINCE_1_0.0
    */
   LinearConstrainer();
@@ -121,9 +129,9 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] target Property to be constrained
-   * @param[in] source Property used as parameter for the path
+   * @param[in] source Property used as parameter for the linear map
    * @param[in] range The range of values in the source property which will be mapped to [0,1]
-   * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
+   * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]. See cfloat.h for FLT_MAX
    */
   void Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX) );
 
@@ -137,12 +145,12 @@ public:
 
 public: // Not intended for application developers
   /**
-   * @brief This constructor is used by Dali::New() methods.
+   * @brief This constructor is used by LinearConstrainer::New() methods.
    *
    * @SINCE_1_0.0
-   * @param[in] pathConstrainer A pointer to an internal PathConstrainer resource
+   * @param[in] internal A pointer to an internal LinearConstrainer resource
    */
-  explicit DALI_INTERNAL LinearConstrainer(Internal::LinearConstrainer* pathConstrainer);
+  explicit DALI_INTERNAL LinearConstrainer(Internal::LinearConstrainer* internal);
 };
 
 /**

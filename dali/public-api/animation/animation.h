@@ -142,7 +142,7 @@ public:
   /**
    * @brief Create an uninitialized Animation; this can be initialized with Animation::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized Animation handle is not allowed.
    * @SINCE_1_0.0
    */
   Animation();
@@ -156,19 +156,19 @@ public:
    * @SINCE_1_0.0
    * @param [in] durationSeconds The duration in seconds.
    * @return A handle to a newly allocated Dali resource.
-   * @pre durationSeconds must be greater than zero.
+   * @pre DurationSeconds must be greater than zero.
    */
   static Animation New(float durationSeconds);
 
   /**
-   * @brief Downcast an Object handle to Animation.
+   * @brief Downcast a handle to Animation handle.
    *
    * If handle points to an Animation object the downcast produces
    * valid handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a Animation object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a Animation object or an uninitialized handle
    */
   static Animation DownCast( BaseHandle handle );
 
@@ -202,7 +202,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] seconds The duration in seconds.
-   * @pre durationSeconds must be greater than zero.
+   * @pre DurationSeconds must be greater than zero.
    */
   void SetDuration(float seconds);
 
@@ -215,13 +215,13 @@ public:
   float GetDuration() const;
 
   /**
-   * @brief Set whether the animation will loop forever.
+   * @brief Set whether the animation will loop.
    *
    * This function resets the loop count and should not be used with SetLoopCount(int).
    * Setting this parameter does not cause the animation to Play()
    *
    * @SINCE_1_0.0
-   * @param[in] looping If true then the animation will loop forever, if false it will never loop.
+   * @param[in] looping True if the animation will loop.
    */
   void SetLooping(bool looping);
 
@@ -322,12 +322,11 @@ public:
   /*
    * @brief Sets the progress of the animation.
    *
-   * When played, the animation will start from this point.
-   * If playing, the animation will jump to, and continue playing from this point.
+   * The animation will play (or continue playing) from this point. The progress
+   * must be in the 0-1 interval or in the play range interval if defined ( See @ref Animation::SetPlayRange ),
+   * otherwise, it will be ignored.
    *
-   * The progress must be in the 0-1 interval or in the play range interval
-   * if defined ( See SetPlayRange ), otherwise, it will be ignored.
-   *
+   * @SINCE_1_0.0
    * @param[in] progress The new progress as a normalized value between [0,1]
    * or between the play range if specified.
    */
@@ -357,12 +356,13 @@ public:
    * @brief Retrieve the speed factor of the animation
    *
    * @SINCE_1_0.0
-   * @return speed factor
+   * @return Speed factor
    */
   float GetSpeedFactor() const;
 
   /**
    * @brief Set the playing range.
+   *
    * Animation will play between the values specified. Both values ( range.x and range.y ) should be between 0-1,
    * otherwise they will be ignored. If the range provided is not in proper order ( minimum,maximum ), it will be reordered.
    *
@@ -388,7 +388,8 @@ public:
 
   /**
    * @brief Play the animation from a given point.
-   * The progress must be in the 0-1 interval or in the play range interval if defined ( See SetPlayRange ),
+   *
+   * The progress must be in the 0-1 interval or in the play range interval if defined ( See @ref Animation::SetPlayRange ),
    * otherwise, it will be ignored.
    *
    * @SINCE_1_0.0
@@ -420,7 +421,7 @@ public:
    * @brief Connect to this signal to be notified when an Animation's animations have finished.
    *
    * @SINCE_1_0.0
-   * @return A signal object to Connect() with.
+   * @return A signal object to @ref Signal::Connect() with.
    */
   AnimationSignalType& FinishedSignal();
 
@@ -516,8 +517,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object/property to animate.
-   * @param [in] keyFrames The key frames
+   * @param [in] target The target object property to animate.
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames);
 
@@ -525,8 +526,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object + property to animate
-   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] target The target object property to animate
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] interpolation The method used to interpolate between values.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation);
@@ -535,8 +536,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object/property to animate.
-   * @param [in] keyFrames The key frames
+   * @param [in] target The target object property to animate.
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] alpha The alpha function to apply.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha);
@@ -545,8 +546,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object + property to animate
-   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] target The target object property to animate
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] alpha The alpha function to apply.
    * @param [in] interpolation The method used to interpolate between values.
    */
@@ -556,8 +557,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object/property to animate.
-   * @param [in] keyFrames The key frames
+   * @param [in] target The target object property to animate.
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] period The effect will occur during this time period.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period);
@@ -566,8 +567,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object + property to animate
-   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] target The target object property to animate
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] period The effect will occur duing this time period.
    * @param [in] interpolation The method used to interpolate between values.
    */
@@ -577,8 +578,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object/property to animate.
-   * @param [in] keyFrames The key frames
+   * @param [in] target The target object property to animate.
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] alpha The alpha function to apply.
    * @param [in] period The effect will occur during this time period.
    */
@@ -588,8 +589,8 @@ public:
    * @brief Animate a property between keyframes.
    *
    * @SINCE_1_0.0
-   * @param [in] target The target object + property to animate
-   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] target The target object property to animate
+   * @param [in] keyFrames The set of time/value pairs between which to animate.
    * @param [in] alpha The alpha function to apply to the overall progress.
    * @param [in] period The effect will occur duing this time period.
    * @param [in] interpolation The method used to interpolate between values.
@@ -600,7 +601,9 @@ public:
   // Actor-specific convenience methods
 
   /**
-   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * @brief Animate an actor's position and orientation through a predefined path.
+   *
+   * The actor will rotate to orient the supplied
    * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
    *
    * @SINCE_1_0.0
@@ -611,7 +614,9 @@ public:
   void Animate( Actor actor, Path path, const Vector3& forward );
 
   /**
-   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * @brief Animate an actor's position and orientation through a predefined path.
+   *
+   * The actor will rotate to orient the supplied
    * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
    *
    * @SINCE_1_0.0
@@ -623,7 +628,9 @@ public:
   void Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha );
 
   /**
-   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * @brief Animate an actor's position and orientation through a predefined path.
+   *
+   * The actor will rotate to orient the supplied
    * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
    *
    * @SINCE_1_0.0
@@ -635,7 +642,9 @@ public:
   void Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period );
 
   /**
-   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * @brief Animate an actor's position and orientation through a predefined path.
+   *
+   * The actor will rotate to orient the supplied
    * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
    *
    * @SINCE_1_0.0
@@ -668,7 +677,7 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods
+   * @brief This constructor is used by Animation::New() methods
    * @SINCE_1_0.0
    * @param [in] animation A pointer to a newly allocated Dali resource
    */
