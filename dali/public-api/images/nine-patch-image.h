@@ -36,7 +36,7 @@ class NinePatchImage;
 }
 
 /**
- * @brief NinePatchImage represents a stretchable image resource
+ * @brief NinePatchImage represents an nine-patch image resource.
  *
  * It contains a bitmap that is synchronously loaded from the file system that contains
  * a 9 patch border - a 1 pixel border that describes the stretch borders and the child
@@ -60,7 +60,7 @@ public:
   /**
    * @brief Constructor which creates an uninitialized NinePatchImage object.
    *
-   * Use Image::New(...) to create an initialised object.
+   * Use @ref NinePatchImage::New to create an initialised object.
    * @SINCE_1_0.0
    */
   NinePatchImage();
@@ -70,23 +70,23 @@ public:
    *
    * A pixel buffer for image data is allocated and loaded from the filesystem.
    * Dali has ownership of the buffer.
-   * @note: default resource management policies are Immediate and Never
-   *
    * @SINCE_1_0.0
-   * @param [in] filename    File to load synchronously into buffer
-   * @return a handle to a new instance of NinePatchImage
+   * @param [in] filename File to load synchronously into buffer
+   * @return A handle to a new instance of NinePatchImage
+   * @note Default resource management policies are Immediate and Never
+   *
    */
   static NinePatchImage New( const std::string& filename );
 
   /**
-   * @brief Downcast an Object handle to NinePatchImage.
+   * @brief Downcast a handle to NinePatchImage handle.
    *
    * If handle points to a NinePatchImage the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a NinePatchImage or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a NinePatchImage or an uninitialized handle
    */
   static NinePatchImage DownCast( BaseHandle handle );
 
@@ -145,7 +145,7 @@ public:
    * @brief Get the child rectangle
    *
    * @SINCE_1_0.0
-   * @return the position and size of the child rectangle
+   * @return The position and size of the child rectangle
    */
   Rect<int> GetChildRectangle();
 
