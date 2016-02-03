@@ -69,7 +69,7 @@ public:
   PropertyNotification();
 
   /**
-   * @brief Downcast an Object handle to PropertyNotification.
+   * @brief Downcast a handle to PropertyNotification handle.
    *
    * If handle points to an PropertyNotification object the downcast
    * produces valid handle. If not the returned handle is left
@@ -138,7 +138,9 @@ public:
   Property::Index GetTargetProperty() const;
 
   /**
-   * @brief Sets the Notification mode. This determines how the property
+   * @brief Sets the Notification mode.
+   *
+   * This determines how the property
    * notification should respond to the result of a condition.
    *
    * @SINCE_1_0.0
