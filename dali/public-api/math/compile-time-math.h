@@ -35,11 +35,11 @@ namespace Dali
 /**
  * @brief Compile time template to calculate base to the power of N.
  *
- * Note! values need to be compile time constants
- * Usage: <code>Power< 10, 2 >::value; // value=100</code>
  * @SINCE_1_0.0
- * @param mantissa to raise to exponent
- * @param N exponent to use for mantissa
+ * @tparam mantissa to raise to exponent
+ * @tparam exponent to use for mantissa
+ * @note values need to be compile time constants
+ * Usage: <code>Power< 10, 2 >::value; // value=100</code>
  */
 template< size_t mantissa, size_t exponent >
 struct Power
@@ -52,7 +52,7 @@ struct Power
  *
  * Specialisation for power of 1
  * @SINCE_1_0.0
- * @param mantissa to raise to exponent
+ * @tparam mantissa to raise to exponent
  */
 template< size_t mantissa >
 struct Power< mantissa, 1 >
@@ -65,7 +65,7 @@ struct Power< mantissa, 1 >
  *
  * Specialisation for power of 0
  * @SINCE_1_0.0
- * @param mantissa to raise to exponent
+ * @tparam mantissa to raise to exponent
  */
 template< size_t mantissa >
 struct Power< mantissa, 0 >
@@ -76,11 +76,11 @@ struct Power< mantissa, 0 >
 /**
  * @brief Compile time template to calculate base logarithm of N.
  *
- * Note! values need to be compile time constants
- * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
  * @SINCE_1_0.0
- * @param number for which to calculate the logarithm
- * @param base logarithm to calculate
+ * @tparam number for which to calculate the logarithm
+ * @tparam base logarithm to calculate
+ * @note values need to be compile time constants
+ * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
  */
 template< size_t number, size_t base = 2 >
 struct Log
@@ -93,7 +93,7 @@ struct Log
  *
  * Specialisation for logarithm of 1
  * @SINCE_1_0.0
- * @param base logarithm to calculate
+ * @tparam base logarithm to calculate
  */
 template< size_t base >
 struct Log< 1, base >
@@ -106,7 +106,7 @@ struct Log< 1, base >
  *
  * Specialisation for logarithm of 0
  * @SINCE_1_0.0
- * @param base logarithm to calculate
+ * @tparam base logarithm to calculate
  */
 template< size_t base >
 struct Log< 0, base >
@@ -118,10 +118,10 @@ struct Log< 0, base >
 /**
  * @brief Compile time template to calculate the machine epsilon for a given floating point number.
  *
- * Note! value needs to be compile time constant
- * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
  * @SINCE_1_0.0
- * @param N the number for which to calculate the machine epsilon
+ * @tparam N the number for which to calculate the machine epsilon
+ * @note value needs to be compile time constant
+ * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
  */
 template< size_t N >
 struct Epsilon
