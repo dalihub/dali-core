@@ -53,6 +53,7 @@ namespace Dali
  *   }
  * );
  * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release. We do recommend not to use it.
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -104,12 +105,10 @@ class ShaderEffect;
  * uniform   vec4      uColor;
  * varying   vec2      vTexCoord;
  * </pre>
- * <BR>
- * <B>
- * Note: In order for fade and color animations to work, the fragment shader needs to multiply the fragment color
- * with the uniform color "uColor" of the node
- * </B>
  * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release. We do recommend not to use it.
+ * @note In order for fade and color animations to work, the fragment shader needs to multiply the fragment color
+ * with the uniform color "uColor" of the node.
  */
 class DALI_IMPORT_API ShaderEffect : public Handle
 {
@@ -119,6 +118,7 @@ public:
   /**
    * @DEPRECATED_1_0.47
    * @brief An enumeration of properties belonging to the ShaderEffect class.
+   *
    * Grid Density defines the spacing of vertex coordinates in world units.
    * ie a larger actor will have more grids at the same spacing.
    *
@@ -219,7 +219,7 @@ public:
 
   /**
    * @DEPRECATED_1_0.47
-   * @brief Downcast an Object handle to ShaderEffect.
+   * @brief Downcast a handle to ShaderEffect handle.
    *
    * If handle points to a ShaderEffect the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
