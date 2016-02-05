@@ -612,6 +612,9 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   if( instruction.mRenderTracker && offscreen != NULL )
   {
+    // This will create a sync object every frame this render tracker
+    // is alive (though it should be now be created only for
+    // render-once render tasks)
     instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
     instruction.mRenderTracker = NULL; // Only create once.
   }

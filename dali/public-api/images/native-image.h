@@ -107,9 +107,23 @@ public:
    * If not, the returned handle is left unintialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object.
-   * @return handle to a NativeImage or an uninitialized handle.
+   * @return Handle to a NativeImage or an uninitialized handle.
    */
   static NativeImage DownCast( BaseHandle handle );
+
+  /**
+   * @brief Get custom fragment prefix for rendering a native image.
+   *
+   * @return String for custom fragment prefix
+   */
+  const char* GetCustomFragmentPreFix();
+
+  /**
+   * @brief Get custom sampler type name for rendering a native image.
+   *
+   * @return String for custom sampler type name
+   */
+  const char* GetCustomSamplerTypename();
 
 public: // Not intended for application developers
 

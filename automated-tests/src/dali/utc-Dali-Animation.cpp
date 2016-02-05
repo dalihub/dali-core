@@ -336,6 +336,422 @@ int UtcDaliAnimationSetLoopingP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationSetLoopCountP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+
+  // Loop
+  float intervalSeconds = 3.0f;
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+
+  finishCheck.Reset();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetLoopCountP2(void)
+{
+  TestApplication application;
+
+  //
+  // switching between forever and loop count
+  //
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animation.SetEndAction(Animation::Discard);
+
+  // Start the animation
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  float intervalSeconds = 3.0f;
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  finishCheck.Reset();
+
+  // Loop forever
+  animation.SetLooping(true);
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  finishCheck.Reset();
+
+  // Loop N again
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  finishCheck.Reset();
+
+  // loop forever
+  animation.SetLooping(true);
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  finishCheck.Reset();
+
+  // Loop N again
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived(); // we never hit play
+
+  finishCheck.Reset();
+
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetLoopCountP3(void)
+{
+  TestApplication application;
+
+  //
+  // switching between forever and loop count
+  //
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animation.SetEndAction(Animation::Discard);
+
+  float intervalSeconds = 3.0f;
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  // loop forever
+  animation.SetLooping(true);
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  finishCheck.Reset();
+
+  // Loop N again
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived(); // we never hit play
+
+  finishCheck.Reset();
+
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetLoopCountP4(void)
+{
+  TestApplication application;
+
+  //
+  // ..and play again
+  //
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animation.SetEndAction(Animation::Bake);
+
+  float intervalSeconds = 3.0f;
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  animation.SetLoopCount(1);
+  animation.Play();
+  DALI_TEST_CHECK(!animation.IsLooping());
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f) );
+
+  finishCheck.Reset();
+
+  animation.Play(); // again
+  DALI_TEST_CHECK(!animation.IsLooping());
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationGetLoopCountP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  DALI_TEST_CHECK(1 == animation.GetLoopCount());
+
+  // Start the animation
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_CHECK(3 == animation.GetLoopCount());
+
+  animation.Play();
+
+  application.Render(0);
+  application.SendNotification();
+
+  // Loop
+  float intervalSeconds = 3.0f;
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+  application.Render(0);
+  application.SendNotification();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+
+  animation.SetLoopCount(0);
+  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_CHECK(0 == animation.GetLoopCount());
+
+  animation.SetLoopCount(1);
+  DALI_TEST_CHECK(!animation.IsLooping());
+  DALI_TEST_CHECK(1 == animation.GetLoopCount());
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimationGetCurrentLoopP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.SetLoopCount(3);
+  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_CHECK(0 == animation.GetCurrentLoop());
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+
+  // Loop
+  float intervalSeconds = 3.0f;
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_CHECK(2 == animation.GetCurrentLoop());
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_CHECK(3 == animation.GetCurrentLoop());
+  DALI_TEST_CHECK(animation.GetLoopCount() == animation.GetCurrentLoop());
+
+  finishCheck.Reset();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_CHECK(3 == animation.GetCurrentLoop());
+
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_CHECK(3 == animation.GetCurrentLoop());
+
+  END_TEST;
+}
+
 int UtcDaliAnimationIsLoopingP(void)
 {
   TestApplication application;

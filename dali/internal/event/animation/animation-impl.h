@@ -85,7 +85,22 @@ public:
   /**
    * @copydoc Dali::Animation::SetLooping()
    */
-  void SetLooping(bool looping);
+  void SetLooping(bool on);
+
+  /**
+   * @copydoc Dali::Animation::SetLoopCount()
+   */
+  void SetLoopCount(int count);
+
+  /**
+   * @copydoc Dali::Animation::GetLoopCount()
+   */
+  int GetLoopCount();
+
+  /**
+   * @copydoc Dali::Animation::GetCurrentLoop()
+   */
+  int GetCurrentLoop();
 
   /**
    * @copydoc Dali::Animation::IsLooping()
@@ -446,7 +461,8 @@ private:
   // Cached for public getters
   float mDurationSeconds;
   float mSpeedFactor;
-  bool mIsLooping;
+  int mLoopCount;
+  int mCurrentLoop;
   Vector2 mPlayRange;
   EndAction mEndAction;
   EndAction mDisconnectAction;

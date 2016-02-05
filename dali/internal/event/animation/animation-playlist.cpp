@@ -91,6 +91,7 @@ void AnimationPlaylist::NotifyCompleted()
       // The animation may be present in mPlaylist - remove if necessary
       // Note that the animation "Finish" signal is emitted after Stop() has been called
       std::vector< Dali::Animation >::iterator iter = std::find( mPlaylist.begin(), mPlaylist.end(), Dali::Animation(animation) );
+      DALI_ASSERT_DEBUG(iter != mPlaylist.end());
       mPlaylist.erase( iter );
     }
   }
