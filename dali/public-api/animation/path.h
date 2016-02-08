@@ -37,7 +37,7 @@ class Path;
 /**
  * @brief A 3D parametric curve
  *
- * Paths can be used to animate position and orientation of actors using Dali::Animate( Actor, Path, ... )
+ * Paths can be used to animate position and orientation of actors using @ref Dali::Animate( Actor, Path, ... )
  *
  * @SINCE_1_0.0
  */
@@ -62,26 +62,26 @@ public:
    * @brief Create an initialized Path handle.
    *
    * @SINCE_1_0.0
-   * @return a handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource.
    */
   static Path New();
 
   /**
-   * @brief Downcast an Object handle to Path handle.
+   * @brief Downcast a handle to Path handle.
    *
-   * If handle points to a KeyFrames object the downcast produces
+   * If handle points to a Path object the downcast produces
    * valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a Path object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a Path object or an uninitialized handle
    */
   static Path DownCast( BaseHandle handle );
 
   /**
    * @brief Create an uninitialized Path handle.
    *
-   * This can be initialized with Path::New(). Calling member
-   * functions with an uninitialized Dali::Object is not allowed.
+   * This can be initialized with Path::New().
+   * Calling member functions with an uninitialized Path handle is not allowed.
    * @SINCE_1_0.0
    */
   Path();
@@ -133,8 +133,8 @@ public:
    * The generating algorithm is as follows:
    * For a given knot point K[N], find the vector that bisects K[N-1],[N] and [N],[N+1].
    * Calculate the tangent vector by taking the normal of this bisector.
-   * The in control point is the length of the preceding segment back along this bisector multiplied by the curvature
-   * The out control point is the length of the succeeding segment forward along this bisector multiplied by the curvature
+   * The in control point is the length of the preceding segment back along this bisector multiplied by the curvature.
+   * The out control point is the length of the succeeding segment forward along this bisector multiplied by the curvature.
    *
    * @SINCE_1_0.0
    * @param[in] curvature The curvature of the spline. 0 gives straight lines between the knots,
@@ -185,7 +185,7 @@ public:
 
 public: // Not intended for application developers
   /**
-   * @brief This constructor is used by Dali::New() methods.
+   * @brief This constructor is used by Path::New() methods.
    *
    * @SINCE_1_0.0
    * @param[in] path A pointer to an internal path resource

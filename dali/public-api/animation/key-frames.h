@@ -49,29 +49,29 @@ class DALI_IMPORT_API KeyFrames : public BaseHandle
 {
 public:
   /**
-   * @brief Create an initialized KeyFrame handle.
+   * @brief Create an initialized KeyFrames handle.
    *
    * @SINCE_1_0.0
-   * @return a handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource.
    */
   static KeyFrames New();
 
   /**
-   * @brief Downcast an Object handle to KeyFrames handle.
+   * @brief Downcast a handle to KeyFrames handle.
    *
    * If handle points to a KeyFrames object the downcast produces
    * valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a KeyFrames object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a KeyFrames object or an uninitialized handle
    */
   static KeyFrames DownCast( BaseHandle handle );
 
   /**
    * @brief Create an uninitialized KeyFrame handle.
    *
-   * This can be initialized with KeyFrame::New(). Calling member
-   * functions with an uninitialized Dali::Object is not allowed.
+   * This can be initialized with KeyFrame::New().
+   * Calling member functions with an uninitialized KeyFrames handle is not allowed.
    * @SINCE_1_0.0
    */
   KeyFrames();
@@ -115,7 +115,7 @@ public:
    *
    * The key frames should be added in time order.
    * @SINCE_1_0.0
-   * @param[in] progress A value between 0.0 and 1.0.
+   * @param[in] progress A progress value between 0.0 and 1.0.
    * @param[in] value A value.
    */
   void Add(float progress, Property::Value value);
@@ -125,7 +125,7 @@ public:
    *
    * The key frames should be added in time order.
    * @SINCE_1_0.0
-   * @param[in] progress A value between 0.0 and 1.0.
+   * @param[in] progress A progress value between 0.0 and 1.0.
    * @param[in] value A value.
    * @param[in] alpha The alpha function used to blend to the next keyframe
    */
@@ -134,7 +134,7 @@ public:
 
 public: // Not intended for application developers
   /**
-   * @brief This constructor is used by Dali::New() methods.
+   * @brief This constructor is used by KeyFrames::New() methods.
    *
    * @SINCE_1_0.0
    * @param[in] keyFrames A pointer to an internal KeyFrame resource
