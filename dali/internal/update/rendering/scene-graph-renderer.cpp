@@ -87,6 +87,18 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
     //@todo MESH_REWORK Use memcpy to copy ptrs from one array to the other
   }
 }
+
+// flags for resending data to renderer
+enum Flags
+{
+  RESEND_DATA_PROVIDER = 1,
+  RESEND_GEOMETRY = 1 << 1,
+  RESEND_FACE_CULLING_MODE = 1 << 2,
+  RESEND_BLEND_COLOR = 1 << 3,
+  RESEND_BLEND_BIT_MASK = 1 << 4,
+  RESEND_PREMULTIPLIED_ALPHA = 1 << 5
+};
+
 }
 
 namespace Dali
@@ -106,10 +118,13 @@ Renderer::Renderer()
  mRenderer(NULL),
  mMaterial(NULL),
  mGeometry(NULL),
+ mBlendColor(NULL),
+ mBlendBitmask(0u),
+ mFaceCullingMode( Dali::Renderer::NONE ),
+ mBlendingMode( Dali::BlendingMode::AUTO ),
  mReferenceCount(0),
  mRegenerateUniformMap(0),
- mResendDataProviders(false),
- mResendGeometry(false),
+ mResendFlag(0),
  mResourcesReady(false),
  mFinishedResourceAcquisition(false),
  mDepthIndex(0)
@@ -190,17 +205,22 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
-  if( mResendDataProviders )
+  if( mResendFlag == 0 )
+  {
+    return;
+  }
+
+  if( mResendFlag & RESEND_DATA_PROVIDER )
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
     typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
     new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
-    mResendDataProviders = false;
+    mResendFlag &= ~RESEND_DATA_PROVIDER;
   }
 
-  if( mResendGeometry )
+  if( mResendFlag & RESEND_GEOMETRY )
   {
     // The first call to GetRenderGeometry() creates the geometry and sends it in a message
     RenderGeometry* geometry = mGeometry->GetRenderGeometry( mSceneController );
@@ -209,7 +229,39 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
     new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, geometry );
-    mResendGeometry = false;
+    mResendFlag &= ~RESEND_GEOMETRY;
+  }
+
+  if( mResendFlag & RESEND_FACE_CULLING_MODE )
+  {
+    typedef MessageValue1< Render::Renderer, Dali::Renderer::FaceCullingMode > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
+    mResendFlag &= ~RESEND_FACE_CULLING_MODE;
+  }
+
+  if( mResendFlag & RESEND_BLEND_BIT_MASK )
+  {
+    typedef MessageValue1< Render::Renderer, unsigned int > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask );
+    mResendFlag &= ~RESEND_BLEND_BIT_MASK;
+  }
+
+  if( mResendFlag & RESEND_BLEND_COLOR )
+  {
+    typedef MessageValue1< Render::Renderer, const Vector4* > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, mBlendColor );
+    mResendFlag &= ~RESEND_BLEND_COLOR;
+  }
+
+  if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
+  {
+    typedef MessageValue1< Render::Renderer, bool > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
+    mResendFlag &= ~RESEND_PREMULTIPLIED_ALPHA;
   }
 }
 
@@ -221,7 +273,7 @@ void Renderer::SetMaterial( BufferIndex bufferIndex, Material* material)
   mMaterial->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
-  mResendDataProviders = true;
+  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::SetGeometry( BufferIndex bufferIndex, Geometry* geometry)
@@ -239,13 +291,53 @@ void Renderer::SetGeometry( BufferIndex bufferIndex, Geometry* geometry)
 
   if( mRenderer )
   {
-    mResendGeometry = true;
+    mResendFlag |= RESEND_GEOMETRY;
   }
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
 {
   mDepthIndex = depthIndex;
+}
+
+void Renderer::SetFaceCullingMode( unsigned int faceCullingMode )
+{
+  mFaceCullingMode = static_cast<Dali::Renderer::FaceCullingMode>(faceCullingMode);
+  mResendFlag |= RESEND_FACE_CULLING_MODE;
+}
+
+void Renderer::SetBlendingMode( unsigned int blendingMode )
+{
+  mBlendingMode = static_cast< BlendingMode::Type >( blendingMode );
+}
+
+void Renderer::SetBlendingOptions( unsigned int options )
+{
+  if( mBlendBitmask != options)
+  {
+    mBlendBitmask = options;
+    mResendFlag |= RESEND_BLEND_BIT_MASK;
+  }
+}
+
+void Renderer::SetBlendColor( const Vector4& blendColor )
+{
+  if( !mBlendColor )
+  {
+    mBlendColor = new Vector4( blendColor );
+  }
+  else
+  {
+    *mBlendColor = blendColor;
+  }
+
+  mResendFlag |= RESEND_BLEND_COLOR;
+}
+
+void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
+{
+  mPremultipledAlphaEnabled = preMultipled;
+  mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
 }
 
 //Called when a node with this renderer is added to the stage
@@ -257,10 +349,12 @@ void Renderer::OnStageConnect()
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
     RenderGeometry* renderGeometry = mGeometry->GetRenderGeometry(mSceneController);
-    mRenderer = Render::Renderer::New( dataProvider, renderGeometry );
+    mRenderer = Render::Renderer::New( dataProvider, renderGeometry,
+                                       mBlendBitmask, mBlendColor,
+                                       static_cast< Dali::Renderer::FaceCullingMode >( mFaceCullingMode ),
+                                       mPremultipledAlphaEnabled );
     mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
-    mResendDataProviders = false;
-    mResendGeometry = false;
+    mResendFlag = 0;
   }
 }
 
@@ -303,7 +397,6 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
 {
   RenderDataProvider* dataProvider = new RenderDataProvider();
 
-  dataProvider->mMaterialDataProvider = mMaterial;
   dataProvider->mUniformMapDataProvider = this;
   dataProvider->mShader = mMaterial->GetShader();
 
@@ -341,20 +434,38 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 
   if( mMaterial )
   {
-    if( mMaterial->GetBlendPolicy() == Material::TRANSLUCENT )
+    switch( mBlendingMode )
     {
-      opacity = Renderer::TRANSLUCENT;
-    }
-    else if( mMaterial->GetBlendPolicy() == Material::USE_ACTOR_COLOR  )
-    {
-      float alpha = node.GetWorldColor( updateBufferIndex ).a;
-      if( alpha <= FULLY_TRANSPARENT )
+      case BlendingMode::ON: // If the renderer should always be use blending
       {
-        opacity = TRANSPARENT;
+        opacity = Renderer::TRANSLUCENT;
+        break;
       }
-      else if( alpha <= FULLY_OPAQUE )
+      case BlendingMode::AUTO:
       {
-        opacity = TRANSLUCENT;
+        if(mMaterial->IsTranslucent() ) // If the renderer should determine opacity using the material
+        {
+          opacity = Renderer::TRANSLUCENT;
+        }
+        else // renderer should determine opacity using the actor color
+        {
+          float alpha = node.GetWorldColor( updateBufferIndex ).a;
+          if( alpha <= FULLY_TRANSPARENT )
+          {
+            opacity = TRANSPARENT;
+          }
+          else if( alpha <= FULLY_OPAQUE )
+          {
+            opacity = TRANSLUCENT;
+          }
+        }
+        break;
+      }
+      case BlendingMode::OFF: // the renderer should never use blending
+      default:
+      {
+        opacity = Renderer::OPAQUE;
+        break;
       }
     }
   }
@@ -369,7 +480,7 @@ void Renderer::ConnectionsChanged( PropertyOwner& object )
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   // Ensure the child object pointers get re-sent to the renderer
-  mResendDataProviders = true;
+  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::ConnectedUniformMapChanged()
