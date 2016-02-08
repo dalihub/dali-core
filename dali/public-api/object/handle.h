@@ -168,6 +168,7 @@ public:
 
   /**
    * @brief Query the index of a property.
+   *
    * Returns the first property index that matches the given name exactly.
    *
    * @SINCE_1_0.0
