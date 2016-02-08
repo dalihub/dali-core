@@ -118,8 +118,8 @@ public:
    * Will always display a backtrace when raised in a debug build.
    *
    * @SINCE_1_0.0
-   * @param[in] location  - the location of the assertion
-   * @param[in] condition - The assertion condition
+   * @param[in] location The location of the assertion
+   * @param[in] condition The assertion condition
    */
   DaliException( const char* location, const char* condition );
 
