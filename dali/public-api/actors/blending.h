@@ -33,6 +33,8 @@ namespace BlendingMode
 /**
  * @brief Blending mode.
  * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use it.
  */
 enum Type
 {
@@ -49,25 +51,26 @@ namespace BlendingFactor
  * @brief Blending Factor.
  *
  * @SINCE_1_0.0
- * @see Dali::RenderableActor::SetBlendFunc() and Dali::RenderableActor::GetBlendFunc()
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use it.
  */
 enum Type
 {
-  ZERO                     = 0,
-  ONE                      = 1,
-  SRC_COLOR                = 0x0300,
-  ONE_MINUS_SRC_COLOR      = 0x0301,
-  SRC_ALPHA                = 0x0302,
-  ONE_MINUS_SRC_ALPHA      = 0x0303,
-  DST_ALPHA                = 0x0304,
-  ONE_MINUS_DST_ALPHA      = 0x0305,
-  DST_COLOR                = 0x0306,
-  ONE_MINUS_DST_COLOR      = 0x0307,
-  SRC_ALPHA_SATURATE       = 0x0308,
-  CONSTANT_COLOR           = 0x8001,
-  ONE_MINUS_CONSTANT_COLOR = 0x8002,
-  CONSTANT_ALPHA           = 0x8003,
-  ONE_MINUS_CONSTANT_ALPHA = 0x8004
+  ZERO                     = 0,  ///< ZERO @SINCE_1_0.0
+  ONE                      = 1,  ///< ONE @SINCE_1_0.0
+  SRC_COLOR                = 0x0300,  ///< SRC_COLOR @SINCE_1_0.0
+  ONE_MINUS_SRC_COLOR      = 0x0301,  ///< ONE_MINUS_SRC_COLOR @SINCE_1_0.0
+  SRC_ALPHA                = 0x0302,  ///< SRC_ALPHA @SINCE_1_0.0
+  ONE_MINUS_SRC_ALPHA      = 0x0303,  ///< ONE_MINUS_SRC_ALPHA @SINCE_1_0.0
+  DST_ALPHA                = 0x0304,  ///< DST_ALPHA @SINCE_1_0.0
+  ONE_MINUS_DST_ALPHA      = 0x0305,  ///< ONE_MINUS_DST_ALPHA @SINCE_1_0.0
+  DST_COLOR                = 0x0306,  ///< DST_COLOR @SINCE_1_0.0
+  ONE_MINUS_DST_COLOR      = 0x0307,  ///< ONE_MINUS_DST_COLOR @SINCE_1_0.0
+  SRC_ALPHA_SATURATE       = 0x0308,  ///< SRC_ALPHA_SATURATE @SINCE_1_0.0
+  CONSTANT_COLOR           = 0x8001,  ///< CONSTANT_COLOR @SINCE_1_0.0
+  ONE_MINUS_CONSTANT_COLOR = 0x8002,  ///< ONE_MINUS_CONSTANT_COLOR @SINCE_1_0.0
+  CONSTANT_ALPHA           = 0x8003,  ///< CONSTANT_ALPHA @SINCE_1_0.0
+  ONE_MINUS_CONSTANT_ALPHA = 0x8004  ///< ONE_MINUS_CONSTANT_ALPHA @SINCE_1_0.0
 };
 
 } // namespace BlendingFactor
@@ -78,13 +81,14 @@ namespace BlendingEquation
  * @brief Blending Equation.
  *
  * @SINCE_1_0.0
- * @see Dali::RenderableActor::SetBlendEquation() and Dali::RenderableActor::GetBlendEquation()
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use it.
  */
 enum Type
 {
-  ADD              = 0x8006,
-  SUBTRACT         = 0x800A,
-  REVERSE_SUBTRACT = 0x800B
+  ADD              = 0x8006,  ///< The source and destination colors are added to each other. @SINCE_1_0.0
+  SUBTRACT         = 0x800A,  ///< Subtracts the destination from the source. @SINCE_1_0.0
+  REVERSE_SUBTRACT = 0x800B  ///< Subtracts the source from the destination. @SINCE_1_0.0
 };
 
 } // namespace BlendingEquation

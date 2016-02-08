@@ -82,7 +82,7 @@ enum Type
 {
   FIXED,                 ///< Size is fixed as set by SetSize @SINCE_1_0.0
   USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size @SINCE_1_0.0
-  FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio not maintained. @SINCE_1_0.0
+  FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio is not maintained. @SINCE_1_0.0
   SIZE_RELATIVE_TO_PARENT,        ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ). @SINCE_1_0.0
   SIZE_FIXED_OFFSET_FROM_PARENT,  ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ). @SINCE_1_0.0
   FIT_TO_CHILDREN,       ///< Size will adjust to wrap around all children @SINCE_1_0.0
@@ -107,7 +107,7 @@ enum Type
 }
 
 /**
- * @brief Different types of alignment.
+ * @brief Horizontal alignment types.
  * @SINCE_1_0.0
  */
 namespace HorizontalAlignment
@@ -120,6 +120,10 @@ enum Type
 };
 }
 
+/**
+ * @brief Vertical alignment types.
+ * @SINCE_1_0.0
+ */
 namespace VerticalAlignment
 {
 enum Type

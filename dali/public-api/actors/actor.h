@@ -98,11 +98,12 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *     {
  *       // Only hit-test the actor and its children if it is sensitive and visible
  *       IF ( ACTOR-IS-SENSITIVE &&
- *            ACTOR-IS-VISIBLE )
+ *            ACTOR-IS-VISIBLE &&
+ *            ACTOR-IS-ON-STAGE )
  *       {
  *         // Depth-first traversal within current layer, visiting parent first
  *
- *         // Check whether current actor should be hit-tested
+ *         // Check whether current actor should be hit-tested.
  *         IF ( ( TOUCH-SIGNAL-NOT-EMPTY || HOVER-SIGNAL-NOT-EMPTY ) &&
  *              ACTOR-HAS-NON-ZERO-SIZE &&
  *              ACTOR-WORLD-COLOR-IS-NOT-TRANSPARENT )
@@ -112,13 +113,13 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *           {
  *             IF ( ACTOR-IS-OVERLAY || ( DISTANCE-TO-ACTOR < DISTANCE-TO-LAST-HIT-ACTOR ) )
  *             {
- *               // The current actor is the closest actor that was underneath the touch
+ *               // The current actor is the closest actor that was underneath the touch.
  *               LAST-HIT-ACTOR = CURRENT-ACTOR
  *             }
  *           }
  *         }
  *
- *         // Keep checking children, in case we hit something closer
+ *         // Keep checking children, in case we hit something closer.
  *         FOR-EACH CHILD (in order)
  *         {
  *           IF ( CHILD-IS-NOT-A-LAYER )
@@ -126,7 +127,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *             // Continue traversal for this child's sub-tree
  *             HIT-TEST-WITHIN-LAYER ( CHILD )
  *           }
- *           // else we skip hit-testing the child's sub-tree altogether
+ *           // else we skip hit-testing the child's sub-tree altogether.
  *         }
  *       }
  *     }
@@ -188,7 +189,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *
  *       IF ( NOT-CONSUMED )
  *       {
- *         // If event is not consumed then deliver it to the parent unless we reach the root actor
+ *         // If event is not consumed then deliver it to the parent unless we reach the root actor.
  *         IF ( ACTOR-PARENT )
  *         {
  *           EMIT-HOVER-SIGNAL( ACTOR-PARENT )
@@ -216,6 +217,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *     touch signals are also emitted from the touch-down actor with an "Interrupted" state.
  *   - If the consumed actor on hover-start is not the same as the consumed actor on hover-finished, then
  *     hover signals are also emitted from the hover-started actor with an "Interrupted" state.
+ *
  * <h3>Key Events:</h3>
  *
  * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
@@ -252,41 +254,41 @@ public:
   {
     enum
     {
-      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3 @SINCE_1_0.0
-      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float @SINCE_1_0.0
-      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float @SINCE_1_0.0
-      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float @SINCE_1_0.0
-      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3 @SINCE_1_0.0
-      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float @SINCE_1_0.0
-      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float @SINCE_1_0.0
-      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float @SINCE_1_0.0
-      SIZE,                                               ///< name "size",                  type Vector3 @SINCE_1_0.0
-      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float @SINCE_1_0.0
-      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float @SINCE_1_0.0
-      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float @SINCE_1_0.0
-      POSITION,                                           ///< name "position",              type Vector3 @SINCE_1_0.0
-      POSITION_X,                                         ///< name "positionX",             type float @SINCE_1_0.0
-      POSITION_Y,                                         ///< name "positionY",             type float @SINCE_1_0.0
-      POSITION_Z,                                         ///< name "positionZ",             type float @SINCE_1_0.0
-      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3    (read-only) @SINCE_1_0.0
-      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float      (read-only) @SINCE_1_0.0
-      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float      (read-only) @SINCE_1_0.0
-      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float      (read-only) @SINCE_1_0.0
-      ORIENTATION,                                        ///< name "orientation",           type Quaternion @SINCE_1_0.0
-      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion (read-only) @SINCE_1_0.0
-      SCALE,                                              ///< name "scale",                 type Vector3 @SINCE_1_0.0
-      SCALE_X,                                            ///< name "scaleX",                type float @SINCE_1_0.0
-      SCALE_Y,                                            ///< name "scaleY",                type float @SINCE_1_0.0
-      SCALE_Z,                                            ///< name "scaleZ",                type float @SINCE_1_0.0
-      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3    (read-only) @SINCE_1_0.0
-      VISIBLE,                                            ///< name "visible",               type bool @SINCE_1_0.0
-      COLOR,                                              ///< name "color",                 type Vector4 @SINCE_1_0.0
-      COLOR_RED,                                          ///< name "colorRed",              type float @SINCE_1_0.0
-      COLOR_GREEN,                                        ///< name "colorGreen",            type float @SINCE_1_0.0
-      COLOR_BLUE,                                         ///< name "colorBlue",             type float @SINCE_1_0.0
-      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float @SINCE_1_0.0
-      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4    (read-only) @SINCE_1_0.0
-      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix     (read-only) @SINCE_1_0.0
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3    (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float      (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float      (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float      (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3    (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float      (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float      (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float      (constraint-input) @SINCE_1_0.0
+      SIZE,                                               ///< name "size",                  type Vector3    (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float      (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      POSITION,                                           ///< name "position",              type Vector3    (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_X,                                         ///< name "positionX",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_Y,                                         ///< name "positionY",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_Z,                                         ///< name "positionZ",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3    (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float      (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float      (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float      (read-only / constraint-input) @SINCE_1_0.0
+      ORIENTATION,                                        ///< name "orientation",           type Quaternion (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion (read-only / constraint-input) @SINCE_1_0.0
+      SCALE,                                              ///< name "scale",                 type Vector3    (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_X,                                            ///< name "scaleX",                type float      (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_Y,                                            ///< name "scaleY",                type float      (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_Z,                                            ///< name "scaleZ",                type float      (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3    (read-only / constraint-input) @SINCE_1_0.0
+      VISIBLE,                                            ///< name "visible",               type bool       (animatable / constraint-input) @SINCE_1_0.0
+      COLOR,                                              ///< name "color",                 type Vector4    (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_RED,                                          ///< name "colorRed",              type float      (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_GREEN,                                        ///< name "colorGreen",            type float      (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_BLUE,                                         ///< name "colorBlue",             type float      (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float      (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4    (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix     (read-only / constraint-input) @SINCE_1_0.0
       NAME,                                               ///< name "name",                  type std::string @SINCE_1_0.0
       SENSITIVE,                                          ///< name "sensitive",             type bool @SINCE_1_0.0
       LEAVE_REQUIRED,                                     ///< name "leaveRequired",         type bool @SINCE_1_0.0
@@ -321,7 +323,7 @@ public:
   /**
    * @brief Create an uninitialized Actor; this can be initialized with Actor::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized Actor handle is not allowed.
    * @SINCE_1_0.0
    */
   Actor();
@@ -335,7 +337,7 @@ public:
   static Actor New();
 
   /**
-   * @brief Downcast an Object handle to Actor handle.
+   * @brief Downcast a handle to Actor handle.
    *
    * If handle points to a Actor object the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
@@ -367,6 +369,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param [in] rhs The actor to copy.
+   * @return A reference to this
    */
   Actor& operator=(const Actor& rhs);
 
@@ -440,17 +443,17 @@ public:
   /**
    * @brief Adds a child Actor to this Actor.
    *
-   * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color,
-   * scale etc as it now inherits them from this actor
    * @SINCE_1_0.0
    * @param [in] child The child.
    * @pre This Actor (the parent) has been initialized.
    * @pre The child actor has been initialized.
    * @pre The child actor is not the same as the parent actor.
-   * @pre The actor is not the Root actor
+   * @pre The actor is not the Root actor.
    * @post The child will be referenced by its parent. This means that the child will be kept alive,
    * even if the handle passed into this method is reset or destroyed.
+   * @note if the child already has a parent, it will be removed from old parent
+   * and reparented to this actor. This may change childs position, color,
+   * scale etc as it now inherits them from this actor.
    */
   void Add(Actor child);
 
@@ -496,7 +499,7 @@ public:
   /**
    * @brief Search through this actor's hierarchy for an actor with the given name.
    *
-   * The actor itself is also considered in the search
+   * The actor itself is also considered in the search.
    * @SINCE_1_0.0
    * @param[in] actorName the name of the actor to find
    * @return A handle to the actor if found, or an empty handle if not.
@@ -507,7 +510,7 @@ public:
   /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.
    *
-   * The actor itself is also considered in the search
+   * The actor itself is also considered in the search.
    * @SINCE_1_0.0
    * @param[in] id the ID of the actor to find
    * @return A handle to the actor if found, or an empty handle if not.
@@ -635,9 +638,9 @@ public:
    * @brief Retrieve the actor's size.
    *
    * @SINCE_1_0.0
-   * @return The actor's current size.
+   * @return The actor's target size.
    * @pre The actor has been initialized.
-   * @note This return is the value that was set using SetSize or the target size of an animation
+   * @note This return is the value that was set using SetSize or the target size of an animation.
    */
   Vector3 GetTargetSize() const;
 
@@ -770,7 +773,7 @@ public:
    * @brief Returns the actors position inheritance mode.
    *
    * @SINCE_1_0.0
-   * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
+   * @return Return the position inheritance mode.
    * @pre The Actor has been initialized.
    */
   PositionInheritanceMode GetPositionInheritanceMode() const;
@@ -867,10 +870,10 @@ public:
   void SetInheritOrientation(bool inherit);
 
   /**
-   * @brief Returns whether the actor inherit's it's parent's orientation.
+   * @brief Returns whether the actor inherits its parent's orientation.
    *
    * @SINCE_1_0.0
-   * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
+   * @return True if the actor inherits its parent orientation, false if it uses world orientation.
    * @pre The Actor has been initialized.
    */
   bool IsOrientationInherited() const;
@@ -921,7 +924,7 @@ public:
    * @brief Apply a relative scale to an actor.
    *
    * @SINCE_1_0.0
-   * @param[in] relativeScale The scale to combine with the actors existing scale.
+   * @param[in] relativeScale The scale to combine with the actor's existing scale.
    * @pre The actor has been initialized.
    */
   void ScaleBy(const Vector3& relativeScale);
@@ -958,10 +961,10 @@ public:
   void SetInheritScale( bool inherit );
 
   /**
-   * @brief Returns whether the actor inherit's it's parent's scale.
+   * @brief Returns whether the actor inherits its parent's scale.
    *
    * @SINCE_1_0.0
-   * @return true if the actor inherit's it's parent scale, false if it uses world scale.
+   * @return True if the actor inherits its parent scale, false if it uses world scale.
    * @pre The Actor has been initialized.
    */
   bool IsScaleInherited() const;
@@ -1080,12 +1083,12 @@ public:
    * @brief Set how the actor and its children should be drawn.
    *
    * Not all actors are renderable, but DrawMode can be inherited from any actor.
-   * By default a renderable actor will be drawn as a 3D object. It will be depth-tested against
+   * If an object is in a 3D layer, it will be depth-tested against
    * other objects in the world i.e. it may be obscured if other objects are in front.
    *
    * If DrawMode::OVERLAY_2D is used, the actor and its children will be drawn as a 2D overlay.
    * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
-   * For overlay actors, the drawing order is with respect to depthIndex property of Renderers,
+   * For overlay actors, the drawing order is with respect to tree levels of Actors,
    * and depth-testing will not be used.
    *
    * If DrawMode::STENCIL is used, the actor and its children will be used to stencil-test other actors
@@ -1103,7 +1106,7 @@ public:
    * @brief Query how the actor and its children will be drawn.
    *
    * @SINCE_1_0.0
-   * @return True if the Actor is an overlay.
+   * @return Return the draw mode type.
    */
   DrawMode::Type GetDrawMode() const;
 
@@ -1132,7 +1135,7 @@ public:
    * @note If an actor's sensitivity is set to false, then it's children will not be hittable either.
    *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
    *       hittable if all of its parents have sensitivity set to true.
-   * @see @see SignalTouch() and SignalHover().
+   * @see @see TouchedSignal() and HoveredSignal().
    */
   void SetSensitive(bool sensitive);
 
@@ -1140,7 +1143,7 @@ public:
    * @brief Query whether an actor emits touch or hover event signals.
    *
    * @SINCE_1_0.0
-   * @return true, if emission of touch or hover event signals is enabled, false otherwise.
+   * @return True, if emission of touch or hover event signals is enabled, false otherwise.
    * @pre The Actor has been initialized.
    * @note If an actor is not sensitive, then it's children will not be hittable either.
    *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
@@ -1170,7 +1173,7 @@ public:
    * @param[in]  required  Should be set to true if a Leave event is required
    * @pre The Actor has been initialized.
    * @note By default, this is set to false as most actors do not require this.
-   * @note Need to connect to the SignalTouch or SignalHover to actually receive this event.
+   * @note Need to connect to the TouchedSignal() or HoveredSignal() to actually receive this event.
    *
    */
   void SetLeaveRequired(bool required);
@@ -1180,7 +1183,7 @@ public:
    * the boundary of the actor.
    *
    * @SINCE_1_0.0
-   * @return true if a Leave event is required, false otherwise.
+   * @return True if a Leave event is required, false otherwise.
    * @pre The Actor has been initialized.
    */
   bool GetLeaveRequired() const;
@@ -1200,7 +1203,7 @@ public:
    * @brief Returns whether the actor is focusable by keyboard navigation.
    *
    * @SINCE_1_0.0
-   * @return true if the actor is focusable by keyboard navigation, false if not.
+   * @return True if the actor is focusable by keyboard navigation, false if not.
    * @pre The Actor has been initialized.
    */
   bool IsKeyboardFocusable() const;
@@ -1208,7 +1211,7 @@ public:
   // SIZE NEGOTIATION
 
   /**
-   * @brief Set the resize policy to be used for the given dimension(s)
+   * @brief Set the resize policy to be used for the given dimension(s).
    *
    * @SINCE_1_0.0
    * @param[in] policy The resize policy to use
@@ -1217,11 +1220,11 @@ public:
   void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
-   * @brief Return the resize policy used for a single dimension
+   * @brief Return the resize policy used for a single dimension.
    *
    * @SINCE_1_0.0
    * @param[in] dimension The dimension to get policy for
-   * @return Return the dimension resize policy
+   * @return Return the dimension resize policy. If more than one dimension is requested, just return the first one found.
    */
   ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
 
@@ -1234,10 +1237,10 @@ public:
   void SetSizeScalePolicy( SizeScalePolicy::Type policy );
 
   /**
-   * @brief Return the size set policy in use
+   * @brief Return the size scale policy in use.
    *
    * @SINCE_1_0.0
-   * @return Return the size set policy
+   * @return Return the size scale policy.
    */
   SizeScalePolicy::Type GetSizeScalePolicy() const;
 
@@ -1247,7 +1250,7 @@ public:
    * This factor is only used when ResizePolicy is set to either:
    * ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
    * This actor's size is set to the actor's size multipled by or added to this factor,
-   * depending on ResizePolicy (See SetResizePolicy).
+   * depending on ResizePolicy ( See SetResizePolicy() ).
    *
    * @SINCE_1_0.0
    * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
@@ -1265,40 +1268,40 @@ public:
   Vector3 GetSizeModeFactor() const;
 
   /**
-   * @brief Calculate the height of the actor given a width
+   * @brief Calculate the height of the actor given a width.
    *
    * The natural size is used for default calculation.
    * size 0 is treated as aspect ratio 1:1.
    *
    * @SINCE_1_0.0
    * @param width Width to use
-   * @return Return the height based on the width
+   * @return Return the height based on the width.
    */
   float GetHeightForWidth( float width );
 
   /**
-   * @brief Calculate the width of the actor given a height
+   * @brief Calculate the width of the actor given a height.
    *
    * The natural size is used for default calculation.
    * size 0 is treated as aspect ratio 1:1.
    *
    * @SINCE_1_0.0
    * @param height Height to use
-   * @return Return the width based on the height
+   * @return Return the width based on the height.
    */
   float GetWidthForHeight( float height );
 
   /**
-   * @brief Return the value of negotiated dimension for the given dimension
+   * @brief Return the value of negotiated dimension for the given dimension.
    *
    * @SINCE_1_0.0
    * @param dimension The dimension to retrieve
-   * @return Return the value of the negotiated dimension
+   * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found.
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
 
   /**
-   * @brief Set the padding for use in layout
+   * @brief Set the padding for use in layout.
    *
    * @SINCE_1_0.0
    * @param[in] padding Padding for the actor
@@ -1306,7 +1309,7 @@ public:
   void SetPadding( const Padding& padding );
 
   /**
-   * @brief Return the value of the padding
+   * @brief Return the value of the padding.
    *
    * @SINCE_1_0.0
    * @param paddingOut The returned padding data
@@ -1314,7 +1317,7 @@ public:
   void GetPadding( Padding& paddingOut ) const;
 
   /**
-   * @brief Set the minimum size an actor can be assigned in size negotiation
+   * @brief Set the minimum size an actor can be assigned in size negotiation.
    *
    * @SINCE_1_0.0
    * @param[in] size The minimum size
@@ -1322,15 +1325,15 @@ public:
   void SetMinimumSize( const Vector2& size );
 
   /**
-   * @brief Return the minimum relayout size
+   * @brief Return the minimum relayout size.
    *
    * @SINCE_1_0.0
-   * @return Return the mininmum size
+   * @return Return the mininmum size.
    */
   Vector2 GetMinimumSize();
 
   /**
-   * @brief Set the maximum size an actor can be assigned in size negotiation
+   * @brief Set the maximum size an actor can be assigned in size negotiation.
    *
    * @SINCE_1_0.0
    * @param[in] size The maximum size
@@ -1338,15 +1341,15 @@ public:
   void SetMaximumSize( const Vector2& size );
 
   /**
-   * @brief Return the maximum relayout size
+   * @brief Return the maximum relayout size.
    *
    * @SINCE_1_0.0
-   * @return Return the maximum size
+   * @return Return the maximum size.
    */
   Vector2 GetMaximumSize();
 
   /**
-   * @brief Get depth in the hierarchy for the actor
+   * @brief Get depth in the hierarchy for the actor.
    *
    * @SINCE_1_0.0
    * @return The current depth in the hierarchy of the actor, or -1 if actor is not in the hierarchy
@@ -1455,13 +1458,14 @@ public: // Signals
    *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
    * @SINCE_1_0.0
-   * @return The signal
+   * @return The signal to connect to.
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    *
    * @note When the parent of a set of actors is connected to the stage, then all of the children
    * will received this callback.
-   *
    * For the following actor tree, the callback order will be A, B, D, E, C, and finally F.
+   *
+   * @code
    *
    *       A (parent)
    *      / \
@@ -1469,6 +1473,7 @@ public: // Signals
    *    / \   \
    *   D   E   F
    *
+   * @endcode
    */
   OnStageSignalType& OnStageSignal();
 
@@ -1478,17 +1483,20 @@ public: // Signals
    * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
    *
    * @SINCE_1_0.0
-   * @return The signal
+   * @return The signal to connect to.
    * @note When the parent of a set of actors is disconnected to the stage, then all of the children
    * will received this callback, starting with the leaf actors.
-   *
    * For the following actor tree, the callback order will be D, E, B, F, C, and finally A.
+   *
+   * @code
    *
    *       A (parent)
    *      / \
    *     B   C
    *    / \   \
    *   D   E   F
+   *
+   * @endcode
    *
    */
   OffStageSignalType& OffStageSignal();
@@ -1504,7 +1512,7 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Actor::New() methods.
    *
    * @SINCE_1_0.0
    * @param [in] actor A pointer to a newly allocated Dali resource
@@ -1516,7 +1524,7 @@ public: // Not intended for application developers
  * @brief Helper for discarding an actor handle.
  *
  * If the handle is empty, this method does nothing.  Otherwise
- * actor.Unparent() will be called, followed by actor.Reset().
+ * Actor::Unparent() will be called, followed by Actor::Reset().
  * @SINCE_1_0.0
  * @param[in,out] actor A handle to an actor, or an empty handle.
  */
