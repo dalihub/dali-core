@@ -167,7 +167,7 @@ struct RelativeToConstraint
    * @brief Functor.
    * @SINCE_1_0.0
    * @param[in,out] current The current property value (vector3 property * scale factor).
-   * @param[in] input Property container for current property calculation
+   * @param[in] inputs Property container for current property calculation
    */
   void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
@@ -199,7 +199,7 @@ struct RelativeToConstraintFloat
    * @brief Functor.
    * @SINCE_1_0.0
    * @param[in,out] current The current property value (float property * scale factor).
-   * @param[in] input Property container for current property calculation
+   * @param[in] inputs Property container for current property calculation
    */
   void operator()( float& current, const PropertyInputContainer& inputs )
   {

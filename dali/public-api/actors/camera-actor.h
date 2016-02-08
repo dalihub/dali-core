@@ -34,7 +34,7 @@ class CameraActor;
 
 /**
  * @brief Camera enumerations.
- * @since_tizen 2.4
+ * @SINCE_1_0.0
  */
 namespace Camera
 {

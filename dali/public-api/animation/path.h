@@ -37,7 +37,7 @@ class Path;
 /**
  * @brief A 3D parametric curve
  *
- * Paths can be used to animate position and orientation of actors using @ref Dali::Animate( Actor, Path, ... )
+ * Paths can be used to animate position and orientation of actors using Dali::Animate()
  *
  * @SINCE_1_0.0
  */

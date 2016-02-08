@@ -40,7 +40,8 @@ struct TapGesture;
  * @brief This class emits a signal when a tap gesture occurs that meets the requirements set by the
  * application.
  *
- * See @ref TapGestureDetector::SetTapsRequired
+ * See @ref TapGestureDetector::SetMinimumTapsRequired
+ * See @ref TapGestureDetector::SetMaximumTapsRequired
  *
  * A TapGesture is a discrete gesture, which means it does not have any state information attached
  * to it.  Please see TapGesture for more information.

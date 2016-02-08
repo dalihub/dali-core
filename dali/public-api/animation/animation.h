@@ -442,7 +442,7 @@ public:
    * @brief Connect to this signal to be notified when an Animation's animations have finished.
    *
    * @SINCE_1_0.0
-   * @return A signal object to @ref Signal::Connect() with.
+   * @return A signal object to connect with.
    */
   AnimationSignalType& FinishedSignal();
 
