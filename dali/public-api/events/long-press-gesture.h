@@ -32,8 +32,8 @@ namespace Dali
 /**
  * @brief A LongPressGesture is emitted when the user touches and holds the screen with the stated number of fingers.
  *
- * This gesture can be in one of two states, when the long-press gesture is first detected: "Started";
- * and when the long-press gesture ends: "Finished".
+ * This gesture can be in one of two states, when the long-press gesture is first detected: Gesture::Started
+ * and when the long-press gesture ends: Gesture::Finished.
  *
  * Long press gesture finishes when all touches have been released.
  *
@@ -48,19 +48,22 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
    * @brief Constructor
    *
    * @SINCE_1_0.0
-   * @param[in] state  The state of the gesture
+   * @param[in] state The state of the gesture
    */
   LongPressGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
    */
   LongPressGesture( const LongPressGesture& rhs );
 
   /**
    * @brief Assignment operator
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   LongPressGesture& operator=( const LongPressGesture& rhs );
 

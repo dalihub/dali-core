@@ -70,7 +70,7 @@ public: // Creation & Destruction
   /**
    * @brief Create an uninitialized LongPressGestureDetector; this can be initialized with LongPressGestureDetector::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized LongPressGestureDetector handle is not allowed.
    * @SINCE_1_0.0
    */
   LongPressGestureDetector();
@@ -108,13 +108,13 @@ public: // Creation & Destruction
   static LongPressGestureDetector New(unsigned int minTouches, unsigned int maxTouches);
 
   /**
-   * @brief Downcast an Object handle to LongPressGestureDetector handle.
+   * @brief Downcast a handle to LongPressGestureDetector handle.
    *
    * If handle points to a LongPressGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a LongPressGestureDetector object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a LongPressGestureDetector object or an uninitialized handle
    */
   static LongPressGestureDetector DownCast( BaseHandle handle );
 
@@ -211,7 +211,7 @@ public: // Signals
 public: // Not intended for Application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods.
+   * @brief This constructor is used by LongPressGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.

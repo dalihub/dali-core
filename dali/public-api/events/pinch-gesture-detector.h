@@ -73,7 +73,7 @@ public: // Creation & Destruction
   /**
    * @brief Create an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized PinchGestureDetector handle is not allowed.
    * @SINCE_1_0.0
    */
   PinchGestureDetector();
@@ -87,13 +87,13 @@ public: // Creation & Destruction
   static PinchGestureDetector New();
 
   /**
-   * @brief Downcast an Object handle to PinchGestureDetector handle.
+   * @brief Downcast a handle to PinchGestureDetector handle.
    *
    * If handle points to a PinchGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a PinchGestureDetector object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a PinchGestureDetector object or an uninitialized handle
    */
   static PinchGestureDetector DownCast( BaseHandle handle );
 
@@ -140,7 +140,7 @@ public: // Signals
 public: // Not intended for Application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods.
+   * @brief This constructor is used by PinchGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.

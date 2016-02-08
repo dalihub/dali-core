@@ -49,7 +49,7 @@ struct DALI_IMPORT_API TouchEvent
   /**
    * @brief Constructor
    * @SINCE_1_0.0
-   * @param[in]  time  The time the event occurred
+   * @param[in] time The time the event occurred
    */
   TouchEvent(unsigned long time);
 

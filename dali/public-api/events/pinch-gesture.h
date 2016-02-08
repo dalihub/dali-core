@@ -33,9 +33,9 @@ namespace Dali
  * @brief A PinchGesture is emitted when the user moves two fingers towards or away from each other.
  *
  * This gesture can be in one of three states; when the pinch gesture is first detected, its
- * state is set to "Started".  After this, if there is change in the gesture, the state will
- * be "Continuing".  Finally, when the gesture ends, the state of the gesture changes to
- * "Finished".
+ * state is set to Gesture::Started.  After this, if there is change in the gesture, the state will
+ * be Gesture::Continuing.  Finally, when the gesture ends, the state of the gesture changes to
+ * Gesture::Finished.
  *
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch
  * until the pinch ends.
@@ -49,19 +49,22 @@ struct DALI_IMPORT_API PinchGesture: public Gesture
    * @brief Default Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  state  The state of the gesture
+   * @param[in] state The state of the gesture
    */
   PinchGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
    */
   PinchGesture( const PinchGesture& rhs );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   PinchGesture& operator=( const PinchGesture& rhs );
 
