@@ -27,7 +27,7 @@ using namespace Dali;
 namespace
 {
 // Size of the VertexAttributeArray enables
-// GLES specification states that there's minimum of
+// GLES specification states that there's a minimum of 8
 const unsigned int TEST_MAX_ATTRIBUTE_CACHE_SIZE = 8;
 
 enum TestAttribType

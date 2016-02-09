@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Generates an XML summary of test cases from Test-kit lite output XML.
+
 use strict;
 use XML::Parser;
 use Encode;

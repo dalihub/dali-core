@@ -85,10 +85,9 @@ int RunAllInParallel(const char* processName, testcase tc_array[], bool reRunFai
  * Run all test cases in serial
  * @param[in] processName The name of this process
  * @param[in] tc_array The array of auto-generated testkit-lite test cases
- * @param[in] reRunFailed True if failed test cases should be re-run
  * @return 0 on success
  */
-int RunAll(const char* processName, testcase tc_array[], bool reRunFailed);
+int RunAll( const char* processName, testcase tc_array[] );
 
 /**
  * Find the named test case in the given array, and run it
