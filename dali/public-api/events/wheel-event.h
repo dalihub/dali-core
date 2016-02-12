@@ -67,7 +67,7 @@ struct DALI_IMPORT_API WheelEvent
    * @SINCE_1_0.0
    * @param[in]  type       The type of the wheel event
    * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
-   * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
+   * @param[in]  modifiers  Modifier keys pressed during the event (such as shift, alt and control)
    * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
    * @param[in]  z          The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
    * @param[in]  timeStamp  The time the wheel is being rolled.
@@ -84,7 +84,7 @@ struct DALI_IMPORT_API WheelEvent
    * @brief Check to see if Shift key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if shift modifier
+   * @return True if shift modifier
    */
   bool IsShiftModifier() const;
 
@@ -92,7 +92,7 @@ struct DALI_IMPORT_API WheelEvent
    * @brief Check to see if Ctrl (control) key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if ctrl modifier
+   * @return True if ctrl modifier
    */
   bool IsCtrlModifier() const;
 
@@ -100,7 +100,7 @@ struct DALI_IMPORT_API WheelEvent
    * @brief Check to see if Alt key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if alt modifier
+   * @return True if alt modifier
    */
   bool IsAltModifier() const;
 

@@ -99,7 +99,7 @@ struct BlendingOptions
    * @param[in] color The blend color.
    * @return True if the blend color changed, otherwise it was already the same color.
    */
-  bool SetBlendColor( const Vector4& color );
+  void SetBlendColor( const Vector4& color );
 
   /**
    * Query the blend color.
@@ -119,7 +119,8 @@ private:
 
   unsigned int mBitmask; ///< A bitmask of blending options
 
-  Vector4* mOptionalColor; ///< A heap-allocated color (owned)
+  Vector4* mBlendColor; ///< A heap-allocated color (owned)
+
 };
 
 } // namespace Internal

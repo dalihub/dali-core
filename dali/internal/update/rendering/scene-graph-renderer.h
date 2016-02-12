@@ -19,6 +19,8 @@
 
 
 #include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -123,6 +125,37 @@ public:
   {
     return mDepthIndex;
   }
+
+  /**
+   * Set the face culling mode
+   * @param[in] faceCullingMode to use
+   */
+  void SetFaceCullingMode( unsigned int faceCullingMode );
+
+  /**
+   * Set the blending mode
+   * @param[in] blendingMode to use
+   */
+  void SetBlendingMode( unsigned int blendingMode );
+
+  /**
+   * Set the blending options. This should only be called from the update thread.
+   * @param[in] options A bitmask of blending options.
+   */
+  void SetBlendingOptions( unsigned int options );
+
+  /**
+   * Set the blend color for blending operation
+   * @param blendColor to pass to GL
+   */
+  void SetBlendColor( const Vector4& blendColor );
+
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
    * Called when an actor with this renderer is added to the stage
@@ -258,19 +291,26 @@ private:
    */
   RenderDataProvider* NewRenderDataProvider();
 
+private:
+
   SceneController* mSceneController;  ///< Used for initializing renderers whilst attached
   Render::Renderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
-  Material*             mMaterial;    ///< The material this renderer uses. (Not owned)
-  Geometry*             mGeometry;    ///< The geometry this renderer uses. (Not owned)
+  Material*          mMaterial;    ///< The material this renderer uses. (Not owned)
+  Geometry*          mGeometry;    ///< The geometry this renderer uses. (Not owned)
+
+  Vector4*                        mBlendColor;      ///< The blend color for blending operation
+  unsigned int                    mBlendBitmask;    ///< The bitmask of blending options
+  Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< The mode of face culling
+  BlendingMode::Type              mBlendingMode;    ///< The mode of blending
 
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
   unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
   unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
+  unsigned char mResendFlag;                    ///< Indicate whether data should be resent to the renderer
   bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
-  bool         mResendDataProviders;           ///< True if the data providers should be resent to the renderer
-  bool         mResendGeometry;                ///< True if geometry should be resent to the renderer
   bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
   bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
+  bool         mPremultipledAlphaEnabled;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions
@@ -309,6 +349,56 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &Renderer::SetDepthIndex, depthIndex );
+}
+
+inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::Renderer::FaceCullingMode faceCullingMode )
+{
+  typedef MessageValue1< Renderer, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetFaceCullingMode, faceCullingMode );
+}
+
+inline void SetBlendingModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, BlendingMode::Type blendingMode )
+{
+  typedef MessageValue1< Renderer, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetBlendingMode, blendingMode );
+}
+
+inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, unsigned int options )
+{
+  typedef MessageValue1< Renderer, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetBlendingOptions, options );
+}
+
+inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Vector4& blendColor )
+{
+  typedef MessageValue1< Renderer, Vector4 > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetBlendColor, blendColor );
+}
+
+inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool preMultiplied )
+{
+  typedef MessageValue1< Renderer, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::EnablePreMultipliedAlpha, preMultiplied );
 }
 
 inline void OnStageConnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )

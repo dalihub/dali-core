@@ -53,21 +53,23 @@ class DALI_IMPORT_API GestureDetector : public Handle
 public: // Creation & Destruction
 
   /**
-   * @brief Create an uninitialized GestureDetector; this can be initialized with one of the derived gestures' New() methods.
+   * @brief Create an uninitialized GestureDetector.
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * This can be initialized with one of the derived gesture detectors' New() methods. For example, PanGestureDetector::New().
+   *
+   * Calling member functions with an uninitialized Dali::GestureDetector handle is not allowed.
    * @SINCE_1_0.0
    */
   GestureDetector();
 
   /**
-   * @brief Downcast an Object handle to GestureDetector handle.
+   * @brief Downcast a handle to GestureDetector handle.
    *
    * If handle points to a GestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a GestureDetector object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a GestureDetector object or an uninitialized handle
    */
   static GestureDetector DownCast( BaseHandle handle );
 
@@ -150,7 +152,7 @@ public: // Actor related
 protected:
 
   /**
-   * @brief This constructor is used by Dali New() methods of derived classes.
+   * @brief This constructor is used by New() methods of derived classes (For example, PanGestureDetector::New()).
    *
    * @SINCE_1_0.0
    * @param [in]  internal  A pointer to a newly allocated Dali resource.

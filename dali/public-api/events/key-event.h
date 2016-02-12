@@ -42,7 +42,7 @@ namespace Dali
  * pressed.
  *
  * Currently KeyEvent is also being used to relay messages from the
- * IMF keyboard to Core. In future IMF may communicate via its own
+ * IMF(Input Method Framework) keyboard to the internal core. In future IMF may communicate via its own
  * module.
  * @SINCE_1_0.0
  */
@@ -90,7 +90,7 @@ struct DALI_IMPORT_API KeyEvent
    * @brief Check to see if Shift key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if shift modifier
+   * @return True if shift modifier
    */
   bool IsShiftModifier() const;
 
@@ -98,7 +98,7 @@ struct DALI_IMPORT_API KeyEvent
    * @brief Check to see if Ctrl (control) key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if ctrl modifier
+   * @return True if ctrl modifier
    */
   bool IsCtrlModifier() const;
 
@@ -106,7 +106,7 @@ struct DALI_IMPORT_API KeyEvent
    * @brief Check to see if Alt key modifier has been supplied.
    *
    * @SINCE_1_0.0
-   * @return bool true if alt modifier
+   * @return True if alt modifier
    */
   bool IsAltModifier() const;
 
@@ -124,6 +124,11 @@ struct DALI_IMPORT_API KeyEvent
 
   /**
    * @brief Keycode for the key pressed.
+   *
+   * @remarks We recommend not to use this key code value
+   * directly because its meaning might be changed in the future. Currently, it means a
+   * platform-specific key code. You need to use IsKey() to know what a key event means
+   * instead of direct comparison of key code value.
    */
   int  keyCode;
 

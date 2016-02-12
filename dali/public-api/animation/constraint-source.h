@@ -67,7 +67,7 @@ struct DALI_IMPORT_API LocalSource
 struct DALI_IMPORT_API ParentSource
 {
   /**
-   * @brief Create a local constraint source.
+   * @brief Create a parent constraint source.
    *
    * @SINCE_1_0.0
    * @param [in] index The index of a property, provided by the parent of the constrained object.

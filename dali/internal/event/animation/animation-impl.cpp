@@ -127,7 +127,8 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mPlayRange( Vector2(0.0f,1.0f)),
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
-  mDefaultAlpha( defaultAlpha )
+  mDefaultAlpha( defaultAlpha ),
+  mState(Dali::Animation::STOPPED)
 {
 }
 
@@ -264,6 +265,8 @@ void Animation::Play()
   // Update the current playlist
   mPlaylist.OnPlay( *this );
 
+  mState = Dali::Animation::PLAYING;
+
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
@@ -275,6 +278,8 @@ void Animation::PlayFrom( float progress )
     // Update the current playlist
     mPlaylist.OnPlay( *this );
 
+    mState = Dali::Animation::PLAYING;
+
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
   }
@@ -282,12 +287,21 @@ void Animation::PlayFrom( float progress )
 
 void Animation::Pause()
 {
+  mState = Dali::Animation::PAUSED;
+
   // mAnimation is being used in a separate thread; queue a Pause message
   PauseAnimationMessage( mEventThreadServices, *mAnimation );
 }
 
+Dali::Animation::State Animation::GetState() const
+{
+  return mState;
+}
+
 void Animation::Stop()
 {
+  mState = Dali::Animation::STOPPED;
+
   // mAnimation is being used in a separate thread; queue a Stop message
   StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
 }
@@ -747,6 +761,8 @@ bool Animation::HasFinished()
     mNotificationCount = playedCount;
 
     hasFinished = true;
+
+    mState = Dali::Animation::STOPPED;
   }
 
   return hasFinished;

@@ -32,9 +32,9 @@ namespace Dali
 /**
  * @brief A PanGesture is emitted when the user moves one or more fingers in a particular direction.
  *
- * This gesture can be in one of three states, when the pan gesture is first detected: "Started";
- * when the pan gesture is continuing: "Continuing"; and finally, when the pan gesture ends:
- * "Finished".
+ * This gesture can be in one of three states, when the pan gesture is first detected: Gesture::Started
+ * when the pan gesture is continuing: Gesture::Continuing and finally, when the pan gesture ends:
+ * Gesture::Finished.
  *
  * A pan gesture will end in the following ways:
  * - User releases the primary finger (the first touch).
@@ -59,19 +59,22 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  state  The state of the gesture
+   * @param[in] state The state of the gesture
    */
   PanGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
    */
   PanGesture( const PanGesture& rhs );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   PanGesture& operator=( const PanGesture& rhs );
 

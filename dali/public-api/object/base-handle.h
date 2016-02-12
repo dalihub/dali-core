@@ -259,7 +259,7 @@ private:
 };
 
 /**
- * @brief Template wrapper to downcast an base object handle to derived class handle.
+ * @brief Template wrapper to downcast a base object handle to derived class handle.
  *
  * @SINCE_1_0.0
  * @param handle to a base object

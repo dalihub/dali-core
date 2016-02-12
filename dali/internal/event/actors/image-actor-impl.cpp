@@ -611,60 +611,60 @@ float ImageActor::GetSortModifier() const
 
 void ImageActor::SetCullFace(CullFaceMode mode)
 {
-  mRenderer->GetMaterial()->SetFaceCullingMode( static_cast< Dali::Material::FaceCullingMode >( mode ) );
+  mRenderer->SetFaceCullingMode( static_cast< Dali::Renderer::FaceCullingMode >( mode ) );
 }
 
 CullFaceMode ImageActor::GetCullFace() const
 {
-  return static_cast< CullFaceMode >( mRenderer->GetMaterial()->GetFaceCullingMode() );
+  return static_cast< CullFaceMode >( mRenderer->GetFaceCullingMode() );
 }
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
 {
-  mRenderer->GetMaterial()->SetBlendMode( mode );
+  mRenderer->SetBlendMode( mode );
 }
 
 BlendingMode::Type ImageActor::GetBlendMode() const
 {
-  return mRenderer->GetMaterial()->GetBlendMode();
+  return mRenderer->GetBlendMode();
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
 {
-  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+  mRenderer->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
                                BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
 {
-  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
                                BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
 {
-  mRenderer->GetMaterial()->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
 {
-  mRenderer->GetMaterial()->SetBlendEquation( equationRgba, equationRgba );
+  mRenderer->SetBlendEquation( equationRgba, equationRgba );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
 {
-  mRenderer->GetMaterial()->SetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->SetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
 {
-  mRenderer->GetMaterial()->GetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->GetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::SetBlendColor( const Vector4& color )
 {
   mBlendColor = color;
-  mRenderer->GetMaterial()->SetBlendColor( mBlendColor );
+  mRenderer->SetBlendColor( mBlendColor );
 }
 
 const Vector4& ImageActor::GetBlendColor() const

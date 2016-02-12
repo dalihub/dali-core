@@ -159,6 +159,11 @@ public:
   void Pause();
 
   /**
+   * @copydoc Dali::Animation::GetState()
+   */
+  Dali::Animation::State GetState() const;
+
+  /**
    * @copydoc Dali::Animation::Stop()
    */
   void Stop();
@@ -467,6 +472,7 @@ private:
   EndAction mEndAction;
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
+  Dali::Animation::State mState;
 
 };
 

@@ -54,7 +54,7 @@ namespace Dali
  * @brief Base class to handle the memory of simple vector.
  *
  * Memory layout is such that it has two std::size_t to hold the count
- * and capacity of the vector. mData is adjusted so that it points to the
+ * and capacity of the vector. VectorBase::mData is adjusted so that it points to the
  * beginning of the first real item so that iterating the items is quick.
  * @SINCE_1_0.0
  */
@@ -85,7 +85,7 @@ protected: // Construction
 public: // API
 
   /**
-   * @brief This method is inlined as its needed frequently for End() iterator.
+   * @brief This method is inlined as its needed frequently for Vector::End() iterator.
    *
    * @SINCE_1_0.0
    * @return The count of elements in this vector.
@@ -102,6 +102,7 @@ public: // API
   }
 
   /**
+   * @brief Gets the count of elements in this vector.
    * @SINCE_1_0.0
    * @return The count of elements in this vector.
    */
@@ -120,6 +121,7 @@ public: // API
   }
 
   /**
+   * @brief Gets the capacity of this vector.
    * @SINCE_1_0.0
    * @return The capacity of this vector.
    */
@@ -139,7 +141,7 @@ protected: // for Derived classes
    * @brief Helper to set the count.
    *
    * @SINCE_1_0.0
-   * @param count Number of elements in the vector.
+   * @param[in] count Number of elements in the vector.
    */
   void SetCount( SizeType count );
 
@@ -147,8 +149,8 @@ protected: // for Derived classes
    * @brief Reserve space in the vector.
    *
    * @SINCE_1_0.0
-   * @param count of elements to reserve.
-   * @param elementSize of a single element.
+   * @param[in] count Count of elements to reserve.
+   * @param[in] elementSize Size of a single element.
    */
   void Reserve( SizeType count, SizeType elementSize );
 
@@ -156,8 +158,8 @@ protected: // for Derived classes
    * @brief Copy a vector.
    *
    * @SINCE_1_0.0
-   * @param vector Vector to copy from.
-   * @param elementSize of a single element.
+   * @param[in] vector Vector to copy from.
+   * @param[in] elementSize Size of a single element.
    */
   void Copy( const VectorBase& vector, SizeType elementSize );
 
@@ -165,7 +167,7 @@ protected: // for Derived classes
    * @brief Swap the contents of two vectors.
    *
    * @SINCE_1_0.0
-   * @param vector Vector to swap with.
+   * @param[in] vector Vector to swap with.
    */
   void Swap( VectorBase& vector );
 
@@ -174,9 +176,9 @@ protected: // for Derived classes
    *
    * Does not change capacity.
    * @SINCE_1_0.0
-   * @param address to erase from.
-   * @param elementSize to erase.
-   * @pre last element cannot be erased as there is nothing to move.
+   * @param[in] address Adress to erase from.
+   * @param[in] elementSize Size to erase.
+   * @pre Last element cannot be erased as there is nothing to move.
    */
   void Erase( char* address, SizeType elementSize );
 
@@ -188,7 +190,7 @@ protected: // for Derived classes
    * @param[in] first Address to the first element to be erased.
    * @param[in] last Address to the last element to be erased.
    * @param[in] elementSize Size of one of the elements to be erased.
-   * @return address pointing to the next element of the last one.
+   * @return Address pointing to the next element of the last one.
    */
   char* Erase( char* first, char* last, SizeType elementSize );
 
@@ -247,8 +249,8 @@ protected: // API for deriving classes
    * @brief Copy vector contents.
    *
    * @SINCE_1_0.0
-   * @param rhs to copy from.
-   * @param elementSize of the content.
+   * @param[in] rhs VectorBase object to copy from.
+   * @param[in] elementSize Size of the content.
    */
   void Copy( const VectorBase& rhs, SizeType elementSize )
   {
@@ -266,8 +268,8 @@ protected: // API for deriving classes
    * @brief Reserve space in the vector.
    *
    * @SINCE_1_0.0
-   * @param count of elements to reserve.
-   * @param elementSize of a single element.
+   * @param[in] count Count of elements to reserve.
+   * @param[in] elementSize Size of a single element.
    */
   void Reserve( SizeType count, SizeType elementSize )
   {
@@ -278,8 +280,8 @@ protected: // API for deriving classes
    * @brief Resize the vector. Does not change capacity.
    *
    * @SINCE_1_0.0
-   * @param count to resize to.
-   * @param elementSize of a single element.
+   * @param[in] count Count to resize to.
+   * @param[in] elementSize Size of a single element.
    */
   void Resize( SizeType count, SizeType elementSize )
   {
@@ -314,8 +316,8 @@ protected: // API for deriving classes
    * @brief Erase an element. Does not change capacity.
    *
    * @SINCE_1_0.0
-   * @param address to erase from.
-   * @param elementSize to erase.
+   * @param[in] address Address to erase from.
+   * @param[in] elementSize Size to erase.
    */
   void Erase( char* address, SizeType elementSize )
   {
@@ -329,7 +331,7 @@ protected: // API for deriving classes
    * @param[in] first Address to the first element to be erased.
    * @param[in] last Address to the last element to be erased.
    * @param[in] elementSize Size of one of the elements to be erased.
-   * @return address pointing to the next element of the last one.
+   * @return Address pointing to the next element of the last one.
    */
   char* Erase( char* first, char* last, SizeType elementSize )
   {
@@ -408,10 +410,10 @@ public: // API
    * @brief Type definitions.
    * @SINCE_1_0.0
    */
-  typedef VectorBase::SizeType SizeType;
+  typedef VectorBase::SizeType SizeType; ///< Size type @SINCE_1_0.0
   typedef T* Iterator;  ///< Most simple Iterator is a pointer @SINCE_1_0.0
-  typedef const T* ConstIterator;
-  typedef T  ItemType;
+  typedef const T* ConstIterator; ///< Const iterator @SINCE_1_0.0
+  typedef T  ItemType; ///< Item type @SINCE_1_0.0
 
   enum
   {
@@ -438,7 +440,7 @@ public: // API
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param vector Vector to copy from.
+   * @param[in] vector Vector to copy from.
    */
   Vector( const Vector& vector )
   {
@@ -450,8 +452,8 @@ public: // API
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param  vector Vector to assign from.
-   * @return reference to self for chaining.
+   * @param[in]  vector Vector to assign from.
+   * @return Reference to self for chaining.
    */
   Vector& operator=( const Vector& vector )
   {
@@ -463,6 +465,7 @@ public: // API
   }
 
   /**
+   * @brief Iterator to the beginning of the data.
    * @SINCE_1_0.0
    * @return Iterator to the beginning of the data.
    */
@@ -473,6 +476,7 @@ public: // API
   }
 
   /**
+   * @brief Iterator to the end of the data (one past last element).
    * @SINCE_1_0.0
    * @return Iterator to the end of the data (one past last element).
    */
@@ -484,10 +488,11 @@ public: // API
   }
 
   /**
+   * @brief Subscript operator.
    * @SINCE_1_0.0
-   * @param  index of the element.
-   * @return reference to the element for given index.
-   * @pre index must be in the vector's range.
+   * @param[in]  index Index of the element.
+   * @return Reference to the element for given index.
+   * @pre Index must be in the vector's range.
    */
   ItemType& operator[]( SizeType index )
   {
@@ -496,8 +501,9 @@ public: // API
   }
 
   /**
+   * @brief Subscript operator.
    * @SINCE_1_0.0
-   * @param  index of the element.
+   * @param[in]  index of the element.
    * @return reference to the element for given index.
    * @pre index must be in the vector's range.
    */
@@ -518,7 +524,7 @@ public: // API
    * become invalid.
    *
    * @SINCE_1_0.0
-   * @param[in] element to be added.
+   * @param[in] element Element to be added.
    */
   void PushBack( const ItemType& element )
   {
@@ -547,7 +553,7 @@ public: // API
    * @pre Iterator at must be in the vector's range ( Vector::Begin(), Vector::End() ).
    *
    * @param[in] at Iterator where to insert the elements into the vector.
-   * @param[in] element to be added.
+   * @param[in] element An element to be added.
    *@SINCE_1_0.0
    */
   void Insert( Iterator at, const ItemType& element )
@@ -601,7 +607,7 @@ public: // API
    *
    * Reserving less than current Capacity is a no-op.
    * @SINCE_1_0.0
-   * @param count of elements to reserve.
+   * @param[in] count Count of elements to reserve.
    */
   void Reserve( SizeType count )
   {
@@ -612,7 +618,7 @@ public: // API
    * @brief Resize the vector. Does not change capacity.
    *
    * @SINCE_1_0.0
-   * @param count to resize to.
+   * @param[in] count Count to resize to.
    */
   void Resize( SizeType count )
   {
@@ -624,8 +630,8 @@ public: // API
    * @brief Resize the vector. Does not change capacity.
    *
    * @SINCE_1_0.0
-   * @param count to resize to.
-   * @param item to insert to the new indices.
+   * @param[in] count Count to resize to.
+   * @param[in] item An item to insert to the new indices.
    */
   void Resize( SizeType count, const ItemType& item )
   {
@@ -653,7 +659,7 @@ public: // API
    * Does not change capacity. Other elements get moved.
    *
    * @SINCE_1_0.0
-   * @param iterator Iterator pointing to item to remove.
+   * @param[in] iterator Iterator pointing to item to remove.
    * @return Iterator pointing to next element.
    * @pre Iterator \e iterator must be within the vector's range ( Vector::Begin(), Vector::End() - 1 ).
    *
@@ -720,7 +726,7 @@ public: // API
    * this in case order does not matter. Does not change capacity.
    *
    * @SINCE_1_0.0
-   * @param iterator Iterator pointing to item to remove.
+   * @param[in] iterator Iterator pointing to item to remove.
    * @pre Iterator \e iterator must be in the vector's range ( Vector::Begin(), Vector::End() - 1 ).
    *
    */
@@ -740,7 +746,7 @@ public: // API
    * @brief Swap the contents of two vectors.
    *
    * @SINCE_1_0.0
-   * @param vector Vector to swap with.
+   * @param[in] vector Vector to swap with.
    */
   void Swap( Vector& vector )
   {

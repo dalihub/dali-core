@@ -35,10 +35,12 @@ namespace Dali
 
 typedef float (*AlphaFunctionPrototype)(float progress); ///< Prototype of an alpha function @SINCE_1_0.0
 
-  /*
+  /**
    * @brief Alpha functions are used in animations to specify the rate of change of the animation parameter over time.
+   *
    * Understanding an animation as a parametric function over time, the alpha function is applied to the parameter of
    * the animation before computing the final animation value.
+   * @SINCE_1_0.0
    */
 class DALI_IMPORT_API AlphaFunction
 {
@@ -78,9 +80,9 @@ public:
    */
   enum Mode
   {
-    BUILTIN_FUNCTION,  //< The user has specified a built-in function
-    CUSTOM_FUNCTION,   //< The user has provided a custom function
-    BEZIER             //< The user has provided the control points of a bezier curve
+    BUILTIN_FUNCTION,  ///< The user has specified a built-in function @SINCE_1_0.0
+    CUSTOM_FUNCTION,   ///< The user has provided a custom function @SINCE_1_0.0
+    BEZIER             ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
   };
 
   /**
@@ -113,6 +115,7 @@ public:
 
   /**
    * @brief Constructor.
+   *
    * Creates a bezier alpha function. The bezier will have the first point at (0,0) and
    * the end point at (1,1).
    * @SINCE_1_0.0
@@ -140,10 +143,10 @@ public:
   AlphaFunctionPrototype GetCustomFunction() const;
 
   /**
-   * @brief Returns the built0in function used by the alpha function
+   * @brief Returns the built-in function used by the alpha function
    * @SINCE_1_0.0
    * @return One of the built-in alpha functions. In case no built-in function
-   * has been specified, it will return AlphaFunction::DEfAULT
+   * has been specified, it will return AlphaFunction::DEFAULT
    */
   BuiltinFunction GetBuiltinFunction() const;
 

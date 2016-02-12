@@ -32,6 +32,10 @@ namespace Internal DALI_INTERNAL
 class CameraActor;
 }
 
+/**
+ * @brief Camera enumerations.
+ * @SINCE_1_0.0
+ */
 namespace Camera
 {
 /**
@@ -78,6 +82,7 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the CameraActor class.
+   *
    * Properties additional to Actor.
    * @SINCE_1_0.0
    */
@@ -105,8 +110,8 @@ public:
   /**
    * @brief Create an uninitialized CameraActor handle.
    *
-   * Initialise it using CameraActor::New().  Calling member functions
-   * with an uninitialized Dali::Object is not allowed.
+   * Initialise it using CameraActor::New().
+   * Calling member functions with an uninitialized CameraActor handle is not allowed.
    * @SINCE_1_0.0
    */
   CameraActor();
@@ -116,7 +121,7 @@ public:
    *
    * Sets the default camera perspective projection for the stage's size. @see SetPerspectiveProjection().
    * @SINCE_1_0.0
-   * @return the newly created camera actor.
+   * @return The newly created camera actor.
    */
   static CameraActor New();
 
@@ -127,18 +132,18 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] size The canvas size.
-   * @return the newly created camera actor.
+   * @return The newly created camera actor.
    */
   static CameraActor New( const Size& size );
 
   /**
-   * @brief Downcast an Object handle to CameraActor.
+   * @brief Downcast a handle to CameraActor handle.
    *
    * If handle points to a CameraActor the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle to An object
-   * @return handle to a CameraActor or an uninitialized handle
+   * @return Handle to a CameraActor or an uninitialized handle
    */
   static CameraActor DownCast( BaseHandle handle );
 
@@ -163,6 +168,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param [in] rhs The actor to copy.
+   * @return A reference to this
    */
   CameraActor& operator=(const CameraActor& rhs);
 
@@ -178,7 +184,7 @@ public:
    * @brief Get the type of the camera.
    *
    * @SINCE_1_0.0
-   * @return the type of camera
+   * @return The type of camera
    */
   Dali::Camera::Type GetType() const;
 
@@ -209,7 +215,7 @@ public:
   /**
    * @brief Get the field of view in Radians.
    *
-   * The default field of view is 45 degrees
+   * The default field of view is 45 degrees.
    * @SINCE_1_0.0
    * @return The field of view in radians
    */
@@ -226,9 +232,9 @@ public:
   /**
    * @brief Get the aspect ratio of the camera.
    *
-   * The default aspect ratio is 4.0f/3.0f
+   * The default aspect ratio is 4.0f/3.0f.
    * @SINCE_1_0.0
-   * @return the aspect ratio
+   * @return The aspect ratio
    */
   float GetAspectRatio( );
 
@@ -236,17 +242,17 @@ public:
    * @brief Sets the near clipping plane distance.
    *
    * @SINCE_1_0.0
-   * @param[in] nearClippingPlane distance of the near clipping plane
+   * @param[in] nearClippingPlane Distance of the near clipping plane
    */
   void SetNearClippingPlane( float nearClippingPlane );
 
   /**
    * @brief Get the near clipping plane distance.
    *
-   * The default near clipping plane is 800.0f, to match the default screen height
-   * Reduce this value to see objects closer to the camera
+   * The default near clipping plane is 800.0f, to match the default screen height.
+   * Reduce this value to see objects closer to the camera.
    * @SINCE_1_0.0
-   * @return the near clipping plane value
+   * @return The near clipping plane value
    */
   float GetNearClippingPlane( );
 
@@ -254,16 +260,16 @@ public:
    * @brief Sets the far clipping plane distance.
    *
    * @SINCE_1_0.0
-   * @param[in] farClippingPlane distance of the far clipping plane
+   * @param[in] farClippingPlane Distance of the far clipping plane
    */
   void SetFarClippingPlane( float farClippingPlane );
 
   /**
    * @brief Get the far clipping plane distance.
    *
-   * The default value is the default near clipping plane + (0xFFFF>>4)
+   * The default value is the default near clipping plane + (0xFFFF>>4).
    * @SINCE_1_0.0
-   * @return the far clipping plane value
+   * @return The far clipping plane value
    */
   float GetFarClippingPlane( );
 
@@ -272,17 +278,17 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] targetPosition The position of the target to look at
-   * @pre Camera type is LOOK_AT_TARGET
+   * @pre Camera type is LOOK_AT_TARGET.
    */
   void SetTargetPosition( const Vector3& targetPosition );
 
   /**
    * @brief Get Camera Target position.
    *
-   * The target position is Vector3::ZERO
+   * The default target position is Vector3::ZERO.
    * @SINCE_1_0.0
    * @return The target position of the camera
-   * @pre Camera type is LOOK_AT_TARGET
+   * @pre Camera type is LOOK_AT_TARGET.
    */
   Vector3 GetTargetPosition() const;
 
@@ -353,7 +359,7 @@ public:
 
 public: // Not intended for use by Application developers
   /**
-   * @brief This constructor is used by Dali New() methods.
+   * @brief This constructor is used by CameraActor::New() methods.
    *
    * @SINCE_1_0.0
    * @param [in] actor A pointer to a newly allocated Dali resource

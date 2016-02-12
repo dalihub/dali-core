@@ -48,12 +48,15 @@ struct DALI_IMPORT_API Gesture
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
    */
   Gesture( const Gesture& rhs );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   Gesture& operator=( const Gesture& rhs );
 

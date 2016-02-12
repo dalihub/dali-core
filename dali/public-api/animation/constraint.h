@@ -292,7 +292,7 @@ public:
   /**
    * @brief Create an uninitialized Constraint; this can be initialized with Constraint::New().
    *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * Calling member functions with an uninitialized Constraint handle is not allowed.
    * @SINCE_1_0.0
    */
   Constraint();
@@ -306,6 +306,7 @@ public:
    * @endcode
    *
    * Create the constraint with this function as follows:
+   *
    * @code
    *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, &MyFunction );
    * @endcode
@@ -337,6 +338,7 @@ public:
    * @endcode
    *
    * Create the constraint with this object as follows:
+   *
    * @code
    *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, MyObject() );
    * @endcode
@@ -369,6 +371,7 @@ public:
    * @endcode
    *
    * Create the constraint with this object as follows:
+   *
    * @code
    *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, MyObject(), &MyObject::MyMethod );
    * @endcode
@@ -426,13 +429,13 @@ public:
   Constraint& operator=( const Constraint& rhs );
 
   /**
-   * @brief Downcast an Object handle to Constraint handle.
+   * @brief Downcast a handle to Constraint handle.
    *
    * If handle points to a Constraint object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in]  baseHandle  to An object
-   * @return handle to a Constraint object or an uninitialized handle
+   * @param[in] baseHandle BaseHandle to an object
+   * @return Handle to a Constraint object or an uninitialized handle
    */
   static Constraint DownCast( BaseHandle baseHandle );
 
@@ -477,9 +480,9 @@ public:
   Dali::Property::Index GetTargetProperty();
 
   /**
-   * @brief Set whether the constraint will "bake" a value when fully-applied.
+   * @brief Set the remove action. Constraint::Bake will "bake" a value when fully-applied.
    *
-   * Otherwise the constrained value will be discarded, when the constraint is removed.
+   * In case of Constraint::Discard, the constrained value will be discarded, when the constraint is removed.
    * The default value is Constraint::Bake.
    * @SINCE_1_0.0
    * @param[in] action The remove-action.
@@ -487,11 +490,10 @@ public:
   void SetRemoveAction( RemoveAction action );
 
   /**
-   * @brief Query whether the constraint will "bake" a value when fully-applied.
+   * @brief Retrieve the remove action that will happen when the constraint is removed.
    *
-   * Otherwise the constrained value will be discarded, when the constraint is removed.
    * @SINCE_1_0.0
-   * @return The apply-action.
+   * @return The remove-action.
    */
   RemoveAction GetRemoveAction() const;
 
@@ -514,7 +516,7 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * @brief This constructor is used by Dali New() methods
+   * @brief This constructor is used by Constraint::New() methods
    * @SINCE_1_0.0
    * @param [in] constraint A pointer to a newly allocated Dali resource
    */
