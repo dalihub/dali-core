@@ -1,6 +1,7 @@
 <VertexShader>
 
-attribute mediump vec2  aPosition;
+attribute mediump vec3  aPosition;
+attribute mediump vec2  aTexCoord;
 
 uniform   mediump mat4  uModelView;
 uniform   mediump mat4  uProjection;
@@ -14,12 +15,12 @@ uniform   mediump vec3  uSize;
 
 varying   mediump vec2  vTexCoord;
 
-uniform   mediump vec4  uTextureRect;
+uniform   mediump vec4  sTextureRect;
 
 void main()
 {
-  gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
-  vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
+  gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+  vTexCoord = aTexCoord;
 }
 
 </VertexShader>
@@ -29,7 +30,7 @@ void main()
 uniform sampler2D sTexture;
 uniform sampler2D sEffect;
 
-uniform mediump vec4 uTextureRect;
+uniform mediump vec4 sTextureRect;
 uniform mediump vec4 uColor;
 
 varying mediump vec2 vTexCoord;

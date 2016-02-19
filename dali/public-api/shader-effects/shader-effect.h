@@ -48,8 +48,8 @@ namespace Dali
  * const string VERTEX_SHADER_SOURCE = DALI_COMPOSE_SHADER (
  *   void main()
  *   {
- *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
- *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
+ *     gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+ *     vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord) );
  *   }
  * );
  * @SINCE_1_0.0
@@ -92,8 +92,8 @@ class ShaderEffect;
  * <pre>
  * void main()
  * {
- *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
- *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
+ *     gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+ *     vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );
  * }
  * </pre>
  * For fragment shader the default part for images contains the following code:
