@@ -92,9 +92,30 @@ public:
   {
     enum
     {
-      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "viewportPosition",  type Vector2 @SINCE_1_0.0
-      VIEWPORT_SIZE,                                           ///< name "viewportSize",      type Vector2 @SINCE_1_0.0
-      CLEAR_COLOR,                                             ///< name "clearColor",        type Vector4 @SINCE_1_0.0
+      /**
+       * @brief name "viewportPosition", type Vector2
+       * @SINCE_1_0.0
+       */
+      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX,
+      /**
+       * @brief name "viewportSize", type Vector2
+       * @SINCE_1_0.0
+       */
+      VIEWPORT_SIZE,
+      /**
+       * @brief name "clearColor", type Vector4
+       * @SINCE_1_0.0
+       */
+      CLEAR_COLOR,
+      /**
+       * @brief name "requiresSync", type BOOLEAN
+       * @details By default, the sync object is not created.
+       *  When native image source is used as render target, in order to track when the render to pixmap is completed, the GL sync should be enabled.
+       *  Thus the RENDER_ONCE finished signal can be emit at the correct timing.
+       * @note The use of GL sync might cause deadlock with multiple access to the single pixmap happening in the same time.
+       * @SINCE_1_1.29
+       */
+      REQUIRES_SYNC,
     };
   };
 
