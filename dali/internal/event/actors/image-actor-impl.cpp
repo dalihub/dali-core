@@ -59,20 +59,14 @@ TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::Actor ), Creat
 
 struct GridVertex
 {
-  GridVertex( float positionX, float positionY, const Vector2& size )
-  : mPosition( positionX*size.x, positionY*size.y, 0.f ),
-    mTextureCoord( positionX+0.5f, positionY+0.5f )
-  {
-  }
-
   Vector3 mPosition;
   Vector2 mTextureCoord;
 };
 
-GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, const Vector2& size )
+GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
 {
   // Create vertices
-  std::vector< GridVertex > vertices;
+  std::vector< Vector2 > vertices;
   vertices.reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
 
   for( unsigned int y = 0u; y < gridHeight + 1; ++y )
@@ -81,7 +75,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
     for( unsigned int x = 0u; x < gridWidth + 1; ++x )
     {
       float xPos = (float)x / gridWidth;
-      vertices.push_back( GridVertex( xPos - 0.5f, yPos - 0.5f, size ) );
+      vertices.push_back( Vector2( xPos - 0.5f, yPos - 0.5f ) );
     }
   }
 
@@ -113,8 +107,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
 
 
   Property::Map vertexFormat;
-  vertexFormat[ "aPosition" ] = Property::VECTOR3;
-  vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
+  vertexFormat[ "aPosition" ] = Property::VECTOR2;
   PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New();
   vertexPropertyBuffer->SetFormat( vertexFormat );
   vertexPropertyBuffer->SetSize( vertices.size() );
@@ -144,17 +137,16 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
 }
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec3 aPosition;\n
-  attribute mediump vec2 aTexCoord;\n
+  attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 sTextureRect;\n
+  uniform mediump vec4 uTextureRect;\n
   \n
   void main()\n
   {\n
-    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);\n
-    vTexCoord = aTexCoord;\n
+    gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);\n
+    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
   }\n
 );
 
@@ -168,8 +160,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
   }\n
 );
-
-const char * const TEXTURE_RECT_UNIFORM_NAME( "sTextureRect" );
 
 const size_t INVALID_TEXTURE_ID = (size_t)-1;
 const int INVALID_RENDERER_ID = -1;
@@ -186,7 +176,7 @@ ImageActorPtr ImageActor::New()
   //Create the renderer
   actor->mRenderer = Renderer::New();
 
-  GeometryPtr quad  = CreateGeometry( 1u, 1u, Vector2::ONE );
+  GeometryPtr quad  = CreateGeometry( 1u, 1u );
   actor->mRenderer->SetGeometry( *quad );
 
   ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
@@ -304,7 +294,6 @@ Vector4 ImageActor::GetNinePatchBorder() const
 
 ImageActor::ImageActor()
 : Actor( Actor::BASIC ),
-  mActorSize( Vector2::ZERO ),
   mGridSize( 1u, 1u ),
   mRendererIndex( INVALID_RENDERER_ID ),
   mTextureIndex( INVALID_TEXTURE_ID ),
@@ -363,11 +352,14 @@ void ImageActor::UpdateGeometry()
     gridHeight = std::min( MAXIMUM_GRID_SIZE, static_cast<uint16_t>(gridSize.height) );
   }
 
-  mGridSize.SetWidth( gridWidth );
-  mGridSize.SetHeight( gridHeight );
+  if( gridWidth != mGridSize.GetWidth() || gridHeight != mGridSize.GetHeight() )
+  {
+    mGridSize.SetWidth( gridWidth );
+    mGridSize.SetHeight( gridHeight );
 
-  GeometryPtr geometry = CreateGeometry( gridWidth, gridHeight, mActorSize );
-  mRenderer->SetGeometry( *geometry );
+    GeometryPtr geometry = CreateGeometry( gridWidth, gridHeight );
+    mRenderer->SetGeometry( *geometry );
+  }
 }
 void ImageActor::UpdateTexureRect()
 {
@@ -387,7 +379,7 @@ void ImageActor::UpdateTexureRect()
   }
 
   Material* material = mRenderer->GetMaterial();
-  material->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
+  material->RegisterProperty( "uTextureRect", textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -764,25 +756,6 @@ void ImageActor::EffectImageUpdated()
       mEffectTextureIndex = INVALID_TEXTURE_ID;
     }
 
-  }
-}
-
-void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  if( mActorSize != size )
-  {
-    mActorSize = size;
-    UpdateGeometry();
-  }
-}
-
-void ImageActor::OnSizeSet( const Vector3& targetSize )
-{
-  Vector2 size( targetSize.x, targetSize.y );
-  if( mActorSize != size )
-  {
-    mActorSize = size;
-    UpdateGeometry();
   }
 }
 

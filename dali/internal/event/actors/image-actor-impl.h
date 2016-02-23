@@ -222,18 +222,6 @@ public:
    */
   virtual void RemoveShaderEffect();
 
-private:
-
-  /**
-   * @copydoc Actor::OnRelayout
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-
-  /**
-   * @copydoc Actor::OnSizeSet
-   */
-  virtual void OnSizeSet( const Vector3& targetSize );
-
 public: // Default property extensions from Object
 
   /**
@@ -331,7 +319,6 @@ private:
   PixelArea               mPixelArea;               ///< The pixel area of the image to render
   Vector4                 mBlendColor;              ///< The blend color for this ImageActor
   Vector4                 mNinePatchBorder;         ///< Nine-patch not supported, but this is used to store what is set so it can be returned for backwards compatibility.
-  Vector2                 mActorSize;               ///< The actor size
   Uint16Pair              mGridSize;                ///< The geometry grid size
   int                     mRendererIndex;           ///< The index location of mRenderer
   size_t                  mTextureIndex;            ///< The texture index for this ImageActor's texture
