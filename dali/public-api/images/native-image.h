@@ -99,23 +99,9 @@ public:
    * If handle points to a NativeImage object, the downcast produces valid handle.
    * If not, the returned handle is left unintialized.
    * @param[in] handle Handle to an object.
-   * @return Handle to a NativeImage or an uninitialized handle.
+   * @return handle to a NativeImage or an uninitialized handle.
    */
   static NativeImage DownCast( BaseHandle handle );
-
-  /**
-   * @brief Get custom fragment prefix for rendering a native image.
-   *
-   * @return String for custom fragment prefix
-   */
-  const char* GetCustomFragmentPreFix();
-
-  /**
-   * @brief Get custom sampler type name for rendering a native image.
-   *
-   * @return String for custom sampler type name
-   */
-  const char* GetCustomSamplerTypename();
 
 public: // Not intended for application developers
 

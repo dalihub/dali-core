@@ -20,20 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/devel-api/images/native-image-interface-extension.h>
 
 namespace Dali
 {
 class TestNativeImage;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
-
-class DALI_IMPORT_API TestNativeImageExtension: public Dali::NativeImageInterface::Extension
-{
-public:
-  inline const char* GetCustomFragmentPreFix(){return "#extension GL_OES_EGL_image_external:require\n";}
-  inline const char* GetCustomSamplerTypename(){return "samplerExternalOES";}
-
-};
 
 class DALI_IMPORT_API TestNativeImage : public Dali::NativeImageInterface
 {
@@ -47,7 +38,6 @@ public:
   inline virtual unsigned int GetWidth() const {return mWidth;};
   inline virtual unsigned int GetHeight() const {return mHeight;};
   inline virtual bool RequiresBlending() const {return true;};
-  inline virtual Dali::NativeImageInterface::Extension* GetExtension() {return mExtension;}
 
 private:
   TestNativeImage(int width, int height);
@@ -59,7 +49,6 @@ public:
   int mExtensionCreateCalls;
   int mExtensionDestroyCalls;
   int mTargetTextureCalls;
-  TestNativeImageExtension* mExtension;
 };
 
 } // Dali

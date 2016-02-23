@@ -208,29 +208,7 @@ int UtcDaliNativeImageExtensionP(void)
   TestNativeImagePointer testNativeImage = TestNativeImage::New( 16, 16 );
   DALI_TEST_CHECK( testNativeImage );
 
-  DALI_TEST_CHECK( NULL != testNativeImage->GetExtension() );
+  DALI_TEST_CHECK( NULL == testNativeImage->GetExtension() );
 
-  END_TEST;
-}
-
-int UtcDaliNativeImageGetCustomFragmentPreFixP(void)
-{
-  TestApplication application;
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( 16, 16 );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-
-  const char* preFix = "#extension GL_OES_EGL_image_external:require\n";
-  DALI_TEST_EQUALS( nativeImage.GetCustomFragmentPreFix(), preFix, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliNativeImageGetCustomSamplerTypenameP(void)
-{
-  TestApplication application;
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( 16, 16 );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-
-  const char* samplerTypename = "samplerExternalOES";
-  DALI_TEST_EQUALS( nativeImage.GetCustomSamplerTypename(), samplerTypename, TEST_LOCATION );
   END_TEST;
 }

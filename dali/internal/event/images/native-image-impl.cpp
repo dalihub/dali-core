@@ -26,7 +26,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/devel-api/images/native-image-interface-extension.h>
 
 using namespace Dali::Integration;
 
@@ -41,20 +40,14 @@ namespace
 TypeRegistration mType( typeid(Dali::NativeImage), typeid(Dali::Image), NULL );
 }
 
-NativeImage::NativeImage( NativeImageInterface& resourceData )
+NativeImage::NativeImage()
 : Image()
 {
-  NativeImageInterface::Extension* extension = resourceData.GetExtension();
-  if( extension != NULL )
-  {
-    mCustomFragmentPreFix = extension->GetCustomFragmentPreFix();
-    mCustomSamplerTypename = extension->GetCustomSamplerTypename();
-  }
 }
 
 NativeImagePtr NativeImage::New( NativeImageInterface& resourceData )
 {
-  NativeImagePtr image = new NativeImage( resourceData );
+  NativeImagePtr image = new NativeImage;
   image->Initialize();
 
   ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
@@ -78,26 +71,6 @@ void NativeImage::CreateGlTexture()
 {
   ResourceClient& resourceClient = ThreadLocalStorage::Get().GetResourceClient();
   resourceClient.CreateGlTexture( GetResourceId() );
-}
-
-const char* NativeImage::GetCustomFragmentPreFix()
-{
-  if( mCustomFragmentPreFix.empty() )
-  {
-    return NULL;
-  }
-
-  return mCustomFragmentPreFix.c_str();
-}
-
-const char* NativeImage::GetCustomSamplerTypename()
-{
-  if( mCustomSamplerTypename.empty() )
-  {
-    return NULL;
-  }
-
-  return mCustomSamplerTypename.c_str();
 }
 
 } // namespace Internal

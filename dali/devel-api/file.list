@@ -41,8 +41,7 @@ devel_api_core_events_header_files = \
 devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/atlas.h \
   $(devel_api_src_dir)/images/distance-field.h \
-  $(devel_api_src_dir)/images/pixel-data.h \
-  $(devel_api_src_dir)/images/native-image-interface-extension.h
+  $(devel_api_src_dir)/images/pixel-data.h
 
 devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/property-buffer.h \
