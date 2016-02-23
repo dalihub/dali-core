@@ -32,13 +32,13 @@ Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>
 
 inline void WrapInPlayRange( float& elapsed, const Dali::Vector2& playRangeSeconds)
 {
-  if (elapsed > playRangeSeconds.y )
+  if( elapsed > playRangeSeconds.y )
   {
-    elapsed = playRangeSeconds.x + fmod(elapsed, playRangeSeconds.y);
+    elapsed = playRangeSeconds.x + fmodf((elapsed-playRangeSeconds.x), (playRangeSeconds.y-playRangeSeconds.x));
   }
   else if( elapsed < playRangeSeconds.x )
   {
-    elapsed = playRangeSeconds.y - fmod(elapsed, playRangeSeconds.y);
+    elapsed = playRangeSeconds.y - fmodf( (playRangeSeconds.x - elapsed), (playRangeSeconds.y-playRangeSeconds.x) );
   }
 }
 
@@ -114,8 +114,20 @@ void Animation::SetPlayRange( const Vector2& range )
 {
   mPlayRange = range;
 
-  //Make sure mElapsedSeconds is within the new range
-  mElapsedSeconds = Dali::Clamp(mElapsedSeconds, mPlayRange.x*mDurationSeconds , mPlayRange.y*mDurationSeconds );
+  // Make sure mElapsedSeconds is within the new range
+
+  if( mState == Stopped )
+  {
+    // Ensure that the animation starts at the right place
+    mElapsedSeconds = mPlayRange.x * mDurationSeconds;
+  }
+  else
+  {
+    // If already past the end of the range, but before end of duration, then clamp will
+    // ensure that the animation stops on the next update.
+    // If not yet at the start of the range, clamping will jump to the start
+    mElapsedSeconds = Dali::Clamp(mElapsedSeconds, mPlayRange.x*mDurationSeconds , mPlayRange.y*mDurationSeconds );
+  }
 }
 
 void Animation::Play()
@@ -134,7 +146,8 @@ void Animation::Play()
 
 void Animation::PlayFrom( float progress )
 {
-  //If the animation is already playing this has no effect
+  // If the animation is already playing this has no effect
+  // Progress is guaranteed to be in range.
   if( mState != Playing )
   {
     mElapsedSeconds = progress * mDurationSeconds;
@@ -269,7 +282,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
                (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
                 ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
 
-    WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
+    WrapInPlayRange( mElapsedSeconds, playRangeSeconds );
 
     UpdateAnimators(bufferIndex, false, false);
 
@@ -305,12 +318,12 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
       mState = Stopped;
     }
   }
-
 }
 
 void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished )
 {
-  float elapsedSecondsClamped = Clamp( mElapsedSeconds, mPlayRange.x * mDurationSeconds,mPlayRange.y * mDurationSeconds );
+  const Vector2 playRange( mPlayRange * mDurationSeconds );
+  float elapsedSecondsClamped = Clamp( mElapsedSeconds, playRange.x, playRange.y );
 
   //Loop through all animators
   bool applied(true);
@@ -327,8 +340,8 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
     {
       if( animator->IsEnabled() )
       {
-        const float initialDelay(animator->GetInitialDelay());
-        if (elapsedSecondsClamped >= initialDelay || mSpeedFactor < 0.0f )
+        const float initialDelay( animator->GetInitialDelay() );
+        if( elapsedSecondsClamped >= initialDelay )
         {
           // Calculate a progress specific to each individual animator
           float progress(1.0f);
