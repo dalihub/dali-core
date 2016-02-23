@@ -122,12 +122,6 @@ bool FrameBufferImage::IsNativeFbo() const
 {
   return mIsNativeFbo;
 }
-
-void FrameBufferImage::SetReleasePolicy( Dali::Image::ReleasePolicy releasePolicy )
-{
-  mReleasePolicy = releasePolicy;
-}
-
 FrameBufferImage::~FrameBufferImage()
 {
 }

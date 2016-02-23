@@ -111,8 +111,8 @@ int UtcDaliFrameBufferImageNew03(void)
 
   DALI_TEST_CHECK( image );
 
-  // ReleasePolicy is deprecated. Only set, but not used internally.
-  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::UNUSED, TEST_LOCATION );
+  //ReleasePolicy is always never for framebuffer images
+  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
 
   // initialise handle with NEVER release policy
   image.Reset();
@@ -122,7 +122,7 @@ int UtcDaliFrameBufferImageNew03(void)
 
   DALI_TEST_CHECK( image );
 
-  // ReleasePolicy is deprecated. Only set, but not used internally.
+  //ReleasePolicy is always never for framebuffer images
   DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
 
   END_TEST;
