@@ -77,7 +77,7 @@ struct ObjectImplHelper
   {
     indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
-    for( unsigned int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+    for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {
       indices.PushBack( DEFAULT_OBJECT_PROPERTY_START_INDEX + i );
     }
@@ -104,7 +104,7 @@ struct ObjectImplHelper
     // debug only, wouldn't need to make this assumption.
 
     // Look for name in default properties
-    for( unsigned int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+    for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {
       const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
       if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string

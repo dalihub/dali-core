@@ -35,6 +35,7 @@ namespace Dali
 
 /**
  * @brief A Array of property values.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Property::Array
 {
@@ -44,24 +45,28 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Array();
 
   /**
    * @brief Copy Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] other The Array to copy from.
    */
   Array( const Array& other );
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Array();
 
   /**
    * @brief Retrieve the number of elements in the array.
    *
+   * @SINCE_1_0.0
    * @return The number of elements in the array.
    */
   SizeType Size() const
@@ -72,6 +77,7 @@ public:
   /**
    * @brief Retrieve the number of elements in the array.
    *
+   * @SINCE_1_0.0
    * @return The number of elements in the array.
    */
   SizeType Count() const;
@@ -79,6 +85,7 @@ public:
   /**
    * @brief Returns whether the array is empty.
    *
+   * @SINCE_1_0.0
    * @return true if empty, false otherwise
    */
   bool Empty() const
@@ -88,22 +95,26 @@ public:
 
   /**
    * @brief Clears the array.
+   * @SINCE_1_0.0
    */
   void Clear();
 
   /**
    * @brief Increase the capcity of the array.
+   * @SINCE_1_0.0
    */
   void Reserve( SizeType size );
 
   /**
    * @brief Resize to size.
+   * @SINCE_1_0.0
    */
   void Resize( SizeType size );
 
   /**
    * @brief Retrieve the capacity of the array.
    *
+   * @SINCE_1_0.0
    * @return The allocated capacity of the array
    */
   SizeType Capacity();
@@ -111,6 +122,7 @@ public:
   /**
    * @brief Add an element to the array.
    *
+   * @SINCE_1_0.0
    * @param[in] value The value to add to the end of the array
    */
   void PushBack( const Value& value );
@@ -118,6 +130,7 @@ public:
   /**
    * @brief Const access an element.
    *
+   * @SINCE_1_0.0
    * @param[in] index The element index to access. No bounds checking is performed.
    *
    * @return The a reference to the element.
@@ -130,6 +143,7 @@ public:
   /**
    * @brief Access an element.
    *
+   * @SINCE_1_0.0
    * @param[in] index The element index to access. No bounds checking is performed.
    *
    * @return The a reference to the element.
@@ -142,6 +156,7 @@ public:
   /**
    * @brief Const operator to access an element.
    *
+   * @SINCE_1_0.0
    * @param[in] index The element index to access. No bounds checking is performed.
    *
    * @return The a reference to the element.
@@ -152,6 +167,7 @@ public:
   /**
    * @brief Operator to access an element.
    *
+   * @SINCE_1_0.0
    * @param[in] index The element index to access. No bounds checking is performed.
    *
    * @return The a reference to the element.
@@ -162,6 +178,7 @@ public:
   /**
    * @brief Assignment Operator
    *
+   * @SINCE_1_0.0
    * @param[in] other The array to copy from.
    *
    * @return The copied array.

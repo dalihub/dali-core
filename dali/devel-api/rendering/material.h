@@ -23,10 +23,8 @@
 #include <string> // std::string
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/blending.h> // Dali::BlendingMode, Dali::BlendingEquation, Dali::BlendingFactor
 #include <dali/public-api/images/image.h> // Dali::Image
 #include <dali/public-api/object/handle.h> // Dali::Handle
-#include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
 #include <dali/devel-api/rendering/sampler.h> // Dali::Sampler
 #include <dali/devel-api/rendering/shader.h> // Dali::Shader
 
@@ -44,36 +42,6 @@ class Material;
 class DALI_IMPORT_API Material : public Handle
 {
 public:
-
-  /**
-   * @brief Set face culling mode.
-   */
-  enum FaceCullingMode
-  {
-    NONE,                     ///< None of the faces should be culled
-    CULL_FRONT,               ///< Cull front face, back face should never be shown
-    CULL_BACK,                ///< Cull back face, back face should never be shown
-    CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
-  };
-
-  /**
-   * @brief An enumeration of properties belonging to the Material class.
-   */
-  struct Property
-  {
-    enum
-    {
-      FACE_CULLING_MODE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "faceCullingMode",                type INTEGER
-      BLENDING_MODE,                                           ///< name "blendingMode",                   type INTEGER
-      BLEND_EQUATION_RGB,                                      ///< name "blendEquationRgb",               type INTEGER
-      BLEND_EQUATION_ALPHA,                                    ///< name "blendEquationAlpha",             type INTEGER
-      BLENDING_SRC_FACTOR_RGB,                                 ///< name "sourceBlendFactorRgb",           type INTEGER
-      BLENDING_DEST_FACTOR_RGB,                                ///< name "destinationBlendFactorRgb",      type INTEGER
-      BLENDING_SRC_FACTOR_ALPHA,                               ///< name "sourceBlendFactorAlpha",         type INTEGER
-      BLENDING_DEST_FACTOR_ALPHA,                              ///< name "destinationBlendFactorAlpha",    type INTEGER
-      BLEND_COLOR,                                             ///< name "blendColor",                     type VECTOR4
-    };
-  };
 
   /**
    * @brief Creates a new Material object
@@ -206,133 +174,6 @@ public:
    * @brief Retrieve the number of textures used by the material
    */
   std::size_t GetNumberOfTextures() const;
-
-  /**
-   * @brief Set the culling mode for this material
-   *
-   * Calling this function sets the property CULLING_MODE
-   *
-   * @param[in] cullingMode The culling mode for this material
-   */
-  void SetFaceCullingMode( FaceCullingMode cullingMode );
-
-  /**
-   * @brief Get the face culling mode for this material
-   *
-   * @return The face culling mode for this material
-   */
-  FaceCullingMode GetFaceCullingMode();
-
-  /**
-   * @brief Sets the blending mode.
-   *
-   * Possible values are: BlendingMode::OFF, BlendingMode::AUTO and BlendingMode::ON. Default is BlendingMode::AUTO.
-   *
-   * If blending is disabled (BlendingMode::OFF) fade in and fade out animations do not work.
-   *
-   * <ul>
-   *   <li> \e OFF Blending is disabled.
-   *   <li> \e AUTO Blending is enabled only if the renderable actor has alpha channel.
-   *   <li> \e ON Blending is enabled.
-   * </ul>
-   *
-   * @param[in] mode The blending mode.
-   */
-  void SetBlendMode( BlendingMode::Type mode );
-
-  /**
-   * @brief Retrieves the blending mode.
-   *
-   * @return The blending mode, one of BlendingMode::OFF, BlendingMode::AUTO or BlendingMode::ON.
-   */
-  BlendingMode::Type GetBlendMode() const;
-
-  /**
-   * @brief Specify the pixel arithmetic used when the actor is blended.
-   *
-   * @param[in] srcFactorRgba Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, and GL_SRC_ALPHA_SATURATE.
-   *
-   * @param[in] destFactorRgba Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, and GL_ONE_MINUS_CONSTANT_ALPHA.
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
-
-  /**
-   * @brief Specify the pixel arithmetic used when the actor is blended.
-   *
-   * @param[in] srcFactorRgb Specifies how the red, green, and blue source blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, and GL_SRC_ALPHA_SATURATE.
-   *
-   * @param[in] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, and GL_ONE_MINUS_CONSTANT_ALPHA.
-   *
-   * @param[in] srcFactorAlpha Specifies how the alpha source blending factor is computed.
-   * The options are the same as for srcFactorRgb.
-   *
-   * @param[in] destFactorAlpha Specifies how the alpha source blending factor is computed.
-   * The options are the same as for destFactorRgb.
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
-
-  /**
-   * @brief Query the pixel arithmetic used when the actor is blended.
-   *
-   * @param[out] srcFactorRgb Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * @param[out] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * @param[out] srcFactorAlpha Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * @param[out] destFactorAlpha Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   */
-  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
-
-  /**
-   * @brief Specify the equation used when the actor is blended.
-   *
-   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
-   * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgba );
-
-  /**
-   * @brief Specify the equation used when the actor is blended.
-   *
-   * @param[in] equationRgb The equation used for combining red, green, and blue components.
-   * @param[in] equationAlpha The equation used for combining the alpha component.
-   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
-
-  /**
-   * @brief Query the equation used when the actor is blended.
-   *
-   * @param[out] equationRgb The equation used for combining red, green, and blue components.
-   * @param[out] equationAlpha The equation used for combining the alpha component.
-   */
-  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
-
-  /**
-   * @brief Specify the color used when the actor is blended; the default is Vector4::ZERO.
-   *
-   * @param[in] color The blend color.
-   */
-  void SetBlendColor( const Vector4& color );
-
-  /**
-   * @brief Query the color used when the actor is blended.
-   *
-   * @return The blend color.
-   */
-  Vector4 GetBlendColor() const;
 
 public:
   /**

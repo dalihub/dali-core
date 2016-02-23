@@ -26,14 +26,15 @@ namespace Dali
  */
 
 /**
- * Stereoscopic view modes
+ * @brief Stereoscopic view modes
+ * @SINCE_1_0.0
  */
 enum ViewMode
 {
-  MONO,              ///< Monoscopic (single camera). This is the default
-  STEREO_HORIZONTAL, ///< Stereoscopic. Frame buffer is split horizontally with the left and right camera views in their respective sides.
-  STEREO_VERTICAL,   ///< Stereoscopic. Frame buffer is split vertically with the left camera view at the top and the right camera view at the bottom.
-  STEREO_INTERLACED  ///< Stereoscopic. Left/Right camera views are rendered into the framebuffer on alternate frames.
+  MONO,              ///< Monoscopic (single camera). This is the default @SINCE_1_0.0
+  STEREO_HORIZONTAL, ///< Stereoscopic. Frame buffer is split horizontally with the left and right camera views in their respective sides. @SINCE_1_0.0
+  STEREO_VERTICAL,   ///< Stereoscopic. Frame buffer is split vertically with the left camera view at the top and the right camera view at the bottom. @SINCE_1_0.0
+  STEREO_INTERLACED  ///< @DEPRECATED_1_1.19 @brief Stereoscopic. Left/Right camera views are rendered into the framebuffer on alternate frames. @SINCE_1_0.0
 };
 
 /**

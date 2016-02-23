@@ -41,6 +41,7 @@ class CallbackBase;
  * - SlotObserver -interface provided by the signal
  *
  * It holds a pointer to the callback, but does not own it.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API SlotConnection
 {
@@ -49,6 +50,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] slotObserver The slot observer.
    * @param[in] callback A callback object (not owned).
    */
@@ -56,12 +58,14 @@ public:
 
   /**
    * @brief Non-virtual destructor, not intended as a base class.
+   * @SINCE_1_0.0
    */
   ~SlotConnection();
 
   /**
    * @brief Retrieve the callback.
    *
+   * @SINCE_1_0.0
    * @return A pointer to the callback.
    */
   CallbackBase* GetCallback();
@@ -69,14 +73,15 @@ public:
   /**
    * @brief Retrieve the slot observer.
    *
+   * @SINCE_1_0.0
    * @return A pointer to the slot observer.
    */
   SlotObserver* GetSlotObserver();
 
 private:
 
-  SlotConnection( const SlotConnection& );            ///< undefined copy constructor
-  SlotConnection& operator=( const SlotConnection& ); ///< undefined assignment operator
+  SlotConnection( const SlotConnection& );            ///< undefined copy constructor @SINCE_1_0.0
+  SlotConnection& operator=( const SlotConnection& ); ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -96,6 +101,7 @@ private:
  *
  * It takes ownership of the callback, and will delete it when
  * the connection is destroyed.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API SignalConnection
 {
@@ -104,6 +110,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] callback The callback which should be a C function.
    */
   SignalConnection( CallbackBase* callback );
@@ -111,6 +118,7 @@ public:
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] signalObserver The signal observer.
    * @param[in] callback Ownership of this callback object is taken.
    */
@@ -118,12 +126,14 @@ public:
 
   /**
    * @brief Non-virtual destructor, not intended as a base class.
+   * @SINCE_1_0.0
    */
   ~SignalConnection();
 
   /**
    * @brief Disconnect the signal from the slot.
    *
+   * @SINCE_1_0.0
    * @param[in] slotObserver The signal disconnecting from the slot.
    */
   void Disconnect( SlotObserver* slotObserver );
@@ -131,14 +141,15 @@ public:
   /**
    * @brief Retrieve the callback.
    *
+   * @SINCE_1_0.0
    * @return A pointer to the callback.
    */
   CallbackBase* GetCallback();
 
 private:
 
-  SignalConnection( const SignalConnection& );            ///< undefined copy constructor
-  SignalConnection& operator=( const SignalConnection& ); ///< undefined assignment operator
+  SignalConnection( const SignalConnection& );            ///< undefined copy constructor @SINCE_1_0.0
+  SignalConnection& operator=( const SignalConnection& ); ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 

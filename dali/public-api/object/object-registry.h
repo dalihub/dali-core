@@ -54,6 +54,7 @@ class ObjectRegistry;
  * |------------------|------------------------------|
  * | objectCreated    | @ref ObjectCreatedSignal()   |
  * | objectDestroyed  | @ref ObjectDestroyedSignal() |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ObjectRegistry : public BaseHandle
 {
@@ -63,11 +64,13 @@ public:
 
   /**
    * @brief Object created signal
+   * @SINCE_1_0.0
    */
   typedef Signal< void ( BaseHandle ) > ObjectCreatedSignalType;
 
   /**
    * @brief Object destroyed signal
+   * @SINCE_1_0.0
    */
   typedef Signal< void ( const Dali::RefObject* ) > ObjectDestroyedSignalType;
 
@@ -76,6 +79,7 @@ public:
    *
    * To retrieve the current objectRegistry,
    * this handle can be set using Stage::GetCurrent().GetObjectRegistry().
+   * @SINCE_1_0.0
    */
   ObjectRegistry();
 
@@ -83,12 +87,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~ObjectRegistry();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   ObjectRegistry(const ObjectRegistry& handle);
@@ -96,6 +102,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -110,8 +117,9 @@ public: // Signals
    * @code
    *   void YourCallbackName(BaseHandle object);
    * @endcode
-   * @pre The Object has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Object has been initialized.
    */
   ObjectCreatedSignalType& ObjectCreatedSignal();
 
@@ -133,8 +141,9 @@ public: // Signals
    * @code
    *   void YourCallbackName(const Dali::RefObject* objectPointer);
    * @endcode
-   * @pre The Object has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Object has been initialized.
    */
   ObjectDestroyedSignalType& ObjectDestroyedSignal();
 
@@ -143,6 +152,7 @@ public: // Not intended for application developers
   /**
    * @brief This constructor is used by Dali Get() method.
    *
+   * @SINCE_1_0.0
    * @param [in] objectRegistry A pointer to a Dali resource
    */
   explicit DALI_INTERNAL ObjectRegistry(Internal::ObjectRegistry* objectRegistry);

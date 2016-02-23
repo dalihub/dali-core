@@ -79,6 +79,21 @@ void Animation::SetLooping(bool looping)
   GetImplementation(*this).SetLooping(looping);
 }
 
+void Animation::SetLoopCount(int count)
+{
+  GetImplementation(*this).SetLoopCount(count);
+}
+
+int Animation::GetLoopCount()
+{
+  return GetImplementation(*this).GetLoopCount();
+}
+
+int Animation::GetCurrentLoop()
+{
+  return GetImplementation(*this).GetCurrentLoop();
+}
+
 bool Animation::IsLooping() const
 {
   return GetImplementation(*this).IsLooping();
@@ -128,6 +143,11 @@ void Animation::PlayFrom(float progress)
 void Animation::Pause()
 {
   GetImplementation(*this).Pause();
+}
+
+Dali::Animation::State Animation::GetState() const
+{
+  return GetImplementation(*this).GetState();
 }
 
 void Animation::Stop()

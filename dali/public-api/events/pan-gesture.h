@@ -32,9 +32,9 @@ namespace Dali
 /**
  * @brief A PanGesture is emitted when the user moves one or more fingers in a particular direction.
  *
- * This gesture can be in one of three states, when the pan gesture is first detected: "Started";
- * when the pan gesture is continuing: "Continuing"; and finally, when the pan gesture ends:
- * "Finished".
+ * This gesture can be in one of three states, when the pan gesture is first detected: Gesture::Started
+ * when the pan gesture is continuing: Gesture::Continuing and finally, when the pan gesture ends:
+ * Gesture::Finished.
  *
  * A pan gesture will end in the following ways:
  * - User releases the primary finger (the first touch).
@@ -43,6 +43,7 @@ namespace Dali
  * - Cancelled by the system.
  *
  * A pan gesture will continue to be sent to the actor under than initial pan until it ends.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API PanGesture: public Gesture
 {
@@ -50,28 +51,36 @@ struct DALI_IMPORT_API PanGesture: public Gesture
 
   /**
    * @brief Default Constructor.
+   * @SINCE_1_0.0
    */
   PanGesture();
 
   /**
    * @brief Constructor.
    *
-   * @param[in]  state  The state of the gesture
+   * @SINCE_1_0.0
+   * @param[in] state The state of the gesture
    */
   PanGesture(Gesture::State state);
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
    */
   PanGesture( const PanGesture& rhs );
 
   /**
    * @brief Assignment operator.
+   * @SINCE_1_0.0
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   PanGesture& operator=( const PanGesture& rhs );
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~PanGesture();
 
@@ -139,6 +148,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    * @brief Returns the speed at which the user is moving their fingers.
    *
    * This is the pixel movement per millisecond.
+   * @SINCE_1_0.0
    * @return The speed of the pan (in pixels per millisecond).
    */
   float GetSpeed() const;
@@ -148,6 +158,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    * if the gesture has just started, then the distance moved since the user touched the screen.
    *
    * This is always a positive value.
+   * @SINCE_1_0.0
    * @return The distance, as a float, a user's finger has panned.
    */
   float GetDistance() const;
@@ -156,6 +167,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    * @brief Returns the speed at which the user is moving their fingers relative to screen coordinates.
    *
    * This is the pixel movement per millisecond.
+   * @SINCE_1_0.0
    * @return The speed of the pan (in pixels per millisecond).
    */
   float GetScreenSpeed() const;
@@ -166,6 +178,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    * since the user touched the screen.
    *
    * This is always a positive value.
+   * @SINCE_1_0.0
    * @return The distance, as a float, a user's finger has panned.
    */
   float GetScreenDistance() const;

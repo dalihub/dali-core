@@ -80,14 +80,43 @@ Material Renderer::GetMaterial() const
   return Dali::Material( materialPtr );
 }
 
-void Renderer::SetDepthIndex( int depthIndex )
+void Renderer::SetBlendFunc( BlendingFactor::Type srcFactorRgba,
+                             BlendingFactor::Type destFactorRgba )
 {
-  GetImplementation(*this).SetDepthIndex( depthIndex );
+  GetImplementation(*this).SetBlendFunc( srcFactorRgba, destFactorRgba );
 }
 
-int Renderer::GetDepthIndex()
+void Renderer::SetBlendFunc( BlendingFactor::Type srcFactorRgb,
+                             BlendingFactor::Type destFactorRgb,
+                             BlendingFactor::Type srcFactorAlpha,
+                             BlendingFactor::Type destFactorAlpha )
 {
-  return GetImplementation(*this).GetDepthIndex();
+  GetImplementation(*this).SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void Renderer::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,
+                             BlendingFactor::Type& destFactorRgb,
+                             BlendingFactor::Type& srcFactorAlpha,
+                             BlendingFactor::Type& destFactorAlpha ) const
+{
+  GetImplementation(*this).GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void Renderer::SetBlendEquation( BlendingEquation::Type equationRgba )
+{
+  GetImplementation(*this).SetBlendEquation( equationRgba );
+}
+
+void Renderer::SetBlendEquation( BlendingEquation::Type equationRgb,
+                                 BlendingEquation::Type equationAlpha )
+{
+  GetImplementation(*this).SetBlendEquation( equationRgb, equationAlpha );
+}
+
+void Renderer::GetBlendEquation( BlendingEquation::Type& equationRgb,
+                                 BlendingEquation::Type& equationAlpha ) const
+{
+  GetImplementation(*this).GetBlendEquation( equationRgb, equationAlpha );
 }
 
 Renderer::Renderer( Internal::Renderer* pointer )

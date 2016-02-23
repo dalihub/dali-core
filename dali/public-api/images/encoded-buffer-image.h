@@ -64,6 +64,7 @@ typedef Uint16Pair ImageDimensions;
  *
  * Image::UploadedSignal is emitted when the decoded image data gets
  * uploaded to the OpenGL ES implementation.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API EncodedBufferImage : public Image
 {
@@ -72,14 +73,16 @@ public:
    * @brief Constructor which creates an uninitialized EncodedBufferImage object.
    *
    * Use Image::New(...) to create an initialised object.
+   * @SINCE_1_0.0
    */
   EncodedBufferImage();
 
   /**
-   * @deprecated DALi 1.1.3 use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
+   * @DEPRECATED_1_1.3. Use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
    *
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
+   * @SINCE_1_0.0
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -101,6 +104,7 @@ public:
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
+   * @SINCE_1_0.0
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -115,8 +119,7 @@ public:
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
-   * @since DALi 1.1.4
-   *
+   * @SINCE_1_1.4
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -139,6 +142,7 @@ public:
    *
    * If handle points to a EncodedBufferImage the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a EncodedBufferImage or an uninitialized handle
    */
@@ -148,12 +152,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~EncodedBufferImage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   EncodedBufferImage(const EncodedBufferImage& handle);
@@ -161,6 +167,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */

@@ -42,8 +42,9 @@ namespace Dali
  * pressed.
  *
  * Currently KeyEvent is also being used to relay messages from the
- * IMF keyboard to Core. In future IMF may communicate via its own
+ * IMF(Input Method Framework) keyboard to the internal core. In future IMF may communicate via its own
  * module.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API KeyEvent
 {
@@ -51,22 +52,25 @@ struct DALI_IMPORT_API KeyEvent
 
   /**
    * @brief Specifies the state of the key event.
+   * @SINCE_1_0.0
    */
   enum State
   {
-    Down,        ///< Key down
-    Up,          ///< Key up
+    Down,        ///< Key down @SINCE_1_0.0
+    Up,          ///< Key up @SINCE_1_0.0
     Last
   };
 
   /**
    * @brief Default constructor
+   * @SINCE_1_0.0
    */
   KeyEvent();
 
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
    * @param[in]  keyString     A string of input characters or key pressed
    * @param[in]  keyCode       The unique key code for the key pressed.
@@ -78,27 +82,31 @@ struct DALI_IMPORT_API KeyEvent
 
   /**
    * @brief Destructor.
+   * @SINCE_1_0.0
    */
   ~KeyEvent();
 
   /**
    * @brief Check to see if Shift key modifier has been supplied.
    *
-   * @return bool true if shift modifier
+   * @SINCE_1_0.0
+   * @return True if shift modifier
    */
   bool IsShiftModifier() const;
 
   /**
    * @brief Check to see if Ctrl (control) key modifier has been supplied.
    *
-   * @return bool true if ctrl modifier
+   * @SINCE_1_0.0
+   * @return True if ctrl modifier
    */
   bool IsCtrlModifier() const;
 
   /**
    * @brief Check to see if Alt key modifier has been supplied.
    *
-   * @return bool true if alt modifier
+   * @SINCE_1_0.0
+   * @return True if alt modifier
    */
   bool IsAltModifier() const;
 
@@ -116,6 +124,11 @@ struct DALI_IMPORT_API KeyEvent
 
   /**
    * @brief Keycode for the key pressed.
+   *
+   * @remarks We recommend not to use this key code value
+   * directly because its meaning might be changed in the future. Currently, it means a
+   * platform-specific key code. You need to use IsKey() to know what a key event means
+   * instead of direct comparison of key code value.
    */
   int  keyCode;
 

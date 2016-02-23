@@ -37,6 +37,7 @@ class Quaternion;
 
 /**
  * @brief An abstract interface for receiving property values.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API PropertyInput
 {
@@ -46,12 +47,14 @@ public:
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~PropertyInput() = 0;
 
   /**
    * @brief Query the type of property input.
    *
+   * @SINCE_1_0.0
    * @return The property type.
    */
   virtual Property::Type GetType() const = 0;
@@ -59,78 +62,88 @@ public:
   /**
    * @brief Retrieve a boolean value.
    *
-   * @pre GetType() returns Property::BOOLEAN.
+   * @SINCE_1_0.0
    * @return The boolean value.
+   * @pre GetType() returns Property::BOOLEAN.
    */
   virtual const bool& GetBoolean() const = 0;
 
   /**
    * @brief Retrieve a float value.
    *
-   * @pre GetType() returns Property::FLOAT.
+   * @SINCE_1_0.0
    * @return The float value.
+   * @pre GetType() returns Property::FLOAT.
    */
   virtual const float& GetFloat() const = 0;
 
   /**
    * @brief Retrieve an integer value.
    *
-   * @pre GetType() returns Property::INTEGER.
+   * @SINCE_1_0.0
    * @return The integer value.
+   * @pre GetType() returns Property::INTEGER.
    */
   virtual const int& GetInteger() const = 0;
 
   /**
    * @brief Retrieve a Vector2 value.
    *
-   * @pre GetType() returns Property::VECTOR2.
+   * @SINCE_1_0.0
    * @return The Vector2 value.
+   * @pre GetType() returns Property::VECTOR2.
    */
   virtual const Vector2& GetVector2() const = 0;
 
   /**
    * @brief Retrieve a Vector3 value.
    *
-   * @pre GetType() returns Property::VECTOR3.
+   * @SINCE_1_0.0
    * @return The Vector3 value.
+   * @pre GetType() returns Property::VECTOR3.
    */
   virtual const Vector3& GetVector3() const = 0;
 
   /**
    * @brief Retrieve a Vector4 value.
    *
-   * @pre GetType() returns Property::VECTOR4.
+   * @SINCE_1_0.0
    * @return The Vector4 value.
+   * @pre GetType() returns Property::VECTOR4.
    */
   virtual const Vector4& GetVector4() const = 0;
 
   /**
    * @brief Retrieve a Matrix (3x3) value.
    *
-   * @pre GetType() returns Property::Matrix3.
+   * @SINCE_1_0.0
    * @return The Matrix value.
+   * @pre GetType() returns Property::Matrix3.
    */
   virtual const Matrix3& GetMatrix3() const = 0;
 
   /**
    * @brief Retrieve a Matrix (4x4) value.
    *
-   * @pre GetType() returns Property::Matrix4.
+   * @SINCE_1_0.0
    * @return The Matrix value.
+   * @pre GetType() returns Property::Matrix4.
    */
   virtual const Matrix& GetMatrix() const = 0;
 
   /**
    * @brief Retrieve a Quaternion value.
    *
-   * @pre GetType() returns Property::Quaternion.
+   * @SINCE_1_0.0
    * @return The Quaternion value.
+   * @pre GetType() returns Property::Quaternion.
    */
   virtual const Quaternion& GetQuaternion() const = 0;
 
   /**
-   * Retrieve the extension for the PropertyInput
+   * @brief Retrieve the extension for the PropertyInput
    *
+   * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
    */
   virtual Extension* GetExtension()

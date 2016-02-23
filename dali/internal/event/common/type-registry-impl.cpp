@@ -232,6 +232,22 @@ bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& registered, con
   return false;
 }
 
+bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value )
+{
+  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
+
+  if( iter != mRegistryLut.end() )
+  {
+    DALI_ASSERT_DEBUG(iter->second);
+
+    GetImplementation(iter->second).AddAnimatableProperty( name, index, value );
+
+    return true;
+  }
+
+  return false;
+}
+
 bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
 {
   RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );

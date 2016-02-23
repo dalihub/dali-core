@@ -122,11 +122,13 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mFinishedCallbackObject( NULL ),
   mDurationSeconds( durationSeconds ),
   mSpeedFactor(1.0f),
-  mIsLooping( false ),
+  mLoopCount(1),
+  mCurrentLoop(0),
   mPlayRange( Vector2(0.0f,1.0f)),
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
-  mDefaultAlpha( defaultAlpha )
+  mDefaultAlpha( defaultAlpha ),
+  mState(Dali::Animation::STOPPED)
 {
 }
 
@@ -159,7 +161,7 @@ void Animation::CreateSceneObject()
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
   // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mIsLooping, mEndAction, mDisconnectAction );
+  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
 
   // Keep a const pointer to the animation.
   mAnimation = animation;
@@ -199,19 +201,33 @@ float Animation::GetDuration() const
   return mDurationSeconds;
 }
 
-void Animation::SetLooping(bool looping)
+void Animation::SetLooping(bool on)
+{
+  SetLoopCount( on ? 0 : 1 );
+}
+
+void Animation::SetLoopCount(int count)
 {
   // Cache for public getters
-  mIsLooping = looping;
+  mLoopCount = count;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetLoopingMessage( mEventThreadServices, *mAnimation, looping );
+  SetLoopingMessage( mEventThreadServices, *mAnimation, mLoopCount );
+}
+
+int Animation::GetLoopCount()
+{
+  return mLoopCount;
+}
+
+int Animation::GetCurrentLoop()
+{
+  return mCurrentLoop;
 }
 
 bool Animation::IsLooping() const
 {
-  // This is not animatable; the cached value is up-to-date.
-  return mIsLooping;
+  return mLoopCount != 1;
 }
 
 void Animation::SetEndAction(EndAction action)
@@ -249,6 +265,8 @@ void Animation::Play()
   // Update the current playlist
   mPlaylist.OnPlay( *this );
 
+  mState = Dali::Animation::PLAYING;
+
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
@@ -260,6 +278,8 @@ void Animation::PlayFrom( float progress )
     // Update the current playlist
     mPlaylist.OnPlay( *this );
 
+    mState = Dali::Animation::PLAYING;
+
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
   }
@@ -267,12 +287,21 @@ void Animation::PlayFrom( float progress )
 
 void Animation::Pause()
 {
+  mState = Dali::Animation::PAUSED;
+
   // mAnimation is being used in a separate thread; queue a Pause message
   PauseAnimationMessage( mEventThreadServices, *mAnimation );
 }
 
+Dali::Animation::State Animation::GetState() const
+{
+  return mState;
+}
+
 void Animation::Stop()
 {
+  mState = Dali::Animation::STOPPED;
+
   // mAnimation is being used in a separate thread; queue a Stop message
   StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
 }
@@ -721,15 +750,19 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 bool Animation::HasFinished()
 {
   bool hasFinished(false);
-  const int playCount(mAnimation->GetPlayCount());
+  const int playedCount(mAnimation->GetPlayedCount());
 
   // If the play count has been incremented, then another notification is required
-  if (playCount > mNotificationCount)
+  mCurrentLoop = mAnimation->GetCurrentLoop();
+
+  if (playedCount > mNotificationCount)
   {
     // Note that only one signal is emitted, if the animation has been played repeatedly
-    mNotificationCount = playCount;
+    mNotificationCount = playedCount;
 
     hasFinished = true;
+
+    mState = Dali::Animation::STOPPED;
   }
 
   return hasFinished;

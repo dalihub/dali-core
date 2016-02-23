@@ -37,6 +37,7 @@ class NativeImage;
 /**
  * @brief NativeImage represents a platform specific image resource.
  * Its data is provided by native resources, such as shared bitmap memory or pixmap.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API  NativeImage : public Image
 {
@@ -46,6 +47,7 @@ public:
    * @brief Constructor with creates an uninitialized NativeImage object.
    *
    * Use NativeImage::New(...) to create an initialised object.
+   * @SINCE_1_0.0
    */
   NativeImage();
 
@@ -53,12 +55,14 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
    ~NativeImage();
 
    /**
     * @brief This copy constructor is required for (smart) pointer semantics.
     *
+    * @SINCE_1_0.0
     * @param [in] handle A reference to the copied handle
     */
    NativeImage( const NativeImage& handle );
@@ -66,6 +70,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle.
    * @return A reference to this.
    */
@@ -78,6 +83,7 @@ public:
    * This function forces the allocation of a texture to happen at the earliest
    * opportunity.
    *
+   * @SINCE_1_0.0
    * @note If the application loses its GL context, native images may lose their
    * GL textures. This function can be called again after context regain to force
    * the creation of the GL texture if still needed.
@@ -88,6 +94,7 @@ public:
    * @brief Create a new NativeImage, which used native resources.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
+   * @SINCE_1_0.0
    * @param [in] nativeImageInterface An reference to the object of the interface implementation.
    * @return A handle to a newly allocated object.
    */
@@ -98,10 +105,25 @@ public:
    *
    * If handle points to a NativeImage object, the downcast produces valid handle.
    * If not, the returned handle is left unintialized.
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object.
-   * @return handle to a NativeImage or an uninitialized handle.
+   * @return Handle to a NativeImage or an uninitialized handle.
    */
   static NativeImage DownCast( BaseHandle handle );
+
+  /**
+   * @brief Get custom fragment prefix for rendering a native image.
+   *
+   * @return String for custom fragment prefix
+   */
+  const char* GetCustomFragmentPreFix();
+
+  /**
+   * @brief Get custom sampler type name for rendering a native image.
+   *
+   * @return String for custom sampler type name
+   */
+  const char* GetCustomSamplerTypename();
 
 public: // Not intended for application developers
 

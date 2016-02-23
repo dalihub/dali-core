@@ -32,14 +32,15 @@ namespace Dali
  */
 
 template <bool x> struct CompileTimeAssertBool;    ///< Bool Template to test condition
-template <> struct CompileTimeAssertBool<true> {}; ///< Specialize for true, but not for false
+template <> struct CompileTimeAssertBool<true> {}; ///< Specialize for true, but not for false @SINCE_1_0.0
 
-template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditional template CompileTimeAsserBool
+template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditional template CompileTimeAsserBool @SINCE_1_0.0
 
 /**
  * @brief Use DALI_COMPILE_TIME_ASSERT to test expressions at compile time.
  *
  * If x is false, then 'sizeof' will be attempted with incomplete type.
+ * @SINCE_1_0.0
  */
 #define DALI_COMPILE_TIME_ASSERT( x ) typedef CompileTimeAssertInt< sizeof( CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType __attribute__((__unused__))
 

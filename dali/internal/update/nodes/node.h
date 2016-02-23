@@ -118,25 +118,6 @@ public:
   void operator delete( void* ptr );
 
   /**
-   * When a Node is marked "active" it has been disconnected, but its properties have been modified.
-   * @note An inactive Node will be skipped during the UpdateManager ResetProperties stage.
-   * @param[in] isActive True if the Node is active.
-   */
-  void SetActive( bool isActive )
-  {
-    mIsActive = isActive;
-  }
-
-  /**
-   * Query whether the Node is active.
-   * @return True if the Node is active.
-   */
-  bool IsActive() const
-  {
-    return mIsActive;
-  }
-
-  /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
    */
   void OnDestroy();
@@ -291,10 +272,8 @@ public:
    * @pre childNode is a child of this Node.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] childNode The node to disconnect.
-   * @param[in] connectedNodes Disconnected Node attachments should be removed from here.
-   * @param[in] disconnectedNodes Disconnected Node attachments should be added here.
    */
-  void DisconnectChild( BufferIndex updateBufferIndex, Node& childNode, std::set<Node*>& connectedNodes,  std::set<Node*>& disconnectedNodes );
+  void DisconnectChild( BufferIndex updateBufferIndex, Node& childNode );
 
   /**
    * Retrieve the children a Node.
@@ -1020,10 +999,8 @@ private:
    * Recursive helper to disconnect a Node and its children.
    * Disconnected Nodes have no parent or children.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] connectedNodes Disconnected Node attachments should be removed from here.
-   * @param[in] disconnectedNodes Disconnected Node attachments should be added here.
    */
-  void RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex, std::set<Node*>& connectedNodes, std::set<Node*>& disconnectedNodes );
+  void RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex );
 
 public: // Default properties
 
@@ -1066,7 +1043,6 @@ protected:
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
-  bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
   DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode:2;///< Determines how position is inherited, 2 bits is enough

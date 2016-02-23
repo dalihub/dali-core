@@ -34,6 +34,7 @@ namespace Dali
  *
  * When a multi-touch event occurs, each touch point represents the points that are currently being
  * touched or the points where a touch has stopped.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API TouchEvent
 {
@@ -41,17 +42,20 @@ struct DALI_IMPORT_API TouchEvent
 
   /**
    * @brief Default constructor
+   * @SINCE_1_0.0
    */
   TouchEvent();
 
   /**
    * @brief Constructor
-   * @param[in]  time  The time the event occurred
+   * @SINCE_1_0.0
+   * @param[in] time The time the event occurred
    */
   TouchEvent(unsigned long time);
 
   /**
    * @brief Destructor
+   * @SINCE_1_0.0
    */
   ~TouchEvent();
 
@@ -75,6 +79,7 @@ struct DALI_IMPORT_API TouchEvent
   /**
    * @brief Returns the total number of points in this TouchEvent.
    *
+   * @SINCE_1_0.0
    * @return Total number of Points.
    */
   unsigned int GetPointCount() const;
@@ -84,10 +89,11 @@ struct DALI_IMPORT_API TouchEvent
    *
    * The first point in the set is always the primary
    * touch point (i.e. the first point touched in a multi-touch event).
-   * @note "point" should be less than the value returned by GetPointCount().
-   *       If out of range, then program asserts.
+   * @SINCE_1_0.0
    * @param[in] point The index of the required Point.
    * @return Point requested
+   * @note "point" should be less than the value returned by GetPointCount().
+   *       If out of range, then program asserts.
    */
   const TouchPoint& GetPoint(unsigned int point) const;
 };

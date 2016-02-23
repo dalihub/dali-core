@@ -33,57 +33,62 @@ namespace Dali
  * @{
  */
 
-typedef float (*AlphaFunctionPrototype)(float progress); ///< Prototype of an alpha function
+typedef float (*AlphaFunctionPrototype)(float progress); ///< Prototype of an alpha function @SINCE_1_0.0
 
-  /*
+  /**
    * @brief Alpha functions are used in animations to specify the rate of change of the animation parameter over time.
+   *
    * Understanding an animation as a parametric function over time, the alpha function is applied to the parameter of
    * the animation before computing the final animation value.
+   * @SINCE_1_0.0
    */
 class DALI_IMPORT_API AlphaFunction
 {
 public:
 
   /**
-   * Built-in alpha functions
+   * @brief Built-in alpha functions
+   * @SINCE_1_0.0
    */
   enum BuiltinFunction
   {
-    DEFAULT,            ///< Linear
-    LINEAR,             ///< No transformation
-    REVERSE,            ///< Reverse linear
+    DEFAULT,            ///< Linear @SINCE_1_0.0
+    LINEAR,             ///< No transformation @SINCE_1_0.0
+    REVERSE,            ///< Reverse linear @SINCE_1_0.0
 
-    EASE_IN_SQUARE,     ///< Speeds up and comes to a sudden stop (Square)
-    EASE_OUT_SQUARE,    ///< Sudden start and slows to a gradual stop (Square)
+    EASE_IN_SQUARE,     ///< Speeds up and comes to a sudden stop (Square) @SINCE_1_0.0
+    EASE_OUT_SQUARE,    ///< Sudden start and slows to a gradual stop (Square) @SINCE_1_0.0
 
-    EASE_IN,            ///< Speeds up and comes to a sudden stop (Cubic)
-    EASE_OUT,           ///< Sudden start and slows to a gradual stop (Cubic)
-    EASE_IN_OUT,        ///< Speeds up and slows to a gradual stop (Cubic)
+    EASE_IN,            ///< Speeds up and comes to a sudden stop (Cubic) @SINCE_1_0.0
+    EASE_OUT,           ///< Sudden start and slows to a gradual stop (Cubic) @SINCE_1_0.0
+    EASE_IN_OUT,        ///< Speeds up and slows to a gradual stop (Cubic) @SINCE_1_0.0
 
-    EASE_IN_SINE,       ///< Speeds up and comes to a sudden stop (sinusoidal)
-    EASE_OUT_SINE,      ///< Sudden start and slows to a gradual stop (sinusoidal)
-    EASE_IN_OUT_SINE,   ///< Speeds up and slows to a gradual stop (sinusoidal)
+    EASE_IN_SINE,       ///< Speeds up and comes to a sudden stop (sinusoidal) @SINCE_1_0.0
+    EASE_OUT_SINE,      ///< Sudden start and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
+    EASE_IN_OUT_SINE,   ///< Speeds up and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
 
-    BOUNCE,             ///< Sudden start, loses momentum and returns to start position
-    SIN,                ///< Single revolution
-    EASE_OUT_BACK,      ///< Sudden start, exceed end position and return to a gradual stop
+    BOUNCE,             ///< Sudden start, loses momentum and returns to start position @SINCE_1_0.0
+    SIN,                ///< Single revolution @SINCE_1_0.0
+    EASE_OUT_BACK,      ///< Sudden start, exceed end position and return to a gradual stop @SINCE_1_0.0
 
     COUNT
   };
 
   /**
-   * All possible functioning modes for the alpha function
+   * @brief All possible functioning modes for the alpha function
+   * @SINCE_1_0.0
    */
   enum Mode
   {
-    BUILTIN_FUNCTION,  //< The user has specified a built-in function
-    CUSTOM_FUNCTION,   //< The user has provided a custom function
-    BEZIER             //< The user has provided the control points of a bezier curve
+    BUILTIN_FUNCTION,  ///< The user has specified a built-in function @SINCE_1_0.0
+    CUSTOM_FUNCTION,   ///< The user has provided a custom function @SINCE_1_0.0
+    BEZIER             ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
   };
 
   /**
    * @brief Default constructor.
    * Creates an alpha function object with the default built-in alpha function
+   * @SINCE_1_0.0
    * @return The alpha function
    */
   AlphaFunction();
@@ -92,6 +97,7 @@ public:
    * @brief Constructor.
    * Creates an alpha function object with the built-in alpha function passed as a parameter
    * to the constructor
+   * @SINCE_1_0.0
    * @param[in] function One of the built-in alpha functions
    * @return The alpha function
    */
@@ -101,6 +107,7 @@ public:
    * @brief Constructor.
    * Creates an alpha function object using a pointer to an alpha function passed as a paramter
    * to the constructor
+   * @SINCE_1_0.0
    * @param[in] function A pointer to an alpha function
    * @return The alpha function
    */
@@ -108,18 +115,21 @@ public:
 
   /**
    * @brief Constructor.
+   *
    * Creates a bezier alpha function. The bezier will have the first point at (0,0) and
    * the end point at (1,1).
-   * @note The x components of the control points will be clamped to the range [0,1] to prevent
-   * non monotonic curves.
+   * @SINCE_1_0.0
    * @param[in] controlPoint0 A Vector2 which will be used as the first control point of the curve
    * @param[in] controlPoint1 A Vector2 which will be used as the second control point of the curve
    * @return The alpha function
+   * @note The x components of the control points will be clamped to the range [0,1] to prevent
+   * non monotonic curves.
    */
   AlphaFunction( const Dali::Vector2& controlPoint0, const Dali::Vector2& controlPoint1 );
 
   /**
    * @brief Return the control points of the alpha function
+   * @SINCE_1_0.0
    * @return Vector4 containing the two control points of the curve.
    * (xy for the first point and zw for the second)
    */
@@ -127,19 +137,22 @@ public:
 
   /**
    * @brief Returns the pointer to the custom function
+   * @SINCE_1_0.0
    * @return A pointer to a custom alpha function or 0 if not defined
    */
   AlphaFunctionPrototype GetCustomFunction() const;
 
   /**
-   * @brief Returns the built0in function used by the alpha function
+   * @brief Returns the built-in function used by the alpha function
+   * @SINCE_1_0.0
    * @return One of the built-in alpha functions. In case no built-in function
-   * has been specified, it will return AlphaFunction::DEfAULT
+   * has been specified, it will return AlphaFunction::DEFAULT
    */
   BuiltinFunction GetBuiltinFunction() const;
 
   /**
    * @brief Returns the functioning mode of the alpha function
+   * @SINCE_1_0.0
    * @return The functioning mode of the alpha function
    */
   Mode GetMode() const;

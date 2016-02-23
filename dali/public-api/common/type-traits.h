@@ -26,29 +26,40 @@ namespace Dali
  */
 
 /**
- * @brief Basic type traits that every type has by default
- * This allows specialisations to not have to repeat all flags
+ * @brief Basic type traits that every type has by default.
+ *
+ * This allows specializations to not have to repeat all flags
+ * @SINCE_1_0.0
  */
 template <typename Type>
 struct BasicTypes
 {
   /**
-   * This flag tells Dali if a class can be considered POD. If it declares copy constructor and/or destructor, its not considered trivial
+   * @brief This flag tells Dali if a class can be considered POD.
+   *
+   * If it declares copy constructor and/or destructor, its not considered trivial
    * and cannot be copied by using memcpy etc.
+   * @SINCE_1_0.0
    */
   enum { IS_TRIVIAL_TYPE = __has_trivial_destructor(Type) && __has_trivial_copy(Type) };
 };
 
 /**
- * @brief Type traits support
+ * @brief Type traits.
+ *
  * An example of overriding a traits flag for a custom type can be done by:
- * <code>
+ *
+ * @code
+ *
  * namespace Dali
  * {
- *   /// Tell DALi that Matrix is POD, even though it has a copy constructor
- *   template <> struct TypeTraits< Matrix > : public BasicTypes< Matrix > { enum { IS_TRIVIAL_TYPE = true }; };
+ *   /// Tell DALi that Dali::Matrix is POD, even though it has a copy constructor
+ *   template <> struct TypeTraits< Dali::Matrix > : public BasicTypes< Dali::Matrix > { enum { IS_TRIVIAL_TYPE = true }; };
  * }
- * </code>
+ *
+ * @endcode
+ *
+ * @SINCE_1_0.0
  */
 template <typename Type>
 struct TypeTraits : public BasicTypes< Type >

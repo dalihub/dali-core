@@ -33,6 +33,7 @@ namespace Dali
  * @brief A TapGesture is emitted when the user taps the screen with the stated number of fingers a stated number of times.
  *
  * This is a discrete gesture so does not have any state information.
+ * @SINCE_1_0.0
  * @see TapGestureDetector
  */
 struct DALI_IMPORT_API TapGesture : public Gesture
@@ -41,21 +42,28 @@ struct DALI_IMPORT_API TapGesture : public Gesture
 
   /**
    * @brief Default Constructor
+   * @SINCE_1_0.0
    */
   TapGesture();
 
   /**
    * @brief Copy constructor
+   * @SINCE_1_0.0
+   * @param rhs A reference to the copied handle
    */
   TapGesture( const TapGesture& rhs );
 
   /**
    * @brief Assignment operator
+   * @SINCE_1_0.0
+   * @param rhs A reference to the copied handle
+   * @return A reference to this
    */
   TapGesture& operator=( const TapGesture& rhs );
 
   /**
    * @brief Virtual destructor
+   * @SINCE_1_0.0
    */
   virtual ~TapGesture();
 

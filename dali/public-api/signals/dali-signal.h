@@ -19,7 +19,7 @@
  */
 
 /**
- * The class should implement Dali::ConnectionTrackerInterface, or inherit from Dali::ConnectionTracker.
+ * @brief The class should implement Dali::ConnectionTrackerInterface, or inherit from Dali::ConnectionTracker.
  * This enforces automatic disconnection when an object is destroyed, so you don't have
  * to manually disconnect from signals.
  *
@@ -48,6 +48,7 @@
  *   }
  * }
  * @endcode
+ * @SINCE_1_0.0
  */
 
 // INTERNAL INCLUDES
@@ -128,6 +129,7 @@ namespace Dali
  *   ...
  * };
  * @endcode
+ * @SINCE_1_0.0
  */
 template< typename _Signature >
 class Signal
@@ -136,6 +138,7 @@ class Signal
 
 /**
  * @brief A template for Signals with no parameters or return value.
+ * @SINCE_1_0.0
  */
 template <>
 class Signal< void () >
@@ -144,6 +147,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -151,6 +155,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -159,6 +164,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -169,6 +175,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -179,6 +186,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)() )
@@ -189,6 +197,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)() )
@@ -199,6 +208,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -211,6 +221,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -223,6 +234,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -235,6 +247,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -247,6 +260,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -259,6 +273,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -269,6 +284,7 @@ public:
 
   /**
    * @brief Emit the signal.
+   * @SINCE_1_0.0
    */
   void Emit()
   {
@@ -277,8 +293,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -288,6 +304,7 @@ private:
 
 /**
  * @brief A template for Signals with no parameters and a return value.
+ * @SINCE_1_0.0
  */
 template < typename Ret >
 class Signal< Ret() >
@@ -296,6 +313,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -303,6 +321,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -311,6 +330,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -321,6 +341,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -330,6 +351,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)() )
@@ -340,6 +362,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)() )
@@ -350,6 +373,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -362,6 +386,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -374,6 +399,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -386,6 +412,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -398,6 +425,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -410,6 +438,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -421,6 +450,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
    */
   Ret Emit()
@@ -430,8 +460,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -441,6 +471,7 @@ private:
 
 /**
  * @brief A template for Signals with 1 parameter.
+ * @SINCE_1_0.0
  */
 template < typename Arg0 >
 class Signal< void ( Arg0 ) >
@@ -449,6 +480,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -456,6 +488,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -464,6 +497,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -474,6 +508,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -483,6 +518,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0 ) )
@@ -493,6 +529,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0 ) )
@@ -503,6 +540,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -515,6 +553,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -527,6 +566,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -539,6 +579,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -551,6 +592,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -563,6 +605,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -574,6 +617,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    */
   void Emit( Arg0 arg0 )
@@ -583,8 +627,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -594,6 +638,7 @@ private:
 
 /**
  * @brief A template for Signals with 1 parameter and a return value.
+ * @SINCE_1_0.0
  */
 template < typename Ret, typename Arg0 >
 class Signal< Ret( Arg0 ) >
@@ -602,6 +647,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -609,6 +655,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -617,6 +664,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -627,6 +675,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -636,6 +685,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0 ) )
@@ -646,6 +696,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0 ) )
@@ -656,6 +707,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -668,6 +720,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -680,6 +733,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -692,6 +746,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -704,6 +759,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -716,6 +772,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -727,6 +784,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
    */
@@ -737,8 +795,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -749,6 +807,7 @@ private:
 /**
  * @brief A template for Signals with 2 parameters.
  *
+ * @SINCE_1_0.0
  */
 template < typename Arg0, typename Arg1 >
 class Signal< void ( Arg0, Arg1 ) >
@@ -758,6 +817,7 @@ public:
   /**
    * @brief Default constructor.
    *
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -766,6 +826,7 @@ public:
   /**
    * @brief Non-virtual destructor.
    *
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -774,6 +835,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -784,6 +846,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -793,6 +856,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -803,6 +867,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -813,6 +878,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -825,6 +891,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -837,6 +904,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -849,6 +917,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -861,6 +930,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -873,6 +943,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -884,6 +955,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    */
@@ -894,8 +966,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -905,6 +977,7 @@ private:
 
 /**
  * @brief A template for Signals with 2 parameters and a return value.
+ * @SINCE_1_0.0
  */
 template < typename Ret, typename Arg0, typename Arg1 >
 class Signal< Ret( Arg0, Arg1 ) >
@@ -913,6 +986,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -920,6 +994,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -928,6 +1003,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -938,6 +1014,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -946,6 +1023,7 @@ public:
   }
   /**
    * @brief Connect a function.
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -956,6 +1034,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -966,6 +1045,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -978,6 +1058,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -990,6 +1071,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -1002,6 +1084,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -1014,6 +1097,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -1026,6 +1110,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -1037,6 +1122,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
@@ -1048,8 +1134,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -1059,6 +1145,7 @@ private:
 
 /**
  * @brief A template for Signals with 3 parameters.
+ * @SINCE_1_0.0
  */
 template < typename Arg0, typename Arg1, typename Arg2 >
 class Signal< void ( Arg0, Arg1, Arg2 ) >
@@ -1067,6 +1154,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -1074,6 +1162,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -1082,6 +1171,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -1092,6 +1182,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -1101,6 +1192,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1111,6 +1203,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1121,6 +1214,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -1133,6 +1227,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -1145,6 +1240,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -1157,6 +1253,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -1169,6 +1266,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -1181,6 +1279,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -1192,6 +1291,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @param[in] arg2 The third value to pass to callbacks.
@@ -1203,8 +1303,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 
@@ -1214,6 +1314,7 @@ private:
 
 /**
  * @brief A template for Signals with 2 parameters and a return value.
+ * @SINCE_1_0.0
  */
 template < typename Ret, typename Arg0, typename Arg1, typename Arg2 >
 class Signal< Ret( Arg0, Arg1, Arg2 ) >
@@ -1222,6 +1323,7 @@ public:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   Signal()
   {
@@ -1229,6 +1331,7 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   * @SINCE_1_0.0
    */
   ~Signal()
   {
@@ -1237,6 +1340,7 @@ public:
   /**
    * @brief Query whether there are any connected slots.
    *
+   * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -1247,6 +1351,7 @@ public:
   /**
    * @brief Query the number of slots.
    *
+   * @SINCE_1_0.0
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -1257,6 +1362,7 @@ public:
   /**
    * @brief Connect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1267,6 +1373,7 @@ public:
   /**
    * @brief Disconnect a function.
    *
+   * @SINCE_1_0.0
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1277,6 +1384,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -1289,6 +1397,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -1301,6 +1410,7 @@ public:
   /**
    * @brief Connect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -1313,6 +1423,7 @@ public:
   /**
    * @brief Disconnect a member function.
    *
+   * @SINCE_1_0.0
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -1325,6 +1436,7 @@ public:
   /**
    * @brief Connect a function object.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -1337,6 +1449,7 @@ public:
   /**
    * @brief Connect a function object using FunctorDelegate.
    *
+   * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -1348,6 +1461,7 @@ public:
   /**
    * @brief Emit the signal.
    *
+   * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @param[in] arg2 The third value to pass to callbacks.
@@ -1360,8 +1474,8 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
-  Signal& operator=( const Signal& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
 
 private:
 

@@ -30,6 +30,7 @@ namespace Dali
  */
 
 /**
+ * @DEPRECATED_1_0.47
  * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
  *
  * We normally use double quotation marks to write a string such as "Hello World".
@@ -47,10 +48,11 @@ namespace Dali
  * const string VERTEX_SHADER_SOURCE = DALI_COMPOSE_SHADER (
  *   void main()
  *   {
- *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
- *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
+ *     gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+ *     vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord) );
  *   }
  * );
+ * @SINCE_1_0.0
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -65,7 +67,7 @@ class ShaderEffect;
 }
 
 /**
- * @deprecated DALi 1.0.47
+ * @DEPRECATED_1_0.47
  *
  * @brief Shader effects provide a visual effect for image actors.
  *
@@ -90,8 +92,8 @@ class ShaderEffect;
  * <pre>
  * void main()
  * {
- *     gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);
- *     vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );
+ *     gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+ *     vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );
  * }
  * </pre>
  * For fragment shader the default part for images contains the following code:
@@ -107,6 +109,7 @@ class ShaderEffect;
  * Note: In order for fade and color animations to work, the fragment shader needs to multiply the fragment color
  * with the uniform color "uColor" of the node
  * </B>
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ShaderEffect : public Handle
 {
@@ -114,6 +117,7 @@ public:
 
   // Default Properties
   /**
+   * @DEPRECATED_1_0.47
    * @brief An enumeration of properties belonging to the ShaderEffect class.
    * Grid Density defines the spacing of vertex coordinates in world units.
    * ie a larger actor will have more grids at the same spacing.
@@ -125,59 +129,68 @@ public:
    *  +---+---+         +---+---+---+
    *                    |   |   |   |
    *                    +---+---+---+
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "gridDensity",    type float
-      IMAGE,                                             ///< name "image",          type Map {"filename":"", "loadPolicy":...}
-      PROGRAM,                                           ///< name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""}
-      GEOMETRY_HINTS                                     ///< name "geometryHints",  type int (bitfield) values from enum GeometryHints
+      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< @DEPRECATED_1_0.47 @brief name "gridDensity",    type float @SINCE_1_0.0
+      IMAGE,                                             ///< @DEPRECATED_1_0.47 @brief name "image",          type Map {"filename":"", "loadPolicy":...} @SINCE_1_0.0
+      PROGRAM,                                           ///< @DEPRECATED_1_0.47 @brief name "program",        type Map {"vertexPrefix":"","fragmentPrefix":"","vertex":"","fragment":""} @SINCE_1_0.0
+      GEOMETRY_HINTS                                     ///< @DEPRECATED_1_0.47 @brief name "geometryHints",  type int (bitfield) values from enum GeometryHints @SINCE_1_0.0
     };
   };
 
   static const float DEFAULT_GRID_DENSITY;              ///< The default density is 40 pixels
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Hints for rendering/subdividing geometry.
+   * @SINCE_1_0.0
    */
   enum GeometryHints
   {
-    HINT_NONE           = 0x00,   ///< no hints
-    HINT_GRID_X         = 0x01,   ///< Geometry must be subdivided in X
-    HINT_GRID_Y         = 0x02,   ///< Geometry must be subdivided in Y
-    HINT_GRID           = (HINT_GRID_X | HINT_GRID_Y),
-    HINT_DEPTH_BUFFER   = 0x04,   ///< Needs depth buffering turned on
-    HINT_BLENDING       = 0x08,   ///< Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO
-    HINT_DOESNT_MODIFY_GEOMETRY = 0x10 ///< Notifies that the vertex shader will not change geometry (enables bounding box culling)
+    HINT_NONE           = 0x00,   ///< @DEPRECATED_1_0.47 @brief no hints @SINCE_1_0.0
+    HINT_GRID_X         = 0x01,   ///< @DEPRECATED_1_0.47 @brief Geometry must be subdivided in X @SINCE_1_0.0
+    HINT_GRID_Y         = 0x02,   ///< @DEPRECATED_1_0.47 @brief Geometry must be subdivided in Y @SINCE_1_0.0
+    HINT_GRID           = (HINT_GRID_X | HINT_GRID_Y),  ///< @DEPRECATED_1_0.47 @brief HINT_GRID_X | HINT_GRID_Y @SINCE_1_0.0
+    HINT_DEPTH_BUFFER   = 0x04,   ///< @DEPRECATED_1_0.47 @brief Needs depth buffering turned on @SINCE_1_0.0
+    HINT_BLENDING       = 0x08,   ///< @DEPRECATED_1_0.47 @brief Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO @SINCE_1_0.0
+    HINT_DOESNT_MODIFY_GEOMETRY = 0x10 ///< @DEPRECATED_1_0.47 @brief Notifies that the vertex shader will not change geometry (enables bounding box culling) @SINCE_1_0.0
   };
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Coordinate type of the shader uniform.
    *
    * Viewport coordinate types will convert from viewport to view space.
    * Use this coordinate type if your are doing a transformation in view space.
    * The texture coordinate type converts a value in actor local space to texture coodinates.
    * This is useful for pixel shaders and accounts for texture atlas.
+   * @SINCE_1_0.0
    */
   enum UniformCoordinateType
   {
-    COORDINATE_TYPE_DEFAULT,           ///< Default, No transformation to be applied
-    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @deprecated Dali 1.1.11 The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
-    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @deprecated Dali 1.1.11 The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_DEFAULT,           ///< @DEPRECATED_1_0.47 @brief Default, No transformation to be applied @SINCE_1_0.0
+    COORDINATE_TYPE_VIEWPORT_POSITION, ///< @DEPRECATED_1_0.47 @brief The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
+    COORDINATE_TYPE_VIEWPORT_DIRECTION ///< @DEPRECATED_1_0.47 @brief The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates. @SINCE_1_0.0
   };
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create an empty ShaderEffect.
    *
    * This can be initialised with ShaderEffect::New(...)
+   * @SINCE_1_0.0
    */
   ShaderEffect();
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create ShaderEffect.
    *
+   * @SINCE_1_0.0
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShader code for the effect. If you pass in an empty string, the default version will be used
    * @param hints GeometryHints to define the geometry of the rendered object
@@ -188,7 +201,9 @@ public:
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Create ShaderEffect.
+   * @SINCE_1_0.0
    * @param vertexShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
@@ -203,126 +218,149 @@ public:
                                     GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Downcast an Object handle to ShaderEffect.
    *
    * If handle points to a ShaderEffect the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a ShaderEffect object or an uninitialized handle
    */
   static ShaderEffect DownCast( BaseHandle handle );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~ShaderEffect();
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Copy constructor
    *
+   * @SINCE_1_0.0
    * @param object A reference to a ShaderEffect object
    */
   ShaderEffect(const ShaderEffect& object);
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
   ShaderEffect& operator=(const ShaderEffect& rhs);
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Sets image for using as effect texture.
    *
    * This image texture will be bound to the "sEffect" sampler
    * so it can be used in fragment shader for effects
    *
+   * @SINCE_1_0.0
    * @param[in] image to use as effect texture
    */
   void SetEffectImage( Image image );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
+   *
    * This will register a property of type Property::FLOAT; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    float value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR2; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    Vector2 value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR3; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    Vector3 value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::VECTOR4; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    Vector4 value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::MATRIX; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    const Matrix& value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief Set a uniform value.
    *
    * This will register a property of type Property::MATRIX3; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
-   * @pre Either the property name is not in use, or a property exists with the correct name & type.
+   * @SINCE_1_0.0
    * @param name The name of the uniform.
    * @param value The value to to set.
    * @param uniformCoordinateType The coordinate type of the uniform.
+   * @pre Either the property name is not in use, or a property exists with the correct name & type.
    */
   void SetUniform( const std::string& name,
                    const Matrix3& value,
@@ -331,7 +369,9 @@ public:
 public: // Not intended for application developers
 
   /**
+   * @DEPRECATED_1_0.47
    * @brief This constructor is used by Dali New() methods.
+   * @SINCE_1_0.0
    * @param [in] effect A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL ShaderEffect(Internal::ShaderEffect* effect);

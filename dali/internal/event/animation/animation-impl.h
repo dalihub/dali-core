@@ -85,7 +85,22 @@ public:
   /**
    * @copydoc Dali::Animation::SetLooping()
    */
-  void SetLooping(bool looping);
+  void SetLooping(bool on);
+
+  /**
+   * @copydoc Dali::Animation::SetLoopCount()
+   */
+  void SetLoopCount(int count);
+
+  /**
+   * @copydoc Dali::Animation::GetLoopCount()
+   */
+  int GetLoopCount();
+
+  /**
+   * @copydoc Dali::Animation::GetCurrentLoop()
+   */
+  int GetCurrentLoop();
 
   /**
    * @copydoc Dali::Animation::IsLooping()
@@ -142,6 +157,11 @@ public:
    * @copydoc Dali::Animation::Pause()
    */
   void Pause();
+
+  /**
+   * @copydoc Dali::Animation::GetState()
+   */
+  Dali::Animation::State GetState() const;
 
   /**
    * @copydoc Dali::Animation::Stop()
@@ -446,11 +466,13 @@ private:
   // Cached for public getters
   float mDurationSeconds;
   float mSpeedFactor;
-  bool mIsLooping;
+  int mLoopCount;
+  int mCurrentLoop;
   Vector2 mPlayRange;
   EndAction mEndAction;
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
+  Dali::Animation::State mState;
 
 };
 

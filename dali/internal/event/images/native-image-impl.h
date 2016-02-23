@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/images/native-image.h>
 #include <dali/internal/event/images/image-impl.h>
@@ -56,12 +59,28 @@ protected:
   /**
    * Constructor
    */
-  NativeImage();
+  NativeImage( NativeImageInterface& nativeImageInterface );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~NativeImage();
+
+public:
+
+  /**
+   * @copydoc Dali::NativeImageInterface::Extension::GetCustomFragmentPreFix()
+   */
+  const char* GetCustomFragmentPreFix();
+
+  /**
+   * @copydoc Dali::NativeImageInterface::Extension::GetCustomSamplerTypename()
+   */
+  const char* GetCustomSamplerTypename();
+
+private:
+  std::string mCustomFragmentPreFix;
+  std::string mCustomSamplerTypename;
 };
 
 } // namespace Internal

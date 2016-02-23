@@ -28,7 +28,7 @@ namespace Dali
 
 const unsigned int CORE_MAJOR_VERSION = 1;
 const unsigned int CORE_MINOR_VERSION = 1;
-const unsigned int CORE_MICRO_VERSION = 16;
+const unsigned int CORE_MICRO_VERSION = 22;
 const char * const CORE_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifndef EMSCRIPTEN
@@ -41,7 +41,7 @@ struct PrintVersion
 {
   PrintVersion()
   {
-    std::cout << "DALi Core:      " << CORE_MAJOR_VERSION << "." << CORE_MINOR_VERSION << "." << CORE_MICRO_VERSION << " (" << CORE_BUILD_DATE << ")" << std::endl;
+    std::cerr << "DALi Core:      " << CORE_MAJOR_VERSION << "." << CORE_MINOR_VERSION << "." << CORE_MICRO_VERSION << " (" << CORE_BUILD_DATE << ")" << std::endl;
   }
 };
 PrintVersion CORE_VERSION;

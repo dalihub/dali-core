@@ -49,6 +49,7 @@ class NinePatchImage;
  * Adding this image to an ImageActor using an Image handle will automatically convert
  * to use the cropped BufferImage - if you don't retain a handle to this object, it will
  * be automatically destroyed.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API NinePatchImage : public ResourceImage
 {
@@ -60,6 +61,7 @@ public:
    * @brief Constructor which creates an uninitialized NinePatchImage object.
    *
    * Use Image::New(...) to create an initialised object.
+   * @SINCE_1_0.0
    */
   NinePatchImage();
 
@@ -70,6 +72,7 @@ public:
    * Dali has ownership of the buffer.
    * @note: default resource management policies are Immediate and Never
    *
+   * @SINCE_1_0.0
    * @param [in] filename    File to load synchronously into buffer
    * @return a handle to a new instance of NinePatchImage
    */
@@ -81,6 +84,7 @@ public:
    * If handle points to a NinePatchImage the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a NinePatchImage or an uninitialized handle
    */
@@ -90,12 +94,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~NinePatchImage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   NinePatchImage(const NinePatchImage& handle);
@@ -103,16 +109,18 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
   NinePatchImage& operator=(const NinePatchImage& rhs);
 
   /**
-   * @deprecated DALi 1.1.4 use GetStretchPixelsX and GetStretchPixelsY instead
+   * @DEPRECATED_1_1.4. Use GetStretchPixelsX and GetStretchPixelsY instead.
    *
    * @brief Get the stretch borders
    *
+   * @SINCE_1_0.0
    * @return The border in pixels from the left, top, right, and bottom of the image respectively.
    */
   Vector4 GetStretchBorders();
@@ -120,8 +128,7 @@ public:
   /**
    * @brief Retrieves the horizontal stretch pixel ranges in the cropped image space
    *
-   * @since DALi 1.1.4
-   *
+   * @SINCE_1_1.4
    * @return the horizontal stretch pixel ranges in the cropped image space
    */
   const StretchRanges& GetStretchPixelsX();
@@ -129,8 +136,7 @@ public:
   /**
    * @brief Retrieves the vertical stretch pixel ranges in the cropped image space
    *
-   * @since DALi 1.1.4
-   *
+   * @SINCE_1_1.4
    * @return the vertical stretch pixel ranges in the cropped image space
    */
   const StretchRanges& GetStretchPixelsY();
@@ -138,6 +144,7 @@ public:
   /**
    * @brief Get the child rectangle
    *
+   * @SINCE_1_0.0
    * @return the position and size of the child rectangle
    */
   Rect<int> GetChildRectangle();
@@ -147,6 +154,7 @@ public:
    *
    * This does not change the internal bitmap.
    *
+   * @SINCE_1_0.0
    * @return The cropped BufferImage
    */
   BufferImage CreateCroppedBufferImage();
@@ -154,8 +162,7 @@ public:
   /**
    * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.
    *
-   * @since DALi 1.1.4
-   *
+   * @SINCE_1_1.4
    * @param [in] url The URL of the image file.
    * @return true if it is a 9 patch or n patch image
    */

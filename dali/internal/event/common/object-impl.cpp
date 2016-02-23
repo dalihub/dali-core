@@ -759,7 +759,7 @@ void Object::DisablePropertyNotifications()
   }
 }
 
-void Object::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
+void Object::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const
 {
   // Get the address of the property if it's a scene property
   const PropertyInputImpl* propertyPtr = GetSceneObjectInputProperty( propertyIndex );
@@ -793,7 +793,7 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
     {
       SceneGraph::UniformPropertyMapping* map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
       // Message takes ownership of Uniform map (and will delete it after copy)
-      AddUniformMapMessage( GetEventThreadServices(), *sceneObject, map);
+      AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *sceneObject, map);
     }
     else
     {
@@ -1258,7 +1258,9 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
       if(basePropertyIndex == Property::INVALID_INDEX)
       {
         // If the property is not a component of a base property, register the whole property itself.
-        RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
+        const  std::string& propertyName = typeInfo->GetPropertyName(index);
+        RegisterSceneGraphProperty(propertyName, index, typeInfo->GetPropertyDefaultValue(index));
+        AddUniformMapping( index, propertyName );
       }
       else
       {
@@ -1267,9 +1269,11 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
         if(!animatableProperty)
         {
           // If the base property is not registered yet, register the base property first.
-          if(Property::INVALID_INDEX != RegisterSceneGraphProperty(typeInfo->GetPropertyName(basePropertyIndex), basePropertyIndex, Property::Value(typeInfo->GetPropertyType(basePropertyIndex))))
+          const  std::string& basePropertyName = typeInfo->GetPropertyName(basePropertyIndex);
+          if(Property::INVALID_INDEX != RegisterSceneGraphProperty(basePropertyName, basePropertyIndex, Property::Value(typeInfo->GetPropertyType(basePropertyIndex))))
           {
             animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size()-1]);
+            AddUniformMapping( basePropertyIndex, basePropertyName );
           }
         }
 

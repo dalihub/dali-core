@@ -25,7 +25,6 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/devel-api/rendering/material.h> // Dali::Material
-#include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -119,69 +118,7 @@ public:
    */
   size_t GetNumberOfTextures() const;
 
-  /**
-   * @copydoc Dali::Material::SetFaceCullingMode()
-   */
-  void SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode );
-
-  /**
-   * @copydoc Dali::Material::GetFaceCullingMode()
-   */
-  Dali::Material::FaceCullingMode GetFaceCullingMode();
-
-  /**
-   * @copydoc Dali::Material::SetBlendMode()
-   */
-  void SetBlendMode( BlendingMode::Type mode );
-
-  /**
-   * @copydoc Dali::Material::GetBlendMode()
-   */
-  BlendingMode::Type GetBlendMode() const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendFunc()
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
-
-  /**
-   * @copydoc Dali::Material::SetBlendFunc()
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
-
-  /**
-   * @copydoc Dali::Material::GetBlendFunc()
-   */
-  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendEquation()
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgba );
-
-  /**
-   * @copydoc Dali::Material::SetBlendEquation()
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
-
-  /**
-   * @copydoc Dali::Material::GetBlendEquation()
-   */
-  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendColor()
-   */
-  void SetBlendColor( const Vector4& color );
-
-  /**
-   * @copydoc Dali::Material::GetBlendColor()
-   */
-  Vector4 GetBlendColor() const;
-
-  /**
+ /**
    * @brief Get the material scene object
    *
    * @return the material scene object
@@ -330,10 +267,6 @@ private: // Data
   IntrusivePtr<Shader> mShader; ///< Connector that holds the shader used by this material
   std::vector<Material::Texture> mTextures; ///<Vector of textures used by this material
 
-  Dali::Material::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
-  BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
-  BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
-  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its rarely used
   bool mOnStage;
 
 };

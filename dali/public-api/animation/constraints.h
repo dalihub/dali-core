@@ -35,24 +35,27 @@ namespace Dali
  */
 
 /**
- * @brief EqualToConstraint
+ * @brief The constraint function that updates the target property with the value of the first source.
  *
- * f(current, property) = property
+ * @e current = <em>input[0]</em>. @e current and <em>input[0]</em> indicate the target property
+ * and the first constraint source (the one added by the first Constraint::AddSource call), respectively.
+ * @SINCE_1_0.0
  */
 struct EqualToConstraint
 {
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   EqualToConstraint()
   { }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for float properties
    *
+   * @SINCE_1_0.0
    * @param[in, out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( float& current, const PropertyInputContainer& inputs )
   {
@@ -60,11 +63,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Vector2 properties
    *
-   * @param[in] current The current property value, the constrained value is set
+   * @SINCE_1_0.0
+   * @param[in, out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Vector2& current, const PropertyInputContainer& inputs )
   {
@@ -72,11 +75,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Vector3 properties
    *
+   * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
@@ -84,11 +87,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Vector4 properties
    *
+   * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Vector4& current, const PropertyInputContainer& inputs )
   {
@@ -96,11 +99,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Quaternion properties
    *
+   * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Quaternion& current, const PropertyInputContainer& inputs )
   {
@@ -108,11 +111,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Matrix3 properties
    *
+   * @SINCE_1_0.0
    * @param[in,out] current The current property value
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Matrix3& current, const PropertyInputContainer& inputs )
   {
@@ -120,11 +123,11 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief override functor for float properties
+   * @brief Override functor for Matrix properties
    *
+   * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
-   * @return The copy of the input property
    */
   void operator()( Matrix& current, const PropertyInputContainer& inputs )
   {
@@ -134,26 +137,37 @@ struct EqualToConstraint
 };
 
 /**
- * @brief RelativeToConstraint for Vector3 properties
+ * @brief The constraint function that updates the target property with the value of the first source
+ * multiplied by scale parameter (for Vector3 properties).
  *
- * current = property * scale
+ * @e current = <em>input[0]</em> * @e scale. @e current, <em>input[0]</em>, and @e scale
+ * indicate the target property, the first constraint source, and the scale parameter, respectively.
+ * * implies element-wise multiplication.
+ * @SINCE_1_0.0
  */
 struct RelativeToConstraint
 {
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
+   * @param[in] scale Scale factor
    */
   RelativeToConstraint( float scale )
   : mScale( scale, scale, scale ) { }
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
+   * @param[in] scale Scale factor
    */
   RelativeToConstraint( const Vector3& scale )
   : mScale( scale ) { }
 
   /**
    * @brief Functor.
+   * @SINCE_1_0.0
+   * @param[in,out] current The current property value (vector3 property * scale factor).
+   * @param[in] inputs Property container for current property calculation
    */
   void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
@@ -164,18 +178,28 @@ struct RelativeToConstraint
 };
 
 /**
- * @brief RelativeToConstraint for float properties
+ * @brief The constraint function that updates the target property with the value of the first source
+ * multiplied by scale parameter (for float properties).
+ *
+ * @e current = <em>input[0]</em> * @e scale. @e current, <em>input[0]</em>, and @e scale
+ * indicate the target property, the first constraint source, and the scale parameter, respectively.
+ * @SINCE_1_0.0
  */
 struct RelativeToConstraintFloat
 {
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
+   * @param[in] scale Scale factor
    */
   RelativeToConstraintFloat( float scale )
   : mScale( scale ) { }
 
   /**
    * @brief Functor.
+   * @SINCE_1_0.0
+   * @param[in,out] current The current property value (float property * scale factor).
+   * @param[in] inputs Property container for current property calculation
    */
   void operator()( float& current, const PropertyInputContainer& inputs )
   {
@@ -193,11 +217,11 @@ struct RelativeToConstraintFloat
  * constrained actor along the vector between camera position and
  * target position.
  *
+ * @SINCE_1_0.0
  * @param[in,out] current The current orientation property value, the constrained value is set.
- * @param[in] inputs Contains the World position of the target, the World position of the camera, and the world orientation of the target
- * @return The orientation of the camera
+ * @param[in] inputs Contains the world position of the target, the world position of the camera, and the world orientation of the target
  */
-inline void LookAt( Quaternion& current, const PropertyInputContainer& inputs )
+inline void LookAt( Dali::Quaternion& current, const Dali::PropertyInputContainer& inputs )
 {
   const PropertyInput& targetPosition( *inputs[0] );
   const PropertyInput& cameraPosition( *inputs[1] );

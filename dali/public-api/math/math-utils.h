@@ -34,6 +34,7 @@ namespace Dali
  *
  * In case of numbers which are already a power of two this function returns the original number.
  * If i is zero returns 1
+ * @SINCE_1_0.0
  * @param[in] i input number
  * @return    next power of two or i itself in case it's a power of two
  */
@@ -58,6 +59,7 @@ inline unsigned int NextPowerOfTwo( unsigned int i )
 /**
  * @brief Whether a number is power of two.
  *
+ * @SINCE_1_0.0
  * @param[in] i input number
  * @return    true if i is power of two
  */
@@ -69,6 +71,7 @@ inline bool IsPowerOfTwo( unsigned int i )
 /**
  * @brief Clamp a value.
  *
+ * @SINCE_1_0.0
  * @param[in] value The value to clamp.
  * @param[in] min The minimum allowed value.
  * @param[in] max The maximum allowed value.
@@ -85,6 +88,7 @@ inline const T& Clamp( const T& value, const T& min, const T& max )
 /**
  * @brief Clamp a value directly.
  *
+ * @SINCE_1_0.0
  * @param[in,out] value The value that will be clamped.
  * @param[in] min The minimum allowed value.
  * @param[in] max The maximum allowed value.
@@ -101,6 +105,7 @@ inline void ClampInPlace( T& value, const T& min, const T& max )
 /**
  * @brief Linear interpolation between two values.
  *
+ * @SINCE_1_0.0
  * @param[in] offset The offset through the range @p low to @p high.
  *                   This value is clamped between 0 and 1
  * @param[in] low    Lowest value in range
@@ -116,6 +121,7 @@ inline const T Lerp( const float offset, const T& low, const T& high )
 /**
  * @brief Get an epsilon that is valid for the given range.
  *
+ * @SINCE_1_0.0
  * @param[in] a the first value in the range
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
@@ -154,6 +160,7 @@ inline float GetRangedEpsilon( float a, float b )
 /**
  * @brief Helper function to compare equality of a floating point value with zero.
  *
+ * @SINCE_1_0.0
  * @param[in] value the value to compare
  * @return true if the value is equal to zero
  */
@@ -168,6 +175,7 @@ inline bool EqualsZero( float value )
 /**
  * @brief Helper function to compare equality of two floating point values.
  *
+ * @SINCE_1_0.0
  * @param[in] a the first value to compare
  * @param[in] b the second value to compare
  * @return true if the values are equal within a minimal epsilon for their values
@@ -180,6 +188,7 @@ inline bool Equals( float a, float b )
 /**
  * @brief Helper function to compare equality of two floating point values.
  *
+ * @SINCE_1_0.0
  * @param[in] a the first value to compare
  * @param[in] b the second value to compare
  * @param[in] epsilon the minimum epsilon value that will be used to consider the values different
@@ -193,6 +202,7 @@ inline bool Equals( float a, float b, float epsilon )
 /**
  * @brief Get an float that is rounded at specified place of decimals.
  *
+ * @SINCE_1_0.0
  * @param[in] value float value
  * @param[in] pos decimal place
  * @return a rounded float
@@ -229,14 +239,15 @@ inline float Round(float value, int pos)
  * calculating positions in a space that repeats, to
  * computing angles that range from 0 to 360.
  *
+ * @SINCE_1_0.0
  * @param[in] x the point to be wrapped within the domain
  * @param[in] start The start of the domain
  * @param[in] end The end of the domain
  *
+ * @return the wrapped value over the domain (start) (end)
  * @note if start = end (i.e. size of domain 0), then wrapping will not occur
  * and result will always be equal to start.
  *
- * @return the wrapped value over the domain (start) (end)
  */
 inline float WrapInDomain(float x, float start, float end)
 {
@@ -271,14 +282,15 @@ inline float WrapInDomain(float x, float start, float end)
  * return -20. i.e. subtract 20 from current value (10) to reach
  * target wrapped value (350).
  *
- * @note assumes both (a) and (b) are already within the domain
- * (start) to (end)
- *
+ * @SINCE_1_0.0
  * @param a the current value
  * @param b the target value
  * @param start the start of the domain
  * @param end the end of the domain
  * @return the shortest direction (the sign) and distance (the magnitude)
+ * @note assumes both (a) and (b) are already within the domain
+ * (start) to (end)
+ *
  */
 inline float ShortestDistanceInDomain( float a, float b, float start, float end )
 {
@@ -313,6 +325,7 @@ inline float ShortestDistanceInDomain( float a, float b, float start, float end 
 /**
  * @brief Extracts the sign of a number
  *
+ * @SINCE_1_0.0
  * @param[in] value The value we want to extract the sign
  * @return -1 for negative values, +1 for positive values and 0 if value is 0
  */

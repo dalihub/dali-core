@@ -59,14 +59,20 @@ TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::Actor ), Creat
 
 struct GridVertex
 {
+  GridVertex( float positionX, float positionY, const Vector2& size )
+  : mPosition( positionX*size.x, positionY*size.y, 0.f ),
+    mTextureCoord( positionX+0.5f, positionY+0.5f )
+  {
+  }
+
   Vector3 mPosition;
   Vector2 mTextureCoord;
 };
 
-GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
+GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, const Vector2& size )
 {
   // Create vertices
-  std::vector< Vector2 > vertices;
+  std::vector< GridVertex > vertices;
   vertices.reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
 
   for( unsigned int y = 0u; y < gridHeight + 1; ++y )
@@ -75,7 +81,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
     for( unsigned int x = 0u; x < gridWidth + 1; ++x )
     {
       float xPos = (float)x / gridWidth;
-      vertices.push_back( Vector2( xPos - 0.5f, yPos - 0.5f ) );
+      vertices.push_back( GridVertex( xPos - 0.5f, yPos - 0.5f, size ) );
     }
   }
 
@@ -107,7 +113,8 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
 
 
   Property::Map vertexFormat;
-  vertexFormat[ "aPosition" ] = Property::VECTOR2;
+  vertexFormat[ "aPosition" ] = Property::VECTOR3;
+  vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
   PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New();
   vertexPropertyBuffer->SetFormat( vertexFormat );
   vertexPropertyBuffer->SetSize( vertices.size() );
@@ -137,16 +144,17 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight )
 }
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
+  attribute mediump vec3 aPosition;\n
+  attribute mediump vec2 aTexCoord;\n
   varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 uTextureRect;\n
+  uniform mediump vec4 sTextureRect;\n
   \n
   void main()\n
   {\n
-    gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);\n
-    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
+    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);\n
+    vTexCoord = aTexCoord;\n
   }\n
 );
 
@@ -160,6 +168,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
   }\n
 );
+
+const char * const TEXTURE_RECT_UNIFORM_NAME( "sTextureRect" );
 
 const size_t INVALID_TEXTURE_ID = (size_t)-1;
 const int INVALID_RENDERER_ID = -1;
@@ -176,7 +186,7 @@ ImageActorPtr ImageActor::New()
   //Create the renderer
   actor->mRenderer = Renderer::New();
 
-  GeometryPtr quad  = CreateGeometry( 1u, 1u );
+  GeometryPtr quad  = CreateGeometry( 1u, 1u, Vector2::ONE );
   actor->mRenderer->SetGeometry( *quad );
 
   ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
@@ -294,6 +304,7 @@ Vector4 ImageActor::GetNinePatchBorder() const
 
 ImageActor::ImageActor()
 : Actor( Actor::BASIC ),
+  mActorSize( Vector2::ZERO ),
   mGridSize( 1u, 1u ),
   mRendererIndex( INVALID_RENDERER_ID ),
   mTextureIndex( INVALID_TEXTURE_ID ),
@@ -352,14 +363,11 @@ void ImageActor::UpdateGeometry()
     gridHeight = std::min( MAXIMUM_GRID_SIZE, static_cast<uint16_t>(gridSize.height) );
   }
 
-  if( gridWidth != mGridSize.GetWidth() || gridHeight != mGridSize.GetHeight() )
-  {
-    mGridSize.SetWidth( gridWidth );
-    mGridSize.SetHeight( gridHeight );
+  mGridSize.SetWidth( gridWidth );
+  mGridSize.SetHeight( gridHeight );
 
-    GeometryPtr geometry = CreateGeometry( gridWidth, gridHeight );
-    mRenderer->SetGeometry( *geometry );
-  }
+  GeometryPtr geometry = CreateGeometry( gridWidth, gridHeight, mActorSize );
+  mRenderer->SetGeometry( *geometry );
 }
 void ImageActor::UpdateTexureRect()
 {
@@ -379,7 +387,7 @@ void ImageActor::UpdateTexureRect()
   }
 
   Material* material = mRenderer->GetMaterial();
-  material->RegisterProperty( "uTextureRect", textureRect );
+  material->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -611,60 +619,60 @@ float ImageActor::GetSortModifier() const
 
 void ImageActor::SetCullFace(CullFaceMode mode)
 {
-  mRenderer->GetMaterial()->SetFaceCullingMode( static_cast< Dali::Material::FaceCullingMode >( mode ) );
+  mRenderer->SetFaceCullingMode( static_cast< Dali::Renderer::FaceCullingMode >( mode ) );
 }
 
 CullFaceMode ImageActor::GetCullFace() const
 {
-  return static_cast< CullFaceMode >( mRenderer->GetMaterial()->GetFaceCullingMode() );
+  return static_cast< CullFaceMode >( mRenderer->GetFaceCullingMode() );
 }
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
 {
-  mRenderer->GetMaterial()->SetBlendMode( mode );
+  mRenderer->SetBlendMode( mode );
 }
 
 BlendingMode::Type ImageActor::GetBlendMode() const
 {
-  return mRenderer->GetMaterial()->GetBlendMode();
+  return mRenderer->GetBlendMode();
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
 {
-  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+  mRenderer->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
                                BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
 {
-  mRenderer->GetMaterial()->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
                                BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
 {
-  mRenderer->GetMaterial()->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
 {
-  mRenderer->GetMaterial()->SetBlendEquation( equationRgba, equationRgba );
+  mRenderer->SetBlendEquation( equationRgba, equationRgba );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
 {
-  mRenderer->GetMaterial()->SetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->SetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
 {
-  mRenderer->GetMaterial()->GetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->GetBlendEquation( equationRgb, equationAlpha );
 }
 
 void ImageActor::SetBlendColor( const Vector4& color )
 {
   mBlendColor = color;
-  mRenderer->GetMaterial()->SetBlendColor( mBlendColor );
+  mRenderer->SetBlendColor( mBlendColor );
 }
 
 const Vector4& ImageActor::GetBlendColor() const
@@ -756,6 +764,25 @@ void ImageActor::EffectImageUpdated()
       mEffectTextureIndex = INVALID_TEXTURE_ID;
     }
 
+  }
+}
+
+void ImageActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  if( mActorSize != size )
+  {
+    mActorSize = size;
+    UpdateGeometry();
+  }
+}
+
+void ImageActor::OnSizeSet( const Vector3& targetSize )
+{
+  Vector2 size( targetSize.x, targetSize.y );
+  if( mActorSize != size )
+  {
+    mActorSize = size;
+    UpdateGeometry();
   }
 }
 

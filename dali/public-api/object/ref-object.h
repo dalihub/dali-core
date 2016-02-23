@@ -36,6 +36,7 @@ class Value;
  *
  * Typically this should be used with an instrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API RefObject
 {
@@ -43,6 +44,7 @@ public:
 
   /**
    * @brief Increment the object's reference count.
+   * @SINCE_1_0.0
    */
   void Reference();
 
@@ -50,12 +52,14 @@ public:
    * @brief Decrement the object's reference count.
    *
    * When the reference count drops to zero, the object will self-destruct.
+   * @SINCE_1_0.0
    */
   void Unreference();
 
   /**
    * @brief Retrieve the object's reference count.
    *
+   * @SINCE_1_0.0
    * @return The reference count
    */
   int ReferenceCount();
@@ -64,6 +68,7 @@ protected:
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   RefObject();
 
@@ -71,6 +76,7 @@ protected:
    * @brief RefObject is intended as a base class.
    *
    * A RefObject may only be deleted when its reference count is zero.
+   * @SINCE_1_0.0
    */
   virtual ~RefObject();
 
@@ -78,6 +84,7 @@ protected:
    * @brief Copy constructor.
    *
    * The newly copied object will have a reference count of zero.
+   * @SINCE_1_0.0
    * @param[in] rhs The object to copy
    */
   RefObject(const RefObject& rhs);
@@ -86,6 +93,7 @@ protected:
    * @brief Assignment operator.
    *
    * The newly copied object will have a reference count of zero.
+   * @SINCE_1_0.0
    * @param[in] rhs The object to copy
    * @return a reference to this
    */

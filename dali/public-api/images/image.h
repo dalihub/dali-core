@@ -50,23 +50,26 @@ class Image;
  * | %Signal Name           | Method                       |
  * |------------------------|------------------------------|
  * | uploaded               | @ref UploadedSignal()        |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Image : public BaseHandle
 {
 public:
 
   /**
-   * @deprecated DALi 1.1.3 Image resource is released as soon as last handle is released
+   * @DEPRECATED_1_1.3. Image resource is released as soon as last handle is released.
    * @brief ReleasePolicy controls the way images are deleted from memory.
+   * @SINCE_1_0.0
    */
   enum ReleasePolicy
   {
-    UNUSED, ///< release resource once image is not in use anymore (eg. all actors using it become offstage). Reload when resource is required again.
-    NEVER   ///< keep image data for the lifetime of the object. (default)
+    UNUSED, ///< release resource once image is not in use anymore (eg. all actors using it become offstage). Reload when resource is required again. @SINCE_1_0.0
+    NEVER   ///< keep image data for the lifetime of the object. (default) @SINCE_1_0.0
   };
 
   /**
    * @brief Type of signal for Image Uploaded.
+   * @SINCE_1_0.0
    */
   typedef Signal< void (Image) > ImageSignalType;
 
@@ -76,6 +79,7 @@ public:
    * @brief Constructor which creates an empty Image handle.
    *
    * Use Image::New(...) to create an initialised handle.
+   * @SINCE_1_0.0
    */
   Image();
 
@@ -83,12 +87,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~Image();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   Image(const Image& handle);
@@ -96,6 +102,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -106,16 +113,18 @@ public:
    *
    * If handle points to a Image object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle to a Image object or an uninitialized handle
    */
   static Image DownCast( BaseHandle handle );
 
   /**
-   * @deprecated DALi 1.1.3
+   * @DEPRECATED_1_1.3
    *
    * @brief Return resource release policy.
    *
+   * @SINCE_1_0.0
    * @return resource release policy
    */
   ReleasePolicy GetReleasePolicy() const;
@@ -125,6 +134,7 @@ public:
    *
    * Returns either the requested width or the actual loaded width if no specific size was requested.
    *
+   * @SINCE_1_0.0
    * @return width of the image in pixels.
    */
   unsigned int GetWidth() const;
@@ -134,6 +144,7 @@ public:
    *
    * Returns either the requested height or the actual loaded height if no specific size was requested.
    *
+   * @SINCE_1_0.0
    * @return height of the image in pixels.
    */
   unsigned int GetHeight() const;
@@ -146,6 +157,7 @@ public: // Signals
    * It Will be sent after an actor using the image is added to
    * the stage, when such a staged image is reloaded, or when a staged
    * BufferImage calls Update().
+   * @SINCE_1_0.0
    * @return A signal object to Connect() with.
    */
   ImageSignalType& UploadedSignal();

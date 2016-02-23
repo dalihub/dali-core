@@ -75,14 +75,29 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
   const Matrix& worldMatrix = renderable.mNode->GetWorldMatrix( updateBufferIndex );
   if ( cull && renderable.mRenderer->GetMaterial().GetShader()->GeometryHintEnabled( Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) )
   {
-    const Vector3& position = worldMatrix.GetTranslation3();
-    const Vector3& scale = renderable.mNode->GetScale( updateBufferIndex );
+    const Vector3& scale = renderable.mNode->GetWorldScale( updateBufferIndex );
     const Vector3& halfSize = renderable.mNode->GetSize( updateBufferIndex ) * scale * 0.5f;
     float radius( halfSize.Length() );
 
-    inside = (radius > Math::MACHINE_EPSILON_1000) &&
-             (cameraAttachment.CheckAABBInFrustum( updateBufferIndex, position, halfSize) );
+    if( radius > Math::MACHINE_EPSILON_1000 )
+    {
+      const Vector3& position = worldMatrix.GetTranslation3();
+      const Quaternion& rotation = renderable.mNode->GetWorldOrientation( updateBufferIndex );
+      bool axisAligned = rotation.IsIdentity();
 
+      if( axisAligned )
+      {
+        inside = cameraAttachment.CheckAABBInFrustum( updateBufferIndex, position, halfSize );
+      }
+      else
+      {
+        inside = cameraAttachment.CheckSphereInFrustum( updateBufferIndex, position, halfSize.Length() );
+      }
+    }
+    else
+    {
+      inside = false;
+    }
   }
 
   if ( inside )
@@ -252,12 +267,13 @@ bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSo
 }
 
 /**
- * Sort color render items
- * @param colorRenderList to sort
+ * Sort render items
+ * @param bufferIndex The buffer to read from
+ * @param renderList to sort
  * @param layer where the renderers are from
  * @param sortingHelper to use for sorting the renderitems (to avoid reallocating)
  */
-inline void SortColorRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, RendererSortingHelper& sortingHelper )
+inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, RendererSortingHelper& sortingHelper )
 {
   const size_t renderableCount = renderList.Count();
   // reserve space if needed
@@ -365,7 +381,7 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
   }
 
   AddRenderersToRenderList( updateBufferIndex, renderList, layer.colorRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
-  SortColorRenderItems( updateBufferIndex, renderList, layer, sortingHelper );
+  SortRenderItems( updateBufferIndex, renderList, layer, sortingHelper );
 
   //Set render flags
   unsigned int flags = 0u;
@@ -412,6 +428,7 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
                                  SceneGraph::CameraAttachment& cameraAttachment,
                                  bool stencilRenderablesExist,
                                  RenderInstruction& instruction,
+                                 RendererSortingHelper& sortingHelper,
                                  bool tryReuseRenderList,
                                  bool cull )
 {
@@ -435,6 +452,7 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
     }
   }
   AddRenderersToRenderList( updateBufferIndex, overlayRenderList, layer.overlayRenderables, viewMatrix, cameraAttachment, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
+  SortRenderItems( updateBufferIndex, overlayRenderList, layer, sortingHelper );
 }
 
 /**
@@ -522,7 +540,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
     if ( overlayRenderablesExist )
     {
       AddOverlayRenderers( updateBufferIndex, layer, viewMatrix, cameraAttachment, stencilRenderablesExist,
-                           instruction, tryReuseRenderList, cull );
+                           instruction, sortingHelper, tryReuseRenderList, cull );
     }
   }
 

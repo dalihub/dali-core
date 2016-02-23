@@ -34,6 +34,7 @@ namespace Dali
 
 /**
  * @brief Template class to create and operate on rectangles.
+ * @SINCE_1_0.0
  */
 
 template< typename T = float >
@@ -43,6 +44,7 @@ struct Rect
 
   /**
    * @brief Constructor.
+   * @SINCE_1_0.0
    */
   Rect()
   : x(0),
@@ -55,6 +57,7 @@ struct Rect
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param [in] x       x coordinate (or left)
    * @param [in] y       y coordinate (or right)
    * @param [in] width   width (or bottom)
@@ -71,6 +74,7 @@ struct Rect
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  The original object
    */
   Rect(const Rect<T>& rhs)
@@ -84,6 +88,7 @@ struct Rect
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  The original object
    * @return reference to this
    */
@@ -103,6 +108,7 @@ struct Rect
   /**
    * @brief Assignment from individual values.
    *
+   * @SINCE_1_0.0
    * @param[in] newX      x coordinate
    * @param[in] newY      y coordinate
    * @param[in] newWidth  width
@@ -119,6 +125,7 @@ struct Rect
   /**
    * @brief Determines whether or not this Rectangle is empty.
    *
+   * @SINCE_1_0.0
    * @return true if width or height are zero
    */
   bool IsEmpty() const
@@ -130,6 +137,7 @@ struct Rect
   /**
    * @brief Get the left of the rectangle.
    *
+   * @SINCE_1_0.0
    * @return The left edge of the rectangle
    */
   T Left() const
@@ -139,6 +147,7 @@ struct Rect
   /**
    * @brief Get the right of the rectangle.
    *
+   * @SINCE_1_0.0
    * @return The right edge of the rectangle
    */
   T Right() const
@@ -149,6 +158,7 @@ struct Rect
   /**
    * @brief Get the top of the rectangle.
    *
+   * @SINCE_1_0.0
    * @return The top of the rectangle
    */
   T Top() const
@@ -159,6 +169,7 @@ struct Rect
   /**
    * @brief Get the bottom of the rectangle.
    *
+   * @SINCE_1_0.0
    * @return The bottom of the rectangle
    */
   T Bottom() const
@@ -169,6 +180,7 @@ struct Rect
   /**
    * @brief Get the area of the rectangle.
    *
+   * @SINCE_1_0.0
    * @return The area of the rectangle
    */
   T Area() const
@@ -179,6 +191,7 @@ struct Rect
   /**
    * @brief Determines whether or not this rectangle and the specified rectangle intersect.
    *
+   * @SINCE_1_0.0
    * @param[in] other  The other rectangle to test against this rectangle
    * @return           true if the rectangles intersect
    */
@@ -193,6 +206,7 @@ struct Rect
   /**
    * @brief Determines whether or not this Rectangle contains the specified rectangle.
    *
+   * @SINCE_1_0.0
    * @param[in] other  The other rectangle to test against this rectangle
    * @return           true if the specified rectangle is contained
    */
@@ -234,6 +248,7 @@ public:   // Data
 /**
  * @brief Equality operator.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs First operand
  * @param[in] rhs Second operand
  * @return true if boxes are exactly same
@@ -250,6 +265,7 @@ inline bool operator==( const Rect<T>& lhs, const Rect<T>& rhs )
 /**
  * @brief Inequality operator.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs The first rectangle
  * @param[in] rhs The second rectangle
  * @return true if rectangles are not identical
@@ -263,6 +279,7 @@ inline bool operator!=( const Rect<T>& lhs, const Rect<T>& rhs )
 /**
  * @brief Equality operator specialization for float.
  *
+ * @SINCE_1_0.0
  * @param[in] lhs The first rectangle
  * @param[in] rhs The second rectangle
  * @return true if rectangles are exactly same
@@ -279,6 +296,7 @@ inline bool operator==( const Rect<float>& lhs, const Rect<float>& rhs )
 /**
  * @brief IsEmpty specialization for float.
  *
+ * @SINCE_1_0.0
  * @return true if the rectangle has zero size.
  */
 template<>
@@ -292,6 +310,7 @@ inline bool Rect<float>::IsEmpty() const
 /**
  * @brief Convert the value of the rectangle into a string and insert in to an output stream.
  *
+ * @SINCE_1_0.0
  * @param [in] stream The output stream operator.
  * @param [in] rectangle the rectangle to output
  * @return The output stream operator.

@@ -43,24 +43,19 @@ void TestGlAbstraction::Initialize()
   mIsRenderbufferResult = 0;
   mIsShaderResult = 0;
   mIsTextureResult = 0;
-  mVertexAttribArrayChanged = false;
-
+  mActiveTextureUnit = 0;
   mCheckFramebufferStatusResult = 0;
   mFramebufferStatus = 0;
   mFramebufferColorAttached = 0;
   mFramebufferDepthAttached = 0;
   mFramebufferStencilAttached = 0;
-
   mNumBinaryFormats = 0;
   mBinaryFormats = 0;
   mProgramBinaryLength = 0;
+
+  mVertexAttribArrayChanged = false;
   mGetProgramBinaryCalled = false;
 
-  mLastAutoTextureIdUsed = 0;
-
-  mLastShaderIdUsed = 0;
-  mLastProgramIdUsed = 0;
-  mLastUniformIdUsed = 0;
   mLastShaderCompiled = 0;
   mLastClearBitMask = 0;
   mClearCount = 0;
@@ -71,6 +66,10 @@ void TestGlAbstraction::Initialize()
   mLastBlendFuncDstRgb    = 0;
   mLastBlendFuncSrcAlpha  = 0;
   mLastBlendFuncDstAlpha  = 0;
+  mLastAutoTextureIdUsed = 0;
+  mLastShaderIdUsed = 0;
+  mLastProgramIdUsed = 0;
+  mLastUniformIdUsed = 0;
 
   mUniforms.clear();
   mProgramUniforms1i.clear();
@@ -78,6 +77,11 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms2f.clear();
   mProgramUniforms3f.clear();
   mProgramUniforms4f.clear();
+
+  for( unsigned int i=0; i<MAX_ATTRIBUTE_CACHE_SIZE; ++i )
+  {
+    mVertexAttribArrayState[i] = false;
+  }
 }
 
 void TestGlAbstraction::PreRender()

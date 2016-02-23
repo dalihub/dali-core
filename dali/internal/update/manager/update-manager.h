@@ -165,14 +165,6 @@ public:
   void DisconnectNode( Node* node );
 
   /**
-   * Called when a property is set on a disconnected Node (via public API)
-   * A disconnected Node has has no parent or children, and its properties cannot be animated/constrained.
-   * @pre The node does not have a parent.
-   * @param[in] node The node to set as "active".
-   */
-  void SetNodeActive( Node* node );
-
-  /**
    * Destroy a Node owned by UpdateManager.
    * This is not immediate; Nodes are passed to the RenderQueue to allow GL resources to be deleted.
    * In the following update, the previously queued Nodes may be deleted.

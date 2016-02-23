@@ -40,17 +40,20 @@ namespace Dali
  * inefficient and illogical (i.e. the data is inherently integer).
  * One of these can be passed in a single 32 bit integer register on
  * common architectures.
+ * @SINCE_1_0.0
  */
 class Uint16Pair
 {
 public:
   /**
    * @brief Default constructor for the (0, 0) tuple.
+   * @SINCE_1_0.0
    */
   Uint16Pair() : mData(0) {}
 
   /**
    * @brief Constructor taking separate x and y (width and height) parameters.
+   * @SINCE_1_0.0
    * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536,
    * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536,
    */
@@ -69,6 +72,7 @@ public:
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
    * @param rhs to copy from
    */
   Uint16Pair( const Uint16Pair& rhs )
@@ -78,7 +82,7 @@ public:
 
   /**
    * @brief Sets the width.
-   * @since DALi version 1.1.13
+   * @SINCE_1_1.13
    * @param[in] width The x dimension to be stored in this 2-tuple.
    */
   void SetWidth( uint16_t width )
@@ -87,7 +91,8 @@ public:
   }
 
   /**
-   * @returns the x dimension stored in this 2-tuple.
+   * @brief @returns the x dimension stored in this 2-tuple.
+   * @SINCE_1_0.0
    */
   uint16_t GetWidth() const
   {
@@ -96,7 +101,7 @@ public:
 
   /**
    * @brief Sets the height.
-   * @since DALi version 1.1.13
+   * @SINCE_1_1.13
    * @param[in] height The y dimension to be stored in this 2-tuple.
    */
   void SetHeight( uint16_t height )
@@ -105,7 +110,8 @@ public:
   }
 
   /**
-   * @returns the y dimension stored in this 2-tuple.
+   * @brief @returns the y dimension stored in this 2-tuple.
+   * @SINCE_1_0.0
    */
   uint16_t GetHeight() const
   {
@@ -114,7 +120,7 @@ public:
 
   /**
    * @brief Sets the x dimension (same as width).
-   * @since DALi version 1.1.14
+   * @SINCE_1_1.14
    * @param[in] x The x dimension to be stored in this 2-tuple.
    */
   void SetX( uint16_t x )
@@ -123,7 +129,8 @@ public:
   }
 
   /**
-   * @returns the x dimension stored in this 2-tuple.
+   * @brief @returns the x dimension stored in this 2-tuple.
+   * @SINCE_1_0.0
    */
   uint16_t GetX()  const
   {
@@ -132,7 +139,7 @@ public:
 
   /**
    * @brief Sets the y dimension (same as height).
-   * @since DALi version 1.1.14
+   * @SINCE_1_1.14
    * @param[in] y The y dimension to be stored in this 2-tuple.
    */
   void SetY( uint16_t y )
@@ -141,7 +148,8 @@ public:
   }
 
   /**
-   * @returns the y dimension stored in this 2-tuple.
+   * @brief @returns the y dimension stored in this 2-tuple.
+   * @SINCE_1_0.0
    */
   uint16_t GetY() const
   {
@@ -149,7 +157,8 @@ public:
   }
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   * @SINCE_1_0.0
    */
   Uint16Pair& operator=( const Uint16Pair& rhs )
   {
@@ -161,7 +170,8 @@ public:
   }
 
   /**
-   * Equality operator.
+   * @brief Equality operator.
+   * @SINCE_1_0.0
    */
   bool operator==( const Uint16Pair& rhs ) const
   {
@@ -169,7 +179,8 @@ public:
   }
 
   /**
-   * Inequality operator.
+   * @brief Inequality operator.
+   * @SINCE_1_0.0
    */
   bool operator!=( const Uint16Pair& rhs ) const
   {
@@ -177,8 +188,9 @@ public:
   }
 
   /**
-   * Less than comparison operator for storing in collections (not geometrically
+   * @brief Less than comparison operator for storing in collections (not geometrically
    * meaningful).
+   * @SINCE_1_0.0
    */
   bool operator<( const Uint16Pair& rhs ) const
   {
@@ -186,8 +198,9 @@ public:
   }
 
   /**
-   * Greater than comparison operator for storing in collections (not
+   * @brief Greater than comparison operator for storing in collections (not
    * geometrically meaningful).
+   * @SINCE_1_0.0
    */
   bool operator>( const Uint16Pair& rhs ) const
   {
@@ -200,6 +213,7 @@ public:
    *
    * Uses a template for loose coupling, to save a header include, and allow any
    * vector type with .x and .y members to be converted.
+   * @SINCE_1_0.0
    */
   template<typename FLOAT_VECTOR_N_TYPE>
   static Uint16Pair FromFloatVec2( const FLOAT_VECTOR_N_TYPE& from )
@@ -215,6 +229,7 @@ public:
    *
    * Uses a template to allow any vector type with operator [] to be converted
    * in addition to plain arrays.
+   * @SINCE_1_0.0
    */
   template<typename FLOAT_ARRAY>
   static Uint16Pair FromFloatArray( const FLOAT_ARRAY& from )

@@ -60,17 +60,18 @@ struct WheelEvent;
  * | contextLost             | @ref ContextLostSignal()             |
  * | contextRegained         | @ref ContextRegainedSignal()         |
  * | sceneCreated            | @ref SceneCreatedSignal()            |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 
-  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;     ///< Key event signal type
-  typedef Signal< void () > EventProcessingFinishedSignalType;    ///< Event Processing finished signal type
-  typedef Signal< void (const TouchEvent&)> TouchedSignalType;    ///< Touched signal type
-  typedef Signal< void (const WheelEvent&)> WheelEventSignalType; ///< Touched signal type
-  typedef Signal< void () > ContextStatusSignal;                  ///< Context status signal type
-  typedef Signal< void () > SceneCreatedSignalType;               ///< Scene created signal type
+  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;     ///< Key event signal type @SINCE_1_0.0
+  typedef Signal< void () > EventProcessingFinishedSignalType;    ///< Event Processing finished signal type @SINCE_1_0.0
+  typedef Signal< void (const TouchEvent&)> TouchedSignalType;    ///< Touched signal type @SINCE_1_0.0
+  typedef Signal< void (const WheelEvent&)> WheelEventSignalType; ///< Touched signal type @SINCE_1_0.0
+  typedef Signal< void () > ContextStatusSignal;                  ///< Context status signal type @SINCE_1_0.0
+  typedef Signal< void () > SceneCreatedSignalType;               ///< Scene created signal type @SINCE_1_0.0
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -79,19 +80,22 @@ public:
    * @brief Allows the creation of an empty stage handle.
    *
    * To retrieve the current stage, this handle can be set using Stage::GetCurrent().
+   * @SINCE_1_0.0
    */
   Stage();
 
   /**
    * @brief Get the current Stage.
    *
-   * @return The current stage or an empty handle if Core has not been created or has been already destroyed.
+   * @SINCE_1_0.0
+   * @return The current stage or an empty handle if the internal core has not been created or has been already destroyed.
    */
   static Stage GetCurrent();
 
   /**
    * @brief Query whether the Stage exists; this should only return false during or after destruction of Dali core.
    *
+   * @SINCE_1_0.0
    * @return True when it's safe to call Stage::GetCurrent().
    */
   static bool IsInstalled();
@@ -100,12 +104,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~Stage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   Stage(const Stage& handle);
@@ -113,6 +119,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -124,9 +131,10 @@ public:
    * @brief Adds a child Actor to the Stage.
    *
    * The child will be referenced.
+   * @SINCE_1_0.0
+   * @param [in] actor The child.
    * @pre The actor has been initialized.
    * @pre The actor does not have a parent.
-   * @param [in] actor The child.
    */
   void Add(Actor& actor);
 
@@ -134,8 +142,9 @@ public:
    * @brief Removes a child Actor from the Stage.
    *
    * The child will be unreferenced.
-   * @pre The actor has been added to the stage.
+   * @SINCE_1_0.0
    * @param [in] actor The child.
+   * @pre The actor has been added to the stage.
    */
   void Remove(Actor& actor);
 
@@ -145,6 +154,7 @@ public:
    * The x component will be the width of the Stage in pixels
    * The y component will be the height of the Stage in pixels
    * The z component will be the distance between far and near planes
+   * @SINCE_1_0.0
    * @return The size of the Stage as a Vector.
    */
   Vector2 GetSize() const;
@@ -154,6 +164,7 @@ public:
   /**
    * @brief Retrieve the list of render-tasks.
    *
+   * @SINCE_1_0.0
    * @return A valid handle to a RenderTaskList.
    */
   RenderTaskList GetRenderTaskList() const;
@@ -164,6 +175,7 @@ public:
    * @brief Query the number of on-stage layers.
    *
    * Note that a default layer is always provided (count >= 1).
+   * @SINCE_1_0.0
    * @return The number of layers.
    */
   unsigned int GetLayerCount() const;
@@ -171,15 +183,17 @@ public:
   /**
    * @brief Retrieve the layer at a specified depth.
    *
-   * @pre depth is less than layer count; see GetLayerCount().
+   * @SINCE_1_0.0
    * @param[in] depth The depth.
    * @return The layer found at the given depth.
+   * @pre Depth is less than layer count; see GetLayerCount().
    */
   Layer GetLayer(unsigned int depth) const;
 
   /**
    * @brief Returns the Stage's Root Layer.
    *
+   * @SINCE_1_0.0
    * @return The root layer.
    */
   Layer GetRootLayer() const;
@@ -189,6 +203,7 @@ public:
   /**
    * @brief Set the background color of the stage.
    *
+   * @SINCE_1_0.0
    * @param[in] color The new background color.
    */
   void SetBackgroundColor(Vector4 color);
@@ -196,6 +211,7 @@ public:
   /**
    * @brief Retrieve the background color of the stage.
    *
+   * @SINCE_1_0.0
    * @return The background color.
    */
   Vector4 GetBackgroundColor() const;
@@ -203,13 +219,15 @@ public:
   /**
    * @brief Retrieve the DPI of the display device to which the stage is connected.
    *
-   * @return the horizontal and vertical DPI
+   * @SINCE_1_0.0
+   * @return The horizontal and vertical DPI
    */
   Vector2 GetDpi() const;
 
   /**
    * @brief Get the Object registry.
    *
+   * @SINCE_1_0.0
    * @return The object registry.
    */
   ObjectRegistry GetObjectRegistry() const;
@@ -221,7 +239,8 @@ public:
    *
    * By default Dali will stop rendering when no Actor positions are being set, and when no animations are running etc.
    * This method is useful to force screen refreshes e.g. when updating a NativeImage.
-   * @param durationSeconds to keep rendering, 0 means render at least one more frame
+   * @SINCE_1_0.0
+   * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
    */
   void KeepRendering( float durationSeconds );
 
@@ -234,6 +253,7 @@ public:
    * @code
    *   void YourCallbackName(const KeyEvent& event);
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   KeyEventSignalType& KeyEventSignal();
@@ -241,6 +261,7 @@ public:
   /**
    * @brief This signal is emitted just after the event processing is finished.
    *
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
@@ -257,8 +278,9 @@ public:
    *   void YourCallbackName(const TouchEvent& event);
    * @endcode
    *
-   * @note Motion events are not emitted.
+   * @SINCE_1_0.0
    * @return The touch signal to connect to.
+   * @note Motion events are not emitted.
    */
   TouchedSignalType& TouchedSignal();
 
@@ -269,6 +291,7 @@ public:
    * @code
    *   void YourCallbackName(const WheelEvent& event);
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   WheelEventSignalType& WheelEventSignal();
@@ -278,7 +301,8 @@ public:
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and tear down UI components when recieved.
-   * @return The ContextLost signal to connect to.
+   * @SINCE_1_0.0
+   * @return The context lost signal to connect to.
    */
   ContextStatusSignal& ContextLostSignal();
 
@@ -288,18 +312,22 @@ public:
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and rebuild UI components on receipt.
-   * @return The ContextRegained signal to connect to.
+   * @SINCE_1_0.0
+   * @return The context regained signal to connect to.
    */
   ContextStatusSignal& ContextRegainedSignal();
 
   /**
-   * @brief This signal is emitted after the initial scene is created. It will be triggered after the
+   * @brief This signal is emitted after the initial scene is created.
+   *
+   * It will be triggered after the
    * application init signal.
    *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName();
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   SceneCreatedSignalType& SceneCreatedSignal();
@@ -307,8 +335,9 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @brief This constructor is used by Dali GetCurrent() methods.
+   * @brief This constructor is used by Stage::GetCurrent() methods.
    *
+   * @SINCE_1_0.0
    * @param [in] stage A pointer to a Dali resource
    */
   explicit DALI_INTERNAL Stage(Internal::Stage* stage);

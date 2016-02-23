@@ -35,7 +35,6 @@ class RenderTracker;
 class RenderItem;
 class Shader;
 class RenderGeometry;
-class MaterialDataProvider;
 
 /**
  * Structure to store information for sorting the renderers.

@@ -54,6 +54,7 @@ class TypeInfo;
  * The internal Dali resources are reference counted. copying a Dali handle will increase the reference count.
  * A resource will not be deleted until all its Dali::BaseHandle handles are destroyed, or reset.
  *
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API BaseHandle
 {
@@ -62,6 +63,7 @@ public:
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A pointer to a newly allocated Dali resource
    */
   BaseHandle(Dali::BaseObject* handle);
@@ -78,6 +80,7 @@ public:
    * handle = SomeClass::New(); // now initialized
    * handle.SomeMethod(); // safe
    * @endcode
+   * @SINCE_1_0.0
    */
   BaseHandle();
 
@@ -85,12 +88,14 @@ public:
    * @brief Dali::BaseHandle is intended as a base class
    *
    * This is non-virtual since derived BaseHandle types must not contain data.
+   * @SINCE_1_0.0
    */
   ~BaseHandle();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   BaseHandle(const BaseHandle& handle);
@@ -99,6 +104,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * It makes this handle use the same BaseObject as the copied handle
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this handle
    */
@@ -107,11 +113,12 @@ public:
   /**
    * @brief Connects a void() functor to a specified signal.
    *
-   * @pre The signal must be available in this object.
+   * @SINCE_1_0.0
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
    * @param [in] functor The functor to copy.
    * @return True if the signal was available.
+   * @pre The signal must be available in this object.
    */
   template <class T>
   bool ConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor )
@@ -122,6 +129,7 @@ public:
   /**
    * @brief Perform action on this object with the given action name and attributes.
    *
+   * @SINCE_1_0.0
    * @param [in] actionName The command for the action.
    * @param [in] attributes The list of attributes for the action.
    * @return The action is performed by the object or not.
@@ -134,6 +142,7 @@ public:
    * Will return an empty string if the typename does not exist. This will happen for types that
    * have not registered with type-registry.
    *
+   * @SINCE_1_0.0
    * @return The type name. Empty string if the typename does not exist.
    */
   const std::string& GetTypeName() const;
@@ -141,6 +150,7 @@ public:
   /**
    * @brief Returns the type info for the Handle.
    *
+   * @SINCE_1_0.0
    * @return The type info.
    */
   bool GetTypeInfo(Dali::TypeInfo& info) const;
@@ -154,6 +164,7 @@ public:
    *
    * This is useful for checking the reference count of the internal resource.
    * This method will not check the validity of the handle so the caller is expected to check it by using if (handle)
+   * @SINCE_1_0.0
    * @return The BaseObject which is referenced by the BaseHandle.
    */
   BaseObject& GetBaseObject();
@@ -163,6 +174,7 @@ public:
    *
    * This is useful for checking the reference count of the internal resource.
    * This method will not check the validity of the handle so the caller is expected to check it by using if (handle)
+   * @SINCE_1_0.0
    * @return The BaseObject which is referenced by the BaseHandle.
    */
   const BaseObject& GetBaseObject() const;
@@ -172,6 +184,7 @@ public:
    *
    * If no other handle copies exist, the internal Dali resouce will be deleted.
    * Calling this is not required i.e. it will happen automatically when a Dali::BaseHandle is destroyed.
+   * @SINCE_1_0.0
    */
   void Reset();
 
@@ -187,12 +200,14 @@ public:
    * @brief Converts an handle to a BooleanType.
    *
    * This is useful for checking whether the handle is empty.
+   * @SINCE_1_0.0
    */
   operator BooleanType() const;
 
   /**
    * @brief Equality operator overload.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs A reference to the compared handle.
    * @return true if the handle handles point to the same Dali resource, or if both are NULL.
    */
@@ -201,6 +216,7 @@ public:
   /**
    * @brief Inequality operator overload.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs A reference to the compared handle.
    * @return true if the handle handles point to the different Dali resources.
    */
@@ -209,6 +225,7 @@ public:
   /**
    * @brief Get the reference counted object pointer.
    *
+   * @SINCE_1_0.0
    * @return A pointer to the reference counted object.
    */
   Dali::RefObject* GetObjectPtr() const;
@@ -218,6 +235,7 @@ private:
   /**
    * @brief Not intended for application developers.
    *
+   * @SINCE_1_0.0
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
    * @param [in] functorDelegate A newly allocatated functor delegate (takes ownership).
@@ -230,6 +248,7 @@ protected:
   /**
    * @brief Used by the safe bool idiom.
    *
+   * @SINCE_1_0.0
    */
   void ThisIsSaferThanReturningVoidStar() const {}
 
@@ -240,11 +259,12 @@ private:
 };
 
 /**
- * @brief Template wrapper to downcast an base object handle to derived class handle.
+ * @brief Template wrapper to downcast a base object handle to derived class handle.
  *
- * @pre The BaseHandle has been initialized.
+ * @SINCE_1_0.0
  * @param handle to a base object
  * @return handle pointer to either a valid deriving handle or an uninitialized handle
+ * @pre The BaseHandle has been initialized.
  */
 template< class T >
 inline T DownCast( BaseHandle handle )
@@ -256,6 +276,7 @@ inline T DownCast( BaseHandle handle )
 
 /**
  * @brief Equality operator
+ * @SINCE_1_0.0
  */
 template <typename T>
 inline bool operator==(const BaseHandle& lhs, const T& rhs)
@@ -266,6 +287,7 @@ inline bool operator==(const BaseHandle& lhs, const T& rhs)
 
 /**
  * @brief Equality operator
+ * @SINCE_1_0.0
  */
 template <typename T>
 inline bool operator!=(const BaseHandle& lhs, const T& rhs)
@@ -276,6 +298,7 @@ inline bool operator!=(const BaseHandle& lhs, const T& rhs)
 
 /**
  * @brief Less than operator
+ * @SINCE_1_0.0
  */
 inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
 {

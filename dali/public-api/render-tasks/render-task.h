@@ -78,6 +78,7 @@ class RenderTask;
  * | %Signal Name | Method                |
  * |--------------|-----------------------|
  * | finished     | @ref FinishedSignal() |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API RenderTask : public Handle
 {
@@ -85,24 +86,27 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the RenderTask class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "viewportPosition",  type Vector2
-      VIEWPORT_SIZE,                                           ///< name "viewportSize",      type Vector2
-      CLEAR_COLOR,                                             ///< name "clearColor",        type Vector4
+      VIEWPORT_POSITION = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "viewportPosition",  type Vector2 @SINCE_1_0.0
+      VIEWPORT_SIZE,                                           ///< name "viewportSize",      type Vector2 @SINCE_1_0.0
+      CLEAR_COLOR,                                             ///< name "clearColor",        type Vector4 @SINCE_1_0.0
     };
   };
 
   /**
    * @brief Typedef for signals sent by this class.
+   * @SINCE_1_0.0
    */
   typedef Signal< void (RenderTask& source) > RenderTaskSignalType;
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
+   * @SINCE_1_0.0
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen.
    * @return True if the conversion was successful, otherwise coordinates should be unmodified.
    */
@@ -110,6 +114,7 @@ public:
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
+   * @SINCE_1_0.0
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen.
    * @return True if the conversion was successful, otherwise coordinates should be unmodified.
    */
@@ -132,11 +137,12 @@ public:
 
   /**
    * @brief The refresh-rate of the RenderTask.
+   * @SINCE_1_0.0
    */
   enum RefreshRate
   {
-    REFRESH_ONCE   = 0, ///< Process once only e.g. take a snap-shot of the scene.
-    REFRESH_ALWAYS = 1  ///< Process every frame.
+    REFRESH_ONCE   = 0, ///< Process once only e.g. take a snap-shot of the scene. @SINCE_1_0.0
+    REFRESH_ALWAYS = 1  ///< Process every frame. @SINCE_1_0.0
   };
 
   static const bool         DEFAULT_EXCLUSIVE;     ///< false
@@ -150,6 +156,7 @@ public:
    * @brief Create an empty RenderTask handle.
    *
    * This can be initialised with RenderTaskList::CreateRenderTask().
+   * @SINCE_1_0.0
    */
   RenderTask();
 
@@ -158,6 +165,7 @@ public:
    *
    * If handle points to a RenderTask the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle A handle to an object.
    * @return A handle to a RenderTask or an uninitialized handle.
    */
@@ -167,12 +175,14 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~RenderTask();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] handle A reference to the copied handle
    */
   RenderTask(const RenderTask& handle);
@@ -180,6 +190,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_0.0
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
@@ -187,6 +198,7 @@ public:
 
   /**
    * @brief Set the actors to be rendered.
+   * @SINCE_1_0.0
    * @param[in] actor This actor and its children will be rendered.
    * If actor is an empty handle, then nothing will be rendered.
    */
@@ -194,18 +206,21 @@ public:
 
   /**
    * @brief Retrieve the actors to be rendered.
+   * @SINCE_1_0.0
    * @return This actor and its children will be rendered.
    */
   Actor GetSourceActor() const;
 
   /**
    * @brief Set whether the RenderTask has exclusive access to the source actors; the default is false.
+   * @SINCE_1_0.0
    * @param[in] exclusive True if the source actors will only be rendered by this render-task.
    */
   void SetExclusive( bool exclusive );
 
   /**
    * @brief Query whether the RenderTask has exclusive access to the source actors.
+   * @SINCE_1_0.0
    * @return True if the source actors will only be rendered by this render-task.
    */
   bool IsExclusive() const;
@@ -217,36 +232,42 @@ public:
    * and has a valid source & camera actor.
    * A RenderTask targetting a frame-buffer can still be hit-tested, provided that the screen->frame-buffer
    * coordinate conversion is successful; see also SetScreenToFrameBufferFunction().
+   * @SINCE_1_0.0
    * @param[in] enabled True if the render-task should be considered for input handling.
    */
   void SetInputEnabled( bool enabled );
 
   /**
    * @brief Query whether the render-task should be considered for input handling.
+   * @SINCE_1_0.0
    * @return True if the render-task should be considered for input handling.
    */
   bool GetInputEnabled() const;
 
   /**
    * @brief Set the actor from which the scene is viewed.
+   * @SINCE_1_0.0
    * @param[in] cameraActor The scene is viewed from the perspective of this actor.
    */
   void SetCameraActor( CameraActor cameraActor );
 
   /**
    * @brief Retrieve the actor from which the scene is viewed.
+   * @SINCE_1_0.0
    * @return The scene is viewed from the perspective of this actor.
    */
   CameraActor GetCameraActor() const;
 
   /**
    * @brief Set the frame-buffer used as a render target.
+   * @SINCE_1_0.0
    * @param[in] frameBuffer A valid frame-buffer handle to enable off-screen rendering, or an uninitialized handle to disable.
    */
   void SetTargetFrameBuffer( FrameBufferImage frameBuffer );
 
   /**
    * @brief Retrieve the frame-buffer used as a render target.
+   * @SINCE_1_0.0
    * @return A valid frame-buffer handle, or an uninitialised handle if off-screen rendering is disabled.
    */
   FrameBufferImage GetTargetFrameBuffer() const;
@@ -255,12 +276,14 @@ public:
    * @brief Set the function used to convert screen coordinates to frame-buffer coordinates.
    *
    * This is useful for hit-testing actors which are rendered off-screen.
+   * @SINCE_1_0.0
    * @param[in] conversionFunction The conversion function.
    */
   void SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction );
 
   /**
    * @brief Retrieve the function used to convert screen coordinates to frame-buffer coordinates.
+   * @SINCE_1_0.0
    * @return The conversion function.
    */
   ScreenToFrameBufferFunction GetScreenToFrameBufferFunction() const;
@@ -271,12 +294,14 @@ public:
    * The local coordinates of the actor are mapped as frame-buffer coordinates.
    * This is useful for hit-testing actors which are rendered off-screen.
    * Note: The mapping actor needs to be rendered by the default render task to make the mapping work properly.
+   * @SINCE_1_0.0
    * @param[in] mappingActor The actor used for conversion.
    */
   void SetScreenToFrameBufferMappingActor( Actor mappingActor );
 
   /**
    * @brief Retrieve the actor used to convert screen coordinates to frame-buffer coordinates.
+   * @SINCE_1_0.0
    * @return The actor used for conversion.
    */
   Actor GetScreenToFrameBufferMappingActor() const;
@@ -286,13 +311,15 @@ public:
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
    * By default this will match the target window or frame-buffer size.
-   * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
+   * @SINCE_1_0.0
    * @param[in] position The viewports position (x,y)
+   * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
   void SetViewportPosition( Vector2 position );
 
   /**
    * @brief Retrieve the GL viewport position used when rendering.
+   * @SINCE_1_0.0
    * @return The viewport.
    */
   Vector2 GetCurrentViewportPosition() const;
@@ -302,12 +329,14 @@ public:
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
    * By default this will match the target window or frame-buffer size.
+   * @SINCE_1_0.0
    * @param[in] size The viewports size (width,height)
    */
   void SetViewportSize( Vector2 size );
 
   /**
    * @brief Retrieve the GL viewport size used when rendering.
+   * @SINCE_1_0.0
    * @return The viewport.
    */
   Vector2 GetCurrentViewportSize() const;
@@ -317,27 +346,31 @@ public:
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
    * By default this will match the target window or frame-buffer size.
-   * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
+   * @SINCE_1_0.0
    * @param[in] viewport The new viewport.
+   * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
   void SetViewport( Viewport viewport );
 
   /**
    * @brief Retrieve the GL viewport used when rendering.
+   * @SINCE_1_0.0
    * @return The viewport.
    */
   Viewport GetViewport() const;
 
   /**
    * @brief Set the clear color used when SetClearEnabled(true) is used.
+   * @SINCE_1_0.0
    * @param[in] color The new clear color.
    */
   void SetClearColor( const Vector4& color );
 
   /**
    * @brief Retrieve the clear color used when SetClearEnabled(true) is used.
-   * @note This property can be animated; the return value may not match the value written with SetClearColor().
+   * @SINCE_1_0.0
    * @return The clear color.
+   * @note This property can be animated; the return value may not match the value written with SetClearColor().
    */
   Vector4 GetClearColor() const;
 
@@ -346,17 +379,19 @@ public:
    *
    * The default is false.
    *
+   * @SINCE_1_0.0
+   * @param[in] enabled True if the render-task should clear.
    * @note The default GL surface is cleared automatically at the
    * beginning of each frame; this setting is only useful when 2+
    * render-tasks are used, and the result of the first task needs to
    * be (partially) cleared before rendering the second.
    *
-   * @param[in] enabled True if the render-task should clear.
    */
   void SetClearEnabled( bool enabled );
 
   /**
    * @brief Query whether the render-task will clear the results of previous render-tasks.
+   * @SINCE_1_0.0
    * @return True if the render-task should clear.
    */
   bool GetClearEnabled() const;
@@ -366,6 +401,7 @@ public:
    *
    * Note that this will only affect image actors that use the default vertex shader.
    * The default mode is to cull actors.
+   * @SINCE_1_0.0
    * @param[in] cullMode True if the renderers should be culled.
    */
   void SetCullMode( bool cullMode );
@@ -373,6 +409,7 @@ public:
   /**
    * @brief Get the cull mode.
    *
+   * @SINCE_1_0.0
    * @return True if the render task should cull the actors to the camera's view frustum
    */
   bool GetCullMode() const;
@@ -392,12 +429,14 @@ public:
    * Repeatedly calling SetRefreshRate(REFRESH_ONCE) will cause more
    * snap-shots to be taken.
    *
+   * @SINCE_1_0.0
    * @param[in] refreshRate The new refresh rate.
    */
   void SetRefreshRate( unsigned int refreshRate );
 
   /**
    * @brief Query the refresh-rate of the RenderTask.
+   * @SINCE_1_0.0
    * @return The refresh-rate.
    */
   unsigned int GetRefreshRate() const;
@@ -405,7 +444,7 @@ public:
   /*
    * @brief Get viewport coordinates for given world position
    *
-   * @since DALi 1.1.13
+   * @SINCE_1_1.13
    *
    * @param[in] position The world position.
    * @param[out] viewportX The viewport x position.
@@ -417,7 +456,7 @@ public:
   /*
    * @brief Get actor local coordinates for given viewport coordinates
    *
-   * @since DALi 1.1.13
+   * @SINCE_1_1.13
    *
    * @param[in] actor The actor describing local coordinate system.
    * @param[in] viewportX The viewport x position.
@@ -432,6 +471,7 @@ public: // Signals
 
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.
+   * @SINCE_1_0.0
    */
   RenderTaskSignalType& FinishedSignal();
 
@@ -439,6 +479,7 @@ public: // Not intended for application developers
 
   /**
    * @brief This constructor is used by Dali New() methods.
+   * @SINCE_1_0.0
    * @param [in] renderTask A pointer to a newly allocated render-task
    */
   explicit DALI_INTERNAL RenderTask( Internal::RenderTask* renderTask );

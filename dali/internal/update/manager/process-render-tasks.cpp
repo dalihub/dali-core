@@ -96,7 +96,7 @@ Layer* FindLayer( Node& node )
 /**
  * Rebuild the Layer::colorRenderables, stencilRenderables and overlayRenderables members,
  * including only renderers which are included in the current render-task.
- * Returns true if all renderers have finshed acquiring resources.
+ * Returns true if all renderers have finished acquiring resources.
  */
 bool AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,
@@ -252,6 +252,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                                  renderTask,
                                                  sourceNode->GetDrawMode() );
 
+      renderTask.SetResourcesFinished( resourcesFinished );
       PrepareRenderInstruction( updateBufferIndex,
                                 sortedLayers,
                                 renderTask,
@@ -259,8 +260,10 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 renderTask.GetCullMode(),
                                 instructions );
     }
-
-    renderTask.SetResourcesFinished( resourcesFinished );
+    else
+    {
+      renderTask.SetResourcesFinished( resourcesFinished );
+    }
   }
 
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "ProcessRenderTasks() Onscreen\n");

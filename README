@@ -8,7 +8,8 @@ T.O.C.
  2.1. Minimum Requirements
  2.2. Creating a DALi Environment
  2.3. Building the Repository
- 2.4. Building and executing test cases
+ 2.4. Build target options
+ 2.5. Building and executing test cases
 
 
 
@@ -74,7 +75,24 @@ Then run the following commands:
  ./configure --prefix=$DESKTOP_PREFIX
  make install -j8
 
-2.4. Building and executing test cases
+2.4. Build target options
+-------------------------
+
+OpenGL ES context:
+
+When building, the OpenGL ES version of the target should be specified.
+
+Valid version options are 20, 30, 31
+
+With configure:
+Add: --enable-gles=X
+
+With gbs:
+Add to the gbs build line: --define "%target_gles_version X"
+
+
+2.5. Building and executing test cases
 --------------------------------------
 
 See the README.md in dali-core/automated-tests.
+

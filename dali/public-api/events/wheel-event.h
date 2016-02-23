@@ -39,6 +39,7 @@ namespace Dali
  *
  * We support a mouse device and there may be another custom device that support the wheel event. The device type is specified as \e type.
  * The mouse wheel event can be sent to the specific actor but the custom wheel event will be sent to the stage.
+ * @SINCE_1_0.0
  */
 struct DALI_IMPORT_API WheelEvent
 {
@@ -46,24 +47,27 @@ struct DALI_IMPORT_API WheelEvent
 
   /**
    * @brief Specifies the type of the wheel event.
+   * @SINCE_1_0.0
    */
   enum Type
   {
-    MOUSE_WHEEL,      ///< Mouse wheel event
-    CUSTOM_WHEEL      ///< Custom wheel event
+    MOUSE_WHEEL,      ///< Mouse wheel event @SINCE_1_0.0
+    CUSTOM_WHEEL      ///< Custom wheel event @SINCE_1_0.0
   };
 
   /**
    * @brief Default constructor.
+   * @SINCE_1_0.0
    */
   WheelEvent();
 
   /**
    * @brief Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in]  type       The type of the wheel event
    * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
-   * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
+   * @param[in]  modifiers  Modifier keys pressed during the event (such as shift, alt and control)
    * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
    * @param[in]  z          The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
    * @param[in]  timeStamp  The time the wheel is being rolled.
@@ -72,27 +76,31 @@ struct DALI_IMPORT_API WheelEvent
 
   /**
    * @brief Destructor.
+   * @SINCE_1_0.0
    */
   ~WheelEvent();
 
   /**
    * @brief Check to see if Shift key modifier has been supplied.
    *
-   * @return bool true if shift modifier
+   * @SINCE_1_0.0
+   * @return True if shift modifier
    */
   bool IsShiftModifier() const;
 
   /**
    * @brief Check to see if Ctrl (control) key modifier has been supplied.
    *
-   * @return bool true if ctrl modifier
+   * @SINCE_1_0.0
+   * @return True if ctrl modifier
    */
   bool IsCtrlModifier() const;
 
   /**
    * @brief Check to see if Alt key modifier has been supplied.
    *
-   * @return bool true if alt modifier
+   * @SINCE_1_0.0
+   * @return True if alt modifier
    */
   bool IsAltModifier() const;
 
