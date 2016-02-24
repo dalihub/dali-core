@@ -99,10 +99,6 @@ struct ObjectImplHelper
   {
     Property::Index index = Property::INVALID_INDEX;
 
-    //@todo MESH_REWORK - Are we assuming that the index into the array is the
-    // same as the enumerated property? if enumIndex in the table was no longer
-    // debug only, wouldn't need to make this assumption.
-
     // Look for name in default properties
     for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {

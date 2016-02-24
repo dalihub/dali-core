@@ -42,8 +42,6 @@ class Shader;
  * the current render. It essentially provides double buffering of the
  * provider accessor through the message system. It does not take ownership
  * of any objects.
- *
- * @todo - Add set of bools to state what changed (For improving performance)
  */
 class RenderDataProvider
 {

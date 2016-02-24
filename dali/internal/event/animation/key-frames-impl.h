@@ -129,7 +129,6 @@ protected:
  * The base template class for each key frame specialization. It stores a vector of
  * ProgressValue pairs in mPVs, and uses the existing interface for KeyFrameChannel
  * to point at this vector.
- * TODO: Incorporate KeyFrameChannel into this base template
  */
 template<typename V>
 class KeyFrameBaseSpec : public KeyFrameSpec
@@ -202,7 +201,6 @@ public:
    */
   void AddKeyFrame(float t, V v, AlphaFunction alpha)
   {
-    // TODO:: Support alpha
     mPVs.push_back(PV(t, v));
   }
 
