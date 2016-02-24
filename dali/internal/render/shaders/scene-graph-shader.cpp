@@ -19,47 +19,12 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-debug.h>
-#include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/gl-resources/texture.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/common/image-sampler.h>
 
-// See render-debug.h
-#ifdef DALI_PRINT_RENDER_INFO
-
-#include <sstream>
-#define DALI_DEBUG_OSTREAM(streamName) std::stringstream streamName;
-
-#define DALI_PRINT_UNIFORM(streamName,bufferIndex,name,value) \
-  { \
-    streamName << " " << name << ": " << value; \
-  }
-
-#define DALI_PRINT_CUSTOM_UNIFORM(streamName,bufferIndex,name,property) \
-  { \
-    streamName << " " << name << ": "; \
-    property.DebugPrint( streamName, bufferIndex ); \
-  }
-
-#define DALI_PRINT_SHADER_UNIFORMS(streamName) \
-  { \
-    std::string debugString( streamName.str() ); \
-    DALI_LOG_RENDER_INFO( "           %s\n", debugString.c_str() ); \
-  }
-
-#else // DALI_PRINT_RENDER_INFO
-
-#define DALI_DEBUG_OSTREAM(streamName)
-#define DALI_PRINT_UNIFORM(streamName,bufferIndex,name,value)
-#define DALI_PRINT_CUSTOM_UNIFORM(streamName,bufferIndex,name,property)
-#define DALI_PRINT_SHADER_UNIFORMS(streamName)
-
-#endif // DALI_PRINT_RENDER_INFO
 
 namespace Dali
 {
@@ -67,22 +32,13 @@ namespace Dali
 namespace Internal
 {
 
-template <> struct ParameterType< Dali::ShaderEffect::GeometryHints> : public BasicType< Dali::ShaderEffect::GeometryHints > {};
-template <> struct ParameterType< Dali::ShaderEffect::UniformCoordinateType > : public BasicType< Dali::ShaderEffect::UniformCoordinateType > {};
-
 namespace SceneGraph
 {
 
 Shader::Shader( Dali::ShaderEffect::GeometryHints& hints )
 : mGeometryHints( hints ),
-  mGridDensity( Dali::ShaderEffect::DEFAULT_GRID_DENSITY ),
-  mTexture( NULL ),
-  mRenderTextureId( 0 ),
-  mUpdateTextureId( 0 ),
   mProgram( NULL ),
-  mConnectionObservers(),
-  mRenderQueue( NULL ),
-  mTextureCache( NULL )
+  mConnectionObservers()
 {
   AddUniformMapObserver( *this );
 }
@@ -90,12 +46,6 @@ Shader::Shader( Dali::ShaderEffect::GeometryHints& hints )
 Shader::~Shader()
 {
   mConnectionObservers.Destroy( *this );
-}
-
-void Shader::Initialize( RenderQueue& renderQueue, TextureCache& textureCache )
-{
-  mRenderQueue = &renderQueue;
-  mTextureCache = &textureCache;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

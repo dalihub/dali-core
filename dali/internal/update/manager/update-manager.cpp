@@ -530,9 +530,6 @@ void UpdateManager::AddShader( Shader* shader )
   }
 
   mImpl->shaders.PushBack( shader );
-
-  // Allows the shader to dispatch texture requests to the cache
-  shader->Initialize( mImpl->renderQueue, mImpl->sceneController->GetTextureCache() );
 }
 
 void UpdateManager::RemoveShader( Shader* shader )

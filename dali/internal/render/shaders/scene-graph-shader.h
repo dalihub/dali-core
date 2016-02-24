@@ -19,46 +19,27 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-
 #include <dali/internal/common/shader-data.h>
-
-#include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/type-abstraction-enums.h>
-
-#include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/effects/shader-declarations.h>
-
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
-#include <dali/internal/render/gl-resources/texture-declarations.h>
-
-#include <dali/internal/render/common/render-manager.h>
 
 
 namespace Dali
 {
-
 namespace Internal
 {
 
 class Program;
+class ProgramCache;
 
 namespace SceneGraph
 {
 
-class RenderQueue;
-class UniformMeta;
-class TextureCache;
 class ConnectionObserver;
 class SceneController;
-
 /**
- * A base class for a collection of shader programs, to apply an effect to different geometry types.
- * This class is also the default shader so its easier to override default behaviour
+ * A holder class for Program; also enables sharing of uniform properties
  */
 class Shader : public PropertyOwner, public UniformMap::Observer
 {
@@ -74,13 +55,6 @@ public:
    * Virtual destructor
    */
   virtual ~Shader();
-
-  /**
-   * Second stage initialization, called when added to the UpdateManager
-   * @param renderQueue Used to queue messages from update to render thread.
-   * @param textureCache Used to retrieve effect textures when rendering.
-   */
-  void Initialize( RenderQueue& renderQueue, TextureCache& textureCache );
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are called during UpdateManager::Update()
@@ -200,21 +174,10 @@ public: // UniformMap::Observer
 private: // Data
 
   Dali::ShaderEffect::GeometryHints mGeometryHints;    ///< shader geometry hints for building the geometry
-  float                          mGridDensity;      ///< grid density
-
-  Texture*                       mTexture;          ///< Raw Pointer to Texture
-  Integration::ResourceId        mRenderTextureId;  ///< Copy of the texture ID for the render thread
-  Integration::ResourceId        mUpdateTextureId;  ///< Copy of the texture ID for update thread
 
   Program*                       mProgram;
 
   ConnectionChangePropagator     mConnectionObservers;
-
-  // These members are only safe to access during UpdateManager::Update()
-  RenderQueue*                   mRenderQueue;                   ///< Used for queuing a message for the next Render
-
-  // These members are only safe to access in render thread
-  TextureCache*                  mTextureCache; // Used for retrieving textures in the render thread
 };
 
 } // namespace SceneGraph
