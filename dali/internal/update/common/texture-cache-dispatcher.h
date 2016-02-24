@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TEXTURE_CACHE_DISPATCHER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/public-api/images/pixel.h>
 #include <dali/devel-api/images/pixel-data.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/resources/resource-client.h> // For RectArea
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/integration-api/bitmap.h>
@@ -43,6 +44,7 @@ namespace SceneGraph
 {
 
 class RenderQueue;
+class TextureCache;
 
 class TextureCacheDispatcher
 {
@@ -50,14 +52,15 @@ public:
 
   /**
    * Constructor
-   * @param[in] renderQueue The queue to which to send messages
+   * @param[in] renderQueue The queue on which to send messages
+   * @param[in] textureCache The Texture Cache object to which to send messages
    */
-  TextureCacheDispatcher( RenderQueue& renderQueue );
+  TextureCacheDispatcher( RenderQueue& renderQueue, TextureCache& textureCache );
 
   /**
-   * Virtual destructor; TextureCacheDispatcher is a base class.
+   * Destructor.
    */
-  virtual ~TextureCacheDispatcher();
+  ~TextureCacheDispatcher();
 
   /**
    * mRenderQueue needs the update buffer index when any of the dispatch methods are
@@ -80,11 +83,11 @@ public:
    * @param[in] pixelFormat Pixel format of the texture
    * @param[in] clearPixels True if the data should be cleared to 0 on creation
    */
-  virtual void DispatchCreateTexture( ResourceId        id,
-                                      unsigned int      width,
-                                      unsigned int      height,
-                                      Pixel::Format     pixelFormat,
-                                      bool              clearPixels ) = 0;
+  void DispatchCreateTexture( ResourceId        id,
+                              unsigned int      width,
+                              unsigned int      height,
+                              Pixel::Format     pixelFormat,
+                              bool              clearPixels );
 
   /**
    * Dispatch a message to add a texture for bitmap.
@@ -92,7 +95,7 @@ public:
    * @param[in] id Resource Id of the bitmap
    * @param[in] bitmap The bitmap
    */
-  virtual void DispatchCreateTextureForBitmap( ResourceId id, Integration::Bitmap* bitmap ) = 0;
+  void DispatchCreateTextureForBitmap( ResourceId id, Integration::Bitmap* bitmap );
 
   /**
    * Dispatch a message to add a native image to the texture cache
@@ -100,7 +103,7 @@ public:
    * @param[in] id Resource Id of the native image
    * @param[in] nativeImage The native image
    */
-  virtual void DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage ) = 0;
+  void DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * Dispatch a message to create a framebuffer texture and add it to the texture cache
@@ -110,7 +113,7 @@ public:
    * @param[in] height Height of the framebuffer
    * @param[in] pixelFormat Pixel format of the framebuffer
    */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat ) = 0;
+  void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Dispatch a message to create a framebuffer texture and add it to the texture cache
@@ -118,13 +121,13 @@ public:
    * @param[in] id Resource Id of the framebuffer
    * @param[in] nativeImage The NativeImage
    */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage ) = 0;
+  void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * @brief Create GL texture for native image resource.
    * @param[in] id The resource id.
    */
-  virtual void DispatchCreateGlTexture( ResourceId id ) = 0;
+  void DispatchCreateGlTexture( ResourceId id );
 
   /**
    * Dispatch a message to update the texture.
@@ -132,7 +135,7 @@ public:
    * @param[in] id Resource Id of the texture
    * @param[in] bitmap The updated bitmap
    */
-  virtual void DispatchUpdateTexture( ResourceId id, Integration::Bitmap* bitmap ) = 0;
+  void DispatchUpdateTexture( ResourceId id, Integration::Bitmap* bitmap );
 
   /**
    * Dispatch a message to update the part of a texture with the bitmap data.
@@ -142,7 +145,7 @@ public:
    * @param [in] xOffset Specifies an offset in the x direction within the texture
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
-  virtual void DispatchUpdateTexture( ResourceId id, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset ) = 0;
+  void DispatchUpdateTexture( ResourceId id, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * Dispatch a message to update the part of a texture with a newly loaded bitmap
@@ -152,7 +155,7 @@ public:
    * @param [in] xOffset Specifies an offset in the x direction within the texture
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
-  virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset ) = 0;
+  void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * Dispatch a message to update the part of a texture with the pixel data.
@@ -162,7 +165,7 @@ public:
    * @param [in] xOffset Specifies an offset in the x direction within the texture
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
-  virtual void DispatchUpdateTexture( ResourceId id, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset ) = 0;
+  void DispatchUpdateTexture( ResourceId id, PixelDataPtr pixelData, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * Dispatch a message to update the texture area
@@ -170,18 +173,19 @@ public:
    * @param[in] id Resource Id of the texture
    * @param[in] area The area of the bitmap that has changed
    */
-  virtual void DispatchUpdateTextureArea( ResourceId id, const RectArea& area ) = 0;
+  void DispatchUpdateTextureArea( ResourceId id, const RectArea& area );
 
   /**
    * Dispatch a message to discard a texture
    * May be called from Update thread
    * @param[in] id Resource Id of the texture
    */
-  virtual void DispatchDiscardTexture( ResourceId id ) = 0;
+  void DispatchDiscardTexture( ResourceId id );
 
 protected:
 
   RenderQueue&             mRenderQueue;
+  TextureCache&            mTextureCache;
   const SceneGraphBuffers* mSceneGraphBuffers;
 };
 

@@ -53,7 +53,9 @@ typedef Integration::ResourceId ResourceId;
 /** Raw bytes of a resource laid out exactly as it wouldbe in a file, but in memory. */
 typedef Dali::RefCountedVector<uint8_t> RequestBuffer;
 /** Counting smart pointer for managing a buffer of raw bytes. */
-typedef IntrusivePtr<RequestBuffer> RequestBufferPtr;
+typedef IntrusivePtr<RequestBuffer>     RequestBufferPtr;
+/** rectangular area (x,y,w,h) */
+typedef Rect<unsigned int>              RectArea;
 
 /**
  * ResourceClient is an event side object that manages resource requests.
@@ -66,7 +68,6 @@ typedef IntrusivePtr<RequestBuffer> RequestBufferPtr;
 class ResourceClient : public ResourceTicketLifetimeObserver
 {
 public:
-  typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
 
   /**
    * Create a resource client.
