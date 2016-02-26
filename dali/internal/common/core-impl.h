@@ -288,7 +288,7 @@ private:
   SceneGraph::UpdateManager*                mUpdateManager;               ///< Update manager
   SceneGraph::RenderManager*                mRenderManager;               ///< Render manager
   SceneGraph::DiscardQueue*                 mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
-  ResourcePostProcessList*                  mResourcePostProcessQueue;    ///< Stores resource ids which require post processing after render
+  LockedResourceQueue*                      mTextureUploadedQueue;        ///< Stores resource ids which require post processing after render
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications

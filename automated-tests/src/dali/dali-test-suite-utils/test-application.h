@@ -73,7 +73,7 @@ public:
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
   void SetSurfaceWidth( unsigned int width, unsigned height );
-  bool Render( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
+  bool Render( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
   unsigned int GetUpdateStatus();
   bool UpdateOnly( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
   bool RenderOnly( );
@@ -82,7 +82,7 @@ public:
   bool GetRenderHasRendered();
 
 private:
-  void DoUpdate( unsigned int intervalMilliseconds );
+  void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );
 
 protected:
   TestPlatformAbstraction   mPlatformAbstraction;

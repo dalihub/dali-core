@@ -55,15 +55,15 @@ public:
   {}
 
   int LoadFailedCalled() {
-    tet_printf("TicketObserver: LoadingFailed() called %d times", mLoadingFailedCalled);
+    tet_printf("TicketObserver: LoadingFailed() called %d times\n", mLoadingFailedCalled);
     return mLoadingFailedCalled;
   }
   int LoadSucceededCalled() {
-    tet_printf("TicketObserver: LoadingSucceeded()  called %d times", mLoadingSucceededCalled);
+    tet_printf("TicketObserver: LoadingSucceeded()  called %d times\n", mLoadingSucceededCalled);
     return mLoadingSucceededCalled;
   }
   int  UploadCalled() {
-    tet_printf("TicketObserver: Uploaded() called %d times", mUploadedCount);
+    tet_printf("TicketObserver: Uploaded() called %d times\n", mUploadedCount);
     return mUploadedCount;
   }
   void Reset() {
@@ -413,7 +413,7 @@ int UtcDaliInternalRequestReloadBitmapRequests01(void)
     DALI_TEST_CHECK( req->GetId() == ticket->GetId() );
     application.GetPlatform().SetResourceLoaded(id, Integration::ResourceBitmap, resourcePtr2);
 
-    application.Render(0);  // Process update messages / UpdateCache
+    application.Render(0 , TEST_LOCATION );  // Process update messages / UpdateCache
     DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::GetResourcesFunc ) );
 
     DALI_TEST_CHECK( resourceManager.IsResourceLoaded(id));
@@ -427,11 +427,11 @@ int UtcDaliInternalRequestReloadBitmapRequests01(void)
     DALI_TEST_EQUALS( imageTicket->GetHeight(), 80, TEST_LOCATION );
 
     application.SendNotification(); // Process event messages
-    application.Render(0);          // Process update messages / UpdateCache
+    application.Render(0, TEST_LOCATION ); // Process update messages / UpdateCache
     application.SendNotification(); // Process event messages
 
     DALI_TEST_EQUALS( testTicketObserver.LoadSucceededCalled(), 2, TEST_LOCATION );
-    DALI_TEST_EQUALS( testTicketObserver.UploadCalled(), 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( testTicketObserver.UploadCalled(), 1, TEST_LOCATION );
     DALI_TEST_EQUALS( ticket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
     DALI_TEST_EQUALS( imageTicket->GetWidth(), 120, TEST_LOCATION );
     DALI_TEST_EQUALS( imageTicket->GetHeight(), 120, TEST_LOCATION );
@@ -439,9 +439,8 @@ int UtcDaliInternalRequestReloadBitmapRequests01(void)
   } // Discard ticket
 
   application.SendNotification(); // Flush update queue (with ticket discarded message
-  application.Render(1);          // Process update messages
+  application.Render(1, TEST_LOCATION );          // Process update messages
   application.SendNotification(); // Send event notifications
-  application.Render(1);          // Process update messages
 
   // Resource should have been discarded.
   DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::CancelLoadFunc ) );
@@ -449,7 +448,7 @@ int UtcDaliInternalRequestReloadBitmapRequests01(void)
 
   DALI_TEST_EQUALS( testTicketObserver.LoadSucceededCalled(), 2, TEST_LOCATION );
   DALI_TEST_EQUALS( testTicketObserver.LoadFailedCalled(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( testTicketObserver.UploadCalled(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( testTicketObserver.UploadCalled(), 1, TEST_LOCATION );
   END_TEST;
 }
 

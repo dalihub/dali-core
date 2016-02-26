@@ -73,13 +73,13 @@ struct RenderManager::Impl
 {
   Impl( Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
-        ResourcePostProcessList& resourcePostProcessQ,
-        PostProcessResourceDispatcher& postProcessDispatcher )
+        LockedResourceQueue& textureUploadedQ,
+        TextureUploadedDispatcher& postProcessDispatcher )
   : context( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     textureCache( renderQueue, postProcessDispatcher, context ),
-    resourcePostProcessQueue( resourcePostProcessQ ),
+    textureUploadedQueue( textureUploadedQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     frameCount( 0 ),
@@ -132,7 +132,7 @@ struct RenderManager::Impl
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
   TextureCache                  textureCache;             ///< Cache for all GL textures
   Render::UniformNameCache      uniformNameCache;         ///< Cache to provide unique indices for uniforms
-  ResourcePostProcessList&      resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
+  LockedResourceQueue&          textureUploadedQueue;     ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
@@ -161,10 +161,10 @@ struct RenderManager::Impl
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
                                    Integration::GlSyncAbstraction& glSyncAbstraction,
-                                   ResourcePostProcessList& resourcePostProcessQ )
+                                   LockedResourceQueue& textureUploadedQ )
 {
   RenderManager* manager = new RenderManager;
-  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, resourcePostProcessQ, *manager );
+  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, textureUploadedQ, *manager );
   return manager;
 }
 
@@ -215,9 +215,9 @@ void RenderManager::ContextDestroyed()
   }
 }
 
-void RenderManager::DispatchPostProcessRequest(ResourcePostProcessRequest& request)
+void RenderManager::DispatchTextureUploaded(ResourceId request)
 {
-  mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].push_back( request );
+  mImpl->textureUploadedQueue.PushBack( request );
 }
 
 void RenderManager::SetShaderSaver( ShaderSaver& upstream )
@@ -497,9 +497,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     }
   }
 
-  // check if anything has been posted to the update thread
-  bool updateRequired = !mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].empty();
-
   //Notify RenderGeometries that rendering has finished
   for ( RenderGeometryOwnerIter iter = mImpl->renderGeometryContainer.Begin(); iter != mImpl->renderGeometryContainer.End(); ++iter )
   {
@@ -515,7 +512,8 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   DALI_PRINT_RENDER_END();
 
-  return updateRequired;
+  // check if anything has been posted to the update thread, if IsEmpty then no update required.
+  return !mImpl->textureUploadedQueue.IsEmpty();
 }
 
 void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
