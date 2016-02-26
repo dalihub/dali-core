@@ -103,7 +103,6 @@ bool KeyFrameChannel<V>::IsActive (float progress)
 
 /**
  * Use a linear search to find the interval containing progress
- * TODO: Use binary search instead
  */
 template <class V>
 bool KeyFrameChannel<V>::FindInterval(

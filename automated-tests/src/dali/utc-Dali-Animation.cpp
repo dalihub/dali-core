@@ -1189,9 +1189,11 @@ int UtcDaliAnimationGetCurrentProgressP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationSetSpeedFactorP(void)
+int UtcDaliAnimationSetSpeedFactorP1(void)
 {
   TestApplication application;
+
+  tet_printf("Testing that setting a speed factor of 2 takes half the time\n");
 
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
@@ -1246,13 +1248,37 @@ int UtcDaliAnimationSetSpeedFactorP(void)
   application.Render(0);
   DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
 
-  finishCheck.Reset();
+  END_TEST;
+}
 
-  //Test -1 speed factor. Animation will play in reverse at normal speed
+int UtcDaliAnimationSetSpeedFactorP2(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  const Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+  const Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( 0.0f, initialPosition);
+  keyframes.Add( 1.0f, targetPosition );
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+
+  tet_printf("Test -1 speed factor. Animation will play in reverse at normal speed\n");
   animation.SetSpeedFactor( -1.0f );
 
   // Start the animation
   animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
@@ -1296,8 +1322,33 @@ int UtcDaliAnimationSetSpeedFactorP(void)
   application.Render(0);
   DALI_TEST_EQUALS( initialPosition, actor.GetCurrentPosition(), TEST_LOCATION );
 
-  //Test change speed factor on the fly
-  finishCheck.Reset();
+  END_TEST;
+}
+
+int UtcDaliAnimationSetSpeedFactorP3(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  const Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+  const Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( 0.0f, initialPosition);
+  keyframes.Add( 1.0f, targetPosition );
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  tet_printf("Test half speed factor. Animation will take twice the duration\n");
 
   //Set speed to be half of normal speed
   animation.SetSpeedFactor( 0.5f );
@@ -1327,8 +1378,62 @@ int UtcDaliAnimationSetSpeedFactorP(void)
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.3f), TEST_LOCATION );
 
-  //Change speed factor while animation still playing.
-  animation.SetSpeedFactor(-1.0f);
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 40% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.4f), TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*1200.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  END_TEST;
+}
+
+
+int UtcDaliAnimationSetSpeedFactorP4(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  const Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+  const Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( 0.0f, initialPosition);
+  keyframes.Add( 1.0f, targetPosition );
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  tet_printf("Test half speed factor. Animation will take twice the duration\n");
+
+  tet_printf("Set speed to be half of normal speed\n");
+  tet_printf("SetSpeedFactor(0.5f)\n");
+  animation.SetSpeedFactor( 0.5f );
+
+  // Start the animation
+  animation.Play();
+
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 10% progress */);
 
@@ -1337,7 +1442,40 @@ int UtcDaliAnimationSetSpeedFactorP(void)
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.1f), TEST_LOCATION );
 
-  application.Render(static_cast<unsigned int>(durationSeconds*100.0f) + 1u/*just beyond the animation duration*/);
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.2f), TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 30% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.3f), TEST_LOCATION );
+
+  tet_printf("Reverse direction of animation whilst playing\n");
+  tet_printf("SetSpeedFactor(-0.5f)\n");
+  animation.SetSpeedFactor(-0.5f);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.2f), TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 10% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.1f), 0.0001, TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
 
   // We did expect the animation to finish
   application.SendNotification();
@@ -1351,6 +1489,352 @@ int UtcDaliAnimationSetSpeedFactorP(void)
   DALI_TEST_EQUALS( initialPosition, actor.GetCurrentPosition(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliAnimationSetSpeedFactorAndRange(void)
+{
+  TestApplication application;
+
+  const unsigned int NUM_FRAMES(15);
+
+  struct TestData
+  {
+    float startTime;
+    float endTime;
+    float startX;
+    float endX;
+    float expected[NUM_FRAMES];
+  };
+
+  TestData testData[] = {
+    // ACTOR 0
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    { 0.0f,                                                                  1.0f, // TimePeriod
+      0.0f,                                                                100.0f, // POS
+      {/**/                 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,  /* Loop */
+       /**/                 30.0f, 40.0f, 50.0f, 60.0f, /* Reverse direction */
+       /**/                               50.0f,
+       /**/                        40.0f,
+       /**/                 30.0f,
+       /**/                                             70.0f,
+       /**/                                      60.0f,
+       /**/                               50.0f,
+       /**/
+      }
+    },
+
+    // ACTOR 1 - Across start of range
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    {                0.2f,                0.5f,                               // TimePeriod
+                     20.0f,               50.0f,                // POS
+      {/**/                 30.0f, 40.0f, 50.0f, 50.0f, 50.0f,  /* Loop */
+       /**/                 30.0f, 40.0f, 50.0f, 50.0f, /* Reverse direction @ frame #9 */
+       /**/                               50.0f,
+       /**/                        40.0f,
+       /**/                 30.0f,
+       /**/                                             50.0f,
+       /**/                                      50.0f,
+       /**/                               50.0f
+      }
+    },
+
+    // ACTOR 2 - Across end of range
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    {/**/                                  0.5f,                      0.9f,   // TimePeriod
+     /**/                                 50.0f,                      90.0f,  // POS
+     { /**/                 50.0f, 50.0f, 50.0f, 60.0f, 70.0f, /* Loop */
+       /**/                 50.0f, 50.0f, 50.0f, 60.0f,/* Reverse direction @ frame #9 */
+       /**/                               50.0f,
+       /**/                        50.0f,
+       /**/                 50.0f,                      70.0f,
+       /**/                                      60.0f,
+       /**/                               50.0f,
+      }
+    },
+
+    // ACTOR 3 - Before beginning of range
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    {/**/     0.1f,      0.25f, // TimePeriod
+     /**/     10.0f,     25.0f, // POS
+     { /**/
+       /**/ 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f
+       /**/
+      }
+    },
+
+    // ACTOR 4 - After end of range
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    {/**/                                                           0.85f,   1.0f, // TimePeriod
+     /**/                                                           85.0f,  100.0f, // POS
+     { /**/
+       /**/ 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f
+       /**/
+     }
+    },
+    // Actor 5 - Middle of range
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    /*                                            | reverse                       */
+    {/**/                          0.4f,            0.65f, // Time Period
+     /**/                         40.0f,            65.0f, // Position
+     { /**/                40.0f, 40.0f, 50.0f, 60.0f, 65.0f,
+       /**/                40.0f, 40.0f, 50.0f, 60.0f, // Reverse
+       /**/                              50.0f,
+       /**/                       40.0f,
+       /**/                40.0f,
+       /**/                                            65.0f,
+       /**/                                      60.0f,
+       /**/                              50.0f,
+     }
+    }
+  };
+
+  const size_t NUM_ENTRIES(sizeof(testData)/sizeof(TestData));
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  std::vector<Dali::Actor> actors;
+
+  for( unsigned int actorIndex = 0; actorIndex < NUM_ENTRIES; ++actorIndex )
+  {
+    Actor actor = Actor::New();
+    actor.SetPosition( Vector3( testData[actorIndex].startX, 0, 0 ) );
+    actors.push_back(actor);
+    Stage::GetCurrent().Add(actor);
+
+    if( actorIndex == 0 || actorIndex == NUM_ENTRIES-1 )
+    {
+      KeyFrames keyframes = KeyFrames::New();
+      keyframes.Add( testData[actorIndex].startTime, Vector3(testData[actorIndex].startX, 0, 0));
+      keyframes.Add( testData[actorIndex].endTime, Vector3(testData[actorIndex].endX, 0, 0));
+      animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+    }
+    else
+    {
+      animation.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( testData[actorIndex].endX, 0, 0 ), TimePeriod( testData[actorIndex].startTime, testData[actorIndex].endTime - testData[actorIndex].startTime) );
+    }
+  }
+
+  tet_printf("Test half speed factor. Animation will take twice the duration\n");
+  tet_printf("Set play range to be 0.3 - 0.8 of the duration\n");
+  tet_printf("SetSpeedFactor(0.5f)\n");
+  animation.SetSpeedFactor( 0.5f );
+  animation.SetPlayRange( Vector2(0.3f, 0.8f) );
+  animation.SetLooping(true);
+
+  // Start the animation
+  animation.Play();
+  application.SendNotification();
+  application.Render(0);   // Frame 0 tests initial values
+
+  for( unsigned int frame = 0; frame < NUM_FRAMES; ++frame )
+  {
+    unsigned int actorIndex = 0u;
+    for( actorIndex = 0u; actorIndex < NUM_ENTRIES; ++actorIndex )
+    {
+      DALI_TEST_EQUALS( actors[actorIndex].GetCurrentPosition().x, testData[actorIndex].expected[frame], 0.001, TEST_LOCATION );
+      if( ! Equals(actors[actorIndex].GetCurrentPosition().x, testData[actorIndex].expected[frame]) )
+      {
+        tet_printf("Failed at frame %u, actorIndex %u\n", frame, actorIndex );
+      }
+    }
+
+    if( frame == 8 )
+    {
+      tet_printf("Reverse direction of animation whilst playing after frame 8\n");
+      tet_printf("SetSpeedFactor(-0.5f)\n");
+      animation.SetSpeedFactor(-0.5f);
+      application.SendNotification();
+    }
+    application.Render(200); // 200 ms at half speed corresponds to 0.1 s
+
+    // We didn't expect the animation to finish yet
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
+{
+  TestApplication application;
+
+  const unsigned int NUM_FRAMES(15);
+
+  struct TestData
+  {
+    float startTime;
+    float endTime;
+    float startX;
+    float endX;
+    float expected[NUM_FRAMES];
+  };
+
+  TestData testData =
+    // ACTOR 0
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    { 0.0f,                                                                  1.0f, // TimePeriod
+      0.0f,                                                                100.0f, // POS
+      {/**/                 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,  /* Loop */
+       /**/                 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,
+       /**/                 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,
+       /**/
+      }
+    };
+
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  std::vector<Dali::Actor> actors;
+
+  Actor actor = Actor::New();
+  actor.SetPosition( Vector3( testData.startX, 0, 0 ) );
+  actors.push_back(actor);
+  Stage::GetCurrent().Add(actor);
+
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( testData.startTime, Vector3(testData.startX, 0, 0));
+  keyframes.Add( testData.endTime, Vector3(testData.endX, 0, 0));
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+
+  tet_printf("Test half speed factor. Animation will take twice the duration\n");
+  tet_printf("Set play range to be 0.3 - 0.8 of the duration\n");
+  tet_printf("SetSpeedFactor(0.5f)\n");
+  tet_printf("SetLoopCount(3)\n");
+  animation.SetSpeedFactor( 0.5f );
+  animation.SetPlayRange( Vector2(0.3f, 0.8f) );
+  animation.SetLoopCount(3);
+
+  // Start the animation
+  animation.Play();
+  application.SendNotification();
+  application.Render(0);   // Frame 0 tests initial values
+
+  for( unsigned int frame = 0; frame < NUM_FRAMES; ++frame )
+  {
+    DALI_TEST_EQUALS( actor.GetCurrentPosition().x, testData.expected[frame], 0.001, TEST_LOCATION );
+
+    application.Render(200); // 200 ms at half speed corresponds to 0.1 s
+
+    if( frame < NUM_FRAMES-1 )
+    {
+      // We didn't expect the animation to finish yet
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+    }
+  }
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 80.0f, 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount02(void)
+{
+  TestApplication application;
+
+  const unsigned int NUM_FRAMES(15);
+
+  struct TestData
+  {
+    float startTime;
+    float endTime;
+    float startX;
+    float endX;
+    float expected[NUM_FRAMES];
+  };
+
+  TestData testData =
+    // ACTOR 0
+    /*0.0f,   0.1f   0.2f   0.3f   0.4f   0.5f   0.6f   0.7f   0.8f   0.9f   1.0f */
+    /*                       |----------PlayRange---------------|                 */
+    { 0.0f,                                                                  1.0f, // TimePeriod
+      0.0f,                                                                100.0f, // POS
+      {/**/                 80.0f, 70.0f, 60.0f, 50.0f, 40.0f,
+       /**/                 80.0f, 70.0f, 60.0f, 50.0f, 40.0f,
+       /**/                 80.0f, 70.0f, 60.0f, 50.0f, 40.0f,
+      }
+    };
+
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  std::vector<Dali::Actor> actors;
+
+  Actor actor = Actor::New();
+  actor.SetPosition( Vector3( testData.startX, 0, 0 ) );
+  actors.push_back(actor);
+  Stage::GetCurrent().Add(actor);
+
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( testData.startTime, Vector3(testData.startX, 0, 0));
+  keyframes.Add( testData.endTime, Vector3(testData.endX, 0, 0));
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
+
+  tet_printf("Test reverse half speed factor. Animation will take twice the duration\n");
+  tet_printf("Set play range to be 0.3 - 0.8 of the duration\n");
+  tet_printf("SetSpeedFactor(-0.5f)\n");
+  tet_printf("SetLoopCount(3)\n");
+  animation.SetSpeedFactor( -0.5f );
+  animation.SetPlayRange( Vector2(0.3f, 0.8f) );
+  animation.SetLoopCount(3);
+
+  // Start the animation
+  animation.Play();
+  application.SendNotification();
+  application.Render(0);   // Frame 0 tests initial values
+
+  for( unsigned int frame = 0; frame < NUM_FRAMES; ++frame )
+  {
+    DALI_TEST_EQUALS( actor.GetCurrentPosition().x, testData.expected[frame], 0.001, TEST_LOCATION );
+
+    application.Render(200); // 200 ms at half speed corresponds to 0.1 s
+
+    if( frame < NUM_FRAMES-1 )
+    {
+      // We didn't expect the animation to finish yet
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+    }
+  }
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 30.0f, 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliAnimationGetSpeedFactorP(void)
 {

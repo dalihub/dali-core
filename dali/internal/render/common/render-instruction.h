@@ -131,7 +131,7 @@ private:
   // Undefined
   RenderInstruction& operator=(const RenderInstruction& rhs);
 
-public: // Data, TODO hide these
+public: // Data
 
   Render::RenderTracker* mRenderTracker;        ///< Pointer to an optional tracker object (not owned)
 

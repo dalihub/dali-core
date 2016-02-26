@@ -199,9 +199,6 @@ void RenderManager::ContextCreated()
 
 void RenderManager::ContextDestroyed()
 {
-  // @todo Set an atomic value to prevent render manager rendering again until
-  // ContextCreated has been called.
-
   mImpl->context.GlContextDestroyed();
   mImpl->programController.GlContextDestroyed();
 
