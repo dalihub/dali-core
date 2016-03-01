@@ -123,7 +123,7 @@ Note the "-e" option for Emscripten.
 
 Create the setenv script. A new section for Emscripten will be created at the top.
 
-# ./dali-env/dali-env -s > setenv
+# ./dali-env/opt/bin/dali-env -s > setenv
 
 Run the setenv script to setup environment variables.
 
