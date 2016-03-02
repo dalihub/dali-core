@@ -2099,7 +2099,7 @@ int UtcDaliRenderTaskOnce02(void)
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture" );
+  material.AddTexture( image, "sTexture");
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, material);
@@ -2731,7 +2731,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture(image, "sTexture" );
+  material.AddTexture( image, "sTexture");
 
   Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, material);

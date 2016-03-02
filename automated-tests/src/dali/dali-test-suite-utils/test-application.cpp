@@ -216,6 +216,7 @@ bool TestApplication::RenderOnly( )
 void TestApplication::ResetContext()
 {
   mCore->ContextDestroyed();
+  mGlAbstraction.Initialize();
   mCore->ContextCreated();
 }
 

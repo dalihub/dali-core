@@ -446,13 +446,14 @@ int UtcDaliMaterialSetTextureUniformName01(void)
   Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
   application.SendNotification();
   application.Render();
 
-  int textureUnit=-1;
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sEffectTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  // Test that the relevant texture unit was bound
+  DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", "3553, 1"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", "3553, 2"), false, TEST_LOCATION );
 
   END_TEST;
 }
@@ -485,16 +486,14 @@ int UtcDaliMaterialSetTextureUniformName02(void)
   Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
   application.SendNotification();
   application.Render();
 
-  int textureUnit=-1;
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sEffectTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
-
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture2", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 1, TEST_LOCATION );
+  // Test that the relevant texture unit was bound
+  DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", "3553, 1"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", "3553, 2"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -755,4 +754,3 @@ int UtcDaliMaterialGetTextureN(void)
 
   END_TEST;
 }
-
