@@ -486,6 +486,16 @@ public:
   PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
+   * @copydoc Dali::Actor::SetInheritPosition()
+   */
+  void SetInheritPosition( bool inherit );
+
+  /**
+   * @copydoc Dali::Actor::IsPositionInherited()
+   */
+  bool IsPositionInherited() const;
+
+  /**
    * Sets the orientation of the Actor.
    * @param [in] angleRadians The new orientation angle in radians.
    * @param [in] axis The new axis of orientation.
@@ -1825,6 +1835,7 @@ protected:
   bool mDerivedRequiresWheelEvent                  : 1; ///< Whether the derived actor type requires wheel event signals
   bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
   bool mInsideOnSizeSet                            : 1; ///< Whether we are inside OnSizeSet
+  bool mInheritPosition                            : 1; ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn

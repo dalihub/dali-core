@@ -59,7 +59,7 @@ class TextureObserver;
 namespace SceneGraph
 {
 class RenderQueue;
-class PostProcessResourceDispatcher;
+class TextureUploadedDispatcher;
 
 typedef std::map<ResourceId, TexturePointer >   TextureContainer;
 typedef std::pair<ResourceId, TexturePointer >  TexturePair;
@@ -79,7 +79,7 @@ public:
    * @param[in] context GL Context
    */
   TextureCache( RenderQueue& renderQueue,
-                PostProcessResourceDispatcher& postProcessDispatcher,
+                TextureUploadedDispatcher& postProcessDispatcher,
                 Context& context );
 
   /**
@@ -322,7 +322,7 @@ protected: // Implements TextureCacheDispatcher
 
 private:
 
-  PostProcessResourceDispatcher& mPostProcessResourceDispatcher;
+  TextureUploadedDispatcher& mTextureUploadedDispatcher;
   Context&         mContext;
   TextureContainer mTextures;
   TextureContainer mFramebufferTextures;

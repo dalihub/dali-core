@@ -506,6 +506,20 @@ public:
   }
 
   /**
+   * Set whether the Node inherits position.
+   * @param[in] inherit True if the parent position is inherited.
+   */
+  void SetInheritPosition(bool inherit)
+  {
+    if (inherit != mInheritPosition)
+    {
+      mInheritPosition = inherit;
+      mPositionInheritanceMode = inherit ?  INHERIT_PARENT_POSITION : DONT_INHERIT_POSITION;
+      SetDirtyFlag(TransformFlag);
+    }
+  }
+
+  /**
    * Set the position inheritance mode.
    * @see Dali::Actor::PositionInheritanceMode
    * @param[in] mode The new position inheritance mode.
@@ -1041,11 +1055,12 @@ protected:
   int  mDirtyFlags:8;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
+  bool mInheritPosition:1;                           ///< Whether the parent's position should be inherited.
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
 
   DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode:2;///< Determines how position is inherited, 2 bits is enough
+  PositionInheritanceMode mPositionInheritanceMode:2;///< Determines how position is inherited, 2 bits is enough.
   ColorMode               mColorMode:2;              ///< Determines whether mWorldColor is inherited, 2 bits is enough
 
   // Changes scope, should be at end of class
@@ -1096,6 +1111,17 @@ inline void SetPositionInheritanceModeMessage( EventThreadServices& eventThreadS
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetPositionInheritanceMode, mode );
+}
+
+inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
+{
+  typedef MessageValue1< Node, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::SetInheritPosition, inherit );
 }
 
 inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )

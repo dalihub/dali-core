@@ -21,10 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-saver.h>
-#include <dali/internal/update/resources/resource-manager-declarations.h>
-#include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/common/post-process-resource-dispatcher.h>
+#include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/gl-resources/gl-call-debug.h>
+#include <dali/internal/render/shaders/program.h>
+#include <dali/internal/update/resources/resource-manager-declarations.h>
 
 namespace Dali
 {

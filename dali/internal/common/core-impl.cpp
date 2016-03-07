@@ -90,7 +90,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mUpdateManager(NULL),
   mRenderManager(NULL),
   mDiscardQueue(NULL),
-  mResourcePostProcessQueue(),
+  mTextureUploadedQueue(),
   mNotificationManager(NULL),
   mImageFactory(NULL),
   mShaderFactory(NULL),
@@ -109,10 +109,9 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mPropertyNotificationManager = PropertyNotificationManager::New();
 
-  std::vector< ResourcePostProcessRequest> init;
-  mResourcePostProcessQueue = new ResourcePostProcessList(init);
+  mTextureUploadedQueue = new LockedResourceQueue;
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mResourcePostProcessQueue );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mTextureUploadedQueue );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
@@ -129,8 +128,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mResourceManager = new ResourceManager(  mPlatform,
                                           *mNotificationManager,
                                            textureCache,
-                                          *mResourcePostProcessQueue,
-                                          *mRenderManager,
+                                          *mTextureUploadedQueue,
                                           *mDiscardQueue,
                                            renderQueue );
 
@@ -210,7 +208,7 @@ Core::~Core()
   delete mTouchResampler;
   delete mRenderManager;
   delete mDiscardQueue;
-  delete mResourcePostProcessQueue;
+  delete mTextureUploadedQueue;
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()

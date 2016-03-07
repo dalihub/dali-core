@@ -18,33 +18,36 @@
  *
  */
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/resource-declarations.h>
+
 namespace Dali
 {
 namespace Internal
 {
-struct ResourcePostProcessRequest;
+typedef Integration::ResourceId ResourceId;
 
 namespace SceneGraph
 {
 
 /**
- * Interface which offers a dispatch mechanism for post process requests on resources
+ * Interface which offers a dispatch mechanism for uploaded notifications on textures
  * Should be offered by a Render Thread object
  */
-class PostProcessResourceDispatcher
+class TextureUploadedDispatcher
 {
 public:
   /**
-   * Dispatch a post process resource request to the Update thread
-   * @param[in] request A post process request
+   * Dispatch a post process resource uploaded request to the Update thread
+   * @param[in] resource A post process request
    */
-  virtual void DispatchPostProcessRequest(ResourcePostProcessRequest& request) = 0;
+  virtual void DispatchTextureUploaded( ResourceId resource ) = 0;
 
 protected:
   /**
    * Virtual destructor
    */
-  virtual ~PostProcessResourceDispatcher(){}
+  virtual ~TextureUploadedDispatcher(){}
 };
 
 

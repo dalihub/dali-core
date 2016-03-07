@@ -154,13 +154,13 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
 }
 
-void TestApplication::DoUpdate( unsigned int intervalMilliseconds )
+void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* location )
 {
   if( GetUpdateStatus() == 0 &&
       mRenderStatus.NeedsUpdate() == false &&
       ! GetRenderController().WasCalled(TestRenderController::RequestUpdateFunc) )
   {
-    fprintf(stderr, "WARNING - Update not required\n");
+    fprintf(stderr, "WARNING - Update not required :%s\n", location==NULL?"NULL":location);
   }
 
   unsigned int nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
@@ -173,9 +173,9 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds )
   mLastVSyncTime = nextVSyncTime;
 }
 
-bool TestApplication::Render( unsigned int intervalMilliseconds  )
+bool TestApplication::Render( unsigned int intervalMilliseconds, const char* location )
 {
-  DoUpdate( intervalMilliseconds );
+  DoUpdate( intervalMilliseconds, location );
   mCore->Render( mRenderStatus );
 
   mFrame++;
