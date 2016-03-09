@@ -102,4 +102,21 @@ Property::Array& Property::Array::operator=( const Property::Array& other )
   return *this;
 }
 
+std::ostream& operator<<( std::ostream& stream, const Property::Array& array )
+{
+  stream << "Array(" << array.Count() << ") = [";
+  for( unsigned int i=0; i<array.Count(); ++i )
+  {
+    if( i>0 )
+    {
+      stream << ", ";
+    }
+    stream << array.GetElementAt(i);
+  }
+  stream << "]";
+
+  return stream;
+}
+
+
 } // namespace Dali
