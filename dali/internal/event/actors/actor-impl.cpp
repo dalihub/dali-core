@@ -4007,6 +4007,7 @@ Vector2 Actor::ApplySizeSetPolicy( const Vector2 size )
           return size;
         }
       }
+      break;
     }
 
     default:
