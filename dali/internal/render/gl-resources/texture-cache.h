@@ -195,8 +195,10 @@ public:
    * @param[in] id Resource id of texture
    * @param[in] target (e.g. GL_TEXTURE_2D)
    * @param[in] textureunit to use
+   *
+   * @return true if the bind succeeded, false if either the create or bind failed.
    */
-  void BindTexture( Texture* texture, ResourceId id, GLenum target, TextureUnit textureunit );
+  bool BindTexture( Texture* texture, ResourceId id, GLenum target, TextureUnit textureunit );
 
   /**
    * Get the texture associated with the resource ID

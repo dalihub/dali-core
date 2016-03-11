@@ -112,7 +112,10 @@ void Material::SetTextureImage( size_t index, Image* image )
       }
     }
 
-    mTextures[index].mImage.Reset(image);
+    if( image )
+    {
+      mTextures[index].mImage.Reset(image);
+    }
     SceneGraph::SetTextureImageMessage( GetEventThreadServices(), *mSceneObject, index, mTextures[index].mImage.Get()->GetResourceId() );
   }
 }

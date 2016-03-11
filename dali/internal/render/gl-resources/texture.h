@@ -106,8 +106,8 @@ public:
    *
    * @param target (e.g. GL_TEXTURE_2D)
    * @param textureunit to bind to
-   * @return True if the opengl texture was created, false if there was already a texture
-   * or no texture could be created yet ( e.g. no bitmap data after context loss )
+   *
+   * @return true if the bind succeeded, or false if either the create or bind failed
    */
   virtual bool Bind(GLenum target, TextureUnit textureunit);
 
