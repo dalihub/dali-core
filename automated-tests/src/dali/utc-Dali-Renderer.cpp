@@ -2292,6 +2292,9 @@ int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethod( methodString ) );
 
   // Test the COLOR_STENCIL RenderMode as it also enables the stencil buffer.
+  // First set a mode to turn off the stencil buffer, so the enable is required.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
   renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR_STENCIL );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 

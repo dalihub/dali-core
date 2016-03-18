@@ -361,7 +361,7 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   END_TEST;
 }
 
-int UtcDaliHitTestAlgorithmStencil(void)
+int UtcDaliHitTestAlgorithmClippingActor(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with a stencil");
@@ -377,42 +377,38 @@ int UtcDaliHitTestAlgorithmStencil(void)
   layer.SetName( "layer" );
   stage.Add( layer );
 
-  // Create a stencil and add that to the layer
-  Actor stencil = CreateRenderableActor(Dali::BufferImage::WHITE() );
-  stencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  stencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  stencil.SetSize( 50.0f, 50.0f );
-  stencil.SetDrawMode( DrawMode::STENCIL );
-  stencil.SetName( "stencil" );
-  layer.Add( stencil );
+  // Create a clipping actor and add it to the layer.
+  Actor clippingActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
+  clippingActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  clippingActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  clippingActor.SetSize( 50.0f, 50.0f );
+  clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  clippingActor.SetName( "clippingActor" );
+  layer.Add( clippingActor );
 
-  // Create a renderable actor and add that to the layer
-  Actor layerHitActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
-  layerHitActor.SetSize( 100.0f, 100.0f );
-  layerHitActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  layerHitActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  layerHitActor.SetName( "layerHitActor" );
-  layer.Add( layerHitActor );
+  // Create a renderable actor and add it to the clipping actor.
+  Actor childActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
+  childActor.SetSize( 100.0f, 100.0f );
+  childActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  childActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  childActor.SetName( "childActor" );
+  clippingActor.Add( childActor );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  // Hit within stencil and actor
-  {
-    HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2( 10.0f, 10.0f ), results, &DefaultIsActorTouchableFunction);
-    DALI_TEST_CHECK( results.actor == layerHitActor );
-    tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
-  }
+  // Hit within clippingActor and childActor.
+  HitTestAlgorithm::Results results;
+  HitTest( stage, Vector2( 10.0f, 10.0f ), results, &DefaultIsActorTouchableFunction );
+  DALI_TEST_CHECK( results.actor == childActor );
+  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
 
-  // Hit within actor but outside of stencil, should hit the root-layer
-  {
-    HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2( 60.0f, 60.0f ), results, &DefaultIsActorTouchableFunction);
-    DALI_TEST_CHECK( results.actor == rootLayer );
-    tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
-  }
+  // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
+  HitTest( stage, Vector2( 60.0f, 60.0f ), results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == rootLayer );
+  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
+
   END_TEST;
 }
 

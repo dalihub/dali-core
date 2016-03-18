@@ -158,15 +158,15 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-  if (mTextureSet)
+  if( mTextureSet )
   {
-    mTextureSet->RemoveObserver(this);
-    mTextureSet=NULL;
+    mTextureSet->RemoveObserver( this );
+    mTextureSet = NULL;
   }
   if( mShader )
   {
-    mShader->RemoveConnectionObserver(*this);
-    mShader=NULL;
+    mShader->RemoveConnectionObserver( *this );
+    mShader = NULL;
   }
 }
 
@@ -662,7 +662,6 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
       break;
     }
   }
-
 
   return opacity;
 }

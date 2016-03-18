@@ -147,12 +147,12 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
               // Ensure tap is within the actor's area
               if ( actor->RaySphereTest( hitTestResults.rayOrigin, hitTestResults.rayDirection ) ) // Quick check
               {
-                Vector4 hitPointLocal;
+                Vector2 hitPointLocal;
                 float distance( 0.0f );
                 if( actor->RayActorTest( hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
                 {
                   // One of the parents was the gestured actor so we can emit the signal for that actor.
-                  EmitGestureSignal( actor, gestureDetectors, Vector2( hitPointLocal.x, hitPointLocal.y ) );
+                  EmitGestureSignal( actor, gestureDetectors, hitPointLocal );
                   break; // We have found AND emitted a signal on the gestured actor, break out.
                 }
               }
