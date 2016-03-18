@@ -155,6 +155,18 @@ struct PositionComponentConstraint
   }
 };
 
+struct OrientationComponentConstraint
+{
+  OrientationComponentConstraint(){}
+
+  void operator()( Quaternion& orientation, const PropertyInputContainer& inputs )
+  {
+    const Quaternion& parentOrientation = inputs[0]->GetQuaternion();
+    Vector3 pos, scale;
+    Quaternion rot;
+    orientation = parentOrientation;
+  }
+};
 // OnRelayout
 
 static bool gOnRelayoutCallBackCalled = false;
@@ -2339,6 +2351,40 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
   DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), parentMatrix, 0.001, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentPosition(), parent.GetCurrentPosition(), 0.001, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliActorConstrainedToOrientation(void)
+{
+  TestApplication app;
+  tet_infoline(" UtcDaliActorConstrainedToOrientation");
+
+  Actor parent = Actor::New();
+  parent.SetParentOrigin(ParentOrigin::CENTER);
+  parent.SetAnchorPoint(AnchorPoint::CENTER);
+  Vector3 parentPosition( 10.0f, 20.0f, 30.0f);
+  Radian rotationAngle(Degree(85.0f));
+  Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
+  Vector3 parentScale( 1.0f, 2.0f, 3.0f );
+  parent.SetPosition( parentPosition );
+  parent.SetOrientation( parentRotation );
+  parent.SetScale( parentScale );
+  Stage::GetCurrent().Add( parent );
+
+  Actor child = Actor::New();
+  child.SetParentOrigin(ParentOrigin::CENTER);
+  Constraint posConstraint = Constraint::New<Quaternion>( child, Actor::Property::ORIENTATION, OrientationComponentConstraint() );
+  posConstraint.AddSource( Source( parent, Actor::Property::ORIENTATION ) );
+  posConstraint.Apply();
+
+  Stage::GetCurrent().Add( child );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), parent.GetCurrentOrientation(), 0.001, TEST_LOCATION );
   END_TEST;
 }
 

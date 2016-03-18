@@ -283,6 +283,12 @@ public:
   {
     return mTxManager->BakeRelativeQuaternionPropertyValue( mId, value );
   }
+
+  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
+  {
+    return Get(bufferIndex);
+  }
+
 };
 
 /**
