@@ -145,8 +145,8 @@ internal_src_files = \
   $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
   $(internal_src_dir)/update/queue/update-message-queue.cpp \
-  $(internal_src_dir)/update/manager/prepare-render-instructions.cpp \
-  $(internal_src_dir)/update/manager/process-render-tasks.cpp \
+  $(internal_src_dir)/update/manager/render-instruction-processor.cpp \
+  $(internal_src_dir)/update/manager/render-task-processor.cpp \
   $(internal_src_dir)/update/manager/transform-manager.cpp \
   $(internal_src_dir)/update/manager/update-algorithms.cpp \
   $(internal_src_dir)/update/manager/update-manager.cpp \

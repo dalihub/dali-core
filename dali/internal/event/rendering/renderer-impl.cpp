@@ -885,7 +885,7 @@ void Renderer::Disconnect()
 }
 
 Renderer::Renderer()
-: mSceneObject (NULL ),
+: mSceneObject(NULL ),
   mBlendColor( NULL ),
   mDepthIndex( 0 ),
   mOnStageCount( 0 ),

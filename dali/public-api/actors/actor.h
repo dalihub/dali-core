@@ -1,8 +1,8 @@
-#ifndef __DALI_ACTOR_H__
-#define __DALI_ACTOR_H__
+#ifndef DALI_ACTOR_H
+#define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
+
 namespace Dali
 {
 /**
@@ -249,59 +250,60 @@ public:
   {
     enum
     {
-      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3    (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float      (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float      (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float      (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3    (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float      (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float      (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float      (constraint-input) @SINCE_1_0.0
-      SIZE,                                               ///< name "size",                  type Vector3    (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float      (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      POSITION,                                           ///< name "position",              type Vector3    (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_X,                                         ///< name "positionX",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_Y,                                         ///< name "positionY",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_Z,                                         ///< name "positionZ",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3    (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float      (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float      (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float      (read-only / constraint-input) @SINCE_1_0.0
-      ORIENTATION,                                        ///< name "orientation",           type Quaternion (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion (read-only / constraint-input) @SINCE_1_0.0
-      SCALE,                                              ///< name "scale",                 type Vector3    (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_X,                                            ///< name "scaleX",                type float      (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_Y,                                            ///< name "scaleY",                type float      (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_Z,                                            ///< name "scaleZ",                type float      (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3    (read-only / constraint-input) @SINCE_1_0.0
-      VISIBLE,                                            ///< name "visible",               type bool       (animatable / constraint-input) @SINCE_1_0.0
-      COLOR,                                              ///< name "color",                 type Vector4    (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_RED,                                          ///< name "colorRed",              type float      (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_GREEN,                                        ///< name "colorGreen",            type float      (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_BLUE,                                         ///< name "colorBlue",             type float      (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float      (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4    (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix     (read-only / constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3     (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float       (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float       (constraint-input) @SINCE_1_0.0
+      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float       (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3     (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float       (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float       (constraint-input) @SINCE_1_0.0
+      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float       (constraint-input) @SINCE_1_0.0
+      SIZE,                                               ///< name "size",                  type Vector3     (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float       (animatable / constraint-input) @SINCE_1_0.0
+      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      POSITION,                                           ///< name "position",              type Vector3     (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_X,                                         ///< name "positionX",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_Y,                                         ///< name "positionY",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      POSITION_Z,                                         ///< name "positionZ",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3     (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float       (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float       (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float       (read-only / constraint-input) @SINCE_1_0.0
+      ORIENTATION,                                        ///< name "orientation",           type Quaternion  (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion  (read-only / constraint-input) @SINCE_1_0.0
+      SCALE,                                              ///< name "scale",                 type Vector3     (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_X,                                            ///< name "scaleX",                type float       (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_Y,                                            ///< name "scaleY",                type float       (animatable / constraint-input) @SINCE_1_0.0
+      SCALE_Z,                                            ///< name "scaleZ",                type float       (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3     (read-only / constraint-input) @SINCE_1_0.0
+      VISIBLE,                                            ///< name "visible",               type bool        (animatable / constraint-input) @SINCE_1_0.0
+      COLOR,                                              ///< name "color",                 type Vector4     (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_RED,                                          ///< name "colorRed",              type float       (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_GREEN,                                        ///< name "colorGreen",            type float       (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_BLUE,                                         ///< name "colorBlue",             type float       (animatable / constraint-input) @SINCE_1_0.0
+      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float       (animatable / constraint-input) @SINCE_1_0.0
+      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4     (read-only / constraint-input) @SINCE_1_0.0
+      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix      (read-only / constraint-input) @SINCE_1_0.0
       NAME,                                               ///< name "name",                  type std::string @SINCE_1_0.0
-      SENSITIVE,                                          ///< name "sensitive",             type bool @SINCE_1_0.0
-      LEAVE_REQUIRED,                                     ///< name "leaveRequired",         type bool @SINCE_1_0.0
-      INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool @SINCE_1_0.0
-      INHERIT_SCALE,                                      ///< name "inheritScale",          type bool @SINCE_1_0.0
+      SENSITIVE,                                          ///< name "sensitive",             type bool        @SINCE_1_0.0
+      LEAVE_REQUIRED,                                     ///< name "leaveRequired",         type bool        @SINCE_1_0.0
+      INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool        @SINCE_1_0.0
+      INHERIT_SCALE,                                      ///< name "inheritScale",          type bool        @SINCE_1_0.0
       COLOR_MODE,                                         ///< name "colorMode",             type std::string @SINCE_1_0.0
       POSITION_INHERITANCE,                               ///< name "positionInheritance",   type std::string @DEPRECATED_1_1.24 Use INHERIT_POSITION instead
       DRAW_MODE,                                          ///< name "drawMode",              type std::string @SINCE_1_0.0
-      SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3 @SINCE_1_0.0
-      WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String @SINCE_1_0.0
-      HEIGHT_RESIZE_POLICY,                               ///< name "heightResizePolicy",    type String @SINCE_1_0.0
-      SIZE_SCALE_POLICY,                                  ///< name "sizeScalePolicy",       type String @SINCE_1_0.0
-      WIDTH_FOR_HEIGHT,                                   ///< name "widthForHeight",        type Boolean @SINCE_1_0.0
-      HEIGHT_FOR_WIDTH,                                   ///< name "heightForWidth",        type Boolean @SINCE_1_0.0
-      PADDING,                                            ///< name "padding",               type Vector4 @SINCE_1_0.0
-      MINIMUM_SIZE,                                       ///< name "minimumSize",           type Vector2 @SINCE_1_0.0
-      MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2 @SINCE_1_0.0
-      INHERIT_POSITION,                                   ///< name "inheritPosition", type bool @SINCE_1_1.24
+      SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3     @SINCE_1_0.0
+      WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String      @SINCE_1_0.0
+      HEIGHT_RESIZE_POLICY,                               ///< name "heightResizePolicy",    type String      @SINCE_1_0.0
+      SIZE_SCALE_POLICY,                                  ///< name "sizeScalePolicy",       type String      @SINCE_1_0.0
+      WIDTH_FOR_HEIGHT,                                   ///< name "widthForHeight",        type bool        @SINCE_1_0.0
+      HEIGHT_FOR_WIDTH,                                   ///< name "heightForWidth",        type bool        @SINCE_1_0.0
+      PADDING,                                            ///< name "padding",               type Vector4     @SINCE_1_0.0
+      MINIMUM_SIZE,                                       ///< name "minimumSize",           type Vector2     @SINCE_1_0.0
+      MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2     @SINCE_1_0.0
+      INHERIT_POSITION,                                   ///< name "inheritPosition",       type bool        @SINCE_1_1.24
+      CLIPPING_MODE,                                      ///< name "clippingMode",          type String      @SINCE_1_2.5
     };
   };
 
@@ -1115,14 +1117,9 @@ public:
    * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
    * For overlay actors, the drawing order is with respect to tree levels of Actors,
    * and depth-testing will not be used.
-   *
-   * If DrawMode::STENCIL is used, the actor and its children will be used to stencil-test other actors
-   * within the Layer. Stencil actors are therefore drawn into the stencil buffer before any other
-   * actors within the Layer.
-   *
+
    * @SINCE_1_0.0
    * @param[in] drawMode The new draw-mode to use.
-   * @note Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
    * @note Layers do not inherit the DrawMode from their parents.
    */
   void SetDrawMode( DrawMode::Type drawMode );
@@ -1585,4 +1582,4 @@ inline void UnparentAndReset( Actor& actor )
  */
 } // namespace Dali
 
-#endif // __DALI_ACTOR_H__
+#endif // DALI_ACTOR_H

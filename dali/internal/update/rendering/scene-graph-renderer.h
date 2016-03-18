@@ -30,6 +30,7 @@
 
 namespace Dali
 {
+
 namespace Internal
 {
 
@@ -362,7 +363,7 @@ private:
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
   Vector4*                     mBlendColor;                       ///< The blend color for blending operation
 
-  Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
+  Dali::Internal::Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
 
   size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
   size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw

@@ -150,7 +150,7 @@ inline int UpdateNodes( Node& node,
 
   UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
 
-  // Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
+  // Draw mode inheritance is treated as or-ing the modes together (as they are a bit-mask).
   inheritedDrawMode |= node.GetDrawMode();
 
   node.PrepareRender( updateBufferIndex );

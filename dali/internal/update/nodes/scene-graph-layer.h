@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_LAYER_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_LAYER_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_LAYER_H
+#define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -45,13 +45,13 @@ class Camera;
 struct Renderable
 {
   Renderable()
-  :mNode(0),
-   mRenderer(0)
+  : mNode( 0 ),
+    mRenderer( 0 )
   {}
 
   Renderable( Node* node, Renderer* renderer )
-  :mNode(node),
-   mRenderer(renderer)
+  : mNode( node ),
+    mRenderer( renderer )
   {}
 
   Node* mNode;
@@ -222,13 +222,12 @@ private:
 
 public: // For update-algorithms
 
-  RenderableContainer stencilRenderables;
   RenderableContainer colorRenderables;
   RenderableContainer overlayRenderables;
 
 private:
 
-  SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
+  SortFunctionType mSortFunction;     ///< Used to sort semi-transparent geometry
 
   ClippingBox mClippingBox;           ///< The clipping box, in window coordinates
   Camera* mLastCamera;                ///< Pointer to the last camera that has rendered the layer
@@ -236,8 +235,8 @@ private:
   Dali::Layer::Behavior mBehavior;    ///< The behavior of the layer
 
   bool mAllChildTransformsClean[ 2 ]; ///< True if all child nodes transforms are clean,
-                                      /// double buffered as we need two clean frames before we can reuse N-1 for N+1
-                                      /// this allows us to cache render items when layer is "static"
+                                      ///  double buffered as we need two clean frames before we can reuse N-1 for N+1
+                                      ///  this allows us to cache render items when layer is "static"
   bool mIsClipping:1;                 ///< True when clipping is enabled
   bool mDepthTestDisabled:1;          ///< Whether depth test is disabled.
   bool mIsDefaultSortFunction:1;      ///< whether the default depth sort function is used
@@ -337,4 +336,4 @@ inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadService
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_LAYER_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_LAYER_H

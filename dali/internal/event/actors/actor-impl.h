@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_ACTOR_H__
-#define __DALI_INTERNAL_ACTOR_H__
+#ifndef DALI_INTERNAL_ACTOR_H
+#define DALI_INTERNAL_ACTOR_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -634,6 +634,12 @@ public:
    * @return The actor's opacity.
    */
   float GetCurrentOpacity() const;
+
+  /**
+   * Retrieve the actor's clipping mode.
+   * @return The actor's clipping mode (cached)
+   */
+  ClippingMode::Type GetClippingMode() const;
 
   /**
    * Sets whether an actor should emit touch or hover signals; see SignalTouch() and SignalHover().
@@ -1275,7 +1281,7 @@ public:
    */
   bool RayActorTest( const Vector4& rayOrigin,
                      const Vector4& rayDir,
-                     Vector4& hitPointLocal,
+                     Vector2& hitPointLocal,
                      float& distance ) const;
 
   /**
@@ -1827,6 +1833,7 @@ protected:
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
+  ClippingMode::Type mClippingMode                 : 2; ///< Cached: Determines which clipping mode (if any) to use.
 
 private:
 
@@ -1859,4 +1866,4 @@ inline const Internal::Actor& GetImplementation( const Dali::Actor& actor )
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_ACTOR_H__
+#endif // DALI_INTERNAL_ACTOR_H

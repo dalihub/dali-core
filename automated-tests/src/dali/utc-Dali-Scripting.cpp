@@ -49,8 +49,7 @@ const unsigned int POSITION_INHERITANCE_MODE_VALUES_COUNT = sizeof( POSITION_INH
 const StringEnum DRAW_MODE_VALUES[] =
 {
     { "NORMAL", DrawMode::NORMAL },
-    { "OVERLAY_2D", DrawMode::OVERLAY_2D },
-    { "STENCIL", DrawMode::STENCIL },
+    { "OVERLAY_2D", DrawMode::OVERLAY_2D }
 };
 const unsigned int DRAW_MODE_VALUES_COUNT = sizeof( DRAW_MODE_VALUES ) / sizeof( DRAW_MODE_VALUES[0] );
 
@@ -484,7 +483,7 @@ int UtcDaliScriptingNewActorProperties(void)
   map[ "sensitive" ] = false;
   map[ "leaveRequired" ] = true;
   map[ "positionInheritance" ] = "DONT_INHERIT_POSITION";
-  map[ "drawMode" ] = "STENCIL";
+  map[ "drawMode" ] = "OVERLAY_2D";
   map[ "inheritOrientation" ] = false;
   map[ "inheritScale" ] = false;
 
@@ -507,7 +506,7 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.IsSensitive(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsOrientationInherited(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsScaleInherited(), false, TEST_LOCATION );
 

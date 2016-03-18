@@ -130,6 +130,18 @@ bool TraceCallStack::FindMethodAndParams(std::string method, const NamedParams& 
   return FindIndexFromMethodAndParams( method, params ) > -1;
 }
 
+bool TraceCallStack::FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const
+{
+  for( size_t i = startIndex; i < mCallStack.size(); ++i )
+  {
+    if( ( mCallStack[i].method.compare( method ) == 0 ) && ( mCallStack[i].paramList.compare( params ) == 0 ) )
+    {
+      startIndex = i;
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Search for a method in the stack with the given parameter list
