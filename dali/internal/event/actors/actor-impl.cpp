@@ -4066,6 +4066,22 @@ void Actor::SetNegotiatedSize( RelayoutContainer& container )
 
 void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& container )
 {
+  // Force a size negotiation for actors that has assigned size during relayout
+  // This is required as otherwise the flags that force a relayout will not
+  // necessarilly be set. This will occur if the actor has already been laid out.
+  // The dirty flags are then cleared. Then if the actor is added back into the
+  // relayout container afterwards, the dirty flags would still be clear...
+  // causing a relayout to be skipped. Here we force any actors added to the
+  // container to be relayed out.
+  if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+  {
+    SetLayoutNegotiated(false, Dimension::WIDTH);
+  }
+  if(GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+  {
+    SetLayoutNegotiated(false, Dimension::HEIGHT);
+  }
+
   // Do the negotiation
   NegotiateDimensions( allocatedSize );
 
@@ -4078,6 +4094,19 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
   {
     ActorPtr child = GetChildAt( i );
+
+    // Forces children that have already been laid out to be relayed out
+    // if they have assigned size during relayout.
+    if(child->GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+    {
+      child->SetLayoutNegotiated(false, Dimension::WIDTH);
+      child->SetLayoutDirty(true, Dimension::WIDTH);
+    }
+    if(child->GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+    {
+      child->SetLayoutNegotiated(false, Dimension::HEIGHT);
+      child->SetLayoutDirty(true, Dimension::HEIGHT);
+    }
 
     // Only relayout if required
     if( child->RelayoutRequired() )
