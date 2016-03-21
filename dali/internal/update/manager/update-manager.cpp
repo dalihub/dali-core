@@ -1207,26 +1207,15 @@ void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuff
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
 }
 
-void UpdateManager::SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data)
+void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
 {
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, Dali::Vector<char>* > DerivedType;
+  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, Dali::Vector<char>*, size_t > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferData, propertyBuffer, data );
-}
-
-void UpdateManager::SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size )
-{
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, size_t > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferSize, propertyBuffer, size );
+  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
 }
 
 } // namespace SceneGraph

@@ -70,15 +70,15 @@ Geometry CreateGeometry()
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
-  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
-  texturedQuadVertices.SetData(texturedQuadVertexData);
+  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat );
+  texturedQuadVertices.SetData( texturedQuadVertexData, 4 );
 
   // Create indices
   unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, sizeof(indexData)/sizeof(indexData[0]) );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   // Create the geometry object
   Geometry texturedQuadGeometry = Geometry::New();

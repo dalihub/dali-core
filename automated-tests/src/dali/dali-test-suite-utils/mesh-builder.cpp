@@ -43,7 +43,7 @@ PropertyBuffer CreatePropertyBuffer()
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer vertexData = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
+  PropertyBuffer vertexData = PropertyBuffer::New( texturedQuadVertexFormat );
   return vertexData;
 }
 
@@ -62,13 +62,13 @@ Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData )
     { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
     { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
     { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
-  vertexData.SetData(texturedQuadVertexData);
+  vertexData.SetData(texturedQuadVertexData, 4);
 
   unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, sizeof(indexData)/sizeof(indexData[0]) );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexData );
