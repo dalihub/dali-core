@@ -59,7 +59,7 @@ class TextureObserver;
 namespace SceneGraph
 {
 class RenderQueue;
-class PostProcessResourceDispatcher;
+class TextureUploadedDispatcher;
 
 typedef std::map<ResourceId, TexturePointer >   TextureContainer;
 typedef std::pair<ResourceId, TexturePointer >  TexturePair;
@@ -79,7 +79,7 @@ public:
    * @param[in] context GL Context
    */
   TextureCache( RenderQueue& renderQueue,
-                PostProcessResourceDispatcher& postProcessDispatcher,
+                TextureUploadedDispatcher& postProcessDispatcher,
                 Context& context );
 
   /**
@@ -195,8 +195,10 @@ public:
    * @param[in] id Resource id of texture
    * @param[in] target (e.g. GL_TEXTURE_2D)
    * @param[in] textureunit to use
+   *
+   * @return true if the bind succeeded, false if either the create or bind failed.
    */
-  void BindTexture( Texture* texture, ResourceId id, GLenum target, TextureUnit textureunit );
+  bool BindTexture( Texture* texture, ResourceId id, GLenum target, TextureUnit textureunit );
 
   /**
    * Get the texture associated with the resource ID
@@ -322,7 +324,7 @@ protected: // Implements TextureCacheDispatcher
 
 private:
 
-  PostProcessResourceDispatcher& mPostProcessResourceDispatcher;
+  TextureUploadedDispatcher& mTextureUploadedDispatcher;
   Context&         mContext;
   TextureContainer mTextures;
   TextureContainer mFramebufferTextures;

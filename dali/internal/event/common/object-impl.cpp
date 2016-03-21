@@ -783,8 +783,6 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
     }
   }
 
-  // @todo MESH_REWORK Store mappings for unstaged objects?
-
   if( propertyPtr != NULL )
   {
     const SceneGraph::PropertyOwner* sceneObject = GetPropertyOwner();
@@ -797,8 +795,6 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
     }
     else
     {
-      // @todo MESH_REWORK FIXME Need to store something that can be sent to the scene
-      // object when staged.
       DALI_ASSERT_ALWAYS(0 && "MESH_REWORK - Need to store property whilst off-stage" );
     }
   }

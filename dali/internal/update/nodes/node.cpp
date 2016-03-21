@@ -71,6 +71,7 @@ Node::Node()
   mDepth(0u),
   mDirtyFlags(AllFlags),
   mIsRoot( false ),
+  mInheritPosition( true ),
   mInheritOrientation( true ),
   mInheritScale( true ),
   mDrawMode( DrawMode::NORMAL ),

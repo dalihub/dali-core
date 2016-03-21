@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 #include <dali/internal/common/shader-saver.h>
-#include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
+#include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 
@@ -65,7 +65,7 @@ class PropertyBufferDataProvider;
  * RenderManager is responsible for rendering the result of the previous "update", which
  * is provided in a RenderCommand during UpdateManager::Update().
  */
-class RenderManager : public PostProcessResourceDispatcher
+class RenderManager : public TextureUploadedDispatcher
 {
 public:
 
@@ -77,7 +77,7 @@ public:
    */
   static RenderManager* New( Integration::GlAbstraction& glAbstraction,
                              Integration::GlSyncAbstraction& glSyncAbstraction,
-                             ResourcePostProcessList& resourcePostProcessQueue );
+                             LockedResourceQueue& resourcePostProcessQueue );
 
   /**
    * Non-virtual destructor; not intended as a base class
@@ -109,9 +109,9 @@ public:
 
   /**
    * Dispatch requests onto the postProcessResourcesQueue
-   * @param[in] request The request to dispatch
+   * @param[in] resource The Id of the resource to dispatch
    */
-  virtual void DispatchPostProcessRequest( ResourcePostProcessRequest& request );
+  virtual void DispatchTextureUploaded( ResourceId resource );
 
   /**
    * Set the upstream interface for compiled shader binaries to be sent back to for eventual

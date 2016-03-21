@@ -49,15 +49,11 @@ ContextNotifierInterface* Core::GetContextNotifier()
   return mImpl->GetContextNotifier();
 }
 
-// @todo Rename to ResetGlContext
 void Core::ContextCreated()
 {
   mImpl->ContextCreated();
 }
 
-// @todo Replace with StopRendering that prevents RenderManager from rendering
-// until we get ResetGLContext again, change ContextCreated to reset gpu buffer cache,
-// gl texture id's
 void Core::ContextDestroyed()
 {
   mImpl->ContextDestroyed();

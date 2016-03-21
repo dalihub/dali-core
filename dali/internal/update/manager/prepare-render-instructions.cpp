@@ -201,8 +201,6 @@ inline bool TryReuseCachedRenderers( Layer& layer,
  */
 bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSortAttributes& rhs )
 {
-  // @todo MESH_REWORK Consider replacing all these sortAttributes with a single long int that
-  // encapsulates the same data (e.g. the middle-order bits of the ptrs)
   if( lhs.renderItem->GetDepthIndex() == rhs.renderItem->GetDepthIndex() )
   {
     if( lhs.shader == rhs.shader )

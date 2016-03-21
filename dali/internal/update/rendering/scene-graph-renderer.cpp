@@ -84,7 +84,6 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
       const Dali::Internal::SceneGraph::UniformPropertyMapping* map = (*iter);
       localMap.PushBack( map );
     }
-    //@todo MESH_REWORK Use memcpy to copy ptrs from one array to the other
   }
 }
 

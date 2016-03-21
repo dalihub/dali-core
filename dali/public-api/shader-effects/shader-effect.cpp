@@ -54,7 +54,6 @@ ShaderEffect& ShaderEffect::operator=(const ShaderEffect& rhs)
 
 ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryHints hints)
 {
-  // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
   internal->SetPrograms( vertexShader, fragmentShader );
@@ -68,7 +67,6 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
                                           const std::string& fragmentShader,
                                           GeometryHints hints)
 {
-  // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
   internal->SetPrograms( vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );

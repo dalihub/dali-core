@@ -228,8 +228,9 @@ private:
    * Bind the material textures in the samplers and setup the samplers
    * @param[in] textureCache The texture cache
    * @param[in] program The shader program
+   * @return False if create or bind failed, true if success.
    */
-  void BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
+  bool BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
 
 public:
 

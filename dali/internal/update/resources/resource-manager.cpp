@@ -42,7 +42,6 @@
 #include <dali/internal/render/queue/render-queue.h>
 
 #include <dali/internal/render/common/texture-cache-dispatcher.h>
-#include <dali/internal/render/common/post-process-resource-dispatcher.h>
 
 using namespace Dali::Integration;
 
@@ -81,16 +80,15 @@ struct ResourceManager::ResourceManagerImpl
   ResourceManagerImpl( PlatformAbstraction& platformAbstraction,
                        NotificationManager& notificationManager,
                        SceneGraph::TextureCacheDispatcher& textureCacheDispatcher,
-                       ResourcePostProcessList& resourcePostProcessQueue,
-                       SceneGraph::PostProcessResourceDispatcher& postProcessResourceDispatcher,
+                       LockedResourceQueue& textureUploadedQueue,
                        DiscardQueue& discardQueue,
                        RenderQueue& renderQueue )
   : mPlatformAbstraction(platformAbstraction),
     mNotificationManager(notificationManager),
     mResourceClient(NULL),
     mTextureCacheDispatcher(textureCacheDispatcher),
-    mResourcePostProcessQueue(resourcePostProcessQueue),
-    mPostProcessResourceDispatcher(postProcessResourceDispatcher),
+    mTextureUploadedQueue(textureUploadedQueue),
+    mTextureUploadedProcessingQueue(),
     mDiscardQueue(discardQueue),
     mRenderQueue(renderQueue),
     mNotificationCount(0),
@@ -103,16 +101,16 @@ struct ResourceManager::ResourceManagerImpl
   {
   }
 
-  PlatformAbstraction&     mPlatformAbstraction;
-  NotificationManager&     mNotificationManager;
-  ResourceClient*          mResourceClient; // (needs to be a ptr - it's not instantiated yet)
-  TextureCacheDispatcher&  mTextureCacheDispatcher;
-  ResourcePostProcessList& mResourcePostProcessQueue;
-  SceneGraph::PostProcessResourceDispatcher& mPostProcessResourceDispatcher;
-  DiscardQueue&            mDiscardQueue; ///< Unwanted resources are added here during UpdateCache()
-  RenderQueue&             mRenderQueue;
-  unsigned int             mNotificationCount;
-  bool                     cacheUpdated; ///< returned by UpdateCache(). Set true in NotifyTickets to indicate a change in a resource
+  PlatformAbstraction&        mPlatformAbstraction;
+  NotificationManager&        mNotificationManager;
+  ResourceClient*             mResourceClient; // (needs to be a ptr - it's not instantiated yet)
+  TextureCacheDispatcher&     mTextureCacheDispatcher;
+  LockedResourceQueue&        mTextureUploadedQueue;
+  TextureUploadedQueue        mTextureUploadedProcessingQueue;
+  DiscardQueue&               mDiscardQueue; ///< Unwanted resources are added here during UpdateCache()
+  RenderQueue&                mRenderQueue;
+  unsigned int                mNotificationCount;
+  bool                        cacheUpdated; ///< returned by UpdateCache(). Set true in NotifyTickets to indicate a change in a resource
 
   /**
    * These containers are used to processs requests, and ResourceCache callbacks.
@@ -142,8 +140,7 @@ struct ResourceManager::ResourceManagerImpl
 ResourceManager::ResourceManager( PlatformAbstraction& platformAbstraction,
                                   NotificationManager& notificationManager,
                                   TextureCacheDispatcher& textureCacheDispatcher,
-                                  ResourcePostProcessList& resourcePostProcessQueue,
-                                  SceneGraph::PostProcessResourceDispatcher& postProcessResourceDispatcher,
+                                  LockedResourceQueue& resourcePostProcessQueue,
                                   DiscardQueue& discardQueue,
                                   RenderQueue& renderQueue )
 {
@@ -151,7 +148,6 @@ ResourceManager::ResourceManager( PlatformAbstraction& platformAbstraction,
                                    notificationManager,
                                    textureCacheDispatcher,
                                    resourcePostProcessQueue,
-                                   postProcessResourceDispatcher,
                                    discardQueue,
                                    renderQueue );
 }
@@ -195,29 +191,17 @@ void ResourceManager::PostProcessResources( BufferIndex updateBufferIndex )
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::Verbose, "ResourceManager: PostProcessResources()\n");
 
-  unsigned int numIds = mImpl->mResourcePostProcessQueue[ updateBufferIndex ].size();
+  mImpl->mTextureUploadedQueue.SwapQueue( mImpl->mTextureUploadedProcessingQueue );
+
+  unsigned int numIds = mImpl->mTextureUploadedProcessingQueue.Size();
   unsigned int i;
 
   // process the list where RenderManager put post process requests
-  for (i = 0; i < numIds; ++i)
+  for ( i = 0; i < numIds; ++i )
   {
-    ResourcePostProcessRequest ppRequest = mImpl->mResourcePostProcessQueue[ updateBufferIndex ][i];
-    switch(ppRequest.postProcess)
-    {
-      case ResourcePostProcessRequest::UPLOADED:
-      {
-        SendToClient( UploadedMessage( *mImpl->mResourceClient, ppRequest.id ) );
-        break;
-      }
-      case ResourcePostProcessRequest::DELETED:
-      {
-        // TextureObservers handled in TextureCache
-        break;
-      }
-    }
+    ResourceId resourceId = mImpl->mTextureUploadedProcessingQueue[i];
+    SendToClient( UploadedMessage( *mImpl->mResourceClient, resourceId ) );
   }
-
-  mImpl->mResourcePostProcessQueue[ updateBufferIndex ].clear();
 }
 
 

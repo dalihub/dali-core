@@ -115,7 +115,6 @@ ShaderPtr Shader::New( const std::string& vertexShader,
                        const std::string& fragmentShader,
                        Dali::Shader::ShaderHints hints )
 {
-  //TODO: MESH_REWORK
   ShaderPtr shader( new Shader() );
   shader->Initialize( vertexShader, fragmentShader, hints );
   return shader;

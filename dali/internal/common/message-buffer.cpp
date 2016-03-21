@@ -97,7 +97,6 @@ unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
   // End marker
   *mNextSlot = 0;
 
-  // @todo Remove cast & change all messages to use WordType instead
   return reinterpret_cast<unsigned int*>(slot);
 }
 
