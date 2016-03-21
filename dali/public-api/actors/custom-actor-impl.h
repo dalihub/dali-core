@@ -137,7 +137,7 @@ public:
   virtual void OnChildAdd(Actor& child) = 0;
 
   /**
-   * @brief Called after a child has been removed from the owning actor.
+   * @brief Called after the owning actor has attempted to remove a child( regardless of whether it succeeded or not ).
    *
    * @SINCE_1_0.0
    * @param[in] child The child being removed

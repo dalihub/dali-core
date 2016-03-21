@@ -461,15 +461,15 @@ void Actor::Remove( Actor& child )
 
   if( removed )
   {
-    // Notification for derived classes
-    OnChildRemove( *(removed.Get()) );
-
     // Only put in a relayout request if there is a suitable dependency
     if( RelayoutDependentOnChildren() )
     {
       RelayoutRequest();
     }
   }
+
+  // Notification for derived classes
+  OnChildRemove( child );
 }
 
 void Actor::Unparent()

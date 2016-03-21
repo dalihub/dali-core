@@ -1731,7 +1731,7 @@ private:
   }
 
   /**
-   * For use in derived classes; this is called after Remove() has removed a child.
+   * For use in derived classes; this is called after Remove() has attempted to remove a child( regardless of whether it succeeded or not ).
    * @param[in] child The child that was removed.
    */
   virtual void OnChildRemove( Actor& child )

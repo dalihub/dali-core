@@ -1567,17 +1567,21 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
   DALI_TEST_EQUALS( "OnChildRemove",        actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION ); // The actorB added to actorA
   // mContainer will then receive OnChildAdd
 
-  DALI_TEST_EQUALS( 2, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  // The derived class are always notified, no matter the child is successfully removed or not
+  DALI_TEST_EQUALS( "OnChildRemove",        actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 5, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 6, (int)(MasterCallStack.size()), TEST_LOCATION );
 
   DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 2 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "ActorA: OnChildRemove",        MasterCallStack[ 3 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnChildAdd",           MasterCallStack[ 4 ], TEST_LOCATION );
+  // The derived class are always notified, no matter the child is successfully removed or not
+  DALI_TEST_EQUALS( "ActorB: OnChildRemove",        MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnChildAdd",           MasterCallStack[ 5 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
