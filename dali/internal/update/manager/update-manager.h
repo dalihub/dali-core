@@ -415,17 +415,10 @@ public:
    * Sets the data of an existing property buffer
    * @param[in] propertyBuffer The property buffer.
    * @param[in] data The new data of the buffer
+   * @param[in] size The new size of the buffer
    * @post Sends a message to RenderManager to set the new data to the property buffer.
    */
-  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data);
-
-  /**
-   * Sets the size of an existing property buffer
-   * @param[in] propertyBuffer The property buffer.
-   * @param[in] size The new size of the buffer
-   * @post Sends a message to RenderManager to set the new size to the property buffer.
-   */
-  void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
+  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size);
 
 public:
 
@@ -965,28 +958,16 @@ inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuf
   new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferFormat, &propertyBuffer, format );
 }
 
-inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Vector<char>* data )
+inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Vector<char>* data, size_t size )
 {
-  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, Vector<char>*  > LocalType;
+  typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, Vector<char>*, size_t  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data );
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data, size );
 }
-
-inline void SetPropertyBufferSize( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, size_t size )
-{
-  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, size_t  > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferSize, &propertyBuffer, size );
-}
-
 
 } // namespace SceneGraph
 

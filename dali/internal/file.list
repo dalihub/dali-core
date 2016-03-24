@@ -143,6 +143,7 @@ internal_src_files = \
   $(internal_src_dir)/update/touch/touch-resampler.cpp \
   $(internal_src_dir)/update/manager/prepare-render-instructions.cpp \
   $(internal_src_dir)/update/manager/process-render-tasks.cpp \
+  $(internal_src_dir)/update/manager/transform-manager.cpp \
   $(internal_src_dir)/update/manager/update-algorithms.cpp \
   $(internal_src_dir)/update/manager/update-manager.cpp \
   $(internal_src_dir)/update/manager/update-manager-debug.cpp \

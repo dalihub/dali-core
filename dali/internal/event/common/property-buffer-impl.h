@@ -46,31 +46,17 @@ public:
   /**
    * @copydoc PropertBuffer::New()
    */
-  static PropertyBufferPtr New();
+  static PropertyBufferPtr New( Dali::Property::Map& format );
 
   /**
-   * @copydoc PropertBuffer::SetSize()
+   * @copydoc PropertBuffer::SetData()
    */
-  void SetSize( std::size_t size );
+  void SetData( const void* data, std::size_t size );
 
   /**
    * @copydoc PropertBuffer::GetSize()
    */
   std::size_t GetSize() const;
-
-  /**
-   * @copydoc PropertBuffer::SetData()
-   */
-  void SetData( const void* data );
-
-  /**
-   * @brief Set the format of the PropertyBuffer
-   *
-   * @pre Has not been set yet
-   *
-   * @param[in] format of the PropertyBuffer
-   */
-  void SetFormat( Dali::Property::Map& format );
 
 public: // Default property extensions from Object
 
@@ -96,17 +82,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize();
-
-  /**
-   * Update the buffer when the format changes
-   */
-  void FormatChanged();
-
-  /**
-   * Update the buffer when the size changes
-   */
-  void SizeChanged();
+  void Initialize( Dali::Property::Map& format );
 
 private: // unimplemented methods
   PropertyBuffer( const PropertyBuffer& );

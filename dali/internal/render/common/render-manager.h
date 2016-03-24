@@ -238,21 +238,15 @@ public:
    * @param[in] propertyBuffer The property buffer.
    * @param[in] format The new format of the buffer
    */
-  void SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
+  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
 
   /**
    * Sets the data of an existing property buffer
    * @param[in] propertyBuffer The property buffer.
    * @param[in] data The new data of the buffer
-   */
-  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data);
-
-  /**
-   * Sets the size of an existing property buffer
-   * @param[in] propertyBuffer The property buffer.
    * @param[in] size The new size of the buffer
    */
-  void SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size );
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size );
 
   /**
    * Set the geometry type of an existing render geometry

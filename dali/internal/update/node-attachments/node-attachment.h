@@ -101,17 +101,6 @@ public:
     return *mParent;
   }
 
-  // Update methods
-
-  /**
-   * Called when the attachment or it's owning node is flagged as dirty during scene graph updates.
-   * Allows derived classes to perform extra processing
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] owningNode The attachment's owning node
-   * @param[in] nodeDirtyFlags of the owning node
-   */
-  virtual void Update( BufferIndex updateBufferIndex, const Node& owningNode, int nodeDirtyFlags ) {}
-
 protected:
 
   /**

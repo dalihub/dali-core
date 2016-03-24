@@ -111,26 +111,21 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
     }
   }
 
-
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR3;
   vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
-  PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New();
-  vertexPropertyBuffer->SetFormat( vertexFormat );
-  vertexPropertyBuffer->SetSize( vertices.size() );
+  PropertyBufferPtr vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
   if( vertices.size() > 0 )
   {
-    vertexPropertyBuffer->SetData( &vertices[ 0 ] );
+    vertexPropertyBuffer->SetData( &vertices[ 0 ], vertices.size() );
   }
 
   Property::Map indexFormat;
   indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBufferPtr indexPropertyBuffer = PropertyBuffer::New();
-  indexPropertyBuffer->SetFormat( indexFormat );
-  indexPropertyBuffer->SetSize( indices.Size() );
+  PropertyBufferPtr indexPropertyBuffer = PropertyBuffer::New( indexFormat );
   if( indices.Size() > 0 )
   {
-    indexPropertyBuffer->SetData( &indices[ 0 ] );
+    indexPropertyBuffer->SetData( &indices[ 0 ], indices.Size() );
   }
 
   // Create the geometry object
@@ -140,7 +135,6 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;
-
 }
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(

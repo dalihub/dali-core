@@ -66,6 +66,7 @@ public:
   typedef SceneGraph::Constraint< PropertyType, PropertyAccessor<PropertyType> > SceneGraphConstraint;
   typedef const SceneGraph::AnimatableProperty<PropertyType>* ScenePropertyPtr;
   typedef typename PropertyConstraintPtr<PropertyType>::Type ConstraintFunctionPtr;
+  typedef const SceneGraph::TransformManagerPropertyHandler<PropertyType> TransformManagerProperty;
 
   /**
    * Construct a new constraint.
@@ -169,18 +170,36 @@ private:
       // The targetProperty should exist, when targetObject exists
       DALI_ASSERT_ALWAYS( NULL != targetProperty && "Constraint target property does not exist" );
 
-      // Connect the constraint
-      SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
-                                                                                     propertyOwners,
-                                                                                     func );
-      DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
-      sceneGraphConstraint->SetRemoveAction( mRemoveAction );
+      if( targetProperty->IsTransformManagerProperty() )  //It is a property managed by the transform manager
+      {
+        // Connect the constraint
+        SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraph::Constraint<PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
+                                                                                      propertyOwners,
+                                                                                      func );
+        DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
+        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
-      // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
+        // object is being used in a separate thread; queue a message to apply the constraint
+        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
-      // Keep a raw-pointer to the scene-graph constraint
-      mSceneGraphConstraint = sceneGraphConstraint;
+        // Keep a raw-pointer to the scene-graph constraint
+        mSceneGraphConstraint = sceneGraphConstraint;
+      }
+      else  //SceneGraph property
+      {
+        // Connect the constraint
+        SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
+                                                                                      propertyOwners,
+                                                                                      func );
+        DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
+        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
+
+        // object is being used in a separate thread; queue a message to apply the constraint
+        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
+
+        // Keep a raw-pointer to the scene-graph constraint
+        mSceneGraphConstraint = sceneGraphConstraint;
+      }
     }
   }
 
@@ -424,21 +443,41 @@ private:
         else if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
         {
           // Constrain float component of Vector3 property
-
-          if ( 0 == componentIndex )
+          if( targetProperty->IsTransformManagerProperty() )
           {
-            typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            if ( 0 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,0> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
+            else if ( 1 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,1> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
+            else if ( 2 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,2> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
           }
-          else if ( 1 == componentIndex )
+          else
           {
-            typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
-          }
-          else if ( 2 == componentIndex )
-          {
-            typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            if ( 0 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
+            else if ( 1 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
+            else if ( 2 == componentIndex )
+            {
+              typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
+              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            }
           }
         }
         else if ( PropertyTypes::Get< Vector4 >() == targetProperty->GetType() )

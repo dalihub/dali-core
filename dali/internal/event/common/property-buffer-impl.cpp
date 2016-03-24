@@ -16,13 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
-
-// EXTERNAL INCLUDE
-#include <algorithm> // std::sort
+#include <dali/internal/event/common/property-buffer-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/object/property-buffer.h> // Dali::Internal::PropertyBuffer
+#include <dali/devel-api/object/property-buffer.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -124,49 +121,38 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
 
 } // unnamed namespace
 
-PropertyBufferPtr PropertyBuffer::New()
+PropertyBufferPtr PropertyBuffer::New( Dali::Property::Map& format )
 {
+  DALI_ASSERT_ALWAYS( format.Count() && "Format cannot be empty." );
+
   PropertyBufferPtr propertyBuffer( new PropertyBuffer() );
-  propertyBuffer->Initialize();
+  propertyBuffer->Initialize( format );
 
   return propertyBuffer;
 }
 
-void PropertyBuffer::SetSize( std::size_t size )
+void PropertyBuffer::SetData( const void* data, std::size_t size )
 {
+  DALI_ASSERT_DEBUG( mFormat.Count() && "Format must be set before setting the data." );
+
   mSize = size;
 
-  SizeChanged();
+  // Check if format and size have been set yet
+  if( mBufferFormat != NULL )
+  {
+    unsigned int bufferSize = mBufferFormat->size * mSize;
+    mBuffer.Resize( bufferSize );
+  }
 
-  SceneGraph::SetPropertyBufferSize(mEventThreadServices.GetUpdateManager(),*mRenderObject, mSize );
+  const char* source = static_cast<const char*>( data );
+  std::copy( source, source + mBuffer.Size(), &mBuffer[0] );
+
+  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, new Dali::Vector<char>( mBuffer ), mSize );
 }
 
 std::size_t PropertyBuffer::GetSize() const
 {
   return mSize;
-}
-
-void PropertyBuffer::SetData( const void* data )
-{
-  DALI_ASSERT_DEBUG( mFormat.Count() && "Format must be set before setting the data." );
-
-  DALI_ASSERT_ALWAYS( mSize && "Size of the buffer must be set before setting the data." );
-
-  const char* source = static_cast<const char*>( data );
-  std::copy( source, source + mBuffer.Size(), &mBuffer[0] );
-
-  SceneGraph::SetPropertyBufferData(mEventThreadServices.GetUpdateManager(),*mRenderObject,new Dali::Vector<char>( mBuffer ));
-}
-
-void PropertyBuffer::SetFormat( Dali::Property::Map& format )
-{
-  DALI_ASSERT_ALWAYS( format.Count() && "Format cannot be empty." );
-
-  DALI_ASSERT_DEBUG( 0 == mFormat.Count() && "Format of property buffer can only be set once." );
-
-  mFormat = format;
-
-  FormatChanged();
 }
 
 const Render::PropertyBuffer* PropertyBuffer::GetRenderObject() const
@@ -183,21 +169,20 @@ PropertyBuffer::~PropertyBuffer()
 }
 
 PropertyBuffer::PropertyBuffer()
-:mEventThreadServices( *Stage::GetCurrent() )
-,mRenderObject(NULL)
-,mBufferFormat( NULL )
-,mSize( 0 )
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mRenderObject( NULL ),
+  mBufferFormat( NULL ),
+  mSize( 0 )
 {
 }
 
-void PropertyBuffer::Initialize()
+void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
   mRenderObject = new Render::PropertyBuffer();
   SceneGraph::AddPropertyBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject );
-}
 
-void PropertyBuffer::FormatChanged()
-{
+  mFormat = formatMap;
+
   size_t numComponents = mFormat.Count();
 
   // Create the format
@@ -261,20 +246,6 @@ void PropertyBuffer::FormatChanged()
   mBufferFormat = format;
 
   SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
-  if( mSize )
-  {
-    SizeChanged();
-  }
-}
-
-void PropertyBuffer::SizeChanged()
-{
-  // Check if format and size have been set yet
-  if( mBufferFormat != NULL )
-  {
-    unsigned int bufferSize = mBufferFormat->size * mSize;
-    mBuffer.Resize( bufferSize );
-  }
 }
 
 unsigned int GetPropertyImplementationSize( Property::Type& propertyType )

@@ -70,15 +70,15 @@ Geometry CreateGeometry()
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
-  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
-  texturedQuadVertices.SetData(texturedQuadVertexData);
+  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat );
+  texturedQuadVertices.SetData( texturedQuadVertexData, 4 );
 
   // Create indices
   unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, sizeof(indexData)/sizeof(indexData[0]) );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   // Create the geometry object
   Geometry texturedQuadGeometry = Geometry::New();
@@ -165,16 +165,8 @@ int UtcFrustumLeftCullP(void)
   float offset = -0.01f;
   Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
 
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
-
   meshActor.SetParentOrigin( Vector3( -radius / stageSize.width + offset, 0.5f, 0.5f ) );
   meshActor.SetAnchorPoint( AnchorPoint::CENTER );
 
@@ -216,13 +208,6 @@ int UtcFrustumRightCullP(void)
 
   float offset = 1.01f;
   Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
-
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
@@ -269,13 +254,6 @@ int UtcFrustumTopCullP(void)
   float offset = -0.01f;
   Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
 
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
@@ -321,13 +299,6 @@ int UtcFrustumBottomCullP(void)
 
   float offset = 1.01f;
   Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
-
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
@@ -378,18 +349,7 @@ int UtcFrustumNearCullP(void)
   Vector3 meshPosition = meshActor.GetCurrentPosition();
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  float offset = ( meshActor.GetTargetSize().z + radius ) * 0.5f; //midpoint between AABB and sphere
-  meshPosition.z = cameraDepth - nearPlane +  offset;
-  meshActor.SetPosition( meshPosition );
-
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
-  offset = radius + 0.1f;
+  float offset = radius + 0.1f;
   meshPosition.z = cameraDepth - nearPlane + offset;
   meshActor.SetPosition( meshPosition );
 
@@ -443,19 +403,7 @@ int UtcFrustumFarCullP(void)
   Vector3 meshPosition = meshActor.GetCurrentPosition();
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  float offset = ( meshActor.GetTargetSize().z + radius ) * 0.5f; //midpoint between AABB and sphere
-
-  meshPosition.z = cameraDepth - farPlane - offset;
-  meshActor.SetPosition( meshPosition );
-
-  drawTrace.Reset();
-  application.SendNotification();
-  application.Render( 16 );
-
-  // This will be box culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
-  offset = radius + 0.1f;
+  float offset = radius + 0.1f;
   meshPosition.z = cameraDepth - farPlane - offset;
   meshActor.SetPosition( meshPosition );
 

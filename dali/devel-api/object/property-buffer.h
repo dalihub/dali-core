@@ -52,15 +52,15 @@ class PropertyBuffer;
  *  Property::Map texturedQuadVertexFormat;
  *  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
  *  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
- *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
- *  texturedQuadVertices.SetData(texturedQuadVertexData);
+ *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat );
+ *  texturedQuadVertices.SetData( texturedQuadVertexData, 4 );
  *
  *  // Create indices
  *  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
  *  Property::Map indexFormat;
  *  indexFormat["indices"] = Property::INTEGER;
- *  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
- *  indices.SetData(indexData);
+ *  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+ *  indices.SetData( indexData, 6 );
  *
  *  // Create the geometry object
  *  Geometry texturedQuadGeometry = Geometry::New();
@@ -81,7 +81,7 @@ public:
    * @param[in] size The number of elements in the property buffer
    * @return Handle to a newly allocated PropertyBuffer
    */
-  static PropertyBuffer New( Dali::Property::Map& bufferFormat, std::size_t size );
+  static PropertyBuffer New( Dali::Property::Map& bufferFormat );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -118,22 +118,6 @@ public:
   PropertyBuffer& operator=( const PropertyBuffer& handle );
 
   /**
-   * @brief Set the number of elements in the buffer
-   *
-   * Calling this function is equivalent to setting the property SIZE
-   *
-   * @param[in] size Number of elements to expand or contract the buffer
-   */
-  void SetSize( std::size_t size );
-
-  /**
-   * @brief Get the number of elements in the buffer
-   *
-   * @return Number of elements to expand or contract the buffer
-   */
-  std::size_t GetSize() const;
-
-  /**
    * @brief Update the whole buffer information
    *
    * This function expects a pointer to an array of structures with the same
@@ -152,8 +136,16 @@ public:
    * </pre>
    *
    * @param[in] data A pointer to the data that will be copied to the buffer.
+   * @param[in] size Number of elements to expand or contract the buffer.
    */
-  void SetData( const void* data );
+  void SetData( const void* data, std::size_t size );
+
+  /**
+   * @brief Get the number of elements in the buffer
+   *
+   * @return Number of elements to expand or contract the buffer
+   */
+  std::size_t GetSize() const;
 
 public:
   /**

@@ -118,18 +118,12 @@ void PropertyBuffer::SetFormat( PropertyBuffer::Format* format )
   mDataChanged = true;
 }
 
-void PropertyBuffer::SetData( Dali::Vector<char>* data )
+void PropertyBuffer::SetData( Dali::Vector<char>* data, size_t size )
 {
   mData = data;
-  mDataChanged = true;
-}
-
-void PropertyBuffer::SetSize( unsigned int size )
-{
   mSize = size;
   mDataChanged = true;
 }
-
 
 bool PropertyBuffer::Update( Context& context, bool isIndexBuffer )
 {

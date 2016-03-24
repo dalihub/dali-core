@@ -304,14 +304,14 @@ const PropertyInputImpl* CameraAttachment::GetViewMatrix() const
   return &mViewMatrix;
 }
 
-void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owningNode, int nodeDirtyFlags )
+void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owningNode )
 {
   // if owning node has changes in world position we need to update camera for next 2 frames
-  if( nodeDirtyFlags & TransformFlag )
+  if( owningNode.IsLocalMatrixDirty() )
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if( nodeDirtyFlags & VisibleFlag )
+  if( owningNode.GetDirtyFlags() & VisibleFlag )
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,
@@ -366,17 +366,21 @@ unsigned int CameraAttachment::UpdateViewMatrix( BufferIndex updateBufferIndex, 
         case Dali::Camera::FREE_LOOK:
           {
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          viewMatrix.SetInverseTransformComponents( Vector3::ONE, owningNode.GetWorldOrientation( updateBufferIndex ),
-                                                    owningNode.GetWorldPosition( updateBufferIndex ) );
+          viewMatrix = owningNode.GetWorldMatrix(updateBufferIndex);
+          viewMatrix.Invert();
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }
           // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
           {
+          const Matrix& owningNodeMatrix( owningNode.GetWorldMatrix(updateBufferIndex) );
+          Vector3 position, scale;
+          Quaternion orientation;
+          owningNodeMatrix.GetTransformComponents( position, orientation, scale );
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          LookAt( viewMatrix, owningNode.GetWorldPosition( updateBufferIndex ), mTargetPosition,
-                  owningNode.GetWorldOrientation( updateBufferIndex ).Rotate( Vector3::YAXIS ) );
+          LookAt( viewMatrix, position, mTargetPosition,
+                  orientation.Rotate( Vector3::YAXIS ) );
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }

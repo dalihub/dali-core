@@ -101,84 +101,6 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
   }
 }
 
-inline void UpdateRootNodeTransformValues( Layer& rootNode, int nodeDirtyFlags, BufferIndex updateBufferIndex )
-{
-  // If the transform values need to be reinherited
-  if ( nodeDirtyFlags & TransformFlag )
-  {
-    rootNode.SetWorldPosition( updateBufferIndex, rootNode.GetPosition( updateBufferIndex ) );
-    rootNode.SetWorldOrientation( updateBufferIndex, rootNode.GetOrientation( updateBufferIndex ) );
-    rootNode.SetWorldScale   ( updateBufferIndex, rootNode.GetScale   ( updateBufferIndex ) );
-  }
-  else
-  {
-    // Copy previous value, in case they changed in the previous frame
-    rootNode.CopyPreviousWorldOrientation( updateBufferIndex );
-    rootNode.CopyPreviousWorldScale( updateBufferIndex );
-    rootNode.CopyPreviousWorldPosition( updateBufferIndex );
-  }
-}
-
-/**
- * Updates transform values for the given node if the transform flag is dirty.
-  * Note that this will cause the size dirty flag to be set. This is why we pass
- * the dirty flags in by reference.
- * @param[in]     node The node to update
- * @param[in,out] nodeDirtyFlags A reference to the dirty flags, these may be modified by this function
- * @param[in]     updateBufferIndex The current index to use for this frame
- */
-inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIndex updateBufferIndex )
-{
-  // If the transform values need to be reinherited
-  if( nodeDirtyFlags & TransformFlag )
-  {
-    // With a non-central anchor-point, the world rotation and scale affects the world position.
-    // Therefore the world rotation & scale must be updated before the world position.
-    if( node.IsOrientationInherited() )
-    {
-      node.InheritWorldOrientation( updateBufferIndex );
-    }
-    else
-    {
-      node.SetWorldOrientation( updateBufferIndex, node.GetOrientation( updateBufferIndex ) );
-    }
-
-    if( node.IsScaleInherited() )
-    {
-      node.InheritWorldScale( updateBufferIndex );
-    }
-    else
-    {
-      node.SetWorldScale( updateBufferIndex, node.GetScale( updateBufferIndex ) );
-    }
-
-    node.InheritWorldPosition( updateBufferIndex );
-  }
-  else
-  {
-    // Copy inherited values, if those changed in the previous frame
-    node.CopyPreviousWorldOrientation( updateBufferIndex );
-    node.CopyPreviousWorldScale( updateBufferIndex );
-    node.CopyPreviousWorldPosition( updateBufferIndex );
-  }
-}
-
-inline void UpdateNodeWorldMatrix( Node &node, int nodeDirtyFlags, BufferIndex updateBufferIndex )
-{
-  // If world-matrix needs to be recalculated
-  if ( nodeDirtyFlags & TransformFlag )
-  {
-    node.SetWorldMatrix( updateBufferIndex,
-                         node.GetWorldScale(updateBufferIndex),
-                         node.GetWorldOrientation(updateBufferIndex),
-                         node.GetWorldPosition(updateBufferIndex) );
-  }
-  else
-  {
-    node.CopyPreviousWorldMatrix( updateBufferIndex );
-  }
-}
-
 /**
  * This is called recursively for all children of the root Node
  */
@@ -229,34 +151,10 @@ inline int UpdateNodesAndAttachments( Node& node,
 
   UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
 
-  // Note: nodeDirtyFlags are passed in by reference and may be modified by the following function
-  UpdateNodeTransformValues( node, nodeDirtyFlags, updateBufferIndex );
-
   // Setting STENCIL will override OVERLAY_2D, if that would otherwise have been inherited.
   inheritedDrawMode |= node.GetDrawMode();
 
-  if ( DALI_UNLIKELY( node.HasAttachment() ) )
-  {
-    //Apply constraints to the attachement
-    NodeAttachment& attachment = node.GetAttachment();
-    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
-    if( propertyOwner != NULL )
-    {
-      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
-    }
-
-    //Update the attachment
-    attachment.Update( updateBufferIndex, node, nodeDirtyFlags );
-  }
-  else if( node.IsObserved() || node.GetRendererCount() )
-  {
-    // This node is being used as a property input for an animation, constraint,
-    // camera or bone. Ensure it's matrix is updated
-    UpdateNodeWorldMatrix( node, nodeDirtyFlags, updateBufferIndex );
-  }
-
   node.PrepareRender( updateBufferIndex );
-
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items
@@ -312,8 +210,6 @@ int UpdateNodesAndAttachments( Layer& rootNode,
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
   UpdateRootNodeOpacity( rootNode, nodeDirtyFlags, updateBufferIndex );
-
-  UpdateRootNodeTransformValues( rootNode, nodeDirtyFlags, updateBufferIndex );
 
   DrawMode::Type drawMode( rootNode.GetDrawMode() );
 

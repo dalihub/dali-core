@@ -155,6 +155,18 @@ struct PositionComponentConstraint
   }
 };
 
+struct OrientationComponentConstraint
+{
+  OrientationComponentConstraint(){}
+
+  void operator()( Quaternion& orientation, const PropertyInputContainer& inputs )
+  {
+    const Quaternion& parentOrientation = inputs[0]->GetQuaternion();
+    Vector3 pos, scale;
+    Quaternion rot;
+    orientation = parentOrientation;
+  }
+};
 // OnRelayout
 
 static bool gOnRelayoutCallBackCalled = false;
@@ -1073,7 +1085,7 @@ int UtcDaliActorInheritPosition(void)
   DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
 
-  // first test default, which is INHERIT_PARENT_POSITION
+  // first test default, which is to inherit position
   DALI_TEST_EQUALS( child.GetPositionInheritanceMode(), Dali::INHERIT_PARENT_POSITION, TEST_LOCATION );
   application.SendNotification();
   application.Render(0); // should only really call Update as Render is not required to update scene
@@ -1082,27 +1094,10 @@ int UtcDaliActorInheritPosition(void)
   DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childPosition, TEST_LOCATION );
 
-  // Change inheritance mode to use parent
-  child.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  DALI_TEST_EQUALS( child.GetPositionInheritanceMode(), Dali::USE_PARENT_POSITION, TEST_LOCATION );
-  application.SendNotification();
-  application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
 
-  // Change inheritance mode to use parent + offset
-  child.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  //Change child position
   Vector3 childOffset( -1.0f, 1.0f, 0.0f );
   child.SetPosition( childOffset );
-  DALI_TEST_EQUALS( child.GetPositionInheritanceMode(), Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
-  application.SendNotification();
-  application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childOffset, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childOffset, TEST_LOCATION );
 
   // Change inheritance mode to not inherit
   child.SetPositionInheritanceMode( Dali::DONT_INHERIT_POSITION );
@@ -1728,6 +1723,9 @@ int UtcDaliActorScreenToLocal(void)
   float localX;
   float localY;
 
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_CHECK( actor.ScreenToLocal(localX, localY, 50.0f, 50.0f) );
 
   DALI_TEST_EQUALS(localX, 40.0f, 0.01f, TEST_LOCATION);
@@ -2296,10 +2294,6 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   child.SetScale( childScale );
   parent.Add( child );
 
-  // The actors should not have a world matrix yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), Matrix::IDENTITY, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldMatrix(), Matrix::IDENTITY, 0.001, TEST_LOCATION );
-
   app.SendNotification();
   app.Render(0);
   app.Render();
@@ -2308,12 +2302,12 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Matrix parentMatrix(false);
   parentMatrix.SetTransformComponents(parentScale, parentRotation, parentPosition);
 
-  Vector3 childWorldPosition = parentPosition + parentRotation * parentScale * childPosition;
-  Quaternion childWorldRotation = parentRotation * childRotation;
-  Vector3 childWorldScale = parentScale * childScale;
+  Matrix childMatrix(false);
+  childMatrix.SetTransformComponents( childScale, childRotation, childPosition );
 
+  //Child matrix should be the composition of child and parent
   Matrix childWorldMatrix(false);
-  childWorldMatrix.SetTransformComponents(childWorldScale, childWorldRotation, childWorldPosition);
+  Matrix::Multiply( childWorldMatrix, childMatrix, parentMatrix);
 
   DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), parentMatrix, 0.001, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentWorldMatrix(), childWorldMatrix, 0.001, TEST_LOCATION );
@@ -2347,10 +2341,6 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
   Stage::GetCurrent().Add( child );
 
-  // The actors should not have a world matrix yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), Matrix::IDENTITY, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldMatrix(), Matrix::IDENTITY, 0.001, TEST_LOCATION );
-
   app.SendNotification();
   app.Render(0);
   app.Render();
@@ -2361,6 +2351,40 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
   DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), parentMatrix, 0.001, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentPosition(), parent.GetCurrentPosition(), 0.001, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliActorConstrainedToOrientation(void)
+{
+  TestApplication app;
+  tet_infoline(" UtcDaliActorConstrainedToOrientation");
+
+  Actor parent = Actor::New();
+  parent.SetParentOrigin(ParentOrigin::CENTER);
+  parent.SetAnchorPoint(AnchorPoint::CENTER);
+  Vector3 parentPosition( 10.0f, 20.0f, 30.0f);
+  Radian rotationAngle(Degree(85.0f));
+  Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
+  Vector3 parentScale( 1.0f, 2.0f, 3.0f );
+  parent.SetPosition( parentPosition );
+  parent.SetOrientation( parentRotation );
+  parent.SetScale( parentScale );
+  Stage::GetCurrent().Add( parent );
+
+  Actor child = Actor::New();
+  child.SetParentOrigin(ParentOrigin::CENTER);
+  Constraint posConstraint = Constraint::New<Quaternion>( child, Actor::Property::ORIENTATION, OrientationComponentConstraint() );
+  posConstraint.AddSource( Source( parent, Actor::Property::ORIENTATION ) );
+  posConstraint.Apply();
+
+  Stage::GetCurrent().Add( child );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), parent.GetCurrentOrientation(), 0.001, TEST_LOCATION );
   END_TEST;
 }
 

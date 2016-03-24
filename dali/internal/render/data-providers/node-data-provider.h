@@ -55,12 +55,6 @@ public:
   virtual const Vector4& GetRenderColor( unsigned int bufferId ) const = 0;
 
   /**
-   * @param[in] bufferIndex The buffer index to use
-   * @return the actor size
-   */
-  virtual const Vector3& GetRenderSize( unsigned int bufferIndex ) const = 0;
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()
    */
   virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const = 0;

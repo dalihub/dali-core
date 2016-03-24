@@ -204,10 +204,10 @@ Core::~Core()
   delete mShaderFactory;
   delete mResourceClient;
   delete mResourceManager;
+  delete mDiscardQueue;
   delete mUpdateManager;
   delete mTouchResampler;
   delete mRenderManager;
-  delete mDiscardQueue;
   delete mTextureUploadedQueue;
 }
 
