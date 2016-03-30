@@ -742,7 +742,7 @@ void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value
-    SetPositionInheritanceModeMessage( GetEventThreadServices(), *mNode, mode );
+    SetInheritPositionMessage( GetEventThreadServices(), *mNode, mode == INHERIT_PARENT_POSITION );
   }
 }
 
