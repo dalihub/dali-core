@@ -461,15 +461,15 @@ void Actor::Remove( Actor& child )
 
   if( removed )
   {
-    // Notification for derived classes
-    OnChildRemove( *(removed.Get()) );
-
     // Only put in a relayout request if there is a suitable dependency
     if( RelayoutDependentOnChildren() )
     {
       RelayoutRequest();
     }
   }
+
+  // Notification for derived classes
+  OnChildRemove( child );
 }
 
 void Actor::Unparent()
@@ -742,7 +742,7 @@ void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value
-    SetPositionInheritanceModeMessage( GetEventThreadServices(), *mNode, mode );
+    SetInheritPositionMessage( GetEventThreadServices(), *mNode, mode == INHERIT_PARENT_POSITION );
   }
 }
 

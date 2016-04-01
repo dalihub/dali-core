@@ -185,10 +185,26 @@ public:
    */
   Array& operator=( const Array& other );
 
+  /**
+   * @brief output to stream
+   * @SINCE_1_1.28
+   */
+  friend std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
+
 private:
   struct DALI_INTERNAL Impl; ///< Private data
   Impl* mImpl; ///< Pointer to private data
 };
+
+/**
+ * @brief Convert the values of the property array into a string and append to an output stream.
+ *
+ * @SINCE_1_1.28
+ * @param [in] stream The output stream operator.
+ * @param [in] array The array to insert
+ * @return The output stream operator.
+ */
+DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
 
 /**
  * @}

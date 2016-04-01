@@ -1222,21 +1222,54 @@ int UtcDaliPropertyValueOutputStream(void)
     DALI_TEST_CHECK( stream.str() == "Foo" );
   }
 
-  // Maps and arrays currently not supported, we just check a message is output
   {
     Property::Map map;
+    map.Insert("key", "value");
+    map.Insert("duration", 10);
+    map.Insert("color", Vector4(1.0, 0.5, 1.0, 1.0));
+
     value = Property::Value( map );
     std::ostringstream stream;
-    stream <<  value;
-    DALI_TEST_CHECK( !stream.str().empty() );
+    stream << value;
+    tet_printf("Checking Property::Value is %s", stream.str().c_str());
+    DALI_TEST_CHECK( !stream.str().compare("Map(3) = {key:value, duration:10, color:[1, 0.5, 1, 1]}"));
   }
   {
     Property::Array array;
+    array.PushBack(0);
+    array.PushBack(2);
+    array.PushBack(3);
     value = Property::Value( array );
     std::ostringstream stream;
     stream <<  value;
-    DALI_TEST_CHECK( !stream.str().empty() );
+    tet_printf("Checking Property::Value is %s", stream.str().c_str());
+    DALI_TEST_CHECK( !stream.str().compare("Array(3) = [0, 2, 3]") );
   }
+
+  {
+    Property::Map map;
+    Property::Map map2;
+    Property::Array array;
+
+    map2.Insert("key", "value");
+    map2.Insert("duration", 10);
+    map.Insert("color", Vector4(1.0, 0.5, 1.0, 1.0));
+    map.Insert("timePeriod", map2);
+    array.PushBack(Vector2(1, 0));
+    array.PushBack(Vector2(0, 1));
+    array.PushBack(Vector2(1, 0));
+    array.PushBack(Vector2(0, 0.5));
+    map.Insert("texCoords", array);
+    value = Property::Value( map );
+
+    std::ostringstream stream;
+    stream << value;
+
+    tet_printf("Checking Property::Value is %s", stream.str().c_str());
+
+    DALI_TEST_CHECK( !stream.str().compare("Map(3) = {color:[1, 0.5, 1, 1], timePeriod:Map(2) = {key:value, duration:10}, texCoords:Array(4) = [[1, 0], [0, 1], [1, 0], [0, 0.5]]}"));
+  }
+
 
   END_TEST;
 }

@@ -187,4 +187,20 @@ Property::Map& Property::Map::operator=( const Property::Map& other )
   return *this;
 }
 
+std::ostream& operator<<( std::ostream& stream, const Property::Map& map )
+{
+  stream << "Map(" << map.Count() << ") = {";
+  for( unsigned int i=0; i<map.Count(); ++i )
+  {
+    if( i>0 )
+    {
+      stream << ", ";
+    }
+    stream << map.GetKey(i) << ":" << map.GetValue( i );
+  }
+  stream << "}";
+
+  return stream;
+}
+
 } // namespace Dali

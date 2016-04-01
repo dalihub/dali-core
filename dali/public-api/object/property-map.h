@@ -212,10 +212,27 @@ public:
    */
   Map& operator=( const Map& other );
 
+  /**
+   * @brief output to stream
+   * @SINCE_1_1.28
+   */
+  friend std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
+
 private:
   struct DALI_INTERNAL Impl; ///< Private data
   Impl* mImpl; ///< Pointer to private data
 };
+
+/**
+ * @brief Convert the key/value pairs of the property map into a string and append to an output stream.
+ *
+ * @SINCE_1_1.28
+ * @param [in] stream The output stream operator.
+ * @param [in] map The map to insert
+ * @return The output stream operator.
+ */
+DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
+
 
 /**
  * @}

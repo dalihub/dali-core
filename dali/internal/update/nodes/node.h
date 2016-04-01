@@ -402,19 +402,6 @@ public:
   }
 
   /**
-   * Set the position inheritance mode.
-   * @see Dali::Actor::PositionInheritanceMode
-   * @param[in] mode The new position inheritance mode.
-   */
-  void SetPositionInheritanceMode( PositionInheritanceMode mode )
-  {
-    if( mTransformId != INVALID_TRANSFORM_ID )
-    {
-      mTransformManager->SetInheritPosition(mTransformId, mode == INHERIT_PARENT_POSITION );
-    }
-  }
-
-  /**
    * Retrieve the local orientation of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
    * @return The local orientation.
@@ -877,17 +864,6 @@ inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetAnchorPoint, anchor );
-}
-
-inline void SetPositionInheritanceModeMessage( EventThreadServices& eventThreadServices, const Node& node, PositionInheritanceMode mode )
-{
-  typedef MessageValue1< Node, PositionInheritanceMode > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetPositionInheritanceMode, mode );
 }
 
 inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
