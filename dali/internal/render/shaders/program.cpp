@@ -222,89 +222,29 @@ GLint Program::GetUniformLocation( unsigned int uniformIndex )
   return location;
 }
 
-namespace
+GLint Program::GetSamplerUniformLocation( int32_t uniqueIndex, const std::string& samplerName  )
 {
-/**
- * This struct is used to record the position of a uniform declaration
- * within the fragment shader source code.
- */
-struct LocationPosition
-{
-  GLint uniformLocation; ///< The location of the uniform (used as an identifier)
-  int characterPosition; ///< the position of the uniform declaration
-  LocationPosition( GLint uniformLocation, int characterPosition )
-  : uniformLocation(uniformLocation), characterPosition(characterPosition)
+  // don't accept negative values (should never happen)
+  DALI_ASSERT_DEBUG( 0 <= uniqueIndex );
+  const uint32_t index( uniqueIndex ); // avoid compiler warning of signed vs unsigned comparisons
+
+  GLint location = UNIFORM_NOT_QUERIED;
+
+  if( index < mSamplerUniformLocations.Size() )
   {
+    location = mSamplerUniformLocations[ index ];
   }
-};
-
-bool sortByPosition( LocationPosition a, LocationPosition b )
-{
-  return a.characterPosition < b.characterPosition;
-}
-}
-
-void Program::GetActiveSamplerUniforms()
-{
-  GLint numberOfActiveUniforms = -1;
-  GLint uniformMaxNameLength=-1;
-
-  mGlAbstraction.GetProgramiv( mProgramId, GL_ACTIVE_UNIFORMS, &numberOfActiveUniforms );
-  mGlAbstraction.GetProgramiv( mProgramId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformMaxNameLength );
-
-  std::vector<std::string> samplerNames;
-  char name[uniformMaxNameLength+1]; // Allow for null terminator
-  std::vector< LocationPosition >  samplerUniformLocations;
-
+  else
   {
-    int nameLength = -1;
-    int number = -1;
-    GLenum type = GL_ZERO;
-
-    for( int i=0; i<numberOfActiveUniforms; ++i )
-    {
-      mGlAbstraction.GetActiveUniform( mProgramId, (GLuint)i, uniformMaxNameLength,
-                                       &nameLength, &number, &type, name );
-
-      if( type == GL_SAMPLER_2D ) /// Is there a native sampler type?
-      {
-        GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
-        samplerNames.push_back(name);
-        samplerUniformLocations.push_back(LocationPosition(location, 0u));
-      }
-    }
+    // not in cache yet, make space and initialize value to not queried
+    mSamplerUniformLocations.Resize( index + 1, UNIFORM_NOT_QUERIED );
   }
-
-  if( samplerUniformLocations.size() > 1 )
+  if( location == UNIFORM_NOT_QUERIED )
   {
-    // Now, re-order according to declaration order in the fragment source.
-    std::string fragShader( mProgramData->GetFragmentShader() );
-    for( unsigned int i=0; i<samplerUniformLocations.size(); ++i )
-    {
-      // Better to write own search algorithm that searches for all of
-      // the sampler names simultaneously, ensuring only one iteration
-      // over fragShader.
-      size_t characterPosition = fragShader.find( samplerNames[i] );
-      samplerUniformLocations[i].characterPosition = characterPosition;
-    }
-    std::sort( samplerUniformLocations.begin(), samplerUniformLocations.end(), sortByPosition);
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetUniformLocation( mProgramId, samplerName.c_str() ) );
+    mSamplerUniformLocations[ index ] = location;
   }
-
-  for( unsigned int i=0; i<samplerUniformLocations.size(); ++i )
-  {
-    mSamplerUniformLocations.push_back( samplerUniformLocations[i].uniformLocation );
-  }
-}
-
-bool Program::GetSamplerUniformLocation( unsigned int index, GLint& location  )
-{
-  bool result = false;
-  if( index < mSamplerUniformLocations.size() )
-  {
-    location = mSamplerUniformLocations[index];
-    result = true;
-  }
-  return result;
+  return location;
 }
 
 void Program::SetUniform1i( GLint location, GLint value0 )
@@ -672,8 +612,6 @@ void Program::Load()
     }
   }
 
-  GetActiveSamplerUniforms();
-
   // No longer needed
   FreeShaders();
 }
@@ -804,7 +742,10 @@ void Program::ResetAttribsUniformCache()
     mUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
   }
 
-  mSamplerUniformLocations.clear();
+  for( unsigned int i = 0; i < mSamplerUniformLocations.Size(); ++i )
+  {
+    mSamplerUniformLocations[ i ] = UNIFORM_NOT_QUERIED;
+  }
 
   // reset uniform caches
   mSizeUniformCache.x = mSizeUniformCache.y = mSizeUniformCache.z = 0.f;

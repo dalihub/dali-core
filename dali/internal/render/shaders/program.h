@@ -157,17 +157,11 @@ public:
   GLint GetUniformLocation( unsigned int uniformIndex );
 
   /**
-   * Introspect the newly loaded shader to get the active sampler locations
-   */
-  void GetActiveSamplerUniforms();
-
-  /**
    * Gets the uniform location for a sampler
-   * @param [in] index The index of the active sampler
-   * @param [out] location The location of the requested sampler
-   * @return true if the active sampler was found
+   * @param [in] uniqueIndex of the sampler uniform in local cache
+   * @return the index of the uniform in the GL program
    */
-  bool GetSamplerUniformLocation( unsigned int index, GLint& location );
+  GLint GetSamplerUniformLocation( int32_t uniqueIndex, const std::string& samplerName );
 
   /**
    * Sets the uniform value
@@ -367,15 +361,12 @@ private:  // Data
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader
   GLuint mProgramId;                          ///< GL identifier for program
-  Internal::ShaderDataPtr mProgramData;       ///< Shader program source and binary (when compiled & linked or loaded)
+  Internal::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
-  typedef std::pair< std::string, GLint > NameLocationPair;
-  typedef std::vector< NameLocationPair > Locations;
-
-  Locations mAttributeLocations;      ///< attribute location cache
-  Locations mUniformLocations;        ///< uniform location cache
-  std::vector<GLint> mSamplerUniformLocations; ///< sampler uniform location cache
+  std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache
+  std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
+  Dali::Vector< GLint > mSamplerUniformLocations; ///< sampler uniform location cache
 
   // uniform value caching
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
