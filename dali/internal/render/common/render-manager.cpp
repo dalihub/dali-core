@@ -329,14 +329,9 @@ void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuff
   propertyBuffer->SetFormat( format );
 }
 
-void RenderManager::SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data)
+void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
 {
-  propertyBuffer->SetData( data );
-}
-
-void RenderManager::SetPropertyBufferSize(Render::PropertyBuffer* propertyBuffer, size_t size )
-{
-  propertyBuffer->SetSize( size );
+  propertyBuffer->SetData( data, size );
 }
 
 void RenderManager::AddGeometry( RenderGeometry* renderGeometry )

@@ -337,7 +337,7 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
   {
     // Build a picking ray in the world reference system.
     // ray starts from the camera world position
-    rayOrigin = mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    rayOrigin = mNode->GetWorldMatrix(0).GetTranslation();
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.

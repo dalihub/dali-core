@@ -244,7 +244,15 @@ public:
   /**
    * @copydoc NodeAttachment::Update
    */
-  virtual void Update( BufferIndex updateBufferIndex, const Node& owningNode, int nodeDirtyFlags );
+  virtual void Update( BufferIndex updateBufferIndex, const Node& owningNode, int nodeDirtyFlags ){};
+
+  /**
+   * Updates view and projection matrices.
+   * Called by the render task using the camera attachment
+   * @param[in] updateBufferIndex The buffer to read from.
+   * @param[in] owningNode The node that owns the camera
+   */
+  void Update( BufferIndex updateBufferIndex, const Node& owningNode );
 
   /**
    * @return true if the view matrix of camera is updated this or the previous frame

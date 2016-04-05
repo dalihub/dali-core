@@ -74,8 +74,9 @@ public:
    *
    * This function takes ownership of the pointer
    * @param[in] data The new data of the PropertyBuffer
+   * @param[in] size The new size of the buffer
    */
-  void SetData( Dali::Vector<char>* data );
+  void SetData( Dali::Vector<char>* data, size_t size );
 
   /**
    * @brief Set the number of elements

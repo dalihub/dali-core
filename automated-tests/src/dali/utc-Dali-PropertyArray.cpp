@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include <stdlib.h>
+#include <string>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
@@ -216,6 +217,41 @@ int UtcDaliPropertyArrayResize(void)
 
   array.Resize(5);
   DALI_TEST_CHECK( array.Count() == 5 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayOstream01(void)
+{
+  std::ostringstream oss;
+
+  Property::Array array;
+  array.PushBack( 0 );
+  array.PushBack( 1 );
+  array.PushBack( 2 );
+
+  oss << array;
+  DALI_TEST_EQUALS( oss.str().compare("Array(3) = [0, 1, 2]"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayOstream02(void)
+{
+  std::ostringstream oss;
+
+  Property::Array array1;
+  array1.PushBack( 0 );
+  array1.PushBack( 1 );
+  array1.PushBack( 2 );
+
+  Property::Array array2;
+  array2.PushBack(array1);
+  array2.PushBack( 1 );
+  array2.PushBack( 2 );
+
+  oss << array2;
+  DALI_TEST_EQUALS( oss.str().compare("Array(3) = [Array(3) = [0, 1, 2], 1, 2]"), 0, TEST_LOCATION );
 
   END_TEST;
 }

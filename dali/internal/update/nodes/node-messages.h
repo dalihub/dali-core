@@ -222,6 +222,164 @@ private:
   float mParam;
 };
 
+
+template <typename P>
+class NodeTransformPropertyMessage : public NodePropertyMessageBase
+{
+public:
+
+  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, const P& );
+
+  /**
+   * Create a message.
+   * @note The node is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
+   * @param[in] node The node.
+   * @param[in] property The property to bake.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the property.
+   */
+  static void Send( EventThreadServices& eventThreadServices,
+                    const Node* node,
+                    const TransformManagerPropertyHandler<P>* property,
+                    MemberFunction member,
+                    const P& value )
+  {
+    // Reserve some memory inside the message queue
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformPropertyMessage ) );
+
+    // Construct message in the message queue memory; note that delete should not be called on the return value
+    new (slot) NodeTransformPropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~NodeTransformPropertyMessage()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex updateBufferIndex )
+  {
+    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+  }
+
+private:
+
+  /**
+   * Create a message.
+   * @note The node is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] updateManager The update-manager.
+   * @param[in] node The node.
+   * @param[in] property The property to bake.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the property.
+   */
+  NodeTransformPropertyMessage( UpdateManager& updateManager,
+                       const Node* node,
+                       const TransformManagerPropertyHandler<P>* property,
+                       MemberFunction member,
+                       const P& value )
+  : NodePropertyMessageBase( updateManager ),
+    mNode( const_cast< Node* >( node ) ),
+    mProperty( const_cast< TransformManagerPropertyHandler<P>* >( property ) ),
+    mMemberFunction( member ),
+    mParam( value )
+  {
+  }
+
+private:
+
+  Node* mNode;
+  TransformManagerPropertyHandler<P>* mProperty;
+  MemberFunction mMemberFunction;
+  P mParam;
+};
+
+
+template <typename P>
+class NodeTransformComponentMessage : public NodePropertyMessageBase
+{
+public:
+
+  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, float );
+
+  /**
+   * Send a message.
+   * @note The node is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
+   * @param[in] node The node.
+   * @param[in] property The property to bake.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the X,Y,Z or W component.
+   */
+  static void Send( EventThreadServices& eventThreadServices,
+                    const Node* node,
+                    const TransformManagerPropertyHandler<P>* property,
+                    MemberFunction member,
+                    float value )
+  {
+    // Reserve some memory inside the message queue
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformComponentMessage ) );
+
+    // Construct message in the message queue memory; note that delete should not be called on the return value
+    new (slot) NodeTransformComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~NodeTransformComponentMessage()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex updateBufferIndex )
+  {
+    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+  }
+
+private:
+
+  /**
+   * Create a message.
+   * @note The node is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] updateManager The update-manager.
+   * @param[in] node The node.
+   * @param[in] property The property to bake.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the X,Y,Z or W component.
+  */
+  NodeTransformComponentMessage( UpdateManager& updateManager,
+                                const Node* node,
+                                const TransformManagerPropertyHandler<P>* property,
+                                MemberFunction member,
+                                float value )
+  : NodePropertyMessageBase( updateManager ),
+    mNode( const_cast< Node* >( node ) ),
+    mProperty( const_cast< TransformManagerPropertyHandler<P>* >( property ) ),
+    mMemberFunction( member ),
+    mParam( value )
+  {
+  }
+
+private:
+
+  Node* mNode;
+  TransformManagerPropertyHandler<P>* mProperty;
+  MemberFunction mMemberFunction;
+  float mParam;
+};
+
 } // namespace SceneGraph
 
 } // namespace Internal

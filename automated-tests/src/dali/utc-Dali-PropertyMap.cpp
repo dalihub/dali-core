@@ -16,7 +16,7 @@
  */
 
 #include <iostream>
-
+#include <string>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
@@ -270,6 +270,44 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK( map[ "world"].Get< int >() == 4 );
   DALI_TEST_CHECK( map[ "foo"].Get< int >() == 5 );
   DALI_TEST_CHECK( map[ "bar"].Get< int >() == 6 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapOstream01(void)
+{
+  Property::Map map;
+
+  map.Insert("duration", 5.0f);
+  map.Insert("delay", 1.0f);
+  map.Insert("value", 100);
+
+  std::ostringstream oss;
+  oss << map;
+
+  tet_printf("Testing ouput of map: %s\n", oss.str().c_str());
+
+  DALI_TEST_EQUALS( oss.str().compare("Map(3) = {duration:5, delay:1, value:100}"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliPropertyMapOstream02(void)
+{
+  Property::Map map, map2;
+
+  map2.Insert("duration", 5.0f);
+  map2.Insert("delay", 1.0f);
+  map.Insert("timePeriod", map2);
+  map.Insert("value", 100);
+
+  std::ostringstream oss;
+  oss << map;
+
+  tet_printf("Testing ouput of map: %s\n", oss.str().c_str());
+
+  DALI_TEST_EQUALS( oss.str().compare("Map(2) = {timePeriod:Map(2) = {duration:5, delay:1}, value:100}"), 0, TEST_LOCATION );
 
   END_TEST;
 }

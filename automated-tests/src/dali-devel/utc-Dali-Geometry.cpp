@@ -57,8 +57,8 @@ PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::stri
   vertexFormat[aPosition] = Property::VECTOR2;
   vertexFormat[aTexCoord] = Property::VECTOR2;
 
-  PropertyBuffer vertexData = PropertyBuffer::New( vertexFormat, 4 );
-  vertexData.SetData(texturedQuadVertexData);
+  PropertyBuffer vertexData = PropertyBuffer::New( vertexFormat );
+  vertexData.SetData( texturedQuadVertexData, 4 );
 
   return vertexData;
 }
@@ -70,8 +70,8 @@ PropertyBuffer CreateIndexBuffer()
 
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, numberElements );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, numberElements );
 
   return indices;
 }

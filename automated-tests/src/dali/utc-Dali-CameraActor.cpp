@@ -1207,6 +1207,9 @@ int UtcDaliCameraActorDefaultProperties(void)
   tet_infoline( "Testing Dali::CameraActor DefaultProperties" );
 
   CameraActor actor = CameraActor::New();
+  Stage stage = Stage::GetCurrent();
+  stage.Add(actor);
+  stage.GetRenderTaskList().GetTask(0).SetCameraActor( actor );
 
   actor.SetAspectRatio( TEST_ASPECT_RATIO );
   Stage::GetCurrent().Add( actor );
@@ -1469,6 +1472,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   stage.Add( target );
   stage.Add( freeLookCameraActor );
   stage.Add( lookAtCameraActor );
+  stage.GetRenderTaskList().GetTask(0).SetCameraActor( freeLookCameraActor );
 
   // Create an arbitrary vector
   for( float x=-1.0f; x<=1.0f; x+=0.1f )
@@ -1489,20 +1493,17 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
         application.SendNotification();
         application.Render();
         Matrix freeLookViewMatrix;
-        Matrix lookAtViewMatrix;
         freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( freeLookViewMatrix );
-        lookAtCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( lookAtViewMatrix );
 
         Matrix freeLookWorld = freeLookCameraActor.GetCurrentWorldMatrix();
 
         Matrix freeLookTest( false );
         Matrix::Multiply( freeLookTest, freeLookViewMatrix, freeLookWorld );
         DALI_TEST_EQUALS( freeLookTest, Matrix::IDENTITY, 0.01f, TEST_LOCATION );
-
-        DALI_TEST_EQUALS( freeLookViewMatrix, lookAtViewMatrix, 0.01, TEST_LOCATION );
       }
     }
   }
+
   END_TEST;
 }
 
@@ -1526,6 +1527,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
   Actor cameraAnchor = Actor::New();
   cameraAnchor.Add( freeLookCameraActor );
   stage.Add( cameraAnchor );
+  stage.GetRenderTaskList().GetTask(0).SetCameraActor( freeLookCameraActor );
 
   for( float angle = 1.0f; angle <= 180.0f; angle += 1.0f )
   {
