@@ -136,9 +136,9 @@ const int GEOMETRY_MEMORY_SIZE(
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
   sizeof( Internal::Render::PropertyBuffer ) );
-const int MATERIAL_MEMORY_SIZE(
-  sizeof( Internal::Material ) +
-  sizeof( Internal::SceneGraph::Material ) );
+const int TEXTURE_SET_MEMORY_SIZE(
+  sizeof( Internal::TextureSet ) +
+  sizeof( Internal::SceneGraph::TextureSet ) );
 const int SAMPLER_MEMORY_SIZE(
   sizeof( Internal::Sampler ) +
   sizeof( Internal::Render::Sampler ) );

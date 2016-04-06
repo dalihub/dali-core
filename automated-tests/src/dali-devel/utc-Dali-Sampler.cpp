@@ -121,11 +121,14 @@ int UtcSamplerSetFilterMode(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   Sampler sampler = Sampler::New();
 
-  Material material = CreateMaterial();
-  material.AddTexture( image, "sTexture", sampler );
+  TextureSet textureSet = CreateTextureSet();
+  textureSet.SetImage( 0u, image );
+  textureSet.SetSampler( 0u, sampler );
 
+  Shader shader = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetParentOrigin( ParentOrigin::CENTER );
@@ -248,12 +251,16 @@ int UtcSamplerSetWrapMode(void)
   TestApplication application;
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  Material material = CreateMaterial();
+  TextureSet textureSet = CreateTextureSet();
   Sampler sampler = Sampler::New();
-  material.AddTexture( image, "sTexture", sampler );
+  textureSet.SetImage( 0u, image );
+  textureSet.SetSampler( 0u, sampler );
 
+  Shader shader = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetParentOrigin( ParentOrigin::CENTER );

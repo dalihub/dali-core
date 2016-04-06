@@ -56,7 +56,7 @@
 #include <dali/internal/update/queue/update-message-queue.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/touch/touch-resampler.h>
@@ -152,7 +152,7 @@ struct UpdateManager::Impl
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
     geometries( sceneGraphBuffers, discardQueue ),
-    materials( sceneGraphBuffers, discardQueue ),
+    textureSets( sceneGraphBuffers, discardQueue ),
     messageQueue( renderController, sceneGraphBuffers ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
@@ -166,7 +166,7 @@ struct UpdateManager::Impl
 
     renderers.SetSceneController( *sceneController );
     geometries.SetSceneController( *sceneController );
-    materials.SetSceneController( *sceneController );
+    textureSets.SetSceneController( *sceneController );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -253,7 +253,7 @@ struct UpdateManager::Impl
 
   ObjectOwnerContainer<Renderer>      renderers;
   ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
-  ObjectOwnerContainer<Material>      materials;                     ///< A container of materials
+  ObjectOwnerContainer<TextureSet>    textureSets;                     ///< A container of texture sets
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -507,9 +507,9 @@ ObjectOwnerContainer<Renderer>& UpdateManager::GetRendererOwner()
 }
 
 
-ObjectOwnerContainer<Material>& UpdateManager::GetMaterialOwner()
+ObjectOwnerContainer<TextureSet>& UpdateManager::GetTexturesOwner()
 {
-  return mImpl->materials;
+  return mImpl->textureSets;
 }
 
 void UpdateManager::AddShader( Shader* shader )
@@ -688,7 +688,7 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     (*iter)->ResetToBaseValues( bufferIndex );
   }
 
-  mImpl->materials.ResetToBaseValues( bufferIndex );
+  mImpl->textureSets.ResetToBaseValues( bufferIndex );
   mImpl->geometries.ResetToBaseValues( bufferIndex );
   mImpl->renderers.ResetToBaseValues( bufferIndex );
 
@@ -809,16 +809,16 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
   }
 }
 
-void UpdateManager::PrepareMaterials( BufferIndex bufferIndex )
+void UpdateManager::PrepareTextureSets( BufferIndex bufferIndex )
 {
-  ObjectOwnerContainer<Material>::Iterator iter = mImpl->materials.GetObjectContainer().Begin();
-  const ObjectOwnerContainer<Material>::Iterator end = mImpl->materials.GetObjectContainer().End();
+  ObjectOwnerContainer<TextureSet>::Iterator iter = mImpl->textureSets.GetObjectContainer().Begin();
+  const ObjectOwnerContainer<TextureSet>::Iterator end = mImpl->textureSets.GetObjectContainer().End();
   for( ; iter != end; ++iter )
   {
     //Apply constraints
     ConstrainPropertyOwner( *(*iter), bufferIndex );
 
-    //Prepare material
+    //Prepare texture set
     (*iter)->Prepare( mImpl->resourceManager );
   }
 }
@@ -944,8 +944,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Constraint custom objects
     ConstrainCustomObjects( bufferIndex );
 
-    //Prepare materials and apply constraints to them
-    PrepareMaterials( bufferIndex );
+    //Prepare texture sets and apply constraints to them
+    PrepareTextureSets( bufferIndex );
 
     //Clear the lists of renderable-attachments from the previous update
     for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )

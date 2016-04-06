@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_MATERIAL_H
-#define DALI_INTERNAL_MATERIAL_H
+#ifndef DALI_INTERNAL_TEXTURE_SET_H
+#define DALI_INTERNAL_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/devel-api/rendering/material.h> // Dali::Material
+#include <dali/devel-api/rendering/texture-set.h> // Dali::TextureSet
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -38,92 +38,48 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class Material;
+class TextureSet;
 }
 
 
-class Material;
-typedef IntrusivePtr<Material> MaterialPtr;
+class TextureSet;
+typedef IntrusivePtr<TextureSet> TextureSetPtr;
 
 /**
- * Material is an object that connects a Shader with Samplers and can be used
- * to shade a Geometry.
+ * TextureSet is an object that holds all the textures used by a renderer
  */
-class Material : public Object, public Connectable
+class TextureSet : public Object, public Connectable
 {
 public:
 
   /**
-   * @copydoc Dali::Material::New()
+   * @copydoc Dali::TextureSet::New()
    */
-  static MaterialPtr New();
+  static TextureSetPtr New();
 
   /**
-   * @copydoc Dali::Material::SetShader()
+   * @copydoc Dali::TextureSet::SetImage()
    */
-  void SetShader( Shader& shader );
+  void SetImage( size_t index, ImagePtr image );
 
   /**
-   * @copydoc Dali::Material::GetShader()
+   * @copydoc Dali::TextureSet::SetSampler()
    */
-  Shader* GetShader() const;
+  void SetSampler( size_t index, SamplerPtr sampler );
 
   /**
-   * @copydoc Dali::Material::AddTexture()
+   * @brief Get the image at position "index" in the texture set
+   * @param[in] index The index of the image
+   * @return A pointer to the image at position "index"
    */
-  size_t AddTexture( ImagePtr image, const std::string& uniformName, SamplerPtr sampler );
-
-  /**
-   * @copydoc Dali::Material::RemoveTexture()
-   */
-  void RemoveTexture( size_t index );
-
-  /**
-   * @copydoc Dali::Material::SetTextureImage()
-   */
-  void SetTextureImage( size_t index, Image* image );
-
-  /**
-   * @copydoc Dali::Material::SetTextureSampler()
-   */
-  void SetTextureSampler( size_t index, Sampler* sampler );
-
-  /**
-   * @copydoc Dali::Material::GetTextureSampler()
-   */
-  Sampler* GetTextureSampler( size_t index ) const;
-
-  /**
-   * @copydoc Dali::Material::SetTextureUniformName()
-   */
-  void SetTextureUniformName( size_t index, const std::string& uniformName );
-
-  /**
-   * @copydoc Dali::Material::GetTextureIndex()
-   */
-  int GetTextureIndex( const std::string& uniformName ) const;
-
-  /**
-   * @copydoc Dali::Material::GetTexture()
-   */
-  Image* GetTexture( const std::string& uniformName ) const;
-
-  /**
-   * @copydoc Dali::Material::GetTexture()
-   */
-  Image* GetTexture( size_t index ) const;
-
-  /**
-   * @copydoc Dali::Material::GetNumberOfTextures()
-   */
-  size_t GetNumberOfTextures() const;
+  ImagePtr GetImage( size_t index );
 
  /**
-   * @brief Get the material scene object
+   * @brief Get the TextureSet scene object
    *
-   * @return the material scene object
+   * @return the texture set scene object
    */
-  const SceneGraph::Material* GetMaterialSceneObject() const;
+  const SceneGraph::TextureSet* GetTextureSetSceneObject() const;
 
 public: // Default property extensions from Object
 
@@ -228,23 +184,15 @@ private: // implementation
   struct Texture
   {
     Texture()
-    :mUniformName(""),
-     mImage(NULL),
-     mSampler( NULL )
+    :image(NULL),
+     sampler( NULL )
     {}
 
-    Texture( const std::string& name, ImagePtr image, SamplerPtr sampler )
-    :mUniformName(name),
-     mImage( image ),
-     mSampler( sampler )
-    {}
-
-    std::string mUniformName;
-    ImagePtr    mImage;
-    SamplerPtr  mSampler;
+    ImagePtr    image;
+    SamplerPtr  sampler;
   };
 
-  Material();
+  TextureSet();
 
   /**
    * Second stage initialization
@@ -255,18 +203,16 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Material();
+  virtual ~TextureSet();
 
 private: // unimplemented methods
-  Material( const Material& );
-  Material& operator=( const Material& );
+  TextureSet( const TextureSet& );
+  TextureSet& operator=( const TextureSet& );
 
 private: // Data
 
-  SceneGraph::Material* mSceneObject;
-  IntrusivePtr<Shader> mShader; ///< Connector that holds the shader used by this material
-  std::vector<Material::Texture> mTextures; ///<Vector of textures used by this material
-
+  SceneGraph::TextureSet* mSceneObject;
+  std::vector<Texture> mTextures;
   bool mOnStage;
 
 };
@@ -274,24 +220,24 @@ private: // Data
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Material& GetImplementation( Dali::Material& handle )
+inline Internal::TextureSet& GetImplementation( Dali::TextureSet& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "TextureSet handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::Material&>(object);
+  return static_cast<Internal::TextureSet&>(object);
 }
 
-inline const Internal::Material& GetImplementation( const Dali::Material& handle )
+inline const Internal::TextureSet& GetImplementation( const Dali::TextureSet& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "TextureSet handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::Material&>(object);
+  return static_cast<const Internal::TextureSet&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_MATERIAL_H
+#endif // DALI_INTERNAL_TEXTURE_SET_H

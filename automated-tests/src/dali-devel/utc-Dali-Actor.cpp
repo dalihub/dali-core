@@ -35,8 +35,8 @@ int UtcDaliActorAddRendererP(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   actor.AddRenderer( renderer );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
@@ -87,8 +87,8 @@ int UtcDaliActorAddRendererOnStage(void)
   application.Render(0);
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   application.SendNotification();
   application.Render(0);
@@ -116,8 +116,8 @@ int UtcDaliActorRemoveRendererP(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   actor.AddRenderer( renderer );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );

@@ -59,9 +59,9 @@ DALI_IMPORT_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of im
 DALI_IMPORT_API extern const int RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
 DALI_IMPORT_API extern const int GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
 DALI_IMPORT_API extern const int PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
-DALI_IMPORT_API extern const int MATERIAL_MEMORY_SIZE;     ///< Total size of material and associated internal objects
-DALI_IMPORT_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of material and associated internal objects
-DALI_IMPORT_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of material and associated internal objects
+DALI_IMPORT_API extern const int TEXTURE_SET_MEMORY_SIZE;     ///< Total size of TextureSet and associated internal objects
+DALI_IMPORT_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of Sampler and associated internal objects
+DALI_IMPORT_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of shader and associated internal objects
 } // namespace Profiling
 
 } // namespace Integration

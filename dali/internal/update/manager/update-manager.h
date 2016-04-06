@@ -78,7 +78,7 @@ class RenderQueue;
 class TextureCache;
 class Geometry;
 class PropertyBuffer;
-class Material;
+class TextureSet;
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes and attachments and
@@ -250,13 +250,19 @@ public:
    */
   ObjectOwnerContainer< Geometry >& GetGeometryOwner();
 
-  ObjectOwnerContainer< Renderer >& GetRendererOwner();
   /**
-   * @brief Get the material owner
+   * @brief Get the renderer owner
    *
-   * @return The material owner
+   * @return The renderer owner
    */
-  ObjectOwnerContainer< Material >& GetMaterialOwner();
+  ObjectOwnerContainer< Renderer >& GetRendererOwner();
+
+  /**
+   * @brief Get the texture set owner
+   *
+   * @return The texture set owner
+   */
+  ObjectOwnerContainer< TextureSet >& GetTexturesOwner();
 
   /**
    * @brief Get the property buffer owner
@@ -528,9 +534,9 @@ private:
   void ProcessPropertyNotifications( BufferIndex bufferIndex );
 
   /**
-   * Prepare materials for rendering
+   * Prepare textures for rendering
    */
-  void PrepareMaterials( BufferIndex bufferIndex );
+  void PrepareTextureSets( BufferIndex bufferIndex );
 
   /**
    * Pass shader binaries queued here on to event thread.

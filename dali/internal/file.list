@@ -80,7 +80,7 @@ internal_src_files = \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \
   $(internal_src_dir)/event/rendering/geometry-impl.cpp \
-  $(internal_src_dir)/event/rendering/material-impl.cpp \
+  $(internal_src_dir)/event/rendering/texture-set-impl.cpp \
   $(internal_src_dir)/event/rendering/renderer-impl.cpp \
   $(internal_src_dir)/event/rendering/sampler-impl.cpp \
   $(internal_src_dir)/event/rendering/shader-impl.cpp \
@@ -155,6 +155,6 @@ internal_src_files = \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
-  $(internal_src_dir)/update/rendering/scene-graph-material.cpp \
+  $(internal_src_dir)/update/rendering/scene-graph-texture-set.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-renderer.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp

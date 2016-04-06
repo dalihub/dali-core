@@ -22,7 +22,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -115,8 +115,9 @@ Renderer* Renderer::New()
 Renderer::Renderer()
 :mSceneController(0),
  mRenderer(NULL),
- mMaterial(NULL),
+ mTextureSet(NULL),
  mGeometry(NULL),
+ mShader(NULL),
  mBlendColor(NULL),
  mBlendBitmask(0u),
  mFaceCullingMode( Dali::Renderer::NONE ),
@@ -137,16 +138,22 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-  if (mMaterial)
+  if (mTextureSet)
   {
-    mMaterial->RemoveConnectionObserver(*this);
-    mMaterial=NULL;
+    mTextureSet->RemoveConnectionObserver(*this);
+    mTextureSet=NULL;
   }
   if (mGeometry)
   {
     mGeometry->RemoveConnectionObserver(*this);
     mGeometry=NULL;
   }
+  if( mShader )
+  {
+    mShader->RemoveConnectionObserver(*this);
+    mShader=NULL;
+  }
+
 }
 
 void Renderer::operator delete( void* ptr )
@@ -161,16 +168,23 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   mFinishedResourceAcquisition = false;
 
   // Can only be considered ready when all the scene graph objects are connected to the renderer
-  if( ( mGeometry ) && ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
-      ( mMaterial ) && ( mMaterial->GetShader() != NULL ) )
+  if( ( mGeometry ) && ( mGeometry->GetVertexBuffers().Count() > 0 ) && ( mShader ) )
   {
-    mMaterial->GetResourcesStatus( mResourcesReady, mFinishedResourceAcquisition );
+    if( mTextureSet )
+    {
+      mTextureSet->GetResourcesStatus( mResourcesReady, mFinishedResourceAcquisition );
+    }
+    else
+    {
+      mResourcesReady = true;
+      mFinishedResourceAcquisition = true;
+    }
   }
 
   if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
-    DALI_ASSERT_DEBUG( mGeometry != NULL && "No geometry available in DoPrepareRender()" );
-    DALI_ASSERT_DEBUG( mMaterial != NULL && "No geometry available in DoPrepareRender()" );
+    DALI_ASSERT_DEBUG( mGeometry != NULL && "No geometry available in PrepareRender()" );
+    DALI_ASSERT_DEBUG( mShader != NULL && "No shader available in PrepareRender()" );
 
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
@@ -180,8 +194,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
       AddMappings( localMap, rendererUniformMap );
 
-      AddMappings( localMap, mMaterial->GetUniformMap() );
-      AddMappings( localMap, mMaterial->GetShader()->GetUniformMap() );
+      if( mTextureSet )
+      {
+        AddMappings( localMap, mTextureSet->GetUniformMap() );
+      }
+
+      AddMappings( localMap, mShader->GetUniformMap() );
       AddMappings( localMap, mGeometry->GetUniformMap() );
 
     }
@@ -264,18 +282,37 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
 }
 
-void Renderer::SetMaterial( BufferIndex bufferIndex, Material* material)
+void Renderer::SetTextures( TextureSet* textureSet )
 {
-  DALI_ASSERT_DEBUG( material != NULL && "Material pointer is NULL" );
+  DALI_ASSERT_DEBUG( textureSet != NULL && "Texture set pointer is NULL" );
 
-  mMaterial = material;
-  mMaterial->AddConnectionObserver( *this );
+  if( mTextureSet )
+  {
+    mTextureSet->RemoveConnectionObserver(*this);
+  }
+
+  mTextureSet = textureSet;
+  mTextureSet->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
-void Renderer::SetGeometry( BufferIndex bufferIndex, Geometry* geometry)
+void Renderer::SetShader( Shader* shader )
+{
+  DALI_ASSERT_DEBUG( shader != NULL && "Shader pointer is NULL" );
+
+  if( mShader )
+  {
+    mShader->RemoveConnectionObserver(*this);
+  }
+
+  mShader = shader;
+  mShader->AddConnectionObserver( *this );
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mResendFlag |= RESEND_DATA_PROVIDER;
+}
+
+void Renderer::SetGeometry( Geometry* geometry )
 {
   DALI_ASSERT_DEBUG( geometry != NULL && "Geometry pointer is NULL");
   if( mGeometry)
@@ -397,15 +434,17 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
   RenderDataProvider* dataProvider = new RenderDataProvider();
 
   dataProvider->mUniformMapDataProvider = this;
-  dataProvider->mShader = mMaterial->GetShader();
+  dataProvider->mShader = mShader;
 
-  size_t textureCount( mMaterial->GetTextureCount() );
-  dataProvider->mTextures.resize( textureCount );
-  for( unsigned int i(0); i<textureCount; ++i )
+  if( mTextureSet )
   {
-    dataProvider->mTextures[i] = Render::Texture( mMaterial->GetTextureUniformName(i),
-                                                  mMaterial->GetTextureId(i),
-                                                  mMaterial->GetTextureSampler(i));
+    size_t textureCount( mTextureSet->GetTextureCount() );
+    dataProvider->mTextures.resize( textureCount );
+    for( unsigned int i(0); i<textureCount; ++i )
+    {
+      dataProvider->mTextures[i] = Render::Texture( mTextureSet->GetTextureId(i),
+                                                    mTextureSet->GetTextureSampler(i));
+    }
   }
 
   return dataProvider;
@@ -431,43 +470,42 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 {
   Renderer::Opacity opacity = Renderer::OPAQUE;
 
-  if( mMaterial )
+  switch( mBlendingMode )
   {
-    switch( mBlendingMode )
+    case BlendingMode::ON: // If the renderer should always be use blending
     {
-      case BlendingMode::ON: // If the renderer should always be use blending
+      opacity = Renderer::TRANSLUCENT;
+      break;
+    }
+    case BlendingMode::AUTO:
+    {
+      bool shaderRequiresBlending( mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) );
+      if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
         opacity = Renderer::TRANSLUCENT;
-        break;
       }
-      case BlendingMode::AUTO:
+      else // renderer should determine opacity using the actor color
       {
-        if(mMaterial->IsTranslucent() ) // If the renderer should determine opacity using the material
+        float alpha = node.GetWorldColor( updateBufferIndex ).a;
+        if( alpha <= FULLY_TRANSPARENT )
         {
-          opacity = Renderer::TRANSLUCENT;
+          opacity = TRANSPARENT;
         }
-        else // renderer should determine opacity using the actor color
+        else if( alpha <= FULLY_OPAQUE )
         {
-          float alpha = node.GetWorldColor( updateBufferIndex ).a;
-          if( alpha <= FULLY_TRANSPARENT )
-          {
-            opacity = TRANSPARENT;
-          }
-          else if( alpha <= FULLY_OPAQUE )
-          {
-            opacity = TRANSLUCENT;
-          }
+          opacity = TRANSLUCENT;
         }
-        break;
       }
-      case BlendingMode::OFF: // the renderer should never use blending
-      default:
-      {
-        opacity = Renderer::OPAQUE;
-        break;
-      }
+      break;
+    }
+    case BlendingMode::OFF: // the renderer should never use blending
+    default:
+    {
+      opacity = Renderer::OPAQUE;
+      break;
     }
   }
+
 
   return opacity;
 }
@@ -499,9 +537,13 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
   {
     mGeometry = NULL;
   }
-  else if( reinterpret_cast<PropertyOwner*>(mMaterial) == &owner )
+  else if( reinterpret_cast<PropertyOwner*>(mTextureSet) == &owner )
   {
-    mMaterial = NULL;
+    mTextureSet = NULL;
+  }
+  else if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
+  {
+    mShader = NULL;
   }
 }
 

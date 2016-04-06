@@ -20,15 +20,16 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/sampler.h>
 #include <dali/devel-api/rendering/renderer.h>
 
 namespace Dali
 {
 
-Material CreateMaterial();
-Material CreateMaterial(Image image);
+Shader CreateShader();
+TextureSet CreateTextureSet();
+TextureSet CreateTextureSet( Image image );
 Geometry CreateQuadGeometry();
 Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData );
 PropertyBuffer CreatePropertyBuffer();

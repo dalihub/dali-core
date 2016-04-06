@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/effects/shader-declarations.h>
@@ -228,7 +228,7 @@ private:
   void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
 
   /**
-   * Bind the material textures in the samplers and setup the samplers
+   * Bind the textures and setup the samplers
    * @param[in] textureCache The texture cache
    * @param[in] program The shader program
    * @return False if create or bind failed, true if success.

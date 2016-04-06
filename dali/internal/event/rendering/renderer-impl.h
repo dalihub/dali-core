@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
+#include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 
 namespace Dali
@@ -43,7 +43,7 @@ class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
 
 /**
- * Renderer is an object that can be used to show content by combining a Geometry with a material.
+ * Renderer is an object that can be used to show content by combining a Geometry with a shader and textures.
  */
 class Renderer : public Object
 {
@@ -66,14 +66,24 @@ public:
   Geometry* GetGeometry() const;
 
   /**
-   * @copydoc Dali::Renderer::SetMaterial()
+   * @copydoc Dali::Renderer::SetTextures()
    */
-  void SetMaterial( Material& material );
+  void SetTextures( TextureSet& textureSet );
 
   /**
-   * @copydoc Dali::Renderer::GetMaterial()
+   * @copydoc Dali::Renderer::GetTextures()
    */
-  Material* GetMaterial() const;
+  TextureSet* GetTextures() const;
+
+  /**
+   * @copydoc Dali::Renderer::SetShader()
+   */
+  void SetShader( Shader& shader );
+
+  /**
+   * @copydoc Dali::Renderer::GetShader()
+   */
+  Shader* GetShader() const;
 
   /**
    * @copydoc Dali::Renderer::SetDepthIndex()
@@ -285,7 +295,8 @@ private: // data
   SceneGraph::Renderer* mSceneObject;
   Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
-  ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
+  ObjectConnector<TextureSet> mTextureSetConnector; ///< Connector that holds the texture set used by this renderer
+  IntrusivePtr<Shader> mShader;                 ///< Connector that holds the shader used by this renderer
 
   int mDepthIndex;
   int mOnStageCount;

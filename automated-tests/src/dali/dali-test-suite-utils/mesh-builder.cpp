@@ -19,22 +19,20 @@
 namespace Dali
 {
 
-Material CreateMaterial()
+Shader CreateShader()
 {
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
-  Material material = Material::New(shader);
-
-  return material;
+  return Shader::New( "vertexSrc", "fragmentSrc" );
 }
 
-Material CreateMaterial( Image image )
+TextureSet CreateTextureSet()
 {
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
-  Material material = Material::New(shader);
-
-  material.AddTexture( image, "sTexture" );
-
-  return material;
+  return TextureSet::New();
+}
+TextureSet CreateTextureSet( Image image )
+{
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetImage( 0u, image );
+  return textureSet;
 }
 
 PropertyBuffer CreatePropertyBuffer()

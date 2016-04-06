@@ -1991,15 +1991,18 @@ int UtcDaliRenderTaskContinous05(void)
   CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
+
+
   Image image = CreateLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetSize(100, 100);
@@ -2096,15 +2099,16 @@ int UtcDaliRenderTaskOnce02(void)
   CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
   Image image = CreateLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture");
+  TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetSize(100, 100);
@@ -2213,15 +2217,16 @@ int UtcDaliRenderTaskOnce04(void)
   CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
   Image image = CreateLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetSize(100, 100);
@@ -2728,15 +2733,16 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
   Image image = CreateLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture");
+  TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetSize(100, 100);
@@ -2827,15 +2833,16 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
   Image image = CreateLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
   Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
   Integration::ResourceId imageRequestId = imageRequest->GetId();
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetSize(100, 100);

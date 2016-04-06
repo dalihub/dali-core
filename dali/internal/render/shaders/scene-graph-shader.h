@@ -31,9 +31,11 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
+
 #include <dali/internal/render/common/render-manager.h>
 
 
@@ -51,12 +53,14 @@ namespace SceneGraph
 class RenderQueue;
 class UniformMeta;
 class TextureCache;
+class ConnectionObserver;
+class SceneController;
 
 /**
  * A base class for a collection of shader programs, to apply an effect to different geometry types.
  * This class is also the default shader so its easier to override default behaviour
  */
-class Shader : public PropertyOwner
+class Shader : public PropertyOwner, public UniformMap::Observer
 {
 public:
 
@@ -135,101 +139,9 @@ public:
     // no default properties
   }
 
-  /**
-   * Set the ID used to access textures
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] textureId The texture ID.
-   */
-  void ForwardTextureId( BufferIndex updateBufferIndex, Integration::ResourceId textureId );
-
-  /**
-   * Gets the effect texture resource ID
-   * This is zero if there is effect texture
-   * @return the resource Id
-   */
-  Integration::ResourceId GetEffectTextureResourceId();
-
-  /**
-   * Forwards the meta data from the update thread to the render thread for actual
-   * installation. (Installation is to a std::vector, which is not thread safe)
-   * @sa InstallUniformMetaInRender
-   * @pre This method should only be called from the update thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] meta A pointer to a UniformMeta to be owned by the Shader.
-   */
-  void ForwardUniformMeta( BufferIndex updateBufferIndex, UniformMeta* meta );
-
-  /**
-   * Forwards coordinate type to render
-   * @sa InstallUniformMetaInRender
-   * @pre This method should only be called from the update thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] index of the metadata.
-   * @param[in] type the coordinate type.
-   */
-  void ForwardCoordinateType( BufferIndex updateBufferIndex, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
-
-  /**
-   * Forwards the grid density.
-   * @pre This method is not thread-safe, and should only be called from the update thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] density The grid density.
-   */
-  void ForwardGridDensity( BufferIndex updateBufferIndex, float density );
-
-  /**
-   * Forwards hints.
-   * @pre This method is not thread-safe, and should only be called from the update thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] hint The geometry hints.
-   */
-  void ForwardHints( BufferIndex updateBufferIndex, Dali::ShaderEffect::GeometryHints hint );
-
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are called in Render thread
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Set the ID used to access textures
-   * @pre This method is not thread-safe, and should only be called from the render thread.
-   * @param[in] textureId The texture ID.
-   */
-  void SetTextureId( Integration::ResourceId textureId );
-
-  /**
-   * Get the texture id, that will be used in the next call to Shader::Apply()
-   * @return textureId The texture ID
-   */
-  Integration::ResourceId GetTextureIdToRender();
-
-  /**
-   * Sets grid density
-   * @pre This method is not thread-safe, and should only be called from the update thread.
-   * @param[in] value The grid density
-   */
-  void SetGridDensity(float value);
-
-  /**
-   * Get the grid density ID.
-   * @pre This method is not thread-safe, and should only be called from the render thread.
-   * @return The grid density.
-   */
-  float GetGridDensity();
-
-  /**
-   * Installs metadata related to a newly installed uniform property.
-   * @pre This method is not thread-safe, and should only be called from the render-thread.
-   * @param[in] meta A pointer to a UniformMeta to be owned by the Shader.
-   */
-  void InstallUniformMetaInRender( UniformMeta* meta );
-
-  /**
-   * Sets the uniform coordinate type
-   * @param index of the uniform
-   * @param type to set
-   */
-  void SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
   /**
    * @brief Set the program for this shader.
@@ -248,19 +160,42 @@ public:
    */
   Program* GetProgram();
 
+public: // Implementation of ObjectOwnerContainer template methods
+
   /**
-   * Sets the shader specific uniforms including custom uniforms
-   * @pre The shader has been initialized.
-   * @pre This method is not thread-safe, and should only be called from the render-thread.
-   * @param[in] context The context used to render.
-   * @param[in] program to use.
-   * @param[in] bufferIndex The buffer to read shader properties from.
-   * @param[in] type        the type of the object (geometry) that is being rendered.
-   * @param[in] subType     Identifier for geometry types with specialised default shaders
+   * Connect the object to the scene graph
+   *
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
-  void SetUniforms( Context& context,
-                    Program& program,
-                    BufferIndex bufferIndex );
+  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+
+  /**
+   * Disconnect the object from the scene graph
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   */
+  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+
+public: // Implementation of ConnectionChangePropagator
+
+  /**
+   * @copydoc ConnectionChangePropagator::AddObserver
+   */
+  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer);
+
+  /**
+   * @copydoc ConnectionChangePropagator::RemoveObserver
+   */
+  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
+
+public:
+
+public: // UniformMap::Observer
+  /**
+   * @copydoc UniformMap::Observer::UniformMappingsChanged
+   */
+  virtual void UniformMappingsChanged( const UniformMap& mappings );
 
 private: // Data
 
@@ -273,8 +208,7 @@ private: // Data
 
   Program*                       mProgram;
 
-  typedef OwnerContainer< UniformMeta* > UniformMetaContainer;
-  UniformMetaContainer           mUniformMetadata;     ///< A container of owned UniformMeta values; one for each property in PropertyOwner::mDynamicProperties
+  ConnectionChangePropagator     mConnectionObservers;
 
   // These members are only safe to access during UpdateManager::Update()
   RenderQueue*                   mRenderQueue;                   ///< Used for queuing a message for the next Render
@@ -282,13 +216,6 @@ private: // Data
   // These members are only safe to access in render thread
   TextureCache*                  mTextureCache; // Used for retrieving textures in the render thread
 };
-
-// Messages for Shader, to be processed in Update thread.
-void SetTextureIdMessage( EventThreadServices& eventThreadServices, const Shader& shader, Integration::ResourceId textureId );
-void SetGridDensityMessage( EventThreadServices& eventThreadServices, const Shader& shader, float density );
-void SetHintsMessage( EventThreadServices& eventThreadServices, const Shader& shader, Dali::ShaderEffect::GeometryHints hint );
-void InstallUniformMetaMessage( EventThreadServices& eventThreadServices, const Shader& shader, UniformMeta& meta );
-void SetCoordinateTypeMessage( EventThreadServices& eventThreadServices, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
 } // namespace SceneGraph
 

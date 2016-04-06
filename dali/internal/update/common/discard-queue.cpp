@@ -95,20 +95,20 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Geometry* geometry )
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Material* material )
+void DiscardQueue::Add( BufferIndex updateBufferIndex, TextureSet* textureSet )
 {
-  DALI_ASSERT_DEBUG( NULL != material );
+  DALI_ASSERT_DEBUG( NULL != textureSet );
 
   // The GL resources will now be freed in frame N
   // The Update for frame N+1 may occur in parallel with the rendering of frame N
   // Queue the node for destruction in frame N+2
   if ( 0u == updateBufferIndex )
   {
-    mMaterialQueue0.PushBack( material );
+    mTextureSetQueue0.PushBack( textureSet );
   }
   else
   {
-    mMaterialQueue1.PushBack( material );
+    mTextureSetQueue1.PushBack( textureSet );
   }
 }
 
@@ -141,7 +141,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mNodeQueue0.Clear();
     mShaderQueue0.Clear();
     mGeometryQueue0.Clear();
-    mMaterialQueue0.Clear();
+    mTextureSetQueue0.Clear();
     mRendererQueue0.Clear();
   }
   else
@@ -149,7 +149,7 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mNodeQueue1.Clear();
     mShaderQueue1.Clear();
     mGeometryQueue1.Clear();
-    mMaterialQueue1.Clear();
+    mTextureSetQueue1.Clear();
     mRendererQueue1.Clear();
   }
 }
