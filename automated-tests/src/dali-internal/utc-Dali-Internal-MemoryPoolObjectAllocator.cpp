@@ -117,7 +117,7 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
   testObject1->DataAccess();
   DALI_TEST_EQUALS( tracking1.testObjectDataAccess, 1, TEST_LOCATION );
 
-  allocator.Free( testObject1 );
+  allocator.Destroy( testObject1 );
   DALI_TEST_EQUALS( tracking1.testObjectDestructed, 1, TEST_LOCATION );
 
   // Reset and allocate another object
@@ -135,7 +135,7 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
   testObject2->DataAccess();
   DALI_TEST_EQUALS( tracking2.testObjectDataAccess, 1, TEST_LOCATION );
 
-  allocator.Free( testObject2 );
+  allocator.Destroy( testObject2 );
   DALI_TEST_EQUALS( tracking2.testObjectDestructed, 1, TEST_LOCATION );
 
   END_TEST;
@@ -157,7 +157,7 @@ int UtcDaliMemoryPoolObjectAllocatorObjectRawAllocation(void)
   testObject->DataAccess();
   DALI_TEST_EQUALS( tracking.testObjectDataAccess, 1, TEST_LOCATION );
 
-  allocator.Free( testObject );
+  allocator.Destroy( testObject );
   DALI_TEST_EQUALS( tracking.testObjectDestructed, 1, TEST_LOCATION );
 
   END_TEST;
@@ -170,14 +170,14 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocationPOD(void)
   bool* testObject1 = allocator.Allocate();
   DALI_TEST_CHECK( testObject1 );
 
-  allocator.Free( testObject1 );
+  allocator.Destroy( testObject1 );
 
   allocator.ResetMemoryPool();
 
   bool* testObject2 = allocator.Allocate();
   DALI_TEST_CHECK( testObject2 );
 
-  allocator.Free( testObject2 );
+  allocator.Destroy( testObject2 );
 
   END_TEST;
 }

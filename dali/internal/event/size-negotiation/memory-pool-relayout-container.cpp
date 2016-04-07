@@ -67,7 +67,7 @@ void MemoryPoolRelayoutContainer::PopBack()
     RelayoutInfoContainer::Iterator back = mRelayoutInfos.End();
     back--;
     RelayoutInfo* info = *back;
-    mAllocator.Free( info );
+    mAllocator.Destroy( info );
     mRelayoutInfos.Erase( back );
   }
 }
@@ -96,7 +96,7 @@ void MemoryPoolRelayoutContainer::Clear()
   for( size_t i = 0; i < Size(); ++i )
   {
     RelayoutInfo* info = mRelayoutInfos[ i ];
-    mAllocator.Free( info );
+    mAllocator.Destroy( info );
   }
 
   mRelayoutInfos.Clear();
