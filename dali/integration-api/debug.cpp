@@ -39,6 +39,15 @@
 namespace Dali
 {
 
+#ifdef DEBUG_ENABLED
+
+// Fake globals for gdb typedefs
+Dali::DebugPropertyValueArray gValueArray;
+Dali::DebugPropertyValueMap   gValueMap;
+
+#endif
+
+
 namespace // unnamed namespace
 {
 
