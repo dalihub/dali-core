@@ -1,13 +1,78 @@
 #ifndef __DALI_DOC_H__
 #define __DALI_DOC_H__
 
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 /**
  * @defgroup dali_core DALi Core
- * @ingroup dali
  *
- * @brief This module provides scene graph-based rendering, animation, and event handling.
+ * @brief DALi Core provides core functionalities such as scene graph-based rendering, animation, and event handling.
+ *
  * It is a base module and forms the biggest part of DALi.
  *
+ * @section dali_core_overview Overview
+ *
+ * DALi Core consists of the following groups of API:
+ *
+ * <table>
+ * <tr>
+ *    <th>API Group</th>
+ *    <th>Description</th>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_actors</td>
+ *    <td>Actor is the primary object for interaction in DALi applications.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_animation</td>
+ *    <td>Animation allows your objects to move around / change their properties for a specified duration.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_common</td>
+ *    <td>Common classes for using DALi.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_events</td>
+ *    <td>Input events and gestures supported by DALi.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_images</td>
+ *    <td>Classes for handling images.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_math</td>
+ *    <td>Basic math classes.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_object</td>
+ *    <td>Classes for the handle/body pattern and property system.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_rendering_effects</td>
+ *    <td>Render task and shader effect classes.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_core_signals</td>
+ *    <td>Classes for the signal and slot structure.</td>
+ * </tr>
+ * </table>
+ *
+ * @ingroup dali
  * @{
  *   @defgroup dali_core_actors Actors
  *   @brief Actor is the primary object for interaction in DALi applications.
@@ -30,13 +95,10 @@
  *   @defgroup dali_core_object Object
  *   @brief Classes for the handle/body pattern and property system.
 
- *   @defgroup dali_core_render_tasks Render Tasks
- *   @brief Render task classes.
+ *   @defgroup dali_core_rendering_effects Rendering & Effect
+ *   @brief Render task and shader effect classes.
 
- *   @defgroup dali_core_shader_effects Shader Effects
- *   @brief Shader effect classes.
-
- *   @defgroup dali_core_signals Signals
+ *   @defgroup dali_core_signals Signal
  *   @brief Classes for the signal and slot structure.
  * @}
  */

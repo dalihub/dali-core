@@ -78,7 +78,6 @@ public:
    * Static property buffers use less memory.
    *
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
-   * @param[in] size The number of elements in the property buffer
    * @return Handle to a newly allocated PropertyBuffer
    */
   static PropertyBuffer New( Dali::Property::Map& bufferFormat );

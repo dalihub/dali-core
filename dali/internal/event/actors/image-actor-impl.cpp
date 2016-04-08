@@ -212,7 +212,14 @@ void ImageActor::SetImage( ImagePtr& image )
     SamplerPtr sampler = Sampler::New();
     sampler->SetFilterMode( mMinFilter, mMagFilter );
 
-    mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
+    if( mTextureIndex != INVALID_TEXTURE_ID )
+    {
+      mRenderer->GetMaterial()->SetTextureImage( mTextureIndex, image.Get() );
+    }
+    else
+    {
+      mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
+    }
 
     if( mRendererIndex == INVALID_RENDERER_ID )
     {

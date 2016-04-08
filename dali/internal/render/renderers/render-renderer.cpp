@@ -367,39 +367,34 @@ bool Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& pr
 
       if( result )
       {
-        Render::Texture& textureMapping = textures[i];
-        // Set sampler uniform location for the texture
-        int32_t uniqueIndex = textureMapping.GetUniformUniqueIndex();
-        if( Render::Texture::NOT_INITIALIZED == uniqueIndex )
-        {
-          uniqueIndex = mUniformNameCache->GetSamplerUniformUniqueIndex( textureMapping.GetUniformName() );
-          textureMapping.SetUniformUniqueIndex( uniqueIndex );
-        }
-        GLint uniformLocation = program.GetSamplerUniformLocation( uniqueIndex, textureMapping.GetUniformName() );
-        if( Program::UNIFORM_UNKNOWN != uniformLocation )
+        GLint uniformLocation;
+
+        bool result = program.GetSamplerUniformLocation( i, uniformLocation );
+        if( result && Program::UNIFORM_UNKNOWN != uniformLocation )
         {
           program.SetUniform1i( uniformLocation, textureUnit );
-        }
 
-        unsigned int samplerBitfield(0);
-        const Render::Sampler* sampler( textureMapping.GetSampler() );
-        if( sampler )
-        {
-          samplerBitfield = ImageSampler::PackBitfield(
-            static_cast< FilterMode::Type >(sampler->GetMinifyFilterMode()),
-            static_cast< FilterMode::Type >(sampler->GetMagnifyFilterMode()),
-            static_cast< WrapMode::Type >(sampler->GetUWrapMode()),
-            static_cast< WrapMode::Type >(sampler->GetVWrapMode())
-                                                       );
-        }
-        else
-        {
-          samplerBitfield = ImageSampler::DEFAULT_BITFIELD;
-        }
+          unsigned int samplerBitfield(0);
+          Render::Texture& textureMapping = textures[i];
+          const Render::Sampler* sampler( textureMapping.GetSampler() );
+          if( sampler )
+          {
+            samplerBitfield = ImageSampler::PackBitfield(
+              static_cast< FilterMode::Type >(sampler->GetMinifyFilterMode()),
+              static_cast< FilterMode::Type >(sampler->GetMagnifyFilterMode()),
+              static_cast< WrapMode::Type >(sampler->GetUWrapMode()),
+              static_cast< WrapMode::Type >(sampler->GetVWrapMode())
+                                                         );
+          }
+          else
+          {
+            samplerBitfield = ImageSampler::DEFAULT_BITFIELD;
+          }
 
-        texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
+          texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
 
-        ++textureUnit;
+          ++textureUnit;
+        }
       }
     }
   }
