@@ -22,7 +22,6 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/math/uint-16-pair.h>
-#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
@@ -128,16 +127,6 @@ public:
    * @copydoc Dali::RenderableActor::GetSortModifier()
    */
   float GetSortModifier() const;
-
-  /**
-   * @copydoc Dali::RenderableActor::SetCullFace()
-   */
-  void SetCullFace(CullFaceMode mode);
-
-  /**
-   * @copydoc Dali::RenderableActor::GetCullFace()
-   */
-  CullFaceMode GetCullFace() const;
 
   /**
    * @copydoc Dali::RenderableActor::SetBlendMode()

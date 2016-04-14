@@ -618,16 +618,6 @@ float ImageActor::GetSortModifier() const
   return mRenderer->GetDepthIndex();
 }
 
-void ImageActor::SetCullFace(CullFaceMode mode)
-{
-  mRenderer->SetFaceCullingMode( static_cast< Dali::Renderer::FaceCullingMode >( mode ) );
-}
-
-CullFaceMode ImageActor::GetCullFace() const
-{
-  return static_cast< CullFaceMode >( mRenderer->GetFaceCullingMode() );
-}
-
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
 {
   mRenderer->SetBlendMode( mode );

@@ -10,7 +10,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/images/pixel-data.cpp \
   $(devel_api_src_dir)/object/property-buffer.cpp \
   $(devel_api_src_dir)/object/weak-handle.cpp \
-  $(devel_api_src_dir)/rendering/cull-face.cpp \
   $(devel_api_src_dir)/rendering/geometry.cpp \
   $(devel_api_src_dir)/rendering/material.cpp \
   $(devel_api_src_dir)/rendering/renderer.cpp \
@@ -50,7 +49,6 @@ devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/weak-handle.h
 
 devel_api_core_rendering_header_files = \
-  $(devel_api_src_dir)/rendering/cull-face.h \
   $(devel_api_src_dir)/rendering/geometry.h \
   $(devel_api_src_dir)/rendering/material.h \
   $(devel_api_src_dir)/rendering/renderer.h \
