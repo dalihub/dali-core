@@ -223,6 +223,32 @@ void RenderGeometry::UploadAndDraw(
       }
       break;
     }
+    case Dali::Geometry::LINE_LOOP:
+    {
+      if( numIndices )
+      {
+        context.DrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_SHORT, 0);
+      }
+      else
+      {
+        unsigned int numVertices = mVertexBuffers[0]->GetElementCount();
+        context.DrawArrays(GL_LINE_LOOP, 0, numVertices );
+      }
+      break;
+    }
+    case Dali::Geometry::LINE_STRIP:
+    {
+      if( numIndices )
+      {
+        context.DrawElements(GL_LINE_STRIP, numIndices, GL_UNSIGNED_SHORT, 0);
+      }
+      else
+      {
+        unsigned int numVertices = mVertexBuffers[0]->GetElementCount();
+        context.DrawArrays(GL_LINE_STRIP, 0, numVertices );
+      }
+      break;
+    }
     default:
     {
       DALI_ASSERT_ALWAYS( 0 && "Geometry type not supported (yet)" );
