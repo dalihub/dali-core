@@ -255,6 +255,7 @@ RenderTask CreateRenderTask(TestApplication& application,
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( refreshRate );
   newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, glSync );
   return newTask;
 }
 
@@ -1760,6 +1761,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
   newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
 
   bool finished = false;
   RenderTaskFinished renderTaskFinished( finished );
@@ -3388,6 +3390,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
   newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
 
   // Framebuffer doesn't actually get created until Connected, i.e. by previous line
 

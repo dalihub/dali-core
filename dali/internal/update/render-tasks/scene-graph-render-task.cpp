@@ -419,7 +419,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
-  if( mTargetIsNativeFramebuffer &&
+  if( mTargetIsNativeFramebuffer && mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE &&
       mResourcesFinished )
   {
@@ -496,6 +496,11 @@ Node* RenderTask::GetCamera() const
   return mCameraNode;
 }
 
+void RenderTask::SetSyncRequired( bool requiresSync )
+{
+  mRequiresSync = requiresSync;
+}
+
 void RenderTask::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
   // Reset default properties
@@ -528,7 +533,8 @@ RenderTask::RenderTask()
   mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
   mFrameCounter( 0u ),
   mRenderedOnceCounter( 0u ),
-  mTargetIsNativeFramebuffer( false )
+  mTargetIsNativeFramebuffer( false ),
+  mRequiresSync( false )
 {
 }
 
