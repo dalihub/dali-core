@@ -96,7 +96,7 @@ int UtcDaliBufferImageNewWithPolicy01(void)
   application.SendNotification();
 
   DALI_TEST_CHECK( image.GetWidth() == 16);
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -137,7 +137,7 @@ int UtcDaliBufferImageNewWithPolicy02(void)
   application.SendNotification();
 
   DALI_TEST_CHECK( image.GetWidth() == 16);
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -165,13 +165,13 @@ int UtcDaliBufferImageDownCast(void)
   tet_infoline("Testing Dali::BufferImage::DownCast()");
 
   BufferImage bitmap = BufferImage::New(1, 1, Dali::Pixel::BGRA8888);
-  ImageActor imageActor = ImageActor::New(bitmap);
+  Actor actor = CreateRenderableActor( bitmap );
   application.SendNotification();
   application.Render(16);
   application.Render(16);
   application.SendNotification();
 
-  Image image = imageActor.GetImage();
+  Image image = GetTexture( actor );
   BufferImage bufferImage = BufferImage::DownCast( image );
 
   DALI_TEST_CHECK(bufferImage);
@@ -184,13 +184,13 @@ int UtcDaliBufferImageDownCast2(void)
   tet_infoline("Testing Dali::BufferImage::DownCast()");
 
   Image image = ResourceImage::New("IncorrectImageName");
-  ImageActor imageActor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   application.SendNotification();
   application.Render(16);
   application.Render(16);
   application.SendNotification();
 
-  Image image1 = imageActor.GetImage();
+  Image image1 = GetTexture( actor );
 
   BufferImage bufferImage = BufferImage::DownCast( image1 );
   DALI_TEST_CHECK(!bufferImage);
@@ -351,7 +351,7 @@ int UtcDaliBufferImageUpdate01(void)
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
 
   BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
 
@@ -399,7 +399,7 @@ int UtcDaliBufferImageUpdate02(void)
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
   BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
 
@@ -454,8 +454,8 @@ int UtcDaliBufferImageUploadedSignal01(void)
   application.Render(16);
   application.SendNotification();
 
-  Dali::ImageActor imageActor = ImageActor::New(image);
-  Stage::GetCurrent().Add(imageActor);
+  Actor actor = CreateRenderableActor( image );
+  Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(16);
   application.SendNotification();
@@ -485,8 +485,8 @@ int UtcDaliBufferImageUploadedSignal02(void)
   application.Render(16);
   application.SendNotification();
 
-  Dali::ImageActor imageActor = ImageActor::New(image);
-  Stage::GetCurrent().Add(imageActor);
+  Actor actor = CreateRenderableActor( image );
+  Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(16);
   application.SendNotification();

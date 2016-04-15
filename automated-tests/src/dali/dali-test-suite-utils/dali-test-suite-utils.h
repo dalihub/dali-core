@@ -29,6 +29,7 @@ void tet_infoline(const char*str);
 void tet_printf(const char *format, ...);
 
 #include "test-application.h"
+#include "test-actor-utils.h"
 
 using namespace Dali;
 

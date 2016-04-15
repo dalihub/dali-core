@@ -88,24 +88,6 @@ struct TestCameraActorCallback
   bool& mSignalVerified;
 };
 
-struct TestImageActorCallback
-{
-  TestImageActorCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestImageActorCallback()");
-    ImageActor actor = ImageActor::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
-
 struct TestLayerCallback
 {
   TestLayerCallback(bool& signalReceived)
@@ -232,34 +214,6 @@ int UtcDaliObjectRegistrySignalCameraCreated(void)
 
   {
     CameraActor actor = CameraActor::New();
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = actor.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
-
-int UtcDaliObjectRegistrySignalImageActorCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  static const char* TestImageFilename = "icon_wrt.png";
-  Image image = ResourceImage::New(TestImageFilename);
-
-  bool verified = false;
-  TestImageActorCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  {
-    ImageActor actor = ImageActor::New(image);
     DALI_TEST_CHECK( test.mSignalVerified );
 
     verified = false;

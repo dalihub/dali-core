@@ -81,6 +81,7 @@ SET(TC_SOURCES
 LIST(APPEND TC_SOURCES
         dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
+        dali-test-suite-utils/test-actor-utils.cpp
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
         dali-test-suite-utils/test-gesture-manager.cpp

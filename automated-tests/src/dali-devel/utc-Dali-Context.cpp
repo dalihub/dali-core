@@ -42,20 +42,13 @@ enum TestAttribType
   ATTRIB_TYPE_LAST
 };
 
-// Create bitmap image
-static BufferImage CreateBufferImage()
+// Create bitmap actor
+static Actor CreateBitmapActor()
 {
   BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
-
-  return image;
-}
-
-static ImageActor CreateImageActor()
-{
-  BufferImage image = CreateBufferImage();
-  ImageActor actor = ImageActor::New( image );
+  Actor actor = CreateRenderableActor( image );
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetName("Test ImageActor");
+  actor.SetName("Test Image Rendering Actor");
   return actor;
 }
 
@@ -101,9 +94,9 @@ int UtcDaliContextVertexAttribImageRendering(void)
   application.GetGlAbstraction().ClearVertexAttribArrayChanged();
 
 
-  // create a test image actor
-  ImageActor imageActor(CreateImageActor());
-  Stage::GetCurrent().Add(imageActor);
+  // create a test bitmap actor
+  Actor actor(CreateBitmapActor());
+  Stage::GetCurrent().Add(actor);
 
 
   application.SendNotification();
