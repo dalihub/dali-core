@@ -459,3 +459,81 @@ int UtcDaliTextureSetSetSampler(void)
   END_TEST;
 }
 
+int UtcDaliTextureSetGetImage(void)
+{
+  TestApplication application;
+
+  TextureSet textureSet = CreateTextureSet();
+  DALI_TEST_EQUALS( textureSet.GetImage(0), Image(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(1), Image(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(2), Image(), TEST_LOCATION );
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  textureSet.SetImage( 0u, image );
+
+  DALI_TEST_EQUALS( textureSet.GetImage(0), image, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(1), Image(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(2), Image(), TEST_LOCATION );
+
+  textureSet.SetImage( 2u, image );
+  DALI_TEST_EQUALS( textureSet.GetImage(0), image, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(1), Image(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(2), image, TEST_LOCATION );
+
+  textureSet.SetImage( 2u, Image() );
+  DALI_TEST_EQUALS( textureSet.GetImage(0), image, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(1), Image(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetImage(2), Image(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetSampler(void)
+{
+  TestApplication application;
+
+  TextureSet textureSet = CreateTextureSet();
+  DALI_TEST_EQUALS( textureSet.GetSampler(0), Sampler(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(1), Sampler(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(2), Sampler(), TEST_LOCATION );
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  textureSet.SetSampler( 0u, sampler );
+
+  DALI_TEST_EQUALS( textureSet.GetSampler(0), sampler, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(1), Sampler(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(2), Sampler(), TEST_LOCATION );
+
+  textureSet.SetSampler( 2u, sampler );
+  DALI_TEST_EQUALS( textureSet.GetSampler(0), sampler, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(1), Sampler(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(2), sampler, TEST_LOCATION );
+
+  textureSet.SetSampler( 2u, Sampler() );
+  DALI_TEST_EQUALS( textureSet.GetSampler(0), sampler, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(1), Sampler(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetSampler(2), Sampler(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetTextureCount(void)
+{
+  TestApplication application;
+
+  TextureSet textureSet = CreateTextureSet();
+  DALI_TEST_EQUALS( textureSet.GetTextureCount(), 0u, TEST_LOCATION );
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  textureSet.SetImage( 0u, image );
+  DALI_TEST_EQUALS( textureSet.GetTextureCount(), 1u, TEST_LOCATION );
+
+  textureSet.SetImage( 1u, image );
+  DALI_TEST_EQUALS( textureSet.GetTextureCount(), 2u, TEST_LOCATION );
+
+  textureSet.SetSampler( 2u, Sampler::New() );
+  DALI_TEST_EQUALS( textureSet.GetTextureCount(), 3u, TEST_LOCATION );
+
+  END_TEST;
+}

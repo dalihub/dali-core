@@ -69,6 +69,12 @@ void TextureSet::SetImage( size_t index, Image image )
   }
 }
 
+Image TextureSet::GetImage( size_t index ) const
+{
+  Internal::Image* imagePtr = GetImplementation(*this).GetImage( index );
+  return Dali::Image( imagePtr );
+}
+
 void TextureSet::SetSampler( size_t index, Sampler sampler )
 {
   if( sampler )
@@ -78,8 +84,19 @@ void TextureSet::SetSampler( size_t index, Sampler sampler )
   }
   else
   {
-    DALI_LOG_ERROR( "Error adding invalid image %s to TextureSet" );
+    GetImplementation(*this).SetSampler( index, NULL );
   }
+}
+
+Sampler TextureSet::GetSampler( size_t index ) const
+{
+  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler( index );
+  return Dali::Sampler( samplerPtr );
+}
+
+size_t TextureSet::GetTextureCount() const
+{
+  return GetImplementation(*this).GetTextureCount();
 }
 
 TextureSet::TextureSet( Internal::TextureSet* pointer )

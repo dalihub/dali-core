@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <string> // std::string
-
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/blending.h> // Dali::BlendingMode, Dali::BlendingEquation, Dali::BlendingFactor
 #include <dali/public-api/object/handle.h> // Dali::Handle
