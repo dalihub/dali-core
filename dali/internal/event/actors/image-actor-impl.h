@@ -38,17 +38,7 @@ namespace Internal
 class Image;
 
 /**
- * An actor which displays an Image object.
- *
- * This handles image fade-in if required, waiting for the image to load.
- *
- * If a new image is set on the actor, then this ensures that the old image
- * is displayed until the new image is ready to render to prevent flashing
- * to the actor color. This will also happen if the image is reloaded.
- *
- * This is achieved by using two connector objects to Image: mImageNext and
- * mImageAttachment's member object. The first one points to the Image object that is going to
- * be displayed next, the second one to the Image that is currently being displayed.
+ * An actor which displays an Image.
  */
 class ImageActor : public Actor
 {
@@ -74,7 +64,7 @@ public:
   void SetImage( ImagePtr& image );
 
   /**
-   * Retrieve the image rendered by the actor's attachment.
+   * Retrieve the image rendered by the actor.
    * @return smart pointer to the image or an empty one if no image is assigned
    */
   ImagePtr GetImage() const;
