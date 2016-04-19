@@ -63,16 +63,24 @@ public:
   void SetImage( size_t index, ImagePtr image );
 
   /**
+   * @copydoc Dali::TextureSet::GetImage()
+   */
+  Image* GetImage( size_t index ) const;
+
+  /**
    * @copydoc Dali::TextureSet::SetSampler()
    */
   void SetSampler( size_t index, SamplerPtr sampler );
 
   /**
-   * @brief Get the image at position "index" in the texture set
-   * @param[in] index The index of the image
-   * @return A pointer to the image at position "index"
+   * @copydoc Dali::TextureSet::GetSampler()
    */
-  ImagePtr GetImage( size_t index );
+  Sampler* GetSampler( size_t index ) const;
+
+  /**
+   * @copydoc Dali::TextureSet::GetTextureCount()
+   */
+  size_t GetTextureCount() const;
 
  /**
    * @brief Get the TextureSet scene object
