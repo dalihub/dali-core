@@ -171,6 +171,7 @@ public: // TEST FUNCTIONS
     SuspendFunc,
     ResumeFunc,
     LoadResourceFunc,
+    LoadResourceSynchronouslyFunc,
     SaveFileFunc,
     LoadFileFunc,
     LoadShaderBinaryFileFunc,

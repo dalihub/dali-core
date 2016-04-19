@@ -396,5 +396,6 @@ struct DefaultFunctionCoverage
 
 // Helper to Create buffer image
 BufferImage CreateBufferImage();
+BufferImage CreateBufferImage(int width, int height, const Vector4& color);
 
 #endif // __DALI_TEST_SUITE_UTILS_H__
