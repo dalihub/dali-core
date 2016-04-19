@@ -58,6 +58,7 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "viewportPosition",   VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_POSITION )
 DALI_PROPERTY( "viewportSize",       VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
 DALI_PROPERTY( "clearColor",         VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
+DALI_PROPERTY( "requiresSync",       BOOLEAN,    true,    false,   false,   Dali::RenderTask::Property::REQUIRES_SYNC     )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals
@@ -277,6 +278,25 @@ void RenderTask::SetClearColor( const Vector4& color )
 const Vector4& RenderTask::GetClearColor() const
 {
   return mSceneObject->GetClearColor( GetEventThreadServices().GetEventBufferIndex() );
+}
+
+void RenderTask::SetSyncRequired( bool requiresSync )
+{
+  if( mRequiresSync != requiresSync )
+  {
+    mRequiresSync = requiresSync;
+
+    if( mSceneObject )
+    {
+      // mSceneObject is being used in a separate thread; queue a message to set the value
+      SetSyncRequiredMessage( GetEventThreadServices(), *mSceneObject, requiresSync );
+    }
+  }
+}
+
+bool RenderTask::IsSyncRequired() const
+{
+  return mRequiresSync;
 }
 
 void RenderTask::SetClearEnabled( bool enabled )
@@ -593,6 +613,11 @@ void RenderTask::SetDefaultProperty( Property::Index index, const Property::Valu
       SetClearColor( property.Get<Vector4>() );
       break;
     }
+    case Dali::RenderTask::Property::REQUIRES_SYNC:
+    {
+      SetSyncRequired( property.Get<bool>() );
+      break;
+    }
     default:
     {
       // nothing to do
@@ -621,6 +646,11 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
     case Dali::RenderTask::Property::CLEAR_COLOR:
     {
       value = GetClearColor();
+      break;
+    }
+    case Dali::RenderTask::Property::REQUIRES_SYNC:
+    {
+      value = IsSyncRequired();
       break;
     }
 
@@ -686,7 +716,7 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty( Property::Inde
         break;
 
       case Dali::RenderTask::Property::CLEAR_COLOR:
-        property = &mSceneObject->mViewportSize;
+        property = &mSceneObject->mClearColor;
         break;
 
       default:
@@ -760,7 +790,8 @@ RenderTask::RenderTask( bool isSystemLevel )
   mInputEnabled( Dali::RenderTask::DEFAULT_INPUT_ENABLED ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
   mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mIsSystemLevel( isSystemLevel )
+  mIsSystemLevel( isSystemLevel ),
+  mRequiresSync( false )
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);
 }

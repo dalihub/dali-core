@@ -212,7 +212,14 @@ void ImageActor::SetImage( ImagePtr& image )
     SamplerPtr sampler = Sampler::New();
     sampler->SetFilterMode( mMinFilter, mMagFilter );
 
-    mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
+    if( mTextureIndex != INVALID_TEXTURE_ID )
+    {
+      mRenderer->GetMaterial()->SetTextureImage( mTextureIndex, image.Get() );
+    }
+    else
+    {
+      mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
+    }
 
     if( mRendererIndex == INVALID_RENDERER_ID )
     {
@@ -609,16 +616,6 @@ void ImageActor::SetSortModifier(float modifier)
 float ImageActor::GetSortModifier() const
 {
   return mRenderer->GetDepthIndex();
-}
-
-void ImageActor::SetCullFace(CullFaceMode mode)
-{
-  mRenderer->SetFaceCullingMode( static_cast< Dali::Renderer::FaceCullingMode >( mode ) );
-}
-
-CullFaceMode ImageActor::GetCullFace() const
-{
-  return static_cast< CullFaceMode >( mRenderer->GetFaceCullingMode() );
 }
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )

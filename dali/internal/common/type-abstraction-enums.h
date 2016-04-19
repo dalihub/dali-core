@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/blending.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/event/effects/shader-declarations.h>
@@ -32,7 +31,6 @@ namespace Dali
 namespace Internal
 {
 
-template <> struct ParameterType< CullFaceMode > : public BasicType< CullFaceMode > {};
 template <> struct ParameterType< Dali::Renderer::FaceCullingMode > : public BasicType< Dali::Renderer::FaceCullingMode > {};
 template <> struct ParameterType< BlendingMode::Type > : public BasicType< BlendingMode::Type > {};
 

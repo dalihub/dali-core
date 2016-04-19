@@ -556,6 +556,21 @@ public:
 
   inline void GetActiveUniform(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
   {
+    switch(index)
+    {
+      case 0:
+        *length = snprintf(name, bufsize, "sTexture");
+        *type = GL_SAMPLER_2D;
+        *size = 1;
+        break;
+      case 1:
+        *length = snprintf(name, bufsize, "sEffect");
+        *type = GL_SAMPLER_2D;
+        *size = 1;
+        break;
+      default:
+        break;
+    }
   }
 
   inline void GetAttachedShaders(GLuint program, GLsizei maxcount, GLsizei* count, GLuint* shaders)
@@ -620,12 +635,19 @@ public:
 
   inline void GetProgramiv(GLuint program, GLenum pname, GLint* params)
   {
-    switch( pname ) {
+    switch( pname )
+    {
       case GL_LINK_STATUS:
         *params = mLinkStatus;
         break;
       case GL_PROGRAM_BINARY_LENGTH_OES:
         *params = mProgramBinaryLength;
+        break;
+      case GL_ACTIVE_UNIFORMS:
+        *params = mNumberOfActiveUniforms;
+        break;
+      case GL_ACTIVE_UNIFORM_MAX_LENGTH:
+        *params = 100;
         break;
     }
   }
@@ -633,7 +655,6 @@ public:
   inline void GetProgramInfoLog(GLuint program, GLsizei bufsize, GLsizei* length, char* infolog)
   {
   }
-
 
   inline void GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint* params)
   {
@@ -759,6 +780,10 @@ public:
     std::stringstream out;
     out << program;
     mShaderTrace.PushCall("LinkProgram", out.str());
+
+    mNumberOfActiveUniforms=2;
+    GetUniformLocation(program, "sTexture");
+    GetUniformLocation(program, "sEffect");
   }
 
   inline void PixelStorei(GLenum pname, GLint param)
@@ -1769,6 +1794,7 @@ private:
   BufferDataCalls mBufferDataCalls;
   BufferSubDataCalls mBufferSubDataCalls;
   GLuint     mLinkStatus;
+  GLint      mNumberOfActiveUniforms;
   GLint      mGetAttribLocationResult;
   GLenum     mGetErrorResult;
   GLubyte*   mGetStringResult;

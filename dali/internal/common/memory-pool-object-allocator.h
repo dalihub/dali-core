@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,25 +101,49 @@ public:
 
   /**
    * @brief Return the object to the memory pool
+   * Note: This performs a deallocation only, if the object has a destructor and is not
+   * freed from within an overloaded delete operator, Destroy() must be used instead.
    *
    * @param object Pointer to the object to delete
    */
   void Free( T* object )
   {
-    object->~T();
-
     mPool->Free( object );
   }
 
   /**
    * @brief Thread-safe version of Free()
+   * Note: This performs a deallocation only, if the object has a destructor and is not
+   * freed from within an overloaded delete operator, DestroyThreadSafe() must be used instead.
    *
    * @param object Pointer to the object to delete
    */
   void FreeThreadSafe( T* object )
   {
-    object->~T();
+    mPool->FreeThreadSafe( object );
+  }
 
+  /**
+   * @brief Return the object to the memory pool after destructing it.
+   * Note: Do not call this from an overloaded delete operator, as this will already have called the objects destructor.
+   *
+   * @param object Pointer to the object to delete
+   */
+  void Destroy( T* object )
+  {
+    object->~T();
+    mPool->Free( object );
+  }
+
+  /**
+   * @brief Thread-safe version of Destroy()
+   * Note: Do not call this from an overloaded delete operator, as this will already have called the objects destructor.
+   *
+   * @param object Pointer to the object to delete
+   */
+  void DestroyThreadSafe( T* object )
+  {
+    object->~T();
     mPool->FreeThreadSafe( object );
   }
 
@@ -128,10 +152,7 @@ public:
    */
   void ResetMemoryPool()
   {
-    if( mPool )
-    {
-      delete mPool;
-    }
+    delete mPool;
 
     mPool = new FixedSizeMemoryPool( TypeSizeWithAlignment< T >::size );
   }

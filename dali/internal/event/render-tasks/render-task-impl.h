@@ -162,6 +162,18 @@ public:
   const Vector4& GetClearColor() const;
 
   /**
+   * Set whether whether GL sync is required for native render target.
+   * @param[in] requiresSync whether whether GL sync is required.
+   */
+  void SetSyncRequired( bool requiresSync );
+
+  /**
+   * Query whether the sync object is required for native render target.
+   * @return True if the sync object is required, false otherwise.
+   */
+ bool IsSyncRequired() const;
+
+  /**
    * @copydoc Dali::RenderTask::SetClearEnabled()
    */
   void SetClearEnabled( bool enabled );
@@ -445,6 +457,7 @@ private:
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode      : 1; ///< True if the render-task's actors should be culled
   bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
+  bool mRequiresSync  : 1; ///< True if the GL sync is required to track the render of
 
   //Signals
   Dali::RenderTask::RenderTaskSignalType  mSignalFinished; ///< Signal emmited when the render task has been processed.

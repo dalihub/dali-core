@@ -32,7 +32,7 @@ void TestGlAbstraction::Initialize()
   mCurrentProgram = 0;
   mCompileStatus = GL_TRUE;
   mLinkStatus = GL_TRUE;
-
+  mNumberOfActiveUniforms = 0;
   mGetAttribLocationResult = 0;
   mGetErrorResult = 0;
   mGetStringResult = NULL;
@@ -77,6 +77,13 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms2f.clear();
   mProgramUniforms3f.clear();
   mProgramUniforms4f.clear();
+
+  mCullFaceTrace.Reset();
+  mEnableDisableTrace.Reset();
+  mShaderTrace.Reset();
+  mTextureTrace.Reset();
+  mTexParamaterTrace.Reset();
+  mDrawTrace.Reset();
 
   for( unsigned int i=0; i<MAX_ATTRIBUTE_CACHE_SIZE; ++i )
   {
