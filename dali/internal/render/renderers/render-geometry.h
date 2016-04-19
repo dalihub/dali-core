@@ -141,10 +141,14 @@ public:
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
+   * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
+   * @param[in] elementBufferCount Number of elements to draw if index buffer bound
    */
   void UploadAndDraw(Context& context,
                      BufferIndex bufferIndex,
-                     Vector<GLint>& attributeLocation );
+                     Vector<GLint>& attributeLocation,
+                     size_t elementBufferOffset,
+                     size_t elementBufferCount );
 
 private:
 

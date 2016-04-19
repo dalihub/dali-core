@@ -156,6 +156,18 @@ public:
   void SetBlendColor( const Vector4& blendColor );
 
   /**
+   * Set the index of first element for indexed draw
+   * @param[in] firstElement index of first element to draw
+   */
+  void SetIndexedDrawFirstElement( size_t firstElement );
+
+  /**
+   * Set the number of elements to draw by indexed draw
+   * @param[in] elementsCount number of elements to draw
+   */
+  void SetIndexedDrawElementsCount( size_t elementsCount );
+
+  /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
@@ -318,6 +330,9 @@ private:
   bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool         mPremultipledAlphaEnabled;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
+  size_t mIndexedDrawFirstElement;             ///< first element index to be drawn using indexed draw
+  size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
+
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions
 };
@@ -406,6 +421,26 @@ inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, cons
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetBlendColor, blendColor );
+}
+
+inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t firstElement )
+{
+  typedef MessageValue1< Renderer, size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawFirstElement, firstElement );
+}
+
+inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t elementsCount )
+{
+  typedef MessageValue1< Renderer, size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawElementsCount, elementsCount );
 }
 
 inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool preMultiplied )

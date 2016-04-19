@@ -135,6 +135,8 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mAttributesLocation(),
   mBlendingOptions(),
   mFaceCullingMode( faceCullingMode  ),
+  mIndexedDrawFirstElement( 0 ),
+  mIndexedDrawElementsCount( 0 ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
@@ -417,6 +419,16 @@ void Renderer::SetBlendColor( const Vector4* color )
   mBlendingOptions.SetBlendColor( *color );
 }
 
+void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+{
+  mIndexedDrawFirstElement = firstElement;
+}
+
+void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+{
+  mIndexedDrawElementsCount = elementsCount;
+}
+
 void Renderer::EnablePreMultipliedAlpha( bool enable )
 {
   mPremultipledAlphaEnabled = enable;
@@ -491,7 +503,7 @@ void Renderer::Render( Context& context,
       mUpdateAttributesLocation = false;
     }
 
-    mRenderGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation );
+    mRenderGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation, mIndexedDrawFirstElement, mIndexedDrawElementsCount );
   }
 }
 

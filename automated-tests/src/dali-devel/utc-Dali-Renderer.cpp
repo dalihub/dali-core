@@ -18,6 +18,8 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
+#include <cstdio>
+
 using namespace Dali;
 
 #include <mesh-builder.h>
@@ -1945,6 +1947,114 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
 
   //Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER( textureBindIndex[3], textureBindIndex[0], TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetIndicesRange(void)
+{
+  std::string
+      vertexShader(
+        "attribute vec2 aPosition;\n"
+        "void main()\n"
+        "{\n"
+        "  gl_Position = aPosition;\n"
+        "}"
+        ),
+      fragmentShader(
+        "void main()\n"
+        "{\n"
+        "  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0)\n"
+        "}\n"
+        );
+
+  TestApplication application;
+  tet_infoline("Test setting the range of indices to draw");
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableDrawCallTrace( true );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 100, 100 );
+
+  // create geometry
+  Geometry geometry = Geometry::New();
+  geometry.SetGeometryType( Geometry::LINE_LOOP );
+
+  // --------------------------------------------------------------------------
+  // index buffer
+  unsigned indices[] = { 0, 2, 4, 6, 8, // offset = 0, count = 5
+                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, // offset = 5, count = 10
+                         1, 3, 5, 7, 9, 1 }; // offset = 15,  count = 6 // line strip
+  Property::Map format;
+  format["indices"] = Property::INTEGER;
+  PropertyBuffer indexBuffer = PropertyBuffer::New( format );
+  indexBuffer.SetData( indices, sizeof(indices)/sizeof(indices[0]));
+
+  // --------------------------------------------------------------------------
+  // vertex buffer
+  struct Vertex
+  {
+    Vector2 position;
+  };
+  Vertex shapes[] =
+  {
+    // pentagon                   // star
+    { Vector2(  0.0f,   1.00f) }, { Vector2(  0.0f,  -1.00f) },
+    { Vector2( -0.95f,  0.31f) }, { Vector2(  0.59f,  0.81f) },
+    { Vector2( -0.59f, -0.81f) }, { Vector2( -0.95f, -0.31f) },
+    { Vector2(  0.59f, -0.81f) }, { Vector2(  0.95f, -0.31f) },
+    { Vector2(  0.95f,  0.31f) }, { Vector2( -0.59f,  0.81f) },
+  };
+  Property::Map vertexFormat;
+  vertexFormat["aPosition"] = Property::VECTOR2;
+  PropertyBuffer vertexBuffer = PropertyBuffer::New( vertexFormat );
+  vertexBuffer.SetData( shapes, sizeof(shapes)/sizeof(shapes[0]));
+
+  // --------------------------------------------------------------------------
+  geometry.SetIndexBuffer( indexBuffer );
+  geometry.AddVertexBuffer( vertexBuffer );
+
+  // create shader
+  Shader shader = Shader::New( vertexShader,fragmentShader );
+  Renderer renderer = Renderer::New( geometry, shader );
+  actor.AddRenderer( renderer );
+
+  Stage stage = Stage::GetCurrent();
+  stage.Add( actor );
+
+  char buffer[ 128 ];
+
+  // LINE_LOOP, first 0, count 5
+  {
+    renderer.SetIndicesRange( 0, 5 );
+    application.SendNotification();
+    application.Render();
+    sprintf( buffer, "%u, 5, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT );
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
+  // LINE_LOOP, first 5, count 10
+  {
+    renderer.SetIndicesRange( 5, 10 );
+    sprintf( buffer, "%u, 10, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
+  // LINE_STRIP, first 15, count 6
+  {
+    renderer.SetIndicesRange( 15, 6 );
+    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
 
   END_TEST;
 }

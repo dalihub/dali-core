@@ -95,7 +95,9 @@ enum Flags
   RESEND_FACE_CULLING_MODE = 1 << 2,
   RESEND_BLEND_COLOR = 1 << 3,
   RESEND_BLEND_BIT_MASK = 1 << 4,
-  RESEND_PREMULTIPLIED_ALPHA = 1 << 5
+  RESEND_PREMULTIPLIED_ALPHA = 1 << 5,
+  RESEND_INDEXED_DRAW_FIRST_ELEMENT = 1 << 6,
+  RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 7,
 };
 
 }
@@ -113,24 +115,26 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-:mSceneController(0),
- mRenderer(NULL),
- mTextureSet(NULL),
- mGeometry(NULL),
- mShader(NULL),
- mBlendColor(NULL),
- mBlendBitmask(0u),
+:mSceneController( 0 ),
+ mRenderer( NULL ),
+ mTextureSet( NULL ),
+ mGeometry( NULL ),
+ mShader( NULL ),
+ mBlendColor( NULL ),
+ mBlendBitmask( 0u ),
  mFaceCullingMode( Dali::Renderer::NONE ),
  mBlendingMode( Dali::BlendingMode::AUTO ),
- mReferenceCount(0),
- mRegenerateUniformMap(0),
- mResendFlag(0),
- mResourcesReady(false),
- mFinishedResourceAcquisition(false),
- mDepthIndex(0)
+ mReferenceCount( 0 ),
+ mRegenerateUniformMap( 0 ),
+ mResendFlag( 0 ),
+ mResourcesReady( false ),
+ mFinishedResourceAcquisition( false ),
+ mIndexedDrawFirstElement( 0 ),
+ mIndexedDrawElementsCount( 0 ),
+ mDepthIndex( 0 )
 {
-  mUniformMapChanged[0]=false;
-  mUniformMapChanged[1]=false;
+  mUniformMapChanged[0] = false;
+  mUniformMapChanged[1] = false;
 
   // Observe our own PropertyOwner's uniform map
   AddUniformMapObserver( *this );
@@ -280,6 +284,24 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
     mResendFlag &= ~RESEND_PREMULTIPLIED_ALPHA;
   }
+
+  if( mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT )
+  {
+    typedef MessageValue1< Render::Renderer, size_t > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement );
+    mResendFlag &= ~RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+  }
+
+  if( mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT )
+  {
+    typedef MessageValue1< Render::Renderer, size_t > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
+    mResendFlag &= ~RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+  }
+
+
 }
 
 void Renderer::SetTextures( TextureSet* textureSet )
@@ -368,6 +390,18 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
   }
 
   mResendFlag |= RESEND_BLEND_COLOR;
+}
+
+void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+{
+  mIndexedDrawFirstElement = firstElement;
+  mResendFlag |= RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+}
+
+void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+{
+  mIndexedDrawElementsCount = elementsCount;
+  mResendFlag |= RESEND_INDEXED_DRAW_ELEMENTS_COUNT;
 }
 
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
