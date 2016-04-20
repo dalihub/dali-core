@@ -53,8 +53,8 @@ namespace SceneGraph
 typedef OwnerContainer< Render::Renderer* >    RendererOwnerContainer;
 typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 
-typedef OwnerContainer< RenderGeometry* >      RenderGeometryOwnerContainer;
-typedef RenderGeometryOwnerContainer::Iterator RenderGeometryOwnerIter;
+typedef OwnerContainer< Render::Geometry* >    GeometryOwnerContainer;
+typedef GeometryOwnerContainer::Iterator       GeometryOwnerIter;
 
 typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
 typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
@@ -148,7 +148,7 @@ struct RenderManager::Impl
   RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
   SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
   PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
-  RenderGeometryOwnerContainer  renderGeometryContainer;  ///< List of owned RenderGeometries
+  GeometryOwnerContainer        geometryContainer;        ///< List of owned Geometries
 
   bool                          renderersAdded;
 
@@ -334,21 +334,26 @@ void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   propertyBuffer->SetData( data, size );
 }
 
-void RenderManager::AddGeometry( RenderGeometry* renderGeometry )
+void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
 {
-  mImpl->renderGeometryContainer.PushBack( renderGeometry );
+  geometry->SetIndexBuffer( indices );
 }
 
-void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
+void RenderManager::AddGeometry( Render::Geometry* geometry )
 {
-  DALI_ASSERT_DEBUG( NULL != renderGeometry );
+  mImpl->geometryContainer.PushBack( geometry );
+}
 
-  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
+void RenderManager::RemoveGeometry( Render::Geometry* geometry )
+{
+  DALI_ASSERT_DEBUG( NULL != geometry );
+
+  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
 
   // Find the geometry
-  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
-    if ( *iter == renderGeometry )
+    if ( *iter == geometry )
     {
       geometries.Erase( iter ); // Geometry found; now destroy it
       break;
@@ -356,33 +361,33 @@ void RenderManager::RemoveGeometry( RenderGeometry* renderGeometry )
   }
 }
 
-void RenderManager::AddPropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer )
+void RenderManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
-  DALI_ASSERT_DEBUG( NULL != renderGeometry );
+  DALI_ASSERT_DEBUG( NULL != geometry );
 
-  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
+  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
 
   // Find the renderer
-  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
-    if ( *iter == renderGeometry )
+    if ( *iter == geometry )
     {
-      (*iter)->AddPropertyBuffer( propertyBuffer, isIndexBuffer );
+      (*iter)->AddPropertyBuffer( propertyBuffer );
       break;
     }
   }
 }
 
-void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer )
+void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
-  DALI_ASSERT_DEBUG( NULL != renderGeometry );
+  DALI_ASSERT_DEBUG( NULL != geometry );
 
-  RenderGeometryOwnerContainer& geometries = mImpl->renderGeometryContainer;
+  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
 
   // Find the renderer
-  for ( RenderGeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
   {
-    if ( *iter == renderGeometry )
+    if ( *iter == geometry )
     {
       (*iter)->RemovePropertyBuffer( propertyBuffer );
       break;
@@ -390,12 +395,12 @@ void RenderManager::RemovePropertyBuffer( RenderGeometry* renderGeometry, Render
   }
 }
 
-void RenderManager::SetGeometryType( RenderGeometry* geometry, int type )
+void RenderManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
 {
-  geometry->SetGeometryType( static_cast<Geometry::GeometryType>(type) );
+  geometry->SetGeometryType( Render::Geometry::GeometryType(geometryType) );
 }
 
-void RenderManager::SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest )
+void RenderManager::SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest )
 {
   geometry->SetRequiresDepthTest( requiresDepthTest );
 }
@@ -493,7 +498,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   }
 
   //Notify RenderGeometries that rendering has finished
-  for ( RenderGeometryOwnerIter iter = mImpl->renderGeometryContainer.Begin(); iter != mImpl->renderGeometryContainer.End(); ++iter )
+  for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
   {
     (*iter)->OnRenderFinished();
   }

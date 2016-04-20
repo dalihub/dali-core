@@ -304,7 +304,7 @@ private: // unimplemented methods
 private: // data
   SceneGraph::Renderer* mSceneObject;
   Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
-  ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
+  GeometryPtr mGeometry; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<TextureSet> mTextureSetConnector; ///< Connector that holds the texture set used by this renderer
   IntrusivePtr<Shader> mShader;                 ///< Connector that holds the shader used by this renderer
 

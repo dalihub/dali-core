@@ -29,6 +29,7 @@
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
 {
@@ -46,7 +47,7 @@ typedef IntrusivePtr<Geometry> GeometryPtr;
  * Geometry is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Geometry : public Object, public Connectable
+class Geometry : public BaseObject
 {
 public:
 
@@ -74,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Geometry::SetIndexBuffer()
    */
-  void SetIndexBuffer( PropertyBuffer& indexBuffer );
+  void SetIndexBuffer( const unsigned short* indices, size_t count );
 
   /**
    * @copydoc Dali::Geometry::SetGeometryType()
@@ -101,102 +102,13 @@ public:
    *
    * @return the geometry scene object
    */
-  const SceneGraph::Geometry* GetGeometrySceneObject() const;
-
-public: // Default property extensions from Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::SetDefaultProperty()
-   */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
-
-  /**
-   * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
-   */
-  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultProperty()
-   */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyOwner()
-   */
-  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
-   */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
-
-public: // Functions from Connectable
-  /**
-   * @copydoc Dali::Internal::Connectable::OnStage()
-   */
-  virtual bool OnStage() const;
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Connect()
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Disconnect()
-   */
-  virtual void Disconnect();
+  const Render::Geometry* GetRenderObject() const;
 
 private: // implementation
+
+  /**
+   * Constructor
+   */
   Geometry();
 
   /**
@@ -205,6 +117,7 @@ private: // implementation
   void Initialize();
 
 protected:
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
@@ -216,15 +129,13 @@ private: // unimplemented methods
 
 private: // data
 
-  SceneGraph::Geometry* mSceneObject;
+  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
+  Render::Geometry* mRenderObject;
 
   std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
-  PropertyBufferPtr              mIndexBuffer;   ///< Intrusive pointer to index buffer
-
   Dali::Geometry::GeometryType mGeometryType;      ///< Geometry type (cached)
   bool                         mRequiresDepthTest; ///< Establish if geometry requires depth testing (cached)
 
-  bool mOnStage;
 };
 
 } // namespace Internal

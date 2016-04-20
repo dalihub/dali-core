@@ -78,23 +78,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Geometry* geometry )
-{
-  DALI_ASSERT_DEBUG( NULL != geometry );
-
-  // The GL resources will now be freed in frame N
-  // The Update for frame N+1 may occur in parallel with the rendering of frame N
-  // Queue the node for destruction in frame N+2
-  if ( 0u == updateBufferIndex )
-  {
-    mGeometryQueue0.PushBack( geometry );
-  }
-  else
-  {
-    mGeometryQueue1.PushBack( geometry );
-  }
-}
-
 void DiscardQueue::Add( BufferIndex updateBufferIndex, TextureSet* textureSet )
 {
   DALI_ASSERT_DEBUG( NULL != textureSet );
@@ -140,7 +123,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   {
     mNodeQueue0.Clear();
     mShaderQueue0.Clear();
-    mGeometryQueue0.Clear();
     mTextureSetQueue0.Clear();
     mRendererQueue0.Clear();
   }
@@ -148,7 +130,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   {
     mNodeQueue1.Clear();
     mShaderQueue1.Clear();
-    mGeometryQueue1.Clear();
     mTextureSetQueue1.Clear();
     mRendererQueue1.Clear();
   }

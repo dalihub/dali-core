@@ -37,7 +37,7 @@ class Geometry;
 /**
  * @brief Geometry is handle to an object that can be used to define a geometric elements.
  */
-class DALI_IMPORT_API Geometry : public Handle
+class DALI_IMPORT_API Geometry : public BaseHandle
 {
 public:
 
@@ -52,17 +52,6 @@ public:
     TRIANGLE_STRIP
   };
 
-  /**
-   * @brief An enumeration of properties belonging to the Geometry class.
-   */
-  struct Property
-  {
-    enum
-    {
-      GEOMETRY_TYPE = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "geometryType",             type STRING
-      REQUIRES_DEPTH_TEST,                                  ///< name "requiresDepthTesting",   type BOOLEAN
-    };
-  };
 
   /**
    * @brief Creates a new Geometry object
@@ -131,16 +120,15 @@ public:
   void RemoveVertexBuffer( std::size_t index );
 
   /**
-   * @brief Set a PropertyBuffer to be used as a source of indices for the geometry
+   * @brief Set a the index data to be used as a source of indices for the geometry
    *
-   * This buffer is required to have exactly one component and it must be of the type Property::INTEGER
+   * Setting this buffer will cause the geometry to be rendered using indices.
+   * To unset call SetIndexBuffer with a null pointer or count 0
    *
-   * By setting this buffer the will case the geometry to be rendered using indices.
-   * To unset call SetIndexBuffer with an empty handle.
-   *
-   * @param[in] indexBuffer PropertyBuffer to be used as a source of indices for the geometry
+   * @param[in] indices Array of indices
+   * @param[in] count Number of indices in the array
    */
-  void SetIndexBuffer( PropertyBuffer& indexBuffer );
+  void SetIndexBuffer( const unsigned short* indices, size_t count );
 
   /**
    * @brief Set the type of primitives this geometry contains

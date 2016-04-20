@@ -21,7 +21,6 @@
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-renderer.h>
@@ -124,13 +123,13 @@ Renderer::Renderer()
  mBlendBitmask( 0u ),
  mFaceCullingMode( Dali::Renderer::NONE ),
  mBlendingMode( Dali::BlendingMode::AUTO ),
+ mIndexedDrawFirstElement( 0 ),
+ mIndexedDrawElementsCount( 0 ),
  mReferenceCount( 0 ),
  mRegenerateUniformMap( 0 ),
  mResendFlag( 0 ),
  mResourcesReady( false ),
  mFinishedResourceAcquisition( false ),
- mIndexedDrawFirstElement( 0 ),
- mIndexedDrawElementsCount( 0 ),
  mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -146,11 +145,6 @@ Renderer::~Renderer()
   {
     mTextureSet->RemoveConnectionObserver(*this);
     mTextureSet=NULL;
-  }
-  if (mGeometry)
-  {
-    mGeometry->RemoveConnectionObserver(*this);
-    mGeometry=NULL;
   }
   if( mShader )
   {
@@ -172,7 +166,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   mFinishedResourceAcquisition = false;
 
   // Can only be considered ready when all the scene graph objects are connected to the renderer
-  if( ( mGeometry ) && ( mGeometry->GetVertexBuffers().Count() > 0 ) && ( mShader ) )
+  if( mGeometry && mShader )
   {
     if( mTextureSet )
     {
@@ -204,8 +198,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       }
 
       AddMappings( localMap, mShader->GetUniformMap() );
-      AddMappings( localMap, mGeometry->GetUniformMap() );
-
     }
     else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
     {
@@ -243,13 +235,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendFlag & RESEND_GEOMETRY )
   {
-    // The first call to GetRenderGeometry() creates the geometry and sends it in a message
-    RenderGeometry* geometry = mGeometry->GetRenderGeometry( mSceneController );
-
-    typedef MessageValue1< Render::Renderer, RenderGeometry* > DerivedType;
+    typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, geometry );
+    new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
     mResendFlag &= ~RESEND_GEOMETRY;
   }
 
@@ -334,18 +323,10 @@ void Renderer::SetShader( Shader* shader )
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
-void Renderer::SetGeometry( Geometry* geometry )
+void Renderer::SetGeometry( Render::Geometry* geometry )
 {
   DALI_ASSERT_DEBUG( geometry != NULL && "Geometry pointer is NULL");
-  if( mGeometry)
-  {
-    mGeometry->RemoveConnectionObserver(*this);
-    mGeometry->OnRendererDisconnect();
-  }
-
   mGeometry = geometry;
-  mGeometry->AddConnectionObserver( *this ); // Observe geometry connections / uniform mapping changes
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   if( mRenderer )
   {
@@ -418,8 +399,7 @@ void Renderer::OnStageConnect()
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-    RenderGeometry* renderGeometry = mGeometry->GetRenderGeometry(mSceneController);
-    mRenderer = Render::Renderer::New( dataProvider, renderGeometry,
+    mRenderer = Render::Renderer::New( dataProvider, mGeometry,
                                        mBlendBitmask, mBlendColor,
                                        static_cast< Dali::Renderer::FaceCullingMode >( mFaceCullingMode ),
                                        mPremultipledAlphaEnabled );
@@ -435,10 +415,6 @@ void Renderer::OnStageDisconnect()
   if( mReferenceCount == 0 )
   {
     mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
-    if( mGeometry )
-    {
-      mGeometry->OnRendererDisconnect();
-    }
     mRenderer = NULL;
   }
 }
@@ -567,11 +543,7 @@ void Renderer::UniformMappingsChanged( const UniformMap& mappings )
 
 void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 {
-  if( reinterpret_cast<PropertyOwner*>(mGeometry) == &owner )
-  {
-    mGeometry = NULL;
-  }
-  else if( reinterpret_cast<PropertyOwner*>(mTextureSet) == &owner )
+  if( reinterpret_cast<PropertyOwner*>(mTextureSet) == &owner )
   {
     mTextureSet = NULL;
   }

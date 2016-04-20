@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDER_GEOMETRY_H
-#define DALI_INTERNAL_SCENE_GRAPH_RENDER_GEOMETRY_H
+#ifndef DALI_INTERNAL_RENDER_GEOMETRY_H
+#define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,11 +19,14 @@
 
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-abstraction.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
+#include <dali/devel-api/rendering/geometry.h>
+
 
 namespace Dali
 {
@@ -36,32 +39,23 @@ class GpuBuffer;
 namespace Render
 {
 class PropertyBuffer;
-}
-
-namespace SceneGraph
-{
 
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
  * to it's GPU buffers, to bind all the buffers and to setup/teardown vertex attribute
  * bindings
  */
-class RenderGeometry
+class Geometry
 {
 public:
+  typedef Dali::Geometry::GeometryType GeometryType;
 
-  typedef SceneGraph::Geometry::GeometryType GeometryType;
-  /**
-   * Constructor. Creates a render geometry object with no GPU buffers.
-   * @param[in] center The center of the geometry
-   * @param[in] geometryType The geometry type
-   * @param[in] requiresDepthTest True if geometry requires depth testing, false otherwise
-   */
-  RenderGeometry( GeometryType geometryType, bool requiresDepthTest );
+  Geometry();
+
   /**
    * Destructor
    */
-  ~RenderGeometry();
+  ~Geometry();
 
   /**
    * Called on Gl Context created
@@ -76,9 +70,14 @@ public:
   /**
    * Adds a property buffer to the geometry
    * @param[in] dataProvider The PropertyBuffer data provider
-   * @param[in] isIndexBuffer True if the property buffer is intended to be used as an index buffer
    */
-  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
+  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer );
+
+  /**
+   * Set the data for the index buffer to be used by the geometry
+   * @param[in] indices A vector containing the indices
+   */
+  void SetIndexBuffer( Dali::Vector<unsigned short>& indices );
 
   /**
    * Removes a PropertyBuffer from the geometry
@@ -153,20 +152,22 @@ public:
 private:
 
   // PropertyBuffers
-  Render::PropertyBuffer* mIndexBuffer;
-  Vector<Render::PropertyBuffer*> mVertexBuffers;
+  Vector< Render::PropertyBuffer* > mVertexBuffers;
 
-  GeometryType  mGeometryType;
+  Dali::Vector< unsigned short> mIndices;
+  OwnerPointer< GpuBuffer > mIndexBuffer;
+  GeometryType mGeometryType;
 
   // Booleans
+  bool mIndicesChanged : 1;
   bool mRequiresDepthTest : 1;
   bool mHasBeenUpdated : 1;
   bool mAttributesChanged : 1;
 
 };
 
-} // namespace SceneGraph
+} // namespace Render
 } // namespace Internal
 } // namespace Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_SAMPLER_DATA_PROVIDER_H
+#endif // DALI_INTERNAL_RENDER_GEOMETRY_H

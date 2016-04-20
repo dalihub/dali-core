@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
 {
@@ -74,15 +75,15 @@ RendererPtr Renderer::New()
 
 void Renderer::SetGeometry( Geometry& geometry )
 {
-  mGeometryConnector.Set( geometry, OnStage() );
-  const SceneGraph::Geometry* geometrySceneObject = geometry.GetGeometrySceneObject();
+  mGeometry = &geometry;
 
+  const Render::Geometry* geometrySceneObject = geometry.GetRenderObject();
   SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
 }
 
 Geometry* Renderer::GetGeometry() const
 {
-  return mGeometryConnector.Get().Get();
+  return mGeometry.Get();
 }
 
 void Renderer::SetTextures( TextureSet& textureSet )
@@ -629,7 +630,6 @@ void Renderer::Connect()
   if( mOnStageCount == 0 )
   {
     OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
-    mGeometryConnector.OnStageConnect();
     mTextureSetConnector.OnStageConnect();
   }
   ++mOnStageCount;
@@ -641,7 +641,6 @@ void Renderer::Disconnect()
   if( mOnStageCount == 0 )
   {
     OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
-    mGeometryConnector.OnStageDisconnect();
     mTextureSetConnector.OnStageDisconnect();
   }
 }

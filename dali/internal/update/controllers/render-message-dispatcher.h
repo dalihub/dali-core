@@ -40,7 +40,6 @@ namespace SceneGraph
 
 class RenderManager;
 class RenderQueue;
-class RenderGeometry;
 class PropertyBufferDataProvider;
 /**
  * A utility class for sending messages to the render-thread.
@@ -72,50 +71,6 @@ public:
    * @post renderer will be destroyed in the next Render.
    */
   void RemoveRenderer( Render::Renderer& renderer );
-
-  /**
-   * Add a Geometry
-   * @param[in] renderGeometry The geometry to add.
-   * @post RenderGeometry ownership is transferred.
-   */
-  void AddGeometry( RenderGeometry& renderGeometry );
-
-  /**
-   * Remove a Geometry.
-   * @param[in] renderGeometry The geometry to remove.
-   * @post RenderGeometry will be destroyed in the next Render.
-   */
-  void RemoveGeometry( RenderGeometry& renderGeometry );
-
-  /**
-   * Add a PropertyBuffer.
-   * @param[in] renderGeometry The geometry
-   * @param[in] propertyBuffer The PropertyBuffer
-   * @param[in] isIndexBuffer True if the buffer is intended to be used as an index buffer
-   */
-  void AddPropertyBuffer( RenderGeometry& renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
-
-  /**
-   * Remove a PropertyBuffer.
-   * @param[in] renderGeometry The geometry
-   * @param[in] propertyBuffer The PropertyBuffer
-   * @post PropertyBuffer will be destroyed in the next Render.
-   */
-  void RemovePropertyBuffer( RenderGeometry& renderGeometry, Render::PropertyBuffer* propertyBuffer );
-
-  /**
-   * Set the geometry type of an existing render geometry
-   * @param[in] geometry The render geometry
-   * @param[in] geometryType The new geometry type
-   */
-  void SetGeometryType( RenderGeometry& geometry, int geometryType );
-
-  /**
-   * Set if an existing geometry requires depth testing
-   * @param[in] geometry The render geometry
-   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
-   */
-  void SetGeometryRequiresDepthTest( RenderGeometry& geometry, bool requiresDepthTest );
 
   /**
    * Add a Render tracker.

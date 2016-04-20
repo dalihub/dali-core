@@ -49,6 +49,7 @@ namespace Render
 class Renderer;
 class Sampler;
 class RenderTracker;
+class Geometry;
 }
 
 namespace SceneGraph
@@ -58,7 +59,6 @@ class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
-class RenderGeometry;
 class PropertyBufferDataProvider;
 
 /**
@@ -208,30 +208,29 @@ public:
    * @param[in] geometry The geometry to add.
    * @post geometry is owned by RenderManager
    */
-  void AddGeometry( RenderGeometry* geometry );
+  void AddGeometry( Render::Geometry* geometry );
 
   /**
    * Remove a geometry from the render manager.
    * @param[in] geometry The geometry to remove.
    * @post geometry is destroyed.
    */
-  void RemoveGeometry( RenderGeometry* geometry );
+  void RemoveGeometry( Render::Geometry* geometry );
 
   /**
-   * Adds a property buffer to a RenderGeometry from the render manager.
+   * Adds a property buffer to a geometry from the render manager.
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer to remove.
-   * @param[in] isIndexBuffer True if the property buffer is intended to be used as an index buffer
    */
-  void AddPropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer, bool isIndexBuffer );
+  void AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
-   * Remove a property buffer from a RenderGeometry from the render manager.
+   * Remove a property buffer from a Render::Geometry from the render manager.
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer to remove.
    * @post property buffer is destroyed.
    */
-  void RemovePropertyBuffer( RenderGeometry* renderGeometry, Render::PropertyBuffer* propertyBuffer );
+  void RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Sets the format of an existing property buffer
@@ -249,18 +248,25 @@ public:
   void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size );
 
   /**
+   * Sets the data for the index buffer of an existing geometry
+   * @param[in] geometry The geometry
+   * @param[in] data A vector containing the indices
+   */
+  void SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& data );
+
+  /**
    * Set the geometry type of an existing render geometry
    * @param[in] geometry The render geometry
    * @param[in] geometryType The new geometry type
    */
-  void SetGeometryType( RenderGeometry* geometry, int geometryType );
+  void SetGeometryType( Render::Geometry* geometry, unsigned int geometryType );
 
   /**
    * Set if an existing geometry requires depth testing
    * @param[in] geometry The render geometry
    * @param[in] requiresDepthTest True if depth testing is required, false otherwise
    */
-  void SetGeometryRequiresDepthTest( RenderGeometry* geometry, bool requiresDepthTest );
+  void SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

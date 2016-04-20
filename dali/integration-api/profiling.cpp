@@ -125,8 +125,7 @@ const int RENDERER_MEMORY_SIZE(
   sizeof( Internal::Render::Renderer ) );
 const int GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::Geometry ) +
-  sizeof( Internal::SceneGraph::Geometry ) +
-  sizeof( Internal::SceneGraph::RenderGeometry) );
+  sizeof( Internal::Render::Geometry) );
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
   sizeof( Internal::Render::PropertyBuffer ) );

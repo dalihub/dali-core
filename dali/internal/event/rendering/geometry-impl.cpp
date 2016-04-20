@@ -33,16 +33,6 @@ namespace Internal
 namespace
 {
 
-/**
- *            |name                    |type     |writable|animatable|constraint-input|enum for index-checking|
- */
-DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "geometryType",          STRING,   true, false, true, Dali::Geometry::Property::GEOMETRY_TYPE )
-DALI_PROPERTY( "requiresDepthTest",     BOOLEAN,  true, false, true, Dali::Geometry::Property::REQUIRES_DEPTH_TEST )
-DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
-
-const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> GEOMETRY_IMPL = { DEFAULT_PROPERTY_DETAILS };
-
 BaseHandle Create()
 {
   return Dali::Geometry::New();
@@ -62,7 +52,7 @@ GeometryPtr Geometry::New()
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   mVertexBuffers.push_back( &vertexBuffer );
-  SceneGraph::AddVertexBufferMessage( GetEventThreadServices(), *mSceneObject, *vertexBuffer.GetRenderObject() );
+  SceneGraph::AddVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
   return mVertexBuffers.size() - 1u;
 }
 
@@ -74,24 +64,28 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
   const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
-  SceneGraph::RemoveVertexBufferMessage( GetEventThreadServices(), *mSceneObject, renderPropertyBuffer );
+  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderPropertyBuffer );
 
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
 
-void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
+void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
 {
-  mIndexBuffer = &indexBuffer;
-  SceneGraph::SetIndexBufferMessage( GetEventThreadServices(), *mSceneObject, *indexBuffer.GetRenderObject() );
+  Dali::Vector<unsigned short> indexData;
+  if( indices && count )
+  {
+    indexData.Resize( count );
+    std::copy( indices, indices + count, indexData.Begin() );
+  }
+
+  SceneGraph::SetIndexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData );
 }
 
 void Geometry::SetGeometryType( Dali::Geometry::GeometryType geometryType )
 {
   if( geometryType != mGeometryType )
   {
-    SceneGraph::SetGeometryTypeMessage(GetEventThreadServices(),
-                                       *mSceneObject,
-                                       geometryType );
+    SceneGraph::SetGeometryTypeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, geometryType );
 
     mGeometryType = geometryType;
   }
@@ -106,9 +100,7 @@ void Geometry::SetRequiresDepthTesting( bool requiresDepthTest )
 {
   if( requiresDepthTest != mRequiresDepthTest )
   {
-    SceneGraph::SetGeometryRequiresDepthTestMessage(GetEventThreadServices(),
-                                                    *mSceneObject,
-                                                    requiresDepthTest );
+    SceneGraph::SetGeometryRequiresDepthTestMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, requiresDepthTest );
 
     mRequiresDepthTest = requiresDepthTest;
   }
@@ -119,199 +111,30 @@ bool Geometry::GetRequiresDepthTesting() const
   return mRequiresDepthTest;
 }
 
-const SceneGraph::Geometry* Geometry::GetGeometrySceneObject() const
+const Render::Geometry* Geometry::GetRenderObject() const
 {
-  return mSceneObject;
-}
-
-unsigned int Geometry::GetDefaultPropertyCount() const
-{
-  return GEOMETRY_IMPL.GetDefaultPropertyCount();
-}
-
-void Geometry::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  GEOMETRY_IMPL.GetDefaultPropertyIndices( indices );
-}
-
-const char* Geometry::GetDefaultPropertyName(Property::Index index) const
-{
-  return GEOMETRY_IMPL.GetDefaultPropertyName( index );
-}
-
-Property::Index Geometry::GetDefaultPropertyIndex( const std::string& name ) const
-{
-  return GEOMETRY_IMPL.GetDefaultPropertyIndex( name );
-}
-
-bool Geometry::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  return GEOMETRY_IMPL.IsDefaultPropertyWritable( index );
-}
-
-bool Geometry::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  return GEOMETRY_IMPL.IsDefaultPropertyAnimatable( index );
-}
-
-bool Geometry::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return GEOMETRY_IMPL.IsDefaultPropertyAConstraintInput( index );
-}
-
-Property::Type Geometry::GetDefaultPropertyType( Property::Index index ) const
-{
-  return GEOMETRY_IMPL.GetDefaultPropertyType( index );
-}
-
-void Geometry::SetDefaultProperty( Property::Index index,
-                                   const Property::Value& propertyValue )
-{
-  switch( index )
-  {
-    case Dali::Geometry::Property::GEOMETRY_TYPE :
-    {
-      Dali::Geometry::GeometryType geometryType = static_cast<Dali::Geometry::GeometryType>(propertyValue.Get<int>());
-      if( geometryType != mGeometryType )
-      {
-        SceneGraph::SetGeometryTypeMessage(GetEventThreadServices(), *mSceneObject, geometryType );
-        mGeometryType = geometryType;
-      }
-      break;
-    }
-    case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
-    {
-      bool requiresDepthTest = propertyValue.Get<bool>();
-      if( requiresDepthTest != mRequiresDepthTest )
-      {
-        SceneGraph::SetGeometryRequiresDepthTestMessage(GetEventThreadServices(), *mSceneObject, requiresDepthTest);
-        mRequiresDepthTest = requiresDepthTest;
-      }
-      break;
-    }
-  }
-}
-
-void Geometry::SetSceneGraphProperty( Property::Index index,
-                                      const PropertyMetadata& entry,
-                                      const Property::Value& value )
-{
-  GEOMETRY_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
-}
-
-Property::Value Geometry::GetDefaultProperty( Property::Index index ) const
-{
-  Property::Value value;
-
-  switch( index )
-  {
-    case Dali::Geometry::Property::GEOMETRY_TYPE :
-    {
-      if( mSceneObject )
-      {
-        value = mGeometryType;
-      }
-      break;
-    }
-    case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
-    {
-      if( mSceneObject )
-      {
-        value = mRequiresDepthTest;
-      }
-      break;
-    }
-  }
-
-  return value;
-}
-
-const SceneGraph::PropertyOwner* Geometry::GetPropertyOwner() const
-{
-  return mSceneObject;
-}
-
-const SceneGraph::PropertyOwner* Geometry::GetSceneObject() const
-{
-  return mSceneObject;
-}
-
-const SceneGraph::PropertyBase* Geometry::GetSceneObjectAnimatableProperty( Property::Index index ) const
-{
-  const SceneGraph::PropertyBase* property = NULL;
-  if( OnStage() )
-  {
-    property = GEOMETRY_IMPL.GetRegisteredSceneGraphProperty ( this,
-                                                               &Geometry::FindAnimatableProperty,
-                                                               &Geometry::FindCustomProperty,
-                                                               index );
-  }
-
-  return property;
-}
-
-const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index index ) const
-{
-  const PropertyInputImpl* property = NULL;
-
-  if( OnStage() )
-  {
-    const SceneGraph::PropertyBase* baseProperty =
-        GEOMETRY_IMPL.GetRegisteredSceneGraphProperty ( this,
-                                                        &Geometry::FindAnimatableProperty,
-                                                        &Geometry::FindCustomProperty,
-                                                        index );
-
-    property = static_cast<const PropertyInputImpl*>( baseProperty );
-  }
-
-  return property;
-}
-
-bool Geometry::OnStage() const
-{
-  return mOnStage;
-}
-
-void Geometry::Connect()
-{
-  mOnStage = true;
-}
-
-void Geometry::Disconnect()
-{
-  mOnStage = false;
+  return mRenderObject;
 }
 
 Geometry::Geometry()
-: mSceneObject( NULL ),
-  mIndexBuffer( NULL ),
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mRenderObject( NULL ),
   mGeometryType(Dali::Geometry::TRIANGLES),
-  mRequiresDepthTest(false),
-  mOnStage( false )
+  mRequiresDepthTest(false)
 {
 }
 
 void Geometry::Initialize()
 {
-  EventThreadServices& eventThreadServices = GetEventThreadServices();
-  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-
-  mSceneObject = new SceneGraph::Geometry();
-  AddMessage( updateManager, updateManager.GetGeometryOwner(), *mSceneObject );
-
-  eventThreadServices.RegisterObject( this );
+  mRenderObject = new Render::Geometry();
+  AddGeometry( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
 Geometry::~Geometry()
 {
-  if( EventThreadServices::IsCoreRunning() )
+  if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    EventThreadServices& eventThreadServices = GetEventThreadServices();
-    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveMessage( updateManager, updateManager.GetGeometryOwner(), *mSceneObject );
-
-    eventThreadServices.UnregisterObject( this );
+    RemoveGeometry( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 

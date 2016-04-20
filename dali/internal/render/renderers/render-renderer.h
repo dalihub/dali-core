@@ -24,11 +24,13 @@
 #include <dali/devel-api/rendering/texture-set.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
@@ -75,14 +77,14 @@ public:
   /**
    * Create a new renderer instance
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
-                        SceneGraph::RenderGeometry* renderGeometry,
+                        Render::Geometry* geometry,
                         unsigned int blendingBitmask,
                         const Vector4* blendColor,
                         Dali::Renderer::FaceCullingMode faceCullingMode,
@@ -91,14 +93,14 @@ public:
   /**
    * Constructor.
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
-            SceneGraph::RenderGeometry* renderGeometry,
+            Render::Geometry* geometry,
             unsigned int blendingBitmask,
             const Vector4* blendColor,
             Dali::Renderer::FaceCullingMode faceCullingMode,
@@ -112,9 +114,9 @@ public:
 
   /**
    * Change the geometry used by the renderer
-   * @param[in] renderGeometry The new geometry
+   * @param[in] geometry The new geometry
    */
-  void SetGeometry( SceneGraph::RenderGeometry* renderGeometry );
+  void SetGeometry( Render::Geometry* geometry );
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
@@ -256,7 +258,7 @@ private:
   Context* mContext;
   SceneGraph::TextureCache* mTextureCache;
   Render::UniformNameCache* mUniformNameCache;
-  SceneGraph::RenderGeometry* mRenderGeometry;
+  Render::Geometry* mGeometry;
 
   struct UniformIndexMap
   {

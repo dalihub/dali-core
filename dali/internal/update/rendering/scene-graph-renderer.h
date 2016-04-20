@@ -35,6 +35,7 @@ namespace Internal
 namespace Render
 {
 class Renderer;
+class Geometry;
 }
 
 namespace SceneGraph
@@ -105,16 +106,7 @@ public:
    * Set the geometry for the renderer
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry( Geometry* geometry );
-
-  /**
-   * Get the geometry of this renderer
-   * @return the geometry this renderer uses
-   */
-  Geometry& GetGeometry()
-  {
-    return *mGeometry;
-  }
+  void SetGeometry( Render::Geometry* geometry );
 
   /**
    * Set the depth index
@@ -310,10 +302,10 @@ private:
 
 private:
 
-  SceneController* mSceneController;  ///< Used for initializing renderers whilst attached
-  Render::Renderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
+  SceneController*   mSceneController;  ///< Used for initializing renderers whilst attached
+  Render::Renderer*  mRenderer;    ///< Raw pointer to the renderer (that's owned by RenderManager)
   TextureSet*        mTextureSet;    ///< The texture set this renderer uses. (Not owned)
-  Geometry*          mGeometry;    ///< The geometry this renderer uses. (Not owned)
+  Render::Geometry*  mGeometry;    ///< The geometry this renderer uses. (Not owned)
   Shader*            mShader;
 
   Vector4*                        mBlendColor;      ///< The blend color for blending operation
@@ -322,6 +314,9 @@ private:
   BlendingMode::Type              mBlendingMode;    ///< The mode of blending
 
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+
+  size_t mIndexedDrawFirstElement;             ///< first element index to be drawn using indexed draw
+  size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
   unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
   unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned char mResendFlag;                    ///< Indicate whether data should be resent to the renderer
@@ -329,9 +324,6 @@ private:
   bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
   bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool         mPremultipledAlphaEnabled;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-
-  size_t mIndexedDrawFirstElement;             ///< first element index to be drawn using indexed draw
-  size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
 
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions
@@ -350,15 +342,15 @@ inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &renderer, &Renderer::SetTextures, const_cast<TextureSet*>(&textureSet) );
 }
 
-inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Geometry& geometry )
+inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry& geometry )
 {
-  typedef MessageValue1< Renderer, Geometry* > LocalType;
+  typedef MessageValue1< Renderer, Render::Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Geometry*>(&geometry) );
+  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(&geometry) );
 }
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Shader& shader )

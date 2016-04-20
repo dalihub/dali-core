@@ -39,7 +39,7 @@ Geometry::~Geometry()
 }
 
 Geometry::Geometry( const Geometry& handle )
-: Handle( handle )
+: BaseHandle( handle )
 {
 }
 
@@ -70,10 +70,9 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
   GetImplementation(*this).RemoveVertexBuffer( index );
 }
 
-void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
+void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
 {
-  DALI_ASSERT_ALWAYS( indexBuffer && "indexBuffer is not initialized ");
-  GetImplementation(*this).SetIndexBuffer( GetImplementation( indexBuffer ) );
+  GetImplementation(*this).SetIndexBuffer( indices, count );
 }
 
 void Geometry::SetGeometryType( GeometryType geometryType )
@@ -97,7 +96,7 @@ bool Geometry::GetRequiresDepthTesting() const
 }
 
 Geometry::Geometry( Internal::Geometry* pointer )
-: Handle( pointer )
+: BaseHandle( pointer )
 {
 }
 

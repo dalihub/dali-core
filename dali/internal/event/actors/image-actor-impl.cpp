@@ -86,7 +86,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   }
 
   // Create indices
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( ( gridWidth + 2 ) * gridHeight * 2 - 2);
 
   for( unsigned int row = 0u; row < gridHeight; ++row )
@@ -120,18 +120,13 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
     vertexPropertyBuffer->SetData( &vertices[ 0 ], vertices.size() );
   }
 
-  Property::Map indexFormat;
-  indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBufferPtr indexPropertyBuffer = PropertyBuffer::New( indexFormat );
-  if( indices.Size() > 0 )
-  {
-    indexPropertyBuffer->SetData( &indices[ 0 ], indices.Size() );
-  }
-
   // Create the geometry object
   GeometryPtr geometry = Geometry::New();
   geometry->AddVertexBuffer( *vertexPropertyBuffer );
-  geometry->SetIndexBuffer( *indexPropertyBuffer );
+  if( indices.Size() > 0 )
+  {
+    geometry->SetIndexBuffer( &indices[0], indices.Size() );
+  }
   geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;

@@ -27,7 +27,6 @@
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-tracker.h>
