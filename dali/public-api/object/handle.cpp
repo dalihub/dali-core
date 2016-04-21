@@ -164,6 +164,18 @@ void Handle::RemoveConstraints( uint32_t tag )
   GetImplementation(*this).RemoveConstraints( tag );
 }
 
+IndirectValue Handle::operator[]( Property::Index index )
+{
+  // Will assert on access if handle is empty
+  return IndirectValue(*this, index);
+}
+
+IndirectValue Handle::operator[]( const std::string& name )
+{
+  // Will assert immediately when GetPropertyIndex is called if handle is empty
+  return IndirectValue(*this, GetPropertyIndex(name));
+}
+
 namespace WeightObject
 {
 

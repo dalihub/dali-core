@@ -305,6 +305,17 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
 void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location);
 
 /**
+ * Test if a property value type is equal to a trivial type.
+ */
+template<typename Type>
+inline void DALI_TEST_VALUE_EQUALS( Property::Value&& value1, Type value2, float epsilon, const char* location)
+{
+  Property::Value value2b(value2);
+  DALI_TEST_EQUALS(value1, value2b, epsilon, location);
+}
+
+
+/**
  * Test whether one unsigned integer value is greater than another.
  * Test succeeds if value1 > value2
  * @param[in] value1 The first value

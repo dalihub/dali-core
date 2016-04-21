@@ -16,7 +16,7 @@
  */
 
 #include <iostream>
-
+#include <typeinfo>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -1828,6 +1828,7 @@ int UtcDaliHandleGetProperties(void)
   END_TEST;
 }
 
+
 int UtcDaliHandleSetPropertyNegative(void)
 {
   TestApplication application;
@@ -2169,5 +2170,125 @@ int UtcDaliHandleSupportsNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+
+int UtcDaliHandleIndexOperatorByIndexP01(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+
+  actor[Actor::Property::SIZE] = Vector3( 100.0f, 200.0f, 1.0f );
+
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>(Actor::Property::SIZE), Vector3( 100.0f, 200.0f, 1.0f ), 0.001f, TEST_LOCATION );
+
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 10.0f, 20.0f, 0.0f ) );
+
+  Vector3 position = actor[ Actor::Property::POSITION ];
+  DALI_TEST_EQUALS( position, Vector3( 10.0f, 20.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleIndexOperatorByIndexP02(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+
+  const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
+  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
+  actor[Actor::Property::COLOR_RED] = 0.5f;
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED), 0.5f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( actor.GetProperty<Vector4>(Actor::Property::COLOR), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 10.0f, 20.0f, 0.0f ) );
+
+  DALI_TEST_EQUALS( (float)actor[ Actor::Property::POSITION_Z ], 0.0f, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleIndexOperatorByIndexP03(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+
+  const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
+  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
+
+  // Value under test is second to allow compiler to deduce type
+  DALI_TEST_VALUE_EQUALS( actor[Actor::Property::COLOR_RED], 1.0f, 0.001f, TEST_LOCATION);
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 10.0f, 20.0f, 0.0f ) );
+
+  DALI_TEST_EQUALS( (float)actor[ Actor::Property::POSITION_Z ], 0.0f, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleIndexOperatorByNameP01(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+
+  actor["size"] = Vector3( 100.0f, 200.0f, 1.0f );
+
+  DALI_TEST_VALUE_EQUALS( actor.GetProperty(Actor::Property::SIZE), Vector3( 100.0f, 200.0f, 1.0f ), 0.001f, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 10.0f, 20.0f, 0.0f ) );
+  Vector3 position = actor[ "position" ];
+
+  DALI_TEST_EQUALS( position, Vector3( 10.0f, 20.0f, 0.0f ), 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliHandleIndexOperatorByNameP02(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+
+  const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
+  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
+  actor["colorRed"] = 0.5f;
+
+  DALI_TEST_VALUE_EQUALS( actor.GetProperty(Actor::Property::COLOR_RED), 0.5f, 0.001f, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS( actor.GetProperty(Actor::Property::COLOR), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 10.0f, 20.0f, 0.0f ) );
+
+  float positionY = actor[ "positionY" ];
+  DALI_TEST_EQUALS( positionY, 20.0f, 0.001f, TEST_LOCATION );
+
+  // Should automatically promote IndirectValue to Property::Value rvalue.
+  DALI_TEST_VALUE_EQUALS( actor["positionZ"], 0.0f, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliHandleIndexOperatorNegative02(void)
+{
+  TestApplication application;
+
+  Actor actor;
+  try
+  {
+    Vector3 position = actor[Actor::Property::POSITION];
+    if( position == position )
+    {
+      DALI_TEST_CHECK(false); // Should throw before reaching here.
+    }
+    DALI_TEST_CHECK(false); // Should throw before reaching here.
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // Assert expected
+  }
+
   END_TEST;
 }
