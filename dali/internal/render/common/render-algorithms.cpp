@@ -145,9 +145,9 @@ inline void ProcessRenderList(
         DALI_PRINT_RENDER_ITEM( item );
 
         Renderer& renderer = item.GetRenderer();
-        Dali::Renderer::DepthWriteMode depthWriteMode = renderer.GetDepthWriteMode();
-        context.DepthMask( ( depthWriteMode == Dali::Renderer::DEPTH_WRITE_AUTO && item.IsOpaque() ) ||
-                           ( depthWriteMode == Dali::Renderer::DEPTH_WRITE_ON ) );
+        DepthWriteMode::Type depthWriteMode = renderer.GetDepthWriteMode();
+        context.DepthMask( ( depthWriteMode == DepthWriteMode::AUTO && item.IsOpaque() ) ||
+                           ( depthWriteMode == DepthWriteMode::ON ) );
 
         renderer.Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
       }

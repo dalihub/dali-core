@@ -88,9 +88,9 @@ public:
                         Render::Geometry* geometry,
                         unsigned int blendingBitmask,
                         const Vector4* blendColor,
-                        Dali::Renderer::FaceCullingMode faceCullingMode,
+                        FaceCullingMode::Type faceCullingMode,
                         bool preMultipliedAlphaEnabled,
-                        Dali::Renderer::DepthWriteMode depthWriteMode );
+                        DepthWriteMode::Type depthWriteMode );
 
   /**
    * Constructor.
@@ -106,9 +106,9 @@ public:
             Render::Geometry* geometry,
             unsigned int blendingBitmask,
             const Vector4* blendColor,
-            Dali::Renderer::FaceCullingMode faceCullingMode,
+            FaceCullingMode::Type faceCullingMode,
             bool preMultipliedAlphaEnabled,
-            Dali::Renderer::DepthWriteMode depthWriteMode );
+            DepthWriteMode::Type depthWriteMode );
 
   /**
    * Change the data providers of the renderer
@@ -139,7 +139,7 @@ public:
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
-  void SetFaceCullingMode( Dali::Renderer::FaceCullingMode mode );
+  void SetFaceCullingMode( FaceCullingMode::Type mode );
 
   /**
    * Set the bitmask for blending options
@@ -176,13 +176,13 @@ public:
    * Query the Renderer's depth write mode
    * @return The renderer depth write mode
    */
-  Dali::Renderer::DepthWriteMode GetDepthWriteMode() const;
+  DepthWriteMode::Type GetDepthWriteMode() const;
 
   /**
    * Sets the depth write mode
    * @param[in] depthWriteMode The depth write mode
    */
-  void SetDepthWriteMode( Dali::Renderer::DepthWriteMode depthWriteMode );
+  void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
 
   /**
    * Called to render during RenderManager::Render().
@@ -276,9 +276,9 @@ private:
 
   Vector<GLint> mAttributesLocation;
 
-  BlendingOptions                 mBlendingOptions; /// Blending options including blend color, blend func and blend equation
-  Dali::Renderer::FaceCullingMode mFaceCullingMode; /// Mode of face culling
-  Dali::Renderer::DepthWriteMode  mDepthWriteMode;  /// Depth write mode
+  BlendingOptions       mBlendingOptions; /// Blending options including blend color, blend func and blend equation
+  FaceCullingMode::Type mFaceCullingMode; /// Mode of face culling
+  DepthWriteMode::Type  mDepthWriteMode;  /// Depth write mode
 
   size_t mIndexedDrawFirstElement;                  /// Offset of first element to draw
   size_t mIndexedDrawElementsCount;                 /// Number of elements to draw

@@ -122,9 +122,9 @@ Renderer::Renderer()
  mShader( NULL ),
  mBlendColor( NULL ),
  mBlendBitmask( 0u ),
- mFaceCullingMode( Dali::Renderer::CULL_NONE ),
- mBlendingMode( Dali::BlendingMode::AUTO ),
- mDepthWriteMode( Dali::Renderer::DEPTH_WRITE_AUTO ),
+ mFaceCullingMode( FaceCullingMode::NONE ),
+ mBlendMode( BlendMode::AUTO ),
+ mDepthWriteMode( DepthWriteMode::AUTO ),
  mIndexedDrawFirstElement( 0 ),
  mIndexedDrawElementsCount( 0 ),
  mReferenceCount( 0 ),
@@ -236,7 +236,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     if( mResendFlag & RESEND_FACE_CULLING_MODE )
     {
-      typedef MessageValue1< Render::Renderer, Dali::Renderer::FaceCullingMode > DerivedType;
+      typedef MessageValue1< Render::Renderer, FaceCullingMode::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
     }
@@ -278,7 +278,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     if( mResendFlag & RESEND_DEPTH_WRITE_MODE )
     {
-      typedef MessageValue1< Render::Renderer, Dali::Renderer::DepthWriteMode > DerivedType;
+      typedef MessageValue1< Render::Renderer, DepthWriteMode::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode );
     }
@@ -335,13 +335,13 @@ void Renderer::SetDepthIndex( int depthIndex )
 
 void Renderer::SetFaceCullingMode( unsigned int faceCullingMode )
 {
-  mFaceCullingMode = static_cast<Dali::Renderer::FaceCullingMode>(faceCullingMode);
+  mFaceCullingMode = static_cast< FaceCullingMode::Type >( faceCullingMode );
   mResendFlag |= RESEND_FACE_CULLING_MODE;
 }
 
-void Renderer::SetBlendingMode( unsigned int blendingMode )
+void Renderer::SetBlendMode( unsigned int blendingMode )
 {
-  mBlendingMode = static_cast< BlendingMode::Type >( blendingMode );
+  mBlendMode = static_cast< BlendMode::Type >( blendingMode );
 }
 
 void Renderer::SetBlendingOptions( unsigned int options )
@@ -387,7 +387,7 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 
 void Renderer::SetDepthWriteMode( unsigned int depthWriteMode )
 {
-  mDepthWriteMode = static_cast<Dali::Renderer::DepthWriteMode>(depthWriteMode);
+  mDepthWriteMode = static_cast< DepthWriteMode::Type >( depthWriteMode );
   mResendFlag |= RESEND_DEPTH_WRITE_MODE;
 }
 
@@ -401,7 +401,7 @@ void Renderer::OnStageConnect()
 
     mRenderer = Render::Renderer::New( dataProvider, mGeometry,
                                        mBlendBitmask, mBlendColor,
-                                       static_cast< Dali::Renderer::FaceCullingMode >( mFaceCullingMode ),
+                                       static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                        mPremultipledAlphaEnabled,
                                        mDepthWriteMode );
 
@@ -482,14 +482,14 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 {
   Renderer::Opacity opacity = Renderer::OPAQUE;
 
-  switch( mBlendingMode )
+  switch( mBlendMode )
   {
-    case BlendingMode::ON: // If the renderer should always be use blending
+    case BlendMode::ON: // If the renderer should always be use blending
     {
       opacity = Renderer::TRANSLUCENT;
       break;
     }
-    case BlendingMode::AUTO:
+    case BlendMode::AUTO:
     {
       bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
@@ -510,7 +510,7 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
       }
       break;
     }
-    case BlendingMode::OFF: // the renderer should never use blending
+    case BlendMode::OFF: // the renderer should never use blending
     default:
     {
       opacity = Renderer::OPAQUE;

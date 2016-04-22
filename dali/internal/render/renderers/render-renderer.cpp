@@ -114,9 +114,9 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          Render::Geometry* geometry,
                          unsigned int blendingBitmask,
                          const Vector4* blendColor,
-                         Dali::Renderer::FaceCullingMode faceCullingMode,
+                         FaceCullingMode::Type faceCullingMode,
                          bool preMultipliedAlphaEnabled,
-                         Dali::Renderer::DepthWriteMode depthWriteMode )
+                         DepthWriteMode::Type depthWriteMode )
 {
   return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode );
 }
@@ -125,9 +125,9 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     Render::Geometry* geometry,
                     unsigned int blendingBitmask,
                     const Vector4* blendColor,
-                    Dali::Renderer::FaceCullingMode faceCullingMode,
+                    FaceCullingMode::Type faceCullingMode,
                     bool preMultipliedAlphaEnabled,
-                    Dali::Renderer::DepthWriteMode depthWriteMode )
+                    DepthWriteMode::Type depthWriteMode )
 : mRenderDataProvider( dataProvider ),
   mContext(NULL),
   mTextureCache( NULL ),
@@ -398,7 +398,7 @@ bool Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& pr
   return result;
 }
 
-void Renderer::SetFaceCullingMode( Dali::Renderer::FaceCullingMode mode )
+void Renderer::SetFaceCullingMode( FaceCullingMode::Type mode )
 {
   mFaceCullingMode =  mode;
 }
@@ -428,12 +428,12 @@ void Renderer::EnablePreMultipliedAlpha( bool enable )
   mPremultipledAlphaEnabled = enable;
 }
 
-void Renderer::SetDepthWriteMode( Dali::Renderer::DepthWriteMode depthWriteMode )
+void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
 {
   mDepthWriteMode = depthWriteMode;
 }
 
-Dali::Renderer::DepthWriteMode Renderer::GetDepthWriteMode() const
+DepthWriteMode::Type Renderer::GetDepthWriteMode() const
 {
   return mDepthWriteMode;
 }

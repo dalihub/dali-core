@@ -375,8 +375,8 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
   // and this renderer is not writing to the depth buffer there is no point on enabling
   // depth buffering
   if ( ( renderList.Count() == 1 ) &&
-       (( renderList.GetRenderer( 0 ).GetDepthWriteMode() == Dali::Renderer::DEPTH_WRITE_OFF ) ||
-        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == Dali::Renderer::DEPTH_WRITE_AUTO && !renderList.GetItem(0).IsOpaque() )))
+       (( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::OFF ) ||
+        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::AUTO && !renderList.GetItem(0).IsOpaque() )))
   {
     //Nothing to do here
   }

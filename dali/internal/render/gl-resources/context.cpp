@@ -93,7 +93,7 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
   mMaxTextureSize(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
-  mCullFaceMode( Dali::Renderer::CULL_NONE ),
+  mCullFaceMode( FaceCullingMode::NONE ),
   mViewPort( 0, 0, 0, 0 )
 {
 }
@@ -227,7 +227,7 @@ void Context::InitializeGlState()
   mBlendEquationSeparateModeRGB = GL_FUNC_ADD;
   mBlendEquationSeparateModeAlpha = GL_FUNC_ADD;
 
-  mCullFaceMode = Dali::Renderer::CULL_NONE; //By default cullface is disabled, front face is set to CCW and cull face is set to back
+  mCullFaceMode = FaceCullingMode::NONE; //By default cullface is disabled, front face is set to CCW and cull face is set to back
 
   // get maximum texture size
   mGlAbstraction.GetIntegerv(GL_MAX_TEXTURE_SIZE, &mMaxTextureSize);
