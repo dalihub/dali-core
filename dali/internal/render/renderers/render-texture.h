@@ -52,19 +52,15 @@ public:
    */
   Texture()
   : mSampler( 0 ),
-    mUniformName(),
-    mTextureId( Integration::InvalidResourceId ),
-    mUniformUniqueIndex( NOT_INITIALIZED )
+    mTextureId( Integration::InvalidResourceId )
   {}
 
   /**
    * Constructor
    */
-  Texture( const std::string& samplerName, Integration::ResourceId textureId, Render::Sampler* sampler )
+  Texture( Integration::ResourceId textureId, Render::Sampler* sampler )
   : mSampler( sampler ),
-    mUniformName( samplerName ),
-    mTextureId( textureId),
-    mUniformUniqueIndex( NOT_INITIALIZED )
+    mTextureId( textureId)
   {}
 
   /**
@@ -85,15 +81,6 @@ public:
 public: // called from RenderThread
 
   /**
-   * Get the texture unit uniform name
-   * @return the name of the texture unit uniform
-   */
-  inline const std::string& GetUniformName() const
-  {
-    return mUniformName;
-  }
-
-  /**
    * Get the texture ID
    * @return the id of the associated texture
    */
@@ -102,31 +89,10 @@ public: // called from RenderThread
     return mTextureId;
   }
 
-  /**
-   * Get the Uniform unique index
-   * @return the identity of the associated texture
-   */
-  inline void SetUniformUniqueIndex( int32_t index )
-  {
-    mUniformUniqueIndex = index;
-  }
-
-  /**
-   * Get the Uniform unique index
-   * @return the identity of the associated texture
-   */
-  inline int32_t GetUniformUniqueIndex() const
-  {
-    return mUniformUniqueIndex;
-  }
-
 private:
 
   Render::Sampler*        mSampler;
-  std::string             mUniformName;
   Integration::ResourceId mTextureId;
-  int32_t                 mUniformUniqueIndex;
-
 };
 
 } // namespace Render

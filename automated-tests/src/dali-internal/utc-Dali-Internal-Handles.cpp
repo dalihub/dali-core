@@ -48,23 +48,3 @@ int UtcDaliCameraActorConstructorRefObject(void)
   DALI_TEST_CHECK(!actor);
   END_TEST;
 }
-
-int UtcDaliImageActorConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::ImageActor::ImageActor(Internal::ImageActor*)");
-
-  ImageActor actor(NULL);
-
-  DALI_TEST_CHECK(!actor);
-  END_TEST;
-}
-
-int UtcDaliTextActorConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::TextActor::TextActor(Internal::TextActor*)");
-  ImageActor actor(NULL);
-  DALI_TEST_CHECK(!actor);
-  END_TEST;
-}

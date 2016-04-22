@@ -378,7 +378,7 @@ int UtcDaliHitTestAlgorithmStencil(void)
   stage.Add( layer );
 
   // Create a stencil and add that to the layer
-  Actor stencil = ImageActor::New(Dali::BufferImage::WHITE() );
+  Actor stencil = CreateRenderableActor(Dali::BufferImage::WHITE() );
   stencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   stencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
   stencil.SetSize( 50.0f, 50.0f );
@@ -387,7 +387,7 @@ int UtcDaliHitTestAlgorithmStencil(void)
   layer.Add( stencil );
 
   // Create a renderable actor and add that to the layer
-  Actor layerHitActor = ImageActor::New( Dali::BufferImage::WHITE() );
+  Actor layerHitActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
   layerHitActor.SetSize( 100.0f, 100.0f );
   layerHitActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   layerHitActor.SetParentOrigin( ParentOrigin::TOP_LEFT );

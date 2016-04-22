@@ -28,7 +28,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 
 namespace Dali
 {

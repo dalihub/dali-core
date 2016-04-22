@@ -130,12 +130,12 @@ float CameraActor::GetFarClippingPlane( )
 
 void CameraActor::SetTargetPosition( const Vector3& targetPosition )
 {
-  GetImplementation(*this).SetTargetPosition(targetPosition);
+  GetImplementation(*this).SetTarget(targetPosition);
 }
 
 Vector3 CameraActor::GetTargetPosition() const
 {
-  return GetImplementation(*this).GetTargetPosition();
+  return GetImplementation(*this).GetTarget();
 }
 
 void CameraActor::SetInvertYAxis(bool invertYAxis)

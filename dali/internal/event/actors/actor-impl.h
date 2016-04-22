@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/internal/event/actors/actor-declarations.h>
-#include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
@@ -66,8 +65,8 @@ typedef RendererContainer::iterator RendererIter;
  * Multi-Touch events are received through signals emitted by the actor tree.
  *
  * An Actor is a proxy for a Node in the scene graph.
- * When an Actor is added to the Stage, it creates a node and attaches it to the scene graph.
- * The scene-graph can be updated in a separate thread, so the attachment is done using an asynchronous message.
+ * When an Actor is added to the Stage, it creates a node and connects it to the scene graph.
+ * The scene-graph can be updated in a separate thread, so the connection is done using an asynchronous message.
  * When a tree of Actors is detached from the Stage, a message is sent to destroy the associated nodes.
  */
 class Actor : public Object
@@ -132,21 +131,6 @@ public:
    * @copydoc Dali::Actor::GetId
    */
   unsigned int GetId() const;
-
-  // Attachments
-
-  /**
-   * Attach an object to an actor.
-   * @pre The actor does not already have an attachment.
-   * @param[in] attachment The object to attach.
-   */
-  void Attach( ActorAttachment& attachment );
-
-  /**
-   * Retreive the object attached to an actor.
-   * @return The attachment.
-   */
-  ActorAttachmentPtr GetAttachment();
 
   // Containment
 
@@ -253,7 +237,6 @@ public:
 
   /**
    * Sets the size of an actor.
-   * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] width  The new width.
    * @param [in] height The new height.
@@ -262,7 +245,6 @@ public:
 
   /**
    * Sets the size of an actor.
-   * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] width The size of the actor along the x-axis.
    * @param [in] height The size of the actor along the y-axis.
@@ -272,7 +254,6 @@ public:
 
   /**
    * Sets the size of an actor.
-   * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
@@ -287,7 +268,6 @@ public:
 
   /**
    * Sets the size of an actor.
-   * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
@@ -1806,8 +1786,6 @@ protected:
   RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
-
-  ActorAttachmentPtr mAttachment;   ///< Optional referenced attachment
 
   // Signals
   Dali::Actor::TouchSignalType             mTouchedSignal;

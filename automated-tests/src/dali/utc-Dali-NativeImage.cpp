@@ -247,9 +247,9 @@ int UtcDaliNativeImageTestCreationFailure(void)
 
   nativeImageInterface->SetGlExtensionCreateResult( false );
 
-  ImageActor imageActor = ImageActor::New( nativeImage );
-  imageActor.SetParentOrigin( ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( imageActor );
+  Actor actor = CreateRenderableActor( nativeImage );
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -273,7 +273,7 @@ int UtcDaliNativeImageTestCreationFailure(void)
   drawTrace.Reset();
 
   nativeImageInterface->SetGlExtensionCreateResult( true );
-  imageActor.SetPosition( 0, 0, 1 );
+  actor.SetPosition( 0, 0, 1 );
   application.SendNotification();
   application.Render();
 

@@ -29,9 +29,6 @@
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 
-#include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
-#include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
-
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
 #include <dali/internal/event/animation/constraint-impl.h>
@@ -101,12 +98,10 @@ const int CONSTRAINT_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
 const int ACTOR_MEMORY_SIZE(
   sizeof( Internal::Actor ) +
-  sizeof( Internal::ActorAttachment ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::NodeAttachment ));
 const int CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraActor ) +
-  sizeof( Internal::CameraAttachment ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::CameraAttachment ) );
 const int IMAGE_ACTOR_MEMORY_SIZE(
@@ -115,7 +110,6 @@ const int IMAGE_ACTOR_MEMORY_SIZE(
   sizeof( Internal::Render::Renderer ));
 const int LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
-  sizeof( Internal::ActorAttachment ) +
   sizeof( Internal::SceneGraph::Layer ) +
   sizeof( Internal::SceneGraph::NodeAttachment ) );
 const int IMAGE_MEMORY_SIZE(
@@ -136,9 +130,9 @@ const int GEOMETRY_MEMORY_SIZE(
 const int PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
   sizeof( Internal::Render::PropertyBuffer ) );
-const int MATERIAL_MEMORY_SIZE(
-  sizeof( Internal::Material ) +
-  sizeof( Internal::SceneGraph::Material ) );
+const int TEXTURE_SET_MEMORY_SIZE(
+  sizeof( Internal::TextureSet ) +
+  sizeof( Internal::SceneGraph::TextureSet ) );
 const int SAMPLER_MEMORY_SIZE(
   sizeof( Internal::Sampler ) +
   sizeof( Internal::Render::Sampler ) );

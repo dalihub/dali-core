@@ -111,7 +111,7 @@ int UtcDaliResourceImageNewWithPolicies01(void)
   // request file loading only when actor added to stage
   DALI_TEST_CHECK( !platform.WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
 
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
 
   Stage::GetCurrent().Add(actor);
 
@@ -163,7 +163,7 @@ int UtcDaliResourceImageNewWithPolicies02(void)
   // request file loading only when actor added to stage
   DALI_TEST_CHECK( !platform.WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
 
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
 
   Stage::GetCurrent().Add(actor);
 
@@ -215,7 +215,7 @@ int UtcDaliResourceImageNewWithPolicies03(void)
   // request file loading immediately
   DALI_TEST_CHECK( platform.WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
 
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
 
   Stage::GetCurrent().Add(actor);
 
@@ -275,7 +275,7 @@ int UtcDaliResourceImageNewWithPolicies04(void)
   // request file loading immediately
   DALI_TEST_CHECK( platform.WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
 
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
 
   Stage::GetCurrent().Add(actor);
 

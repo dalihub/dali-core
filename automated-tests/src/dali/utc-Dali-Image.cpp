@@ -162,10 +162,10 @@ int UtcDaliImageSignalUploaded(void)
 
   image.UploadedSignal().Connect( SignalUploadedHandler );
 
-  Dali::ImageActor imageActor = ImageActor::New(image);
-  Stage::GetCurrent().Add(imageActor);
-  imageActor.SetSize(80, 80);
-  imageActor.SetVisible(true);
+  Dali::Actor actor = CreateRenderableActor( image );
+  Stage::GetCurrent().Add( actor );
+  actor.SetSize(80, 80);
+  actor.SetVisible(true);
 
   application.SendNotification();
   application.Render(0);
@@ -239,10 +239,10 @@ int UtcDaliImageDiscard02(void)
 
   {
     {
-      ImageActor actor;
+      Actor actor;
       {
         Image image = ResourceImage::New(gTestImageFilename, ImageDimensions( 40, 30 ) );
-        actor = ImageActor::New(image);
+        actor = CreateRenderableActor(image);
         Stage::GetCurrent().Add(actor);
 
         application.SendNotification();
@@ -289,7 +289,7 @@ int UtcDaliImageDiscard03(void)
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   Image image = ResourceImage::New(gTestImageFilename);
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -344,7 +344,7 @@ int UtcDaliImageContextLoss(void)
   // request file loading immediately
 
   DALI_TEST_CHECK( platform.WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-  ImageActor actor = ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();

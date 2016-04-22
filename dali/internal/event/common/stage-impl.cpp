@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
 #include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/property-notification-manager.h>

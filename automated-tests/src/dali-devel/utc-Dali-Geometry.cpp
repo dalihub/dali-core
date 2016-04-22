@@ -156,8 +156,8 @@ int UtcDaliGeometryAddVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -234,8 +234,8 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -268,8 +268,8 @@ int UtcDaliGeometrySetIndexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -325,8 +325,8 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -456,8 +456,8 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   geometry.AddVertexBuffer( vertexBuffer );
   geometry.SetIndexBuffer( indexBuffer );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -575,10 +575,8 @@ int UtcDaliGeometrySetGetRequireDepthTesting(void)
   tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -611,10 +609,8 @@ int UtcDaliGeometryPropertyRequiresDepthTest(void)
   tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -647,10 +643,8 @@ int UtcDaliGeometryConstraint(void)
   tet_infoline("Test that a custom geometry property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -691,10 +685,8 @@ int UtcDaliGeometryConstraint02(void)
   tet_infoline("Test that a uniform map geometry property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -749,10 +741,8 @@ int UtcDaliGeometryAnimatedProperty01(void)
   tet_infoline("Test that a custom geometry property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -792,10 +782,8 @@ int UtcDaliGeometryAnimatedProperty02(void)
   tet_infoline("Test that a uniform map geometry property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);

@@ -41,7 +41,6 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
-#include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -334,23 +333,6 @@ void Actor::SetName( const std::string& name )
 unsigned int Actor::GetId() const
 {
   return mId;
-}
-
-void Actor::Attach( ActorAttachment& attachment )
-{
-  DALI_ASSERT_DEBUG( !mAttachment && "An Actor can only have one attachment" );
-
-  if( OnStage() )
-  {
-    attachment.Connect();
-  }
-
-  mAttachment = ActorAttachmentPtr( &attachment );
-}
-
-ActorAttachmentPtr Actor::GetAttachment()
-{
-  return mAttachment;
 }
 
 bool Actor::OnStage() const
@@ -1917,7 +1899,6 @@ Actor::Actor( DerivedType derivedType )
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
   mGestureData( NULL ),
-  mAttachment(),
   mTargetSize( 0.0f, 0.0f, 0.0f ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
@@ -2057,12 +2038,6 @@ void Actor::ConnectToSceneGraph()
     ConnectNodeMessage( GetEventThreadServices().GetUpdateManager(), *(mParent->mNode), *mNode );
   }
 
-  // Notify attachment
-  if( mAttachment )
-  {
-    mAttachment->Connect();
-  }
-
   unsigned int rendererCount( GetRendererCount() );
   for( unsigned int i(0); i<rendererCount; ++i )
   {
@@ -2149,12 +2124,6 @@ void Actor::DisconnectFromSceneGraph()
 {
   // Notification for Object::Observers
   OnSceneObjectRemove();
-
-  // Notify attachment
-  if( mAttachment )
-  {
-    mAttachment->Disconnect();
-  }
 
   unsigned int rendererCount( GetRendererCount() );
   for( unsigned int i(0); i<rendererCount; ++i )

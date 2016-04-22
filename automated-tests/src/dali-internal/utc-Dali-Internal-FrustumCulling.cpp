@@ -22,7 +22,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/sampler.h>
 #include <dali/devel-api/rendering/shader.h>
@@ -94,9 +94,11 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
   BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
 
   Geometry geometry = CreateGeometry();
-  Material material = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints ) );
-  material.AddTexture( image, "sTexture" );
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints );
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetImage( 0u, image );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );

@@ -26,7 +26,7 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/common/render-item.h>
@@ -74,7 +74,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   const Matrix& worldMatrix = renderable.mNode->GetWorldMatrix( updateBufferIndex );
   const Vector3& size = renderable.mNode->GetSize( updateBufferIndex );
-  if ( cull && renderable.mRenderer->GetMaterial().GetShader()->GeometryHintEnabled( Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) )
+  if ( cull && renderable.mRenderer->GetShader().GeometryHintEnabled( Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) )
   {
     const Vector3& position = worldMatrix.GetTranslation3();
     float radius( size.Length() * 0.5f );
@@ -178,7 +178,7 @@ inline bool TryReuseCachedRenderers( Layer& layer,
 
 /**
  * Function which sorts render items by depth index then by instance
- * ptrs of shader/geometry/material.
+ * ptrs of shader/texture/geometry.
  * @param lhs item
  * @param rhs item
  * @return true if left item is greater than right
@@ -201,7 +201,7 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
 }
 /**
  * Function which sorts the render items by Z function, then
- * by instance ptrs of shader/geometry/material.
+ * by instance ptrs of shader/texture/geometry.
  * @param lhs item
  * @param rhs item
  * @return true if left item is greater than right
@@ -213,7 +213,7 @@ bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSo
   {
     if( lhsIsOpaque )
     {
-      //If both RenderItems are opaque, sort using shader, then material then geometry
+      //If both RenderItems are opaque, sort using shader, then texture then geometry
       if( lhs.shader == rhs.shader )
       {
         if( lhs.textureResourceId == rhs.textureResourceId )
@@ -226,7 +226,7 @@ bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSo
     }
     else
     {
-      //If both RenderItems are transparent, sort using z,then shader, then material, then geometry
+      //If both RenderItems are transparent, sort using z,then shader, then texture, then geometry
       if( Equals(lhs.zValue, rhs.zValue) )
       {
         if( lhs.shader == rhs.shader )

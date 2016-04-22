@@ -262,8 +262,8 @@ int UtcDaliLayerSetSortFunction(void)
   TestApplication application;
   BufferImage img = BufferImage::New( 1,1 );
   // create two transparent actors so there is something to sort
-  ImageActor actor = ImageActor::New( img );
-  ImageActor actor2 = ImageActor::New( img );
+  Actor actor = CreateRenderableActor( img );
+  Actor actor2 = CreateRenderableActor( img );
   actor.SetSize(1,1);
   actor.SetColor( Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
   actor2.SetSize(1,1);
@@ -558,7 +558,7 @@ int UtcDaliLayerClippingGLCalls(void)
 
   // Add at least one renderable actor so the GL calls are actually made
   BufferImage img = BufferImage::New( 1,1 );
-  Actor actor = ImageActor::New( img );
+  Actor actor = CreateRenderableActor( img );
   stage.Add( actor );
 
   // flush the queue and render once

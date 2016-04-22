@@ -46,8 +46,8 @@ int UtcDaliRendererNew01(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   DALI_TEST_EQUALS( (bool)renderer, true, TEST_LOCATION );
   END_TEST;
@@ -66,8 +66,8 @@ int UtcDaliRendererCopyConstructor(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Renderer rendererCopy( renderer );
   DALI_TEST_EQUALS( (bool)rendererCopy, true, TEST_LOCATION );
@@ -80,8 +80,8 @@ int UtcDaliRendererAssignmentOperator(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Renderer renderer2;
   DALI_TEST_EQUALS( (bool)renderer2, false, TEST_LOCATION );
@@ -96,8 +96,8 @@ int UtcDaliRendererDownCast01(void)
   TestApplication application;
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   BaseHandle handle(renderer);
   Renderer renderer2 = Renderer::DownCast(handle);
@@ -126,8 +126,8 @@ int UtcDaliRendererSetGetGeometry(void)
   Geometry geometry2 = CreateQuadGeometry();
   geometry2.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry1, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry1, shader);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
@@ -159,22 +159,22 @@ int UtcDaliRendererSetGetGeometry(void)
   END_TEST;
 }
 
-int UtcDaliRendererSetGetMaterial(void)
+int UtcDaliRendererSetGetShader(void)
 {
   TestApplication application;
-  tet_infoline( "Test SetMaterial, GetMaterial" );
+  tet_infoline( "Test SetShader, GetShader" );
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableCullFaceCallTrace(true);
 
-  Material material1 = CreateMaterial();
-  material1.RegisterProperty( "uFadeColor", Color::RED );
+  Shader shader1 = CreateShader();
+  shader1.RegisterProperty( "uFadeColor", Color::RED );
 
-  Material material2 = CreateMaterial();
-  material2.RegisterProperty( "uFadeColor", Color::GREEN );
+  Shader shader2 = CreateShader();
+  shader2.RegisterProperty( "uFadeColor", Color::GREEN );
 
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material1);
+  Renderer renderer = Renderer::New(geometry, shader1);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
@@ -184,24 +184,24 @@ int UtcDaliRendererSetGetMaterial(void)
   application.SendNotification();
   application.Render(0);
 
-  // Expect that the first material's fade color property is accessed
+  // Expect that the first shaders's fade color property is accessed
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( renderer.GetMaterial(), material1, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetShader(), shader1, TEST_LOCATION );
 
-  // set the second material to the renderer
-  renderer.SetMaterial( material2 );
+  // set the second shader to the renderer
+  renderer.SetShader( shader2 );
 
   application.SendNotification();
   application.Render(0);
 
-  // Expect that the second material's fade color property is accessed
+  // Expect that the second shader's fade color property is accessed
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( renderer.GetMaterial(), material2, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetShader(), shader2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -212,9 +212,9 @@ int UtcDaliRendererSetGetDepthIndex(void)
 
   tet_infoline("Test SetDepthIndex, GetDepthIndex");
 
-  Material material = CreateMaterial();
+  Shader shader = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, material);
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetSize(400, 400);
@@ -245,8 +245,8 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
 
   tet_infoline("Test SetFaceCullingMode(cullingMode)");
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -330,8 +330,8 @@ int UtcDaliRendererBlendingOptions01(void)
   tet_infoline("Test SetBlendFunc(src, dest) ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   // set a transparent actor color so that blending is enabled
@@ -374,8 +374,8 @@ int UtcDaliRendererBlendingOptions02(void)
   tet_infoline("Test SetBlendFunc(srcRgb, destRgb, srcAlpha, destAlpha) ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.SetOpacity( 0.5f ); // enable blending
@@ -419,8 +419,8 @@ int UtcDaliRendererBlendingOptions03(void)
   tet_infoline("Test GetBlendEquation() defaults ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -444,8 +444,8 @@ int UtcDaliRendererBlendingOptions04(void)
   tet_infoline("Test SetBlendEquation() ");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.SetOpacity( 0.1f );
@@ -490,8 +490,8 @@ int UtcDaliRendererSetBlendMode01(void)
   tet_infoline("Test setting the blend mode to on with an opaque color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.SetOpacity( 0.98f );
@@ -522,8 +522,8 @@ int UtcDaliRendererSetBlendMode02(void)
   tet_infoline("Test setting the blend mode to off with a transparent color renders with blending disabled (and not enabled)");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.SetOpacity( 0.15f );
@@ -551,11 +551,11 @@ int UtcDaliRendererSetBlendMode03(void)
 {
   TestApplication application;
 
-  tet_infoline("Test setting the blend mode to auto with a transparent material color renders with blending enabled");
+  tet_infoline("Test setting the blend mode to auto with a transparent color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.SetOpacity( 0.75f );
@@ -586,8 +586,8 @@ int UtcDaliRendererSetBlendMode04(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color renders with blending disabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -614,11 +614,11 @@ int UtcDaliRendererSetBlendMode04b(void)
 {
   TestApplication application;
 
-  tet_infoline("Test setting the blend mode to auto with an opaque material color and a transparent actor color renders with blending enabled");
+  tet_infoline("Test setting the blend mode to auto with a transparent actor color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -646,11 +646,11 @@ int UtcDaliRendererSetBlendMode04c(void)
 {
   TestApplication application;
 
-  tet_infoline("Test setting the blend mode to auto with an opaque material color and an opaque actor color renders with blending disabled");
+  tet_infoline("Test setting the blend mode to auto with an opaque opaque actor color renders with blending disabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New( geometry, material );
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -682,8 +682,11 @@ int UtcDaliRendererSetBlendMode05(void)
 
   Geometry geometry = CreateQuadGeometry();
   BufferImage image = BufferImage::New( 40, 40, Pixel::RGBA8888 );
-  Material material = CreateMaterial( image );
-  Renderer renderer = Renderer::New( geometry, material );
+
+  Shader shader = CreateShader();
+  TextureSet textureSet = CreateTextureSet( image );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -713,9 +716,8 @@ int UtcDaliRendererSetBlendMode06(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
-  Material material = Material::New(shader);
 
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -745,10 +747,11 @@ int UtcDaliRendererSetBlendMode07(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
-  Material material = Material::New(shader);
+
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
-  material.AddTexture( image, "sTexture" );
-  Renderer renderer = Renderer::New( geometry, material );
+  TextureSet textureSet = CreateTextureSet( image );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -777,8 +780,7 @@ int UtcDaliRendererGetBlendMode(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
-  Material material = Material::New(shader);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   // default value
   unsigned int mode = renderer.GetProperty<int>( Renderer::Property::BLENDING_MODE );
@@ -805,10 +807,11 @@ int UtcDaliRendererSetBlendColor(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
-  Material material = Material::New(shader);
+  TextureSet textureSet = TextureSet::New();
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
-  material.AddTexture( image, "sTexture" );
-  Renderer renderer = Renderer::New( geometry, material );
+  textureSet.SetImage( 0u, image );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -844,8 +847,7 @@ int UtcDaliRendererGetBlendColor(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
-  Material material = Material::New(shader);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLENDING_COLOR ), Color::TRANSPARENT, TEST_LOCATION );
 
@@ -871,9 +873,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
-  Material material = Material::New(shader);
-
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -932,10 +932,8 @@ int UtcDaliRendererConstraint01(void)
   tet_infoline("Test that a non-uniform renderer property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -976,10 +974,8 @@ int UtcDaliRendererConstraint02(void)
   tet_infoline("Test that a uniform map renderer property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1034,10 +1030,8 @@ int UtcDaliRendererAnimatedProperty01(void)
   tet_infoline("Test that a non-uniform renderer property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1077,10 +1071,8 @@ int UtcDaliRendererAnimatedProperty02(void)
   tet_infoline("Test that a uniform map renderer property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1133,12 +1125,12 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1151,7 +1143,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
 
   actor.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
+  Property::Index textureSetFadeColorIndex = textureSet.RegisterProperty( "uFadeColor", Color::BLUE );
 
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
@@ -1167,12 +1159,12 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
-  // Animate material's fade color property. Should be no change to uniform
+  // Animate texture set's fade color property. Should be no change to uniform
   Animation  animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, Color::WHITE);
   keyFrames.Add(1.0f, Color::TRANSPARENT);
-  animation.AnimateBetween( Property( material, materialFadeColorIndex ), keyFrames );
+  animation.AnimateBetween( Property( textureSet, textureSetFadeColorIndex ), keyFrames );
   animation.Play();
 
   application.SendNotification();
@@ -1197,12 +1189,12 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1215,7 +1207,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   actor.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
+  Property::Index textureSetFadeColorIndex = textureSet.RegisterProperty( "uFadeColor", Color::BLUE );
 
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
@@ -1232,12 +1224,12 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
-  // Animate material's fade color property. Should be no change to uniform
+  // Animate texture set's fade color property. Should be no change to uniform
   Animation  animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, Color::WHITE);
   keyFrames.Add(1.0f, Color::TRANSPARENT);
-  animation.AnimateBetween( Property( material, materialFadeColorIndex ), keyFrames );
+  animation.AnimateBetween( Property( textureSet, textureSetFadeColorIndex ), keyFrames );
   animation.Play();
 
   application.SendNotification();
@@ -1263,12 +1255,12 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1279,7 +1271,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   // Don't add property / uniform map to renderer or actor
 
-  material.RegisterProperty( "uFadeColor", Color::BLUE );
+  textureSet.RegisterProperty( "uFadeColor", Color::BLUE );
 
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
@@ -1293,7 +1285,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   application.SendNotification();
   application.Render(0);
 
-  // Expect that the material's fade color property is accessed
+  // Expect that the texture set's fade color property is accessed
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::BLUE, TEST_LOCATION );
@@ -1329,12 +1321,12 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-  material.AddTexture( image, "sTexture" );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1343,7 +1335,7 @@ int UtcDaliRendererUniformMapPrecendence04(void)
   application.SendNotification();
   application.Render(0);
 
-  // Don't add property / uniform map to renderer/actor/material
+  // Don't add property / uniform map to renderer/actor/texture set
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
   Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
@@ -1391,11 +1383,12 @@ int UtcDaliRendererUniformMapPrecendence05(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1404,7 +1397,7 @@ int UtcDaliRendererUniformMapPrecendence05(void)
   application.SendNotification();
   application.Render(0);
 
-  // Don't add property / uniform map to renderer/actor/material/sampler
+  // Don't add property / uniform map to renderer/actor/texture set/sampler
 
   shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
@@ -1453,11 +1446,12 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1468,7 +1462,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
 
   renderer.RegisterProperty( "uUniform1", Color::RED );
   actor.RegisterProperty( "uUniform2", Color::GREEN );
-  material.RegisterProperty( "uUniform3", Color::BLUE );
+  textureSet.RegisterProperty( "uUniform3", Color::BLUE );
   shader.RegisterProperty( "uUniform4", Color::MAGENTA );
   geometry.RegisterProperty( "uUniform5", Color::YELLOW );
 
@@ -1511,11 +1505,12 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
+  TextureSet textureSet = CreateTextureSet( image );
 
   PropertyBuffer vertexBuffer = CreatePropertyBuffer();
   Geometry geometry = CreateQuadGeometryFromBuffer(vertexBuffer);
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -1531,7 +1526,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   actor.RegisterProperty( "uFadeProgress", value2 );
 
   Property::Value value3(Vector3(0.5f, 0.5f, 1.0f));
-  material.RegisterProperty( "uFadePosition", value3);
+  textureSet.RegisterProperty( "uFadePosition", value3);
 
   Property::Value value5(Matrix3::IDENTITY);
   shader.RegisterProperty( "uANormalMatrix", value5 );
@@ -1583,9 +1578,9 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   actor0.SetParentOrigin(AnchorPoint::CENTER);
   actor0.SetPosition(0.0f,0.0f);
   Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material0 = Material::New( shader );
-  material0.AddTexture( image0, "sTexture0" );
-  Renderer renderer0 = Renderer::New( geometry, material0 );
+  TextureSet textureSet0 = CreateTextureSet( image0 );
+  Renderer renderer0 = Renderer::New( geometry, shader );
+  renderer0.SetTextures( textureSet0 );
   actor0.AddRenderer(renderer0);
   actor0.SetSize(1, 1);
   Stage::GetCurrent().Add(actor0);
@@ -1597,9 +1592,9 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   actor1.SetParentOrigin(AnchorPoint::CENTER);
   actor1.SetPosition(0.0f,0.0f);
   Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material1 = Material::New( shader );
-  material1.AddTexture( image1, "sTexture1" );
-  Renderer renderer1 = Renderer::New( geometry, material1 );
+  TextureSet textureSet1 = CreateTextureSet( image1 );
+  Renderer renderer1 = Renderer::New( geometry, shader );
+  renderer1.SetTextures( textureSet1 );
   actor1.AddRenderer(renderer1);
   actor1.SetSize(1, 1);
   Stage::GetCurrent().Add(actor1);
@@ -1611,9 +1606,9 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   actor2.SetParentOrigin(AnchorPoint::CENTER);
   actor2.SetPosition(0.0f,0.0f);
   Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material2 = Material::New( shader );
-  material2.AddTexture( image2, "sTexture2" );
-  Renderer renderer2 = Renderer::New( geometry, material2 );
+  TextureSet textureSet2 = CreateTextureSet( image2 );
+  Renderer renderer2 = Renderer::New( geometry, shader );
+  renderer2.SetTextures( textureSet2 );
   actor2.AddRenderer(renderer2);
   actor2.SetSize(1, 1);
   Stage::GetCurrent().Add(actor2);
@@ -1625,9 +1620,9 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   actor3.SetParentOrigin(AnchorPoint::CENTER);
   actor3.SetPosition(0.0f,0.0f);
   Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material3 = Material::New( shader );
-  material3.AddTexture( image3, "sTexture3" );
-  Renderer renderer3 = Renderer::New( geometry, material3 );
+  TextureSet textureSet3 = CreateTextureSet( image3 );
+  Renderer renderer3 = Renderer::New( geometry, shader );
+  renderer3.SetTextures( textureSet3 );
   actor3.AddRenderer(renderer3);
   actor3.SetSize(1, 1);
   Stage::GetCurrent().Add(actor3);
@@ -1726,9 +1721,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer0
   Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material0 = Material::New( shader );
-  material0.AddTexture( image0, "sTexture0" );
-  Renderer renderer0 = Renderer::New( geometry, material0 );
+  TextureSet textureSet0 = CreateTextureSet( image0 );
+  Renderer renderer0 = Renderer::New( geometry, shader );
+  renderer0.SetTextures( textureSet0 );
   renderer0.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
   actor0.AddRenderer(renderer0);
   application.SendNotification();
@@ -1736,9 +1731,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer1
   Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material1 = Material::New( shader );
-  material1.AddTexture( image1, "sTexture1" );
-  Renderer renderer1 = Renderer::New( geometry, material1 );
+  TextureSet textureSet1 = CreateTextureSet( image1 );
+  Renderer renderer1 = Renderer::New( geometry, shader );
+  renderer1.SetTextures( textureSet1 );
   renderer1.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
   actor0.AddRenderer(renderer1);
   application.SendNotification();
@@ -1746,9 +1741,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer2
   Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material2 = Material::New( shader );
-  material2.AddTexture( image2, "sTexture2" );
-  Renderer renderer2 = Renderer::New( geometry, material2 );
+  TextureSet textureSet2 = CreateTextureSet( image2 );
+  Renderer renderer2 = Renderer::New( geometry, shader );
+  renderer2.SetTextures( textureSet2 );
   renderer2.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
   actor0.AddRenderer(renderer2);
   application.SendNotification();
@@ -1756,9 +1751,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer3
   Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material3 = Material::New( shader );
-  material3.AddTexture( image3, "sTexture3" );
-  Renderer renderer3 = Renderer::New( geometry, material3 );
+  TextureSet textureSet3 = CreateTextureSet( image3 );
+  Renderer renderer3 = Renderer::New( geometry, shader );
+  renderer3.SetTextures( textureSet3 );
   renderer3.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
   actor1.AddRenderer(renderer3);
   application.SendNotification();
@@ -1766,9 +1761,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer4
   Image image4= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material4 = Material::New( shader );
-  material4.AddTexture( image4, "sTexture4" );
-  Renderer renderer4 = Renderer::New( geometry, material4 );
+  TextureSet textureSet4 = CreateTextureSet( image4 );
+  Renderer renderer4 = Renderer::New( geometry, shader );
+  renderer4.SetTextures( textureSet4 );
   renderer4.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
   actor1.AddRenderer(renderer4);
   application.SendNotification();
@@ -1776,9 +1771,9 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Renderer5
   Image image5= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material5 = Material::New( shader );
-  material5.AddTexture( image5, "sTexture5" );
-  Renderer renderer5 = Renderer::New( geometry, material5 );
+  TextureSet textureSet5 = CreateTextureSet( image5 );
+  Renderer renderer5 = Renderer::New( geometry, shader );
+  renderer5.SetTextures( textureSet5 );
   renderer5.SetProperty( Renderer::Property::DEPTH_INDEX, -1 );
   actor1.AddRenderer(renderer5);
   application.SendNotification();
@@ -1829,9 +1824,9 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor0.SetAnchorPoint(AnchorPoint::CENTER);
   actor0.SetParentOrigin(AnchorPoint::CENTER);
   Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material0 = Material::New( shader );
-  material0.AddTexture( image0, "sTexture0" );
-  Renderer renderer0 = Renderer::New( geometry, material0 );
+  TextureSet textureSet0 = CreateTextureSet( image0 );
+  Renderer renderer0 = Renderer::New( geometry, shader );
+  renderer0.SetTextures( textureSet0 );
   actor0.AddRenderer(renderer0);
   actor0.SetPosition(0.0f,0.0f);
   actor0.SetSize(100, 100);
@@ -1844,9 +1839,9 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor1.SetAnchorPoint(AnchorPoint::CENTER);
   actor1.SetParentOrigin(AnchorPoint::CENTER);
   Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material1 = Material::New( shader );
-  material1.AddTexture( image1, "sTexture1" );
-  Renderer renderer1 = Renderer::New( geometry, material1 );
+  TextureSet textureSet1 = CreateTextureSet( image1 );
+  Renderer renderer1 = Renderer::New( geometry, shader );
+  renderer1.SetTextures( textureSet1 );
   actor1.SetPosition(0.0f,0.0f);
   actor1.AddRenderer(renderer1);
   actor1.SetSize(100, 100);
@@ -1859,9 +1854,9 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor2.SetAnchorPoint(AnchorPoint::CENTER);
   actor2.SetParentOrigin(AnchorPoint::CENTER);
   Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material2 = Material::New( shader );
-  material2.AddTexture( image2, "sTexture2" );
-  Renderer renderer2 = Renderer::New( geometry, material2 );
+  TextureSet textureSet2 = CreateTextureSet( image2 );
+  Renderer renderer2 = Renderer::New( geometry, shader );
+  renderer2.SetTextures( textureSet2 );
   actor2.AddRenderer(renderer2);
   actor2.SetPosition(0.0f,0.0f);
   actor2.SetSize(100, 100);
@@ -1873,9 +1868,9 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor3.SetAnchorPoint(AnchorPoint::CENTER);
   actor3.SetParentOrigin(AnchorPoint::CENTER);
   Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material3 = Material::New( shader );
-  material3.AddTexture( image3, "sTexture3" );
-  Renderer renderer3 = Renderer::New( geometry, material3 );
+  TextureSet textureSet3 = CreateTextureSet( image3 );
+  Renderer renderer3 = Renderer::New( geometry, shader );
+  renderer3.SetTextures( textureSet3 );
   actor3.SetPosition(0.0f,0.0f);
   actor3.AddRenderer(renderer3);
   actor3.SetSize(100, 100);
@@ -1888,9 +1883,9 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor4.SetAnchorPoint(AnchorPoint::CENTER);
   actor4.SetParentOrigin(AnchorPoint::CENTER);
   Image image4 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  Material material4 = Material::New( shader );
-  material4.AddTexture( image4, "sTexture4" );
-  Renderer renderer4 = Renderer::New( geometry, material4 );
+  TextureSet textureSet4 = CreateTextureSet( image4 );
+  Renderer renderer4 = Renderer::New( geometry, shader );
+  renderer4.SetTextures( textureSet4 );
   actor4.AddRenderer(renderer4);
   actor4.SetPosition(0.0f,0.0f);
   actor4.SetSize(100, 100);

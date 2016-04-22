@@ -83,16 +83,28 @@ Geometry* Renderer::GetGeometry() const
   return mGeometryConnector.Get().Get();
 }
 
-void Renderer::SetMaterial( Material& material )
+void Renderer::SetTextures( TextureSet& textureSet )
 {
-  mMaterialConnector.Set( material, OnStage() );
-  const SceneGraph::Material* materialSceneObject = material.GetMaterialSceneObject();
-  SetMaterialMessage( GetEventThreadServices(), *mSceneObject, *materialSceneObject );
+  mTextureSetConnector.Set( textureSet, OnStage() );
+  const SceneGraph::TextureSet* textureSetSceneObject = textureSet.GetTextureSetSceneObject();
+  SetTexturesMessage( GetEventThreadServices(), *mSceneObject, *textureSetSceneObject );
 }
 
-Material* Renderer::GetMaterial() const
+TextureSet* Renderer::GetTextures() const
 {
-  return mMaterialConnector.Get().Get();
+  return mTextureSetConnector.Get().Get();
+}
+
+void Renderer::SetShader( Shader& shader )
+{
+  mShader = &shader;
+  SceneGraph::Shader& sceneGraphShader = *shader.GetShaderSceneObject();
+  SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
+}
+
+Shader* Renderer::GetShader() const
+{
+  return mShader.Get();
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
@@ -569,7 +581,7 @@ void Renderer::Connect()
   {
     OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
     mGeometryConnector.OnStageConnect();
-    mMaterialConnector.OnStageConnect();
+    mTextureSetConnector.OnStageConnect();
   }
   ++mOnStageCount;
 }
@@ -581,7 +593,7 @@ void Renderer::Disconnect()
   {
     OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
     mGeometryConnector.OnStageDisconnect();
-    mMaterialConnector.OnStageDisconnect();
+    mTextureSetConnector.OnStageDisconnect();
   }
 }
 
