@@ -69,8 +69,8 @@ public:
       BLENDING_DEST_FACTOR_ALPHA,                         ///< name "destinationBlendFactorAlpha",    type INTEGER
       BLENDING_COLOR,                                     ///< name "blendingColor",                  type VECTOR4
       BLEND_PRE_MULTIPLIED_ALPHA,                         ///< name "blendPreMultipledAlpha",         type BOOLEAN
-      INDEXED_DRAW_FIRST_ELEMENT,                         ///< name "indexedDrawFirstElement",        type INTEGER
-      INDEXED_DRAW_ELEMENTS_COUNT                         ///< name "indexedDrawElementsCount",       type INTEGER
+      INDEX_RANGE_FIRST,                                  ///< name "indexRangeFirst",                type INTEGER
+      INDEX_RANGE_COUNT                                   ///< name "indexRangeCount",                type INTEGER
     };
   };
 
@@ -135,10 +135,10 @@ public:
    * @param [in] firstElement first element to draw
    * @param [in] elementsCount number of elements to draw
    */
-  inline void SetIndicesRange( int firstElement, int elementsCount )
+  inline void SetIndexRange( int firstElement, int elementsCount )
   {
-    SetProperty( Property::INDEXED_DRAW_FIRST_ELEMENT, firstElement );
-    SetProperty( Property::INDEXED_DRAW_ELEMENTS_COUNT, elementsCount );
+    SetProperty( Property::INDEX_RANGE_FIRST, firstElement );
+    SetProperty( Property::INDEX_RANGE_COUNT, elementsCount );
   }
 
   /**

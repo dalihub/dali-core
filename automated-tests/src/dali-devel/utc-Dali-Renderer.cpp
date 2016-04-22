@@ -1951,7 +1951,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   END_TEST;
 }
 
-int UtcDaliRendererSetIndicesRange(void)
+int UtcDaliRendererSetIndexRange(void)
 {
   std::string
       vertexShader(
@@ -2027,7 +2027,7 @@ int UtcDaliRendererSetIndicesRange(void)
 
   // LINE_LOOP, first 0, count 5
   {
-    renderer.SetIndicesRange( 0, 5 );
+    renderer.SetIndexRange( 0, 5 );
     application.SendNotification();
     application.Render();
     sprintf( buffer, "%u, 5, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT );
@@ -2037,7 +2037,7 @@ int UtcDaliRendererSetIndicesRange(void)
 
   // LINE_LOOP, first 5, count 10
   {
-    renderer.SetIndicesRange( 5, 10 );
+    renderer.SetIndexRange( 5, 10 );
     sprintf( buffer, "%u, 10, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -2047,7 +2047,7 @@ int UtcDaliRendererSetIndicesRange(void)
 
   // LINE_STRIP, first 15, count 6
   {
-    renderer.SetIndicesRange( 15, 6 );
+    renderer.SetIndexRange( 15, 6 );
     geometry.SetGeometryType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
