@@ -593,29 +593,6 @@ int UtcDaliScriptingNewImage10P(void)
   END_TEST;
 }
 
-int UtcDaliScriptingNewShaderEffect(void)
-{
-  TestApplication application;
-
-  Property::Map programMap;
-  programMap[ "vertexFilename" ] = "bump.vert";
-  programMap[ "fragmentFilename" ] = "bump.frag";
-
-  Property::Map imageMap;
-  imageMap[ "filename" ] = "image.png";
-
-  Property::Map map;
-  map[ "image" ] = imageMap;
-  map[ "program" ] = programMap;
-  map[ "uLightPosition" ] = Vector3( 0.0, 0.0, -1.5);
-  map[ "uAmbientLight" ] = (int)10;
-
-  ShaderEffect shader = NewShaderEffect( map );
-
-  DALI_TEST_CHECK( shader );
-  END_TEST;
-}
-
 int UtcDaliScriptingNewActorNegative(void)
 {
   TestApplication application;
@@ -663,7 +640,6 @@ int UtcDaliScriptingNewActorProperties(void)
   map[ "color" ] = Color::MAGENTA;
   map[ "name" ] = "MyActor";
   map[ "colorMode" ] = "USE_PARENT_COLOR";
-  map[ "inheritShaderEffect" ] = false;
   map[ "sensitive" ] = false;
   map[ "leaveRequired" ] = true;
   map[ "positionInheritance" ] = "DONT_INHERIT_POSITION";
