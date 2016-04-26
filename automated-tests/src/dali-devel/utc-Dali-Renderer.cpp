@@ -242,7 +242,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
 
   // By default, none of the faces should be culled
   unsigned int cullFace = renderer.GetProperty<int>( Renderer::Property::FACE_CULLING_MODE );
-  DALI_TEST_CHECK( static_cast< Dali::Renderer::FaceCullingMode >( cullFace ) == Renderer::NONE );
+  DALI_TEST_CHECK( static_cast< Dali::Renderer::FaceCullingMode >( cullFace ) == Renderer::CULL_NONE );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& cullFaceStack = gl.GetCullFaceTrace();
@@ -298,13 +298,13 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
 
   {
     cullFaceStack.Reset();
-    renderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::NONE );
+    renderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::CULL_NONE );
     application.SendNotification();
     application.Render();
 
     DALI_TEST_EQUALS( cullFaceStack.CountMethod( "CullFace" ), 0, TEST_LOCATION );
     cullFace = renderer.GetProperty<int>( Renderer::Property::FACE_CULLING_MODE );
-    DALI_TEST_CHECK( static_cast< Dali::Renderer::FaceCullingMode >( cullFace ) == Renderer::NONE );
+    DALI_TEST_CHECK( static_cast< Dali::Renderer::FaceCullingMode >( cullFace ) == Renderer::CULL_NONE );
   }
 
   END_TEST;
@@ -733,7 +733,7 @@ int UtcDaliRendererSetBlendMode07(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_OPAQUE renders with blending disabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
 
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
   TextureSet textureSet = CreateTextureSet( image );
@@ -766,7 +766,7 @@ int UtcDaliRendererGetBlendMode(void)
   tet_infoline("Test GetBlendMode()");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
   // default value
@@ -793,7 +793,7 @@ int UtcDaliRendererSetBlendColor(void)
   tet_infoline("Test SetBlendColor(color)");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   TextureSet textureSet = TextureSet::New();
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
   textureSet.SetImage( 0u, image );
@@ -833,7 +833,7 @@ int UtcDaliRendererGetBlendColor(void)
   tet_infoline("Test GetBlendColor()");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLENDING_COLOR ), Color::TRANSPARENT, TEST_LOCATION );
@@ -859,7 +859,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
   tet_infoline("Test BLEND_PRE_MULTIPLIED_ALPHA property");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();

@@ -557,37 +557,3 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   END_TEST;
 }
 
-int UtcDaliGeometrySetGetRequireDepthTesting(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-
-  DALI_TEST_EQUALS( geometry.GetRequiresDepthTesting(), false, TEST_LOCATION );
-
-  geometry.SetRequiresDepthTesting(true);
-
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  application.SendNotification();
-  application.Render();
-//  TODO: Not supported yes
-//  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
-//  std::ostringstream out;
-//  out << GL_DEPTH_TEST;
-//  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
-
-  DALI_TEST_EQUALS( geometry.GetRequiresDepthTesting(), true, TEST_LOCATION );
-
-  END_TEST;
-}
-

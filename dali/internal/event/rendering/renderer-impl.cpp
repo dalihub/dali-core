@@ -53,6 +53,7 @@ DALI_PROPERTY( "blendingColor",                   VECTOR4,   true, false,  false
 DALI_PROPERTY( "blendPreMultipliedAlpha",         BOOLEAN,   true, false,  false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA )
 DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_FIRST )
 DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
+DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -459,6 +460,19 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case Dali::Renderer::Property::DEPTH_WRITE_MODE:
+    {
+      int value;
+      propertyValue.Get( value );
+      Dali::Renderer::DepthWriteMode mode = static_cast<Dali::Renderer::DepthWriteMode>(value);
+      if( mode != mDepthWriteMode )
+      {
+        mDepthWriteMode = mode;
+        SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, mode );
+      }
+
+      break;
+    }
   }
 }
 
@@ -567,6 +581,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = static_cast<int>( mIndexedDrawElementCount );
       break;
     }
+    case Dali::Renderer::Property::DEPTH_WRITE_MODE:
+    {
+      value = mDepthWriteMode;
+      break;
+    }
   }
   return value;
 }
@@ -652,9 +671,10 @@ Renderer::Renderer()
   mOnStageCount( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
-  mFaceCullingMode( Dali::Renderer::NONE ),
+  mFaceCullingMode( Dali::Renderer::CULL_NONE ),
   mBlendingMode( Dali::BlendingMode::AUTO ),
   mBlendingOptions(),
+  mDepthWriteMode( Dali::Renderer::DEPTH_WRITE_AUTO ),
   mPremultipledAlphaEnabled( false )
 {
 }

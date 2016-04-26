@@ -45,10 +45,20 @@ public:
    */
   enum FaceCullingMode
   {
-    NONE,                     ///< None of the faces should be culled
+    CULL_NONE,                     ///< None of the faces should be culled
     CULL_FRONT,               ///< Cull front face, back face should never be shown
     CULL_BACK,                ///< Cull back face, back face should never be shown
     CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
+  };
+
+  /**
+   * @brief Depth buffer write modes
+   */
+  enum DepthWriteMode
+  {
+    DEPTH_WRITE_OFF,  ///< Renderer doesn't write to the depth buffer
+    DEPTH_WRITE_AUTO, ///< Renderer only writes to the depth buffer if it's opaque
+    DEPTH_WRITE_ON    ///< Renderer writes to the depth buffer
   };
 
   /**
@@ -59,7 +69,7 @@ public:
     enum
     {
       DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depthIndex",                     type INTEGER
-      FACE_CULLING_MODE,                                  ///< name "faceCullingMode",                type INTEGER
+      FACE_CULLING_MODE,                                  ///< name "faceCullingMode",                type INTEGER  @see FaceCullingMode
       BLENDING_MODE,                                      ///< name "blendingMode",                   type INTEGER
       BLEND_EQUATION_RGB,                                 ///< name "blendEquationRgb",               type INTEGER
       BLEND_EQUATION_ALPHA,                               ///< name "blendEquationAlpha",             type INTEGER
@@ -70,7 +80,8 @@ public:
       BLENDING_COLOR,                                     ///< name "blendingColor",                  type VECTOR4
       BLEND_PRE_MULTIPLIED_ALPHA,                         ///< name "blendPreMultipledAlpha",         type BOOLEAN
       INDEX_RANGE_FIRST,                                  ///< name "indexRangeFirst",                type INTEGER
-      INDEX_RANGE_COUNT                                   ///< name "indexRangeCount",                type INTEGER
+      INDEX_RANGE_COUNT,                                  ///< name "indexRangeCount",                type INTEGER
+      DEPTH_WRITE_MODE                                   ///< name "depthWriteMode",                  type INTEGER  @see DepthWriteMode
     };
   };
 

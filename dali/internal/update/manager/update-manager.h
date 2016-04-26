@@ -442,13 +442,6 @@ public:
   void RemoveGeometry( Render::Geometry* geometry );
 
   /**
-   * Sets if a Geometry requieres depth testing
-   * @param[in] geometry The geometry
-   * @param[in] requiresDepthTest True if the geometry requires depth testing, false otherwise
-   */
-  void SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest );
-
-  /**
    * Sets the geometry type of an existing Geometry
    * @param[in] geometry The geometry
    * @param[in] geometryType The type of the geometry
@@ -1154,17 +1147,6 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetGeometryType, &geometry, geometryType );
-}
-
-inline void SetGeometryRequiresDepthTestMessage( UpdateManager& manager, Render::Geometry& geometry, bool requiresDepthTest )
-{
-  typedef MessageValue2< UpdateManager, Render::Geometry*, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetGeometryRequiresDepthTest, &geometry, requiresDepthTest );
 }
 
 } // namespace SceneGraph

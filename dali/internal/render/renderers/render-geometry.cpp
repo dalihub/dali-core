@@ -33,7 +33,6 @@ Geometry::Geometry()
   mIndexBuffer(NULL),
   mGeometryType( Dali::Geometry::TRIANGLES ),
   mIndicesChanged(false),
-  mRequiresDepthTest(false ),
   mHasBeenUpdated(false),
   mAttributesChanged(true)
 {
