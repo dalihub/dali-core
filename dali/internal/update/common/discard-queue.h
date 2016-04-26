@@ -54,7 +54,6 @@ class DiscardQueue
 public:
 
   typedef OwnerContainer< Shader* > ShaderQueue;
-  typedef OwnerContainer< TextureSet* > TextureSetQueue;
   typedef OwnerContainer< Renderer* > RendererQueue;
 
   /**
@@ -76,12 +75,6 @@ public:
    * @param[in] node The discarded node; DiscardQueue takes ownership.
    */
   void Add( BufferIndex updateBufferIndex, Node* node );
-
-  /**
-   * Adds an unwanted texture set to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render.
-   */
-  void Add( BufferIndex updateBufferIndex, TextureSet* textureSet );
 
   /**
    * Adds an unwanted shader to the discard queue.
@@ -122,13 +115,11 @@ private:
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
   ShaderQueue                  mShaderQueue0;
-  TextureSetQueue              mTextureSetQueue0;
   RendererQueue                mRendererQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   ShaderQueue                  mShaderQueue1;
-  TextureSetQueue              mTextureSetQueue1;
   RendererQueue                mRendererQueue1;
 };
 

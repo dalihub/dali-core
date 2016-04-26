@@ -143,7 +143,7 @@ Renderer::~Renderer()
 {
   if (mTextureSet)
   {
-    mTextureSet->RemoveConnectionObserver(*this);
+    mTextureSet->RemoveObserver(this);
     mTextureSet=NULL;
   }
   if( mShader )
@@ -191,12 +191,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
       AddMappings( localMap, rendererUniformMap );
-
-      if( mTextureSet )
-      {
-        AddMappings( localMap, mTextureSet->GetUniformMap() );
-      }
-
       AddMappings( localMap, mShader->GetUniformMap() );
     }
     else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
@@ -289,8 +283,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
     mResendFlag &= ~RESEND_INDEXED_DRAW_FIRST_ELEMENT;
   }
-
-
 }
 
 void Renderer::SetTextures( TextureSet* textureSet )
@@ -299,11 +291,11 @@ void Renderer::SetTextures( TextureSet* textureSet )
 
   if( mTextureSet )
   {
-    mTextureSet->RemoveConnectionObserver(*this);
+    mTextureSet->RemoveObserver(this);
   }
 
   mTextureSet = textureSet;
-  mTextureSet->AddConnectionObserver( *this );
+  mTextureSet->AddObserver( this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
@@ -518,6 +510,11 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 
 
   return opacity;
+}
+
+void Renderer::TextureSetChanged()
+{
+  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::ConnectionsChanged( PropertyOwner& object )

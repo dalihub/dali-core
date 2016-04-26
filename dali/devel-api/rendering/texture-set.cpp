@@ -41,7 +41,7 @@ TextureSet::~TextureSet()
 }
 
 TextureSet::TextureSet( const TextureSet& handle )
-: Handle( handle )
+: BaseHandle( handle )
 {
 }
 
@@ -100,7 +100,7 @@ size_t TextureSet::GetTextureCount() const
 }
 
 TextureSet::TextureSet( Internal::TextureSet* pointer )
-: Handle( pointer )
+: BaseHandle( pointer )
 {
 }
 

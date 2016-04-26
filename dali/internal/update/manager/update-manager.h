@@ -250,13 +250,6 @@ public:
   ObjectOwnerContainer< Renderer >& GetRendererOwner();
 
   /**
-   * @brief Get the texture set owner
-   *
-   * @return The texture set owner
-   */
-  ObjectOwnerContainer< TextureSet >& GetTexturesOwner();
-
-  /**
    * @brief Get the property buffer owner
    *
    * @return The property buffer owner
@@ -280,6 +273,21 @@ public:
    * @post The shader is destroyed.
    */
   void RemoveShader(Shader* shader);
+
+  /**
+   * Add a newly created TextureSet.
+   * @param[in] textureSet The texture set to add.
+   * @post The TextureSet is owned by the UpdateManager.
+   */
+  void AddTextureSet(TextureSet* textureSet);
+
+  /**
+   * Remove a TextureSet.
+   * @pre The TextureSet has been added to the UpdateManager.
+   * @param[in] textureSet The TextureSet to remove.
+   * @post The TextureSet is destroyed.
+   */
+  void RemoveTextureSet(TextureSet* textureSet);
 
   /**
    * Set the shader program for a Shader object
@@ -928,6 +936,30 @@ inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owne
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Remove, &object );
+}
+
+// The render thread can safely change the Shader
+inline void AddTextureSetMessage( UpdateManager& manager, TextureSet& textureSet )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< TextureSet > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddTextureSet, &textureSet );
+}
+
+// The render thread can safely change the Shader
+inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& textureSet )
+{
+  typedef MessageValue1< UpdateManager, TextureSet* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveTextureSet, &textureSet );
 }
 
 inline void AddSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )

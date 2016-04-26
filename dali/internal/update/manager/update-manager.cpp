@@ -113,6 +113,9 @@ typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
 typedef GestureContainer::ConstIterator        GestureConstIter;
 
+typedef OwnerContainer< TextureSet* >          TextureSetContainer;
+typedef TextureSetContainer::Iterator          TextureSetIter;
+typedef TextureSetContainer::ConstIterator     TextureSetConstIter;
 
 /**
  * Structure to contain UpdateManager internal data
@@ -150,7 +153,7 @@ struct UpdateManager::Impl
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
-    textureSets( sceneGraphBuffers, discardQueue ),
+    textureSets(),
     messageQueue( renderController, sceneGraphBuffers ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
@@ -163,7 +166,6 @@ struct UpdateManager::Impl
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache );
 
     renderers.SetSceneController( *sceneController );
-    textureSets.SetSceneController( *sceneController );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -249,7 +251,7 @@ struct UpdateManager::Impl
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
   ObjectOwnerContainer<Renderer>      renderers;
-  ObjectOwnerContainer<TextureSet>    textureSets;                     ///< A container of texture sets
+  TextureSetContainer                 textureSets;                     ///< A container of texture sets
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -497,12 +499,6 @@ ObjectOwnerContainer<Renderer>& UpdateManager::GetRendererOwner()
   return mImpl->renderers;
 }
 
-
-ObjectOwnerContainer<TextureSet>& UpdateManager::GetTexturesOwner()
-{
-  return mImpl->textureSets;
-}
-
 void UpdateManager::AddShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
@@ -614,6 +610,26 @@ void UpdateManager::RemoveGesture( PanGesture* gesture )
   DALI_ASSERT_DEBUG(false);
 }
 
+void UpdateManager::AddTextureSet( TextureSet* textureSet )
+{
+  DALI_ASSERT_DEBUG( NULL != textureSet );
+  mImpl->textureSets.PushBack( textureSet );
+}
+
+void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
+{
+  DALI_ASSERT_DEBUG(textureSet != NULL);
+  size_t textureSetCount( mImpl->textureSets.Size() );
+  for( size_t i(0); i<textureSetCount; ++i )
+  {
+    if( textureSet == mImpl->textureSets[i] )
+    {
+      mImpl->textureSets.Remove( mImpl->textureSets.Begin() + i );
+      return;
+    }
+  }
+}
+
 unsigned int* UpdateManager::ReserveMessageSlot( std::size_t size, bool updateScene )
 {
   return mImpl->messageQueue.ReserveMessageSlot( size, updateScene );
@@ -676,7 +692,6 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     (*iter)->ResetToBaseValues( bufferIndex );
   }
 
-  mImpl->textureSets.ResetToBaseValues( bufferIndex );
   mImpl->renderers.ResetToBaseValues( bufferIndex );
 
   // Reset animatable shader properties to base values
@@ -798,15 +813,11 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 
 void UpdateManager::PrepareTextureSets( BufferIndex bufferIndex )
 {
-  ObjectOwnerContainer<TextureSet>::Iterator iter = mImpl->textureSets.GetObjectContainer().Begin();
-  const ObjectOwnerContainer<TextureSet>::Iterator end = mImpl->textureSets.GetObjectContainer().End();
-  for( ; iter != end; ++iter )
+  size_t textureSetCount( mImpl->textureSets.Size() );
+  for( size_t i(0); i<textureSetCount; ++i )
   {
-    //Apply constraints
-    ConstrainPropertyOwner( *(*iter), bufferIndex );
-
     //Prepare texture set
-    (*iter)->Prepare( mImpl->resourceManager );
+    mImpl->textureSets[i]->Prepare( mImpl->resourceManager );
   }
 }
 

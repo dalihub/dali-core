@@ -215,6 +215,10 @@ public:
     return mReferenceCount > 0;
   }
 
+  /**
+   * Called by the TextureSet to notify to the renderer that it has changed
+   */
+  void TextureSetChanged();
 
 public: // Implementation of ObjectOwnerContainer template methods
   /**

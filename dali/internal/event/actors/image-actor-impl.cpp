@@ -374,8 +374,7 @@ void ImageActor::UpdateTexureRect()
     textureRect.w = vScale * float(mPixelArea.y + mPixelArea.height);
   }
 
-  TextureSet* textureSet = mRenderer->GetTextures();
-  textureSet->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
+  mRenderer->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const

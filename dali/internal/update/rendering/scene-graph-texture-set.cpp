@@ -18,15 +18,13 @@
 #include "scene-graph-texture-set.h"
 
 // INTERNAL HEADERS
-#include <dali/public-api/actors/blending.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/devel-api/rendering/texture-set.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/update/resources/texture-metadata.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace //Unnamed namespace
 {
@@ -51,19 +49,16 @@ TextureSet* TextureSet::New()
 TextureSet::TextureSet()
 : mSamplers(),
   mTextureId(),
-  mConnectionObservers(),
+  mRenderers(),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mChanged( true ),
   mHasAlpha( false )
 {
-  // Observe own property-owner's uniform map
-  AddUniformMapObserver( *this );
 }
 
 TextureSet::~TextureSet()
 {
-  mConnectionObservers.Destroy( *this );
 }
 
 void TextureSet::operator delete( void* ptr )
@@ -163,7 +158,7 @@ void TextureSet::SetImage( size_t index,  ResourceId imageId )
 
   mTextureId[index] = imageId;
   mChanged = true;
-  mConnectionObservers.ConnectionsChanged(*this);
+  NotifyChangeToRenderers();
 }
 
 void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
@@ -183,7 +178,7 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   mSamplers[index] = sampler;
 
   mChanged = true;
-  mConnectionObservers.ConnectionsChanged(*this);
+  NotifyChangeToRenderers();
 }
 
 bool TextureSet::HasAlpha() const
@@ -197,29 +192,41 @@ void TextureSet::GetResourcesStatus( bool& resourcesReady, bool& finishedResourc
   finishedResourceAcquisition = mFinishedResourceAcquisition;
 }
 
-void TextureSet::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+void TextureSet::AddObserver( Renderer* renderer )
 {
+  size_t rendererCount( mRenderers.Size() );
+  for( size_t i(0); i<rendererCount; ++i )
+  {
+    if( mRenderers[i] == renderer )
+    {
+      //Renderer already in the list
+      return;
+    }
+  }
+
+  mRenderers.PushBack( renderer );
 }
 
-void TextureSet::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+void TextureSet::RemoveObserver( Renderer* renderer )
 {
+  size_t rendererCount( mRenderers.Size() );
+  for( size_t i(0); i<rendererCount; ++i )
+  {
+    if( mRenderers[i] == renderer )
+    {
+      mRenderers.Remove( mRenderers.Begin() + i );
+      return;
+    }
+  }
 }
 
-void TextureSet::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
+void TextureSet::NotifyChangeToRenderers()
 {
-  mConnectionObservers.Add(observer);
-}
-
-void TextureSet::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
-{
-  mConnectionObservers.Remove(observer);
-}
-
-void TextureSet::UniformMappingsChanged( const UniformMap& mappings )
-{
-  // Our uniform map  has changed.
-  // Inform connected observers.
-  mConnectionObservers.ConnectedUniformMapChanged();
+  size_t rendererCount = mRenderers.Size();
+  for( size_t i(0); i<rendererCount; ++i )
+  {
+    mRenderers[i]->TextureSetChanged();
+  }
 }
 
 } // namespace SceneGraph
