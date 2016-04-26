@@ -46,11 +46,11 @@ public:
   /**
    * @brief Create a PixelData object.
    *
-   * @param [in] buffer         The raw pixel data.
-   * @param [in] width          Buffer width in pixels
-   * @param [in] height         Buffer height in pixels
-   * @param [in] pixelFormat    The pixel format
-   * @param [in] release        The function used to release the memory.
+   * @param [in] buffer           The raw pixel data.
+   * @param [in] width            Buffer width in pixels
+   * @param [in] height           Buffer height in pixels
+   * @param [in] pixelFormat      The pixel format
+   * @param [in] releaseFunction  The function used to release the memory.
    */
   static PixelDataPtr New( unsigned char* buffer,
                            unsigned int width,
@@ -87,11 +87,11 @@ public:
   /**
    * @brief Constructor.
    *
-   * @param [in] buffer         The raw pixel data.
-   * @param [in] width          Buffer width in pixels
-   * @param [in] height         Buffer height in pixels
-   * @param [in] pixelFormat    The pixel format
-   * @param [in] release        The function used to release the memory.
+   * @param [in] buffer           The raw pixel data.
+   * @param [in] width            Buffer width in pixels
+   * @param [in] height           Buffer height in pixels
+   * @param [in] pixelFormat      The pixel format
+   * @param [in] releaseFunction  The function used to release the memory.
    */
   PixelData( unsigned char* buffer,
              unsigned int width,

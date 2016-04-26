@@ -169,7 +169,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::WeakHandleBase::GetHandle()
+   * @copydoc Dali::WeakHandleBase::GetBaseHandle()
    */
   T GetHandle() const
   {
