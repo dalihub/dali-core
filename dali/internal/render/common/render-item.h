@@ -137,19 +137,19 @@ public:
   }
 
   /**
-   * Sets the size of the render item
-   * @param[in] size The size of the render item
+   * Retrives the size of the render item
+   * @return The size of the render item
    */
-  void SetSize( const Vector3& size)
+  const Vector3& GetSize() const
   {
-    mSize = size;
+    return mSize;
   }
 
   /**
    * Retrives the size of the render item
    * @return The size of the render item
    */
-  const Vector3& GetSize() const
+  Vector3& GetSize()
   {
     return mSize;
   }

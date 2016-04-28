@@ -70,16 +70,11 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      bool cull )
 {
   bool inside( true );
-
-  const Matrix& worldMatrix = renderable.mNode->GetWorldMatrix( updateBufferIndex );
-  const Vector3& size = renderable.mNode->GetSize( updateBufferIndex );
   if ( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::HINT_MODIFIES_GEOMETRY ) )
   {
-    const Vector3& position = worldMatrix.GetTranslation3();
-    float radius( size.Length() * 0.5f );
-
-    inside = (radius > Math::MACHINE_EPSILON_1000) &&
-        (cameraAttachment.CheckSphereInFrustum( updateBufferIndex, position, radius ) );
+    const Vector4& boundingSphere = renderable.mNode->GetBoundingSphere();
+    inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
+             (cameraAttachment.CheckSphereInFrustum( updateBufferIndex, Vector3(boundingSphere), boundingSphere.w ) );
   }
 
   if ( inside )
@@ -102,8 +97,8 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
         item.SetDepthIndex( renderable.mRenderer->GetDepthIndex() + static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
       }
       // save MV matrix onto the item
+      const Matrix& worldMatrix = renderable.mNode->GetWorldMatrixAndSize( item.GetSize() );
       Matrix::Multiply( item.GetModelViewMatrix(), worldMatrix, viewMatrix );
-      item.SetSize( size );
     }
   }
 }

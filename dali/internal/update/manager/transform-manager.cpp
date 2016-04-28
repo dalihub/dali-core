@@ -25,6 +25,7 @@
 //INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/compile-time-assert.h>
+#include <dali/internal/common/math.h>
 
 namespace Dali
 {
@@ -71,6 +72,7 @@ TransformId TransformManager::CreateTransform()
     mParent.PushBack(INVALID_TRANSFORM_ID);
     mWorld.PushBack(Matrix::IDENTITY);
     mLocal.PushBack(Matrix::IDENTITY);
+    mBoundingSpheres.PushBack( Vector4(0.0f,0.0f,0.0f,0.0f) );
     mTxComponentAnimatableBaseValue.PushBack(TransformComponentAnimatable());
     mSizeBase.PushBack(Vector3(0.0f,0.0f,0.0f));
     mComponentDirty.PushBack(false);
@@ -88,6 +90,7 @@ TransformId TransformManager::CreateTransform()
     mParent[mComponentCount] = INVALID_TRANSFORM_ID;
     mLocal[mComponentCount].SetIdentity();
     mWorld[mComponentCount].SetIdentity();
+    mBoundingSpheres[mComponentCount] = Vector4(0.0f,0.0f,0.0f,0.0f);
     mSizeBase[mComponentCount] = Vector3(0.0f,0.0f,0.0f);
     mComponentDirty[mComponentCount] = false;
     mLocalMatrixDirty[mComponentCount] = false;
@@ -113,6 +116,7 @@ void TransformManager::RemoveTransform(TransformId id)
   mSizeBase[index] = mSizeBase[mComponentCount];
   mComponentDirty[index] = mComponentDirty[mComponentCount];
   mLocalMatrixDirty[index] = mLocalMatrixDirty[mComponentCount];
+  mBoundingSpheres[index] = mBoundingSpheres[mComponentCount];
 
   TransformId lastItemId = mComponentId[mComponentCount];
   mIds[ lastItemId ] = index;
@@ -227,6 +231,7 @@ void TransformManager::Update()
           mLocal[i].SetTransformComponents( mTxComponentAnimatable[i].mScale,mTxComponentAnimatable[i].mOrientation, localPosition );
         }
 
+        //Update the world matrix
         Matrix::Multiply( mWorld[i], mLocal[i], mWorld[parentIndex]);
       }
       else
@@ -276,6 +281,14 @@ void TransformManager::Update()
       localPosition = mTxComponentAnimatable[i].mPosition + anchorPosition;
       mWorld[i].SetTransformComponents( mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition );
     }
+
+    //Update the bounding sphere
+    Vec3 centerToEdge = { mSize[i].Length() * 0.5f, 0.0f, 0.0f };
+    Vec3 centerToEdgeWorldSpace;
+    TransformVector3( centerToEdgeWorldSpace, mWorld[i].AsFloat(), centerToEdge );
+
+    mBoundingSpheres[i] = mWorld[i].GetTranslation();
+    mBoundingSpheres[i].w = Length( centerToEdgeWorldSpace );
   }
 }
 
@@ -291,6 +304,7 @@ void TransformManager::SwapComponents( unsigned int i, unsigned int j )
   std::swap( mSizeBase[i], mSizeBase[j] );
   std::swap( mLocal[i], mLocal[j] );
   std::swap( mComponentDirty[i], mComponentDirty[j] );
+  std::swap( mBoundingSpheres[i], mBoundingSpheres[j] );
 
   mIds[ mComponentId[i] ] = i;
   mIds[ mComponentId[j] ] = j;
@@ -809,6 +823,18 @@ void TransformManager::BakeRelativeQuaternionPropertyValue( TransformId id, cons
   unsigned int index( mIds[id] );
   mTxComponentAnimatable[ index ].mOrientation = mTxComponentAnimatableBaseValue[index].mOrientation = mTxComponentAnimatable[ index ].mOrientation * q;
   mComponentDirty[ index ] = true;
+}
+
+const Vector4& TransformManager::GetBoundingSphere( TransformId id ) const
+{
+  return mBoundingSpheres[ mIds[id] ];
+}
+
+const Matrix& TransformManager::GetWorldMatrixAndSize( TransformId id, Vector3& size ) const
+{
+  unsigned int index = mIds[id];
+  size = mSize[index];
+  return mWorld[index];
 }
 
 } //namespace SceneGraph
