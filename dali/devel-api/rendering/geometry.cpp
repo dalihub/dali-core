@@ -85,16 +85,6 @@ Geometry::GeometryType Geometry::GetGeometryType() const
   return GetImplementation(*this).GetGeometryType();
 }
 
-void Geometry::SetRequiresDepthTesting( bool requiresDepthTest )
-{
-  GetImplementation(*this).SetRequiresDepthTesting( requiresDepthTest );
-}
-
-bool Geometry::GetRequiresDepthTesting() const
-{
-  return GetImplementation(*this).GetRequiresDepthTesting();
-}
-
 Geometry::Geometry( Internal::Geometry* pointer )
 : BaseHandle( pointer )
 {

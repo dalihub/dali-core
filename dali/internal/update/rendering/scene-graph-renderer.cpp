@@ -97,6 +97,7 @@ enum Flags
   RESEND_PREMULTIPLIED_ALPHA = 1 << 5,
   RESEND_INDEXED_DRAW_FIRST_ELEMENT = 1 << 6,
   RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 7,
+  RESEND_DEPTH_WRITE_MODE = 1 << 8,
 };
 
 }
@@ -121,8 +122,9 @@ Renderer::Renderer()
  mShader( NULL ),
  mBlendColor( NULL ),
  mBlendBitmask( 0u ),
- mFaceCullingMode( Dali::Renderer::NONE ),
+ mFaceCullingMode( Dali::Renderer::CULL_NONE ),
  mBlendingMode( Dali::BlendingMode::AUTO ),
+ mDepthWriteMode( Dali::Renderer::DEPTH_WRITE_AUTO ),
  mIndexedDrawFirstElement( 0 ),
  mIndexedDrawElementsCount( 0 ),
  mReferenceCount( 0 ),
@@ -130,6 +132,7 @@ Renderer::Renderer()
  mResendFlag( 0 ),
  mResourcesReady( false ),
  mFinishedResourceAcquisition( false ),
+ mPremultipledAlphaEnabled(false),
  mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -212,76 +215,75 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
-  if( mResendFlag == 0 )
+  if( mResendFlag != 0 )
   {
-    return;
-  }
+    if( mResendFlag & RESEND_DATA_PROVIDER )
+    {
+      RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-  if( mResendFlag & RESEND_DATA_PROVIDER )
-  {
-    RenderDataProvider* dataProvider = NewRenderDataProvider();
+      typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
+    }
 
-    typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
-    mResendFlag &= ~RESEND_DATA_PROVIDER;
-  }
+    if( mResendFlag & RESEND_GEOMETRY )
+    {
+      typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-  if( mResendFlag & RESEND_GEOMETRY )
-  {
-    typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
+    }
 
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
-    mResendFlag &= ~RESEND_GEOMETRY;
-  }
+    if( mResendFlag & RESEND_FACE_CULLING_MODE )
+    {
+      typedef MessageValue1< Render::Renderer, Dali::Renderer::FaceCullingMode > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
+    }
 
-  if( mResendFlag & RESEND_FACE_CULLING_MODE )
-  {
-    typedef MessageValue1< Render::Renderer, Dali::Renderer::FaceCullingMode > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
-    mResendFlag &= ~RESEND_FACE_CULLING_MODE;
-  }
+    if( mResendFlag & RESEND_BLEND_BIT_MASK )
+    {
+      typedef MessageValue1< Render::Renderer, unsigned int > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask );
+    }
 
-  if( mResendFlag & RESEND_BLEND_BIT_MASK )
-  {
-    typedef MessageValue1< Render::Renderer, unsigned int > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask );
-    mResendFlag &= ~RESEND_BLEND_BIT_MASK;
-  }
+    if( mResendFlag & RESEND_BLEND_COLOR )
+    {
+      typedef MessageValue1< Render::Renderer, const Vector4* > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, mBlendColor );
+    }
 
-  if( mResendFlag & RESEND_BLEND_COLOR )
-  {
-    typedef MessageValue1< Render::Renderer, const Vector4* > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, mBlendColor );
-    mResendFlag &= ~RESEND_BLEND_COLOR;
-  }
+    if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
+    {
+      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
+    }
 
-  if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
-  {
-    typedef MessageValue1< Render::Renderer, bool > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
-    mResendFlag &= ~RESEND_PREMULTIPLIED_ALPHA;
-  }
+    if( mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT )
+    {
+      typedef MessageValue1< Render::Renderer, size_t > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement );
+    }
 
-  if( mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT )
-  {
-    typedef MessageValue1< Render::Renderer, size_t > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement );
-    mResendFlag &= ~RESEND_INDEXED_DRAW_FIRST_ELEMENT;
-  }
+    if( mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT )
+    {
+      typedef MessageValue1< Render::Renderer, size_t > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
+    }
 
-  if( mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT )
-  {
-    typedef MessageValue1< Render::Renderer, size_t > DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
-    mResendFlag &= ~RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+    if( mResendFlag & RESEND_DEPTH_WRITE_MODE )
+    {
+      typedef MessageValue1< Render::Renderer, Dali::Renderer::DepthWriteMode > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode );
+    }
+
+    mResendFlag = 0;
   }
 }
 
@@ -383,6 +385,12 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
   mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
 }
 
+void Renderer::SetDepthWriteMode( unsigned int depthWriteMode )
+{
+  mDepthWriteMode = static_cast<Dali::Renderer::DepthWriteMode>(depthWriteMode);
+  mResendFlag |= RESEND_DEPTH_WRITE_MODE;
+}
+
 //Called when a node with this renderer is added to the stage
 void Renderer::OnStageConnect()
 {
@@ -394,7 +402,9 @@ void Renderer::OnStageConnect()
     mRenderer = Render::Renderer::New( dataProvider, mGeometry,
                                        mBlendBitmask, mBlendColor,
                                        static_cast< Dali::Renderer::FaceCullingMode >( mFaceCullingMode ),
-                                       mPremultipledAlphaEnabled );
+                                       mPremultipledAlphaEnabled,
+                                       mDepthWriteMode );
+
     mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
     mResendFlag = 0;
   }
@@ -481,7 +491,7 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
     }
     case BlendingMode::AUTO:
     {
-      bool shaderRequiresBlending( mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) );
+      bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
         opacity = Renderer::TRANSLUCENT;

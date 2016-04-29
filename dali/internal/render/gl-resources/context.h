@@ -545,7 +545,7 @@ public:
       mCullFaceMode = mode;
       switch(mode)
       {
-        case Dali::Renderer::NONE:
+        case Dali::Renderer::CULL_NONE:
         {
           LOG_GL("Disable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE) );

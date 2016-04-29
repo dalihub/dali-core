@@ -167,6 +167,12 @@ public:
   void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
+   * Sets the depth buffer write mode
+   * @param[in] depthWriteMode The depth buffer write mode
+   */
+  void SetDepthWriteMode( unsigned int depthWriteMode );
+
+  /**
    * Called when an actor with this renderer is added to the stage
    */
   void OnStageConnect();
@@ -316,6 +322,7 @@ private:
   unsigned int                    mBlendBitmask;    ///< The bitmask of blending options
   Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< The mode of face culling
   BlendingMode::Type              mBlendingMode;    ///< The mode of blending
+  Dali::Renderer::DepthWriteMode  mDepthWriteMode;  ///< The depth write mode
 
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
 
@@ -323,11 +330,12 @@ private:
   size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
   unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
   unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
-  unsigned char mResendFlag;                    ///< Indicate whether data should be resent to the renderer
+  unsigned char mResendFlag;                   ///< Indicate whether data should be resent to the renderer
   bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
   bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
   bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
-  bool         mPremultipledAlphaEnabled;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool         mPremultipledAlphaEnabled : 1;  ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+
 
 public:
   int mDepthIndex; ///< Used only in PrepareRenderInstructions
@@ -447,6 +455,16 @@ inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThread
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::EnablePreMultipliedAlpha, preMultiplied );
+}
+
+inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::Renderer::DepthWriteMode depthWriteMode )
+{
+  typedef MessageValue1< Renderer, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetDepthWriteMode, depthWriteMode );
 }
 
 inline void OnStageConnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )

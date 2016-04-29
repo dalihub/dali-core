@@ -1237,17 +1237,6 @@ void UpdateManager::RemoveGeometry( Render::Geometry* geometry )
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveGeometry, geometry );
 }
 
-void UpdateManager::SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest )
-{
-  typedef MessageValue2< RenderManager, Render::Geometry*, bool > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetGeometryRequiresDepthTest, geometry, requiresDepthTest );
-}
-
 void UpdateManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
 {
   typedef MessageValue2< RenderManager, Render::Geometry*, unsigned int > DerivedType;

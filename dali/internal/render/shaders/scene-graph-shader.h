@@ -47,9 +47,9 @@ public:
 
   /**
    * Constructor
-   * @param hints Geometry hints
+   * @param hints Shader hints
    */
-  Shader( Dali::ShaderEffect::GeometryHints& hints );
+  Shader( Dali::Shader::ShaderHints& hints );
 
   /**
    * Virtual destructor
@@ -61,32 +61,14 @@ public:
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Query whether a shader geometry hint is set.
+   * Query whether a shader hint is set.
    * @pre The shader has been initialized.
-   * @param[in] hint The geometry hint to check.
-   * @return True if the given geometry hint is set.
+   * @param[in] hint The hint to check.
+   * @return True if the given hint is set.
    */
-  bool GeometryHintEnabled( Dali::ShaderEffect::GeometryHints hint ) const
+  bool HintEnabled( Dali::Shader::ShaderHints hint ) const
   {
-    return mGeometryHints & hint;
-  }
-
-  /**
-   * Retrieve the set of geometry hints.
-   * @return The hints.
-   */
-  Dali::ShaderEffect::GeometryHints GetGeometryHints() const
-  {
-    return mGeometryHints;
-  }
-
-  /**
-   * Set the geometry hints.
-   * @param[in] hints The hints.
-   */
-  void SetGeometryHints( Dali::ShaderEffect::GeometryHints hints )
-  {
-    mGeometryHints = hints;
+    return mHints & hint;
   }
 
   /**
@@ -173,7 +155,7 @@ public: // UniformMap::Observer
 
 private: // Data
 
-  Dali::ShaderEffect::GeometryHints mGeometryHints;    ///< shader geometry hints for building the geometry
+  Dali::Shader::ShaderHints     mHints;
 
   Program*                       mProgram;
 
