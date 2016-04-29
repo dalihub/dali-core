@@ -69,6 +69,8 @@ public:
       BLENDING_DEST_FACTOR_ALPHA,                         ///< name "destinationBlendFactorAlpha",    type INTEGER
       BLENDING_COLOR,                                     ///< name "blendingColor",                  type VECTOR4
       BLEND_PRE_MULTIPLIED_ALPHA,                         ///< name "blendPreMultipledAlpha",         type BOOLEAN
+      INDEX_RANGE_FIRST,                                  ///< name "indexRangeFirst",                type INTEGER
+      INDEX_RANGE_COUNT                                   ///< name "indexRangeCount",                type INTEGER
     };
   };
 
@@ -127,6 +129,17 @@ public:
    * @return The geometry used by the renderer
    */
   Geometry GetGeometry() const;
+
+  /**
+   * @brief Sets effective range of indices to draw from bound index buffer
+   * @param [in] firstElement first element to draw
+   * @param [in] elementsCount number of elements to draw
+   */
+  inline void SetIndexRange( int firstElement, int elementsCount )
+  {
+    SetProperty( Property::INDEX_RANGE_FIRST, firstElement );
+    SetProperty( Property::INDEX_RANGE_COUNT, elementsCount );
+  }
 
   /**
    * @brief Sets the texture set to be used by this renderer

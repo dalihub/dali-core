@@ -124,29 +124,7 @@ struct TestAnimationCallback
   bool& mSignalVerified;
 };
 
-struct TestShaderEffectCallback
-{
-  TestShaderEffectCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestShaderEffectCallback()");
-    ShaderEffect actor = ShaderEffect::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
-
-
 } // anonymous namespace
-
-
-
 
 int UtcDaliObjectRegistryGet(void)
 {
@@ -268,44 +246,6 @@ int UtcDaliObjectRegistrySignalAnimationCreated(void)
 
     verified = false;
     objectPointer = animation.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
-
-int UtcDaliObjectRegistrySignalShaderEffectCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  static const char* VertexSource =
-  "void main()\n"
-  "{\n"
-  "  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-  "  vTexCoord = aTexCoord;\n"
-  "}\n";
-
-  static const char* FragmentSource =
-  "void main()\n"
-  "{\n"
-  "  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-  "}\n";
-
-  bool verified = false;
-  TestShaderEffectCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  {
-    ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = effect.GetObjectPtr();
   }
   DALI_TEST_CHECK( test.mSignalVerified );
   END_TEST;

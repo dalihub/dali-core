@@ -57,7 +57,6 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 
@@ -114,6 +113,9 @@ typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
 typedef GestureContainer::ConstIterator        GestureConstIter;
 
+typedef OwnerContainer< TextureSet* >          TextureSetContainer;
+typedef TextureSetContainer::Iterator          TextureSetIter;
+typedef TextureSetContainer::ConstIterator     TextureSetConstIter;
 
 /**
  * Structure to contain UpdateManager internal data
@@ -151,8 +153,7 @@ struct UpdateManager::Impl
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
-    geometries( sceneGraphBuffers, discardQueue ),
-    textureSets( sceneGraphBuffers, discardQueue ),
+    textureSets(),
     messageQueue( renderController, sceneGraphBuffers ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
@@ -165,8 +166,6 @@ struct UpdateManager::Impl
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache );
 
     renderers.SetSceneController( *sceneController );
-    geometries.SetSceneController( *sceneController );
-    textureSets.SetSceneController( *sceneController );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -252,8 +251,7 @@ struct UpdateManager::Impl
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
   ObjectOwnerContainer<Renderer>      renderers;
-  ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
-  ObjectOwnerContainer<TextureSet>    textureSets;                     ///< A container of texture sets
+  TextureSetContainer                 textureSets;                     ///< A container of texture sets
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -496,20 +494,9 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-ObjectOwnerContainer<Geometry>& UpdateManager::GetGeometryOwner()
-{
-  return mImpl->geometries;
-}
-
 ObjectOwnerContainer<Renderer>& UpdateManager::GetRendererOwner()
 {
   return mImpl->renderers;
-}
-
-
-ObjectOwnerContainer<TextureSet>& UpdateManager::GetTexturesOwner()
-{
-  return mImpl->textureSets;
 }
 
 void UpdateManager::AddShader( Shader* shader )
@@ -623,6 +610,26 @@ void UpdateManager::RemoveGesture( PanGesture* gesture )
   DALI_ASSERT_DEBUG(false);
 }
 
+void UpdateManager::AddTextureSet( TextureSet* textureSet )
+{
+  DALI_ASSERT_DEBUG( NULL != textureSet );
+  mImpl->textureSets.PushBack( textureSet );
+}
+
+void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
+{
+  DALI_ASSERT_DEBUG(textureSet != NULL);
+  size_t textureSetCount( mImpl->textureSets.Size() );
+  for( size_t i(0); i<textureSetCount; ++i )
+  {
+    if( textureSet == mImpl->textureSets[i] )
+    {
+      mImpl->textureSets.Remove( mImpl->textureSets.Begin() + i );
+      return;
+    }
+  }
+}
+
 unsigned int* UpdateManager::ReserveMessageSlot( std::size_t size, bool updateScene )
 {
   return mImpl->messageQueue.ReserveMessageSlot( size, updateScene );
@@ -685,8 +692,6 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     (*iter)->ResetToBaseValues( bufferIndex );
   }
 
-  mImpl->textureSets.ResetToBaseValues( bufferIndex );
-  mImpl->geometries.ResetToBaseValues( bufferIndex );
   mImpl->renderers.ResetToBaseValues( bufferIndex );
 
   // Reset animatable shader properties to base values
@@ -808,15 +813,11 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 
 void UpdateManager::PrepareTextureSets( BufferIndex bufferIndex )
 {
-  ObjectOwnerContainer<TextureSet>::Iterator iter = mImpl->textureSets.GetObjectContainer().Begin();
-  const ObjectOwnerContainer<TextureSet>::Iterator end = mImpl->textureSets.GetObjectContainer().End();
-  for( ; iter != end; ++iter )
+  size_t textureSetCount( mImpl->textureSets.Size() );
+  for( size_t i(0); i<textureSetCount; ++i )
   {
-    //Apply constraints
-    ConstrainPropertyOwner( *(*iter), bufferIndex );
-
     //Prepare texture set
-    (*iter)->Prepare( mImpl->resourceManager );
+    mImpl->textureSets[i]->Prepare( mImpl->resourceManager );
   }
 }
 
@@ -959,10 +960,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
 
-    //Apply constraints to RenderTasks, shaders and geometries
+    //Apply constraints to RenderTasks, shaders
     ConstrainRenderTasks( bufferIndex );
     ConstrainShaders( bufferIndex );
-    mImpl->geometries.ConstrainObjects( bufferIndex );
 
     //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
@@ -1214,6 +1214,84 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
 }
+
+void UpdateManager::AddGeometry( Render::Geometry* geometry )
+{
+  typedef MessageValue1< RenderManager, Render::Geometry* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddGeometry, geometry );
+}
+
+void UpdateManager::RemoveGeometry( Render::Geometry* geometry )
+{
+  typedef MessageValue1< RenderManager, Render::Geometry* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveGeometry, geometry );
+}
+
+void UpdateManager::SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest )
+{
+  typedef MessageValue2< RenderManager, Render::Geometry*, bool > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetGeometryRequiresDepthTest, geometry, requiresDepthTest );
+}
+
+void UpdateManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
+{
+  typedef MessageValue2< RenderManager, Render::Geometry*, unsigned int > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetGeometryType, geometry, geometryType );
+}
+
+void UpdateManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
+{
+  typedef IndexBufferMessage< RenderManager > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager, geometry, indices );
+}
+
+void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+{
+  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
+}
+
+void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+{
+  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddVertexBuffer, geometry, propertyBuffer );
+}
+
 
 } // namespace SceneGraph
 

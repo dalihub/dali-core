@@ -39,9 +39,6 @@ public:
 
   /**
    * @brief Creates a new Sampler object
-   *
-   * @param[in] image Image used by this sampler
-   * @param[in] uniformName String with the name of the uniform
    */
   static Sampler New();
 

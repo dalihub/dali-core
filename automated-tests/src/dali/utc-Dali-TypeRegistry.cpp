@@ -613,13 +613,6 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
   an.Play();
   application.Render();
 
-  // shader effect
-  type = registry.GetTypeInfo( "ShaderEffect" );
-  DALI_TEST_CHECK( type );
-  ShaderEffect ef = ShaderEffect::DownCast(type.CreateInstance());
-  DALI_TEST_CHECK( ef );
-  application.Render();
-
   END_TEST;
 }
 

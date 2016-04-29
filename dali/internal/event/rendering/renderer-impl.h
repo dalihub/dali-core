@@ -158,6 +158,16 @@ public:
    Vector4 GetBlendColor() const;
 
    /**
+    * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
+    */
+   void SetIndexedDrawFirstElement( size_t firstElement );
+
+   /**
+    * @copydoc Dali::Renderer::SetIndexedDrawElementsCount
+    */
+   void SetIndexedDrawElementsCount( size_t elementsCount );
+
+   /**
     * @brief Set whether the Pre-multiplied Alpha Blending is required
     *
     * @param[in] preMultipled whether alpha is pre-multiplied.
@@ -294,12 +304,15 @@ private: // unimplemented methods
 private: // data
   SceneGraph::Renderer* mSceneObject;
   Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
-  ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
+  GeometryPtr mGeometry; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<TextureSet> mTextureSetConnector; ///< Connector that holds the texture set used by this renderer
   IntrusivePtr<Shader> mShader;                 ///< Connector that holds the shader used by this renderer
 
   int mDepthIndex;
   int mOnStageCount;
+
+  size_t mIndexedDrawFirstElement;                   ///< Offset of first element to draw from bound index buffer
+  size_t mIndexedDrawElementCount;                    ///< Number of elements to draw
 
   Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
   BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode

@@ -29,12 +29,16 @@ namespace Dali
 namespace Internal
 {
 
+namespace Render
+{
+class Geometry;
+}
+
 namespace SceneGraph
 {
 class RenderTracker;
 class RenderItem;
 class Shader;
-class RenderGeometry;
 
 /**
  * Structure to store information for sorting the renderers.
@@ -54,7 +58,7 @@ struct RendererWithSortAttributes
   RenderItem*                   renderItem;       ///< The render item that is being sorted (includes depth index)
   const Shader*                 shader;           ///< The shader instance
   Integration::ResourceId       textureResourceId;///< The first texture resource ID of the texture set instance, is InvalidResourceId if the texture set doesn't have any textures
-  const RenderGeometry*         geometry;         ///< The geometry instance
+  const Render::Geometry*       geometry;         ///< The geometry instance
   float                         zValue;           ///< The zValue of the given renderer (either distance from camera, or a custom calculated value)
 };
 

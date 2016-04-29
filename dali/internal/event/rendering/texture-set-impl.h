@@ -48,7 +48,7 @@ typedef IntrusivePtr<TextureSet> TextureSetPtr;
 /**
  * TextureSet is an object that holds all the textures used by a renderer
  */
-class TextureSet : public Object, public Connectable
+class TextureSet : public BaseObject, public Connectable
 {
 public:
 
@@ -88,88 +88,6 @@ public:
    * @return the texture set scene object
    */
   const SceneGraph::TextureSet* GetTextureSetSceneObject() const;
-
-public: // Default property extensions from Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::SetDefaultProperty()
-   */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
-
-  /**
-   * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
-   */
-  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultProperty()
-   */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyOwner()
-   */
-  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
-   */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
-   */
-  virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
 public: // Functions from Connectable
   /**
@@ -218,7 +136,7 @@ private: // unimplemented methods
   TextureSet& operator=( const TextureSet& );
 
 private: // Data
-
+  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the update thread
   SceneGraph::TextureSet* mSceneObject;
   std::vector<Texture> mTextures;
   bool mOnStage;

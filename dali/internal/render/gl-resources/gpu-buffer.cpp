@@ -98,15 +98,6 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usag
 
   GLenum glTargetEnum = GL_ARRAY_BUFFER;
 
-  if(ELEMENT_ARRAY_BUFFER == target)
-  {
-    glTargetEnum = GL_ELEMENT_ARRAY_BUFFER;
-  }
-  else if(TRANSFORM_FEEDBACK_BUFFER == target)
-  {
-    glTargetEnum = GL_TRANSFORM_FEEDBACK_BUFFER;
-  }
-
   // make sure the buffer is bound, don't perform any checks because size may be zero
   if(ARRAY_BUFFER == target)
   {
@@ -114,10 +105,12 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usag
   }
   else if(ELEMENT_ARRAY_BUFFER == target)
   {
+    glTargetEnum = GL_ELEMENT_ARRAY_BUFFER;
     mContext.BindElementArrayBuffer( mBufferId );
   }
   else if(TRANSFORM_FEEDBACK_BUFFER == target)
   {
+    glTargetEnum = GL_TRANSFORM_FEEDBACK_BUFFER;
     mContext.BindTransformFeedbackBuffer( mBufferId );
   }
 

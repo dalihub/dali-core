@@ -152,7 +152,6 @@ internal_src_files = \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
-  $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-texture-set.cpp \
   $(internal_src_dir)/update/rendering/scene-graph-renderer.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp

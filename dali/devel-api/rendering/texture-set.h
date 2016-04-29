@@ -39,7 +39,7 @@ class TextureSet;
  * @brief TextureSet is a handle to an object that specifies the set of images used as textures by a renderer
  * The images have to be ordered in the same order they are declared in the shader
  */
-class DALI_IMPORT_API TextureSet : public Handle
+class DALI_IMPORT_API TextureSet : public BaseHandle
 {
 public:
 

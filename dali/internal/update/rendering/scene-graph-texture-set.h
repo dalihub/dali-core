@@ -20,11 +20,8 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/texture-set.h>
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 
 namespace Dali
@@ -39,12 +36,10 @@ class Sampler;
 }
 namespace SceneGraph
 {
+class Renderer;
 class Sampler;
-class Shader;
-class ConnectionObserver;
-class SceneController;
 
-class TextureSet : public PropertyOwner, public UniformMap::Observer
+class TextureSet
 {
 public:
 
@@ -100,37 +95,20 @@ public:
    */
   void GetResourcesStatus( bool& resourcesReady, bool& finishedResourceAcquisition );
 
-
-public: // Implementation of ObjectOwnerContainer template methods
-
   /**
-   * Connect the object to the scene graph
+   * Adds a renderer to the Renderers list of the texture set.
+   * Renderers using the TextureSet get a notification when the texture set changes
    *
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   * @param[in] renderer The renderer using the TextureSet
    */
-  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+  void AddObserver( Renderer* renderer );
 
   /**
-   * Disconnect the object from the scene graph
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   * Removes a renderer from the TextureSet renderers list
+   *
+   * @param[in] renderer The renderer no longer using the TextureSet
    */
-  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
-
-public: // Implementation of ConnectionChangePropagator
-
-  /**
-   * @copydoc ConnectionChangePropagator::AddObserver
-   */
-  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer);
-
-  /**
-   * @copydoc ConnectionChangePropagator::RemoveObserver
-   */
-  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
-
-public:
+  void RemoveObserver( Renderer* renderer );
 
   /**
    * Get the ResourceId of a texture in the TextureSet
@@ -161,11 +139,6 @@ public:
     return mTextureId.Size();
   }
 
-public: // UniformMap::Observer
-  /**
-   * @copydoc UniformMap::Observer::UniformMappingsChanged
-   */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
 
 private:
 
@@ -174,15 +147,21 @@ private:
    */
   TextureSet();
 
+  /**
+   * Helper method to notify the renderers observing the TextureSet
+   * that the TextureSet has changed
+   */
+  void NotifyChangeToRenderers();
+
 private: // Data
 
-  Vector< Render::Sampler* >      mSamplers; // Not owned
-  Vector< ResourceId >            mTextureId;
-  ConnectionChangePropagator      mConnectionObservers;
-  bool                            mResourcesReady; ///< if the textures are ready to be used for rendering
+  Vector< Render::Sampler* >      mSamplers;                    ///< List of samplers used by each texture. Not owned
+  Vector< ResourceId >            mTextureId;                   ///< List of texture ids
+  Vector<Renderer*>               mRenderers;                   ///< List of renderers using the TextureSet
+  bool                            mResourcesReady;              ///< if the textures are ready to be used for rendering
   bool                            mFinishedResourceAcquisition; ///< if resource loading is completed
-  bool                            mChanged; ///< if the texture set has changed since the last frame
-  bool                            mHasAlpha; ///< if any of the textures has an alpha channel
+  bool                            mChanged;                     ///< if the texture set has changed since the last frame
+  bool                            mHasAlpha;                    ///< if any of the textures has an alpha channel
 };
 
 inline void SetImageMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, ResourceId resourceId )
