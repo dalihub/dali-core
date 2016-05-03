@@ -593,29 +593,6 @@ int UtcDaliScriptingNewImage10P(void)
   END_TEST;
 }
 
-int UtcDaliScriptingNewShaderEffect(void)
-{
-  TestApplication application;
-
-  Property::Map programMap;
-  programMap[ "vertexFilename" ] = "bump.vert";
-  programMap[ "fragmentFilename" ] = "bump.frag";
-
-  Property::Map imageMap;
-  imageMap[ "filename" ] = "image.png";
-
-  Property::Map map;
-  map[ "image" ] = imageMap;
-  map[ "program" ] = programMap;
-  map[ "uLightPosition" ] = Vector3( 0.0, 0.0, -1.5);
-  map[ "uAmbientLight" ] = (int)10;
-
-  ShaderEffect shader = NewShaderEffect( map );
-
-  DALI_TEST_CHECK( shader );
-  END_TEST;
-}
-
 int UtcDaliScriptingNewActorNegative(void)
 {
   TestApplication application;
@@ -663,7 +640,6 @@ int UtcDaliScriptingNewActorProperties(void)
   map[ "color" ] = Color::MAGENTA;
   map[ "name" ] = "MyActor";
   map[ "colorMode" ] = "USE_PARENT_COLOR";
-  map[ "inheritShaderEffect" ] = false;
   map[ "sensitive" ] = false;
   map[ "leaveRequired" ] = true;
   map[ "positionInheritance" ] = "DONT_INHERIT_POSITION";
@@ -742,7 +718,7 @@ int UtcDaliScriptingNewActorChildren(void)
   map[ "position" ] = Vector3::XAXIS;
 
   Property::Map child1Map;
-  child1Map[ "type" ] = "ImageActor";
+  child1Map[ "type" ] = "CameraActor";
   child1Map[ "position" ] = Vector3::YAXIS;
 
   Property::Array childArray;
@@ -762,7 +738,7 @@ int UtcDaliScriptingNewActorChildren(void)
 
   Actor child1 = handle.GetChildAt(0);
   DALI_TEST_CHECK( child1 );
-  DALI_TEST_CHECK( ImageActor::DownCast( child1 ) );
+  DALI_TEST_CHECK( CameraActor::DownCast( child1 ) );
   DALI_TEST_EQUALS( child1.GetCurrentPosition(), Vector3::YAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
 
@@ -788,15 +764,15 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Stage::GetCurrent().Remove( actor );
   }
 
-  // ImageActor Type
+  // Layer Type
   {
-    Actor actor = ImageActor::New();
+    Actor actor = Layer::New();
 
     Property::Map map;
     CreatePropertyMap( actor, map );
     DALI_TEST_CHECK( !map.Empty() );
     DALI_TEST_CHECK( NULL != map.Find( "type" ) );
-    DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "ImageActor", TEST_LOCATION );
+    DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "Layer", TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
   }
@@ -868,7 +844,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
   // Children
   {
     Actor actor = Actor::New();
-    Actor child = ImageActor::New();
+    Actor child = Layer::New();
     actor.Add( child );
 
     Stage::GetCurrent().Add( actor );
@@ -888,7 +864,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Property::Map childMap( children[0].Get< Property::Map >() );
     DALI_TEST_CHECK( !childMap.Empty() );
     DALI_TEST_CHECK( childMap.Find( "type" ) );
-    DALI_TEST_EQUALS( childMap.Find( "type" )->Get< std::string >(), "ImageActor", TEST_LOCATION );
+    DALI_TEST_EQUALS( childMap.Find( "type" )->Get< std::string >(), "Layer", TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
   }

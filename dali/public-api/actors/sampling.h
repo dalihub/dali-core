@@ -33,8 +33,6 @@ namespace FilterMode
 /**
  * @brief Texture filtering mode.
  * @SINCE_1_0.0
- * @remarks This is an experimental feature and might not be supported in the next release.
- * We do recommend not to use it.
  */
 enum Type
 {

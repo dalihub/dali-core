@@ -35,6 +35,7 @@ namespace Internal
 namespace Render
 {
 class Renderer;
+class Geometry;
 }
 
 namespace SceneGraph
@@ -46,7 +47,7 @@ typedef Dali::Vector< Renderer* > RendererContainer;
 typedef RendererContainer::Iterator RendererIter;
 typedef RendererContainer::ConstIterator RendererConstIter;
 
-class Material;
+class TextureSet;
 class Geometry;
 
 class Renderer :  public PropertyOwner,
@@ -80,36 +81,32 @@ public:
   void operator delete( void* ptr );
 
   /**
-   * Set the material for the renderer
-   * @param[in] bufferIndex The current frame's buffer index
-   * @param[in] material The material this renderer will use
+   * Set the texture set for the renderer
+   * @param[in] textureSet The texture set this renderer will use
    */
-  void SetMaterial( BufferIndex bufferIndex, Material* material);
+  void SetTextures( TextureSet* textureSet );
+
 
   /**
-   * Get the material of this renderer
-   * @return the material this renderer uses
+   * Set the shader for the renderer
+   * @param[in] shader The shader this renderer will use
    */
-  Material& GetMaterial()
+  void SetShader( Shader* shader );
+
+  /**
+   * Get the shader used by this renderer
+   * @return the shader this renderer uses
+   */
+  Shader& GetShader()
   {
-    return *mMaterial;
+    return *mShader;
   }
 
   /**
    * Set the geometry for the renderer
-   * @param[in] bufferIndex The current frame's buffer index
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry( BufferIndex bufferIndex, Geometry* material);
-
-  /**
-   * Get the geometry of this renderer
-   * @return the geometry this renderer uses
-   */
-  Geometry& GetGeometry()
-  {
-    return *mGeometry;
-  }
+  void SetGeometry( Render::Geometry* geometry );
 
   /**
    * Set the depth index
@@ -149,6 +146,18 @@ public:
    * @param blendColor to pass to GL
    */
   void SetBlendColor( const Vector4& blendColor );
+
+  /**
+   * Set the index of first element for indexed draw
+   * @param[in] firstElement index of first element to draw
+   */
+  void SetIndexedDrawFirstElement( size_t firstElement );
+
+  /**
+   * Set the number of elements to draw by indexed draw
+   * @param[in] elementsCount number of elements to draw
+   */
+  void SetIndexedDrawElementsCount( size_t elementsCount );
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -206,6 +215,10 @@ public:
     return mReferenceCount > 0;
   }
 
+  /**
+   * Called by the TextureSet to notify to the renderer that it has changed
+   */
+  void TextureSetChanged();
 
 public: // Implementation of ObjectOwnerContainer template methods
   /**
@@ -293,10 +306,11 @@ private:
 
 private:
 
-  SceneController* mSceneController;  ///< Used for initializing renderers whilst attached
-  Render::Renderer*  mRenderer;    ///< Raw pointer to the new renderer (that's owned by RenderManager)
-  Material*          mMaterial;    ///< The material this renderer uses. (Not owned)
-  Geometry*          mGeometry;    ///< The geometry this renderer uses. (Not owned)
+  SceneController*   mSceneController;  ///< Used for initializing renderers whilst attached
+  Render::Renderer*  mRenderer;    ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*        mTextureSet;    ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*  mGeometry;    ///< The geometry this renderer uses. (Not owned)
+  Shader*            mShader;
 
   Vector4*                        mBlendColor;      ///< The blend color for blending operation
   unsigned int                    mBlendBitmask;    ///< The bitmask of blending options
@@ -304,6 +318,9 @@ private:
   BlendingMode::Type              mBlendingMode;    ///< The mode of blending
 
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+
+  size_t mIndexedDrawFirstElement;             ///< first element index to be drawn using indexed draw
+  size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
   unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
   unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned char mResendFlag;                    ///< Indicate whether data should be resent to the renderer
@@ -318,26 +335,37 @@ public:
 
 
 /// Messages
-inline void SetMaterialMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Material& material )
+inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const TextureSet& textureSet )
 {
-  typedef MessageDoubleBuffered1< Renderer, Material* > LocalType;
+  typedef MessageValue1< Renderer, TextureSet* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetMaterial, const_cast<Material*>(&material) );
+  new (slot) LocalType( &renderer, &Renderer::SetTextures, const_cast<TextureSet*>(&textureSet) );
 }
 
-inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Geometry& geometry )
+inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry& geometry )
 {
-  typedef MessageDoubleBuffered1< Renderer, Geometry* > LocalType;
+  typedef MessageValue1< Renderer, Render::Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Geometry*>(&geometry) );
+  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(&geometry) );
+}
+
+inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Shader& shader )
+{
+  typedef MessageValue1< Renderer, Shader* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &renderer, &Renderer::SetShader, &shader );
 }
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& attachment, int depthIndex )
@@ -389,6 +417,26 @@ inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, cons
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetBlendColor, blendColor );
+}
+
+inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t firstElement )
+{
+  typedef MessageValue1< Renderer, size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawFirstElement, firstElement );
+}
+
+inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t elementsCount )
+{
+  typedef MessageValue1< Renderer, size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawElementsCount, elementsCount );
 }
 
 inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool preMultiplied )

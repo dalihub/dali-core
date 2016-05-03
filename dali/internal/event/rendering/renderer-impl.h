@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
+#include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 
 namespace Dali
@@ -43,7 +43,7 @@ class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
 
 /**
- * Renderer is an object that can be used to show content by combining a Geometry with a material.
+ * Renderer is an object that can be used to show content by combining a Geometry with a shader and textures.
  */
 class Renderer : public Object
 {
@@ -66,14 +66,24 @@ public:
   Geometry* GetGeometry() const;
 
   /**
-   * @copydoc Dali::Renderer::SetMaterial()
+   * @copydoc Dali::Renderer::SetTextures()
    */
-  void SetMaterial( Material& material );
+  void SetTextures( TextureSet& textureSet );
 
   /**
-   * @copydoc Dali::Renderer::GetMaterial()
+   * @copydoc Dali::Renderer::GetTextures()
    */
-  Material* GetMaterial() const;
+  TextureSet* GetTextures() const;
+
+  /**
+   * @copydoc Dali::Renderer::SetShader()
+   */
+  void SetShader( Shader& shader );
+
+  /**
+   * @copydoc Dali::Renderer::GetShader()
+   */
+  Shader* GetShader() const;
 
   /**
    * @copydoc Dali::Renderer::SetDepthIndex()
@@ -148,6 +158,16 @@ public:
    Vector4 GetBlendColor() const;
 
    /**
+    * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
+    */
+   void SetIndexedDrawFirstElement( size_t firstElement );
+
+   /**
+    * @copydoc Dali::Renderer::SetIndexedDrawElementsCount
+    */
+   void SetIndexedDrawElementsCount( size_t elementsCount );
+
+   /**
     * @brief Set whether the Pre-multiplied Alpha Blending is required
     *
     * @param[in] preMultipled whether alpha is pre-multiplied.
@@ -162,7 +182,7 @@ public:
    bool IsPreMultipliedAlphaEnabled() const;
 
   /**
-   * @brief Get the scene graph object ( the node attachment )
+   * @brief Get the scene graph object
    *
    * @return the scene object
    */
@@ -284,11 +304,15 @@ private: // unimplemented methods
 private: // data
   SceneGraph::Renderer* mSceneObject;
   Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
-  ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
-  ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
+  GeometryPtr mGeometry; ///< Connector that holds the geometry used by this renderer
+  ObjectConnector<TextureSet> mTextureSetConnector; ///< Connector that holds the texture set used by this renderer
+  IntrusivePtr<Shader> mShader;                 ///< Connector that holds the shader used by this renderer
 
   int mDepthIndex;
   int mOnStageCount;
+
+  size_t mIndexedDrawFirstElement;                   ///< Offset of first element to draw from bound index buffer
+  size_t mIndexedDrawElementCount;                    ///< Number of elements to draw
 
   Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
   BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode

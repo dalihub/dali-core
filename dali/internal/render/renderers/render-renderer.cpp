@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -110,17 +111,17 @@ namespace Render
 {
 
 Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
-                         SceneGraph::RenderGeometry* renderGeometry,
+                         Render::Geometry* geometry,
                          unsigned int blendingBitmask,
                          const Vector4* blendColor,
                          Dali::Renderer::FaceCullingMode faceCullingMode,
                          bool preMultipliedAlphaEnabled )
 {
-  return new Renderer( dataProvider, renderGeometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled );
+  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
-                    SceneGraph::RenderGeometry* renderGeometry,
+                    Render::Geometry* geometry,
                     unsigned int blendingBitmask,
                     const Vector4* blendColor,
                     Dali::Renderer::FaceCullingMode faceCullingMode,
@@ -129,11 +130,13 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mContext(NULL),
   mTextureCache( NULL ),
   mUniformNameCache( NULL ),
-  mRenderGeometry( renderGeometry ),
+  mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
   mBlendingOptions(),
   mFaceCullingMode( faceCullingMode  ),
+  mIndexedDrawFirstElement( 0 ),
+  mIndexedDrawElementsCount( 0 ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
@@ -166,9 +169,9 @@ void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvid
   mUpdateAttributesLocation = true;
 }
 
-void Renderer::SetGeometry( SceneGraph::RenderGeometry* renderGeometry )
+void Renderer::SetGeometry( Render::Geometry* geometry )
 {
-  mRenderGeometry = renderGeometry;
+  mGeometry = geometry;
   mUpdateAttributesLocation = true;
 }
 
@@ -177,7 +180,7 @@ void Renderer::SetGeometry( SceneGraph::RenderGeometry* renderGeometry )
 // @todo MESH_REWORK Should use Update thread objects only in PrepareRenderInstructions.
 bool Renderer::RequiresDepthTest() const
 {
-  return mRenderGeometry->RequiresDepthTest();
+  return mGeometry->RequiresDepthTest();
 }
 
 void Renderer::SetBlending( Context& context, bool blend )
@@ -210,7 +213,7 @@ void Renderer::SetBlending( Context& context, bool blend )
 
 void Renderer::GlContextDestroyed()
 {
-  mRenderGeometry->GlContextDestroyed();
+  mGeometry->GlContextDestroyed();
 }
 
 void Renderer::GlCleanup()
@@ -416,6 +419,16 @@ void Renderer::SetBlendColor( const Vector4* color )
   mBlendingOptions.SetBlendColor( *color );
 }
 
+void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+{
+  mIndexedDrawFirstElement = firstElement;
+}
+
+void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+{
+  mIndexedDrawElementsCount = elementsCount;
+}
+
 void Renderer::EnablePreMultipliedAlpha( bool enable )
 {
   mPremultipledAlphaEnabled = enable;
@@ -482,15 +495,15 @@ void Renderer::Render( Context& context,
       }
     }
 
-  SetUniforms( bufferIndex, node, size, *program );
+    SetUniforms( bufferIndex, node, size, *program );
 
-    if( mUpdateAttributesLocation || mRenderGeometry->AttributesChanged() )
+    if( mUpdateAttributesLocation || mGeometry->AttributesChanged() )
     {
-      mRenderGeometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
+      mGeometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
       mUpdateAttributesLocation = false;
     }
 
-    mRenderGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation );
+    mGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation, mIndexedDrawFirstElement, mIndexedDrawElementsCount );
   }
 }
 
@@ -507,7 +520,7 @@ void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererW
     sortAttributes.textureResourceId = Integration::InvalidResourceId;
   }
 
-  sortAttributes.geometry = mRenderGeometry;
+  sortAttributes.geometry = mGeometry;
 }
 
 } // namespace SceneGraph

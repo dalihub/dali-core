@@ -101,7 +101,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   tet_infoline( "UtcDaliImageFactoryCachedRequest02 - Discard previously requested resource" );
 
   Image image = ResourceImage::New( gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED );
-  ImageActor actor = ImageActor::New( image );
+  Actor actor = CreateRenderableActor( image );
 
   application.SendNotification();
   application.Render();

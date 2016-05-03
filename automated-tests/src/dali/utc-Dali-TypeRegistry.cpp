@@ -597,16 +597,6 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
 
   TypeInfo type;
 
-  // image actor
-  type = registry.GetTypeInfo( "ImageActor" );
-  DALI_TEST_CHECK( type );
-  DALI_TEST_CHECK( type.GetCreator() );
-  DALI_TEST_CHECK( ImageActor::DownCast( type.GetCreator()() ) );
-  ImageActor ia = ImageActor::DownCast(type.CreateInstance());
-  DALI_TEST_CHECK( ia );
-  Stage::GetCurrent().Add( ia );
-  application.Render();
-
   // camera actor
   type = registry.GetTypeInfo( "CameraActor" );
   DALI_TEST_CHECK( type );
@@ -621,13 +611,6 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
   Animation an = Animation::DownCast(type.CreateInstance());
   DALI_TEST_CHECK( an );
   an.Play();
-  application.Render();
-
-  // shader effect
-  type = registry.GetTypeInfo( "ShaderEffect" );
-  DALI_TEST_CHECK( type );
-  ShaderEffect ef = ShaderEffect::DownCast(type.CreateInstance());
-  DALI_TEST_CHECK( ef );
   application.Render();
 
   END_TEST;
@@ -649,8 +632,8 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeNameN(void)
 
 int UtcDaliTypeRegistryGetTypeInfoFromTypeIdP(void)
 {
-  TypeInfo named_type = TypeRegistry::Get().GetTypeInfo( "ImageActor" );
-  TypeInfo typeinfo_type = TypeRegistry::Get().GetTypeInfo( typeid(Dali::ImageActor) );
+  TypeInfo named_type = TypeRegistry::Get().GetTypeInfo( "CameraActor" );
+  TypeInfo typeinfo_type = TypeRegistry::Get().GetTypeInfo( typeid(Dali::CameraActor) );
 
   DALI_TEST_CHECK( named_type );
   DALI_TEST_CHECK( typeinfo_type );

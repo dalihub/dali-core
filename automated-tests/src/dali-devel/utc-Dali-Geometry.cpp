@@ -63,18 +63,6 @@ PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::stri
   return vertexData;
 }
 
-PropertyBuffer CreateIndexBuffer()
-{
-  const unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
-  const unsigned int numberElements = sizeof(indexData)/sizeof(indexData[0]) ;
-
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, numberElements );
-
-  return indices;
-}
 
 }
 
@@ -156,8 +144,8 @@ int UtcDaliGeometryAddVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -234,8 +222,8 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -263,13 +251,12 @@ int UtcDaliGeometrySetIndexBuffer(void)
   tet_infoline("Test SetIndexBuffer");
 
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
-  PropertyBuffer indexBuffer = CreateIndexBuffer( );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -292,7 +279,8 @@ int UtcDaliGeometrySetIndexBuffer(void)
   // Set index buffer
   application.GetGlAbstraction().ResetBufferDataCalls();
 
-  geometry.SetIndexBuffer( indexBuffer );
+  const unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
   application.SendNotification();
   application.Render(0);
   application.Render();
@@ -325,8 +313,8 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -450,14 +438,15 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   unsigned int numVertex = 4u;
   unsigned int numIndex = 6u; // 6 unsigned short
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
-  PropertyBuffer indexBuffer = CreateIndexBuffer( );
+
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
-  geometry.SetIndexBuffer( indexBuffer );
+  const unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
-  Material material = CreateMaterial();
-  Renderer renderer = Renderer::New(geometry, material);
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.SetSize(Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
@@ -575,10 +564,8 @@ int UtcDaliGeometrySetGetRequireDepthTesting(void)
   tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
+  Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -604,234 +591,3 @@ int UtcDaliGeometrySetGetRequireDepthTesting(void)
   END_TEST;
 }
 
-int UtcDaliGeometryPropertyRequiresDepthTest(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-
-  DALI_TEST_EQUALS( geometry.GetProperty<bool>(Geometry::Property::REQUIRES_DEPTH_TEST), false, TEST_LOCATION );
-
-  geometry.SetProperty(Geometry::Property::REQUIRES_DEPTH_TEST, true );
-
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  application.SendNotification();
-  application.Render();
-//  TODO: Not supported yet
-//  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
-//  std::ostringstream out;
-//  out << GL_DEPTH_TEST;
-//  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
-
-  DALI_TEST_EQUALS( geometry.GetProperty<bool>(Geometry::Property::REQUIRES_DEPTH_TEST), true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliGeometryConstraint(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test that a custom geometry property can be constrained");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-
-  Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), initialColor, TEST_LOCATION );
-
-  // Apply constraint
-  Constraint constraint = Constraint::New<Vector4>( geometry, colorIndex, TestConstraintNoBlue );
-  constraint.Apply();
-  application.SendNotification();
-  application.Render(0);
-
-  // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
-
-  geometry.RemoveConstraints();
-  geometry.SetProperty(colorIndex, Color::WHITE );
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), Color::WHITE, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliGeometryConstraint02(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test that a uniform map geometry property can be constrained");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-  application.SendNotification();
-  application.Render(0);
-
-  Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  application.SendNotification();
-  application.Render(0);
-
-  Vector4 actualValue(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, initialColor, TEST_LOCATION );
-
-  // Apply constraint
-  Constraint constraint = Constraint::New<Vector4>( geometry, colorIndex, TestConstraintNoBlue );
-  constraint.Apply();
-  application.SendNotification();
-  application.Render(0);
-
-   // Expect no blue component in either buffer - yellow
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::YELLOW, TEST_LOCATION );
-
-  application.Render(0);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::YELLOW, TEST_LOCATION );
-
-  geometry.RemoveConstraints();
-  geometry.SetProperty(colorIndex, Color::WHITE );
-  application.SendNotification();
-  application.Render(0);
-
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::WHITE, TEST_LOCATION );
-
-  END_TEST;
-}
-
-
-
-int UtcDaliGeometryAnimatedProperty01(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test that a custom geometry property can be animated");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-
-  Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), initialColor, TEST_LOCATION );
-
-  Animation  animation = Animation::New(1.0f);
-  KeyFrames keyFrames = KeyFrames::New();
-  keyFrames.Add(0.0f, initialColor);
-  keyFrames.Add(1.0f, Color::TRANSPARENT);
-  animation.AnimateBetween( Property( geometry, colorIndex ), keyFrames );
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(500);
-
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), Color::WHITE * 0.5f, TEST_LOCATION );
-
-  application.Render(500);
-
-  DALI_TEST_EQUALS( geometry.GetProperty<Vector4>(colorIndex), Color::TRANSPARENT, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliGeometryAnimatedProperty02(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test that a uniform map geometry property can be animated");
-
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Material material = Material::New( shader );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, material );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
-  Stage::GetCurrent().Add(actor);
-  application.SendNotification();
-  application.Render(0);
-
-  Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  application.SendNotification();
-  application.Render(0);
-
-  Vector4 actualValue(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, initialColor, TEST_LOCATION );
-
-  Animation  animation = Animation::New(1.0f);
-  KeyFrames keyFrames = KeyFrames::New();
-  keyFrames.Add(0.0f, initialColor);
-  keyFrames.Add(1.0f, Color::TRANSPARENT);
-  animation.AnimateBetween( Property( geometry, colorIndex ), keyFrames );
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(500);
-
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::WHITE * 0.5f, TEST_LOCATION );
-
-  application.Render(500);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
-
-  END_TEST;
-}

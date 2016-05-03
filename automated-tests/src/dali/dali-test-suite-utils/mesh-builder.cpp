@@ -19,22 +19,20 @@
 namespace Dali
 {
 
-Material CreateMaterial()
+Shader CreateShader()
 {
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
-  Material material = Material::New(shader);
-
-  return material;
+  return Shader::New( "vertexSrc", "fragmentSrc" );
 }
 
-Material CreateMaterial( Image image )
+TextureSet CreateTextureSet()
 {
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
-  Material material = Material::New(shader);
-
-  material.AddTexture( image, "sTexture" );
-
-  return material;
+  return TextureSet::New();
+}
+TextureSet CreateTextureSet( Image image )
+{
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetImage( 0u, image );
+  return textureSet;
 }
 
 PropertyBuffer CreatePropertyBuffer()
@@ -64,15 +62,11 @@ Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData )
     { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
   vertexData.SetData(texturedQuadVertexData, 4);
 
-  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
+  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexData );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   return geometry;
 }

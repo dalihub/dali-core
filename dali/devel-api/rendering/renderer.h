@@ -2,7 +2,7 @@
 #define DALI_RENDERER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <string> // std::string
-
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/blending.h> // Dali::BlendingMode, Dali::BlendingEquation, Dali::BlendingFactor
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_OBJECT_PROPERTY_START_INDEX
 #include <dali/devel-api/rendering/geometry.h> // Dali::Geometry
-#include <dali/devel-api/rendering/material.h> // Dali::Material
+#include <dali/devel-api/rendering/texture-set.h> // Dali::TextureSet
 
 namespace Dali
 {
@@ -37,7 +34,7 @@ class Renderer;
 }
 
 /**
- * @brief Renderer is a handle to an object that can be used to provide an image to a material.
+ * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader
  */
 class DALI_IMPORT_API Renderer : public Handle
 {
@@ -61,7 +58,7 @@ public:
   {
     enum
     {
-      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depthIndex",   type INTEGER
+      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depthIndex",                     type INTEGER
       FACE_CULLING_MODE,                                  ///< name "faceCullingMode",                type INTEGER
       BLENDING_MODE,                                      ///< name "blendingMode",                   type INTEGER
       BLEND_EQUATION_RGB,                                 ///< name "blendEquationRgb",               type INTEGER
@@ -70,8 +67,10 @@ public:
       BLENDING_DEST_FACTOR_RGB,                           ///< name "destinationBlendFactorRgb",      type INTEGER
       BLENDING_SRC_FACTOR_ALPHA,                          ///< name "sourceBlendFactorAlpha",         type INTEGER
       BLENDING_DEST_FACTOR_ALPHA,                         ///< name "destinationBlendFactorAlpha",    type INTEGER
-      BLENDING_COLOR,                                     ///< name "blendingColor",                     type VECTOR4
+      BLENDING_COLOR,                                     ///< name "blendingColor",                  type VECTOR4
       BLEND_PRE_MULTIPLIED_ALPHA,                         ///< name "blendPreMultipledAlpha",         type BOOLEAN
+      INDEX_RANGE_FIRST,                                  ///< name "indexRangeFirst",                type INTEGER
+      INDEX_RANGE_COUNT                                   ///< name "indexRangeCount",                type INTEGER
     };
   };
 
@@ -79,9 +78,9 @@ public:
    * @brief Creates a new Renderer object
    *
    * @param[in] geometry Geometry to be used by this renderer
-   * @param[in] material Material to be used by this renderer
+   * @param[in] shader Shader to be used by this renderer
    */
-  static Renderer New( Geometry& geometry, Material& material );
+  static Renderer New( Geometry& geometry, Shader& shader );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -132,18 +131,41 @@ public:
   Geometry GetGeometry() const;
 
   /**
-   * @brief Sets the material to be used by this renderer
-   *
-   * @param[in] material The material to be used by this renderer
+   * @brief Sets effective range of indices to draw from bound index buffer
+   * @param [in] firstElement first element to draw
+   * @param [in] elementsCount number of elements to draw
    */
-  void SetMaterial( Material& material );
+  inline void SetIndexRange( int firstElement, int elementsCount )
+  {
+    SetProperty( Property::INDEX_RANGE_FIRST, firstElement );
+    SetProperty( Property::INDEX_RANGE_COUNT, elementsCount );
+  }
 
   /**
-   * @brief Gets the material used by this renderer
+   * @brief Sets the texture set to be used by this renderer
    *
-   * @return The material used by the renderer
+   * @param[in] textureSet The texture set to be used by this renderer
    */
-  Material GetMaterial() const;
+  void SetTextures( TextureSet& textureSet );
+
+  /**
+   * @brief Gets the texture set used by this renderer
+   *
+   * @return The texture set used by the renderer
+   */
+  TextureSet GetTextures() const;
+
+  /**
+   * @brief Set the shader used by this renderer
+   * @param[in] shader The shader to be used by this renderer
+   */
+  void SetShader( Shader& shader );
+
+  /**
+   * @brief Get the shader used by this renderer
+   * @return THe shader used by the renderer
+   */
+  Shader GetShader() const;
 
   /**
    * @brief Specify the pixel arithmetic used when the actor is blended.

@@ -49,7 +49,7 @@ int UtcDaliFrameBufferImageNew01(void)
 
   // initialise handle
   image = FrameBufferImage::New();            // create framebuffer with the same dimensions as the stage
-  ImageActor actor=ImageActor::New(image);
+  Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -62,12 +62,6 @@ int UtcDaliFrameBufferImageNew01(void)
   DALI_TEST_EQUALS((float)image.GetHeight(), stageSize.height, TEST_LOCATION);
 
   image = FrameBufferImage::New(16, 16);      // create framebuffer with dimensions of 16x16
-  actor.SetImage(image);
-
-  application.SendNotification();
-  application.Render();
-  application.Render();
-  application.SendNotification();
 
   DALI_TEST_CHECK( image );
   DALI_TEST_EQUALS(image.GetWidth(), 16u, TEST_LOCATION);
@@ -139,7 +133,7 @@ int UtcDaliFrameBufferImageAttachments01(void)
 
   // initialise handle
   image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR);       // create framebuffer with Color buffer
-  ImageActor actor=ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -165,7 +159,7 @@ int UtcDaliFrameBufferImageAttachments02(void)
 
   // initialise handle
   image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_DEPTH); // create framebuffer with Color and Depth buffer
-  ImageActor actor=ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -191,7 +185,7 @@ int UtcDaliFrameBufferImageAttachments03(void)
 
   // initialise handle
   image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_STENCIL);  // create framebuffer with Color and Stencil
-  ImageActor actor=ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -217,7 +211,7 @@ int UtcDaliFrameBufferImageAttachments04(void)
 
   // initialise handle
   image = FrameBufferImage::New(64, 64, Pixel::RGBA8888, RenderBuffer::COLOR_DEPTH_STENCIL);  // create framebuffer with Color, Depth and Stencil buffers
-  ImageActor actor=ImageActor::New(image);
+  Actor actor = CreateRenderableActor(image);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();

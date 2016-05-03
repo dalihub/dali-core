@@ -57,15 +57,11 @@ class PropertyBuffer;
  *
  *  // Create indices
  *  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
- *  Property::Map indexFormat;
- *  indexFormat["indices"] = Property::INTEGER;
- *  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
- *  indices.SetData( indexData, 6 );
  *
  *  // Create the geometry object
  *  Geometry texturedQuadGeometry = Geometry::New();
  *  texturedQuadGeometry.AddVertexBuffer( texturedQuadVertices );
- *  texturedQuadGeometry.SetIndexBuffer( indices );
+ *  texturedQuadGeometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0] );
  *
  */
 class DALI_IMPORT_API PropertyBuffer : public BaseHandle

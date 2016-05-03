@@ -15,7 +15,7 @@ SET(TC_SOURCES
         utc-Dali-Geometry.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
-        utc-Dali-Material.cpp
+        utc-Dali-TextureSet.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-PixelData.cpp
         utc-Dali-PropertyBuffer.cpp
@@ -31,6 +31,7 @@ SET(TC_SOURCES
 LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/mesh-builder.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
+        ../dali/dali-test-suite-utils/test-actor-utils.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp

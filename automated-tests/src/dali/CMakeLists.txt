@@ -28,7 +28,6 @@ SET(TC_SOURCES
         utc-Dali-Handle.cpp
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Image.cpp
-        utc-Dali-ImageActor.cpp
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
@@ -60,7 +59,6 @@ SET(TC_SOURCES
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
-        utc-Dali-ShaderEffect.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-Stage.cpp
@@ -81,6 +79,7 @@ SET(TC_SOURCES
 LIST(APPEND TC_SOURCES
         dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
+        dali-test-suite-utils/test-actor-utils.cpp
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
         dali-test-suite-utils/test-gesture-manager.cpp

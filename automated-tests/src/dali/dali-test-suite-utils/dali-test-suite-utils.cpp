@@ -299,9 +299,9 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-BufferImage CreateBufferImage()
+BufferImage CreateBufferImage(int width, int height, const Vector4& color)
 {
-  BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
+  BufferImage image = BufferImage::New(width, height, Pixel::RGBA8888);
 
   PixelBuffer* pixbuf = image.GetBuffer();
 
@@ -309,11 +309,16 @@ BufferImage CreateBufferImage()
   // than a 3x3 image
   for(size_t i=0; i<16; i++)
   {
-    pixbuf[i*4+0] = 0xFF;
-    pixbuf[i*4+1] = 0xFF;
-    pixbuf[i*4+2] = 0xFF;
-    pixbuf[i*4+3] = 0xFF;
+    pixbuf[i*4+0] = color.r*255;
+    pixbuf[i*4+1] = color.g*255;
+    pixbuf[i*4+2] = color.b*255;
+    pixbuf[i*4+3] = color.a*255;
   }
 
   return image;
+}
+
+BufferImage CreateBufferImage()
+{
+  return CreateBufferImage(4, 4, Color::WHITE);
 }

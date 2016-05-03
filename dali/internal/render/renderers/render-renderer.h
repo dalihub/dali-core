@@ -21,14 +21,16 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
@@ -75,14 +77,14 @@ public:
   /**
    * Create a new renderer instance
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
-                        SceneGraph::RenderGeometry* renderGeometry,
+                        Render::Geometry* geometry,
                         unsigned int blendingBitmask,
                         const Vector4* blendColor,
                         Dali::Renderer::FaceCullingMode faceCullingMode,
@@ -91,14 +93,14 @@ public:
   /**
    * Constructor.
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] renderGeometry The geometry for the renderer
+   * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
-            SceneGraph::RenderGeometry* renderGeometry,
+            Render::Geometry* geometry,
             unsigned int blendingBitmask,
             const Vector4* blendColor,
             Dali::Renderer::FaceCullingMode faceCullingMode,
@@ -112,9 +114,9 @@ public:
 
   /**
    * Change the geometry used by the renderer
-   * @param[in] renderGeometry The new geometry
+   * @param[in] geometry The new geometry
    */
-  void SetGeometry( SceneGraph::RenderGeometry* renderGeometry );
+  void SetGeometry( Render::Geometry* geometry );
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
@@ -146,6 +148,18 @@ public:
    * @param[in] blendColor The blend color to pass to GL
    */
   void SetBlendColor( const Vector4* color );
+
+  /**
+   * Set the first element index to draw by the indexed draw
+   * @param[in] firstElement index of first element to draw
+   */
+  void SetIndexedDrawFirstElement( size_t firstElement );
+
+  /**
+   * Set the number of elements to draw by the indexed draw
+   * @param[in] elementsCount number of elements to draw
+   */
+  void SetIndexedDrawElementsCount( size_t elementsCount );
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -228,7 +242,7 @@ private:
   void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
 
   /**
-   * Bind the material textures in the samplers and setup the samplers
+   * Bind the textures and setup the samplers
    * @param[in] textureCache The texture cache
    * @param[in] program The shader program
    * @return False if create or bind failed, true if success.
@@ -244,7 +258,7 @@ private:
   Context* mContext;
   SceneGraph::TextureCache* mTextureCache;
   Render::UniformNameCache* mUniformNameCache;
-  SceneGraph::RenderGeometry* mRenderGeometry;
+  Render::Geometry* mGeometry;
 
   struct UniformIndexMap
   {
@@ -259,6 +273,9 @@ private:
 
   BlendingOptions                 mBlendingOptions; /// Blending options including blend color, blend func and blend equation
   Dali::Renderer::FaceCullingMode mFaceCullingMode; /// Mode of face culling
+
+  size_t mIndexedDrawFirstElement;                  /// Offset of first element to draw
+  size_t mIndexedDrawElementsCount;                 /// Number of elements to draw
 
   unsigned int mSamplerBitfield;                    ///< Sampler options used for texture filtering
   bool mUpdateAttributesLocation:1;                 ///< Indicates attribute locations have changed

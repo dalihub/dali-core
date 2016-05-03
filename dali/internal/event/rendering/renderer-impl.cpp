@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
 {
@@ -50,6 +51,8 @@ DALI_PROPERTY( "sourceBlendFactorAlpha",          INTEGER,   true, false,  false
 DALI_PROPERTY( "destinationBlendFactorAlpha",     INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_DEST_FACTOR_ALPHA )
 DALI_PROPERTY( "blendingColor",                   VECTOR4,   true, false,  false, Dali::Renderer::Property::BLENDING_COLOR )
 DALI_PROPERTY( "blendPreMultipliedAlpha",         BOOLEAN,   true, false,  false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA )
+DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_FIRST )
+DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -72,27 +75,39 @@ RendererPtr Renderer::New()
 
 void Renderer::SetGeometry( Geometry& geometry )
 {
-  mGeometryConnector.Set( geometry, OnStage() );
-  const SceneGraph::Geometry* geometrySceneObject = geometry.GetGeometrySceneObject();
+  mGeometry = &geometry;
 
+  const Render::Geometry* geometrySceneObject = geometry.GetRenderObject();
   SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
 }
 
 Geometry* Renderer::GetGeometry() const
 {
-  return mGeometryConnector.Get().Get();
+  return mGeometry.Get();
 }
 
-void Renderer::SetMaterial( Material& material )
+void Renderer::SetTextures( TextureSet& textureSet )
 {
-  mMaterialConnector.Set( material, OnStage() );
-  const SceneGraph::Material* materialSceneObject = material.GetMaterialSceneObject();
-  SetMaterialMessage( GetEventThreadServices(), *mSceneObject, *materialSceneObject );
+  mTextureSetConnector.Set( textureSet, OnStage() );
+  const SceneGraph::TextureSet* textureSetSceneObject = textureSet.GetTextureSetSceneObject();
+  SetTexturesMessage( GetEventThreadServices(), *mSceneObject, *textureSetSceneObject );
 }
 
-Material* Renderer::GetMaterial() const
+TextureSet* Renderer::GetTextures() const
 {
-  return mMaterialConnector.Get().Get();
+  return mTextureSetConnector.Get().Get();
+}
+
+void Renderer::SetShader( Shader& shader )
+{
+  mShader = &shader;
+  SceneGraph::Shader& sceneGraphShader = *shader.GetShaderSceneObject();
+  SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
+}
+
+Shader* Renderer::GetShader() const
+{
+  return mShader.Get();
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
@@ -207,6 +222,25 @@ Vector4 Renderer::GetBlendColor() const
   }
   return Color::TRANSPARENT; // GL default
 }
+
+void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+{
+  if( firstElement != mIndexedDrawFirstElement )
+  {
+    mIndexedDrawFirstElement = firstElement;
+    SetIndexedDrawFirstElementMessage( GetEventThreadServices(), *mSceneObject, mIndexedDrawFirstElement );
+  }
+}
+
+void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+{
+  if( elementsCount != mIndexedDrawElementCount )
+  {
+    mIndexedDrawElementCount = elementsCount;
+    SetIndexedDrawElementsCountMessage( GetEventThreadServices(), *mSceneObject, mIndexedDrawElementCount );
+  }
+}
+
 
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
@@ -407,6 +441,24 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case Dali::Renderer::Property::INDEX_RANGE_FIRST:
+    {
+      int firstElement;
+      if( propertyValue.Get( firstElement ) )
+      {
+        SetIndexedDrawFirstElement( firstElement );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::INDEX_RANGE_COUNT:
+    {
+      int elementsCount;
+      if( propertyValue.Get( elementsCount ) )
+      {
+        SetIndexedDrawElementsCount( elementsCount );
+      }
+      break;
+    }
   }
 }
 
@@ -505,6 +557,16 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = IsPreMultipliedAlphaEnabled();
       break;
     }
+    case Dali::Renderer::Property::INDEX_RANGE_FIRST:
+    {
+      value = static_cast<int>( mIndexedDrawFirstElement );
+      break;
+    }
+    case Dali::Renderer::Property::INDEX_RANGE_COUNT:
+    {
+      value = static_cast<int>( mIndexedDrawElementCount );
+      break;
+    }
   }
   return value;
 }
@@ -568,8 +630,7 @@ void Renderer::Connect()
   if( mOnStageCount == 0 )
   {
     OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
-    mGeometryConnector.OnStageConnect();
-    mMaterialConnector.OnStageConnect();
+    mTextureSetConnector.OnStageConnect();
   }
   ++mOnStageCount;
 }
@@ -580,17 +641,18 @@ void Renderer::Disconnect()
   if( mOnStageCount == 0 )
   {
     OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
-    mGeometryConnector.OnStageDisconnect();
-    mMaterialConnector.OnStageDisconnect();
+    mTextureSetConnector.OnStageDisconnect();
   }
 }
 
 Renderer::Renderer()
-: mSceneObject(NULL),
+: mSceneObject (NULL ),
   mBlendColor( NULL ),
-  mDepthIndex(0),
-  mOnStageCount(0),
-  mFaceCullingMode(Dali::Renderer::NONE),
+  mDepthIndex( 0 ),
+  mOnStageCount( 0 ),
+  mIndexedDrawFirstElement( 0 ),
+  mIndexedDrawElementCount( 0 ),
+  mFaceCullingMode( Dali::Renderer::NONE ),
   mBlendingMode( Dali::BlendingMode::AUTO ),
   mBlendingOptions(),
   mPremultipledAlphaEnabled( false )

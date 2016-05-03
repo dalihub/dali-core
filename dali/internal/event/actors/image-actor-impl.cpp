@@ -86,7 +86,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   }
 
   // Create indices
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( ( gridWidth + 2 ) * gridHeight * 2 - 2);
 
   for( unsigned int row = 0u; row < gridHeight; ++row )
@@ -120,18 +120,13 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
     vertexPropertyBuffer->SetData( &vertices[ 0 ], vertices.size() );
   }
 
-  Property::Map indexFormat;
-  indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBufferPtr indexPropertyBuffer = PropertyBuffer::New( indexFormat );
-  if( indices.Size() > 0 )
-  {
-    indexPropertyBuffer->SetData( &indices[ 0 ], indices.Size() );
-  }
-
   // Create the geometry object
   GeometryPtr geometry = Geometry::New();
   geometry->AddVertexBuffer( *vertexPropertyBuffer );
-  geometry->SetIndexBuffer( *indexPropertyBuffer );
+  if( indices.Size() > 0 )
+  {
+    geometry->SetIndexBuffer( &indices[0], indices.Size() );
+  }
   geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;
@@ -165,7 +160,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 const char * const TEXTURE_RECT_UNIFORM_NAME( "sTextureRect" );
 
-const size_t INVALID_TEXTURE_ID = (size_t)-1;
 const int INVALID_RENDERER_ID = -1;
 const uint16_t MAXIMUM_GRID_SIZE = 2048;
 }
@@ -184,9 +178,9 @@ ImageActorPtr ImageActor::New()
   actor->mRenderer->SetGeometry( *quad );
 
   ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
-  MaterialPtr material = Material::New();
-  material->SetShader( *shader );
-  actor->mRenderer->SetMaterial( *material );
+  actor->mRenderer->SetShader( *shader );
+  TextureSetPtr textureSet = TextureSet::New();
+  actor->mRenderer->SetTextures( *textureSet );
 
   return actor;
 }
@@ -212,14 +206,9 @@ void ImageActor::SetImage( ImagePtr& image )
     SamplerPtr sampler = Sampler::New();
     sampler->SetFilterMode( mMinFilter, mMagFilter );
 
-    if( mTextureIndex != INVALID_TEXTURE_ID )
-    {
-      mRenderer->GetMaterial()->SetTextureImage( mTextureIndex, image.Get() );
-    }
-    else
-    {
-      mTextureIndex = mRenderer->GetMaterial()->AddTexture( image, "sTexture", sampler );
-    }
+    TextureSet* textureSet( mRenderer->GetTextures() );
+    textureSet->SetImage( 0u, image.Get() );
+    textureSet->SetSampler( 0u, sampler );
 
     if( mRendererIndex == INVALID_RENDERER_ID )
     {
@@ -238,7 +227,7 @@ void ImageActor::SetImage( ImagePtr& image )
 
 ImagePtr ImageActor::GetImage() const
 {
-  return mRenderer->GetMaterial()->GetTexture( mTextureIndex );
+  return mRenderer->GetTextures()->GetImage( 0u );
 }
 
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
@@ -308,8 +297,6 @@ ImageActor::ImageActor()
   mActorSize( Vector2::ZERO ),
   mGridSize( 1u, 1u ),
   mRendererIndex( INVALID_RENDERER_ID ),
-  mTextureIndex( INVALID_TEXTURE_ID ),
-  mEffectTextureIndex( INVALID_TEXTURE_ID ),
   mMinFilter( FilterMode::DEFAULT ),
   mMagFilter( FilterMode::DEFAULT ),
   mStyle( Dali::ImageActor::STYLE_QUAD ),
@@ -387,8 +374,7 @@ void ImageActor::UpdateTexureRect()
     textureRect.w = vScale * float(mPixelArea.y + mPixelArea.height);
   }
 
-  Material* material = mRenderer->GetMaterial();
-  material->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
+  mRenderer->RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -676,13 +662,9 @@ void ImageActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type mag
   mMinFilter = minFilter;
   mMagFilter = magFilter;
 
-  if( mTextureIndex != INVALID_TEXTURE_ID )
-  {
-    SamplerPtr sampler = Sampler::New();
-    sampler->SetFilterMode( minFilter, magFilter );
-
-    mRenderer->GetMaterial()->SetTextureSampler( mTextureIndex, sampler.Get() );
-  }
+  SamplerPtr sampler = Sampler::New();
+  sampler->SetFilterMode( minFilter, magFilter );
+  mRenderer->GetTextures()->SetSampler( 0u, sampler.Get() );
 }
 
 void ImageActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
@@ -702,7 +684,7 @@ void ImageActor::SetShaderEffect( ShaderEffect& effect )
   effect.Connect( this );
 
   ShaderPtr shader = mShaderEffect->GetShader();
-  mRenderer->GetMaterial()->SetShader( *shader );
+  mRenderer->SetShader( *shader );
 
   EffectImageUpdated();
 
@@ -721,7 +703,7 @@ void ImageActor::RemoveShaderEffect()
     mShaderEffect->Disconnect( this );
     // change to the standard shader and quad geometry
     ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
-    mRenderer->GetMaterial()->SetShader( *shader );
+    mRenderer->SetShader( *shader );
     mShaderEffect.Reset();
 
     UpdateGeometry();
@@ -736,25 +718,12 @@ void ImageActor::EffectImageUpdated()
     if( effectImage )
     {
       Image& effectImageImpl = GetImplementation( effectImage );
-
-      if( mEffectTextureIndex == INVALID_TEXTURE_ID )
-      {
-        mEffectTextureIndex = mRenderer->GetMaterial()->AddTexture( &effectImageImpl, "sEffect", NULL );
-      }
-      else
-      {
-        mRenderer->GetMaterial()->SetTextureImage( mEffectTextureIndex, &effectImageImpl );
-      }
+      mRenderer->GetTextures()->SetImage( 1u, &effectImageImpl );
     }
     else
     {
-      if( mEffectTextureIndex != INVALID_TEXTURE_ID )
-      {
-        mRenderer->GetMaterial()->RemoveTexture( mEffectTextureIndex );
-      }
-      mEffectTextureIndex = INVALID_TEXTURE_ID;
+       mRenderer->GetTextures()->SetImage( 1u, 0 );
     }
-
   }
 }
 

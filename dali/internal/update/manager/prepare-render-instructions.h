@@ -29,12 +29,16 @@ namespace Dali
 namespace Internal
 {
 
+namespace Render
+{
+class Geometry;
+}
+
 namespace SceneGraph
 {
 class RenderTracker;
 class RenderItem;
 class Shader;
-class RenderGeometry;
 
 /**
  * Structure to store information for sorting the renderers.
@@ -53,8 +57,8 @@ struct RendererWithSortAttributes
 
   RenderItem*                   renderItem;       ///< The render item that is being sorted (includes depth index)
   const Shader*                 shader;           ///< The shader instance
-  Integration::ResourceId       textureResourceId;///< The first texture resource ID of the sampler instance, is InvalidResourceId if the material doesn't have any samplers
-  const RenderGeometry*         geometry;         ///< The geometry instance
+  Integration::ResourceId       textureResourceId;///< The first texture resource ID of the texture set instance, is InvalidResourceId if the texture set doesn't have any textures
+  const Render::Geometry*       geometry;         ///< The geometry instance
   float                         zValue;           ///< The zValue of the given renderer (either distance from camera, or a custom calculated value)
 };
 
@@ -69,7 +73,7 @@ class RenderInstructionContainer;
  * update the attachments ModelView matrices
  *
  * The opaque and transparent render lists are sorted first by depth
- * index, then by Z (for transparent only), then by shader, material
+ * index, then by Z (for transparent only), then by shader, texture
  * and geometry. The render algorithm should then work through both
  * lists simultaneously, working through opaque then transparent
  * items at each depth index, resetting the flags appropriately.

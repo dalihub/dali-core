@@ -23,8 +23,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
@@ -55,8 +54,6 @@ class DiscardQueue
 public:
 
   typedef OwnerContainer< Shader* > ShaderQueue;
-  typedef OwnerContainer< Geometry* > GeometryQueue;
-  typedef OwnerContainer< Material* > MaterialQueue;
   typedef OwnerContainer< Renderer* > RendererQueue;
 
   /**
@@ -78,18 +75,6 @@ public:
    * @param[in] node The discarded node; DiscardQueue takes ownership.
    */
   void Add( BufferIndex updateBufferIndex, Node* node );
-
-  /**
-   * Adds an unwanted geometry to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render
-   */
-  void Add( BufferIndex updateBufferIndex, Geometry* geometry );
-
-  /**
-   * Adds an unwanted material to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render.
-   */
-  void Add( BufferIndex updateBufferIndex, Material* material );
 
   /**
    * Adds an unwanted shader to the discard queue.
@@ -130,15 +115,11 @@ private:
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
   ShaderQueue                  mShaderQueue0;
-  GeometryQueue                mGeometryQueue0;
-  MaterialQueue                mMaterialQueue0;
   RendererQueue                mRendererQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   ShaderQueue                  mShaderQueue1;
-  GeometryQueue                mGeometryQueue1;
-  MaterialQueue                mMaterialQueue1;
   RendererQueue                mRendererQueue1;
 };
 

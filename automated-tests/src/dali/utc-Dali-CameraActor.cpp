@@ -1275,7 +1275,7 @@ int UtcDaliCameraActorModelView(void)
 
   BufferImage image = CreateBufferImage();
 
-  ImageActor actor = ImageActor::New( image );
+  Actor actor = CreateRenderableActor(image);
   actor.SetSize( 100.0f, 100.0f );
   actor.SetPosition( 20.0f, 30.0f, 40.0f );
   actor.SetParentOrigin( ParentOrigin::CENTER );
@@ -1311,9 +1311,9 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.Render();
   application.SendNotification();
   Image image = CreateBufferImage();
-  ImageActor imageActor = ImageActor::New( image );
-  imageActor.SetSize( 100.0f, 100.0f );
-  Stage::GetCurrent().Add( imageActor );
+  Actor actor = CreateRenderableActor( image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE );
+  actor.SetSize( 100.0f, 100.0f );
+  Stage::GetCurrent().Add( actor );
 
   Matrix projectionMatrix;
   Matrix viewMatrix;
@@ -1321,18 +1321,15 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   camera.GetProperty( CameraActor::CameraActor::Property::PROJECTION_MATRIX ).Get( projectionMatrix );
   camera.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( viewMatrix );
 
-  ShaderEffect shaderEffect = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE );
-  imageActor.SetShaderEffect( shaderEffect );
+  actor.RegisterProperty( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
+  actor.RegisterProperty( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
 
-  shaderEffect.SetUniform( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
-  shaderEffect.SetUniform( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
+  Property::Index projectionMatrixPropertyIndex = actor.GetPropertyIndex( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME );
+  Property::Index viewMatrixPropertyIndex = actor.GetPropertyIndex( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME );
 
-  Property::Index projectionMatrixPropertyIndex = shaderEffect.GetPropertyIndex( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME );
-  Property::Index viewMatrixPropertyIndex = shaderEffect.GetPropertyIndex( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME );
-
-  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( shaderEffect, projectionMatrixPropertyIndex, EqualToConstraint() );
+  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( actor, projectionMatrixPropertyIndex, EqualToConstraint() );
   projectionMatrixConstraint.AddSource( Source( camera, CameraActor::Property::PROJECTION_MATRIX ) );
-  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( shaderEffect, viewMatrixPropertyIndex, EqualToConstraint() );
+  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( actor, viewMatrixPropertyIndex, EqualToConstraint() );
   viewMatrixConstraint.AddSource( Source( camera, CameraActor::Property::VIEW_MATRIX ) );
 
   projectionMatrixConstraint.Apply();
