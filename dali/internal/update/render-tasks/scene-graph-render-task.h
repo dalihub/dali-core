@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class RenderTracker;
 namespace SceneGraph
 {
 class Node;
-class CameraAttachment;
+class Camera;
 class RenderInstruction;
 class RenderMessageDispatcher;
 
@@ -104,10 +104,11 @@ public:
   bool IsExclusive() const;
 
   /**
-   * Set the node from which the scene is viewed.
-   * @param[in] node The scene is viewed from the perspective of this node.
+   * Set the camera from which the scene is viewed.
+   * @param[in] cameraNode that camera is connected with
+   * @param[in] camera to use.
    */
-  void SetCameraNode( Node* node );
+  void SetCamera( Node* cameraNode, Camera* camera );
 
   /**
    * Set the frame-buffer used as a render target.
@@ -289,23 +290,23 @@ public:
 
   /**
    * Retrieve the view-matrix; this is double buffered for input handling.
-   * @pre GetCameraNode() returns a node with valid CameraAttachment.
+   * @pre GetCameraNode() returns a node with valid Camera.
    * @param[in] bufferIndex The buffer to read from.
    * @return The view-matrix.
    */
   const Matrix& GetViewMatrix( BufferIndex bufferIndex ) const;
 
   /**
-   * @brief Retrieve the camera attachment.
-   * @pre GetCameraNode() returns a node with valid CameraAttachment.
+   * @brief Retrieve the camera.
+   * @pre GetCameraNode() returns a node with valid Camera.
    *
-   * @return The camera attachment.
+   * @return The camera.
    */
-  SceneGraph::CameraAttachment& GetCameraAttachment() const;
+  SceneGraph::Camera& GetCamera() const;
 
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
-   * @pre GetCameraNode() returns a node with valid CameraAttachment.
+   * @pre GetCameraNode() returns a node with valid Camera.
    * @param[in] bufferIndex The buffer to read from.
    * @return The projection-matrix.
    */
@@ -327,11 +328,6 @@ public:
    * @return true if the view matrix has been updated during this or last frame
    */
   bool ViewMatrixUpdated();
-
-  /**
-   * @return A pointer to the camera used by the RenderTask
-   */
-  Node* GetCamera() const;
 
   /**
    * Set whether GL sync is required for native render target.
@@ -367,7 +363,7 @@ private:
   Render::RenderTracker* mRenderSyncTracker;
   Node* mSourceNode;
   Node* mCameraNode;
-  CameraAttachment* mCameraAttachment;
+  SceneGraph::Camera* mCamera;
   unsigned int mFrameBufferResourceId;
 
   bool mResourcesFinished:1; ///< True if all resources were available when the render-task was processed
@@ -472,18 +468,17 @@ inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, Rend
   new (slot) LocalType( &task, &RenderTask::SetSourceNode, node );
 }
 
-inline void SetCameraNodeMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Node* constNode )
+inline void SetCameraMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Node* constNode, const Camera* constCamera )
 {
-  // Scene graph thread can destroy this object.
+  typedef MessageValue2< RenderTask, Node*, Camera* > LocalType;
+
   Node* node = const_cast< Node* >( constNode );
-
-  typedef MessageValue1< RenderTask, Node* > LocalType;
-
-  // Reserve some memory inside the message queue
+  Camera* camera = const_cast< Camera* >( constCamera );
+  // Reserve memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetCameraNode, node );
+  new (slot) LocalType( &task, &RenderTask::SetCamera, node, camera );
 }
 
 inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, RenderTask& task, bool exclusive )

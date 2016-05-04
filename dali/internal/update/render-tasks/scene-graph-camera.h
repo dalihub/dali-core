@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_CAMERA_ATTACHMENT_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_CAMERA_ATTACHMENT_H__
+#ifndef __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__
+#define __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/inherited-property.h>
 
 namespace Dali
@@ -43,12 +41,13 @@ template <> struct ParameterType< Dali::Camera::ProjectionMode >
 namespace SceneGraph
 {
 
+class Node;
 class SceneController;
 
 /**
- * An attachment for camera objects and their properties.
+ * Scene-graph camera object
  */
-class CameraAttachment : public NodeAttachment
+class Camera
 {
 public:
   static const Dali::Camera::Type DEFAULT_TYPE;
@@ -84,105 +83,80 @@ public:
   };
 
   /**
-   * Construct a new CameraAttachment.
+   * Construct a new Camera.
    * @return a new camera.
    */
-  static CameraAttachment* New();
+  static Camera* New();
 
   /**
-   * @copydoc NodeAttachment::Initialize().
+   * Destructor
    */
-  virtual void Initialize( SceneController& sceneController, BufferIndex updateBufferIndex );
+  ~Camera();
 
   /**
-   * @copydoc NodeAttachment::OnDestroy().
-   */
-  virtual void OnDestroy();
-
-  /**
-   * @copydoc NodeAttachment::ConnectedToSceneGraph()
-   */
-  virtual void ConnectedToSceneGraph();
-
-  /**
-   * @copydoc NodeAttachment::DisconnectedFromSceneGraph()
-   */
-  virtual void DisconnectedFromSceneGraph();
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~CameraAttachment();
-
-  /**
-   * @copydoc Dali::Internal::CameraAttachment::SetType
+   * @copydoc Dali::Internal::CameraActor::SetType
    */
   void SetType( Dali::Camera::Type type );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetInvertYAxis
+   * @copydoc Dali::Internal::CameraActor::SetInvertYAxis
    */
   void SetInvertYAxis( bool invertYAxis );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetProjectionMode
+   * @copydoc Dali::Internal::CameraActor::SetProjectionMode
    */
   void SetProjectionMode( Dali::Camera::ProjectionMode projectionMode );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetFieldOfView
+   * @copydoc Dali::Internal::CameraActor::SetFieldOfView
    */
   void SetFieldOfView( float fieldOfView );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetAspectRatio
+   * @copydoc Dali::Internal::CameraActor::SetAspectRatio
    */
   void SetAspectRatio( float aspectRatio );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetStereoBias
+   * @copydoc Dali::Internal::CameraActor::SetStereoBias
    */
   void SetStereoBias(const Vector2& stereoBias);
 
    /**
-   * @copydoc Dali::Internal::CameraAttachment::SetLeftClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetLeftClippingPlane
    */
   void SetLeftClippingPlane( float leftClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetRightClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetRightClippingPlane
    */
   void SetRightClippingPlane( float rightClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetTopClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetTopClippingPlane
    */
   void SetTopClippingPlane( float topClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetBottomClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetBottomClippingPlane
    */
   void SetBottomClippingPlane( float bottomClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetNearClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetNearClippingPlane
    */
   void SetNearClippingPlane( float nearClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetFarClippingPlane
+   * @copydoc Dali::Internal::CameraActor::SetFarClippingPlane
    */
   void SetFarClippingPlane( float farClippingPlane );
 
   /**
-   * @copydoc Dali::Internal::CameraAttachment::SetTarget
+   * @copydoc Dali::Internal::CameraActor::SetTarget
    */
   void SetTargetPosition( const Vector3& targetPosition );
-
-  /**
-   * Get Camera Target
-   */
-  Vector3 GetTargetPosition() const;
 
   /**
    * Retrieve the view-matrix; this is double buffered for input handling.
@@ -229,26 +203,21 @@ public:
 
   /**
    * Retrieve the projection-matrix property querying interface.
-   * @pre The attachment is on-stage.
+   * @pre The camera is on-stage.
    * @return The projection-matrix property querying interface.
    */
   const PropertyInputImpl* GetProjectionMatrix() const;
 
   /**
    * Retrieve the viewMatrix property querying interface.
-   * @pre The attachment is on-stage.
+   * @pre The camera is on-stage.
    * @return The viewMatrix property querying interface.
    */
   const PropertyInputImpl* GetViewMatrix() const;
 
   /**
-   * @copydoc NodeAttachment::Update
-   */
-  virtual void Update( BufferIndex updateBufferIndex, const Node& owningNode, int nodeDirtyFlags ){};
-
-  /**
    * Updates view and projection matrices.
-   * Called by the render task using the camera attachment
+   * Called by the render task using the camera
    * @param[in] updateBufferIndex The buffer to read from.
    * @param[in] owningNode The node that owns the camera
    */
@@ -259,20 +228,18 @@ public:
    */
   bool ViewMatrixUpdated();
 
-protected:
-
-  /**
-   * Protected constructor, see New().
-   */
-  CameraAttachment();
-
 private:
 
-  // Undefined
-  CameraAttachment(const CameraAttachment&);
+  /**
+   * Constructor
+   */
+  Camera();
 
+  // Non copyable
   // Undefined
-  CameraAttachment& operator=(const CameraAttachment& rhs);
+  Camera(const Camera&);
+  // Undefined
+  Camera& operator=(const Camera& rhs);
 
   /**
    * Recalculates the view matrix.
@@ -298,7 +265,6 @@ private:
    * @param[in] normalize will normalize plane equation coefficients by default.
    */
   void UpdateFrustum( BufferIndex updateBufferIndex, bool normalize = true );
-
 
   unsigned int                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   unsigned int                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
@@ -327,153 +293,150 @@ public:  // PROPERTIES
 
 };
 
-// Messages for CameraAttachment
+// Messages for Camera
 
-inline void SetTypeMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, Dali::Camera::Type parameter )
+inline void SetTypeMessage( EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::Type parameter )
 {
-  typedef MessageValue1< CameraAttachment, Dali::Camera::Type > LocalType;
+  typedef MessageValue1< Camera, Dali::Camera::Type > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetType, parameter );
+  new (slot) LocalType( &camera, &Camera::SetType, parameter );
 }
 
-inline void SetProjectionModeMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, Dali::Camera::ProjectionMode parameter )
+inline void SetProjectionModeMessage( EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::ProjectionMode parameter )
 {
-  typedef MessageValue1< CameraAttachment, Dali::Camera::ProjectionMode > LocalProjectionMode;
+  typedef MessageValue1< Camera, Dali::Camera::ProjectionMode > LocalProjectionMode;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalProjectionMode ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalProjectionMode( &attachment, &CameraAttachment::SetProjectionMode, parameter );
+  new (slot) LocalProjectionMode( &camera, &Camera::SetProjectionMode, parameter );
 }
 
-
-inline void SetFieldOfViewMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetFieldOfViewMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetFieldOfView, parameter );
+  new (slot) LocalType( &camera, &Camera::SetFieldOfView, parameter );
 }
 
-inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetAspectRatio, parameter );
+  new (slot) LocalType( &camera, &Camera::SetAspectRatio, parameter );
 }
 
-inline void SetStereoBiasMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, const Vector2& parameter )
+inline void SetStereoBiasMessage( EventThreadServices& eventThreadServices, const Camera& camera, const Vector2& parameter )
 {
-  typedef MessageValue1< CameraAttachment, Vector2 > LocalType;
+  typedef MessageValue1< Camera, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetStereoBias, parameter );
+  new (slot) LocalType( &camera, &Camera::SetStereoBias, parameter );
 }
 
-inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetLeftClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetLeftClippingPlane, parameter );
 }
 
-inline void SetRightClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetRightClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetRightClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetRightClippingPlane, parameter );
 }
 
-inline void SetTopClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetTopClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetTopClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetTopClippingPlane, parameter );
 }
 
-inline void SetBottomClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetBottomClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetBottomClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetBottomClippingPlane, parameter );
 }
 
-inline void SetNearClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetNearClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetNearClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetNearClippingPlane, parameter );
 }
 
-inline void SetFarClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
+inline void SetFarClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< Camera, float > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetFarClippingPlane, parameter );
+  new (slot) LocalType( &camera, &Camera::SetFarClippingPlane, parameter );
 }
 
-inline void SetTargetPositionMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, const Vector3& parameter )
+inline void SetTargetPositionMessage( EventThreadServices& eventThreadServices, const Camera& camera, const Vector3& parameter )
 {
-  typedef MessageValue1< CameraAttachment, Vector3 > LocalType;
+  typedef MessageValue1< Camera, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetTargetPosition, parameter );
+  new (slot) LocalType( &camera, &Camera::SetTargetPosition, parameter );
 }
 
-
-inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, bool parameter )
+inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, const Camera& camera, bool parameter )
 {
-  typedef MessageValue1< CameraAttachment, bool > LocalType;
+  typedef MessageValue1< Camera, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &CameraAttachment::SetInvertYAxis, parameter );
+  new (slot) LocalType( &camera, &Camera::SetInvertYAxis, parameter );
 }
-
 
 } // namespace SceneGraph
 
@@ -481,4 +444,4 @@ inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, con
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_CAMERA_ATTACHMENT_H__
+#endif // __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__

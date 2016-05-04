@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_LAYER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ template <> struct ParameterType< Dali::Layer::Behavior >
 
 namespace SceneGraph
 {
+class Camera;
 
 /**
  * Pair of node-renderer
@@ -61,9 +62,9 @@ typedef Dali::Vector< Renderable > RenderableContainer;
 
 /**
  * Layers have a "depth" relative to all other layers in the scene-graph.
- * Non-layer child nodes (and their attachments) are considered part of the layer.
+ * Non-layer child nodes are considered part of the layer.
  *
- * Layers are rendered separately, and the depth buffer is cleared before each layer is rendered.
+ * Layers are rendered separately, and by default the depth buffer is cleared before each layer is rendered.
  * Objects in higher layers, are rendered after (in front of) objects in lower layers.
  */
 class Layer : public Node
@@ -184,7 +185,7 @@ public:
    * to use is the same than the one used before ( Otherwise View transform will be different )
    *
    */
-  bool CanReuseRenderers(Node* camera)
+  bool CanReuseRenderers( Camera* camera )
   {
     bool bReturn( mAllChildTransformsClean[ 0 ] && mAllChildTransformsClean[ 1 ] && camera == mLastCamera );
     mLastCamera = camera;
@@ -230,7 +231,7 @@ private:
   SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
   ClippingBox mClippingBox;           ///< The clipping box, in window coordinates
-  Node* mLastCamera;                  ///< Pointer to the last camera that has rendered the layer
+  Camera* mLastCamera;                ///< Pointer to the last camera that has rendered the layer
 
   Dali::Layer::Behavior mBehavior;    ///< The behavior of the layer
 

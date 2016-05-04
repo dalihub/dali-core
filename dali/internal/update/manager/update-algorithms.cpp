@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
@@ -104,13 +103,13 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
 /**
  * This is called recursively for all children of the root Node
  */
-inline int UpdateNodesAndAttachments( Node& node,
-                                      int parentFlags,
-                                      BufferIndex updateBufferIndex,
-                                      ResourceManager& resourceManager,
-                                      RenderQueue& renderQueue,
-                                      Layer& currentLayer,
-                                      int inheritedDrawMode )
+inline int UpdateNodes( Node& node,
+                        int parentFlags,
+                        BufferIndex updateBufferIndex,
+                        ResourceManager& resourceManager,
+                        RenderQueue& renderQueue,
+                        Layer& currentLayer,
+                        int inheritedDrawMode )
 {
   //Apply constraints to the node
   ConstrainPropertyOwner( node, updateBufferIndex );
@@ -169,13 +168,13 @@ inline int UpdateNodesAndAttachments( Node& node,
   for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    cumulativeDirtyFlags |=UpdateNodesAndAttachments( child,
-                                                      nodeDirtyFlags,
-                                                      updateBufferIndex,
-                                                      resourceManager,
-                                                      renderQueue,
-                                                      *layer,
-                                                      inheritedDrawMode );
+    cumulativeDirtyFlags |=UpdateNodes( child,
+                                        nodeDirtyFlags,
+                                        updateBufferIndex,
+                                        resourceManager,
+                                        renderQueue,
+                                        *layer,
+                                        inheritedDrawMode );
   }
 
   return cumulativeDirtyFlags;
@@ -184,10 +183,10 @@ inline int UpdateNodesAndAttachments( Node& node,
 /**
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
-int UpdateNodesAndAttachments( Layer& rootNode,
-                               BufferIndex updateBufferIndex,
-                               ResourceManager& resourceManager,
-                               RenderQueue& renderQueue )
+int UpdateNodeTree( Layer& rootNode,
+                    BufferIndex updateBufferIndex,
+                    ResourceManager& resourceManager,
+                    RenderQueue& renderQueue )
 {
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
 
@@ -219,13 +218,13 @@ int UpdateNodesAndAttachments( Layer& rootNode,
   for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    cumulativeDirtyFlags |= UpdateNodesAndAttachments( child,
-                                                       nodeDirtyFlags,
-                                                       updateBufferIndex,
-                                                       resourceManager,
-                                                       renderQueue,
-                                                       rootNode,
-                                                       drawMode );
+    cumulativeDirtyFlags |= UpdateNodes( child,
+                                         nodeDirtyFlags,
+                                         updateBufferIndex,
+                                         resourceManager,
+                                         renderQueue,
+                                         rootNode,
+                                         drawMode );
   }
 
   return cumulativeDirtyFlags;

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,10 @@ public:
    * @param[in] rendererDispatcher Used for passing ownership of renderers to the render-thread.
    * @param[in] renderQueue  The renderQueue
    * @param[in] discardQueue The discardQueue
-   * @param[in] textureCache
    */
   SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
                        RenderQueue& renderQueue,
-                       DiscardQueue& discardQueue,
-                       TextureCache& textureCache );
+                       DiscardQueue& discardQueue );
 
   /**
    * Destructor
@@ -72,11 +70,6 @@ public:  // from SceneController
    */
   virtual DiscardQueue& GetDiscardQueue() { return mDiscardQueue; }
 
-  /**
-   * @copydoc SceneController::GetTextureCache()
-   */
-  virtual TextureCache& GetTextureCache() { return mTextureCache; }
-
 private:
 
   // Undefined copy constructor.
@@ -90,7 +83,6 @@ private:
   RenderMessageDispatcher& mRenderMessageDispatcher;    ///< Used for passing messages to the render-thread
   RenderQueue&             mRenderQueue;           ///< render queue
   DiscardQueue&            mDiscardQueue;          ///< discard queue
-  TextureCache&            mTextureCache;          ///< texture cache
 
 };
 

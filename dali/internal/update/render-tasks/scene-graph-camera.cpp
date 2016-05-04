@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,16 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
-// INTERNAL HEADERS
+// EXTERNAL INCLUDES
+#include <stdint.h>
+
+// INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/update/controllers/scene-controller.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
+#include <dali/internal/update/nodes/node.h>
 
 namespace // unnamed namespace
 {
@@ -135,24 +136,23 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 
 } // unnamed namespace
 
-const Dali::Camera::Type CameraAttachment::DEFAULT_TYPE( Dali::Camera::FREE_LOOK );
-const Dali::Camera::ProjectionMode CameraAttachment::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
-const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( false );
-const float CameraAttachment::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
-const float CameraAttachment::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
-const float CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
-const float CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
-const float CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
-const float CameraAttachment::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
-const float CameraAttachment::DEFAULT_NEAR_CLIPPING_PLANE( 800.0f ); // default height of the screen
-const float CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE( DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE );
-const Vector2 CameraAttachment::DEFAULT_STEREO_BIAS( 0.0f, 0.0f );
-const Vector3 CameraAttachment::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
+const Dali::Camera::Type Camera::DEFAULT_TYPE( Dali::Camera::FREE_LOOK );
+const Dali::Camera::ProjectionMode Camera::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
+const bool  Camera::DEFAULT_INVERT_Y_AXIS( false );
+const float Camera::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
+const float Camera::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
+const float Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
+const float Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
+const float Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
+const float Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
+const float Camera::DEFAULT_NEAR_CLIPPING_PLANE( 800.0f ); // default height of the screen
+const float Camera::DEFAULT_FAR_CLIPPING_PLANE( DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE );
+const Vector2 Camera::DEFAULT_STEREO_BIAS( 0.0f, 0.0f );
+const Vector3 Camera::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
 
 
-CameraAttachment::CameraAttachment()
-: NodeAttachment(),
-  mUpdateViewFlag( UPDATE_COUNT ),
+Camera::Camera()
+: mUpdateViewFlag( UPDATE_COUNT ),
   mUpdateProjectionFlag( UPDATE_COUNT ),
   mType( DEFAULT_TYPE ),
   mProjectionMode( DEFAULT_MODE ),
@@ -173,138 +173,118 @@ CameraAttachment::CameraAttachment()
 {
 }
 
-CameraAttachment* CameraAttachment::New()
+Camera* Camera::New()
 {
-  return new CameraAttachment();
+  return new Camera();
 }
 
-void CameraAttachment::Initialize( SceneController& sceneController, BufferIndex updateBufferIndex )
-{
-  // do nothing
-}
-
-void CameraAttachment::OnDestroy()
-{
-  // do nothing
-}
-
-void CameraAttachment::ConnectedToSceneGraph()
-{
-  // do nothing
-}
-
-void CameraAttachment::DisconnectedFromSceneGraph()
-{
-  // do nothing
-}
-
-CameraAttachment::~CameraAttachment()
+Camera::~Camera()
 {
 }
 
-void CameraAttachment::SetType( Dali::Camera::Type type )
+void Camera::SetType( Dali::Camera::Type type )
 {
   mType = type;
 }
 
-void CameraAttachment::SetProjectionMode( Dali::Camera::ProjectionMode mode )
+void Camera::SetProjectionMode( Dali::Camera::ProjectionMode mode )
 {
   mProjectionMode = mode;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetInvertYAxis( bool invertYAxis )
+void Camera::SetInvertYAxis( bool invertYAxis )
 {
   mInvertYAxis = invertYAxis;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetFieldOfView( float fieldOfView )
+void Camera::SetFieldOfView( float fieldOfView )
 {
   mFieldOfView = fieldOfView;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetAspectRatio( float aspectRatio )
+void Camera::SetAspectRatio( float aspectRatio )
 {
   mAspectRatio = aspectRatio;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetStereoBias( const Vector2& stereoBias )
+void Camera::SetStereoBias( const Vector2& stereoBias )
 {
   mStereoBias = stereoBias;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetLeftClippingPlane( float leftClippingPlane )
+void Camera::SetLeftClippingPlane( float leftClippingPlane )
 {
   mLeftClippingPlane = leftClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetRightClippingPlane( float rightClippingPlane )
+void Camera::SetRightClippingPlane( float rightClippingPlane )
 {
   mRightClippingPlane = rightClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetTopClippingPlane( float topClippingPlane )
+void Camera::SetTopClippingPlane( float topClippingPlane )
 {
   mTopClippingPlane = topClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetBottomClippingPlane( float bottomClippingPlane )
+void Camera::SetBottomClippingPlane( float bottomClippingPlane )
 {
   mBottomClippingPlane = bottomClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetNearClippingPlane( float nearClippingPlane )
+void Camera::SetNearClippingPlane( float nearClippingPlane )
 {
   mNearClippingPlane = nearClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetFarClippingPlane( float farClippingPlane )
+void Camera::SetFarClippingPlane( float farClippingPlane )
 {
   mFarClippingPlane = farClippingPlane;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetTargetPosition( const Vector3& targetPosition )
+void Camera::SetTargetPosition( const Vector3& targetPosition )
 {
   mTargetPosition = targetPosition;
   mUpdateViewFlag = UPDATE_COUNT;
 }
 
-const Matrix& CameraAttachment::GetProjectionMatrix( BufferIndex bufferIndex ) const
+const Matrix& Camera::GetProjectionMatrix( BufferIndex bufferIndex ) const
 {
   return mProjectionMatrix[ bufferIndex ];
 }
 
-const Matrix& CameraAttachment::GetViewMatrix( BufferIndex bufferIndex ) const
+const Matrix& Camera::GetViewMatrix( BufferIndex bufferIndex ) const
 {
   return mViewMatrix[ bufferIndex ];
 }
 
-const Matrix& CameraAttachment::GetInverseViewProjectionMatrix( BufferIndex bufferIndex ) const
+const Matrix& Camera::GetInverseViewProjectionMatrix( BufferIndex bufferIndex ) const
 {
   return mInverseViewProjection[ bufferIndex ];
 }
 
-const PropertyInputImpl* CameraAttachment::GetProjectionMatrix() const
+const PropertyInputImpl* Camera::GetProjectionMatrix() const
 {
   return &mProjectionMatrix;
 }
 
-const PropertyInputImpl* CameraAttachment::GetViewMatrix() const
+const PropertyInputImpl* Camera::GetViewMatrix() const
 {
   return &mViewMatrix;
 }
 
-void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owningNode )
+void Camera::Update( BufferIndex updateBufferIndex, const Node& owningNode )
 {
   // if owning node has changes in world position we need to update camera for next 2 frames
   if( owningNode.IsLocalMatrixDirty() )
@@ -343,12 +323,12 @@ void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owning
   }
 }
 
-bool CameraAttachment::ViewMatrixUpdated()
+bool Camera::ViewMatrixUpdated()
 {
   return 0u != mUpdateViewFlag;
 }
 
-unsigned int CameraAttachment::UpdateViewMatrix( BufferIndex updateBufferIndex, const Node& owningNode )
+unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex, const Node& owningNode )
 {
   unsigned int retval( mUpdateViewFlag );
   if( 0u != mUpdateViewFlag )
@@ -364,23 +344,22 @@ unsigned int CameraAttachment::UpdateViewMatrix( BufferIndex updateBufferIndex, 
       {
         // camera orientation taken from node - i.e. look in abitrary, unconstrained direction
         case Dali::Camera::FREE_LOOK:
-          {
+        {
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          viewMatrix = owningNode.GetWorldMatrix(updateBufferIndex);
+          viewMatrix = owningNode.GetWorldMatrix( updateBufferIndex );
           viewMatrix.Invert();
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }
           // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
-          {
-          const Matrix& owningNodeMatrix( owningNode.GetWorldMatrix(updateBufferIndex) );
+        {
+          const Matrix& owningNodeMatrix( owningNode.GetWorldMatrix( updateBufferIndex ) );
           Vector3 position, scale;
           Quaternion orientation;
           owningNodeMatrix.GetTransformComponents( position, orientation, scale );
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          LookAt( viewMatrix, position, mTargetPosition,
-                  orientation.Rotate( Vector3::YAXIS ) );
+          LookAt( viewMatrix, position, mTargetPosition, orientation.Rotate( Vector3::YAXIS ) );
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }
@@ -391,7 +370,7 @@ unsigned int CameraAttachment::UpdateViewMatrix( BufferIndex updateBufferIndex, 
   return retval;
 }
 
-void CameraAttachment::UpdateFrustum( BufferIndex updateBufferIndex, bool normalize )
+void Camera::UpdateFrustum( BufferIndex updateBufferIndex, bool normalize )
 {
 
   // Extract the clip matrix planes
@@ -460,7 +439,7 @@ void CameraAttachment::UpdateFrustum( BufferIndex updateBufferIndex, bool normal
   mFrustum[ updateBufferIndex ? 0 : 1 ] = planes;
 }
 
-bool CameraAttachment::CheckSphereInFrustum( BufferIndex bufferIndex, const Vector3& origin, float radius )
+bool Camera::CheckSphereInFrustum( BufferIndex bufferIndex, const Vector3& origin, float radius )
 {
   const FrustumPlanes& planes = mFrustum[ bufferIndex ];
   for ( uint32_t i = 0; i < 6; ++i )
@@ -473,7 +452,7 @@ bool CameraAttachment::CheckSphereInFrustum( BufferIndex bufferIndex, const Vect
   return true;
 }
 
-bool CameraAttachment::CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents )
+bool Camera::CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents )
 {
   const FrustumPlanes& planes = mFrustum[ bufferIndex ];
   for ( uint32_t i = 0; i < 6; ++i )
@@ -488,7 +467,7 @@ bool CameraAttachment::CheckAABBInFrustum( BufferIndex bufferIndex, const Vector
   return true;
 }
 
-unsigned int CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
+unsigned int Camera::UpdateProjection( BufferIndex updateBufferIndex )
 {
   unsigned int retval( mUpdateProjectionFlag );
   // Early-exit if no update required
@@ -505,7 +484,7 @@ unsigned int CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
       {
         case Dali::Camera::PERSPECTIVE_PROJECTION:
         {
-          Matrix &projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
+          Matrix &projectionMatrix = mProjectionMatrix.Get( updateBufferIndex );
           Perspective( projectionMatrix,
                        mFieldOfView,
                        mAspectRatio,
@@ -517,7 +496,7 @@ unsigned int CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
         }
         case Dali::Camera::ORTHOGRAPHIC_PROJECTION:
         {
-          Matrix &projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
+          Matrix &projectionMatrix = mProjectionMatrix.Get( updateBufferIndex );
           Orthographic( projectionMatrix,
                         mLeftClippingPlane,   mRightClippingPlane,
                         mBottomClippingPlane, mTopClippingPlane,
@@ -527,7 +506,7 @@ unsigned int CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
         }
       }
 
-      mProjectionMatrix.SetDirty(updateBufferIndex);
+      mProjectionMatrix.SetDirty( updateBufferIndex );
     }
     --mUpdateProjectionFlag;
   }
