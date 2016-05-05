@@ -139,9 +139,9 @@ NinePatchImage CustomizeNinePatch( TestApplication& application,
     AddChildRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredChildRegion, pixelFormat );
   }
 
-  tet_infoline("Getting resource");
+  tet_infoline("Setting resource as it's loaded synchronously");
   Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+  platform.SetSynchronouslyLoadedResource( resourcePtr );
 
   Image image = ResourceImage::New( "blah.#.png" );
 
