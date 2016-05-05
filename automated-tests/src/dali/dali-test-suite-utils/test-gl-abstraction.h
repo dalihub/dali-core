@@ -389,6 +389,9 @@ public:
 
   inline void DepthFunc(GLenum func)
   {
+    std::stringstream out;
+    out << func;
+    mDepthFunctionTrace.PushCall("DepthFunc", out.str());
   }
 
   inline void DepthMask(GLboolean flag)
@@ -1634,6 +1637,11 @@ public: // TEST FUNCTIONS
   inline void ResetDrawCallStack() { mDrawTrace.Reset(); }
   inline TraceCallStack& GetDrawTrace() { return mDrawTrace; }
 
+  //Methods for Depth function verification
+  inline void EnableDepthFunctionCallTrace(bool enable) { mDepthFunctionTrace.Enable(enable); }
+  inline void ResetDepthFunctionCallStack() { mDepthFunctionTrace.Reset(); }
+  inline TraceCallStack& GetDepthFunctionTrace() { return mDepthFunctionTrace; }
+
   template <typename T>
   inline bool GetUniformValue( const char* name, T& value ) const
   {
@@ -1850,6 +1858,7 @@ private:
   TraceCallStack mTextureTrace;
   TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
+  TraceCallStack mDepthFunctionTrace;
 
   // Shaders & Uniforms
   GLuint mLastShaderIdUsed;

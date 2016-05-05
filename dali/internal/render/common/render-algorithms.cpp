@@ -40,6 +40,71 @@ namespace Render
 {
 
 /**
+ * Helper to set the depth function
+ * @param[in] context The GL context
+ * @param[in] depthFunction The depth function
+ */
+inline void SetDepthFunction( Context& context, DepthFunction::Type depthFunction )
+{
+  switch( depthFunction )
+  {
+    case DepthFunction::OFF:
+    {
+      context.EnableDepthBuffer( false );
+      break;
+    }
+    case DepthFunction::NEVER:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_NEVER );
+      break;
+    }
+    case DepthFunction::ALWAYS:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_ALWAYS );
+      break;
+    }
+    case DepthFunction::LESS:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_LESS );
+      break;
+    }
+    case DepthFunction::GREATER:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_GREATER );
+      break;
+    }
+    case DepthFunction::EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_EQUAL );
+      break;
+    }
+    case DepthFunction::NOT_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_NOTEQUAL );
+      break;
+    }
+    case DepthFunction::LESS_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_LEQUAL );
+      break;
+    }
+    case DepthFunction::GREATER_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_GEQUAL );
+      break;
+    }
+  }
+}
+
+/**
  * Sets up the scissor test if required.
  * @param[in] renderList The render list from which to get the clipping flag
  * @param[in] context The context
@@ -148,6 +213,7 @@ inline void ProcessRenderList(
         context.DepthMask( ( depthWriteMode == DepthWriteMode::AUTO && item.mIsOpaque ) ||
                            ( depthWriteMode == DepthWriteMode::ON ) );
 
+        SetDepthFunction( context, item.mRenderer->GetDepthFunction() );
         item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
                                 item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
       }
