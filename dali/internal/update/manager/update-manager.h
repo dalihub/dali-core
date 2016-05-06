@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/manager/object-owner-container.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
@@ -78,10 +77,11 @@ class RenderQueue;
 class TextureCache;
 class PropertyBuffer;
 class TextureSet;
+class Camera;
 
 /**
- * UpdateManager maintains a scene graph i.e. a tree of nodes and attachments and
- * other property owner objects.
+ * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
+ * other scene graph property owning objects.
  * It controls the Update traversal, in which nodes are repositioned/animated,
  * and organizes the the culling and rendering of the scene.
  * It also maintains the lifecycle of nodes and other property owners that are
@@ -173,12 +173,16 @@ public:
   void DestroyNode( Node* node );
 
   /**
-   * Attach an object to a Node.
-   * The UpdateManager is responsible for calling NodeAttachment::Initialize().
-   * @param[in] node The node which will own the attachment.
-   * @param[in] attachment The object to attach.
+   * Add a camera on scene
+   * @param[in] camera to add
    */
-  void AttachToNode( Node* node, NodeAttachment* attachment );
+  void AddCamera( Camera* camera );
+
+  /**
+   * Remove a camera from scene
+   * @param[in] camera to remove
+   */
+  void RemoveCamera( const Camera* camera );
 
   /**
    * Add a newly created object.
@@ -521,12 +525,6 @@ private:
   unsigned int KeepUpdatingCheck( float elapsedSeconds ) const;
 
   /**
-   * Helper to calculate new camera setup when root node resizes.
-   * @param[in] updateBuffer The buffer to read the root node size from.
-   */
-  void UpdateProjectionAndViewMatrices(int updateBuffer);
-
-  /**
    * Post process resources that have been updated by renderer
    */
   void PostProcessResources();
@@ -586,13 +584,6 @@ private:
    * Pass shader binaries queued here on to event thread.
    */
   void ForwardCompiledShadersToEventThread();
-
-  /**
-   * Update the default camera.
-   * This must be altered to match the root Node for 2D layouting.
-   * @param[in] updateBuffer The buffer to read the root node size from.
-   */
-  void UpdateDefaultCamera( int updateBuffer );
 
   /**
    * Update node shaders, opacity, geometry etc.
@@ -683,18 +674,27 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
   new (slot) LocalType( &manager, &UpdateManager::DestroyNode, &node );
 }
 
-inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent, NodeAttachment* attachment )
+inline void AddCameraMessage( UpdateManager& manager, const Camera* constCamera )
 {
-  // Scene graph thread can modify this object.
-  Node& parent = const_cast< Node& >( constParent );
+  typedef MessageValue1< UpdateManager, Camera* > LocalType;
 
-  typedef MessageValue2< UpdateManager, Node*, NodeAttachmentOwner > LocalType;
+  Camera* camera = const_cast<Camera*>( constCamera );
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddCamera, camera );
+}
+
+inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
+{
+  typedef MessageValue1< UpdateManager, const Camera* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AttachToNode, &parent, attachment );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveCamera, camera );
 }
 
 inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )

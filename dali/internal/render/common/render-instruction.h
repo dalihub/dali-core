@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/viewport.h>
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/render/common/render-list.h>
 
 namespace Dali
@@ -37,7 +37,6 @@ class RenderTracker;
 
 namespace SceneGraph
 {
-class CameraAttachment;
 
 /**
  * A set of rendering instructions consisting of:
@@ -92,12 +91,12 @@ public:
    * render-lists are cleared but not released, while matrices and other settings reset in
    * preparation for building a set of instructions for the renderer.
    *
-   * @param[in] cameraAttachment to use to get view and projection matrices.
+   * @param[in] camera to use to get view and projection matrices.
    * @param[in] offscreenId A resource Id of an off-screen render target, or 0
    * @param[in] viewport A pointer to a viewport, of NULL.
    * @param[in] clearColor A pointer to a color to clear with, or NULL if no clear is required.
    */
-  void Reset( CameraAttachment* cameraAttachment,
+  void Reset( Camera* camera,
               unsigned int offscreenId,
               const Viewport* viewport,
               const Vector4* clearColor );
@@ -110,7 +109,7 @@ public:
   const Matrix* GetViewMatrix( BufferIndex index ) const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCameraAttachment->GetViewMatrix( index );
+    return &mCamera->GetViewMatrix( index );
   }
 
   /**
@@ -121,7 +120,7 @@ public:
   const Matrix* GetProjectionMatrix( BufferIndex index ) const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCameraAttachment->GetProjectionMatrix( index );
+    return &mCamera->GetProjectionMatrix( index );
   }
 
 private:
@@ -144,7 +143,7 @@ public: // Data
 
 private: // Data
 
-  CameraAttachment* mCameraAttachment;  ///< camera that is used
+  Camera* mCamera;  ///< camera that is used
   RenderListContainer mRenderLists;     ///< container of all render lists
   RenderListContainer::SizeType mNextFreeRenderList;     ///< index for the next free render list
 

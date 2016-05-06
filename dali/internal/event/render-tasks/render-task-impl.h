@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ class EventThreadServices;
 namespace SceneGraph
 {
 class RenderTask;
+class Camera;
 }
 
 class RenderTask : public Object
@@ -432,6 +433,7 @@ protected:
     RenderTask& mRenderTask;
 
     Actor* mActor; ///< Raw-pointer to the actor; not owned.
+    const SceneGraph::Camera* mCamera;    ///< Raw-pointer to camera scene-graph object; not owned.
   };
 
 private:
@@ -440,7 +442,7 @@ private:
 
   Connector mSourceConnector; ///< Responsible for connecting/disconnecting source Nodes
   Connector mCameraConnector; ///< Responsible for connecting/disconnecting camera Nodes
-  Connector mMappingConnector; /// Responsible for connecting/disconnection actor node, which used to mapping screen to frame buffer coordinate
+  Connector mMappingConnector; /// Responsible for connecting/disconnecting actor node, which used to mapping screen to frame buffer coordinate
 
   Vector4 mClearColor;       ///< Optional clear color
 

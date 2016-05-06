@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_DISCARD_QUEUE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,12 @@ namespace Dali
 namespace Internal
 {
 
-class Texture;
-
 namespace SceneGraph
 {
 
-class Node;
 class RenderQueue;
 class Shader;
+class Camera;
 
 
 /**
@@ -55,6 +53,7 @@ public:
 
   typedef OwnerContainer< Shader* > ShaderQueue;
   typedef OwnerContainer< Renderer* > RendererQueue;
+  typedef OwnerContainer< Camera* > CameraQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -94,6 +93,14 @@ public:
   void Add( BufferIndex updateBufferIndex, Renderer* renderer );
 
   /**
+   * Adds an unwanted Camera to the discard queue.
+   * This is done because Render thread may use Matrices from the camera
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] camera The discarded renderer; DiscardQueue takes ownership.
+   */
+  void Add( BufferIndex updateBufferIndex, Camera* camera );
+
+  /**
    * Release the nodes which were queued in the frame N-2.
    * @pre This method should be called (once) at the beginning of every Update.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -116,11 +123,13 @@ private:
   NodeOwnerContainer           mNodeQueue0;
   ShaderQueue                  mShaderQueue0;
   RendererQueue                mRendererQueue0;
+  CameraQueue                  mCameraQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   ShaderQueue                  mShaderQueue1;
   RendererQueue                mRendererQueue1;
+  CameraQueue                  mCameraQueue1;
 };
 
 } // namespace SceneGraph

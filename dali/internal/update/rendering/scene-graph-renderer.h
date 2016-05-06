@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER2_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,10 +312,10 @@ private:
 
 private:
 
-  SceneController*   mSceneController;  ///< Used for initializing renderers whilst attached
-  Render::Renderer*  mRenderer;    ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*        mTextureSet;    ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*  mGeometry;    ///< The geometry this renderer uses. (Not owned)
+  SceneController*   mSceneController; ///< Used for initializing renderers
+  Render::Renderer*  mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*        mTextureSet;      ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*  mGeometry;        ///< The geometry this renderer uses. (Not owned)
   Shader*            mShader;
 
   Vector4*              mBlendColor;      ///< The blend color for blending operation
@@ -332,7 +332,7 @@ private:
   unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned char mResendFlag;                   ///< Indicate whether data should be resent to the renderer
   bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
-  bool         mResourcesReady;                ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
+  bool         mResourcesReady;                ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
   bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool         mPremultipledAlphaEnabled : 1;  ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
@@ -376,7 +376,7 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Re
   new (slot) LocalType( &renderer, &Renderer::SetShader, &shader );
 }
 
-inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& attachment, int depthIndex )
+inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int depthIndex )
 {
   typedef MessageValue1< Renderer, int > LocalType;
 
@@ -384,7 +384,7 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &Renderer::SetDepthIndex, depthIndex );
+  new (slot) LocalType( &renderer, &Renderer::SetDepthIndex, depthIndex );
 }
 
 inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::FaceCullingMode::Type faceCullingMode )

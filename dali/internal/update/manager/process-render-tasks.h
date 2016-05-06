@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PROCESS_RENDER_TASKS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class RenderTaskList;
 
 /**
  * Process the list of render-tasks; the output is a series of render instructions.
- * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque attachments which are ready to render.
+ * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque renderers which are ready to render.
  * If there is only one default render-task, then no further processing is required.
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] renderTasks The list of render-tasks.

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PREPARE_RENDER_INSTRUCTIONS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,9 +68,8 @@ class RenderTask;
 class RenderInstructionContainer;
 
 /**
- * Sorts and prepares the list of opaque/transparent renderable
- * attachments for each layer.  Whilst iterating through each layer,
- * update the attachments ModelView matrices
+ * Sorts and prepares the list of opaque/transparent renderers for each layer.
+ * Whilst iterating through each layer, update the renderitems ModelView matrices
  *
  * The opaque and transparent render lists are sorted first by depth
  * index, then by Z (for transparent only), then by shader, texture

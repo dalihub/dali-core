@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
-#include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
-
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/resources/texture-metadata.h>
 
@@ -57,6 +54,7 @@
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
@@ -98,20 +96,18 @@ const int CONSTRAINT_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
 const int ACTOR_MEMORY_SIZE(
   sizeof( Internal::Actor ) +
-  sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::SceneGraph::NodeAttachment ));
+  sizeof( Internal::SceneGraph::Node ) );
 const int CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraActor ) +
   sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::SceneGraph::CameraAttachment ) );
+  sizeof( Internal::SceneGraph::Camera ) );
 const int IMAGE_ACTOR_MEMORY_SIZE(
   sizeof( Internal::ImageActor ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::Render::Renderer ));
 const int LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
-  sizeof( Internal::SceneGraph::Layer ) +
-  sizeof( Internal::SceneGraph::NodeAttachment ) );
+  sizeof( Internal::SceneGraph::Layer ) );
 const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::Image ) +
   sizeof( Internal::ImageFactoryCache::Request ) +

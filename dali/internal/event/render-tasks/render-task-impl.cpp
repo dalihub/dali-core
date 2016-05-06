@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,14 @@ bool RenderTask::GetInputEnabled() const
 
 void RenderTask::SetCameraActor( CameraActor* cameraActor )
 {
+  if( cameraActor )
+  {
+    mCameraConnector.mCamera = cameraActor->GetCamera();
+  }
+  else
+  {
+    mCameraConnector.mCamera = NULL;
+  }
   mCameraConnector.SetActor( cameraActor );
 }
 
@@ -806,7 +814,8 @@ RenderTask::~RenderTask()
 RenderTask::Connector::Connector( Type type, RenderTask& renderTask )
 : mType( type ),
   mRenderTask( renderTask ),
-  mActor( NULL )
+  mActor( NULL ),
+  mCamera( NULL )
 {
 }
 
@@ -857,6 +866,7 @@ void RenderTask::Connector::ObjectDestroyed( Object& object )
   }
 
   mActor = NULL;
+  mCamera = NULL; // only meaningful for the camera connector but no simple way to distinguish
 
   UpdateRenderTask();
 }
@@ -887,7 +897,7 @@ void RenderTask::Connector::UpdateRenderTask()
     }
     else if( CAMERA_CONNECTOR == mType )
     {
-      SetCameraNodeMessage( mRenderTask.GetEventThreadServices(), *(mRenderTask.mSceneObject), node );
+      SetCameraMessage( mRenderTask.GetEventThreadServices(), *(mRenderTask.mSceneObject), node, mCamera );
     }
   }
 }
