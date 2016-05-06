@@ -123,7 +123,7 @@ public:
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
-   * @param[in] elementBufferCount Number of elements to draw if index buffer bound
+   * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
   void UploadAndDraw(Context& context,
                      BufferIndex bufferIndex,

@@ -1860,6 +1860,28 @@ int UtcDaliRendererSetIndexRange(void)
     DALI_TEST_CHECK( result );
   }
 
+  // Index out of bounds
+  {
+    renderer.SetIndexRange( 15, 30 );
+    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
+  // drawing whole buffer starting from 15 ( last valid primitive )
+  {
+    renderer.SetIndexRange( 15, 0 );
+    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
   END_TEST;
 }
 
