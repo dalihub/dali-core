@@ -42,7 +42,9 @@ RenderItem* RenderItem::New()
 }
 
 RenderItem::RenderItem()
-: mModelViewMatrix( false ),
+: mModelMatrix( false ),
+  mModelViewMatrix( false ),
+  mSize(),
   mRenderer( NULL ),
   mNode( NULL ),
   mDepthIndex( 0 ),
@@ -57,46 +59,6 @@ RenderItem::~RenderItem()
 void RenderItem::operator delete( void* ptr )
 {
   gRenderItemPool.Free( static_cast<RenderItem*>( ptr ) );
-}
-
-void RenderItem::Reset()
-{
-  mRenderer = NULL;
-}
-
-void RenderItem::SetRenderer( Render::Renderer* renderer )
-{
-  mRenderer = renderer;
-}
-
-void RenderItem::SetNode( Node* node )
-{
-  mNode = node;
-}
-
-Render::Renderer& RenderItem::GetRenderer() const
-{
-  return *mRenderer;
-}
-
-Matrix& RenderItem::GetModelViewMatrix()
-{
-  return mModelViewMatrix;
-}
-
-const Matrix& RenderItem::GetModelViewMatrix() const
-{
-  return mModelViewMatrix;
-}
-
-void RenderItem::SetDepthIndex( int depthIndex )
-{
-  mDepthIndex = depthIndex;
-}
-
-void RenderItem::SetIsOpaque( bool isOpaque )
-{
-  mIsOpaque = isOpaque;
 }
 
 } // namespace SceneGraph

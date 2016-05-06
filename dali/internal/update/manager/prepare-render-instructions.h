@@ -37,7 +37,7 @@ class Geometry;
 namespace SceneGraph
 {
 class RenderTracker;
-class RenderItem;
+struct RenderItem;
 class Shader;
 
 /**

@@ -84,21 +84,21 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
     {
       // Get the next free RenderItem
       RenderItem& item = renderList.GetNextFreeItem();
-      item.SetRenderer( &renderable.mRenderer->GetRenderer() );
-      item.SetNode( renderable.mNode );
-      item.SetIsOpaque( opacity == Renderer::OPAQUE );
+      item.mRenderer = &renderable.mRenderer->GetRenderer();
+      item.mNode = renderable.mNode;
+      item.mIsOpaque = (opacity == Renderer::OPAQUE);
 
       if( isLayer3d )
       {
-        item.SetDepthIndex( renderable.mRenderer->GetDepthIndex() );
+        item.mDepthIndex = renderable.mRenderer->GetDepthIndex();
       }
       else
       {
-        item.SetDepthIndex( renderable.mRenderer->GetDepthIndex() + static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
+        item.mDepthIndex = renderable.mRenderer->GetDepthIndex() + static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER;
       }
       // save MV matrix onto the item
-      const Matrix& worldMatrix = renderable.mNode->GetWorldMatrixAndSize( item.GetSize() );
-      Matrix::Multiply( item.GetModelViewMatrix(), worldMatrix, viewMatrix );
+      renderable.mNode->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+      Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
     }
   }
 }
@@ -179,7 +179,7 @@ inline bool TryReuseCachedRenderers( Layer& layer,
  */
 bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSortAttributes& rhs )
 {
-  if( lhs.renderItem->GetDepthIndex() == rhs.renderItem->GetDepthIndex() )
+  if( lhs.renderItem->mDepthIndex == rhs.renderItem->mDepthIndex )
   {
     if( lhs.shader == rhs.shader )
     {
@@ -191,7 +191,7 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
     }
     return lhs.shader < rhs.shader;
   }
-  return lhs.renderItem->GetDepthIndex() < rhs.renderItem->GetDepthIndex();
+  return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
 }
 /**
  * Function which sorts the render items by Z function, then
@@ -202,8 +202,8 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
  */
 bool CompareItems3D( const RendererWithSortAttributes& lhs, const RendererWithSortAttributes& rhs )
 {
-  bool lhsIsOpaque = lhs.renderItem->IsOpaque();
-  if( lhsIsOpaque ==  rhs.renderItem->IsOpaque())
+  bool lhsIsOpaque = lhs.renderItem->mIsOpaque;
+  if( lhsIsOpaque ==  rhs.renderItem->mIsOpaque )
   {
     if( lhsIsOpaque )
     {
@@ -276,10 +276,10 @@ inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, La
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.GetRenderer().SetSortAttributes( bufferIndex, sortingHelper[ index ] );
+      item.mRenderer->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
 
       // the default sorting function should get inlined here
-      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
+      sortingHelper[ index ].zValue = Internal::Layer::ZValue( item.mModelViewMatrix.GetTranslation3() ) - item.mDepthIndex;
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].renderItem = &item;
@@ -292,8 +292,8 @@ inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, La
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.GetRenderer().SetSortAttributes( bufferIndex, sortingHelper[ index ] );
-      sortingHelper[ index ].zValue = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3() ) - item.GetDepthIndex();
+      item.mRenderer->SetSortAttributes( bufferIndex, sortingHelper[ index ] );
+      sortingHelper[ index ].zValue = (*sortFunction)( item.mModelViewMatrix.GetTranslation3() ) - item.mDepthIndex;
 
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].renderItem = &item;
@@ -317,7 +317,7 @@ inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, La
   for( unsigned int index = 0; index < renderableCount; ++index, ++renderListIter )
   {
     *renderListIter = sortingHelper[ index ].renderItem;
-    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, &sortingHelper[ index ].renderItem->GetRenderer() );
+    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, sortingHelper[ index ].renderItem->mRenderer);
   }
 }
 
@@ -371,7 +371,7 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
   // depth buffering
   if ( ( renderList.Count() == 1 ) &&
        (( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::OFF ) ||
-        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::AUTO && !renderList.GetItem(0).IsOpaque() )))
+        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::AUTO && !renderList.GetItem(0).mIsOpaque )))
   {
     //Nothing to do here
   }

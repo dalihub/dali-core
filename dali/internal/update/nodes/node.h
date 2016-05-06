@@ -590,17 +590,15 @@ public:
 
   /**
    * Retrieve world matrix and size of the node
-   *
+   * @param[out] The local to world matrix of the node
    * @param[out] size The current size of the node
-   * @return The local to world matrix of the node
    */
-  const Matrix& GetWorldMatrixAndSize( Vector3& size ) const
+  void GetWorldMatrixAndSize( Matrix& worldMatrix, Vector3& size ) const
   {
     if( mTransformId != INVALID_TRANSFORM_ID )
     {
-      return mTransformManager->GetWorldMatrixAndSize( mTransformId, size );
+      mTransformManager->GetWorldMatrixAndSize( mTransformId, worldMatrix, size );
     }
-    return Matrix::IDENTITY;
   }
 
   /**

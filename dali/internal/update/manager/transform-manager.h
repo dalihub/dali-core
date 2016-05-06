@@ -334,10 +334,10 @@ public:
   /**
    * Get the world matrix and size of a given component
    * @param[in] id Id of the transform component
+   * @param[out] The world matrix of the component
    * @param[out] size size of the component
-   * @return The world matrix of the component
    */
-  const Matrix& GetWorldMatrixAndSize( TransformId id, Vector3& size ) const;
+  void GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const;
 
 private:
 

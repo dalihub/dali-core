@@ -200,6 +200,7 @@ public:
                BufferIndex bufferIndex,
                const SceneGraph::NodeDataProvider& node,
                SceneGraph::Shader& defaultShader,
+               const Matrix& modelMatrix,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
