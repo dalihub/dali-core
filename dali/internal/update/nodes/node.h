@@ -605,6 +605,35 @@ public:
   }
 
   /**
+   * Retrieve the bounding sphere of the node
+   * @return A vector4 describing the bounding sphere. XYZ is the center and W is the radius
+   */
+  const Vector4& GetBoundingSphere() const
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID )
+    {
+      return mTransformManager->GetBoundingSphere( mTransformId );
+    }
+
+    return Vector4::ZERO;
+  }
+
+  /**
+   * Retrieve world matrix and size of the node
+   *
+   * @param[out] size The current size of the node
+   * @return The local to world matrix of the node
+   */
+  const Matrix& GetWorldMatrixAndSize( Vector3& size ) const
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID )
+    {
+      return mTransformManager->GetWorldMatrixAndSize( mTransformId, size );
+    }
+    return Matrix::IDENTITY;
+  }
+
+  /**
    * Checks if local matrix has changed since last update
    * @return true if local matrix has changed, false otherwise
    */

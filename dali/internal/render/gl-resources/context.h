@@ -537,7 +537,7 @@ public:
    * enables GL_CULL_FACE if in any of the face culling modes
    * otherwise disables GL_CULL_FACE
    */
-  void CullFace( Dali::Renderer::FaceCullingMode mode )
+  void CullFace( Dali::FaceCullingMode::Type mode )
   {
     // Avoid unnecessary calls to gl
     if(mCullFaceMode != mode)
@@ -545,14 +545,14 @@ public:
       mCullFaceMode = mode;
       switch(mode)
       {
-        case Dali::Renderer::NONE:
+        case Dali::FaceCullingMode::NONE:
         {
           LOG_GL("Disable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE) );
           break;
         }
 
-        case Dali::Renderer::CULL_FRONT:
+        case Dali::FaceCullingMode::FRONT:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -561,7 +561,7 @@ public:
           break;
         }
 
-        case Dali::Renderer::CULL_BACK:
+        case Dali::FaceCullingMode::BACK:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -570,7 +570,7 @@ public:
           break;
         }
 
-        case Dali::Renderer::CULL_BACK_AND_FRONT:
+        case Dali::FaceCullingMode::FRONT_AND_BACK:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
           CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
@@ -1725,7 +1725,7 @@ private: // Data
   Vector4 mClearColor;        ///< clear color
 
   // Face culling mode
-  Dali::Renderer::FaceCullingMode mCullFaceMode;
+  Dali::FaceCullingMode::Type mCullFaceMode;
 
   // cached viewport size
   Rect< int > mViewPort;

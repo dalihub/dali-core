@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/constraints.h> // for EqualToConstraint
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
@@ -606,44 +607,44 @@ float ImageActor::GetSortModifier() const
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
 {
-  mRenderer->SetBlendMode( mode );
+  mRenderer->SetBlendMode( static_cast<BlendMode::Type>( mode ) );
 }
 
 BlendingMode::Type ImageActor::GetBlendMode() const
 {
-  return mRenderer->GetBlendMode();
+  return static_cast<BlendingMode::Type>( mRenderer->GetBlendMode() );
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
 {
-  mRenderer->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+  mRenderer->SetBlendFunc( static_cast<BlendFactor::Type>(srcFactorRgba), static_cast<BlendFactor::Type>(destFactorRgba), static_cast<BlendFactor::Type>(srcFactorRgba), static_cast<BlendFactor::Type>(destFactorRgba) );
 }
 
 void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
                                BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
 {
-  mRenderer->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->SetBlendFunc( static_cast<BlendFactor::Type>(srcFactorRgb), static_cast<BlendFactor::Type>(destFactorRgb), static_cast<BlendFactor::Type>(srcFactorAlpha), static_cast<BlendFactor::Type>(destFactorAlpha) );
 }
 
 void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
                                BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
 {
-  mRenderer->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  mRenderer->GetBlendFunc( reinterpret_cast<BlendFactor::Type&>(srcFactorRgb), reinterpret_cast<BlendFactor::Type&>(destFactorRgb), reinterpret_cast<BlendFactor::Type&>(srcFactorAlpha), reinterpret_cast<BlendFactor::Type&>(destFactorAlpha) );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
 {
-  mRenderer->SetBlendEquation( equationRgba, equationRgba );
+  mRenderer->SetBlendEquation( static_cast<BlendEquation::Type>(equationRgba), static_cast<BlendEquation::Type>(equationRgba) );
 }
 
 void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
 {
-  mRenderer->SetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->SetBlendEquation( static_cast<BlendEquation::Type>(equationRgb), static_cast<BlendEquation::Type>(equationAlpha) );
 }
 
 void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
 {
-  mRenderer->GetBlendEquation( equationRgb, equationAlpha );
+  mRenderer->GetBlendEquation( reinterpret_cast<BlendEquation::Type&>(equationRgb), reinterpret_cast<BlendEquation::Type&>(equationAlpha) );
 }
 
 void ImageActor::SetBlendColor( const Vector4& color )

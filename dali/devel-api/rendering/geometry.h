@@ -146,24 +146,6 @@ public:
    */
   GeometryType GetGeometryType() const;
 
-  /**
-   * @brief Set if the geometry requires depth testing
-   *
-   * Should be set to true if this geometry has overlapping triangles in arbitrary order
-   *
-   * Calling this function is equivalent to setting the REQUIRES_DEPTH_TESTING property
-   *
-   * @param[in] requiresDepthTest Specifies if the geometry requires depth testing
-   */
-  void SetRequiresDepthTesting( bool requiresDepthTest );
-
-  /**
-   * @brief Return if the geometry requires depth testing
-   *
-   * @return True if the geometry requires depth testing
-   */
-  bool GetRequiresDepthTesting() const;
-
 public:
   /**
    * @brief The constructor

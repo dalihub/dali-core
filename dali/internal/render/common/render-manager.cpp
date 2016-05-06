@@ -400,11 +400,6 @@ void RenderManager::SetGeometryType( Render::Geometry* geometry, unsigned int ge
   geometry->SetGeometryType( Render::Geometry::GeometryType(geometryType) );
 }
 
-void RenderManager::SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest )
-{
-  geometry->SetRequiresDepthTest( requiresDepthTest );
-}
-
 void RenderManager::AddRenderTracker( Render::RenderTracker* renderTracker )
 {
   mImpl->AddRenderTracker(renderTracker);

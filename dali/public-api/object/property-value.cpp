@@ -101,14 +101,15 @@ struct Property::Value::Impl
 
   Impl( const AngleAxis& angleAxisValue )
   : type( Property::ROTATION ),
-    quaternionValue( new Quaternion( angleAxisValue.angle, angleAxisValue.axis ) )
+    angleAxisValue( new AngleAxis(angleAxisValue) )
   {
   }
 
   Impl( const Quaternion& quaternionValue )
   : type( Property::ROTATION ),
-    quaternionValue( new Quaternion( quaternionValue ) )
+    angleAxisValue( new AngleAxis() )
   {
+    quaternionValue.ToAxisAngle( angleAxisValue->axis, angleAxisValue->angle );
   }
 
   Impl(const std::string& stringValue)
@@ -181,7 +182,7 @@ struct Property::Value::Impl
       }
       case Property::ROTATION:
       {
-        delete quaternionValue;
+        delete angleAxisValue;
         break;
       }
       case Property::STRING:
@@ -215,7 +216,7 @@ public: // Data
     Vector4* vector4Value;
     Matrix3* matrix3Value;
     Matrix* matrixValue;
-    Quaternion* quaternionValue;
+    AngleAxis* angleAxisValue;
     std::string* stringValue;
     Rect<int>* rectValue;
     Property::Array* arrayValue;
@@ -352,7 +353,7 @@ Property::Value::Value( Type type )
     }
     case Property::ROTATION:
     {
-      mImpl = new Impl( Quaternion() );
+      mImpl = new Impl( AngleAxis() );
       break;
     }
     case Property::STRING:
@@ -451,7 +452,7 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::ROTATION:
       {
-        *mImpl->quaternionValue = *value.mImpl->quaternionValue; // type cannot change in mImpl so quaternion is allocated
+        *mImpl->angleAxisValue = *value.mImpl->angleAxisValue; // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::STRING:
@@ -527,7 +528,7 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::ROTATION:
       {
-        newImpl = new Impl( *value.mImpl->quaternionValue ); // type cannot change in mImpl so quaternion is allocated
+        newImpl = new Impl( *value.mImpl->angleAxisValue ); // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::MATRIX3:
@@ -699,9 +700,9 @@ bool Property::Value::Get( Rect<int>& rectValue ) const
 bool Property::Value::Get( AngleAxis& angleAxisValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so angleAxis is allocated
   {
-    mImpl->quaternionValue->ToAxisAngle( angleAxisValue.axis, angleAxisValue.angle );
+    angleAxisValue = *(mImpl->angleAxisValue);
     converted = true;
   }
   return converted;
@@ -710,9 +711,9 @@ bool Property::Value::Get( AngleAxis& angleAxisValue ) const
 bool Property::Value::Get( Quaternion& quaternionValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so angleAxis is allocated
   {
-    quaternionValue = *(mImpl->quaternionValue);
+    quaternionValue = Quaternion(mImpl->angleAxisValue->angle, mImpl->angleAxisValue->axis );
     converted = true;
   }
   return converted;
@@ -826,7 +827,7 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
       }
       case Dali::Property::ROTATION:
       {
-        stream << *impl.quaternionValue;
+        stream << *impl.angleAxisValue;
         break;
       }
       case Dali::Property::STRING:

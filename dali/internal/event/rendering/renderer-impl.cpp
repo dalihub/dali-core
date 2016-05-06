@@ -42,17 +42,18 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "depthIndex",                      INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_INDEX )
 DALI_PROPERTY( "faceCullingMode",                 INTEGER,   true, false,  false, Dali::Renderer::Property::FACE_CULLING_MODE )
-DALI_PROPERTY( "blendingMode",                    INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_MODE )
+DALI_PROPERTY( "blendMode",                       INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_MODE )
 DALI_PROPERTY( "blendEquationRgb",                INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_RGB )
 DALI_PROPERTY( "blendEquationAlpha",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_ALPHA )
-DALI_PROPERTY( "sourceBlendFactorRgb",            INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_SRC_FACTOR_RGB )
-DALI_PROPERTY( "destinationBlendFactorRgb",       INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_DEST_FACTOR_RGB )
-DALI_PROPERTY( "sourceBlendFactorAlpha",          INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_SRC_FACTOR_ALPHA )
-DALI_PROPERTY( "destinationBlendFactorAlpha",     INTEGER,   true, false,  false, Dali::Renderer::Property::BLENDING_DEST_FACTOR_ALPHA )
-DALI_PROPERTY( "blendingColor",                   VECTOR4,   true, false,  false, Dali::Renderer::Property::BLENDING_COLOR )
+DALI_PROPERTY( "blendFactorSrcRgb",               INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB )
+DALI_PROPERTY( "blendFactorDestRgb",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB )
+DALI_PROPERTY( "blendFactorSrcAlpha",             INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA )
+DALI_PROPERTY( "blendFactorDestAlpha",            INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA )
+DALI_PROPERTY( "blendColor",                      VECTOR4,   true, false,  false, Dali::Renderer::Property::BLEND_COLOR )
 DALI_PROPERTY( "blendPreMultipliedAlpha",         BOOLEAN,   true, false,  false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA )
 DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_FIRST )
 DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
+DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -124,7 +125,7 @@ int Renderer::GetDepthIndex() const
   return mDepthIndex;
 }
 
-void Renderer::SetFaceCullingMode( Dali::Renderer::FaceCullingMode cullingMode )
+void Renderer::SetFaceCullingMode( FaceCullingMode::Type cullingMode )
 {
   if( mFaceCullingMode != cullingMode )
   {
@@ -134,45 +135,45 @@ void Renderer::SetFaceCullingMode( Dali::Renderer::FaceCullingMode cullingMode )
   }
 }
 
-Dali::Renderer::FaceCullingMode Renderer::GetFaceCullingMode()
+FaceCullingMode::Type Renderer::GetFaceCullingMode()
 {
   return mFaceCullingMode;
 }
 
-void Renderer::SetBlendMode( BlendingMode::Type mode )
+void Renderer::SetBlendMode( BlendMode::Type mode )
 {
-  if( mBlendingMode != mode )
+  if( mBlendMode != mode )
   {
-    mBlendingMode = mode;
+    mBlendMode = mode;
 
-    SetBlendingModeMessage( GetEventThreadServices(), *mSceneObject, mBlendingMode );
+    SetBlendModeMessage( GetEventThreadServices(), *mSceneObject, mBlendMode );
   }
 }
 
-BlendingMode::Type Renderer::GetBlendMode() const
+BlendMode::Type Renderer::GetBlendMode() const
 {
-  return mBlendingMode;
+  return mBlendMode;
 }
 
-void Renderer::SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba )
+void Renderer::SetBlendFunc( BlendFactor::Type srcFactorRgba, BlendFactor::Type destFactorRgba )
 {
   mBlendingOptions.SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
   SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::SetBlendFunc( BlendingFactor::Type srcFactorRgb,
-                             BlendingFactor::Type destFactorRgb,
-                             BlendingFactor::Type srcFactorAlpha,
-                             BlendingFactor::Type destFactorAlpha )
+void Renderer::SetBlendFunc( BlendFactor::Type srcFactorRgb,
+                             BlendFactor::Type destFactorRgb,
+                             BlendFactor::Type srcFactorAlpha,
+                             BlendFactor::Type destFactorAlpha )
 {
   mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
   SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,
-                             BlendingFactor::Type& destFactorRgb,
-                             BlendingFactor::Type& srcFactorAlpha,
-                             BlendingFactor::Type& destFactorAlpha ) const
+void Renderer::GetBlendFunc( BlendFactor::Type& srcFactorRgb,
+                             BlendFactor::Type& destFactorRgb,
+                             BlendFactor::Type& srcFactorAlpha,
+                             BlendFactor::Type& destFactorAlpha ) const
 {
   srcFactorRgb    = mBlendingOptions.GetBlendSrcFactorRgb();
   destFactorRgb   = mBlendingOptions.GetBlendDestFactorRgb();
@@ -180,21 +181,21 @@ void Renderer::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,
   destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
 }
 
-void Renderer::SetBlendEquation( BlendingEquation::Type equationRgba )
+void Renderer::SetBlendEquation( BlendEquation::Type equationRgba )
 {
   mBlendingOptions.SetBlendEquation( equationRgba, equationRgba );
   SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::SetBlendEquation( BlendingEquation::Type equationRgb,
-                                 BlendingEquation::Type equationAlpha )
+void Renderer::SetBlendEquation( BlendEquation::Type equationRgb,
+                                 BlendEquation::Type equationAlpha )
 {
   mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
   SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::GetBlendEquation( BlendingEquation::Type& equationRgb,
-                                 BlendingEquation::Type& equationAlpha ) const
+void Renderer::GetBlendEquation( BlendEquation::Type& equationRgb,
+                                 BlendEquation::Type& equationAlpha ) const
 {
   // These are not animatable, the cached values are up-to-date.
   equationRgb   = mBlendingOptions.GetBlendEquationRgb();
@@ -248,7 +249,7 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
   {
     if( preMultipled )
     {
-      SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA, BlendingFactor::ONE, BlendingFactor::ONE );
+      SetBlendFunc( BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE );
     }
     mPremultipledAlphaEnabled = preMultipled;
     SetEnablePreMultipliedAlphaMessage( GetEventThreadServices(), *mSceneObject, mPremultipledAlphaEnabled );
@@ -320,16 +321,16 @@ void Renderer::SetDefaultProperty( Property::Index index,
       int faceCullingMode;
       if( propertyValue.Get( faceCullingMode ) )
       {
-        SetFaceCullingMode( Dali::Renderer::FaceCullingMode( faceCullingMode ) );
+        SetFaceCullingMode( FaceCullingMode::Type( faceCullingMode ) );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_MODE:
+    case Dali::Renderer::Property::BLEND_MODE:
     {
       int blendingMode;
       if( propertyValue.Get( blendingMode ) )
       {
-        SetBlendMode( BlendingMode::Type( blendingMode ) );
+        SetBlendMode( BlendMode::Type( blendingMode ) );
       }
       break;
     }
@@ -338,8 +339,8 @@ void Renderer::SetDefaultProperty( Property::Index index,
       int blendingEquation;
       if( propertyValue.Get( blendingEquation ) )
       {
-        BlendingEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
-        mBlendingOptions.SetBlendEquation( static_cast<BlendingEquation::Type>( blendingEquation ), alphaEquation );
+        BlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+        mBlendingOptions.SetBlendEquation( static_cast<BlendEquation::Type>( blendingEquation ), alphaEquation );
         SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
       }
       break;
@@ -349,81 +350,81 @@ void Renderer::SetDefaultProperty( Property::Index index,
       int blendingEquation;
       if( propertyValue.Get( blendingEquation ) )
       {
-        BlendingEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
-        mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendingEquation::Type>( blendingEquation ) );
+        BlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
+        mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendEquation::Type>( blendingEquation ) );
         SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_SRC_FACTOR_RGB:
+    case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
     {
       int blendingFactor;
       if( propertyValue.Get( blendingFactor ) )
       {
-        BlendingFactor::Type srcFactorRgb;
-        BlendingFactor::Type destFactorRgb;
-        BlendingFactor::Type srcFactorAlpha;
-        BlendingFactor::Type destFactorAlpha;
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
         GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-        SetBlendFunc( static_cast<BlendingFactor::Type>( blendingFactor ),
+        SetBlendFunc( static_cast<BlendFactor::Type>( blendingFactor ),
             destFactorRgb,
             srcFactorAlpha,
             destFactorAlpha );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_DEST_FACTOR_RGB:
+    case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
     {
       int blendingFactor;
       if( propertyValue.Get( blendingFactor ) )
       {
-        BlendingFactor::Type srcFactorRgb;
-        BlendingFactor::Type destFactorRgb;
-        BlendingFactor::Type srcFactorAlpha;
-        BlendingFactor::Type destFactorAlpha;
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
         GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
         SetBlendFunc( srcFactorRgb,
-            static_cast<BlendingFactor::Type>( blendingFactor ),
+            static_cast<BlendFactor::Type>( blendingFactor ),
             srcFactorAlpha,
             destFactorAlpha );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_SRC_FACTOR_ALPHA:
+    case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
     {
       int blendingFactor;
       if( propertyValue.Get( blendingFactor ) )
       {
-        BlendingFactor::Type srcFactorRgb;
-        BlendingFactor::Type destFactorRgb;
-        BlendingFactor::Type srcFactorAlpha;
-        BlendingFactor::Type destFactorAlpha;
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
         GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
         SetBlendFunc( srcFactorRgb,
             destFactorRgb,
-            static_cast<BlendingFactor::Type>( blendingFactor ),
+            static_cast<BlendFactor::Type>( blendingFactor ),
             destFactorAlpha );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_DEST_FACTOR_ALPHA:
+    case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
     {
       int blendingFactor;
       if( propertyValue.Get( blendingFactor ) )
       {
-        BlendingFactor::Type srcFactorRgb;
-        BlendingFactor::Type destFactorRgb;
-        BlendingFactor::Type srcFactorAlpha;
-        BlendingFactor::Type destFactorAlpha;
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
         GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
         SetBlendFunc( srcFactorRgb,
             destFactorRgb,
             srcFactorAlpha,
-            static_cast<BlendingFactor::Type>( blendingFactor ) );
+            static_cast<BlendFactor::Type>( blendingFactor ) );
       }
       break;
     }
-    case Dali::Renderer::Property::BLENDING_COLOR:
+    case Dali::Renderer::Property::BLEND_COLOR:
     {
       Vector4 blendColor;
       if( propertyValue.Get( blendColor ) )
@@ -459,6 +460,19 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case Dali::Renderer::Property::DEPTH_WRITE_MODE:
+    {
+      int value;
+      propertyValue.Get( value );
+      DepthWriteMode::Type mode = static_cast<DepthWriteMode::Type>(value);
+      if( mode != mDepthWriteMode )
+      {
+        mDepthWriteMode = mode;
+        SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, mode );
+      }
+
+      break;
+    }
   }
 }
 
@@ -485,9 +499,9 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mFaceCullingMode;
       break;
     }
-    case Dali::Renderer::Property::BLENDING_MODE:
+    case Dali::Renderer::Property::BLEND_MODE:
     {
-      value = mBlendingMode;
+      value = mBlendMode;
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
@@ -500,47 +514,47 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = static_cast<int>( mBlendingOptions.GetBlendEquationAlpha() );
       break;
     }
-    case Dali::Renderer::Property::BLENDING_SRC_FACTOR_RGB:
+    case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
+      BlendFactor::Type srcFactorRgb;
+      BlendFactor::Type destFactorRgb;
+      BlendFactor::Type srcFactorAlpha;
+      BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
       value = static_cast<int>( srcFactorRgb );
       break;
     }
-    case Dali::Renderer::Property::BLENDING_DEST_FACTOR_RGB:
+    case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
+      BlendFactor::Type srcFactorRgb;
+      BlendFactor::Type destFactorRgb;
+      BlendFactor::Type srcFactorAlpha;
+      BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
       value = static_cast<int>( destFactorRgb );
       break;
     }
-    case Dali::Renderer::Property::BLENDING_SRC_FACTOR_ALPHA:
+    case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
+      BlendFactor::Type srcFactorRgb;
+      BlendFactor::Type destFactorRgb;
+      BlendFactor::Type srcFactorAlpha;
+      BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
       value = static_cast<int>( srcFactorAlpha );
       break;
     }
-    case Dali::Renderer::Property::BLENDING_DEST_FACTOR_ALPHA:
+    case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
     {
-      BlendingFactor::Type srcFactorRgb;
-      BlendingFactor::Type destFactorRgb;
-      BlendingFactor::Type srcFactorAlpha;
-      BlendingFactor::Type destFactorAlpha;
+      BlendFactor::Type srcFactorRgb;
+      BlendFactor::Type destFactorRgb;
+      BlendFactor::Type srcFactorAlpha;
+      BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
       value = static_cast<int>( destFactorAlpha );
       break;
     }
-    case Dali::Renderer::Property::BLENDING_COLOR:
+    case Dali::Renderer::Property::BLEND_COLOR:
     {
       if( mBlendColor )
       {
@@ -565,6 +579,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
     case Dali::Renderer::Property::INDEX_RANGE_COUNT:
     {
       value = static_cast<int>( mIndexedDrawElementCount );
+      break;
+    }
+    case Dali::Renderer::Property::DEPTH_WRITE_MODE:
+    {
+      value = mDepthWriteMode;
       break;
     }
   }
@@ -652,9 +671,10 @@ Renderer::Renderer()
   mOnStageCount( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
-  mFaceCullingMode( Dali::Renderer::NONE ),
-  mBlendingMode( Dali::BlendingMode::AUTO ),
+  mFaceCullingMode( FaceCullingMode::NONE ),
+  mBlendMode( BlendMode::AUTO ),
   mBlendingOptions(),
+  mDepthWriteMode( DepthWriteMode::AUTO ),
   mPremultipledAlphaEnabled( false )
 {
 }

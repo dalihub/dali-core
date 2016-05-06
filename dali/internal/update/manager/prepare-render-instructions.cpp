@@ -70,16 +70,11 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      bool cull )
 {
   bool inside( true );
-
-  const Matrix& worldMatrix = renderable.mNode->GetWorldMatrix( updateBufferIndex );
-  const Vector3& size = renderable.mNode->GetSize( updateBufferIndex );
-  if ( cull && renderable.mRenderer->GetShader().GeometryHintEnabled( Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) )
+  if ( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::HINT_MODIFIES_GEOMETRY ) )
   {
-    const Vector3& position = worldMatrix.GetTranslation3();
-    float radius( size.Length() * 0.5f );
-
-    inside = (radius > Math::MACHINE_EPSILON_1000) &&
-        (cameraAttachment.CheckSphereInFrustum( updateBufferIndex, position, radius ) );
+    const Vector4& boundingSphere = renderable.mNode->GetBoundingSphere();
+    inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
+             (cameraAttachment.CheckSphereInFrustum( updateBufferIndex, Vector3(boundingSphere), boundingSphere.w ) );
   }
 
   if ( inside )
@@ -102,8 +97,8 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
         item.SetDepthIndex( renderable.mRenderer->GetDepthIndex() + static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
       }
       // save MV matrix onto the item
+      const Matrix& worldMatrix = renderable.mNode->GetWorldMatrixAndSize( item.GetSize() );
       Matrix::Multiply( item.GetModelViewMatrix(), worldMatrix, viewMatrix );
-      item.SetSize( size );
     }
   }
 }
@@ -371,15 +366,12 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
     flags = RenderList::STENCIL_BUFFER_ENABLED;
   }
 
-  // Special optimization if depth test is disabled or if only one opaque rendered in the layer (for example background image)
-  // and this renderer does not need depth test against itself (e.g. mesh)
-  // and if this layer has got exactly one opaque renderer
-  // and this renderer is not interested in depth testing
-  // (i.e. is an image and not a mesh)
-
+  // Special optimization. If this layer has got exactly one renderer
+  // and this renderer is not writing to the depth buffer there is no point on enabling
+  // depth buffering
   if ( ( renderList.Count() == 1 ) &&
-       ( !renderList.GetRenderer( 0 ).RequiresDepthTest() ) &&
-       ( !renderList.GetItem(0).IsOpaque() ) )
+       (( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::OFF ) ||
+        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::AUTO && !renderList.GetItem(0).IsOpaque() )))
   {
     //Nothing to do here
   }

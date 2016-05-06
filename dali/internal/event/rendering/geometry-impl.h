@@ -88,16 +88,6 @@ public:
   Dali::Geometry::GeometryType GetGeometryType() const;
 
   /**
-   * @copydoc Dali::Geometry::SetRequiresDepthTesting()
-   */
-  void SetRequiresDepthTesting( bool requiresDepthTest );
-
-  /**
-   * @copydoc Dali::Geometry::GetRequiresDepthTesting()
-   */
-  bool GetRequiresDepthTesting() const;
-
-  /**
    * @brief Get the geometry scene object
    *
    * @return the geometry scene object
@@ -134,8 +124,6 @@ private: // data
 
   std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
   Dali::Geometry::GeometryType mGeometryType;      ///< Geometry type (cached)
-  bool                         mRequiresDepthTest; ///< Establish if geometry requires depth testing (cached)
-
 };
 
 } // namespace Internal

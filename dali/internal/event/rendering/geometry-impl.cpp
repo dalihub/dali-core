@@ -83,21 +83,6 @@ Dali::Geometry::GeometryType Geometry::GetGeometryType() const
   return mGeometryType;
 }
 
-void Geometry::SetRequiresDepthTesting( bool requiresDepthTest )
-{
-  if( requiresDepthTest != mRequiresDepthTest )
-  {
-    SceneGraph::SetGeometryRequiresDepthTestMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, requiresDepthTest );
-
-    mRequiresDepthTest = requiresDepthTest;
-  }
-}
-
-bool Geometry::GetRequiresDepthTesting() const
-{
-  return mRequiresDepthTest;
-}
-
 const Render::Geometry* Geometry::GetRenderObject() const
 {
   return mRenderObject;
@@ -106,8 +91,7 @@ const Render::Geometry* Geometry::GetRenderObject() const
 Geometry::Geometry()
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
-  mGeometryType(Dali::Geometry::TRIANGLES),
-  mRequiresDepthTest(false)
+  mGeometryType(Dali::Geometry::TRIANGLES)
 {
 }
 

@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/blending.h> // Dali::BlendingMode, Dali::BlendingEquation, Dali::BlendingFactor
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_OBJECT_PROPERTY_START_INDEX
 #include <dali/devel-api/rendering/geometry.h> // Dali::Geometry
@@ -33,6 +32,102 @@ namespace Internal DALI_INTERNAL
 class Renderer;
 }
 
+namespace FaceCullingMode
+{
+
+/**
+ * @brief Set face culling mode.
+ * @SINCE_1_1.33
+ */
+enum Type
+{
+  NONE,                ///< None of the faces should be culled
+  FRONT,               ///< Cull front face, back face should never be shown
+  BACK,                ///< Cull back face, back face should never be shown
+  FRONT_AND_BACK,      ///< Cull front and back faces; if the geometry is composed of triangles none of the faces will be shown
+};
+
+} // namespace FaceCullingMode
+
+namespace BlendMode
+{
+
+/**
+ * @brief Blend mode.
+ * @SINCE_1_1.33
+ */
+enum Type
+{
+  OFF,  ///< Blending is disabled. @SINCE_1_1.33
+  AUTO, ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_1.33
+  ON    ///< Blending is enabled. @SINCE_1_1.33
+};
+
+} // namespace BlendMode
+
+namespace BlendEquation
+{
+/**
+ * @brief Blend Equation.
+ *
+ * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use it.
+ */
+enum Type
+{
+  ADD              = 0x8006,  ///< The source and destination colors are added to each other. @SINCE_1_0.0
+  SUBTRACT         = 0x800A,  ///< Subtracts the destination from the source. @SINCE_1_0.0
+  REVERSE_SUBTRACT = 0x800B  ///< Subtracts the source from the destination. @SINCE_1_0.0
+};
+
+} // namespace BlendEquation
+
+namespace BlendFactor
+{
+/**
+ * @brief Blend Factor.
+ *
+ * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use it.
+ */
+enum Type
+{
+  ZERO                     = 0,  ///< ZERO @SINCE_1_0.0
+  ONE                      = 1,  ///< ONE @SINCE_1_0.0
+  SRC_COLOR                = 0x0300,  ///< SRC_COLOR @SINCE_1_0.0
+  ONE_MINUS_SRC_COLOR      = 0x0301,  ///< ONE_MINUS_SRC_COLOR @SINCE_1_0.0
+  SRC_ALPHA                = 0x0302,  ///< SRC_ALPHA @SINCE_1_0.0
+  ONE_MINUS_SRC_ALPHA      = 0x0303,  ///< ONE_MINUS_SRC_ALPHA @SINCE_1_0.0
+  DST_ALPHA                = 0x0304,  ///< DST_ALPHA @SINCE_1_0.0
+  ONE_MINUS_DST_ALPHA      = 0x0305,  ///< ONE_MINUS_DST_ALPHA @SINCE_1_0.0
+  DST_COLOR                = 0x0306,  ///< DST_COLOR @SINCE_1_0.0
+  ONE_MINUS_DST_COLOR      = 0x0307,  ///< ONE_MINUS_DST_COLOR @SINCE_1_0.0
+  SRC_ALPHA_SATURATE       = 0x0308,  ///< SRC_ALPHA_SATURATE @SINCE_1_0.0
+  CONSTANT_COLOR           = 0x8001,  ///< CONSTANT_COLOR @SINCE_1_0.0
+  ONE_MINUS_CONSTANT_COLOR = 0x8002,  ///< ONE_MINUS_CONSTANT_COLOR @SINCE_1_0.0
+  CONSTANT_ALPHA           = 0x8003,  ///< CONSTANT_ALPHA @SINCE_1_0.0
+  ONE_MINUS_CONSTANT_ALPHA = 0x8004  ///< ONE_MINUS_CONSTANT_ALPHA @SINCE_1_0.0
+};
+
+} // namespace BlendFactor
+
+namespace DepthWriteMode
+{
+
+/**
+ * @brief Depth buffer write modes
+ */
+enum Type
+{
+  OFF,  ///< Renderer doesn't write to the depth buffer
+  AUTO, ///< Renderer only writes to the depth buffer if it's opaque
+  ON    ///< Renderer writes to the depth buffer
+};
+
+} // namespace DepthWriteMode
+
 /**
  * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader
  */
@@ -41,36 +136,96 @@ class DALI_IMPORT_API Renderer : public Handle
 public:
 
   /**
-   * @brief Set face culling mode.
-   */
-  enum FaceCullingMode
-  {
-    NONE,                     ///< None of the faces should be culled
-    CULL_FRONT,               ///< Cull front face, back face should never be shown
-    CULL_BACK,                ///< Cull back face, back face should never be shown
-    CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
-  };
-
-  /**
    * @brief An enumeration of properties belonging to the Renderer class.
    */
   struct Property
   {
     enum
     {
-      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depthIndex",                     type INTEGER
-      FACE_CULLING_MODE,                                  ///< name "faceCullingMode",                type INTEGER
-      BLENDING_MODE,                                      ///< name "blendingMode",                   type INTEGER
-      BLEND_EQUATION_RGB,                                 ///< name "blendEquationRgb",               type INTEGER
-      BLEND_EQUATION_ALPHA,                               ///< name "blendEquationAlpha",             type INTEGER
-      BLENDING_SRC_FACTOR_RGB,                            ///< name "sourceBlendFactorRgb",           type INTEGER
-      BLENDING_DEST_FACTOR_RGB,                           ///< name "destinationBlendFactorRgb",      type INTEGER
-      BLENDING_SRC_FACTOR_ALPHA,                          ///< name "sourceBlendFactorAlpha",         type INTEGER
-      BLENDING_DEST_FACTOR_ALPHA,                         ///< name "destinationBlendFactorAlpha",    type INTEGER
-      BLENDING_COLOR,                                     ///< name "blendingColor",                  type VECTOR4
-      BLEND_PRE_MULTIPLIED_ALPHA,                         ///< name "blendPreMultipledAlpha",         type BOOLEAN
-      INDEX_RANGE_FIRST,                                  ///< name "indexRangeFirst",                type INTEGER
-      INDEX_RANGE_COUNT                                   ///< name "indexRangeCount",                type INTEGER
+      /**
+       * @brief name "depthIndex", type INTEGER
+       * @note The default value is 0
+       */
+      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,
+
+      /**
+       * @brief name "faceCullingMode", type INTEGER
+       * @note The default value is FaceCullingMode::NONE
+       */
+      FACE_CULLING_MODE,
+
+      /**
+       * @brief name "blendMode", type INTEGER
+       * @note The default value is BlendMode::AUTO
+       */
+      BLEND_MODE,
+
+      /**
+       * @brief name "blendEquationRgb", type INTEGER
+       * @note The default value is BlendEquation::ADD
+       */
+      BLEND_EQUATION_RGB,
+
+      /**
+       * @brief name "blendEquationAlpha", type INTEGER
+       * @note The default value is BlendEquation::ADD
+       */
+      BLEND_EQUATION_ALPHA,
+
+      /**
+       * @brief name "blendFactorSrcRgb", type INTEGER
+       * @note The default value is BlendFactor::SRC_ALPHA
+       */
+      BLEND_FACTOR_SRC_RGB,
+
+      /**
+       * @brief name "blendFactorDestRgb", type INTEGER
+       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA
+       */
+      BLEND_FACTOR_DEST_RGB,
+
+      /**
+       * @brief name "blendFactorSrcAlpha", type INTEGER
+       * @note The default value is BlendFactor::ONE
+       */
+      BLEND_FACTOR_SRC_ALPHA,
+
+      /**
+       * @brief name "blendFactorDestAlpha", type INTEGER
+       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA
+       */
+      BLEND_FACTOR_DEST_ALPHA,
+
+      /**
+       * @brief name "blendColor", type VECTOR4
+       * @note The default value is Color::TRANSPARENT
+       */
+      BLEND_COLOR,
+
+      /**
+       * @brief name "blendPreMultipledAlpha", type BOOLEAN
+       * @note The default value is false
+       */
+      BLEND_PRE_MULTIPLIED_ALPHA,
+
+      /**
+       * @brief name "indexRangeFirst", type INTEGER
+       * @note The default value is 0
+       */
+      INDEX_RANGE_FIRST,
+
+      /**
+       * @brief name "indexRangeCount", type INTEGER
+       * @note The default (0) means that whole range of indices will be used
+       */
+      INDEX_RANGE_COUNT,
+
+      /**
+       * @brief name "depthWriteMode", type INTEGER
+       * @see DepthWriteMode
+       * @note The default value is DepthWriteMode::AUTO
+       */
+      DEPTH_WRITE_MODE
     };
   };
 
@@ -166,79 +321,6 @@ public:
    * @return THe shader used by the renderer
    */
   Shader GetShader() const;
-
-  /**
-   * @brief Specify the pixel arithmetic used when the actor is blended.
-   *
-   * @param[in] srcFactorRgba Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, and GL_SRC_ALPHA_SATURATE.
-   *
-   * @param[in] destFactorRgba Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, and GL_ONE_MINUS_CONSTANT_ALPHA.
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
-
-  /**
-   * @brief Specify the pixel arithmetic used when the actor is blended.
-   *
-   * @param[in] srcFactorRgb Specifies how the red, green, and blue source blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, and GL_SRC_ALPHA_SATURATE.
-   *
-   * @param[in] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
-   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
-   * GL_CONSTANT_ALPHA, and GL_ONE_MINUS_CONSTANT_ALPHA.
-   *
-   * @param[in] srcFactorAlpha Specifies how the alpha source blending factor is computed.
-   * The options are the same as for srcFactorRgb.
-   *
-   * @param[in] destFactorAlpha Specifies how the alpha source blending factor is computed.
-   * The options are the same as for destFactorRgb.
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
-
-  /**
-   * @brief Query the pixel arithmetic used when the actor is blended.
-   *
-   * @param[out] srcFactorRgb Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * @param[out] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   * @param[out] srcFactorAlpha Specifies how the red, green, blue, and alpha source blending factors are computed.
-   * @param[out] destFactorAlpha Specifies how the red, green, blue, and alpha destination blending factors are computed.
-   */
-  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
-
-  /**
-   * @brief Specify the equation used when the actor is blended.
-   *
-   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
-   * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgba );
-
-  /**
-   * @brief Specify the equation used when the actor is blended.
-   *
-   * @param[in] equationRgb The equation used for combining red, green, and blue components.
-   * @param[in] equationAlpha The equation used for combining the alpha component.
-   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
-
-  /**
-   * @brief Query the equation used when the actor is blended.
-   *
-   * @param[out] equationRgb The equation used for combining red, green, and blue components.
-   * @param[out] equationAlpha The equation used for combining the alpha component.
-   */
-  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
 
 public:
   /**
