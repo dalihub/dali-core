@@ -128,6 +128,27 @@ enum Type
 
 } // namespace DepthWriteMode
 
+namespace DepthFunction
+{
+
+/**
+ * @brief Depth functions
+ */
+enum Type
+{
+  OFF,          ///< Depth test is disabled
+  NEVER,        ///< Depth test never passes
+  ALWAYS,       ///< Depth test always passes
+  LESS,         ///< Depth test passes if the incoming depth value is less than the stored depth value
+  GREATER,      ///< Depth test passes if the incoming depth value is greater than the stored depth value
+  EQUAL,        ///< Depth test passes if the incoming depth value is equal to the stored depth value
+  NOT_EQUAL,    ///< Depth test passes if the incoming depth value is not equal to the stored depth value
+  LESS_EQUAL,   ///< Depth test passes if the incoming depth value is less than or equal to the stored depth value
+  GREATER_EQUAL ///< Depth test passes if the incoming depth value is greater than or equal to the stored depth value
+};
+
+} // namespace DepthFunction
+
 /**
  * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader
  */
@@ -225,7 +246,14 @@ public:
        * @see DepthWriteMode
        * @note The default value is DepthWriteMode::AUTO
        */
-      DEPTH_WRITE_MODE
+      DEPTH_WRITE_MODE,
+
+      /**
+       * @brief name "depthFunction", type INTEGER
+       * @see DepthFunction
+       * @note The default value is DepthFunction::LESS
+       */
+      DEPTH_FUNCTION
     };
   };
 

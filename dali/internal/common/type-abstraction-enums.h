@@ -31,6 +31,7 @@ namespace Internal
 template <> struct ParameterType< Dali::FaceCullingMode::Type > : public BasicType< Dali::FaceCullingMode::Type > {};
 template <> struct ParameterType< Dali::BlendMode::Type > : public BasicType< Dali::BlendMode::Type > {};
 template <> struct ParameterType< Dali::DepthWriteMode::Type > : public BasicType< Dali::DepthWriteMode::Type > {};
+template <> struct ParameterType< Dali::DepthFunction::Type > : public BasicType< Dali::DepthFunction::Type > {};
 
 } //namespace Internal
 

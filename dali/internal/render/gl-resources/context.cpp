@@ -91,6 +91,7 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBlendFuncSeparateDstAlpha(GL_ZERO),
   mBlendEquationSeparateModeRGB( GL_FUNC_ADD ),
   mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
+  mDepthFunction( GL_LESS ),
   mMaxTextureSize(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode( FaceCullingMode::NONE ),
