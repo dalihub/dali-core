@@ -330,8 +330,8 @@ public:
   bool ViewMatrixUpdated();
 
   /**
-   * Set whether GL sync is required for native render target.
-   * @param[in] whether GL sync is required for native render target
+   * Indicate whether GL sync is required for native render target.
+   * @param[in] requiresSync whether GL sync is required for native render target
    */
   void SetSyncRequired( bool requiresSync );
 
