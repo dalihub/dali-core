@@ -443,6 +443,7 @@ void Renderer::Render( Context& context,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
                        SceneGraph::Shader& defaultShader,
+                       const Matrix& modelMatrix,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
@@ -477,7 +478,7 @@ void Renderer::Render( Context& context,
     // Only set up and draw if we have textures and they are all valid
 
     // set projection and view matrix if program has not yet received them yet this frame
-    SetMatrices( *program, node.GetModelMatrix( bufferIndex ), viewMatrix, projectionMatrix, modelViewMatrix );
+    SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix );
 
     // set color uniform
     GLint loc = program->GetUniformLocation( Program::UNIFORM_COLOR );

@@ -830,11 +830,11 @@ const Vector4& TransformManager::GetBoundingSphere( TransformId id ) const
   return mBoundingSpheres[ mIds[id] ];
 }
 
-const Matrix& TransformManager::GetWorldMatrixAndSize( TransformId id, Vector3& size ) const
+void TransformManager::GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const
 {
   unsigned int index = mIds[id];
+  worldMatrix = mWorld[index];
   size = mSize[index];
-  return mWorld[index];
 }
 
 } //namespace SceneGraph

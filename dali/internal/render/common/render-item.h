@@ -38,17 +38,11 @@ class Renderer;
 namespace SceneGraph
 {
 
-class RenderItem;
-
-typedef std::vector< RenderItem > RendererItemContainer;
-
 /**
- * A render-item is a renderer & modelView matrix pair.
+ * A RenderItem contains all the data needed for rendering
  */
-class RenderItem
+struct RenderItem
 {
-public:
-
   /**
    * Construct a new RenderItem
    */
@@ -65,94 +59,14 @@ public:
    */
   void operator delete( void* ptr );
 
-  /**
-   * Reset the render-item.
-   */
-  void Reset();
 
-  /**
-   * Retrieve the renderer.
-   * @return The renderer.
-   */
-  Render::Renderer& GetRenderer() const;
-
-  /**
-   * Set the renderer
-   * @param[in] renderer The renderer
-   */
-  void SetRenderer( Render::Renderer* renderer );
-
-  /**
-   * Set the node
-   * @param[in] node The node
-   */
-  void SetNode( Node* node );
-
-  /**
-   * Retrieve the node
-   * @return The node
-   */
-  const Node& GetNode() const
-  {
-    return *mNode;
-  }
-  /**
-   * Retrieve the modelView matrix.
-   * @return The modelView matrix.
-   */
-  Matrix& GetModelViewMatrix();
-
-  /**
-   * Retrieve the modelView matrix.
-   * @return The modelView matrix.
-   */
-  const Matrix& GetModelViewMatrix() const;
-
-  /**
-   * Retrieve the depth index
-   */
-  int GetDepthIndex() const
-  {
-    return mDepthIndex;
-  }
-
-  /**
-   * Set the depth index
-   */
-  void SetDepthIndex( int depthIndex );
-
-  /**
-   * Set if the RenderItem is opaque
-   * @param[in] isOpaque true if the RenderItem is opaque, false otherwise
-   */
-  void SetIsOpaque( bool isOpaque );
-
-  /**
-   * Check if the RenderItem is opaque
-   * @return True if it is opaque, false otherwise
-   */
-  bool IsOpaque() const
-  {
-    return mIsOpaque;
-  }
-
-  /**
-   * Retrives the size of the render item
-   * @return The size of the render item
-   */
-  const Vector3& GetSize() const
-  {
-    return mSize;
-  }
-
-  /**
-   * Retrives the size of the render item
-   * @return The size of the render item
-   */
-  Vector3& GetSize()
-  {
-    return mSize;
-  }
+  Matrix            mModelMatrix;
+  Matrix            mModelViewMatrix;
+  Vector3           mSize;
+  Render::Renderer* mRenderer;
+  Node*             mNode;
+  int               mDepthIndex;
+  bool              mIsOpaque:1;
 
 private:
 
@@ -164,13 +78,6 @@ private:
   // RenderItems should not be copied as they are heavy
   RenderItem( const RenderItem& item );
   RenderItem& operator = ( const RenderItem& item );
-
-  Matrix            mModelViewMatrix;
-  Vector3           mSize;
-  Render::Renderer* mRenderer;
-  Node*             mNode;
-  int               mDepthIndex;
-  bool              mIsOpaque:1;
 };
 
 } // namespace SceneGraph

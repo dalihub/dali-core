@@ -144,12 +144,12 @@ inline void ProcessRenderList(
         const RenderItem& item = renderList.GetItem( index );
         DALI_PRINT_RENDER_ITEM( item );
 
-        Renderer& renderer = item.GetRenderer();
-        DepthWriteMode::Type depthWriteMode = renderer.GetDepthWriteMode();
-        context.DepthMask( ( depthWriteMode == DepthWriteMode::AUTO && item.IsOpaque() ) ||
+        DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
+        context.DepthMask( ( depthWriteMode == DepthWriteMode::AUTO && item.mIsOpaque ) ||
                            ( depthWriteMode == DepthWriteMode::ON ) );
 
-        renderer.Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                                item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
       }
     }
     else
@@ -158,7 +158,8 @@ inline void ProcessRenderList(
       {
         const RenderItem& item = renderList.GetItem( index );
         DALI_PRINT_RENDER_ITEM( item );
-        item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                                item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
       }
     }
   }
@@ -170,7 +171,8 @@ inline void ProcessRenderList(
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
+      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
     }
 
   }
