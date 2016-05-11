@@ -191,7 +191,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
       AddMappings( localMap, rendererUniformMap );
-      AddMappings( localMap, mShader->GetUniformMap() );
+
+      if( mShader )
+      {
+        AddMappings( localMap, mShader->GetUniformMap() );
+      }
     }
     else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
     {
