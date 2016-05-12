@@ -38,10 +38,10 @@
 #include <dali/internal/event/resources/resource-client.h>
 
 #include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/resources/texture-metadata.h>
-#include <dali/internal/render/queue/render-queue.h>
 
-#include <dali/internal/render/common/texture-cache-dispatcher.h>
+#include <dali/internal/render/queue/render-queue.h>
 
 using namespace Dali::Integration;
 

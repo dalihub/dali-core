@@ -74,7 +74,7 @@ class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderQueue;
-class TextureCache;
+class TextureCacheDispatcher;
 class PropertyBuffer;
 class TextureSet;
 class Camera;
@@ -101,7 +101,7 @@ public:
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
-   * @param[in] textureCache Used for caching textures.
+   * @param[in] textureCacheDispatcher Used for sending messages to texture cache.
    * @param[in] touchResampler Used for re-sampling touch events.
    */
   UpdateManager( NotificationManager& notificationManager,
@@ -112,7 +112,7 @@ public:
                  Integration::RenderController& controller,
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
-                 TextureCache& textureCache,
+                 TextureCacheDispatcher& textureCacheDispatcher,
                  TouchResampler& touchResampler );
 
   /**

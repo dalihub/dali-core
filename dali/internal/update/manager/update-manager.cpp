@@ -41,6 +41,7 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -130,7 +131,6 @@ struct UpdateManager::Impl
         RenderController& renderController,
         RenderManager& renderManager,
         RenderQueue& renderQueue,
-        TextureCache& textureCache,
         TouchResampler& touchResampler,
         SceneGraphBuffers& sceneGraphBuffers )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
@@ -281,7 +281,7 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              TextureCache& textureCache,
+                              TextureCacheDispatcher& textureCacheDispatcher,
                               TouchResampler& touchResampler )
   : mImpl(NULL)
 {
@@ -293,11 +293,10 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     controller,
                     renderManager,
                     renderQueue,
-                    textureCache,
                     touchResampler,
                     mSceneGraphBuffers );
 
-  textureCache.SetBufferIndices( &mSceneGraphBuffers );
+  textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
 }
 
 UpdateManager::~UpdateManager()

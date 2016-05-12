@@ -83,7 +83,6 @@ private:
   RenderMessageDispatcher& mRenderMessageDispatcher;    ///< Used for passing messages to the render-thread
   RenderQueue&             mRenderQueue;           ///< render queue
   DiscardQueue&            mDiscardQueue;          ///< discard queue
-
 };
 
 } // namespace SceneGraph

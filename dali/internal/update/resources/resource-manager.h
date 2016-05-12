@@ -241,7 +241,7 @@ public: // Used by ResourceClient
    * @param[in] textureId The resource ID of a bitmap-texture to remove.
    * @param[in] area The updated area. Zero width/height indicates the whole bitmap has been updated
    */
-  void HandleUpdateBitmapAreaRequest( ResourceId textureId, const Dali::RectArea& area );
+  void HandleUpdateBitmapAreaRequest( ResourceId textureId, const RectArea& area );
 
   /**
    * Upload a bitmap to a position within a specified texture

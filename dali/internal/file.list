@@ -98,7 +98,6 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-item.cpp \
   $(internal_src_dir)/render/common/render-tracker.cpp \
   $(internal_src_dir)/render/common/render-manager.cpp \
-  $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/render/data-providers/render-data-provider.cpp \
   $(internal_src_dir)/render/data-providers/uniform-name-cache.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
@@ -133,6 +132,7 @@ internal_src_files = \
   $(internal_src_dir)/update/common/scene-graph-buffers.cpp \
   $(internal_src_dir)/update/common/scene-graph-connection-change-propagator.cpp \
   $(internal_src_dir)/update/common/scene-graph-property-notification.cpp \
+  $(internal_src_dir)/update/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/update/common/uniform-map.cpp \
   $(internal_src_dir)/update/controllers/render-message-dispatcher.cpp \
   $(internal_src_dir)/update/controllers/scene-controller-impl.cpp \
