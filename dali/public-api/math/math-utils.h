@@ -33,10 +33,10 @@ namespace Dali
  * @brief Returns the next power of two.
  *
  * In case of numbers which are already a power of two this function returns the original number.
- * If i is zero returns 1
+ * If i is zero returns 1.
  * @SINCE_1_0.0
- * @param[in] i input number
- * @return    next power of two or i itself in case it's a power of two
+ * @param[in] i Input number
+ * @return    The next power of two or i itself in case it's a power of two
  */
 inline unsigned int NextPowerOfTwo( unsigned int i )
 {
@@ -60,8 +60,8 @@ inline unsigned int NextPowerOfTwo( unsigned int i )
  * @brief Whether a number is power of two.
  *
  * @SINCE_1_0.0
- * @param[in] i input number
- * @return    true if i is power of two
+ * @param[in] i Input number
+ * @return    True if i is power of two.
  */
 inline bool IsPowerOfTwo( unsigned int i )
 {
@@ -107,7 +107,7 @@ inline void ClampInPlace( T& value, const T& min, const T& max )
  *
  * @SINCE_1_0.0
  * @param[in] offset The offset through the range @p low to @p high.
- *                   This value is clamped between 0 and 1
+ *                   This value is clamped between 0 and 1.
  * @param[in] low    Lowest value in range
  * @param[in] high   Highest value in range
  * @return A value between low and high.
@@ -226,14 +226,16 @@ inline float Round(float value, int pos)
  * start: 2
  * end: 8
  *
+ * @code
  *   2                         8
  * (\ / start)               (\ / end)
  *   |----x                    |
+ * @endcode
  *
  * The value x will be confined to this domain.
  * If x is below 2 e.g. 0, then it is wraped to 6.
  * If x is above or equal to 8 e.g. 8.1 then it is
- * wrapped to 2.1
+ * wrapped to 2.1.
  *
  * Domain wrapping is useful for various problems from
  * calculating positions in a space that repeats, to
@@ -245,7 +247,7 @@ inline float Round(float value, int pos)
  * @param[in] end The end of the domain
  *
  * @return the wrapped value over the domain (start) (end)
- * @note if start = end (i.e. size of domain 0), then wrapping will not occur
+ * @note If start = end (i.e. size of domain 0), then wrapping will not occur
  * and result will always be equal to start.
  *
  */
@@ -267,8 +269,10 @@ inline float WrapInDomain(float x, float start, float end)
  * @brief Find the shortest distance (magnitude) and direction (sign)
  * from (a) to (b) in domain (start) to (end).
  *
- * (\ / start)               (\ / end)
- *   |-a                 b<----|
+ * @code
+ *  (\ / start)               (\ / end)
+ *    |-a                 b<----|
+ * @endcode
  *
  * Knowing the shortest distance is useful with wrapped domains
  * to solve problems such as determing the closest object to
@@ -288,8 +292,8 @@ inline float WrapInDomain(float x, float start, float end)
  * @param start the start of the domain
  * @param end the end of the domain
  * @return the shortest direction (the sign) and distance (the magnitude)
- * @note assumes both (a) and (b) are already within the domain
- * (start) to (end)
+ * @note Assumes both (a) and (b) are already within the domain
+ * (start) to (end).
  *
  */
 inline float ShortestDistanceInDomain( float a, float b, float start, float end )

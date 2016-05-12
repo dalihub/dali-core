@@ -72,7 +72,7 @@ struct Radian
    *
    * @SINCE_1_0.0
    * @param[in] value Float value in radians
-   * @return a reference to this object
+   * @return A reference to this
    */
   Radian& operator=( float value )
   {
@@ -85,7 +85,7 @@ struct Radian
    *
    * @SINCE_1_0.0
    * @param[in] degree The value in degrees.
-   * @return a reference to this object
+   * @return A reference to this
    */
   Radian& operator=( Degree degree )
   {

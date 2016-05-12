@@ -70,7 +70,7 @@ struct AngleAxis
 
 };
 
-// compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
+// Compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 /**
  * @brief Compare two angle axis for equality
@@ -78,7 +78,7 @@ struct AngleAxis
  * @SINCE_1_0.0
  * @param lhs angle axis
  * @param rhs angle axis
- * @return true if they are equal
+ * @return True if they are equal
  */
 inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
 {
