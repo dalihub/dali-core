@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,13 @@ int UtcDaliVector4Assign02P(void)
   DALI_TEST_EQUALS(v0.y, 2.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
+  v0.w = v0.z = 99.f;
+  v0 = vec2;
+  DALI_TEST_EQUALS(v0.x, 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0.y, 2.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
+
   END_TEST;
 }
 
