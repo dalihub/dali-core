@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_NODE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/node-attachments/node-attachment-declarations.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
@@ -55,7 +54,6 @@ namespace SceneGraph
 
 class DiscardQueue;
 class Layer;
-class NodeAttachment;
 class RenderTask;
 class UpdateManager;
 
@@ -77,8 +75,7 @@ enum NodePropertyFlags
 static const int AllFlags = ( ChildDeletedFlag << 1 ) - 1; // all the flags
 
 /**
- * Size is not inherited.
- * VisibleFlag is inherited so that attachments can be synchronized with nodes after they become visible
+ * Size is not inherited. VisibleFlag is inherited
  */
 static const int InheritedDirtyFlags = TransformFlag | VisibleFlag | ColorFlag | OverlayFlag;
 
@@ -144,24 +141,6 @@ public:
     return NULL;
   }
 
-  // Attachments
-
-  /**
-   * Attach an object to this Node; This should only be done by UpdateManager::AttachToNode.
-   * @pre The Node does not already have an attachment.
-   * @param[in] attachment The object to attach.
-   */
-  void Attach( NodeAttachment& attachment );
-
-  /**
-   * Query the node if it has an attachment.
-   * @return True if it has an attachment.
-   */
-  bool HasAttachment() const
-  {
-    return mAttachment;
-  }
-
   /**
    * Add a renderer to the node
    * @param[in] renderer The renderer added to the node
@@ -210,15 +189,6 @@ public:
   unsigned int GetRendererCount()
   {
     return mRenderer.Size();
-  }
-
-  /**
-   * Retreive the object attached to this node.
-   * @return The attachment.
-   */
-  NodeAttachment& GetAttachment() const
-  {
-    return *mAttachment;
   }
 
   // Containment methods
@@ -620,17 +590,15 @@ public:
 
   /**
    * Retrieve world matrix and size of the node
-   *
+   * @param[out] The local to world matrix of the node
    * @param[out] size The current size of the node
-   * @return The local to world matrix of the node
    */
-  const Matrix& GetWorldMatrixAndSize( Vector3& size ) const
+  void GetWorldMatrixAndSize( Matrix& worldMatrix, Vector3& size ) const
   {
     if( mTransformId != INVALID_TRANSFORM_ID )
     {
-      return mTransformManager->GetWorldMatrixAndSize( mTransformId, size );
+      mTransformManager->GetWorldMatrixAndSize( mTransformId, worldMatrix, size );
     }
-    return Matrix::IDENTITY;
   }
 
   /**
@@ -838,7 +806,6 @@ protected:
   Node*               mParent;                       ///< Pointer to parent node (a child is owned by its parent)
   RenderTask*         mExclusiveRenderTask;          ///< Nodes can be marked as exclusive to a single RenderTask
 
-  NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
   RendererContainer   mRenderer;                     ///< Container of renderers; not owned
 
   NodeContainer       mChildren;                     ///< Container of children; not owned

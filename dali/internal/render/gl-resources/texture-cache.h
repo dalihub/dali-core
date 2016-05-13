@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_TEXTURE_CACHE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/resources/resource-client.h> // For RectArea
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/render/common/texture-cache-dispatcher.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 
@@ -69,7 +69,7 @@ typedef TextureContainer::const_iterator        TextureConstIter;
 /**
  * Caches textures. Owned by Render Thread
  */
-class TextureCache : public TextureCacheDispatcher
+class TextureCache
 {
 public:
  /**
@@ -255,72 +255,6 @@ public:
    * @return The discard policy.
    */
   ResourcePolicy::Discardable GetDiscardBitmapsPolicy();
-
-protected: // Implements TextureCacheDispatcher
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateTexture()
-   */
-  virtual void DispatchCreateTexture( ResourceId        id,
-                                      unsigned int      width,
-                                      unsigned int      height,
-                                      Pixel::Format     pixelFormat,
-                                      bool              clearPixels );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateTextureForBitmap()
-   */
-  virtual void DispatchCreateTextureForBitmap( ResourceId id, Integration::Bitmap* bitmap );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateTextureForNativeImage()
-   */
-  virtual void DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateGlTexture()
-   */
-  virtual void DispatchCreateGlTexture( ResourceId id );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()
-   */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()
-   */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
-   */
-  virtual void DispatchUpdateTexture( ResourceId id, Integration::Bitmap* bitmap );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
-   */
-  virtual void DispatchUpdateTexture( ResourceId id, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset ) ;
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
-   */
-  virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
-   */
-  virtual void DispatchUpdateTexture( ResourceId destId, PixelDataPtr srcId, std::size_t xOffset, std::size_t yOffset );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUpdateTextureArea()
-   */
-  virtual void DispatchUpdateTextureArea( ResourceId id, const RectArea& area );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchDiscardTexture()
-   */
-  virtual void DispatchDiscardTexture( ResourceId id );
 
 private:
 

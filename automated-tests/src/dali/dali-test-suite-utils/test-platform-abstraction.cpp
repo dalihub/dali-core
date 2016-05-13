@@ -26,12 +26,14 @@ TestPlatformAbstraction::TestPlatformAbstraction()
 : mTrace(),
   mIsLoadingResult( false ),
   mGetDefaultFontSizeResult( 0 ),
-  mResources(),
-  mRequest( NULL ),
+  mLoadedResourcesQueue(),
+  mFailedLoadQueue(),
+  mResourceRequests(),
   mSize(),
   mClosestSize(),
   mLoadFileResult(),
-  mSaveFileResult( false )
+  mSaveFileResult( false ),
+  mSynchronouslyLoadedResource()
 {
   Initialize();
 }
@@ -78,18 +80,14 @@ void TestPlatformAbstraction::LoadResource(const Integration::ResourceRequest& r
   out << "Type:" << request.GetType()->id << ", Path: " << request.GetPath() << std::endl ;
 
   mTrace.PushCall("LoadResource", out.str());
-  if(mRequest != NULL)
-  {
-    delete mRequest;
-    tet_infoline ("Warning: multiple resource requests not handled by Test Suite. You may see unexpected errors");
-  }
-  mRequest = new Integration::ResourceRequest(request);
+
+  mResourceRequests.PushBack( new Integration::ResourceRequest(request) );
 }
 
 Integration::ResourcePointer TestPlatformAbstraction::LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath )
 {
   mTrace.PushCall("LoadResourceSynchronously", "");
-  return mResources.loadedResource;
+  return mSynchronouslyLoadedResource;
 }
 
 Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::ResourceType& resourceType, uint8_t * buffer, size_t size )
@@ -107,13 +105,19 @@ void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
 {
   mTrace.PushCall("GetResources", "");
 
-  if(mResources.loaded)
+  while( !mLoadedResourcesQueue.empty() )
   {
-    cache.LoadResponse( mResources.loadedId, mResources.loadedType, mResources.loadedResource, Integration::RESOURCE_COMPLETELY_LOADED );
+    LoadedResource loaded( *mLoadedResourcesQueue.begin() );
+    mLoadedResourcesQueue.erase( mLoadedResourcesQueue.begin() );
+    cache.LoadResponse( loaded.id, loaded.type, loaded.resource, Integration::RESOURCE_COMPLETELY_LOADED );
   }
-  if(mResources.loadFailed)
+
+  // iterate through the resources which failed to load
+  while( !mFailedLoadQueue.empty() )
   {
-    cache.LoadFailed( mResources.loadFailedId, mResources.loadFailure );
+    FailedLoad failed( *mFailedLoadQueue.begin() );
+    mFailedLoadQueue.erase( mFailedLoadQueue.begin() );
+    cache.LoadFailed( failed.id, failed.failure );
   }
 }
 
@@ -172,14 +176,11 @@ void TestPlatformAbstraction::Initialize()
 {
   mTrace.Reset();
   mTrace.Enable(true);
-  memset(&mResources, 0, sizeof(Resources));
+  mLoadedResourcesQueue.clear();
+  mFailedLoadQueue.clear();
+  mResourceRequests.Clear();
   mIsLoadingResult=false;
-
-  if(mRequest)
-  {
-    delete mRequest;
-    mRequest = 0;
-  }
+  mSynchronouslyLoadedResource.Reset();
 }
 
 bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
@@ -210,36 +211,76 @@ void TestPlatformAbstraction::SetIsLoadingResult(bool result)
 
 void TestPlatformAbstraction::ClearReadyResources()
 {
-  memset(&mResources, 0, sizeof(Resources));
+  mLoadedResourcesQueue.clear();
+  mFailedLoadQueue.clear();
+  mSynchronouslyLoadedResource.Reset();
 }
 
 void TestPlatformAbstraction::SetResourceLoaded(Integration::ResourceId  loadedId,
                                                 Integration::ResourceTypeId  loadedType,
                                                 Integration::ResourcePointer loadedResource)
 {
-  mResources.loaded = true;
-  mResources.loadedId = loadedId;
-  mResources.loadedType = loadedType;
-  mResources.loadedResource = loadedResource;
+  LoadedResource loadedInfo;
+  loadedInfo.id = loadedId;
+  loadedInfo.type = loadedType;
+  loadedInfo.resource = loadedResource;
+  mLoadedResourcesQueue.push_back( loadedInfo );
 }
 
 void TestPlatformAbstraction::SetResourceLoadFailed(Integration::ResourceId  id,
                                                     Integration::ResourceFailure failure)
 {
-  mResources.loadFailed = true;
-  mResources.loadFailedId = id;
-  mResources.loadFailure = failure;
+  FailedLoad failedInfo;
+  failedInfo.id = id;
+  failedInfo.failure = failure;
+  mFailedLoadQueue.push_back( failedInfo );
 }
 
 Integration::ResourceRequest* TestPlatformAbstraction::GetRequest()
 {
-  return mRequest;
+  Integration::ResourceRequest* request = NULL;
+
+  // Return last request
+  if( ! mResourceRequests.Empty() )
+  {
+    request = *( mResourceRequests.End() - 1 );
+  }
+
+  return request;
+}
+
+const TestPlatformAbstraction::ResourceRequestContainer& TestPlatformAbstraction::GetAllRequests() const
+{
+  return mResourceRequests;
+}
+
+void TestPlatformAbstraction::SetAllResourceRequestsAsLoaded()
+{
+  for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
+       iter != endIter; ++iter )
+  {
+    Integration::ResourceRequest* request = *iter;
+    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
+    Integration::ResourcePointer resource(bitmap);
+    bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+    SetResourceLoaded( request->GetId(), request->GetType()->id, resource );
+  }
+  mResourceRequests.Clear();
+}
+
+void TestPlatformAbstraction::SetAllResourceRequestsAsFailed( Integration::ResourceFailure failure )
+{
+  for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
+       iter != endIter; ++iter )
+  {
+    SetResourceLoadFailed( (*iter)->GetId(), failure);
+  }
+  mResourceRequests.Clear();
 }
 
 void TestPlatformAbstraction::DiscardRequest()
 {
-  delete mRequest;
-  mRequest = NULL;
+  mResourceRequests.Clear();
 }
 
 void TestPlatformAbstraction::SetClosestImageSize(const Vector2& size)
@@ -259,6 +300,11 @@ void TestPlatformAbstraction::SetLoadFileResult( bool result, Dali::Vector< unsi
 void TestPlatformAbstraction::SetSaveFileResult( bool result )
 {
   mSaveFileResult = result;
+}
+
+void TestPlatformAbstraction::SetSynchronouslyLoadedResource( Integration::ResourcePointer resource )
+{
+  mSynchronouslyLoadedResource = resource;
 }
 
 } // namespace Dali

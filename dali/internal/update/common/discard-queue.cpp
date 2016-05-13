@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
 {
@@ -61,23 +62,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
-{
-  DALI_ASSERT_DEBUG( NULL != renderer );
-
-  // The GL resources will now be freed in frame N
-  // The Update for frame N+1 may occur in parallel with the rendering of frame N
-  // Queue the node for destruction in frame N+2
-  if ( 0u == updateBufferIndex )
-  {
-    mRendererQueue0.PushBack( renderer );
-  }
-  else
-  {
-    mRendererQueue1.PushBack( renderer );
-  }
-}
-
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
@@ -97,6 +81,37 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
   }
 }
 
+void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
+{
+  DALI_ASSERT_DEBUG( NULL != renderer );
+
+  // The GL resources will now be freed in frame N
+  // The Update for frame N+1 may occur in parallel with the rendering of frame N
+  // Queue the node for destruction in frame N+2
+  if ( 0u == updateBufferIndex )
+  {
+    mRendererQueue0.PushBack( renderer );
+  }
+  else
+  {
+    mRendererQueue1.PushBack( renderer );
+  }
+}
+
+void DiscardQueue::Add( BufferIndex updateBufferIndex, Camera* camera )
+{
+  DALI_ASSERT_DEBUG( NULL != camera );
+
+  if ( 0u == updateBufferIndex )
+  {
+    mCameraQueue0.PushBack( camera );
+  }
+  else
+  {
+    mCameraQueue1.PushBack( camera );
+  }
+}
+
 void DiscardQueue::Clear( BufferIndex updateBufferIndex )
 {
   // Destroy some discarded objects; these should no longer own any GL resources
@@ -106,12 +121,14 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
     mNodeQueue0.Clear();
     mShaderQueue0.Clear();
     mRendererQueue0.Clear();
+    mCameraQueue0.Clear();
   }
   else
   {
     mNodeQueue1.Clear();
     mShaderQueue1.Clear();
     mRendererQueue1.Clear();
+    mCameraQueue1.Clear();
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -634,10 +634,14 @@ bool Property::Value::Get( int& integerValue ) const
 bool Property::Value::Get( Vector2& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR2) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector2Value);
-    converted = true;
+    // type cannot change in mImpl so vector is allocated
+    if( mImpl->type == VECTOR2 || mImpl->type == VECTOR3 || mImpl->type == VECTOR4 )
+    {
+      vectorValue = *(mImpl->vector2Value); // if Vector3 or 4 only x and y are assigned
+      converted = true;
+    }
   }
   return converted;
 }
@@ -645,10 +649,19 @@ bool Property::Value::Get( Vector2& vectorValue ) const
 bool Property::Value::Get( Vector3& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR3) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector3Value);
-    converted = true;
+    // type cannot change in mImpl so vector is allocated
+    if ( mImpl->type == VECTOR3 || mImpl->type == VECTOR4 )
+    {
+      vectorValue = *(mImpl->vector3Value); // if Vector4 only x,y,z are assigned
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR2 )
+    {
+      vectorValue = *(mImpl->vector2Value);
+      converted = true;
+    }
   }
   return converted;
 }
@@ -656,10 +669,23 @@ bool Property::Value::Get( Vector3& vectorValue ) const
 bool Property::Value::Get( Vector4& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR4) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector4Value);
-    converted = true;
+    if( mImpl->type == VECTOR4 ) // type cannot change in mImpl so vector is allocated
+    {
+      vectorValue = *(mImpl->vector4Value);
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR2 )
+    {
+      vectorValue = *(mImpl->vector2Value);
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR3 )
+    {
+      vectorValue = *(mImpl->vector3Value);
+      converted = true;
+    }
   }
   return converted;
 }

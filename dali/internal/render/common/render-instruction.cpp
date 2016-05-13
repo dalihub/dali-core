@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ RenderInstruction::RenderInstruction()
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
   mOffscreenTextureId( 0 ),
-  mCameraAttachment( 0 ),
+  mCamera( 0 ),
   mNextFreeRenderList( 0 )
 {
   // reserve 6 lists, which is enough for three layers with opaque and transparent things on
@@ -104,12 +104,12 @@ const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeTyp
   return mRenderLists[ index ];
 }
 
-void RenderInstruction::Reset( CameraAttachment* cameraAttachment,
-                               unsigned int      offscreenTextureId,
-                               const Viewport*   viewport,
-                               const Vector4*    clearColor )
+void RenderInstruction::Reset( Camera*         camera,
+                               unsigned int    offscreenTextureId,
+                               const Viewport* viewport,
+                               const Vector4*  clearColor )
 {
-  mCameraAttachment = cameraAttachment;
+  mCamera = camera;
   mViewport = viewport ? *viewport : Viewport();
   mIsViewportSet = NULL != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;

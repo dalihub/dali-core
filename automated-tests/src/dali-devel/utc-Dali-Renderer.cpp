@@ -1860,5 +1860,176 @@ int UtcDaliRendererSetIndexRange(void)
     DALI_TEST_CHECK( result );
   }
 
+  // Index out of bounds
+  {
+    renderer.SetIndexRange( 15, 30 );
+    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
+  // drawing whole buffer starting from 15 ( last valid primitive )
+  {
+    renderer.SetIndexRange( 15, 0 );
+    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
+    application.SendNotification();
+    application.Render();
+    bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
+    DALI_TEST_CHECK( result );
+  }
+
+  END_TEST;
+}
+
+
+int UtcDaliRendererSetDepthFunction(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the depth function");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage stage = Stage::GetCurrent();
+  stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
+  stage.Add(actor);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+  glAbstraction.EnableDepthFunctionCallTrace(true);
+
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glDepthFunctionStack = glAbstraction.GetDepthFunctionTrace();
+
+  std::ostringstream depthTestStr;
+  depthTestStr << GL_DEPTH_TEST;
+
+  //OFF
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::OFF);
+    glEnableDisableStack.Reset();
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    //Depth testing should be disabled
+    DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", depthTestStr.str().c_str() ) );
+  }
+
+  //GL_NEVER
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::NEVER);
+
+    glEnableDisableStack.Reset();
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", depthTestStr.str().c_str() ) );
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_NEVER;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_ALWAYS
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::ALWAYS);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_ALWAYS;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_LESS
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_LESS;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_GREATER
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::GREATER);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_GREATER;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_EQUAL
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::EQUAL);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_EQUAL;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_NOTEQUAL
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::NOT_EQUAL);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_NOTEQUAL;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_LEQUAL
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS_EQUAL);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_LEQUAL;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
+  //GL_GEQUAL
+  {
+    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::GREATER_EQUAL);
+
+    glDepthFunctionStack.Reset();
+    application.SendNotification();
+    application.Render();
+
+    std::ostringstream depthFunctionStr;
+    depthFunctionStr << GL_GEQUAL;
+    DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
+  }
+
   END_TEST;
 }

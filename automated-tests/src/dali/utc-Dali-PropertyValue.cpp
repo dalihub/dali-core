@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -876,6 +876,26 @@ int UtcDaliPropertyValueGetVector2P(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueGetVector2fromVector3P(void)
+{
+  Property::Value value( Vector3(1.f,2.f,3.f) );
+  Vector2 result;
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector2fromVector4P(void)
+{
+  Property::Value value( Vector4(1.f,2.f,3.f,4.f) );
+  Vector2 result;
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), result, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueGetVector2N(void)
 {
   Property::Value value;
@@ -899,6 +919,26 @@ int UtcDaliPropertyValueGetVector3P(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueGetVector3FromVector2P(void)
+{
+  Property::Value value( Vector2(1.0f,2.0f) );
+  Vector3 result(99.f,88.f,77.f);
+  DALI_TEST_EQUALS( Vector3(1.0f,2.0f,0.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(1.0f,2.0f,0.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector3FromVector4P(void)
+{
+  Property::Value value( Vector4(4.f,3.f,2.f,1.f) );
+  Vector3 result;
+  DALI_TEST_EQUALS( Vector3(4.f,3.f,2.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(4.f,3.f,2.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueGetVector3N(void)
 {
   Property::Value value;
@@ -919,6 +959,26 @@ int UtcDaliPropertyValueGetVector4P(void)
   DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), value.Get< Vector4 >(), TEST_LOCATION );
   DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector4FromVector2P(void)
+{
+  Property::Value value( Vector2(-1.f,-3.f) );
+  Vector4 result(99.f,88.f,77.f,66.f);
+  DALI_TEST_EQUALS( Vector4(-1.f,-3.f,0.f,0.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(-1.f,-3.f,0.f,0.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector4FromVector3P(void)
+{
+  Property::Value value( Vector3(1.f,2.f,-1.f) );
+  Vector4 result(99.f,88.f,77.f,66.f);
+  DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,0.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,0.f), result, TEST_LOCATION );
   END_TEST;
 }
 

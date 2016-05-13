@@ -664,8 +664,12 @@ public:
    */
   void DepthFunc(GLenum func)
   {
-    LOG_GL("DepthFunc %x\n", func);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.DepthFunc(func) );
+    if( func != mDepthFunction )
+    {
+      mDepthFunction = func;
+      LOG_GL("DepthFunc %x\n", func);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.DepthFunc(func) );
+    }
   }
 
   /**
@@ -1720,6 +1724,8 @@ private: // Data
   // glBlendEquationSeparate state
   GLenum mBlendEquationSeparateModeRGB;    ///< Controls RGB blend mode
   GLenum mBlendEquationSeparateModeAlpha;  ///< Controls Alpha blend mode
+
+  GLenum mDepthFunction;  ///The depth function
 
   GLint mMaxTextureSize;      ///< return value from GetIntegerv(GL_MAX_TEXTURE_SIZE)
   Vector4 mClearColor;        ///< clear color

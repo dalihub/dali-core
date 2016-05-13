@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,20 +107,10 @@ bool RenderTask::IsExclusive() const
   return mExclusive;
 }
 
-void RenderTask::SetCameraNode( Node* cameraNode )
+void RenderTask::SetCamera( Node* cameraNode, Camera* camera )
 {
-  // if camera changed
-  if( cameraNode != mCameraNode )
-  {
-    if( cameraNode )
-    {
-      // get attachment. when camera node is changed we will get a message from event thread object
-      // so no need to observe the node here
-      mCameraAttachment = dynamic_cast< CameraAttachment* >( &cameraNode->GetAttachment() );
-      DALI_ASSERT_DEBUG( mCameraAttachment && "Camera without attachment" );
-    }
-    mCameraNode = cameraNode;
-  }
+  mCameraNode = cameraNode;
+  mCamera = camera;
 }
 
 void RenderTask::SetFrameBufferId( unsigned int resourceId, bool isNativeFBO )
@@ -230,7 +220,7 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
   // Check camera node
   if ( NULL == mCameraNode ||
        NULL == mCameraNode->GetParent() ||
-       NULL == mCameraAttachment )
+       NULL == mCamera )
   {
     // Camera node is missing or disconnected
     TASK_LOG_FMT(Debug::General, " =F  No Camera  FC:%d\n", mFrameCounter );
@@ -238,7 +228,7 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
     return false;
   }
 
-  mCameraAttachment->Update( updateBufferIndex, *mCameraNode );
+  mCamera->Update( updateBufferIndex, *mCameraNode );
 
   TASK_LOG_FMT(Debug::General, " =T (FBO ID:%d) FC:%d\n", mFrameBufferResourceId , mFrameCounter );
   return true;
@@ -387,34 +377,34 @@ unsigned int RenderTask::GetRenderedOnceCounter() const
 
 const Matrix& RenderTask::GetViewMatrix( BufferIndex bufferIndex ) const
 {
-  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+  DALI_ASSERT_DEBUG( NULL != mCamera );
 
-  return mCameraAttachment->GetViewMatrix( bufferIndex );
+  return mCamera->GetViewMatrix( bufferIndex );
 }
 
-SceneGraph::CameraAttachment& RenderTask::GetCameraAttachment() const
+SceneGraph::Camera& RenderTask::GetCamera() const
 {
-  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
-  return *mCameraAttachment;
+  DALI_ASSERT_DEBUG( NULL != mCamera );
+  return *mCamera;
 }
 
 const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
 {
-  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+  DALI_ASSERT_DEBUG( NULL != mCamera );
 
-  return mCameraAttachment->GetProjectionMatrix( bufferIndex );
+  return mCamera->GetProjectionMatrix( bufferIndex );
 }
 
 void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
 {
-  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+  DALI_ASSERT_DEBUG( NULL != mCamera );
 
   TASK_LOG(Debug::General);
 
   Viewport viewport;
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
-  instruction.Reset( mCameraAttachment,
+  instruction.Reset( mCamera,
                      GetFrameBufferId(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
@@ -441,9 +431,9 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
 bool RenderTask::ViewMatrixUpdated()
 {
   bool retval = false;
-  if( mCameraAttachment )
+  if( mCamera )
   {
-    retval = mCameraAttachment->ViewMatrixUpdated();
+    retval = mCamera->ViewMatrixUpdated();
   }
   return retval;
 }
@@ -491,11 +481,6 @@ bool RenderTask::GetViewportEnabled( BufferIndex bufferIndex ) const
   return false;
 }
 
-Node* RenderTask::GetCamera() const
-{
-  return mCameraNode;
-}
-
 void RenderTask::SetSyncRequired( bool requiresSync )
 {
   mRequiresSync = requiresSync;
@@ -518,7 +503,7 @@ RenderTask::RenderTask()
   mRenderSyncTracker( NULL ),
   mSourceNode( NULL ),
   mCameraNode( NULL ),
-  mCameraAttachment( NULL ),
+  mCamera( NULL ),
   mFrameBufferResourceId( 0 ),
   mResourcesFinished( false ),
   mWaitingToRender( false ),

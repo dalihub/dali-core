@@ -73,7 +73,7 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param rhs to copy from
+   * @param[in] rhs A reference to assign
    */
   Uint16Pair( const Uint16Pair& rhs )
   {
@@ -110,8 +110,9 @@ public:
   }
 
   /**
-   * @brief @returns the y dimension stored in this 2-tuple.
+   * @brief Returns the y dimension stored in this 2-tuple.
    * @SINCE_1_0.0
+   * @return Height
    */
   uint16_t GetHeight() const
   {
@@ -129,8 +130,9 @@ public:
   }
 
   /**
-   * @brief @returns the x dimension stored in this 2-tuple.
+   * @brief Returns the x dimension stored in this 2-tuple.
    * @SINCE_1_0.0
+   * @return X
    */
   uint16_t GetX()  const
   {
@@ -148,8 +150,9 @@ public:
   }
 
   /**
-   * @brief @returns the y dimension stored in this 2-tuple.
+   * @brief Returns the y dimension stored in this 2-tuple.
    * @SINCE_1_0.0
+   * @return Y
    */
   uint16_t GetY() const
   {
@@ -172,6 +175,8 @@ public:
   /**
    * @brief Equality operator.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference for comparison
+   * @return True if same
    */
   bool operator==( const Uint16Pair& rhs ) const
   {
@@ -181,6 +186,8 @@ public:
   /**
    * @brief Inequality operator.
    * @SINCE_1_0.0
+   * @param[in] rhs A reference for comparison
+   * @return True if different
    */
   bool operator!=( const Uint16Pair& rhs ) const
   {
@@ -191,6 +198,8 @@ public:
    * @brief Less than comparison operator for storing in collections (not geometrically
    * meaningful).
    * @SINCE_1_0.0
+   * @param[in] rhs A reference for comparison
+   * @return True if less
    */
   bool operator<( const Uint16Pair& rhs ) const
   {
@@ -201,6 +210,8 @@ public:
    * @brief Greater than comparison operator for storing in collections (not
    * geometrically meaningful).
    * @SINCE_1_0.0
+   * @param[in] rhs A reference for comparison
+   * @return True if greater
    */
   bool operator>( const Uint16Pair& rhs ) const
   {
@@ -214,6 +225,8 @@ public:
    * Uses a template for loose coupling, to save a header include, and allow any
    * vector type with .x and .y members to be converted.
    * @SINCE_1_0.0
+   * @param[in] from Floating point vector2
+   * @return Closest integer value.
    */
   template<typename FLOAT_VECTOR_N_TYPE>
   static Uint16Pair FromFloatVec2( const FLOAT_VECTOR_N_TYPE& from )
@@ -230,6 +243,8 @@ public:
    * Uses a template to allow any vector type with operator [] to be converted
    * in addition to plain arrays.
    * @SINCE_1_0.0
+   * @param[in] from Floating point array
+   * @return Closest integer value.
    */
   template<typename FLOAT_ARRAY>
   static Uint16Pair FromFloatArray( const FLOAT_ARRAY& from )

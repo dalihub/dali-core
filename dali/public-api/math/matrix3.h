@@ -59,7 +59,7 @@ public:
    * @brief Copy Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] m Another 3x3 matrix
+   * @param[in] m A reference to the copied 3x3 matrix
    */
   Matrix3(const Matrix3& m);
 
@@ -90,7 +90,7 @@ public:
   /**
    * @brief Assignment Operator
    * @SINCE_1_0.0
-   * @param matrix from which to copy values
+   * @param[in] matrix from which to copy values
    * @return reference to this object
    */
   Matrix3& operator=( const Matrix3& matrix );
@@ -98,8 +98,8 @@ public:
   /**
    * @brief Assignment Operator
    * @SINCE_1_0.0
-   * @param matrix from which to copy values
-   * @return reference to this object
+   * @param[in] matrix A reference to the copied matrix
+   * @return A reference to this
    */
   Matrix3& operator=( const Matrix& matrix );
 
@@ -109,7 +109,7 @@ public:
    * Utilises appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs    the Matrix to compare this to
+   * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
   bool operator==(const Matrix3 & rhs) const;
@@ -120,7 +120,7 @@ public:
    * Utilises appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs    the Matrix to compare this to
+   * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
   bool operator!=(const Matrix3 & rhs) const;
@@ -143,9 +143,15 @@ public:
    * @brief Returns the contents of the matrix as an array of 9 floats.
    *
    * The order of the values for a matrix is:
+   *
+   * @code
+   *
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
    *   xAxis.z yAxis.z zAxis.z
+   *
+   * @endcode
+   *
    * @SINCE_1_0.0
    * @return the matrix contents as an array of 9 floats.
    */
@@ -154,10 +160,15 @@ public:
   /**
    * @brief Returns the contents of the matrix as an array of 9 floats.
    *
+   * @code
+   *
    * The order of the values for a matrix is:
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
    *   xAxis.z yAxis.z zAxis.z
+   *
+   * @endcode
+   *
    * @SINCE_1_0.0
    * @return the matrix contents as an array of 9 floats.
    */
@@ -174,7 +185,7 @@ public:
   /**
    * @brief Swaps the rows to columns
    * @SINCE_1_0.0
-   * @return true
+   * @return true if successful
    */
   bool Transpose();
 
@@ -182,7 +193,7 @@ public:
    * @brief Multiplies all elements of the matrix by the scale value.
    *
    * @SINCE_1_0.0
-   * @param scale - the value by which to scale the whole matrix.
+   * @param[in] scale The value by which to scale the whole matrix.
    *
    */
   void Scale(float scale);
@@ -214,9 +225,9 @@ public:
    *
    * Use this method in time critical path as it does not require temporaries
    * @SINCE_1_0.0
-   * @param result of the multiplication
-   * @param lhs matrix, this can be same matrix as result
-   * @param rhs matrix, this cannot be same matrix as result
+   * @param[out] result Result of the multiplication
+   * @param[in] lhs Matrix, this can be same matrix as result
+   * @param[in] rhs Matrix, this cannot be same matrix as result
    */
   static void Multiply( Matrix3& result, const Matrix3& lhs, const Matrix3& rhs );
 
@@ -229,8 +240,8 @@ private:
  * @brief Print a 3x3 matrix.
  *
  * @SINCE_1_0.0
- * @param [in] o The output stream operator.
- * @param [in] matrix The matrix to print.
+ * @param[in] o The output stream operator.
+ * @param[in] matrix The matrix to print.
  * @return The output stream operator.
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);

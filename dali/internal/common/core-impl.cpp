@@ -22,30 +22,33 @@
 #include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/platform-abstraction.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
-#include <dali/integration-api/render-controller.h>
-#include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/animation/animation-playlist.h>
-#include <dali/internal/event/common/property-notification-manager.h>
-#include <dali/internal/event/common/notification-manager.h>
 #include <dali/integration-api/events/event.h>
+#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/integration-api/render-controller.h>
+
+#include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/animation/animation-playlist.h>
+#include <dali/internal/event/common/notification-manager.h>
+#include <dali/internal/event/common/property-notification-manager.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
-#include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/render/common/performance-monitor.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/event/images/image-factory.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/effects/shader-factory.h>
-#include <dali/internal/update/touch/touch-resampler.h>
-#include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
+#include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/common/texture-cache-dispatcher.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/resources/resource-manager.h>
+#include <dali/internal/update/touch/touch-resampler.h>
+
+#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 
@@ -54,6 +57,7 @@ using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderQueue;
 using Dali::Internal::SceneGraph::TextureCache;
+using Dali::Internal::SceneGraph::TextureCacheDispatcher;
 
 namespace
 {
@@ -123,11 +127,13 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   }
   textureCache.SetDiscardBitmapsPolicy(discardPolicy);
 
+  mTextureCacheDispatcher = new SceneGraph::TextureCacheDispatcher( renderQueue, textureCache );
+
   mDiscardQueue = new DiscardQueue( renderQueue );
 
   mResourceManager = new ResourceManager(  mPlatform,
                                           *mNotificationManager,
-                                           textureCache,
+                                          *mTextureCacheDispatcher,
                                           *mTextureUploadedQueue,
                                           *mDiscardQueue,
                                            renderQueue );
@@ -142,7 +148,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                       textureCache,
+                                      *mTextureCacheDispatcher,
                                       *mTouchResampler );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
@@ -205,6 +211,7 @@ Core::~Core()
   delete mResourceClient;
   delete mResourceManager;
   delete mDiscardQueue;
+  delete mTextureCacheDispatcher;
   delete mUpdateManager;
   delete mTouchResampler;
   delete mRenderManager;

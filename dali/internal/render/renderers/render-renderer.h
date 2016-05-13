@@ -83,6 +83,7 @@ public:
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthFunction Depth function
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
                         Render::Geometry* geometry,
@@ -90,7 +91,8 @@ public:
                         const Vector4* blendColor,
                         FaceCullingMode::Type faceCullingMode,
                         bool preMultipliedAlphaEnabled,
-                        DepthWriteMode::Type depthWriteMode );
+                        DepthWriteMode::Type depthWriteMode,
+                        DepthFunction::Type depthFunction );
 
   /**
    * Constructor.
@@ -101,6 +103,7 @@ public:
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthFunction Depth function
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
             Render::Geometry* geometry,
@@ -108,7 +111,8 @@ public:
             const Vector4* blendColor,
             FaceCullingMode::Type faceCullingMode,
             bool preMultipliedAlphaEnabled,
-            DepthWriteMode::Type depthWriteMode );
+            DepthWriteMode::Type depthWriteMode,
+            DepthFunction::Type depthFunction );
 
   /**
    * Change the data providers of the renderer
@@ -173,16 +177,28 @@ public:
   void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
+   * Sets the depth write mode
+   * @param[in] depthWriteMode The depth write mode
+   */
+  void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
+
+  /**
    * Query the Renderer's depth write mode
    * @return The renderer depth write mode
    */
   DepthWriteMode::Type GetDepthWriteMode() const;
 
   /**
-   * Sets the depth write mode
-   * @param[in] depthWriteMode The depth write mode
+   * Sets the depth function
+   * @param[in] depthFunction The depth function
    */
-  void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
+  void SetDepthFunction( DepthFunction::Type depthFunction );
+
+  /**
+   * Query the Renderer's depth function
+   * @return The renderer depth function
+   */
+  DepthFunction::Type GetDepthFunction() const;
 
   /**
    * Called to render during RenderManager::Render().
@@ -200,6 +216,7 @@ public:
                BufferIndex bufferIndex,
                const SceneGraph::NodeDataProvider& node,
                SceneGraph::Shader& defaultShader,
+               const Matrix& modelMatrix,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
@@ -279,6 +296,7 @@ private:
   BlendingOptions       mBlendingOptions; /// Blending options including blend color, blend func and blend equation
   FaceCullingMode::Type mFaceCullingMode; /// Mode of face culling
   DepthWriteMode::Type  mDepthWriteMode;  /// Depth write mode
+  DepthFunction::Type   mDepthFunction;   /// Depth function
 
   size_t mIndexedDrawFirstElement;                  /// Offset of first element to draw
   size_t mIndexedDrawElementsCount;                 /// Number of elements to draw

@@ -67,7 +67,7 @@ public:
    * @brief Construct from a quaternion represented by a vector.
    *
    * @SINCE_1_0.0
-   * @param[in] vector - x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
+   * @param[in] vector x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
    */
   explicit Quaternion( const Vector4& vector );
 
@@ -75,8 +75,8 @@ public:
    * @brief Constructor from an axis and angle.
    *
    * @SINCE_1_0.0
-   * @param[in] angle - the angle around the axis
-   * @param[in] axis  - the vector of the axis
+   * @param[in] angle The angle around the axis
+   * @param[in] axis  The vector of the axis
    */
   Quaternion( Radian angle, const Vector3& axis );
 
@@ -142,7 +142,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[out] axis
-   * @param[out] angle in radians
+   * @param[out] angle Angle in radians
    * @return true if converted correctly
    */
   bool ToAxisAngle( Vector3& axis, Radian& angle ) const;
@@ -213,7 +213,7 @@ public:
    * @brief Division operator.
    *
    * @SINCE_1_0.0
-   * @param[in] other a quaternion to divide by
+   * @param[in] other A quaternion to divide by
    * @return A quaternion containing the result
    */
   const Quaternion operator/( const Quaternion& other ) const;
@@ -249,7 +249,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] other The quaternion to add
-   * @return itself
+   * @return A reference to this
    */
   const Quaternion& operator+=( const Quaternion& other );
 
@@ -258,7 +258,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] other The quaternion to subtract
-   * @return itself
+   * @return A reference to this
    */
   const Quaternion& operator-=( const Quaternion& other );
 
@@ -267,7 +267,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] other The quaternion to multiply
-   * @return itself
+   * @return A reference to this
    */
   const Quaternion& operator*=( const Quaternion& other );
 
@@ -276,7 +276,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] scale the value to scale by
-   * @return itself
+   * @return A reference to this
    */
   const Quaternion& operator*=( float scale );
 
@@ -284,8 +284,8 @@ public:
    * @brief Scale with Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] scale the value to scale by
-   * @return itself
+   * @param[in] scale The value to scale by
+   * @return A reference to this
    */
   const Quaternion& operator/=( float scale );
 
@@ -372,8 +372,8 @@ public:
    * @brief Return the dot product of two quaternions.
    *
    * @SINCE_1_0.0
-   * @param[in] q1 - the first quaternion
-   * @param[in] q2 - the second quaternion
+   * @param[in] q1 The first quaternion
+   * @param[in] q2 The second quaternion
    * @return the dot product of the two quaternions
    */
   static float Dot( const Quaternion &q1, const Quaternion &q2 );
@@ -382,9 +382,9 @@ public:
    * @brief Linear Interpolation (using a straight line between the two quaternions).
    *
    * @SINCE_1_0.0
-   * @param[in] q1 - the start quaternion
-   * @param[in] q2 - the end quaternion
-   * @param[in] t  - a progress value between 0 and 1
+   * @param[in] q1 The start quaternion
+   * @param[in] q2 The end quaternion
+   * @param[in] t  A progress value between 0 and 1
    * @return the interpolated quaternion
    */
   static Quaternion Lerp( const Quaternion &q1, const Quaternion &q2, float t );
@@ -394,9 +394,9 @@ public:
    * the two quaternions).
    *
    * @SINCE_1_0.0
-   * @param[in] q1 - the start quaternion
-   * @param[in] q2 - the end quaternion
-   * @param[in] progress  - a progress value between 0 and 1
+   * @param[in] q1 The start quaternion
+   * @param[in] q2 The end quaternion
+   * @param[in] progress A progress value between 0 and 1
    * @return the interpolated quaternion
    */
   static Quaternion Slerp( const Quaternion &q1, const Quaternion &q2, float progress );
@@ -405,9 +405,9 @@ public:
    * @brief This version of Slerp, used by Squad, does not check for theta > 90.
    *
    * @SINCE_1_0.0
-   * @param[in] q1 - the start quaternion
-   * @param[in] q2 - the end quaternion
-   * @param[in] t  - a progress value between 0 and 1
+   * @param[in] q1 The start quaternion
+   * @param[in] q2 The end quaternion
+   * @param[in] t  A progress value between 0 and 1
    * @return the interpolated quaternion
    */
   static Quaternion SlerpNoInvert( const Quaternion &q1, const Quaternion &q2, float t );
@@ -416,11 +416,11 @@ public:
    * @brief Spherical Cubic Interpolation.
    *
    * @SINCE_1_0.0
-   * @param[in] start - the start quaternion
-   * @param[in] end - the end quaternion
-   * @param[in] ctrl1  - the control quaternion for q1
-   * @param[in] ctrl2  - the control quaternion for q2
-   * @param[in] t  - a progress value between 0 and 1
+   * @param[in] start The start quaternion
+   * @param[in] end The end quaternion
+   * @param[in] ctrl1 The control quaternion for q1
+   * @param[in] ctrl2 The control quaternion for q2
+   * @param[in] t  A progress value between 0 and 1
    * @return the interpolated quaternion
    */
   static Quaternion Squad( const Quaternion& start, const Quaternion& end,  const Quaternion& ctrl1,  const Quaternion& ctrl2, float t );
@@ -429,9 +429,9 @@ public:
    * @brief Returns the shortest angle between two quaternions in Radians.
    *
    * @SINCE_1_0.0
-   * @param[in] q1 - the first quaternion
-   * @param[in] q2 - the second quaternion
-   * @return the angle between the two quaternions.
+   * @param[in] q1 The first quaternion
+   * @param[in] q2 The second quaternion
+   * @return The angle between the two quaternions.
    */
   static float AngleBetween( const Quaternion& q1, const Quaternion& q2 );
 
@@ -439,7 +439,7 @@ public:
    * @brief Rotate v by this Quaternion (Quaternion must be unit).
    *
    * @SINCE_1_0.0
-   * @param[in] vector a vector to rotate
+   * @param[in] vector A vector to rotate
    * @return the rotated vector
    */
   Vector4 Rotate( const Vector4& vector ) const;
@@ -448,7 +448,7 @@ public:
    * @brief Rotate v by this Quaternion (Quaternion must be unit).
    *
    * @SINCE_1_0.0
-   * @param[in] vector a vector to rotate
+   * @param[in] vector A vector to rotate
    * @return the rotated vector
    */
   Vector3 Rotate( const Vector3& vector ) const;

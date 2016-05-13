@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -50,7 +51,6 @@
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/manager/transform-manager.h>
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
@@ -66,6 +66,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -130,7 +131,6 @@ struct UpdateManager::Impl
         RenderController& renderController,
         RenderManager& renderManager,
         RenderQueue& renderQueue,
-        TextureCache& textureCache,
         TouchResampler& touchResampler,
         SceneGraphBuffers& sceneGraphBuffers )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
@@ -163,7 +163,7 @@ struct UpdateManager::Impl
     renderSortingHelper(),
     renderTaskWaiting( false )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache );
+    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
     renderers.SetSceneController( *sceneController );
 
@@ -212,7 +212,6 @@ struct UpdateManager::Impl
       systemLevelRoot = NULL;
     }
 
-    sceneController->GetTextureCache().SetBufferIndices(NULL); // TODO - Remove
     delete sceneController;
   }
 
@@ -245,6 +244,7 @@ struct UpdateManager::Impl
   SortedLayerPointers                 sortedLayers;                  ///< A container of Layer pointers sorted by depth
   SortedLayerPointers                 systemLevelSortedLayers;       ///< A separate container of system-level Layers
 
+  OwnerContainer< Camera* >           cameras;                       ///< A container of cameras
   OwnerContainer< PropertyOwner* >    customObjects;                 ///< A container of owned objects (with custom properties)
 
   AnimationContainer                  animations;                    ///< A container of owned animations
@@ -281,7 +281,7 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              TextureCache& textureCache,
+                              TextureCacheDispatcher& textureCacheDispatcher,
                               TouchResampler& touchResampler )
   : mImpl(NULL)
 {
@@ -293,11 +293,10 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     controller,
                     renderManager,
                     renderQueue,
-                    textureCache,
                     touchResampler,
                     mSceneGraphBuffers );
 
-  textureCache.SetBufferIndices( &mSceneGraphBuffers );
+  textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
 }
 
 UpdateManager::~UpdateManager()
@@ -384,14 +383,30 @@ void UpdateManager::DestroyNode( Node* node )
   node->OnDestroy();
 }
 
-//@todo MESH_REWORK Extend to allow arbitrary scene objects to connect to each other
-void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
+void UpdateManager::AddCamera( Camera* camera )
 {
-  DALI_ASSERT_DEBUG( node != NULL );
-  DALI_ASSERT_DEBUG( attachment != NULL );
+  DALI_ASSERT_DEBUG( camera != NULL );
 
-  // attach node to attachment first so that parent is known by the time attachment is connected
-  node->Attach( *attachment ); // node takes ownership
+  mImpl->cameras.PushBack( camera ); // takes ownership
+}
+
+void UpdateManager::RemoveCamera( const Camera* camera )
+{
+  // Find the camera
+  OwnerContainer<Camera*>::Iterator iter = mImpl->cameras.Begin();
+  OwnerContainer<Camera*>::ConstIterator end = mImpl->cameras.End();
+  for ( ; iter != end; ++iter )
+  {
+    Camera* value = *iter;
+    if ( camera == value )
+    {
+      // Transfer ownership to the discard queue
+      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), mImpl->cameras.Release( iter ) );
+
+      return;
+    }
+  }
+
 }
 
 void UpdateManager::AddObject( PropertyOwner* object )
@@ -873,19 +888,19 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
     return;
   }
 
-  // Prepare resources, update shaders, update attachments, for each node
+  // Prepare resources, update shaders, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
-  mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
-                                                     bufferIndex,
-                                                     mImpl->resourceManager,
-                                                     mImpl->renderQueue );
+  mImpl->nodeDirtyFlags = UpdateNodeTree( *( mImpl->root ),
+                                          bufferIndex,
+                                          mImpl->resourceManager,
+                                          mImpl->renderQueue );
 
   if ( mImpl->systemLevelRoot )
   {
-    mImpl->nodeDirtyFlags |= UpdateNodesAndAttachments( *( mImpl->systemLevelRoot ),
-                                                        bufferIndex,
-                                                        mImpl->resourceManager,
-                                                        mImpl->renderQueue );
+    mImpl->nodeDirtyFlags |= UpdateNodeTree( *( mImpl->systemLevelRoot ),
+                                             bufferIndex,
+                                             mImpl->resourceManager,
+                                             mImpl->renderQueue );
   }
 }
 
@@ -945,7 +960,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Prepare texture sets and apply constraints to them
     PrepareTextureSets( bufferIndex );
 
-    //Clear the lists of renderable-attachments from the previous update
+    //Clear the lists of renderers from the previous update
     for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
     {
       mImpl->sortedLayers[i]->ClearRenderables();

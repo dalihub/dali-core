@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,9 @@ namespace Internal
 namespace SceneGraph
 {
 
-class CameraController;
 class RenderMessageDispatcher;
 class RenderQueue;
 class DiscardQueue;
-class TextureCache;
 
 /**
  * Abstract interface for the scene controller
@@ -71,15 +69,6 @@ public:
    * @return A reference to the discard queue
    */
   virtual DiscardQueue& GetDiscardQueue() = 0;
-
-  /**
-   * Return the texture cache
-   * TODO: Remove this method when renderer's & shader's second stage initialization
-   * is done by RenderManager rather than by the attachments in the Update thread.
-   * DO NOT USE THIS IN THE UPDATE THREAD!
-   * @return A reference to the texture cache
-   */
-  virtual TextureCache& GetTextureCache() = 0;
 
 private:
 

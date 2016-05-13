@@ -66,7 +66,7 @@ namespace SceneGraph
 {
 class RenderInstruction;
 struct RenderList;
-class RenderItem;
+struct RenderItem;
 }
 
 namespace Render

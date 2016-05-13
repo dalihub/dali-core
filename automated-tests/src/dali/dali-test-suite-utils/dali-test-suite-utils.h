@@ -153,6 +153,82 @@ inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
   return CompareType<float>(q1.degree, q2.degree, epsilon);
 }
 
+template <>
+inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2, float epsilon)
+{
+  Property::Type type = q1.GetType();
+  if( type != q2.GetType() )
+  {
+    return false;
+  }
+
+  switch(type)
+  {
+    case Property::BOOLEAN:
+    {
+      bool a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return a == b;
+      break;
+    }
+    case Property::INTEGER:
+    {
+      int a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return a == b;
+      break;
+    }
+    case Property::FLOAT:
+    {
+      float a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return CompareType<float>(a, b, epsilon);
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      Vector2 a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return CompareType<Vector2>(a, b, epsilon);
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      Vector3 a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return CompareType<Vector3>(a, b, epsilon);
+      break;
+    }
+    case Property::RECTANGLE:
+    case Property::VECTOR4:
+    {
+      Vector4 a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return CompareType<Vector4>(a, b, epsilon);
+      break;
+    }
+    case Property::ROTATION:
+    {
+      Quaternion a, b;
+      q1.Get(a);
+      q2.Get(b);
+      return CompareType<Quaternion>(a, b, epsilon);
+      break;
+    }
+    default:
+      return false;
+  }
+
+  return false;
+}
+
+
 bool operator==(TimePeriod a, TimePeriod b);
 std::ostream& operator<<( std::ostream& ostream, TimePeriod value );
 std::ostream& operator<<( std::ostream& ostream, Radian angle );
@@ -195,6 +271,23 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char
     tet_result(TET_PASS);
   }
 }
+
+template<typename Type>
+inline void DALI_TEST_NOT_EQUALS(Type value1, Type value2, float epsilon, const char* location)
+{
+  if( CompareType<Type>(value1, value2, epsilon) )
+  {
+    std::ostringstream o;
+    o << value1 << " !=  " << value2 << std::endl;
+    fprintf(stderr, "%s, checking %s", location, o.str().c_str());
+    tet_result(TET_FAIL);
+  }
+  else
+  {
+    tet_result(TET_PASS);
+  }
+}
+
 
 /**
  * Test whether two TimePeriods are within a certain distance of each other.
@@ -309,6 +402,14 @@ inline void DALI_TEST_EQUALS<const std::string&>( const std::string &str1, const
 {
   DALI_TEST_EQUALS(str1.c_str(), str2.c_str(), location);
 }
+
+/**
+ * Test whether two strings are equal.
+ * @param[in] str1 The first string
+ * @param[in] str2 The second string
+ * @param[in] location The TEST_LOCATION macro should be used here
+ */
+void DALI_TEST_EQUALS( Property::Value& str1, const char* str2, const char* location);
 
 /**
  * Test whether two strings are equal.

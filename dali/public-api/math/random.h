@@ -40,8 +40,8 @@ namespace Random
  *
  * Note, uses a limited number of values.
  * @SINCE_1_0.0
- * @param[in] f0 the lower bound
- * @param[in] f1 the upper bound
+ * @param[in] f0 The lower bound
+ * @param[in] f1 The upper bound
  * @return a random value between the lower and upper bound
  */
 inline float Range(float f0, float f1)

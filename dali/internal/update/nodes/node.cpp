@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
@@ -67,7 +66,6 @@ Node::Node()
   mWorldColor( Color::WHITE ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
-  mAttachment( NULL ),
   mChildren(),
   mRegenerateUniformMap( 0 ),
   mDepth(0u),
@@ -95,12 +93,6 @@ void Node::operator delete( void* ptr )
 
 void Node::OnDestroy()
 {
-  // Node attachments should be notified about the disconnection.
-  if ( mAttachment )
-  {
-    mAttachment->OnDestroy();
-  }
-
   // Animators, Constraints etc. should be disconnected from the child's properties.
   PropertyOwner::Destroy();
 }
@@ -124,18 +116,6 @@ void Node::CreateTransform( SceneGraph::TransformManager* transformManager )
   mWorldScale.Initialize( transformManager, mTransformId );
   mWorldOrientation.Initialize( transformManager, mTransformId );
   mWorldMatrix.Initialize( transformManager, mTransformId );
-}
-
-void Node::Attach( NodeAttachment& object )
-{
-  DALI_ASSERT_DEBUG(!mAttachment);
-
-  object.SetParent(*this);
-
-  mAttachment = &object;
-  SetAllDirtyFlags();
-
-  mAttachment->ConnectedToSceneGraph();
 }
 
 void Node::SetRoot(bool isRoot)
@@ -205,12 +185,6 @@ void Node::ConnectChild( Node* childNode )
 
   // Inform property observers of new connection
   childNode->ConnectToSceneGraph();
-
-  // Inform child node attachment that the node has been added to the stage
-  if( childNode->mAttachment )
-  {
-    childNode->mAttachment->ConnectedToSceneGraph();
-  }
 }
 
 void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode )
@@ -313,12 +287,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 
   // Remove all child pointers
   mChildren.Clear();
-
-  // Inform child node attachment that the node has been removed from the stage
-  if( mAttachment )
-  {
-    mAttachment->DisconnectedFromSceneGraph();
-  }
 
   if( mTransformId != INVALID_TRANSFORM_ID )
   {

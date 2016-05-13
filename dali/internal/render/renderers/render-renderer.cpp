@@ -116,9 +116,10 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          const Vector4* blendColor,
                          FaceCullingMode::Type faceCullingMode,
                          bool preMultipliedAlphaEnabled,
-                         DepthWriteMode::Type depthWriteMode )
+                         DepthWriteMode::Type depthWriteMode,
+                         DepthFunction::Type depthFunction )
 {
-  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode );
+  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthFunction );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
@@ -127,7 +128,8 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     const Vector4* blendColor,
                     FaceCullingMode::Type faceCullingMode,
                     bool preMultipliedAlphaEnabled,
-                    DepthWriteMode::Type depthWriteMode )
+                    DepthWriteMode::Type depthWriteMode,
+                    DepthFunction::Type depthFunction )
 : mRenderDataProvider( dataProvider ),
   mContext(NULL),
   mTextureCache( NULL ),
@@ -138,6 +140,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions(),
   mFaceCullingMode( faceCullingMode  ),
   mDepthWriteMode( depthWriteMode ),
+  mDepthFunction( depthFunction ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementsCount( 0 ),
   mUpdateAttributesLocation( true ),
@@ -438,11 +441,22 @@ DepthWriteMode::Type Renderer::GetDepthWriteMode() const
   return mDepthWriteMode;
 }
 
+void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
+{
+  mDepthFunction = depthFunction;
+}
+
+DepthFunction::Type Renderer::GetDepthFunction() const
+{
+  return mDepthFunction;
+}
+
 void Renderer::Render( Context& context,
                        SceneGraph::TextureCache& textureCache,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
                        SceneGraph::Shader& defaultShader,
+                       const Matrix& modelMatrix,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
@@ -477,7 +491,7 @@ void Renderer::Render( Context& context,
     // Only set up and draw if we have textures and they are all valid
 
     // set projection and view matrix if program has not yet received them yet this frame
-    SetMatrices( *program, node.GetModelMatrix( bufferIndex ), viewMatrix, projectionMatrix, modelViewMatrix );
+    SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix );
 
     // set color uniform
     GLint loc = program->GetUniformLocation( Program::UNIFORM_COLOR );
