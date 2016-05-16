@@ -123,7 +123,7 @@ int UtcDaliShaderConstraint01(void)
   tet_infoline("Test that a non-uniform shader property can be constrained");
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -165,7 +165,7 @@ int UtcDaliShaderConstraint02(void)
   tet_infoline("Test that a uniform map shader property can be constrained");
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -219,7 +219,7 @@ int UtcDaliShaderAnimatedProperty01(void)
   tet_infoline("Test that a non-uniform shader property can be animated");
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -260,7 +260,7 @@ int UtcDaliShaderAnimatedProperty02(void)
   tet_infoline("Test that a uniform map shader property can be animated");
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
