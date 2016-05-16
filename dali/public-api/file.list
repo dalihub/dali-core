@@ -189,7 +189,8 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/property.h \
   $(public_api_src_dir)/object/ref-object.h \
   $(public_api_src_dir)/object/type-info.h \
-  $(public_api_src_dir)/object/type-registry.h
+  $(public_api_src_dir)/object/type-registry.h \
+  $(public_api_src_dir)/object/type-registry-helper.h
 
 public_api_core_render_tasks_header_files = \
   $(public_api_src_dir)/render-tasks/render-task.h \
