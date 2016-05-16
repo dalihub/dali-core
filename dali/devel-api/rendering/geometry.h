@@ -146,6 +146,16 @@ public:
    */
   GeometryType GetGeometryType() const;
 
+  /**
+   * @brief Unit quad geometry.
+   *
+   * The quad has its four corners located at [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5] and [0.5, 0.5].
+   * The attribute name for vertex position is 'aPosition'.
+   *
+   * @return The quad geometry.
+   */
+  static Geometry QUAD();
+
 public:
   /**
    * @brief The constructor
