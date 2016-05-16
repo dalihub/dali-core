@@ -120,7 +120,7 @@ int UtcDaliTextureSetSetImage01(void)
   TextureSet textureSet = CreateTextureSet();
   textureSet.SetImage( 0u, image );
 
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -167,7 +167,7 @@ int UtcDaliTextureSetSetImage02(void)
   textureSet.SetImage( 0u, image );
   textureSet.SetSampler( 0u, sampler );
 
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -210,7 +210,7 @@ int UtcDaliTextureSetSetSampler(void)
   Shader shader = CreateShader();
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
