@@ -129,7 +129,9 @@ void TransformManager::RemoveTransform(TransformId id)
 void TransformManager::SetParent( TransformId id, TransformId parentId )
 {
   DALI_ASSERT_ALWAYS( id != parentId );
-  mParent[ mIds[id] ] = parentId;
+  unsigned int index = mIds[id];
+  mParent[ index ] = parentId;
+  mComponentDirty[ index ] = true;
   mReorder = true;
 }
 
@@ -222,7 +224,6 @@ void TransformManager::Update()
         if( mComponentDirty[i] || mLocalMatrixDirty[parentIndex])
         {
           //Full transform inherited
-          mComponentDirty[i] = false;
           mLocalMatrixDirty[i] = true;
 
           anchorPosition = ( half - mTxComponentStatic[i].mAnchorPoint ) * mSize[i] * mTxComponentAnimatable[i].mScale;
@@ -272,6 +273,8 @@ void TransformManager::Update()
           mLocal[i].SetTransformComponents( localScale, localOrientation, localPosition );
           Matrix::Multiply( mWorld[i], mLocal[i], parentMatrix );
         }
+
+        mLocalMatrixDirty[i] = true;
       }
     }
     else  //Component has no parent or doesn't inherit transform
@@ -279,7 +282,9 @@ void TransformManager::Update()
       anchorPosition = ( half - mTxComponentStatic[i].mAnchorPoint ) * mSize[i] * mTxComponentAnimatable[i].mScale;
       anchorPosition *= mTxComponentAnimatable[i].mOrientation;
       localPosition = mTxComponentAnimatable[i].mPosition + anchorPosition;
-      mWorld[i].SetTransformComponents( mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition );
+      mLocal[i].SetTransformComponents( mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition );
+      mWorld[i] = mLocal[i];
+      mLocalMatrixDirty[i] = true;
     }
 
     //Update the bounding sphere
@@ -289,6 +294,8 @@ void TransformManager::Update()
 
     mBoundingSpheres[i] = mWorld[i].GetTranslation();
     mBoundingSpheres[i].w = Length( centerToEdgeWorldSpace );
+
+    mComponentDirty[i] = false;
   }
 }
 
