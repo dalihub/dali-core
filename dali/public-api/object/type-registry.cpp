@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,13 @@ AnimatablePropertyComponentRegistration::AnimatablePropertyComponentRegistration
   DALI_ASSERT_ALWAYS( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) );
 
   Internal::TypeRegistry::Get()->RegisterAnimatablePropertyComponent( registered, name, index, baseIndex, componentIndex );
+}
+
+ChildPropertyRegistration::ChildPropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type )
+{
+  DALI_ASSERT_ALWAYS( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) );
+
+  Internal::TypeRegistry::Get()->RegisterChildProperty( registered, name, index, type );
 }
 
 } // namespace Dali

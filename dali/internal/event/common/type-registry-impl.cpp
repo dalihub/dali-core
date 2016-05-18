@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,6 +257,22 @@ bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& regist
     DALI_ASSERT_DEBUG(iter->second);
 
     GetImplementation(iter->second).AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
+
+    return true;
+  }
+
+  return false;
+}
+
+bool TypeRegistry::RegisterChildProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type )
+{
+  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
+
+  if( iter != mRegistryLut.end() )
+  {
+    DALI_ASSERT_DEBUG(iter->second);
+
+    GetImplementation(iter->second).AddChildProperty( name, index, type );
 
     return true;
   }
