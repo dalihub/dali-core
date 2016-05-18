@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
 
   // For each render-task:
   //   1) Prepare the render-task
-  //   2) Clear the layer-stored lists of attachments (TODO check if the layer is not changed and don't clear in this case)
+  //   2) Clear the layer-stored lists of renderers (TODO check if the layer is not changed and don't clear in this case)
   //   3) Traverse the scene-graph, filling the lists for the current render-task
   //   4) Prepare render-instructions
 

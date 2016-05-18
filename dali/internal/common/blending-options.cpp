@@ -46,69 +46,99 @@ static unsigned int CLEAR_BLEND_EQUATION_MASK = 0xFF00FFFF; // 8 bits cleared
  * @param[in] factor The BlendFunc value.
  * @param[in] bitshift Used to shift to the correct part of options.
  */
-void StoreBlendingFactor( unsigned int& options, BlendingFactor::Type factor, int bitShift )
+void StoreBlendFactor( unsigned int& options, BlendFactor::Type factor, int bitShift )
 {
-  switch ( factor )
+  switch( factor )
   {
-    case BlendingFactor::ZERO:
+    case BlendFactor::ZERO:
+    {
       options |= ( 0u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE:
+    case BlendFactor::ONE:
+    {
       options |= ( 1u << bitShift );
       break;
+    }
 
-    case BlendingFactor::SRC_COLOR:
+    case BlendFactor::SRC_COLOR:
+    {
       options |= ( 2u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_SRC_COLOR:
+    case BlendFactor::ONE_MINUS_SRC_COLOR:
+    {
       options |= ( 3u << bitShift );
       break;
+    }
 
-    case BlendingFactor::SRC_ALPHA:
+    case BlendFactor::SRC_ALPHA:
+    {
       options |= ( 4u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_SRC_ALPHA:
+    case BlendFactor::ONE_MINUS_SRC_ALPHA:
+    {
       options |= ( 5u << bitShift );
       break;
+    }
 
-    case BlendingFactor::DST_ALPHA:
+    case BlendFactor::DST_ALPHA:
+    {
       options |= ( 6u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_DST_ALPHA:
+    case BlendFactor::ONE_MINUS_DST_ALPHA:
+    {
       options |= ( 7u << bitShift );
       break;
+    }
 
-    case BlendingFactor::DST_COLOR:
+    case BlendFactor::DST_COLOR:
+    {
       options |= ( 8u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_DST_COLOR:
+    case BlendFactor::ONE_MINUS_DST_COLOR:
+    {
       options |= ( 9u << bitShift );
       break;
+    }
 
-    case BlendingFactor::SRC_ALPHA_SATURATE:
+    case BlendFactor::SRC_ALPHA_SATURATE:
+    {
       options |= ( 10u << bitShift );
       break;
+    }
 
-    case BlendingFactor::CONSTANT_COLOR:
+    case BlendFactor::CONSTANT_COLOR:
+    {
       options |= ( 11u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_CONSTANT_COLOR:
+    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+    {
       options |= ( 12u << bitShift );
       break;
+    }
 
-    case BlendingFactor::CONSTANT_ALPHA:
+    case BlendFactor::CONSTANT_ALPHA:
+    {
       options |= ( 13u << bitShift );
       break;
+    }
 
-    case BlendingFactor::ONE_MINUS_CONSTANT_ALPHA:
+    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+    {
       options |= ( 14u << bitShift );
       break;
+    }
   }
 }
 
@@ -118,48 +148,54 @@ void StoreBlendingFactor( unsigned int& options, BlendingFactor::Type factor, in
  * @param[in] factor The BlendEquation value.
  * @param[in] bitshift Used to shift to the correct part of options.
  */
-void StoreBlendingEquation( unsigned int& options, BlendingEquation::Type factor, int bitShift )
+void StoreBlendEquation( unsigned int& options, BlendEquation::Type factor, int bitShift )
 {
   switch ( factor )
   {
-    case BlendingEquation::ADD:
+    case BlendEquation::ADD:
+    {
       options |= ( 0u << bitShift );
       break;
+    }
 
-    case BlendingEquation::SUBTRACT:
+    case BlendEquation::SUBTRACT:
+    {
       options |= ( 1u << bitShift );
       break;
+    }
 
-    case BlendingEquation::REVERSE_SUBTRACT:
+    case BlendEquation::REVERSE_SUBTRACT:
+    {
       options |= ( 2u << bitShift );
       break;
+    }
   }
 }
 
 const unsigned int BLENDING_FACTOR_COUNT   = 15;
 const unsigned int BLENDING_EQUATION_COUNT = 3;
 
-BlendingFactor::Type BLENDING_FACTORS[ BLENDING_FACTOR_COUNT ] =
-  { BlendingFactor::ZERO,
-    BlendingFactor::ONE,
-    BlendingFactor::SRC_COLOR,
-    BlendingFactor::ONE_MINUS_SRC_COLOR,
-    BlendingFactor::SRC_ALPHA,
-    BlendingFactor::ONE_MINUS_SRC_ALPHA,
-    BlendingFactor::DST_ALPHA,
-    BlendingFactor::ONE_MINUS_DST_ALPHA,
-    BlendingFactor::DST_COLOR,
-    BlendingFactor::ONE_MINUS_DST_COLOR,
-    BlendingFactor::SRC_ALPHA_SATURATE,
-    BlendingFactor::CONSTANT_COLOR,
-    BlendingFactor::ONE_MINUS_CONSTANT_COLOR,
-    BlendingFactor::CONSTANT_ALPHA,
-    BlendingFactor::ONE_MINUS_CONSTANT_ALPHA };
+BlendFactor::Type BLENDING_FACTORS[ BLENDING_FACTOR_COUNT ] =
+  { BlendFactor::ZERO,
+    BlendFactor::ONE,
+    BlendFactor::SRC_COLOR,
+    BlendFactor::ONE_MINUS_SRC_COLOR,
+    BlendFactor::SRC_ALPHA,
+    BlendFactor::ONE_MINUS_SRC_ALPHA,
+    BlendFactor::DST_ALPHA,
+    BlendFactor::ONE_MINUS_DST_ALPHA,
+    BlendFactor::DST_COLOR,
+    BlendFactor::ONE_MINUS_DST_COLOR,
+    BlendFactor::SRC_ALPHA_SATURATE,
+    BlendFactor::CONSTANT_COLOR,
+    BlendFactor::ONE_MINUS_CONSTANT_COLOR,
+    BlendFactor::CONSTANT_ALPHA,
+    BlendFactor::ONE_MINUS_CONSTANT_ALPHA };
 
-BlendingEquation::Type BLENDING_EQUATIONS[ BLENDING_EQUATION_COUNT ] =
-  { BlendingEquation::ADD,
-    BlendingEquation::SUBTRACT,
-    BlendingEquation::REVERSE_SUBTRACT };
+BlendEquation::Type BLENDING_EQUATIONS[ BLENDING_EQUATION_COUNT ] =
+  { BlendEquation::ADD,
+    BlendEquation::SUBTRACT,
+    BlendEquation::REVERSE_SUBTRACT };
 
 /**
  * Utility to retrieve one of the BlendFunc values.
@@ -168,7 +204,7 @@ BlendingEquation::Type BLENDING_EQUATIONS[ BLENDING_EQUATION_COUNT ] =
  * @param[in] bitshift Used to shift to the correct part of options.
  * @return The blending factor.
  */
-BlendingFactor::Type RetrieveBlendingFactor( unsigned int options, int mask, int bitShift )
+BlendFactor::Type RetrieveBlendFactor( unsigned int options, int mask, int bitShift )
 {
   unsigned int index = options & mask;
   index = index >> bitShift;
@@ -185,7 +221,7 @@ BlendingFactor::Type RetrieveBlendingFactor( unsigned int options, int mask, int
  * @param[in] bitshift Used to shift to the correct part of options.
  * @return The blending equation.
  */
-BlendingEquation::Type RetrieveBlendingEquation( unsigned int options, int mask, int bitShift )
+BlendEquation::Type RetrieveBlendEquation( unsigned int options, int mask, int bitShift )
 {
   unsigned int index = options & mask;
   index = index >> bitShift;
@@ -207,10 +243,10 @@ BlendingOptions::BlendingOptions()
 : mBitmask( 0u ),
   mBlendColor( NULL )
 {
-  SetBlendFunc( DEFAULT_BLENDING_SRC_FACTOR_RGB,   DEFAULT_BLENDING_DEST_FACTOR_RGB,
-                DEFAULT_BLENDING_SRC_FACTOR_ALPHA, DEFAULT_BLENDING_DEST_FACTOR_ALPHA );
+  SetBlendFunc( BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA,
+                BlendFactor::ONE,       BlendFactor::ONE_MINUS_SRC_ALPHA );
 
-  SetBlendEquation( DEFAULT_BLENDING_EQUATION_RGB, DEFAULT_BLENDING_EQUATION_ALPHA );
+  SetBlendEquation( BlendEquation::ADD, BlendEquation::ADD );
 }
 
 BlendingOptions::~BlendingOptions()
@@ -228,53 +264,53 @@ unsigned int BlendingOptions::GetBitmask() const
   return mBitmask;
 }
 
-void BlendingOptions::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                                    BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
+void BlendingOptions::SetBlendFunc( BlendFactor::Type srcFactorRgb,   BlendFactor::Type destFactorRgb,
+                                    BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha )
 {
   mBitmask &= CLEAR_BLEND_FUNC_MASK; // Clear the BlendFunc values
 
-  StoreBlendingFactor( mBitmask, srcFactorRgb,    SHIFT_TO_SRC_FACTOR_RGB );
-  StoreBlendingFactor( mBitmask, destFactorRgb,   SHIFT_TO_DEST_FACTOR_RGB );
-  StoreBlendingFactor( mBitmask, srcFactorAlpha,  SHIFT_TO_SRC_FACTOR_ALPHA );
-  StoreBlendingFactor( mBitmask, destFactorAlpha, SHIFT_TO_DEST_FACTOR_ALPHA );
+  StoreBlendFactor( mBitmask, srcFactorRgb,    SHIFT_TO_SRC_FACTOR_RGB );
+  StoreBlendFactor( mBitmask, destFactorRgb,   SHIFT_TO_DEST_FACTOR_RGB );
+  StoreBlendFactor( mBitmask, srcFactorAlpha,  SHIFT_TO_SRC_FACTOR_ALPHA );
+  StoreBlendFactor( mBitmask, destFactorAlpha, SHIFT_TO_DEST_FACTOR_ALPHA );
 }
 
-BlendingFactor::Type BlendingOptions::GetBlendSrcFactorRgb() const
+BlendFactor::Type BlendingOptions::GetBlendSrcFactorRgb() const
 {
-  return RetrieveBlendingFactor( mBitmask, MASK_SRC_FACTOR_RGB,  SHIFT_TO_SRC_FACTOR_RGB );
+  return RetrieveBlendFactor( mBitmask, MASK_SRC_FACTOR_RGB,  SHIFT_TO_SRC_FACTOR_RGB );
 }
 
-BlendingFactor::Type BlendingOptions::GetBlendDestFactorRgb() const
+BlendFactor::Type BlendingOptions::GetBlendDestFactorRgb() const
 {
-  return RetrieveBlendingFactor( mBitmask, MASK_DEST_FACTOR_RGB, SHIFT_TO_DEST_FACTOR_RGB );
+  return RetrieveBlendFactor( mBitmask, MASK_DEST_FACTOR_RGB, SHIFT_TO_DEST_FACTOR_RGB );
 }
 
-BlendingFactor::Type BlendingOptions::GetBlendSrcFactorAlpha() const
+BlendFactor::Type BlendingOptions::GetBlendSrcFactorAlpha() const
 {
-  return RetrieveBlendingFactor( mBitmask, MASK_SRC_FACTOR_ALPHA,  SHIFT_TO_SRC_FACTOR_ALPHA );
+  return RetrieveBlendFactor( mBitmask, MASK_SRC_FACTOR_ALPHA,  SHIFT_TO_SRC_FACTOR_ALPHA );
 }
 
-BlendingFactor::Type BlendingOptions::GetBlendDestFactorAlpha() const
+BlendFactor::Type BlendingOptions::GetBlendDestFactorAlpha() const
 {
-  return RetrieveBlendingFactor( mBitmask, MASK_DEST_FACTOR_ALPHA, SHIFT_TO_DEST_FACTOR_ALPHA );
+  return RetrieveBlendFactor( mBitmask, MASK_DEST_FACTOR_ALPHA, SHIFT_TO_DEST_FACTOR_ALPHA );
 }
 
-void BlendingOptions::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
+void BlendingOptions::SetBlendEquation( BlendEquation::Type equationRgb, BlendEquation::Type equationAlpha )
 {
   mBitmask &= CLEAR_BLEND_EQUATION_MASK; // Clear the BlendEquation values
 
-  StoreBlendingEquation( mBitmask, equationRgb,   SHIFT_TO_EQUATION_RGB );
-  StoreBlendingEquation( mBitmask, equationAlpha, SHIFT_TO_EQUATION_ALPHA );
+  StoreBlendEquation( mBitmask, equationRgb,   SHIFT_TO_EQUATION_RGB );
+  StoreBlendEquation( mBitmask, equationAlpha, SHIFT_TO_EQUATION_ALPHA );
 }
 
-BlendingEquation::Type BlendingOptions::GetBlendEquationRgb() const
+BlendEquation::Type BlendingOptions::GetBlendEquationRgb() const
 {
-  return RetrieveBlendingEquation( mBitmask, MASK_EQUATION_RGB, SHIFT_TO_EQUATION_RGB );
+  return RetrieveBlendEquation( mBitmask, MASK_EQUATION_RGB, SHIFT_TO_EQUATION_RGB );
 }
 
-BlendingEquation::Type BlendingOptions::GetBlendEquationAlpha() const
+BlendEquation::Type BlendingOptions::GetBlendEquationAlpha() const
 {
-  return RetrieveBlendingEquation( mBitmask, MASK_EQUATION_ALPHA, SHIFT_TO_EQUATION_ALPHA );
+  return RetrieveBlendEquation( mBitmask, MASK_EQUATION_ALPHA, SHIFT_TO_EQUATION_ALPHA );
 }
 
 void BlendingOptions::SetBlendColor( const Vector4& color )

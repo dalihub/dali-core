@@ -73,9 +73,7 @@ public:
   enum ShaderHints
   {
     HINT_NONE                     = 0x00, ///< no hints
-    HINT_REQUIRES_SELF_DEPTH_TEST = 0x01, ///< Expects depth testing enabled
     HINT_OUTPUT_IS_TRANSPARENT    = 0x02, ///< Might generate transparent alpha from opaque inputs
-    HINT_OUTPUT_IS_OPAQUE         = 0x04, ///< Outputs opaque colors even if the inputs are transparent
     HINT_MODIFIES_GEOMETRY        = 0x08, ///< Might change position of vertices,
                                           ///< this option disables any culling optimizations
   };

@@ -233,12 +233,27 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
   DALI_TEST_EQUALS(str1.c_str(), str2, location);
 }
 
-/**
- * Test whether two strings are equal.
- * @param[in] str1 The first string
- * @param[in] str2 The second string
- * @param[in] location The TEST_LOCATION macro should be used here
- */
+void DALI_TEST_EQUALS( Property::Value& str1, const char* str2, const char* location)
+{
+  bool result = false;
+
+  if( str1.GetType() == Property::STRING )
+  {
+    std::string string;
+    str1.Get(string);
+    result = !string.compare(str2);
+  }
+
+  if( result )
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+}
+
 void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location)
 {
   DALI_TEST_EQUALS(str1, str2.c_str(), location);

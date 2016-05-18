@@ -262,13 +262,6 @@ public:
   void SetGeometryType( Render::Geometry* geometry, unsigned int geometryType );
 
   /**
-   * Set if an existing geometry requires depth testing
-   * @param[in] geometry The render geometry
-   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
-   */
-  void SetGeometryRequiresDepthTest( Render::Geometry* geometry, bool requiresDepthTest );
-
-  /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the
    * tracker. The lifetime of the tracker is related to the lifetime of the tracked
    * object, usually an offscreen render task.

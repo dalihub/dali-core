@@ -127,7 +127,7 @@ void PrintRenderList( const RenderList& list )
 void PrintRenderItem( const SceneGraph::RenderItem& item )
 {
   std::stringstream debugStream;
-  debugStream << "Rendering item, ModelView: " << item.GetModelViewMatrix();
+  debugStream << "Rendering item, ModelView: " << item.mModelViewMatrix;
 
   std::string debugString( debugStream.str() );
   DALI_LOG_RENDER_INFO( "         %s\n", debugString.c_str() );

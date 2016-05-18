@@ -82,13 +82,17 @@ public:
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
+   * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthFunction Depth function
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
                         Render::Geometry* geometry,
                         unsigned int blendingBitmask,
                         const Vector4* blendColor,
-                        Dali::Renderer::FaceCullingMode faceCullingMode,
-                        bool preMultipliedAlphaEnabled);
+                        FaceCullingMode::Type faceCullingMode,
+                        bool preMultipliedAlphaEnabled,
+                        DepthWriteMode::Type depthWriteMode,
+                        DepthFunction::Type depthFunction );
 
   /**
    * Constructor.
@@ -98,13 +102,17 @@ public:
    * @param[in] blendColor The blend color to pass to GL
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
+   * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthFunction Depth function
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
             Render::Geometry* geometry,
             unsigned int blendingBitmask,
             const Vector4* blendColor,
-            Dali::Renderer::FaceCullingMode faceCullingMode,
-            bool preMultipliedAlphaEnabled);
+            FaceCullingMode::Type faceCullingMode,
+            bool preMultipliedAlphaEnabled,
+            DepthWriteMode::Type depthWriteMode,
+            DepthFunction::Type depthFunction );
 
   /**
    * Change the data providers of the renderer
@@ -135,7 +143,7 @@ public:
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
-  void SetFaceCullingMode( Dali::Renderer::FaceCullingMode mode );
+  void SetFaceCullingMode( FaceCullingMode::Type mode );
 
   /**
    * Set the bitmask for blending options
@@ -169,16 +177,28 @@ public:
   void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
-   * Set the sampler used to render the set texture.
-   * @param[in] samplerBitfield The packed sampler options used to render.
+   * Sets the depth write mode
+   * @param[in] depthWriteMode The depth write mode
    */
-  void SetSampler( unsigned int samplerBitfield );
+  void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
 
   /**
-   * Query whether the derived type of Renderer requires depth testing.
-   * @return True if the renderer requires depth testing.
+   * Query the Renderer's depth write mode
+   * @return The renderer depth write mode
    */
-  bool RequiresDepthTest() const;
+  DepthWriteMode::Type GetDepthWriteMode() const;
+
+  /**
+   * Sets the depth function
+   * @param[in] depthFunction The depth function
+   */
+  void SetDepthFunction( DepthFunction::Type depthFunction );
+
+  /**
+   * Query the Renderer's depth function
+   * @return The renderer depth function
+   */
+  DepthFunction::Type GetDepthFunction() const;
 
   /**
    * Called to render during RenderManager::Render().
@@ -196,6 +216,7 @@ public:
                BufferIndex bufferIndex,
                const SceneGraph::NodeDataProvider& node,
                SceneGraph::Shader& defaultShader,
+               const Matrix& modelMatrix,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
@@ -238,6 +259,9 @@ private:
 
   /**
    * Set the program uniform in the map from the mapped property
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] program The shader program
+   * @param[in] map The uniform
    */
   void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
 
@@ -249,11 +273,9 @@ private:
    */
   bool BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
 
-public:
+private:
 
   OwnerPointer< SceneGraph::RenderDataProvider > mRenderDataProvider;
-
-private:
 
   Context* mContext;
   SceneGraph::TextureCache* mTextureCache;
@@ -271,15 +293,16 @@ private:
 
   Vector<GLint> mAttributesLocation;
 
-  BlendingOptions                 mBlendingOptions; /// Blending options including blend color, blend func and blend equation
-  Dali::Renderer::FaceCullingMode mFaceCullingMode; /// Mode of face culling
+  BlendingOptions       mBlendingOptions; /// Blending options including blend color, blend func and blend equation
+  FaceCullingMode::Type mFaceCullingMode; /// Mode of face culling
+  DepthWriteMode::Type  mDepthWriteMode;  /// Depth write mode
+  DepthFunction::Type   mDepthFunction;   /// Depth function
 
   size_t mIndexedDrawFirstElement;                  /// Offset of first element to draw
   size_t mIndexedDrawElementsCount;                 /// Number of elements to draw
 
-  unsigned int mSamplerBitfield;                    ///< Sampler options used for texture filtering
   bool mUpdateAttributesLocation:1;                 ///< Indicates attribute locations have changed
-  bool mPremultipledAlphaEnabled:1;      ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool mPremultipledAlphaEnabled:1;                 ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace SceneGraph

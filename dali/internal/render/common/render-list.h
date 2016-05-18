@@ -41,8 +41,6 @@ namespace SceneGraph
 
 class Layer;
 
-
-class RenderItem;
 typedef OwnerContainer< RenderItem* > RenderItemContainer;
 
 struct RenderList;
@@ -166,7 +164,6 @@ public:
     }
     // get the item mNextFree points to and increase by one
     RenderItem& item = *mItems[ mNextFree++ ];
-    item.Reset();
     return item;
   }
 
@@ -185,7 +182,7 @@ public:
   const Render::Renderer& GetRenderer( RenderItemContainer::SizeType index ) const
   {
     DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
-    return mItems[ index ]->GetRenderer();
+    return *mItems[ index ]->mRenderer;
   }
 
   /**

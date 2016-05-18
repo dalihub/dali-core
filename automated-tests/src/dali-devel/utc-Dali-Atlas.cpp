@@ -43,7 +43,7 @@ void PrepareResourceImage( TestApplication& application, unsigned int imageWidth
   memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
 
   Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+  platform.SetSynchronouslyLoadedResource( resourcePtr );
 }
 
 PixelDataPtr CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)

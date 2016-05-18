@@ -140,10 +140,7 @@ std::string GetStringProperty(const std::string& field, const Property::Value& p
 Dali::Shader::ShaderHints ConvertHints( Dali::ShaderEffect::GeometryHints hints)
 {
   int convertedHints = Dali::Shader::HINT_NONE;
-  if( hints & Dali::ShaderEffect::HINT_DEPTH_BUFFER )
-  {
-    convertedHints |= Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
-  }
+
   if( hints & Dali::ShaderEffect::HINT_BLENDING )
   {
     convertedHints |= Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT;

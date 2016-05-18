@@ -117,31 +117,13 @@ public:
   }
 
   /**
-   * Sets if the geometry requires depth testing
-   * @param[in] requiresDepthTest True if depth testing is required, false otherwise
-   */
-  void SetRequiresDepthTest( bool requiresDepthTest )
-  {
-    mRequiresDepthTest = requiresDepthTest;
-  }
-
-  /**
-   * Check if geometry requires depth testing
-   * @return True if depth testing is required, false otherwise
-   */
-  bool RequiresDepthTest() const
-  {
-    return mRequiresDepthTest;
-  }
-
-  /**
    * Upload the geometry if it has changed, set up the attributes and perform
    * the Draw call corresponding to the geometry type
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
-   * @param[in] elementBufferCount Number of elements to draw if index buffer bound
+   * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
   void UploadAndDraw(Context& context,
                      BufferIndex bufferIndex,
@@ -160,7 +142,6 @@ private:
 
   // Booleans
   bool mIndicesChanged : 1;
-  bool mRequiresDepthTest : 1;
   bool mHasBeenUpdated : 1;
   bool mAttributesChanged : 1;
 

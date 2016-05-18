@@ -549,4 +549,3 @@ std::ostream& operator<<( std::ostream& o, const Quaternion& quaternion )
 }
 
 } // namespace Dali
-

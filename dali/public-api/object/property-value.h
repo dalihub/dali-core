@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_VALUE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,7 +239,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] boolValue On return, a boolean value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::BOOLEAN.
+   * @pre GetType() is a type convertible to bool.
    */
   bool Get( bool& boolValue ) const;
 
@@ -249,7 +249,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] floatValue On return, a floating-point value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::FLOAT.
+   * @pre GetType() is a type convertible to float.
    */
   bool Get( float& floatValue ) const;
 
@@ -259,7 +259,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] integerValue On return, an integer value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::INTEGER.
+   * @pre GetType() is a type convertible to int.
    */
   bool Get( int& integerValue ) const;
 
@@ -269,7 +269,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] rect On return, an integer rectangle.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::RECTANGLE.
+   * @pre GetType() is a type convertible to Rect<int>.
    */
   bool Get( Rect<int>& rect ) const;
 
@@ -279,7 +279,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] vectorValue On return, a vector value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::VECTOR2.
+   * @pre GetType() is a type convertible to Vector2.
    */
   bool Get( Vector2& vectorValue ) const;
 
@@ -289,7 +289,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] vectorValue On return, a vector value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::VECTOR3.
+   * @pre GetType() is a type convertible to Vector3.
    */
   bool Get( Vector3& vectorValue ) const;
 
@@ -299,7 +299,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] vectorValue On return, a vector value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::VECTOR4.
+   * @pre GetType() is a type convertible to Vector4.
    */
   bool Get( Vector4& vectorValue ) const;
 
@@ -309,7 +309,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] matrixValue On return, a matrix3 value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::MATRIX3.
+   * @pre GetType() is a type convertible to Matrix3.
    */
   bool Get( Matrix3& matrixValue ) const;
 
@@ -319,7 +319,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] matrixValue On return, a matrix value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::MATRIX.
+   * @pre GetType() is a type convertible to Matrix.
    */
   bool Get( Matrix& matrixValue ) const;
 
@@ -329,7 +329,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] angleAxisValue On return, a angle-axis value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::ROTATION.
+   * @pre GetType() is a type convertible to AngleAxis.
    */
   bool Get( AngleAxis& angleAxisValue ) const;
 
@@ -339,7 +339,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] quaternionValue On return, a quaternion value.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::ROTATION.
+   * @pre GetType() is a type convertible to Quaternion.
    */
   bool Get( Quaternion& quaternionValue ) const;
 
@@ -349,7 +349,7 @@ public:
    * @SINCE_1_0.0
    * @param [out] stringValue A string.
    * @return true if the value is successfully retrieved, false if the type is not convertible
-   * @pre GetType() returns Property::STRING.
+   * @pre GetType() is a type convertible to string.
    */
   bool Get( std::string& stringValue ) const;
 

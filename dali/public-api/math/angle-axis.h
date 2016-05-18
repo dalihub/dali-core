@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <iosfwd>
+#include <ostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector3.h>
@@ -66,7 +70,7 @@ struct AngleAxis
 
 };
 
-// compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
+// Compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 /**
  * @brief Compare two angle axis for equality
@@ -74,11 +78,24 @@ struct AngleAxis
  * @SINCE_1_0.0
  * @param lhs angle axis
  * @param rhs angle axis
- * @return true if they are equal
+ * @return True if they are equal
  */
 inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
 {
   return (lhs.angle == rhs.angle) && (lhs.axis == rhs.axis);
+}
+
+/**
+ * @brief Print an angle axis
+ *
+ * @SINCE_1_1.33
+ * @param [in] o The output stream operator.
+ * @param [in] angleAxis The angle axis to print
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& o, const Dali::AngleAxis& angleAxis)
+{
+  return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree( angleAxis.angle ).degree << " degrees ]";
 }
 
 /**

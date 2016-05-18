@@ -37,6 +37,7 @@ class Quaternion;
 
 /**
  * @brief The Matrix class represents transformations and projections.
+ *
  * It is agnostic w.r.t. row/column major notation - it operates on a flat array.
  * Each axis is contiguous in memory, so the x axis corresponds to elements 0, 1, 2 and 3, the y axis dorresponds to elements 4, 5, 6, 7, etc.
  * @SINCE_1_0.0
@@ -59,7 +60,7 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param initialize to zero or leave uninitialized
+   * @param[in] initialize True for initialization by zero or otherwise
    */
   explicit Matrix( bool initialize );
 
@@ -69,13 +70,17 @@ public:
    * The matrix is initialised with the contents of 'array' which must contain 16 floats.
    * The order of the values for a transform matrix is:
    *
+   * @code
+   *
    *   xAxis.x xAxis.y xAxis.z 0.0f
    *   yAxis.x yAxis.y yAxis.z 0.0f
    *   zAxis.x zAxis.y zAxis.z 0.0f
    *   trans.x trans.y trans.z 1.0f
    *
+   * @endcode
+   *
    * @SINCE_1_0.0
-   * @param [in] array     16 floats
+   * @param [in] array Pointer of 16 floats data
    */
   explicit Matrix(const float* array);
 
@@ -83,7 +88,7 @@ public:
    * @brief Constructs a matrix from quaternion.
    *
    * @SINCE_1_0.0
-   * @param rotation as quaternion
+   * @param rotation Rotation as quaternion
    */
   explicit Matrix( const Quaternion& rotation );
 
@@ -91,7 +96,7 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] matrix to copy values from
+   * @param [in] matrix A reference to the copied matrix
    */
   Matrix( const Matrix& matrix );
 
@@ -99,8 +104,8 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] matrix to copy values from
-   * @return a reference to this
+   * @param [in] matrix A reference to the copied matrix
+   * @return A reference to this
    */
   Matrix& operator=( const Matrix& matrix );
 
@@ -119,7 +124,7 @@ public:
    * @brief Sets this matrix to be an identity matrix with scale.
    *
    * @SINCE_1_0.0
-   * @param scale to set on top of identity matrix
+   * @param[in] scale Scale to set on top of identity matrix
    */
   void SetIdentityAndScale( const Vector3& scale );
 
@@ -129,7 +134,7 @@ public:
    * Any Matrix representing only a rotation and/or translation
    * can be inverted using this function. It is faster and more accurate then using Invert().
    * @SINCE_1_0.0
-   * @param [out] result     returns the inverse of this matrix
+   * @param [out] result The inverse of this matrix
    */
   void InvertTransform(Matrix& result) const;
 
@@ -178,7 +183,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @param [in] axis     the values to set the axis to
+   * @param[in] axis The values to set the axis to
    */
   void SetXAxis(const Vector3& axis);
 
@@ -187,7 +192,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @param [in] axis     the values to set the axis to
+   * @param[in] axis The values to set the axis to
    */
   void SetYAxis(const Vector3& axis);
 
@@ -196,7 +201,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @param [in] axis     the values to set the axis to
+   * @param[in] axis The values to set the axis to
    */
   void SetZAxis(const Vector3& axis);
 
@@ -225,7 +230,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @param [in] translation   the translation
+   * @param[in] translation The translation
    */
   void SetTranslation(const Vector4& translation);
 
@@ -234,7 +239,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @param [in] translation   the translation
+   * @param[in] translation The translation
    */
   void SetTranslation(const Vector3& translation);
 
@@ -252,10 +257,16 @@ public:
    * @brief Returns the contents of the matrix as an array of 16 floats.
    *
    * The order of the values for a transform matrix is:
+   *
+   * @code
+   *
    *   xAxis.x xAxis.y xAxis.z 0.0f
    *   yAxis.x yAxis.y yAxis.z 0.0f
    *   zAxis.x zAxis.y zAxis.z 0.0f
    *   trans.x trans.y trans.z 1.0f
+   *
+   * @endcode
+   *
    * @SINCE_1_0.0
    * @return the matrix contents as an array of 16 floats.
    * @note inlined for performance reasons (generates less code than a function call)
@@ -267,10 +278,15 @@ public:
    *
    * The order of the values for a transform matrix is:
    *
+   * @code
+   *
    *   xAxis.x xAxis.y xAxis.z 0.0f
    *   yAxis.x yAxis.y yAxis.z 0.0f
    *   zAxis.x zAxis.y zAxis.z 0.0f
    *   trans.x trans.y trans.z 1.0f
+   *
+   * @endcode
+   *
    * @SINCE_1_0.0
    * @return the matrix contents as an array of 16 floats.
    * @note inlined for performance reasons (generates less code than a function call)
@@ -282,9 +298,9 @@ public:
    *
    * Use this method in time critical path as it does not require temporaries
    * @SINCE_1_0.0
-   * @param result of the multiplication
-   * @param lhs matrix, this can be same matrix as result
-   * @param rhs matrix, this cannot be same matrix as result
+   * @param[out] result Result of the multiplication
+   * @param[in] lhs Matrix, this can be same matrix as result
+   * @param[in] rhs Matrix, this cannot be same matrix as result
    */
   static void Multiply( Matrix& result, const Matrix& lhs, const Matrix& rhs );
 
@@ -293,9 +309,9 @@ public:
    *
    * Use this method in time critical path as it does not require temporaries
    * @SINCE_1_0.0
-   * @param result of the multiplication
-   * @param lhs matrix, this can be same matrix as result
-   * @param rhs quaternion
+   * @param[out] result Result of the multiplication
+   * @param[in] lhs Matrix, this can be same matrix as result
+   * @param[in] rhs Quaternion
    */
   static void Multiply( Matrix& result, const Matrix& lhs, const Quaternion& rhs );
 
@@ -303,7 +319,7 @@ public:
    * @brief The multiplication operator.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs    the Matrix to multiply this by
+   * @param[in] rhs The Matrix to multiply this by
    * @return A matrix containing the result
    */
   Vector4 operator*(const Vector4& rhs) const;
@@ -314,7 +330,7 @@ public:
    * Utilises appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs    the Matrix to compare this to
+   * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
   bool operator==(const Matrix & rhs) const;
@@ -324,7 +340,7 @@ public:
    *
    * Utilises appropriate machine epsilon values.
    * @SINCE_1_0.0
-   * @param [in] rhs    the Matrix to compare this to
+   * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are not equal.
    */
   bool operator!=(const Matrix & rhs) const;
@@ -334,9 +350,9 @@ public:
    *
    * Performs scale, rotation, then translation
    * @SINCE_1_0.0
-   * @param[in] scale to apply
-   * @param[in] rotation to apply
-   * @param[in] translation to apply
+   * @param[in] scale Scale to apply
+   * @param[in] rotation Rotation to apply
+   * @param[in] translation Translation to apply
    */
   void SetTransformComponents(const Vector3& scale,
                               const Quaternion& rotation,
@@ -347,9 +363,9 @@ public:
    *
    * Performs translation, then rotation, then scale.
    * @SINCE_1_0.0
-   * @param[in] scale to apply
-   * @param[in] rotation to apply
-   * @param[in] translation to apply
+   * @param[in] scale Scale to apply
+   * @param[in] rotation Rotation to apply
+   * @param[in] translation Translation to apply
    */
   void SetInverseTransformComponents(const Vector3&    scale,
                                      const Quaternion& rotation,
@@ -364,7 +380,7 @@ public:
    * @param[in] xAxis The X axis of the basis
    * @param[in] yAxis The Y axis of the basis
    * @param[in] zAxis The Z axis of the basis
-   * @param[in] translation to apply
+   * @param[in] translation Translation to apply
    */
   void SetInverseTransformComponents(const Vector3&    xAxis,
                                      const Vector3&    yAxis,
@@ -375,9 +391,9 @@ public:
    * @brief Gets the position, scale and rotation components from the given transform matrix.
    *
    * @SINCE_1_0.0
-   * @param[out] position to set
-   * @param[out] rotation to set - only valid if the transform matrix has not been skewed or sheared
-   * @param[out] scale to set - only valid if the transform matrix has not been skewed or sheared
+   * @param[out] position Position to set
+   * @param[out] rotation Rotation to set - only valid if the transform matrix has not been skewed or sheared
+   * @param[out] scale Scale to set - only valid if the transform matrix has not been skewed or sheared
    * @pre This matrix must not contain skews or shears.
    */
   void GetTransformComponents(Vector3& position,
@@ -394,8 +410,8 @@ private:
  *
  * It is printed in memory order, i.e. each printed row is contiguous in memory.
  * @SINCE_1_0.0
- * @param [in] o The output stream operator.
- * @param [in] matrix The matrix to print.
+ * @param[in] o The output stream operator.
+ * @param[in] matrix The matrix to print.
  * @return The output stream operator.
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);

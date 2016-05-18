@@ -1,5 +1,8 @@
+#ifndef __DALI_INTERNAL_MATH_H__
+#define __DALI_INTERNAL_MATH_H__
+
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +18,35 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/internal/update/node-attachments/node-attachment.h>
-
-// INTERNAL INCLUDES
-#include <dali/internal/update/nodes/node.h>
-#include <dali/public-api/common/dali-common.h>
-
 namespace Dali
 {
 
 namespace Internal
 {
 
-namespace SceneGraph
-{
+typedef float Vec3[3];
+typedef float Vec4[4];
+typedef float Mat4[16];
 
-NodeAttachment::NodeAttachment()
-: mParent(NULL)
-{
-}
+/**
+ * @brief Applies a transformation matrix to a vector
+ *
+ * @param[out] result The transformed vector
+ * @param[in] m The transformation matrix
+ * @param[in] v The vector to transform
+ */
+void TransformVector3( Vec3 result, const Mat4 m, const Vec3 v );
 
-NodeAttachment::~NodeAttachment()
-{
-}
-
-void NodeAttachment::SetParent( Node& parent )
-{
-  DALI_ASSERT_DEBUG(mParent == NULL);
-
-  mParent = &parent;
-}
-
-} // namespace SceneGraph
+/**
+ * @brief Computes the length of a vector3
+ *
+ * @param[in] v The vector
+ * @return The lenght of the vector
+ */
+float Length( const Vec3 v );
 
 } // namespace Internal
 
 } // namespace Dali
+
+#endif  //__DALI_INTERNAL_MATH_H__

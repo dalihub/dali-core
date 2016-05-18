@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/common/projection.h>
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
 {
@@ -147,8 +147,8 @@ CameraActorPtr CameraActor::New( const Size& size )
   actor->SetName("DefaultCamera");
 
   // Create scene-object and transfer ownership through message
-  SceneGraph::CameraAttachment* sceneObject = SceneGraph::CameraAttachment::New();
-  AttachToNodeMessage( actor->GetEventThreadServices().GetUpdateManager(), *actor->mNode, sceneObject );
+  SceneGraph::Camera* sceneObject = SceneGraph::Camera::New();
+  AddCameraMessage( actor->GetEventThreadServices().GetUpdateManager(), sceneObject );
 
   // Keep raw pointer for message passing
   actor->mSceneObject = sceneObject;
@@ -165,23 +165,28 @@ CameraActorPtr CameraActor::New( const Size& size )
 CameraActor::CameraActor()
 : Actor( Actor::BASIC ),
   mSceneObject( NULL ),
-  mTarget( SceneGraph::CameraAttachment::DEFAULT_TARGET_POSITION ),
-  mType( SceneGraph::CameraAttachment::DEFAULT_TYPE ),
-  mProjectionMode( SceneGraph::CameraAttachment::DEFAULT_MODE ),
-  mFieldOfView( SceneGraph::CameraAttachment::DEFAULT_FIELD_OF_VIEW ),
-  mAspectRatio( SceneGraph::CameraAttachment::DEFAULT_ASPECT_RATIO ),
-  mNearClippingPlane( SceneGraph::CameraAttachment::DEFAULT_NEAR_CLIPPING_PLANE ),
-  mFarClippingPlane( SceneGraph::CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE ),
-  mLeftClippingPlane( SceneGraph::CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE ),
-  mRightClippingPlane( SceneGraph::CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE ),
-  mTopClippingPlane( SceneGraph::CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE ),
-  mBottomClippingPlane( SceneGraph::CameraAttachment::DEFAULT_BOTTOM_CLIPPING_PLANE ),
-  mInvertYAxis( SceneGraph::CameraAttachment::DEFAULT_INVERT_Y_AXIS )
+  mTarget( SceneGraph::Camera::DEFAULT_TARGET_POSITION ),
+  mType( SceneGraph::Camera::DEFAULT_TYPE ),
+  mProjectionMode( SceneGraph::Camera::DEFAULT_MODE ),
+  mFieldOfView( SceneGraph::Camera::DEFAULT_FIELD_OF_VIEW ),
+  mAspectRatio( SceneGraph::Camera::DEFAULT_ASPECT_RATIO ),
+  mNearClippingPlane( SceneGraph::Camera::DEFAULT_NEAR_CLIPPING_PLANE ),
+  mFarClippingPlane( SceneGraph::Camera::DEFAULT_FAR_CLIPPING_PLANE ),
+  mLeftClippingPlane( SceneGraph::Camera::DEFAULT_LEFT_CLIPPING_PLANE ),
+  mRightClippingPlane( SceneGraph::Camera::DEFAULT_RIGHT_CLIPPING_PLANE ),
+  mTopClippingPlane( SceneGraph::Camera::DEFAULT_TOP_CLIPPING_PLANE ),
+  mBottomClippingPlane( SceneGraph::Camera::DEFAULT_BOTTOM_CLIPPING_PLANE ),
+  mInvertYAxis( SceneGraph::Camera::DEFAULT_INVERT_Y_AXIS )
 {
 }
 
 CameraActor::~CameraActor()
 {
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    // Create scene-object and transfer ownership through message
+    RemoveCameraMessage( GetEventThreadServices().GetUpdateManager(), mSceneObject );
+  }
 }
 
 void CameraActor::SetTarget( const Vector3& target )
@@ -492,6 +497,10 @@ const Matrix& CameraActor::GetProjectionMatrix() const
   {
     return Matrix::IDENTITY;
   }
+}
+const SceneGraph::Camera* CameraActor::GetCamera() const
+{
+  return mSceneObject;
 }
 
 unsigned int CameraActor::GetDefaultPropertyCount() const

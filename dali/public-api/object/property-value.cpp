@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,14 +101,15 @@ struct Property::Value::Impl
 
   Impl( const AngleAxis& angleAxisValue )
   : type( Property::ROTATION ),
-    quaternionValue( new Quaternion( angleAxisValue.angle, angleAxisValue.axis ) )
+    angleAxisValue( new AngleAxis(angleAxisValue) )
   {
   }
 
   Impl( const Quaternion& quaternionValue )
   : type( Property::ROTATION ),
-    quaternionValue( new Quaternion( quaternionValue ) )
+    angleAxisValue( new AngleAxis() )
   {
+    quaternionValue.ToAxisAngle( angleAxisValue->axis, angleAxisValue->angle );
   }
 
   Impl(const std::string& stringValue)
@@ -181,7 +182,7 @@ struct Property::Value::Impl
       }
       case Property::ROTATION:
       {
-        delete quaternionValue;
+        delete angleAxisValue;
         break;
       }
       case Property::STRING:
@@ -215,7 +216,7 @@ public: // Data
     Vector4* vector4Value;
     Matrix3* matrix3Value;
     Matrix* matrixValue;
-    Quaternion* quaternionValue;
+    AngleAxis* angleAxisValue;
     std::string* stringValue;
     Rect<int>* rectValue;
     Property::Array* arrayValue;
@@ -352,7 +353,7 @@ Property::Value::Value( Type type )
     }
     case Property::ROTATION:
     {
-      mImpl = new Impl( Quaternion() );
+      mImpl = new Impl( AngleAxis() );
       break;
     }
     case Property::STRING:
@@ -451,7 +452,7 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::ROTATION:
       {
-        *mImpl->quaternionValue = *value.mImpl->quaternionValue; // type cannot change in mImpl so quaternion is allocated
+        *mImpl->angleAxisValue = *value.mImpl->angleAxisValue; // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::STRING:
@@ -527,7 +528,7 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::ROTATION:
       {
-        newImpl = new Impl( *value.mImpl->quaternionValue ); // type cannot change in mImpl so quaternion is allocated
+        newImpl = new Impl( *value.mImpl->angleAxisValue ); // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::MATRIX3:
@@ -633,10 +634,14 @@ bool Property::Value::Get( int& integerValue ) const
 bool Property::Value::Get( Vector2& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR2) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector2Value);
-    converted = true;
+    // type cannot change in mImpl so vector is allocated
+    if( mImpl->type == VECTOR2 || mImpl->type == VECTOR3 || mImpl->type == VECTOR4 )
+    {
+      vectorValue = *(mImpl->vector2Value); // if Vector3 or 4 only x and y are assigned
+      converted = true;
+    }
   }
   return converted;
 }
@@ -644,10 +649,19 @@ bool Property::Value::Get( Vector2& vectorValue ) const
 bool Property::Value::Get( Vector3& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR3) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector3Value);
-    converted = true;
+    // type cannot change in mImpl so vector is allocated
+    if ( mImpl->type == VECTOR3 || mImpl->type == VECTOR4 )
+    {
+      vectorValue = *(mImpl->vector3Value); // if Vector4 only x,y,z are assigned
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR2 )
+    {
+      vectorValue = *(mImpl->vector2Value);
+      converted = true;
+    }
   }
   return converted;
 }
@@ -655,10 +669,23 @@ bool Property::Value::Get( Vector3& vectorValue ) const
 bool Property::Value::Get( Vector4& vectorValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == VECTOR4) ) // type cannot change in mImpl so vector is allocated
+  if( mImpl )
   {
-    vectorValue = *(mImpl->vector4Value);
-    converted = true;
+    if( mImpl->type == VECTOR4 ) // type cannot change in mImpl so vector is allocated
+    {
+      vectorValue = *(mImpl->vector4Value);
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR2 )
+    {
+      vectorValue = *(mImpl->vector2Value);
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR3 )
+    {
+      vectorValue = *(mImpl->vector3Value);
+      converted = true;
+    }
   }
   return converted;
 }
@@ -699,9 +726,9 @@ bool Property::Value::Get( Rect<int>& rectValue ) const
 bool Property::Value::Get( AngleAxis& angleAxisValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so angleAxis is allocated
   {
-    mImpl->quaternionValue->ToAxisAngle( angleAxisValue.axis, angleAxisValue.angle );
+    angleAxisValue = *(mImpl->angleAxisValue);
     converted = true;
   }
   return converted;
@@ -710,9 +737,9 @@ bool Property::Value::Get( AngleAxis& angleAxisValue ) const
 bool Property::Value::Get( Quaternion& quaternionValue ) const
 {
   bool converted = false;
-  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so angleAxis is allocated
   {
-    quaternionValue = *(mImpl->quaternionValue);
+    quaternionValue = Quaternion(mImpl->angleAxisValue->angle, mImpl->angleAxisValue->axis );
     converted = true;
   }
   return converted;
@@ -826,7 +853,7 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
       }
       case Dali::Property::ROTATION:
       {
-        stream << *impl.quaternionValue;
+        stream << *impl.angleAxisValue;
         break;
       }
       case Dali::Property::STRING:

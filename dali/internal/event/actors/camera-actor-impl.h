@@ -31,11 +31,11 @@ namespace Internal
 
 namespace SceneGraph
 {
-class CameraAttachment;
+class Camera;
 }
 
 /**
- * An actor with CameraAttachment.
+ * An actor with Camera.
  */
 class CameraActor : public Actor
 {
@@ -190,6 +190,12 @@ public:
    */
   const Matrix& GetProjectionMatrix() const;
 
+  /**
+   * Return the scene graph camera (for RenderTask)
+   * @return The scene graph camera.
+   */
+  const SceneGraph::Camera* GetCamera() const;
+
 public: // properties
 
   /**
@@ -266,7 +272,7 @@ private:
 
 private: // Data
 
-  const SceneGraph::CameraAttachment* mSceneObject; ///< Not owned
+  const SceneGraph::Camera* mSceneObject; ///< Not owned
 
   Vector3            mTarget;
   Dali::Camera::Type mType;

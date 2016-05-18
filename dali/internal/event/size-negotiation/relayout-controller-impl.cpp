@@ -31,6 +31,7 @@
 #include <dali/public-api/object/object-registry.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
@@ -211,8 +212,18 @@ void RelayoutController::OnApplicationSceneCreated()
 
   // Spread the dirty flag through whole tree - don't need to explicity
   // add request on rootLayer as it will automatically be added below.
-  Dali::Actor rootLayer = Dali::Stage::GetCurrent().GetRootLayer();
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::Actor rootLayer = stage.GetRootLayer();
   RequestRelayoutTree( rootLayer );
+
+  // Also add request on the root of system overlay
+  Dali::Internal::SystemOverlay* systemOverlay = GetImplementation(stage).GetSystemOverlayInternal();
+  if( systemOverlay )
+  {
+    Dali::Internal::Actor& systemOverlayInternalRoot = systemOverlay->GetDefaultRootActor();
+    Dali::Actor systemOverlayRoot = Dali::Actor(&systemOverlayInternalRoot);
+    RequestRelayoutTree( systemOverlayRoot );
+  }
 
   // Flag request for end of frame
   Request();

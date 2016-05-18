@@ -98,54 +98,54 @@ public:
   /**
     * @copydoc Dali::Renderer::SetFaceCullingMode()
     */
-   void SetFaceCullingMode( Dali::Renderer::FaceCullingMode cullingMode );
+   void SetFaceCullingMode( FaceCullingMode::Type cullingMode );
 
    /**
     * @copydoc Dali::Renderer::GetFaceCullingMode()
     */
-   Dali::Renderer::FaceCullingMode GetFaceCullingMode();
+   FaceCullingMode::Type GetFaceCullingMode();
 
    /**
     * @copydoc Dali::Renderer::SetBlendMode()
     */
-   void SetBlendMode( BlendingMode::Type mode );
+   void SetBlendMode( BlendMode::Type mode );
 
    /**
     * @copydoc Dali::Renderer::GetBlendMode()
     */
-   BlendingMode::Type GetBlendMode() const;
+   BlendMode::Type GetBlendMode() const;
 
    /**
     * @copydoc Dali::Renderer::SetBlendFunc()
     */
-   void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
+   void SetBlendFunc( BlendFactor::Type srcFactorRgba, BlendFactor::Type destFactorRgba );
 
    /**
     * @copydoc Dali::Renderer::SetBlendFunc()
     */
-   void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                      BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
+   void SetBlendFunc( BlendFactor::Type srcFactorRgb,   BlendFactor::Type destFactorRgb,
+                      BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha );
 
    /**
     * @copydoc Dali::Renderer::GetBlendFunc()
     */
-   void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                      BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
+   void GetBlendFunc( BlendFactor::Type& srcFactorRgb,   BlendFactor::Type& destFactorRgb,
+                      BlendFactor::Type& srcFactorAlpha, BlendFactor::Type& destFactorAlpha ) const;
 
    /**
     * @copydoc Dali::Renderer::SetBlendEquation()
     */
-   void SetBlendEquation( BlendingEquation::Type equationRgba );
+   void SetBlendEquation( BlendEquation::Type equationRgba );
 
    /**
     * @copydoc Dali::Renderer::SetBlendEquation()
     */
-   void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+   void SetBlendEquation( BlendEquation::Type equationRgb, BlendEquation::Type equationAlpha );
 
    /**
     * @copydoc Dali::Renderer::GetBlendEquation()
     */
-   void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
+   void GetBlendEquation( BlendEquation::Type& equationRgb, BlendEquation::Type& equationAlpha ) const;
 
    /**
     * @copydoc Dali::Renderer::SetBlendColor()
@@ -303,22 +303,24 @@ private: // unimplemented methods
 
 private: // data
   SceneGraph::Renderer* mSceneObject;
-  Vector4* mBlendColor;                         ///< Local copy of blend color, pointer only as its rarely used
-  GeometryPtr mGeometry; ///< Connector that holds the geometry used by this renderer
+  Vector4* mBlendColor;                             ///< Local copy of blend color, pointer only as its rarely used
+  GeometryPtr mGeometry;                            ///< Connector that holds the geometry used by this renderer
   ObjectConnector<TextureSet> mTextureSetConnector; ///< Connector that holds the texture set used by this renderer
-  IntrusivePtr<Shader> mShader;                 ///< Connector that holds the shader used by this renderer
+  IntrusivePtr<Shader> mShader;                     ///< Connector that holds the shader used by this renderer
 
   int mDepthIndex;
   int mOnStageCount;
 
-  size_t mIndexedDrawFirstElement;                   ///< Offset of first element to draw from bound index buffer
-  size_t mIndexedDrawElementCount;                    ///< Number of elements to draw
+  size_t mIndexedDrawFirstElement;                  ///< Offset of first element to draw from bound index buffer
+  size_t mIndexedDrawElementCount;                  ///< Number of elements to draw
 
-  Dali::Renderer::FaceCullingMode mFaceCullingMode; ///< Local copy of face culling mode
-  BlendingMode::Type mBlendingMode;                 ///< Local copy of blending mode
+  Dali::FaceCullingMode::Type mFaceCullingMode;     ///< Local copy of face culling mode
+  BlendMode::Type mBlendMode;                       ///< Local copy of blending mode
   BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
-  bool mPremultipledAlphaEnabled;                   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  Dali::DepthWriteMode::Type mDepthWriteMode;       ///< Local copy of depth write mode
+  Dali::DepthFunction::Type mDepthFunction;         ///< Local copy of depth function
 
+  bool mPremultipledAlphaEnabled : 1;               ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace Internal

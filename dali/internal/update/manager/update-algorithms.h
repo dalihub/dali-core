@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_UPDATE_ALGORITHMS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,20 +45,18 @@ class RenderQueue;
 void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex );
 
 /**
- * Update a tree of nodes, and attached objects.
+ * Update a tree of nodes
  * The inherited properties of each node are recalculated if necessary.
- * When a renderable attachment is ready to render, PrepareResources() is called and
- * it is added to the list for its Layer.
  * @param[in] rootNode The root of a tree of nodes.
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] resourceManager The resource manager.
  * @param[in] renderQueue Used to query messages for the next Render.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
-int UpdateNodesAndAttachments( Layer& rootNode,
-                               BufferIndex updateBufferIndex,
-                               ResourceManager& resourceManager,
-                               RenderQueue& renderQueue );
+int UpdateNodeTree( Layer& rootNode,
+                    BufferIndex updateBufferIndex,
+                    ResourceManager& resourceManager,
+                    RenderQueue& renderQueue );
 
 } // namespace SceneGraph
 

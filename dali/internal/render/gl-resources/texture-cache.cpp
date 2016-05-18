@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,13 @@
  *
  */
 
+// CLASS HEADER
+#include <dali/internal/render/gl-resources/texture-cache.h>
+
+// INTERNAL HEADERS
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/bitmap.h>
+#include <dali/internal/event/resources/resource-client.h> // For RectArea
 #include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/gl-resources/context.h>
@@ -46,9 +51,6 @@ namespace Dali
 namespace Internal
 {
 
-// value types used by messages
-template <> struct ParameterType< Pixel::Format > : public BasicType< Pixel::Format > {};
-template <> struct ParameterType< RenderBuffer::Format > : public BasicType< RenderBuffer::Format > {};
 
 namespace SceneGraph
 {
@@ -74,8 +76,7 @@ void GlContextDestroyed( TextureContainer& textures )
 TextureCache::TextureCache( RenderQueue& renderQueue,
                             TextureUploadedDispatcher& postProcessResourceDispatcher,
                             Context& context)
-: TextureCacheDispatcher(renderQueue),
-  mTextureUploadedDispatcher(postProcessResourceDispatcher),
+: mTextureUploadedDispatcher(postProcessResourceDispatcher),
   mContext(context),
   mDiscardBitmapsPolicy(ResourcePolicy::OWNED_DISCARD)
 {
@@ -109,7 +110,7 @@ void TextureCache::AddNativeImage(ResourceId id, NativeImageInterfacePtr nativeI
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddNativeImage(id=%i NativeImg:%p)\n", id, nativeImage.Get());
 
-  /// TODO - currently a new Texture is created even if we reuse the same NativeImage
+  /// WARNING - currently a new Texture is created even if we reuse the same NativeImage
   Texture* texture = TextureFactory::NewNativeImageTexture(*nativeImage, mContext);
   mTextures.insert(TexturePair(id, texture));
 }
@@ -217,7 +218,7 @@ void TextureCache::UpdateTexture( ResourceId id, PixelDataPtr pixelData, std::si
   }
 }
 
-void TextureCache::UpdateTextureArea( ResourceId id, const Dali::RectArea& area )
+void TextureCache::UpdateTextureArea( ResourceId id, const RectArea& area )
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::UpdateTextureArea(id=%i)\n", id );
 
@@ -440,195 +441,6 @@ void TextureCache::SetDiscardBitmapsPolicy( ResourcePolicy::Discardable policy )
 ResourcePolicy::Discardable TextureCache::GetDiscardBitmapsPolicy()
 {
   return mDiscardBitmapsPolicy;
-}
-
-
-/********************************************************************************
- **********************  Implements TextureCacheDispatcher  *********************
- ********************************************************************************/
-
-void TextureCache::DispatchCreateTexture( ResourceId        id,
-                                          unsigned int      width,
-                                          unsigned int      height,
-                                          Pixel::Format     pixelFormat,
-                                          bool              clearPixels )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue5< TextureCache, ResourceId, unsigned int, unsigned int, Pixel::Format, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::CreateTexture, id, width, height, pixelFormat, clearPixels );
-  }
-}
-
-void TextureCache::DispatchCreateTextureForBitmap( ResourceId id, Bitmap* bitmap )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, Integration::BitmapPtr > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddBitmap, id, bitmap );
-  }
-}
-
-void TextureCache::DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, NativeImageInterfacePtr > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddNativeImage, id, nativeImage );
-  }
-}
-
-void TextureCache::DispatchCreateGlTexture( ResourceId id )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue1< TextureCache, ResourceId > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::CreateGlTexture, id );
-  }
-}
-
-void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue5< TextureCache, ResourceId, unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddFrameBuffer, id, width, height, pixelFormat, bufferFormat );
-  }
-}
-
-void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, NativeImageInterfacePtr > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddFrameBuffer, id, nativeImage );
-  }
-}
-
-void TextureCache::DispatchUpdateTexture( ResourceId id, Bitmap* bitmap )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, Integration::BitmapPtr > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::UpdateTexture, id, bitmap );
-  }
-}
-
-void TextureCache::DispatchUpdateTexture( ResourceId id, Integration::BitmapPtr bitmap , std::size_t xOffset, std::size_t yOffset)
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue4< TextureCache, ResourceId, Integration::BitmapPtr, std::size_t, std::size_t > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::UpdateTexture, id, bitmap, xOffset, yOffset );
-  }
-}
-
-void TextureCache::DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue4< TextureCache, ResourceId, ResourceId, std::size_t, std::size_t > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::UpdateTexture, destId, srcId, xOffset, yOffset );
-  }
-}
-
-void TextureCache::DispatchUpdateTexture( ResourceId id, PixelDataPtr pixelData , std::size_t xOffset, std::size_t yOffset)
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue4< TextureCache, ResourceId, PixelDataPtr, std::size_t, std::size_t > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::UpdateTexture, id, pixelData, xOffset, yOffset );
-  }
-}
-
-void TextureCache::DispatchUpdateTextureArea( ResourceId id, const Dali::RectArea& area )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, Dali::RectArea > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::UpdateTextureArea, id, area );
-  }
-}
-
-void TextureCache::DispatchDiscardTexture( ResourceId id )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue1< TextureCache, ResourceId > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::DiscardTexture, id );
-  }
 }
 
 } // SceneGraph

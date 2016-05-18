@@ -40,6 +40,71 @@ namespace Render
 {
 
 /**
+ * Helper to set the depth function
+ * @param[in] context The GL context
+ * @param[in] depthFunction The depth function
+ */
+inline void SetDepthFunction( Context& context, DepthFunction::Type depthFunction )
+{
+  switch( depthFunction )
+  {
+    case DepthFunction::OFF:
+    {
+      context.EnableDepthBuffer( false );
+      break;
+    }
+    case DepthFunction::NEVER:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_NEVER );
+      break;
+    }
+    case DepthFunction::ALWAYS:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_ALWAYS );
+      break;
+    }
+    case DepthFunction::LESS:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_LESS );
+      break;
+    }
+    case DepthFunction::GREATER:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_GREATER );
+      break;
+    }
+    case DepthFunction::EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_EQUAL );
+      break;
+    }
+    case DepthFunction::NOT_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_NOTEQUAL );
+      break;
+    }
+    case DepthFunction::LESS_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_LEQUAL );
+      break;
+    }
+    case DepthFunction::GREATER_EQUAL:
+    {
+      context.EnableDepthBuffer( true );
+      context.DepthFunc( GL_GEQUAL );
+      break;
+    }
+  }
+}
+
+/**
  * Sets up the scissor test if required.
  * @param[in] renderList The render list from which to get the clipping flag
  * @param[in] context The context
@@ -70,18 +135,24 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context )
 {
   const unsigned int renderFlags = renderList.GetFlags();
 
-  bool enableDepthBuffer = ( ( renderFlags & RenderList::DEPTH_BUFFER_ENABLED ) != 0u );
+  if( ( renderFlags & RenderList::DEPTH_BUFFER_ENABLED ) != 0u )
+  {
+    //Enable depth testing
+    context.EnableDepthBuffer( true );
+  }
+  else
+  {
+    //Disable depth test and depth write
+    context.EnableDepthBuffer( false );
+    context.DepthMask( false );
+  }
 
   GLbitfield clearMask   = ( renderFlags & RenderList::DEPTH_CLEAR ) ? GL_DEPTH_BUFFER_BIT : 0u;
-
-  context.EnableDepthBuffer( enableDepthBuffer );
 
   // Stencil enabled, writing, and clearing...
   const bool enableStencilBuffer( renderFlags & RenderList::STENCIL_BUFFER_ENABLED );
   const bool enableStencilWrite( renderFlags & RenderList::STENCIL_WRITE );
-
   context.EnableStencilBuffer( enableStencilBuffer );
-
   if( enableStencilBuffer )
   {
     context.StencilFunc( (enableStencilWrite ? GL_ALWAYS : GL_EQUAL), 1, 0xFF );
@@ -130,15 +201,32 @@ inline void ProcessRenderList(
   {
     bool depthBufferEnabled = ( ( renderList.GetFlags() & RenderList::DEPTH_BUFFER_ENABLED ) != 0u );
     size_t count = renderList.Count();
-    for ( size_t index = 0; index < count; ++index )
+
+    if( depthBufferEnabled )
     {
-      const RenderItem& item = renderList.GetItem( index );
-      DALI_PRINT_RENDER_ITEM( item );
+      for ( size_t index = 0; index < count; ++index )
+      {
+        const RenderItem& item = renderList.GetItem( index );
+        DALI_PRINT_RENDER_ITEM( item );
 
-      //Enable depth writes if depth buffer is enabled and item is opaque
-      context.DepthMask( depthBufferEnabled && ( item.IsOpaque() || item.GetRenderer().RequiresDepthTest() ) );
+        DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
+        context.DepthMask( ( depthWriteMode == DepthWriteMode::AUTO && item.mIsOpaque ) ||
+                           ( depthWriteMode == DepthWriteMode::ON ) );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
+        SetDepthFunction( context, item.mRenderer->GetDepthFunction() );
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                                item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+      }
+    }
+    else
+    {
+      for ( size_t index = 0; index < count; ++index )
+      {
+        const RenderItem& item = renderList.GetItem( index );
+        DALI_PRINT_RENDER_ITEM( item );
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                                item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+      }
     }
   }
   else
@@ -149,7 +237,8 @@ inline void ProcessRenderList(
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      item.GetRenderer().Render( context, textureCache, bufferIndex, item.GetNode(), defaultShader, item.GetModelViewMatrix(), viewMatrix, projectionMatrix, item.GetSize(), !item.IsOpaque() );
+      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
     }
 
   }

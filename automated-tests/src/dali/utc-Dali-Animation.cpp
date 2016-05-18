@@ -4444,7 +4444,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByActorOrientationP(void)
+int UtcDaliAnimationAnimateByActorOrientationP1(void)
 {
   TestApplication application;
 
@@ -4500,6 +4500,131 @@ int UtcDaliAnimationAnimateByActorOrientationP(void)
   DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliAnimationAnimateByActorOrientationP2(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing that rotation angle > 360 performs full rotations\n");
+
+  Actor actor = Actor::New();
+  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ), ROTATION_EPSILON, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Degree relativeRotationDegrees(710.0f);
+  Radian relativeRotationRadians(relativeRotationDegrees);
+
+  animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), AngleAxis( relativeRotationRadians, Vector3::ZAXIS ) );
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.25f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.5f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.75f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  END_TEST;
+}
+
+
+int UtcDaliAnimationAnimateByActorOrientationP3(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing that rotation angle > 360 performs partial rotations when cast to Quaternion\n");
+
+  Actor actor = Actor::New();
+  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ), ROTATION_EPSILON, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Degree relativeRotationDegrees(730.0f);
+  Radian relativeRotationRadians(relativeRotationDegrees);
+
+  Radian actualRotationRadians( Degree(10.0f) );
+
+  animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), Quaternion( relativeRotationRadians, Vector3::ZAXIS ) );
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(actualRotationRadians * 0.25f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(actualRotationRadians * 0.5f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(actualRotationRadians * 0.75f, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(actualRotationRadians, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::ZAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  END_TEST;
+}
+
 
 int UtcDaliAnimationAnimateByActorOrientationAlphaFunctionP(void)
 {

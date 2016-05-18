@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,11 +347,11 @@ int UtcDaliPropertyValueConstructorsAngleAxisP(void)
 
 int UtcDaliPropertyValueConstructorsQuaternionP(void)
 {
-  Quaternion v( Vector4(1.0,1.0,1.0,1.0) );
+  Quaternion v( Radian( Math::PI ), Vector3::ZAXIS );
   Property::Value value(v);
 
   DALI_TEST_CHECK( value.GetType() == Property::ROTATION );
-  DALI_TEST_CHECK( value.Get<Quaternion>() == v );
+  DALI_TEST_EQUALS( v, value.Get<Quaternion>(), 0.001, TEST_LOCATION);
 
   END_TEST;
 }
@@ -692,11 +692,14 @@ int UtcDaliPropertyValueAssignmentOperatorRectP(void)
 int UtcDaliPropertyValueAssignmentOperatorQuaternionP(void)
 {
   Property::Value value;
-  value = Property::Value( Quaternion(1,1,1,1) ); // mismatch
-  DALI_TEST_CHECK( Quaternion(1,1,1,1) == value.Get<Quaternion>() );
+  Quaternion result( Radian( Math::PI_2 ), Vector3::YAXIS );
+  value = Property::Value( result );
+
+  DALI_TEST_EQUALS( value.Get<Quaternion>(), result, 0.001, TEST_LOCATION );
+
   Property::Value copy( Property::ROTATION );
   copy = value; // match
-  DALI_TEST_CHECK( Quaternion(1,1,1,1) == copy.Get<Quaternion>() );
+  DALI_TEST_EQUALS( copy.Get<Quaternion>(), result, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -873,6 +876,26 @@ int UtcDaliPropertyValueGetVector2P(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueGetVector2fromVector3P(void)
+{
+  Property::Value value( Vector3(1.f,2.f,3.f) );
+  Vector2 result;
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector2fromVector4P(void)
+{
+  Property::Value value( Vector4(1.f,2.f,3.f,4.f) );
+  Vector2 result;
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), result, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueGetVector2N(void)
 {
   Property::Value value;
@@ -896,6 +919,26 @@ int UtcDaliPropertyValueGetVector3P(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueGetVector3FromVector2P(void)
+{
+  Property::Value value( Vector2(1.0f,2.0f) );
+  Vector3 result(99.f,88.f,77.f);
+  DALI_TEST_EQUALS( Vector3(1.0f,2.0f,0.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(1.0f,2.0f,0.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector3FromVector4P(void)
+{
+  Property::Value value( Vector4(4.f,3.f,2.f,1.f) );
+  Vector3 result;
+  DALI_TEST_EQUALS( Vector3(4.f,3.f,2.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(4.f,3.f,2.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueGetVector3N(void)
 {
   Property::Value value;
@@ -916,6 +959,26 @@ int UtcDaliPropertyValueGetVector4P(void)
   DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), value.Get< Vector4 >(), TEST_LOCATION );
   DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector4FromVector2P(void)
+{
+  Property::Value value( Vector2(-1.f,-3.f) );
+  Vector4 result(99.f,88.f,77.f,66.f);
+  DALI_TEST_EQUALS( Vector4(-1.f,-3.f,0.f,0.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(-1.f,-3.f,0.f,0.f), result, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueGetVector4FromVector3P(void)
+{
+  Property::Value value( Vector3(1.f,2.f,-1.f) );
+  Vector4 result(99.f,88.f,77.f,66.f);
+  DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,0.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,0.f), result, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1012,25 +1075,33 @@ int UtcDaliPropertyValueGetAngleAxisN(void)
 
 int UtcDaliPropertyValueGetQuaternionP(void)
 {
-  Property::Value value( Quaternion(1.f,2.f,3.f,4.f) );
-  Quaternion result;
-  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), value.Get< Quaternion >(), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
+  Vector3 axis(1, 1, 0);
+  axis.Normalize();
+
+  Quaternion result( Radian( 1.f ), axis );
+  Property::Value value( result );
+
+  DALI_TEST_EQUALS( result, value.Get< Quaternion >(), TEST_LOCATION );
+  Quaternion test2;
+  DALI_TEST_EQUALS( true, value.Get( test2 ), TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetQuaternionN(void)
 {
   Property::Value value;
-  Quaternion result(1.f,2.f,3.f,4.f);
+  Vector3 axis(1, 1, 0);
+  axis.Normalize();
+  Quaternion result( Radian( 1.f ), axis );
+  Quaternion test(result);
+
   DALI_TEST_EQUALS( Quaternion(), value.Get< Quaternion >(), TEST_LOCATION );
-  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( test ), TEST_LOCATION );
+  DALI_TEST_EQUALS( test, result, TEST_LOCATION );
 
   Property::Value value2("");
-  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value2.Get( test ), TEST_LOCATION );
+  DALI_TEST_EQUALS( test, result, TEST_LOCATION );
   END_TEST;
 }
 

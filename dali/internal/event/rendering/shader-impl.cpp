@@ -50,9 +50,7 @@ const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_
 
 Dali::Scripting::StringEnum ShaderHintsTable[] =
   { { "HINT_NONE",                     Dali::Shader::HINT_NONE},
-    { "HINT_REQUIRES_SELF_DEPTH_TEST", Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST},
     { "HINT_OUTPUT_IS_TRANSPARENT",    Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT},
-    { "HINT_OUTPUT_IS_OPAQUE",         Dali::Shader::HINT_OUTPUT_IS_OPAQUE},
     { "HINT_MODIFIES_GEOMETRY",        Dali::Shader::HINT_MODIFIES_GEOMETRY}
   };
 
@@ -85,19 +83,9 @@ Property::Value HintString(const Dali::Shader::ShaderHints& hints)
     s = "HINT_NONE";
   }
 
-  if(hints & Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST)
-  {
-    AppendString(s, "HINT_REQUIRES_SELF_DEPTH_TEST");
-  }
-
   if(hints & Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT)
   {
     AppendString(s, "HINT_OUTPUT_IS_TRANSPARENT");
-  }
-
-  if(hints & Dali::Shader::HINT_OUTPUT_IS_OPAQUE)
-  {
-    AppendString(s, "HINT_OUTPUT_IS_OPAQUE");
   }
 
   if(hints & Dali::Shader::HINT_MODIFIES_GEOMETRY)
@@ -307,26 +295,7 @@ void Shader::Initialize(
 {
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-
-  // @todo MESH_REWORK - Pass hints directly to a new scene graph shader
-  int effectHint = Dali::ShaderEffect::HINT_NONE;
-  if( hints & Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT )
-  {
-    effectHint |= Dali::ShaderEffect::HINT_BLENDING;
-  }
-
-  if( hints & Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST )
-  {
-    effectHint |= Dali::ShaderEffect::HINT_DEPTH_BUFFER;
-  }
-
-  if( (hints & Dali::Shader::HINT_MODIFIES_GEOMETRY) == 0x0 )
-  {
-    effectHint |= Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY;
-  }
-  Dali::ShaderEffect::GeometryHints shaderEffectHint = static_cast<Dali::ShaderEffect::GeometryHints>( effectHint );
-
-  mSceneObject = new SceneGraph::Shader( shaderEffectHint );
+  mSceneObject = new SceneGraph::Shader( hints );
 
   // Add to update manager
   AddShaderMessage( updateManager, *mSceneObject );

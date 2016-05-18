@@ -190,6 +190,12 @@ int UtcDaliImageSignalUploaded(void)
   application.Render(16);
   application.SendNotification();
 
+  request = platform.GetRequest();
+  if(request)
+  {
+    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
+  }
+
   //upload
   application.Render(16);
   application.SendNotification();

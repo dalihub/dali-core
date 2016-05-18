@@ -65,6 +65,7 @@ namespace SceneGraph
 class UpdateManager;
 class RenderManager;
 class DiscardQueue;
+class TextureCacheDispatcher;
 }
 
 /**
@@ -288,6 +289,7 @@ private:
   SceneGraph::UpdateManager*                mUpdateManager;               ///< Update manager
   SceneGraph::RenderManager*                mRenderManager;               ///< Render manager
   SceneGraph::DiscardQueue*                 mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
+  SceneGraph::TextureCacheDispatcher*       mTextureCacheDispatcher;      ///< Used to send messages to TextureCache
   LockedResourceQueue*                      mTextureUploadedQueue;        ///< Stores resource ids which require post processing after render
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support

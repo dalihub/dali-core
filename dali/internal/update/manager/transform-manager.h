@@ -324,6 +324,21 @@ public:
    */
   void BakeRelativeQuaternionPropertyValue( TransformId id, const Quaternion& q );
 
+  /**
+   * Get the bounding sphere, in world coordinates, of a given component
+   * @param[in] id Id of the transform component
+   * @return The world space bounding sphere of the component
+   */
+  const Vector4& GetBoundingSphere( TransformId id ) const;
+
+  /**
+   * Get the world matrix and size of a given component
+   * @param[in] id Id of the transform component
+   * @param[out] The world matrix of the component
+   * @param[out] size size of the component
+   */
+  void GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const;
+
 private:
 
   //Helper struct to order components
@@ -358,13 +373,13 @@ private:
   Vector<TransformId> mParent;                                 ///< Parent of the components
   Vector<Matrix> mWorld;                                       ///< Local to world transform of the components
   Vector<Matrix> mLocal;                                       ///< Local to parent space transform of the components
+  Vector<Vector4> mBoundingSpheres;                            ///< Bounding spheres. xyz is the center and w is the radius
   Vector<TransformComponentAnimatable> mTxComponentAnimatableBaseValue;  ///< Base values for the animatable part of the components
   Vector<Vector3> mSizeBase;                                             ///< Base value for the size of the components
   Vector<bool> mComponentDirty;    ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
   Vector<bool> mLocalMatrixDirty;  ///< 1u if the local matrix has been updated in this frame, 0 otherwise
   Vector<SOrderItem> mOrderedComponents;   ///< Used to reorder components when hierarchy changes
   bool mReorder;                           ///< Flag to determine if the components have to reordered in the next Update
-
 };
 
 } //namespace SceneGraph

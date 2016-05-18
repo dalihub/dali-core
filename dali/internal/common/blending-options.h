@@ -1,5 +1,5 @@
-#ifndef __DALI_BLENDING_OPTIONS_H__
-#define __DALI_BLENDING_OPTIONS_H__
+#ifndef DALI_BLENDING_OPTIONS_H
+#define DALI_BLENDING_OPTIONS_H
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/blending.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/public-api/math/vector4.h>
 
 namespace Dali
@@ -56,43 +56,43 @@ struct BlendingOptions
   /**
    * @copydoc Dali::RenderableActor::SetBlendFunc()
    */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
+  void SetBlendFunc( BlendFactor::Type srcFactorRgb,   BlendFactor::Type destFactorRgb,
+                     BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha );
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendFunc()
    */
-  BlendingFactor::Type GetBlendSrcFactorRgb() const;
+  BlendFactor::Type GetBlendSrcFactorRgb() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendFunc()
    */
-  BlendingFactor::Type GetBlendDestFactorRgb() const;
+  BlendFactor::Type GetBlendDestFactorRgb() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendFunc()
    */
-  BlendingFactor::Type GetBlendSrcFactorAlpha() const;
+  BlendFactor::Type GetBlendSrcFactorAlpha() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendFunc()
    */
-  BlendingFactor::Type GetBlendDestFactorAlpha() const;
+  BlendFactor::Type GetBlendDestFactorAlpha() const;
 
   /**
    * @copydoc Dali::RenderableActor::SetBlendEquation()
    */
-  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+  void SetBlendEquation( BlendEquation::Type equationRgb, BlendEquation::Type equationAlpha );
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  BlendingEquation::Type GetBlendEquationRgb() const;
+  BlendEquation::Type GetBlendEquationRgb() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  BlendingEquation::Type GetBlendEquationAlpha() const;
+  BlendEquation::Type GetBlendEquationAlpha() const;
 
   /**
    * Set the blend color.
@@ -127,4 +127,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_BLENDING_OPTIONS_H__
+#endif // DALI_BLENDING_OPTIONS_H

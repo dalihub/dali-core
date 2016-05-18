@@ -33,7 +33,6 @@ Geometry::Geometry()
   mIndexBuffer(NULL),
   mGeometryType( Dali::Geometry::TRIANGLES ),
   mIndicesChanged(false),
-  mRequiresDepthTest(false ),
   mHasBeenUpdated(false),
   mAttributesChanged(true)
 {
@@ -158,24 +157,26 @@ void Geometry::UploadAndDraw(
     base += mVertexBuffers[i]->EnableVertexAttributes( context, attributeLocation, base );
   }
 
-  GLenum geometryGLType(0);
-  unsigned int numIndices(0u);
+  size_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
   if( mIndexBuffer )
   {
     numIndices = mIndices.Size();
 
-    if( elementBufferOffset )
+    if( elementBufferOffset != 0u )
     {
-      elementBufferOffset = elementBufferOffset >= numIndices ? numIndices- 1 : elementBufferOffset;
+      elementBufferOffset = elementBufferOffset >= numIndices ? numIndices - 1 : elementBufferOffset;
       firstIndexOffset = elementBufferOffset * sizeof(GLushort);
+      numIndices -= elementBufferOffset;
     }
-    if ( elementBufferCount )
+
+    if( elementBufferCount != 0u )
     {
-      numIndices = std::min( elementBufferCount, numIndices - elementBufferOffset );
+      numIndices = std::min( elementBufferCount, numIndices );
     }
   }
 
+  GLenum geometryGLType(GL_NONE);
   switch(mGeometryType)
   {
     case Dali::Geometry::TRIANGLES:
@@ -211,11 +212,6 @@ void Geometry::UploadAndDraw(
     case Dali::Geometry::LINE_STRIP:
     {
       geometryGLType = GL_LINE_STRIP;
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( 0 && "Geometry type not supported (yet)" );
       break;
     }
   }

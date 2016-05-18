@@ -73,7 +73,7 @@ public:
    * @brief Conversion constructor from an array of two floats.
    *
    * @SINCE_1_0.0
-   * @param [in] array of xy
+   * @param [in] array Array of xy
    */
   explicit Vector2(const float* array)
   : x(array[0]),
@@ -112,7 +112,7 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] array of floats
+   * @param[in] array Array of floats
    * @return itself
    */
   Vector2& operator=(const float* array)
@@ -127,7 +127,7 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs vector to assign.
+   * @param[in] rhs Vector to assign.
    * @return itself
    */
   Vector2& operator=(const Vector3& rhs);
@@ -136,7 +136,7 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs vector to assign.
+   * @param[in] rhs Vector to assign.
    * @return itself
    */
   Vector2& operator=(const Vector4& rhs);
@@ -145,7 +145,7 @@ public:
    * @brief Addition operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs vector to add.
+   * @param[in] rhs Vector to add.
    * @return A vector containing the result of the addition
    */
   Vector2 operator+(const Vector2& rhs) const
@@ -159,7 +159,7 @@ public:
    * @brief Addition assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs vector to add.
+   * @param[in] rhs Vector to add.
    * @return itself
    */
   Vector2& operator+=(const Vector2& rhs)
@@ -174,7 +174,7 @@ public:
    * @brief Subtraction operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs  the vector to subtract
+   * @param[in] rhs  The vector to subtract
    * @return A vector containing the result of the subtraction
    */
   Vector2 operator-(const Vector2& rhs) const
@@ -188,7 +188,7 @@ public:
    * @brief Subtraction assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the vector to subtract
+   * @param[in] rhs The vector to subtract
    * @return itself
    */
   Vector2& operator-=(const Vector2& rhs)
@@ -203,7 +203,7 @@ public:
    * @brief Multiplication operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the vector to multiply
+   * @param[in] rhs The vector to multiply
    * @return A vector containing the result of the multiplication
    */
   Vector2 operator*(const Vector2& rhs) const
@@ -215,7 +215,7 @@ public:
    * @brief Multiplication operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the float value to scale the vector
+   * @param[in] rhs The float value to scale the vector
    * @return A vector containing the result of the scaling
    */
   Vector2 operator*(float rhs) const
@@ -227,7 +227,7 @@ public:
    * @brief Multiplication assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the vector to multiply
+   * @param[in] rhs The vector to multiply
    * @return itself
    */
   Vector2& operator*=(const Vector2& rhs)
@@ -242,7 +242,7 @@ public:
    * @brief Multiplication assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the float value to scale the vector
+   * @param[in] rhs The float value to scale the vector
    * @return itself
    */
   Vector2& operator*=(float rhs)
@@ -257,7 +257,7 @@ public:
    * @brief Division operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the vector to divide
+   * @param[in] rhs The vector to divide
    * @return A vector containing the result of the division
    */
   Vector2 operator/(const Vector2& rhs) const
@@ -282,7 +282,7 @@ public:
    * @brief Division assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the vector to divide
+   * @param[in] rhs The vector to divide
    * @return itself
    */
   Vector2& operator/=(const Vector2& rhs)
@@ -297,7 +297,7 @@ public:
    * @brief Division assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs the float value to scale the vector by
+   * @param[in] rhs The float value to scale the vector by
    * @return itself
    */
   Vector2& operator/=(float rhs)
@@ -351,7 +351,7 @@ public:
    *
    * Asserts if index is out of range. Should be 0 or 1
    * @SINCE_1_0.0
-   * @param[in] index Subscript
+   * @param[in] index Subscript index
    * @return    The float at the given index
    */
   const float& operator[](const unsigned int index) const
@@ -405,8 +405,8 @@ public:
     * @brief Clamps the vector between minimum and maximum vectors.
     *
     * @SINCE_1_0.0
-    * @param [in] min the minimum vector
-    * @param [in] max the maximum vector
+    * @param [in] min The minimum vector
+    * @param [in] max The maximum vector
    */
   void Clamp( const Vector2& min, const Vector2& max );
 
@@ -502,9 +502,9 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
  * @brief Clamps each of vector v's components between minimum and maximum values.
  *
  * @SINCE_1_0.0
- * @param [in] v     a vector
- * @param [in] min the minimum value
- * @param [in] max the maximum value
+ * @param [in] v     A vector
+ * @param [in] min The minimum value
+ * @param [in] max The maximum value
  * @return     a vector containing the clamped components of v
  */
 DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );

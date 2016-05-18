@@ -4,6 +4,7 @@ internal_src_files = \
   $(internal_src_dir)/common/blending-options.cpp \
   $(internal_src_dir)/common/core-impl.cpp \
   $(internal_src_dir)/common/internal-constants.cpp \
+  $(internal_src_dir)/common/math.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
   $(internal_src_dir)/common/mutex-impl.cpp \
   $(internal_src_dir)/common/image-sampler.cpp \
@@ -97,7 +98,6 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-item.cpp \
   $(internal_src_dir)/render/common/render-tracker.cpp \
   $(internal_src_dir)/render/common/render-manager.cpp \
-  $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/render/data-providers/render-data-provider.cpp \
   $(internal_src_dir)/render/data-providers/uniform-name-cache.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
@@ -132,6 +132,7 @@ internal_src_files = \
   $(internal_src_dir)/update/common/scene-graph-buffers.cpp \
   $(internal_src_dir)/update/common/scene-graph-connection-change-propagator.cpp \
   $(internal_src_dir)/update/common/scene-graph-property-notification.cpp \
+  $(internal_src_dir)/update/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/update/common/uniform-map.cpp \
   $(internal_src_dir)/update/controllers/render-message-dispatcher.cpp \
   $(internal_src_dir)/update/controllers/scene-controller-impl.cpp \
@@ -145,8 +146,7 @@ internal_src_files = \
   $(internal_src_dir)/update/manager/update-algorithms.cpp \
   $(internal_src_dir)/update/manager/update-manager.cpp \
   $(internal_src_dir)/update/manager/update-manager-debug.cpp \
-  $(internal_src_dir)/update/node-attachments/node-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-camera-attachment.cpp \
+  $(internal_src_dir)/update/render-tasks/scene-graph-camera.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \
