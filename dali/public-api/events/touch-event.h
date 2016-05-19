@@ -30,6 +30,8 @@ namespace Dali
  */
 
 /**
+ * @DEPRECATED_1_1.37 Use TouchEventHandle instead
+ *
  * @brief Touch events are a collection of touch points at a specific moment in time.
  *
  * When a multi-touch event occurs, each touch point represents the points that are currently being
@@ -41,12 +43,14 @@ struct DALI_IMPORT_API TouchEvent
   // Construction & Destruction
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief Default constructor
    * @SINCE_1_0.0
    */
   TouchEvent();
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief Constructor
    * @SINCE_1_0.0
    * @param[in] time The time the event occurred
@@ -54,6 +58,7 @@ struct DALI_IMPORT_API TouchEvent
   TouchEvent(unsigned long time);
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief Destructor
    * @SINCE_1_0.0
    */
@@ -62,6 +67,7 @@ struct DALI_IMPORT_API TouchEvent
   // Data
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief This is a container of points for this touch event.
    *
    * The first point in the set is always the
@@ -70,6 +76,7 @@ struct DALI_IMPORT_API TouchEvent
   TouchPointContainer points;
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief The time (in ms) that the touch event occurred.
    */
   unsigned long time;
@@ -77,6 +84,7 @@ struct DALI_IMPORT_API TouchEvent
   // Convenience Methods
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief Returns the total number of points in this TouchEvent.
    *
    * @SINCE_1_0.0
@@ -85,6 +93,7 @@ struct DALI_IMPORT_API TouchEvent
   unsigned int GetPointCount() const;
 
   /**
+   * @DEPRECATED_1_1.37
    * @brief Returns a touch point at the index requested.
    *
    * The first point in the set is always the primary

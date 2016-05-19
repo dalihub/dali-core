@@ -46,6 +46,7 @@ struct Degree;
 class Quaternion;
 class Layer;
 struct KeyEvent;
+class TouchData;
 struct TouchEvent;
 struct HoverEvent;
 struct WheelEvent;
@@ -312,12 +313,13 @@ public:
 
   // Typedefs
 
-  typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                 ///< Touch signal type @SINCE_1_0.0
-  typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                 ///< Hover signal type @SINCE_1_0.0
-  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;           ///< Wheel signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OnRelayoutSignalType; ///< Called when the actor is relaid out @SINCE_1_0.0
+  typedef Signal< bool (Actor, const TouchEvent&) > TouchSignalType;        ///< @DEPRECATED_1_1.37 @brief Touch signal type @SINCE_1_0.0
+  typedef Signal< bool (Actor, const TouchData&) >  TouchDataSignalType;    ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
+  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
+  typedef Signal< void (Actor) > OnStageSignalType;                         ///< Stage connection signal type @SINCE_1_0.0
+  typedef Signal< void (Actor) > OffStageSignalType;                        ///< Stage disconnection signal type @SINCE_1_0.0
+  typedef Signal< void (Actor) > OnRelayoutSignalType;                      ///< Called when the actor is relaid out @SINCE_1_0.0
 
   // Creation
 
@@ -1142,7 +1144,7 @@ public:
   // Input Handling
 
   /**
-   * @brief Sets whether an actor should emit touch or hover signals; see SignalTouch() and SignalHover().
+   * @brief Sets whether an actor should emit touch or hover signals.
    *
    * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouch(),
    * the touch event signal will be emitted, and as soon as an application connects to the SignalHover(), the
@@ -1438,6 +1440,7 @@ public: // Renderer
 public: // Signals
 
   /**
+   * @DEPRECATED_1_1.37 Use TouchSignal() instead.
    * @brief This signal is emitted when touch input is received.
    *
    * A callback of the following type may be connected:
@@ -1451,6 +1454,21 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   TouchSignalType& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when touch input is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Actor actor, TouchData& touch );
+   * @endcode
+   * The return value of True, indicates that the touch event has been consumed.
+   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   * @SINCE_1_1.37
+   * @return The signal to connect to.
+   * @pre The Actor has been initialized.
+   */
+  TouchDataSignalType& TouchSignal();
 
   /**
    * @brief This signal is emitted when hover input is received.

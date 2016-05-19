@@ -149,6 +149,11 @@ Stage::TouchedSignalType& Stage::TouchedSignal()
   return GetImplementation(*this).TouchedSignal();
 }
 
+Stage::TouchSignalType& Stage::TouchSignal()
+{
+  return GetImplementation( *this ).TouchSignal();
+}
+
 Stage::WheelEventSignalType& Stage::WheelEventSignal()
 {
   return GetImplementation(*this).WheelEventSignal();

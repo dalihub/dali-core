@@ -171,6 +171,8 @@ public:
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
 
   /**
+   * @DEPRECATED_1_1.37 Connect to TouchSignal() instead.
+   *
    * @brief Called after a touch-event is received by the owning actor.
    *
    * @SINCE_1_0.0
