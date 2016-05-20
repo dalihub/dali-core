@@ -22,54 +22,90 @@
 #include <dali/public-api/common/compile-time-assert.h>
 #include <dali/public-api/object/type-registry.h>
 
-namespace Dali
-{
-
-namespace Internal
-{
-
 /**
- * @brief These macros are used to use the type-registry to register properties and signals.
- * This forces registration to be done in a standard way across actors and controls and facilitates future compile-time checks to be added.
- *
- * Note: Currently a compile time check is done for the order of the properties. The order is not critical to registration, but helps maintain the ordering between the header and implementations to avoid properties being added out of place.
- *
- * Note: The signal macro also generates string const chars.
+ * @brief These macros are used internally by the property macros.
+ * Use the the property macros in the section below this one (without the _INTERNAL postfix) when defining properties.
+ * These internal macros exist as to perform the compile-time check on the enumeration order, the __COUNTER__ macro is used twice.
+ * Using it twice within the same macro would result in two different values.
  */
 #define DALI_TOKEN_PASTE_EXPAND( x, y ) x ## y
 #define DALI_TOKEN_PASTE( x, y ) DALI_TOKEN_PASTE_EXPAND(x, y)
 
 #define DALI_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
-  PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
   DALI_COMPILE_TIME_ASSERT( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
-
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
-  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Property::valueType );
-
+  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType );
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, value, enumIndex) \
-  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, value );
-
+  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, value );
 #define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex) \
-  AnimatablePropertyComponentRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, objectNamespace::objectType::Property::baseEnumIndex, componentIndex );
-
+  Dali::AnimatablePropertyComponentRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, objectNamespace::objectType::Property::baseEnumIndex, componentIndex );
 #define DALI_CHILD_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
-  ChildPropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::ChildProperty::enumIndex, Property::valueType );
-
+  Dali::ChildPropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::ChildProperty::enumIndex, Property::valueType );
 #define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
   const char* const textVariable = text; \
-  SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal );
-
+  Dali::SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal );
 #define DALI_ACTION_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
   const char* const textVariable = text; \
-  TypeAction DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction );
+  Dali::TypeAction DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction );
 
-// For use within implementations:
 
+/**
+ * @brief These macros are used to define properties for implementations of CustomActor.
+ * @SINCE_1_1.36
+ *
+ * These macros should be used when defining properties, signals and actions.
+ * They provide the following benefits:
+ * - A standard and consistent way to define properties.
+ * - Concise definition promotes readability, especially with large numbers of properties.
+ * - Provides a built-in compile-time check. This checks the order of the properties within the enumeration match the order of the property macros. Note: This check is not performed for animatable properties.
+ * - Enforces how properties are enumerated in the object handles header file.
+ *
+ * Note: The compile-type check will produce the following message on failure:
+ *       error: invalid application of 'sizeof' to incomplete type 'Dali::CompileTimeAssertBool<false>'
+ *
+ * Macro usage example:
+ *
+ * Within the your object's implementation cpp:
+ * @code
+ * #include <dali/public-api/object/type-registry-helper.h>
+ * ...
+ * DALI_TYPE_REGISTRATION_BEGIN( MyApp::MyCustomActor, Dali::CustomActor, Create )
+ * DALI_PROPERTY_REGISTRATION( MyApp, MyCustomActor, "myProperty", INTEGER, MY_PROPERTY )
+ * DALI_TYPE_REGISTRATION_END()
+ * @endcode
+ *
+ * Within your handle's header:
+ *
+ * @code
+ * #include <dali/public-api/common/dali-common.h>
+ *
+ *
+ * ///< @brief The start and end property ranges for this control.
+ * enum PropertyRange
+ * {
+ *   PROPERTY_START_INDEX = Dali::PROPERTY_REGISTRATION_START_INDEX,
+ *   PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000
+ * };
+ *
+ * ///< @brief An enumeration of properties belonging to the Button class.
+ * struct Property
+ * {
+ *   enum
+ *   {
+ *     MY_PROPERTY = PROPERTY_START_INDEX    ///< @brief name "myProperty", type Integer
+ *   };
+ * };
+ * @endcode
+ *
+ * Using these macros have certain prerequisites on how the property enumeration is defined.
+ * Please see the Programming Guide (within the generated Doxygen) for full details.
+ */
 #define DALI_TYPE_REGISTRATION_BEGIN( thisType, baseType, createFunction ) \
-  TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction );
+  Dali::TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction );
 
 #define DALI_TYPE_REGISTRATION_BEGIN_CREATE( thisType, baseType, createFunction, createAtStartup ) \
-  TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction, createAtStartup );
+  Dali::TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction, createAtStartup );
 
 #define DALI_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
   DALI_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
@@ -92,11 +128,7 @@ namespace Internal
 #define DALI_ACTION_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
   DALI_ACTION_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )
 
-#define DALI_TYPE_REGISTRATION_END( ) // Empty for now, can be used to perform checks.
+#define DALI_TYPE_REGISTRATION_END( ) // This macro exists for consistency and readability.
 
-
-} // namespace Internal
-
-} // namespace Dali
 
 #endif // __DALI_TYPE_REGISTRY_HELPER_H__
