@@ -44,11 +44,15 @@ class ResourceImage;
  *
  * <h3>ResourceImage Loading</h3>
  *
- * When the ResourceImage is created, resource loading will be attempted unless a compatible resource is found in cache.
+ * When the ResourceImage is created, resource loading will be attempted unless
+ * the ResourceImage is created with ResourceImage::IMMEDIATE loading policy or a compatible resource is found in cache.
+ * In case of loading images ResourceImage::ON_DEMAND, resource loading will only be attempted if the associated Dali::Toolkit::ImageView
+ * is put on Stage.
  * Scaling of images to a desired smaller size can be requested by providing desired dimensions,
  * scaling mode and filter mode to to ResourceImage::New().
  *
  * <i>Custom load requests</i>
+ *
  * Size, scaling mode, filter mode, and orientation compensation can be set when requesting an image.
  *
  * <i>Compatible resources</i>
@@ -63,7 +67,9 @@ class ResourceImage;
  *
  * The same request used on creating the ResourceImage is re-issued when reloading images.
  * If the file changed since the last load operation, this might result in a different resource.
- * Reload only takes effect if the ResourceImage has already finished loading
+ * Reload only takes effect if both of these conditions apply:
+ * - The ResourceImage has already finished loading
+ * - The ResourceImage is either on Stage or using ResourceImage::IMMEDIATE load policy
  *
  * Signals
  * | %Signal Name         | Method                       |
@@ -74,17 +80,22 @@ class ResourceImage;
 class DALI_IMPORT_API ResourceImage : public Image
 {
 public:
+  /**
+   * @brief Resource management options.
+   */
 
   /**
    * @DEPRECATED_1_1.3. Image loading starts immediately in the frame when then ResourceImage object is created.
    *
    * @brief LoadPolicy controls the way images are loaded into memory.
    * @SINCE_1_0.0
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
    */
   enum LoadPolicy
   {
-    IMMEDIATE, ///< load image once it is created (default) @SINCE_1_0.0
-    ON_DEMAND  ///< delay loading until the image is being used (a related actor is added to Stage) @SINCE_1_0.0
+    IMMEDIATE, ///< Load image once it is created (default) @SINCE_1_0.0
+    ON_DEMAND  ///< Delay loading until the image is being used (a related actor is added to Stage) @SINCE_1_0.0
   };
 
   /**
@@ -217,13 +228,13 @@ public:
   ///@}
 
   /**
-   * @brief Downcast an Object handle to ResourceImage handle.
+   * @brief Downcast a handle to ResourceImage handle.
    *
    * If handle points to a ResourceImage object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a Image object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a Image object or an uninitialized handle
    */
   static ResourceImage DownCast( BaseHandle handle );
 
@@ -233,7 +244,9 @@ public:
    * @brief Return load policy.
    *
    * @SINCE_1_0.0
-   * @return resource load policy
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
+   * @return Resource load policy
    */
   LoadPolicy GetLoadPolicy() const;
 

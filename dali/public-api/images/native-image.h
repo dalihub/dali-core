@@ -35,8 +35,9 @@ class NativeImage;
 }
 
 /**
- * @brief NativeImage represents a platform specific image resource.
- * Its data is provided by native resources, such as shared bitmap memory or pixmap.
+ * @brief NativeImage represents an image resource that can be added to ImageViews.
+ *
+ * Its data is provided by native resources, such as shared bitmap memory or pixmap from X11 or ECORE-X11, etc.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API  NativeImage : public Image
@@ -101,13 +102,13 @@ public:
   static NativeImage New( NativeImageInterface& nativeImageInterface );
 
   /**
-   * @brief Downcast an Object handle to NativeImage handle.
+   * @brief Downcast a handle to NativeImage handle.
    *
    * If handle points to a NativeImage object, the downcast produces valid handle.
    * If not, the returned handle is left unintialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object.
-   * @return Handle to a NativeImage or an uninitialized handle.
+   * @return handle to a NativeImage or an uninitialized handle.
    */
   static NativeImage DownCast( BaseHandle handle );
 

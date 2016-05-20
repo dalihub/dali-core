@@ -72,7 +72,7 @@ public:
   virtual unsigned int TargetTexture() = 0;
 
   /**
-   * @brief Called in each NativeTexture::Bind() call to allow implementation specific operations.
+   * @brief Called in internal each NativeTexture::Bind() call to allow implementation specific operations.
    *
    * The correct texture sampler has already been bound before the function gets called.
    * @SINCE_1_0.0
@@ -84,7 +84,7 @@ public:
    * @brief Returns the width of the NativeImage.
    *
    * @SINCE_1_0.0
-   * @return width
+   * @return Width
    */
   virtual unsigned int GetWidth() const = 0;
 
@@ -92,7 +92,7 @@ public:
    * @brief Returns the height of the NativeImage.
    *
    * @SINCE_1_0.0
-   * @return height
+   * @return Height
    */
   virtual unsigned int GetHeight() const = 0;
 
@@ -131,7 +131,7 @@ protected:
  * @brief Pointer to Dali::NativeImageInterface
  * @SINCE_1_0.0
  */
-typedef IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;
+typedef Dali::IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;
 
 /**
  * @}

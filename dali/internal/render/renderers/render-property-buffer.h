@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <dali/internal/common/owner-pointer.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/sampling.h>
 #include <dali/devel-api/rendering/sampler.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 
@@ -158,18 +159,17 @@ public:
 private:
   OwnerPointer< PropertyBuffer::Format >  mFormat;  ///< Format of the buffer
   OwnerPointer< Dali::Vector< char > >    mData;    ///< Data
-  OwnerPointer<GpuBuffer> mGpuBuffer;               ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
+  OwnerPointer< GpuBuffer > mGpuBuffer;               ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
 
-  size_t  mSize;      ///< Number of Elements in the buffer
+  size_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
 
 };
 
 } // namespace Render
 
-
-
 } // namespace Internal
+
 } // namespace Dali
 
 

@@ -40,8 +40,25 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SIN
 
 
 /**
- * @brief BufferImage represents an image resource as a pixel data buffer
+ * @brief BufferImage represents an image resource that can be added to ImageViews.
+ *
  * Its pixel buffer data is provided by the application developer.
+ *
+ * Care should be taken with pixel data allocated by the application,
+ * as the data is copied to GL both when the image is added to the
+ * stage and after a call to Update().  In both of these cases, a
+ * Image::UploadedSignal will be sent to the application confirming that the
+ * operation has completed.
+ *
+ * The application can free the pixel data after receiving a
+ * Image::UploadedSignal.
+ *
+ * Similarly, once the image is on stage (i.e. it's being used by an
+ * ImageView that is on stage), the application should only write to
+ * the buffer after receiving a Image::UploadedSignal, then call Update()
+ * once the write is finished. This avoids the pixel data being changed
+ * whilst it's being copied to GL. Writing to the buffer without waiting
+ * for the signal will likely result in visible tearing.
  *
  * If the pixel format of the pixel buffer contains an alpha channel,
  * then the image is considered to be have transparent pixels without
@@ -67,14 +84,14 @@ public:
    * Dali has ownership of the buffer.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * @note: default resource management policies are Immediate and Never
-   *
    * @SINCE_1_0.0
-   * @param [in] width       image width in pixels
-   * @param [in] height      image height in pixels
-   * @param [in] pixelformat the pixel format (rgba 32 bit by default)
-   * @return a handle to a new instance of BufferImage
+   * @param [in] width       Image width in pixels
+   * @param [in] height      Image height in pixels
+   * @param [in] pixelformat The pixel format (rgba 32 bit by default)
+   * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
+   * @note default resource management policies are Immediate and Never
+   *
    */
   static BufferImage New(unsigned int width,
                          unsigned int height,
@@ -91,11 +108,14 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @SINCE_1_0.0
+   * @remarks ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the Remarks of ReleasePolicy for more information.
    * @param [in] width          Image width in pixels
    * @param [in] height         Image height in pixels
    * @param [in] pixelFormat    The pixel format
    * @param [in] releasePolicy  Optionally release memory when image is not visible on screen.
-   * @return a handle to a new instance of BufferImage
+   * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
    */
   static BufferImage New(unsigned int  width,
@@ -110,19 +130,19 @@ public:
    *
    * The application holds ownership of the buffer. It must not
    * destroy the PixelBuffer on a staged image if it has called
-   * Update() and hasn't received a SignalUploaded, or if it has just
-   * added it to the stage and has not received a SignalUploaded.
+   * Update() and hasn't received a Image::UploadedSignal, or if it has just
+   * added it to the stage and has not received a Image::UploadedSignal.
    *
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @SINCE_1_0.0
-   * @param [in] pixelBuffer  pixel buffer. has to be allocated by application.
-   * @param [in] width        image width in pixels
-   * @param [in] height       image height in pixels
-   * @param [in] pixelFormat  the pixel format (rgba 32 bit by default)
-   * @param [in] stride       the internal stride of the pixelbuffer in pixels
-   * @return a handle to a new instance of BufferImage
+   * @param [in] pixelBuffer  Pixel buffer. has to be allocated by application.
+   * @param [in] width        Image width in pixels
+   * @param [in] height       Image height in pixels
+   * @param [in] pixelFormat  The pixel format (rgba 32 bit by default)
+   * @param [in] stride       The internal stride of the pixelbuffer in pixels
+   * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
    */
   static BufferImage New(PixelBuffer*  pixelBuffer,
@@ -140,22 +160,25 @@ public:
    *
    * The application holds ownership of the buffer. It must not
    * destroy the PixelBuffer on a staged image if it has called
-   * Update() and hasn't received a SignalUploaded, or if it has just
-   * added it to the stage and has not received a SignalUploaded.
+   * Update() and hasn't received a Image::UploadedSignal, or if it has just
+   * added it to the stage and has not received a Image::UploadedSignal.
    *
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @SINCE_1_0.0
-   * @param [in] pixelBuffer   pixel buffer. has to be allocated by application.
-   * @param [in] width         image width in pixels
-   * @param [in] height        image height in pixels
-   * @param [in] pixelFormat   the pixel format
-   * @param [in] stride        the internal stride of the pixelbuffer in pixels
-   * @param [in] releasePolicy optionally relase memory when image is not visible on screen.
-   * @return a handle to a new instance of BufferImage
+   * @remarks ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the Remarks of ReleasePolicy for more information.
+   * @param [in] pixelBuffer   Pixel buffer. has to be allocated by application.
+   * @param [in] width         Image width in pixels
+   * @param [in] height        Image height in pixels
+   * @param [in] pixelFormat   The pixel format
+   * @param [in] stride        The internal stride of the pixelbuffer in pixels
+   * @param [in] releasePolicy Optionally relase memory when image is not visible on screen.
+   * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
-   * @note in case releasePolicy is "Unused", application has to call
+   * @note in case releasePolicy is Image::UNUSED, application has to call
    * BufferImage::Update() whenever image is re-added to the stage
    *
    */
@@ -167,14 +190,14 @@ public:
                          ReleasePolicy releasePolicy);
 
   /**
-   * @brief Downcast an Object handle to BufferImage.
+   * @brief Downcast a handle to BufferImage handle.
    *
    * If handle points to a BufferImage the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a BufferImage or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a BufferImage or an uninitialized handle
    */
   static BufferImage DownCast( BaseHandle handle );
 
@@ -198,7 +221,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param [in] rhs A reference to the copied handle
    * @return A reference to this
    */
   BufferImage& operator=(const BufferImage& rhs);
@@ -220,10 +243,10 @@ public:
    *
    * Whilst the image is on stage, after writing to the buffer the
    * application should call Update() and wait for the
-   * SignalUploaded() method before writing again.
+   * Image::UploadedSignal() method before writing again.
    *
    * @SINCE_1_0.0
-   * @return the pixel buffer
+   * @return The pixel buffer
    */
   PixelBuffer* GetBuffer();
 
@@ -231,7 +254,7 @@ public:
    * @brief Returns buffer size in bytes.
    *
    * @SINCE_1_0.0
-   * @return the buffer size in bytes
+   * @return The buffer size in bytes
    */
   unsigned int GetBufferSize() const;
 
@@ -239,7 +262,7 @@ public:
    * @brief Returns buffer stride (in bytes).
    *
    * @SINCE_1_0.0
-   * @return the buffer stride
+   * @return The buffer stride
    */
   unsigned int GetBufferStride() const;
 
@@ -247,32 +270,32 @@ public:
    * @brief Returns the pixel format of the contained buffer
    *
    * @SINCE_1_0.0
-   * @return the pixel format
+   * @return The pixel format
    */
   Pixel::Format GetPixelFormat() const;
 
   /**
    * @brief Inform Dali that the contents of the buffer have changed.
    *
-   * SignalUploaded will be sent in response if the image is on stage
+   * Image::UploadedSignal will be sent in response if the image is on stage
    * and the image data has been successfully copied to graphics
    * memory. To avoid visual tearing, the application should wait for
-   * the SignalUploaded before modifying the data.
+   * the Image::UploadedSignal before modifying the data.
    *
    * The application must not destroy an external PixelBuffer on a staged
-   * image after calling this method until the SignalUploaded has been
+   * image after calling this method until the Image::UploadedSignal has been
    * successfully received.
    *
-   * @note: BufferImage::Update might not work with BGR/BGRA formats!
-   * @note: Some GPUs may not support Non power of two buffer updates (for
-   * example C110/SGX540)
    * @SINCE_1_0.0
+   * @note BufferImage::Update might not work with BGR/BGRA formats!
+   * @note Some GPUs may not support Non power of two buffer updates (for
+   * example C110/SGX540)
    */
   void Update();
 
   /**
    * @copydoc Update()
-   * @param [in] updateArea area that has changed in buffer
+   * @param [in] updateArea Area that has changed in buffer
    */
   void Update( RectArea updateArea );
 
@@ -283,7 +306,7 @@ public:
    * is responsible for freeing it.
    *
    * The application must not destroy an external PixelBuffer on a staged image
-   * if it has called Update() and hasn't received a SignalUploaded.
+   * if it has called Update() and hasn't received a Image::UploadedSignal.
    *
    * @SINCE_1_0.0
    * @return true if application owns data, false otherwise

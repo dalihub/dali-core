@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -456,6 +456,21 @@ void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property
   DALI_ASSERT_ALWAYS( success && "Property component already registered" );
 }
 
+void TypeInfo::AddChildProperty( const std::string& name, Property::Index index, Property::Type type )
+{
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
+                                                        PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+  if ( iter == mRegisteredChildProperties.end() )
+  {
+    mRegisteredChildProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
+  }
+}
+
 size_t TypeInfo::GetPropertyCount() const
 {
   size_t count( mRegisteredProperties.size() );
@@ -539,6 +554,76 @@ int TypeInfo::GetComponentIndex( Property::Index index ) const
   }
 
   return componentIndex;
+}
+
+Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
+{
+  Property::Index index = Property::INVALID_INDEX;
+
+  // Slow but should not be done that often
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
+                                                          PropertyNameFinder< RegisteredPropertyPair >( name ) );
+
+  if ( iter != mRegisteredChildProperties.end() )
+  {
+    index = iter->first;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      index = GetImplementation(base).GetChildPropertyIndex( name );
+    }
+  }
+
+  return index;
+}
+
+const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
+{
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredChildProperties.end() )
+  {
+    return iter->second.name;
+  }
+
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    return GetImplementation(base).GetChildPropertyName( index );
+  }
+
+  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+}
+
+Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
+{
+  Property::Type type( Property::NONE );
+
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredChildProperties.end() )
+  {
+    type = iter->second.type;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      type = GetImplementation(base).GetChildPropertyType( index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+    }
+  }
+
+  return type;
 }
 
 bool TypeInfo::IsPropertyWritable( Property::Index index ) const

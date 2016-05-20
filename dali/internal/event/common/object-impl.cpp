@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,7 +219,15 @@ Property::Index Object::GetPropertyIndex(const std::string& name) const
       CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
       if ( custom->name == name )
       {
-        index = count;
+        if ( custom->childPropertyIndex != Property::INVALID_INDEX )
+        {
+          // If it is a child property, return the child property index
+          index = custom->childPropertyIndex;
+        }
+        else
+        {
+          index = count;
+        }
         break;
       }
     }
@@ -360,6 +368,19 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   {
     return custom->GetType();
   }
+  else if( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX && index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX )
+  {
+    Object* parent = GetParentObject();
+    if( parent )
+    {
+      const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
+      if( parentTypeInfo )
+      {
+        return parentTypeInfo->GetChildPropertyType( index );
+      }
+    }
+  }
+
   return Property::NONE;
 }
 
@@ -404,6 +425,30 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   else
   {
     CustomPropertyMetadata* custom = FindCustomProperty( index );
+
+    if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
+    {
+      if( !custom )
+      {
+        // If the child property is not registered yet, register it.
+        custom = new CustomPropertyMetadata( "", propertyValue, Property::READ_WRITE );
+        mCustomProperties.PushBack( custom );
+      }
+
+      custom->childPropertyIndex = index;
+
+      // Resolve name for the child property
+      Object* parent = GetParentObject();
+      if( parent )
+      {
+        const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
+        if( parentTypeInfo )
+        {
+          custom->name = parentTypeInfo->GetChildPropertyName( index );
+        }
+      }
+    }
+
     if( custom )
     {
       if( custom->IsAnimatable() )
@@ -513,7 +558,16 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
     int i=0;
     for ( ; iter != endIter; ++iter, ++i )
     {
-      indices.PushBack( PROPERTY_CUSTOM_START_INDEX + i );
+      CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>( *iter );
+      if ( custom->childPropertyIndex != Property::INVALID_INDEX )
+      {
+        // If it is a child property, add the child property index
+        indices.PushBack( custom->childPropertyIndex );
+      }
+      else
+      {
+        indices.PushBack( PROPERTY_CUSTOM_START_INDEX + i );
+      }
     }
   }
 }
@@ -648,7 +702,26 @@ Property::Index Object::RegisterProperty( const std::string& name, const Propert
     {
       // Add entry to the property lookup
       index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
-      mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue, accessMode ) );
+
+      CustomPropertyMetadata* customProperty = new CustomPropertyMetadata( name, propertyValue, accessMode );
+
+      // Resolve index for the child property
+      Object* parent = GetParentObject();
+      if( parent )
+      {
+        const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
+        if( parentTypeInfo )
+        {
+          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( name );
+          if( childPropertyIndex != Property::INVALID_INDEX )
+          {
+            customProperty->childPropertyIndex = childPropertyIndex;
+            index = childPropertyIndex;
+          }
+        }
+      }
+
+      mCustomProperties.PushBack( customProperty );
     }
   }
 
@@ -824,7 +897,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
     {
       case Property::BOOLEAN:
       {
-        const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<bool>* property = static_cast< const AnimatableProperty<bool>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -833,7 +906,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::INTEGER:
       {
-        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<int>* property = static_cast< const AnimatableProperty<int>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -842,7 +915,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::FLOAT:
       {
-        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<float>* property = static_cast< const AnimatableProperty<float>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -851,7 +924,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::VECTOR2:
       {
-        const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Vector2>* property = static_cast< const AnimatableProperty<Vector2>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         if(entry->componentIndex == 0)
@@ -871,7 +944,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::VECTOR3:
       {
-        const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Vector3>* property = static_cast< const AnimatableProperty<Vector3>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         if(entry->componentIndex == 0)
@@ -895,7 +968,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::VECTOR4:
       {
-        const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Vector4>* property = static_cast< const AnimatableProperty<Vector4>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         if(entry->componentIndex == 0)
@@ -923,7 +996,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::MATRIX:
       {
-        const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix>* property = static_cast< const AnimatableProperty<Matrix>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -932,7 +1005,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::MATRIX3:
       {
-        const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix3>* property = static_cast< const AnimatableProperty<Matrix3>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -941,7 +1014,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       case Property::ROTATION:
       {
-        const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<Quaternion>* property = static_cast< const AnimatableProperty<Quaternion>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -1214,12 +1287,27 @@ Object::~Object()
 CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) const
 {
   CustomPropertyMetadata* property( NULL );
-  int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
-  if( arrayIndex >= 0 )
+  int arrayIndex;
+  if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    if( arrayIndex < (int)mCustomProperties.Count() ) // we can only access the first 2 billion custom properties
+    for ( arrayIndex = 0; arrayIndex < (int)mCustomProperties.Count(); arrayIndex++ )
     {
-      property = static_cast<CustomPropertyMetadata*>(mCustomProperties[ arrayIndex ]);
+      CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>( mCustomProperties[ arrayIndex ] );
+      if( custom->childPropertyIndex == index )
+      {
+        property = custom;
+      }
+    }
+  }
+  else
+  {
+    arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
+    if( arrayIndex >= 0 )
+    {
+      if( arrayIndex < (int)mCustomProperties.Count() ) // we can only access the first 2 billion custom properties
+      {
+        property = static_cast<CustomPropertyMetadata*>(mCustomProperties[ arrayIndex ]);
+      }
     }
   }
   return property;
@@ -1286,6 +1374,42 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
   }
 
   return animatableProperty;
+}
+
+void Object::ResolveChildProperties()
+{
+  // Resolve index for the child property
+  Object* parent = GetParentObject();
+  if( parent )
+  {
+    const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
+    if( parentTypeInfo )
+    {
+      // Go through each custom property
+      for ( int arrayIndex = 0; arrayIndex < (int)mCustomProperties.Count(); arrayIndex++ )
+      {
+        CustomPropertyMetadata* customProperty = static_cast<CustomPropertyMetadata*>( mCustomProperties[ arrayIndex ] );
+
+        if( customProperty->name == "" )
+        {
+          if( customProperty->childPropertyIndex != Property::INVALID_INDEX )
+          {
+            // Resolve name for any child property with no name
+            customProperty->name = parentTypeInfo->GetChildPropertyName( customProperty->childPropertyIndex );
+          }
+        }
+        else
+        {
+          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( customProperty->name );
+          if( childPropertyIndex != Property::INVALID_INDEX )
+          {
+            // Resolve index for any property with a name that matches the parent's child property name
+            customProperty->childPropertyIndex = childPropertyIndex;
+          }
+        }
+      }
+    }
+  }
 }
 
 } // namespace Internal

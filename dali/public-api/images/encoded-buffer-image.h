@@ -42,7 +42,8 @@ typedef Uint16Pair ImageDimensions;
 
 
 /**
- * @brief EncodedBufferImage represents a Image as a buffer of encoded pixel data.
+ * @brief EncodedBufferImage represents an image resource that can be added to
+ * ImageViews.
  *
  * A memory buffer of encoded image data is provided by the application and
  * decoded asynchronously on a background thread to fill the image's
@@ -72,7 +73,7 @@ public:
   /**
    * @brief Constructor which creates an uninitialized EncodedBufferImage object.
    *
-   * Use Image::New(...) to create an initialised object.
+   * Use @ref EncodedBufferImage::New to create an initialised object.
    * @SINCE_1_0.0
    */
   EncodedBufferImage();
@@ -83,6 +84,9 @@ public:
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
    * @SINCE_1_0.0
+   * @remarks Image::ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the remarks of ReleasePolicy for more information.
    * @param [in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
@@ -93,7 +97,7 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] releasePol The ReleasePolicy to apply to Image.
+   * @param [in] releasePol The releasePolicy to apply to Image. The default value is Image::NEVER.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.
@@ -138,13 +142,13 @@ public:
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
 
   /**
-   * @brief Downcast an Object handle to EncodedBufferImage.
+   * @brief Downcast a handle to EncodedBufferImage handle.
    *
    * If handle points to a EncodedBufferImage the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a EncodedBufferImage or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a EncodedBufferImage or an uninitialized handle
    */
   static EncodedBufferImage DownCast( BaseHandle handle );
 

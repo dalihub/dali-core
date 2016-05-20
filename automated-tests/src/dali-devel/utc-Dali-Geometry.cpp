@@ -396,7 +396,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   application.SendNotification();
   drawTrace.Enable( false );
 
-  // geometry type is set as GL_POINTS
+  // geometry type is set as GL_TRIANGLE_STRIP
   // no index buffer, call glDrawArrays,
   DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
   out.str("");
@@ -417,7 +417,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   application.SendNotification();
   drawTrace.Enable( false );
 
-  // geometry type is set as GL_POINTS
+  // geometry type is set as GL_TRIANGLE_FAN
   // no index buffer, call glDrawArrays,
   DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
   out.str("");
@@ -456,7 +456,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
 
   /****************************************************/
-  // Default (TRIANGLES), no index buffer
+  // Default (TRIANGLES), with index buffer
   drawTrace.Reset();
   drawTrace.Enable(true);
   application.SendNotification();
@@ -474,7 +474,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::TRIANGLES, TEST_LOCATION);
 
   /*********************************************************/
-  // LINES, no index buffer
+  // LINES, with index buffer
   geometry.SetGeometryType( Geometry::LINES );
 
   drawTrace.Reset();
@@ -526,7 +526,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   application.SendNotification();
   drawTrace.Enable( false );
 
-  // geometry type is set as GL_POINTS
+  // geometry type is set as GL_TRIANGLE_STRIP
   DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawElements" ), 2, TEST_LOCATION);
   out.str("");
   out << GL_TRIANGLE_STRIP << ", " << numIndex << ", " << GL_UNSIGNED_SHORT<<", "<<"indices";
@@ -546,13 +546,51 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   application.SendNotification();
   drawTrace.Enable( false );
 
-  // geometry type is set as GL_POINTS
+  // geometry type is set as GL_TRIANGLE_FAN
   DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawElements" ), 2, TEST_LOCATION);
   out.str("");
   out << GL_TRIANGLE_FAN << ", " << numIndex << ", " << GL_UNSIGNED_SHORT<<", "<<"indices";
   DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawElements", out.str()), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::TRIANGLE_FAN, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGeometryQUAD(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test Geometry::QUAD()");
+
+  Geometry geometry = Geometry::QUAD();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+  drawTrace.Enable( false );
+
+  // geometry type is set as GL_TRIANGLE_STRIP, no index buffer
+  // no index buffer, call glDrawArrays,
+  DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
+  std::stringstream out;
+  int numVertex = 4;
+  out << GL_TRIANGLE_STRIP << ", " << 0 << ", " << numVertex;
+  DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::TRIANGLE_STRIP, TEST_LOCATION);
 
   END_TEST;
 }
