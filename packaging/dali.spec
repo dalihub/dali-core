@@ -90,7 +90,8 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --enable-gles=%{target_gles_version} \
       --infodir=%{_infodir}
 
-make %{?jobs:-j%jobs}
+#make %{?jobs:-j%jobs}
+make
 
 ##############################
 # Installation
