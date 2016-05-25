@@ -99,11 +99,6 @@ void Core::ProcessEvents()
   mImpl->ProcessEvents();
 }
 
-void Core::UpdateTouchData(const TouchData& touch)
-{
-  mImpl->UpdateTouchData(touch);
-}
-
 unsigned int Core::GetMaximumUpdateCount() const
 {
   return mImpl->GetMaximumUpdateCount();

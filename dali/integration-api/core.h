@@ -322,15 +322,6 @@ public:
   void ProcessEvents();
 
   /**
-   * Update external raw touch data in core.
-   * The core will use the touch data to generate Dali Touch/Gesture events for applications to use
-   * in the update thread.
-   * @param[in] touch The raw touch data.
-   * @note This can be called from either the event thread OR a dedicated touch thread.
-   */
-  void UpdateTouchData(const TouchData& touch);
-
-  /**
    * The Core::Update() method prepares a frame for rendering. This method determines how many frames
    * may be prepared, ahead of the rendering.
    * For example if the maximum update count is 2, then Core::Update() for frame N+1 may be processed

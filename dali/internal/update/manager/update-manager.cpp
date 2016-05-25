@@ -58,7 +58,6 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
@@ -131,7 +130,6 @@ struct UpdateManager::Impl
         RenderController& renderController,
         RenderManager& renderManager,
         RenderQueue& renderQueue,
-        TouchResampler& touchResampler,
         SceneGraphBuffers& sceneGraphBuffers )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
@@ -146,7 +144,6 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
-    touchResampler( touchResampler ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     taskList( renderMessageDispatcher, resourceManager ),
     systemLevelTaskList( renderMessageDispatcher, resourceManager ),
@@ -229,7 +226,6 @@ struct UpdateManager::Impl
   RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
-  TouchResampler&                     touchResampler;                ///< Used to resample touch events on every update.
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -281,8 +277,7 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              TextureCacheDispatcher& textureCacheDispatcher,
-                              TouchResampler& touchResampler )
+                              TextureCacheDispatcher& textureCacheDispatcher )
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
@@ -293,7 +288,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     controller,
                     renderManager,
                     renderQueue,
-                    touchResampler,
                     mSceneGraphBuffers );
 
   textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
@@ -917,7 +911,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   bool resourceChanged = mImpl->resourceManager.UpdateCache( bufferIndex );
 
   //Process Touches & Gestures
-  mImpl->touchResampler.Update();
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                  // The scene-graph requires an update if..
