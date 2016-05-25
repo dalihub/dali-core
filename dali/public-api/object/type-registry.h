@@ -391,12 +391,8 @@ class DALI_IMPORT_API ChildPropertyRegistration
 public:
 
   /**
-   * @brief This constructor registers a child property (i.e. a property that the parent
-   * supports in its children) with the registered type.
-   *
-   * This constructor is for event-thread only properties where the
-   * value of the property can be retrieved and set via specified
-   * functions.
+   * @brief This constructor registers an event-thread only child property (i.e. a property
+   * that the parent supports in its children) with the registered type.
    *
    * @SINCE_1_1.35
    * @param [in] registered The TypeRegistration object
