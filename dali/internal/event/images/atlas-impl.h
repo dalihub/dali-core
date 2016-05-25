@@ -78,7 +78,7 @@ public:
                SizeType yOffset );
 
   /**
-   * @copydoc Dali::Atlas::Upload( Dali::Atlas::PixelDataPtr, uint32_t )
+   * @copydoc Dali::Atlas::Upload( Dali::PixelData, uint32_t, uint32_t )
    */
   bool Upload( PixelDataPtr pixelData,
                SizeType xOffset,
