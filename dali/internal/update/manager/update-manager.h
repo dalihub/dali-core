@@ -102,7 +102,6 @@ public:
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] textureCacheDispatcher Used for sending messages to texture cache.
-   * @param[in] touchResampler Used for re-sampling touch events.
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationFinishedNotifier,
@@ -112,8 +111,7 @@ public:
                  Integration::RenderController& controller,
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
-                 TextureCacheDispatcher& textureCacheDispatcher,
-                 TouchResampler& touchResampler );
+                 TextureCacheDispatcher& textureCacheDispatcher );
 
   /**
    * Destructor.

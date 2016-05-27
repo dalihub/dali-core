@@ -161,11 +161,6 @@ public:
   void ProcessEvents();
 
   /**
-   * @copydoc Dali::Integration::Core::UpdateTouchData(const Integration::TouchData&)
-   */
-  void UpdateTouchData(const Integration::TouchData& touch);
-
-  /**
    * @copydoc Dali::Integration::Core::GetMaximumUpdateCount()
    */
   unsigned int GetMaximumUpdateCount() const;
@@ -298,7 +293,6 @@ private:
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
-  TouchResampler*                           mTouchResampler;              ///< Resamples touches to correct frame rate.
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
 
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended

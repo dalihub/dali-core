@@ -4,6 +4,7 @@ T.O.C.
  1.   GBS Builds
  1.1. NON-SMACK Targets
  1.2. SMACK enabled Targets
+ 1.3. DEBUG Builds
  2.   Building for Ubuntu desktop
  2.1. Minimum Requirements
  2.2. Creating a DALi Environment
@@ -27,6 +28,10 @@ T.O.C.
 
  gbs build -A [TARGET_ARCH] --define "%enable_dali_smack_rules 1"
 
+1.3. DEBUG Builds
+-----------------
+
+ gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
 
 
 2. Building for Ubuntu desktop

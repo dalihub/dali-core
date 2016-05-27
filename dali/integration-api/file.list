@@ -56,6 +56,5 @@ platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/pan-gesture-event.h \
    $(platform_abstraction_src_dir)/events/pinch-gesture-event.h \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.h \
-   $(platform_abstraction_src_dir)/events/touch-data.h \
    $(platform_abstraction_src_dir)/events/touch-event-combiner.h \
    $(platform_abstraction_src_dir)/events/touch-event-integ.h

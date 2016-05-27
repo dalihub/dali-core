@@ -1429,6 +1429,12 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_CHECK( childActor );
   unsigned int initialChildActorPropertyCount( childActor.GetPropertyCount() );
 
+  // The type of child properties should be Property::None as the child hasn't registered any child property yet.
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex2 ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex3 ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex4 ), Property::NONE, TEST_LOCATION );
+
   // Set the value for the first child property when the child actor doesn't have a parent yet
   childActor.SetProperty(propertyIndex, true);
 

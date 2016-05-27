@@ -368,18 +368,6 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   {
     return custom->GetType();
   }
-  else if( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX && index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX )
-  {
-    Object* parent = GetParentObject();
-    if( parent )
-    {
-      const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
-      if( parentTypeInfo )
-      {
-        return parentTypeInfo->GetChildPropertyType( index );
-      }
-    }
-  }
 
   return Property::NONE;
 }

@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.1.35
+Version:    1.1.36
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -88,6 +88,9 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
       --enable-gles=%{target_gles_version} \
+%if 0%{?enable_debug}
+      --enable-debug \
+%endif
       --infodir=%{_infodir}
 
 make %{?jobs:-j%jobs}
