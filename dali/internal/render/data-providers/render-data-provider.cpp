@@ -60,6 +60,16 @@ RenderDataProvider::Textures& RenderDataProvider::GetTextures()
   return mTextures;
 }
 
+RenderDataProvider::Samplers& RenderDataProvider::GetSamplers()
+{
+  return mSamplers;
+}
+
+std::vector<Render::NewTexture*>& RenderDataProvider::GetNewTextures()
+{
+  return mNewTextures;
+}
+
 } // SceneGraph
 } // Internal
 } // Dali

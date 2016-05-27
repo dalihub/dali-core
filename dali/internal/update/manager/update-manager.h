@@ -59,7 +59,8 @@ class TouchResampler;
 
 namespace Render
 {
-class Sampler;
+struct Sampler;
+class FrameBuffer;
 }
 // value types used by messages
 template <> struct ParameterType< PropertyNotification::NotifyMode >
@@ -391,10 +392,11 @@ public:
   /**
    * Sets the wrap mode for an existing sampler
    * @param[in] sampler The sampler
-   * @param[in] uWrapMode Wrapping mode in x direction
-   * @param[in] vWrapMode Wrapping mode in y direction
+   * @param[in] rWrapMode Wrapping mode in z direction
+   * @param[in] sWrapMode Wrapping mode in x direction
+   * @param[in] tWrapMode Wrapping mode in y direction
    */
-  void SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode );
+  void SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode );
 
   /**
    * Add a new property buffer to RenderManager
@@ -471,6 +473,63 @@ public:
    */
   void RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
+  /**
+   * Adds a texture to the render manager
+   * @param[in] texture The texture to add
+   * The texture will be owned by RenderManager
+   */
+  void AddTexture( Render::NewTexture* texture );
+
+  /**
+   * Removes a texture from the render manager
+   * @param[in] texture The texture to remove
+   * @post The texture will be destroyed in the render thread
+   */
+  void RemoveTexture( Render::NewTexture* texture );
+
+  /**
+   * Uploads data to a texture owned by the RenderManager
+   * @param[in] texture The texture
+   * @param[in] buffer Vector with the data to be uploaded
+   * @param[in] params The parameters for the upload
+   */
+  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params );
+
+  /**
+   * Generates mipmaps for a texture owned by the RenderManager
+   * @param[in] texture The texture
+   */
+  void GenerateMipmaps( Render::NewTexture* texture );
+
+  /**
+   * Adds a framebuffer to the render manager
+   * @param[in] frameBuffer The framebuffer to add
+   * The framebuffer will be owned by RenderManager
+   */
+  void AddFrameBuffer( Render::FrameBuffer* frameBuffer );
+
+  /**
+   * Removes a FrameBuffer from the render manager
+   * @param[in] frameBuffer The FrameBuffer to remove
+   * @post The FrameBuffer will be destroyed in the render thread
+   */
+  void RemoveFrameBuffer( Render::FrameBuffer* frameBuffer );
+
+  /**
+   * Attach a texture as color output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
+   */
+  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int face );
+
+  /**
+   * Attach a texture as depth-stencil to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as depth-stencil buffer when rendering
+   */
+  void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture );
 
 public:
 
@@ -986,15 +1045,15 @@ inline void SetFilterModeMessage( UpdateManager& manager, Render::Sampler& sampl
   new (slot) LocalType( &manager, &UpdateManager::SetFilterMode, &sampler, minFilterMode, magFilterMode );
 }
 
-inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler, unsigned int uWrapMode, unsigned int vWrapMode )
+inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
 {
-  typedef MessageValue3< UpdateManager, Render::Sampler*, unsigned int, unsigned int  > LocalType;
+  typedef MessageValue4< UpdateManager, Render::Sampler*, unsigned int, unsigned int, unsigned int > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, uWrapMode, vWrapMode );
+  new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
 inline void AddPropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
@@ -1145,6 +1204,125 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetGeometryType, &geometry, geometryType );
+}
+
+inline void AddTexture( UpdateManager& manager, Render::NewTexture& texture )
+{
+  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddTexture, &texture );
+}
+
+inline void RemoveTexture( UpdateManager& manager, Render::NewTexture& texture )
+{
+  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
+}
+
+template< typename T >
+class UploadTextureDataMessage : public MessageBase
+{
+public:
+
+  /**
+   * Constructor which does a Vector::Swap()
+   */
+  UploadTextureDataMessage( T* manager, Render::NewTexture* texture, Dali::Vector<unsigned char>& data, const Dali::TextureUploadParams& params )
+  : MessageBase(),
+    mManager( manager ),
+    mRenderTexture( texture ),
+    mParams( params )
+  {
+    mData.Swap( data );
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~UploadTextureDataMessage()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex /*bufferIndex*/ )
+  {
+    DALI_ASSERT_DEBUG( mManager && "Message does not have an object" );
+    mManager->UploadTexture( mRenderTexture, mData, mParams );
+  }
+
+private:
+
+  T* mManager;
+  Render::NewTexture* mRenderTexture;
+  Dali::Vector<unsigned char> mData;
+  Dali::TextureUploadParams mParams;
+};
+
+inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, Dali::Vector<unsigned char>& data, const Dali::TextureUploadParams& params )
+{
+  typedef UploadTextureDataMessage< UpdateManager > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &texture, data, params );
+}
+
+inline void GenerateMipmapsMessage( UpdateManager& manager, Render::NewTexture& texture )
+{
+  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::GenerateMipmaps, &texture );
+}
+
+
+inline void AddFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
+{
+  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, &frameBuffer );
+}
+
+inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
+{
+  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer );
+}
+
+inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+{
+  typedef MessageValue4< UpdateManager, Render::FrameBuffer*, Render::NewTexture*, unsigned int, unsigned int  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
 }
 
 } // namespace SceneGraph

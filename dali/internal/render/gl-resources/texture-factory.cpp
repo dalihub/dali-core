@@ -19,11 +19,11 @@
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/gl-defines.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/gl-resources/compressed-bitmap-texture.h>
 #include <dali/internal/render/gl-resources/native-texture.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 
 namespace Dali

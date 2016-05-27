@@ -34,6 +34,7 @@ namespace Dali
 class Actor;
 class CameraActor;
 class FrameBufferImage;
+class FrameBuffer;
 struct Vector4;
 
 namespace Internal DALI_INTERNAL
@@ -292,6 +293,20 @@ public:
    * @return A valid frame-buffer handle, or an uninitialised handle if off-screen rendering is disabled.
    */
   FrameBufferImage GetTargetFrameBuffer() const;
+
+  /**
+   * @brief Set the frame-buffer used as a render target.
+   * @SINCE_1_1.37
+   * @param[in] frameBuffer er A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it.
+   */
+  void SetFrameBuffer( FrameBuffer frameBuffer );
+
+  /**
+   * @brief Retrieve the frame-buffer used as a render target.
+   * @SINCE_1_1.37
+   * @return The framebuffer
+   */
+  FrameBuffer GetFrameBuffer() const;
 
   /**
    * @brief Set the function used to convert screen coordinates to frame-buffer coordinates.

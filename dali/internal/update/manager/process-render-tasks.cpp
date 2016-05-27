@@ -209,7 +209,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
     RenderTask& renderTask = **iter;
 
     // off screen only
-    if(0 == renderTask.GetFrameBufferId())
+    if(0 == renderTask.GetFrameBufferId() && renderTask.GetFrameBuffer() == 0 )
     {
       // Skip to next task
       continue;
@@ -274,7 +274,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
     RenderTask& renderTask = **iter;
 
     // on screen only
-    if(0 != renderTask.GetFrameBufferId())
+    if(0 != renderTask.GetFrameBufferId() || renderTask.GetFrameBuffer() != 0 )
     {
       // Skip to next task
       continue;

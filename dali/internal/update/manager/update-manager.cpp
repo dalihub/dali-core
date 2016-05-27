@@ -64,6 +64,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
@@ -1168,15 +1169,15 @@ void UpdateManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFil
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetFilterMode, sampler, minFilterMode, magFilterMode );
 }
 
-void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode )
+void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
 {
-  typedef MessageValue3< RenderManager, Render::Sampler*, unsigned int, unsigned int > DerivedType;
+  typedef MessageValue4< RenderManager, Render::Sampler*, unsigned int, unsigned int, unsigned int > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetWrapMode, sampler, uWrapMode, vWrapMode );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetWrapMode, sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
 void UpdateManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
@@ -1289,6 +1290,82 @@ void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::Propert
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddVertexBuffer, geometry, propertyBuffer );
 }
 
+void UpdateManager::AddTexture( Render::NewTexture* texture )
+{
+  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddTexture, texture );
+}
+
+void UpdateManager::RemoveTexture( Render::NewTexture* texture)
+{
+  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveTexture, texture );
+}
+
+void UpdateManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params )
+{
+  typedef UploadTextureDataMessage< RenderManager > DerivedType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager, texture, buffer, params );
+}
+
+void UpdateManager::GenerateMipmaps( Render::NewTexture* texture )
+{
+  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::GenerateMipmaps, texture );
+}
+
+void UpdateManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
+{
+  typedef MessageValue1< RenderManager, Render::FrameBuffer* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddFrameBuffer, frameBuffer );
+}
+
+void UpdateManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer)
+{
+  typedef MessageValue1< RenderManager, Render::FrameBuffer* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveFrameBuffer, frameBuffer );
+}
+
+void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+{
+  typedef MessageValue4< RenderManager, Render::FrameBuffer*, Render::NewTexture*, unsigned int, unsigned int > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
+}
 
 } // namespace SceneGraph
 

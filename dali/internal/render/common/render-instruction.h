@@ -23,6 +23,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/render/common/render-list.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 
 namespace Dali
 {
@@ -98,6 +99,7 @@ public:
    */
   void Reset( Camera* camera,
               unsigned int offscreenId,
+              Render::FrameBuffer* frameBuffer,
               const Viewport* viewport,
               const Vector4* clearColor );
 
@@ -140,6 +142,7 @@ public: // Data
   bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
 
   unsigned int mOffscreenTextureId;     ///< Optional offscreen target
+  Render::FrameBuffer* mFrameBuffer;
 
 private: // Data
 

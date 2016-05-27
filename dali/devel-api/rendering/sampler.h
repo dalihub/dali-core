@@ -91,12 +91,19 @@ public:
   /**
    * @brief Set the wrap modes for this sampler
    *
-   * Calling this function sets the properties U_WRAP and V_WRAP
-   *
    * param[in] uWrap Wrap mode for u coordinates
    * param[in] vWrap Wrap mode for v coordinates
    */
   void SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap );
+
+  /**
+   * @brief Set the wrap modes for this sampler
+   *
+   * param[in] rWrap Wrap mode in the z direction
+   * param[in] sWrap Wrap mode for x direction
+   * param[in] tWrap Wrap mode for y direction
+   */
+  void SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap );
 
 public:
   /**

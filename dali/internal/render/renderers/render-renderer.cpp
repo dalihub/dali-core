@@ -27,9 +27,9 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-name-cache.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/public-api/actors/blending.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
 {
@@ -351,10 +351,12 @@ void Renderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program
   }
 }
 
-bool Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& program )
+bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& textureCache, Program& program )
 {
-  int textureUnit = 0;
+  unsigned int textureUnit = 0;
   bool result = true;
+
+  std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
 
   std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
   for( size_t i(0); result && i<textures.size(); ++i )
@@ -374,21 +376,11 @@ bool Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& pr
         {
           program.SetUniform1i( uniformLocation, textureUnit );
 
-          unsigned int samplerBitfield(0);
-          Render::Texture& textureMapping = textures[i];
-          const Render::Sampler* sampler( textureMapping.GetSampler() );
+          unsigned int samplerBitfield(ImageSampler::DEFAULT_BITFIELD);
+          const Render::Sampler* sampler(  samplers[i] );
           if( sampler )
           {
-            samplerBitfield = ImageSampler::PackBitfield(
-              static_cast< FilterMode::Type >(sampler->GetMinifyFilterMode()),
-              static_cast< FilterMode::Type >(sampler->GetMagnifyFilterMode()),
-              static_cast< WrapMode::Type >(sampler->GetUWrapMode()),
-              static_cast< WrapMode::Type >(sampler->GetVWrapMode())
-                                                         );
-          }
-          else
-          {
-            samplerBitfield = ImageSampler::DEFAULT_BITFIELD;
+            samplerBitfield = sampler->mBitfield;
           }
 
           texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
@@ -398,6 +390,23 @@ bool Renderer::BindTextures( SceneGraph::TextureCache& textureCache, Program& pr
       }
     }
   }
+
+  std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
+  GLint uniformLocation(0);
+  for( size_t i(0); result && i<newTextures.size(); ++i )
+  {
+    if( newTextures[i] )
+    {
+      bool result = program.GetSamplerUniformLocation( i, uniformLocation );
+      if( result )
+      {
+        newTextures[i]->Bind(context, textureUnit, samplers[i] );
+        program.SetUniform1i( uniformLocation, textureUnit );
+        ++textureUnit;
+      }
+    }
+  }
+
   return result;
 }
 
@@ -486,7 +495,7 @@ void Renderer::Render( Context& context,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  if( DALI_LIKELY( BindTextures( textureCache, *program ) ) )
+  if( DALI_LIKELY( BindTextures( context, textureCache, *program ) ) )
   {
     // Only set up and draw if we have textures and they are all valid
 

@@ -23,6 +23,7 @@
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 namespace Dali
 {
@@ -101,6 +102,16 @@ public:
    * @copydoc Dali::RenderTask::GetTargetFrameBuffer
    */
   Dali::FrameBufferImage GetTargetFrameBuffer() const;
+
+  /**
+    * @copydoc Dali::RenderTask::SetFrameBuffer()
+    */
+   void SetFrameBuffer( Dali::FrameBuffer frameBuffer );
+
+   /**
+    * @copydoc Dali::RenderTask::GetFrameBuffer
+    */
+   FrameBuffer* GetFrameBuffer() const;
 
   /**
    * @copydoc Dali::RenderTask::SetScreenToFrameBufferFunction
@@ -451,6 +462,8 @@ private:
   unsigned int mRefreshOnceCounter;
 
   Dali::FrameBufferImage mFrameBufferImage;  ///< Optional off-screen render target.
+  FrameBufferPtr  mFrameBuffer;
+
 
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
