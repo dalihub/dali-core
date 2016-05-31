@@ -20,6 +20,7 @@
 
 /**
  * @brief The class should implement Dali::ConnectionTrackerInterface, or inherit from Dali::ConnectionTracker.
+ *
  * This enforces automatic disconnection when an object is destroyed, so you don't have
  * to manually disconnect from signals.
  *

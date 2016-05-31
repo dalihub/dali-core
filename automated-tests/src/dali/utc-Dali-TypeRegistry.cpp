@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1381,6 +1381,236 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
   catch ( DaliException& e )
   {
     DALI_TEST_ASSERT( e, "Base property does not support component", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  unsigned int initialPropertyCount( customActor.GetPropertyCount() );
+
+  // Register child properties to the parent
+  std::string propertyName( "childProp1" );
+  int propertyIndex( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  Property::Type propertyType( Property::BOOLEAN );
+  ChildPropertyRegistration childProperty1( customType1, propertyName, propertyIndex, propertyType );
+
+  std::string propertyName2( "childProp2" );
+  int propertyIndex2( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1 );
+  Property::Type propertyType2( Property::INTEGER );
+  ChildPropertyRegistration childProperty2( customType1, propertyName2, propertyIndex2, propertyType2 );
+
+  std::string propertyName3( "childProp3" );
+  int propertyIndex3( CHILD_PROPERTY_REGISTRATION_START_INDEX + 2 );
+  Property::Type propertyType3( Property::FLOAT );
+  ChildPropertyRegistration childProperty3( customType1, propertyName3, propertyIndex3, propertyType3 );
+
+  std::string propertyName4( "childProp4" );
+  int propertyIndex4( CHILD_PROPERTY_REGISTRATION_START_INDEX + 3 );
+  Property::Type propertyType4( Property::INTEGER );
+  ChildPropertyRegistration childProperty4( customType1, propertyName4, propertyIndex4, propertyType4 );
+
+  // Check property count are not changed because the child properties will not be created for the parent
+  DALI_TEST_EQUALS( initialPropertyCount, customActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Create a child actor
+  Actor childActor = Actor::New();
+  DALI_TEST_CHECK( childActor );
+  unsigned int initialChildActorPropertyCount( childActor.GetPropertyCount() );
+
+  // The type of child properties should be Property::None as the child hasn't registered any child property yet.
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex2 ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex3 ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex4 ), Property::NONE, TEST_LOCATION );
+
+  // Set the value for the first child property when the child actor doesn't have a parent yet
+  childActor.SetProperty(propertyIndex, true);
+
+  // Check that the first child property is dynamically created
+  DALI_TEST_EQUALS( initialChildActorPropertyCount + 1u, childActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Check the first child property value
+  DALI_TEST_EQUALS( childActor.GetProperty< bool >( propertyIndex ), true, TEST_LOCATION );
+
+  // Check the first child property type
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex ), propertyType, TEST_LOCATION );
+
+  // Check that the first child property have no name, as it doesn't have a parent yet.
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex ), "", TEST_LOCATION );
+
+  // Check that the first property can't be accessed through its name, as it doesn't have a parent yet.
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName ), Property::INVALID_INDEX, TEST_LOCATION );
+
+  // Create a custom property for the child with the same name as the second child property registered to the parent
+  Property::Index customPropertyIndex = childActor.RegisterProperty(propertyName2, 100, Property::READ_WRITE);
+
+  // Check that the custom property is created
+  DALI_TEST_EQUALS( initialChildActorPropertyCount + 2u, childActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Check the property value
+  DALI_TEST_EQUALS( childActor.GetProperty< int >( customPropertyIndex ), 100, TEST_LOCATION );
+
+  // Check the property index
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName2 ), customPropertyIndex, TEST_LOCATION );
+
+  // Check the property type
+  DALI_TEST_EQUALS( childActor.GetPropertyType( customPropertyIndex ), propertyType2, TEST_LOCATION );
+
+  // Check the property name
+  DALI_TEST_EQUALS( childActor.GetPropertyName( customPropertyIndex ), propertyName2, TEST_LOCATION );
+
+  // Now add the child actor to the parent
+  customActor.Add( childActor );
+
+  // Check that the first child property now has the correct name as previously registered to the parent
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
+
+  // Check that the child property index for the first child property can now be retrieved through its child property name
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName ), propertyIndex, TEST_LOCATION );
+
+  // Check that the second child property now has the correct index as previously registered to the parent
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex2 ), propertyName2, TEST_LOCATION );
+
+  // Check that the second child property can be accessed through both its custom property index and its child property index
+  DALI_TEST_EQUALS( childActor.GetProperty< int >( customPropertyIndex ), 100, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetProperty< int >( propertyIndex2 ), 100, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( customPropertyIndex ), propertyType2, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex2 ), propertyType2, TEST_LOCATION );
+
+  // Check that the child property index for the second child property can now be retrieved through its child property name
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName2 ), propertyIndex2, TEST_LOCATION );
+
+  // Set the value for the third child property when the child actor is already added to the parent
+  childActor.SetProperty(propertyIndex3, 0.15f);
+
+  // Check that the third child property is dynamically created
+  DALI_TEST_EQUALS( initialChildActorPropertyCount + 3u, childActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Check the third child property value
+  DALI_TEST_EQUALS( childActor.GetProperty< float >( propertyIndex3 ), 0.15f, TEST_LOCATION );
+
+  // Check the third child property type
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex3 ), propertyType3, TEST_LOCATION );
+
+  // Check the third child property name
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex3 ), propertyName3, TEST_LOCATION );
+
+  // Check the third child property index.
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName3 ), propertyIndex3, TEST_LOCATION );
+
+  // Create a custom property for the child with the same name as the fourth child property registered to the parent
+  Property::Index customPropertyIndex2 = childActor.RegisterProperty(propertyName4, 20, Property::READ_WRITE);
+
+  // Check that the custom property is created
+  DALI_TEST_EQUALS( initialChildActorPropertyCount + 4u, childActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Check the fourth child property value
+  DALI_TEST_EQUALS( childActor.GetProperty< int >( propertyIndex4 ), 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetProperty< int >( customPropertyIndex2 ), 20, TEST_LOCATION );
+
+  // Check the fourth child property type
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex4 ), propertyType4, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( customPropertyIndex2 ), propertyType4, TEST_LOCATION );
+
+  // Check the fourth child property name
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex4 ), propertyName4, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyName( customPropertyIndex2 ), propertyName4, TEST_LOCATION );
+
+  // Check the fourth child property index.
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName4 ), propertyIndex4, TEST_LOCATION );
+
+  // Now create another parent actor with different child properties registered
+  TypeInfo typeInfo2 = typeRegistry.GetTypeInfo( "MyNamedActor" );
+  DALI_TEST_CHECK( typeInfo2 );
+  BaseHandle handle2 = typeInfo2.CreateInstance();
+  DALI_TEST_CHECK( handle2 );
+  Actor customActor2 = Actor::DownCast( handle2 );
+  DALI_TEST_CHECK( customActor2 );
+
+  // Register child properties to the new parent
+  std::string newPropertyName( "newChildProp" );
+  int newPropertyIndex( CHILD_PROPERTY_REGISTRATION_START_INDEX ); // The same index as the first child property "childProp1" in the old parent
+  Property::Type newPropertyType( Property::VECTOR2 );
+  ChildPropertyRegistration newChildProperty( namedActorType, newPropertyName, newPropertyIndex, newPropertyType );
+
+  std::string newPropertyName2( "childProp3" ); // The same name as the third child property in the old parent
+  int newPropertyIndex2( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1 ); // The same index as the second child property "childProp2" in the old parent
+  Property::Type newPropertyType2( Property::FLOAT ); // The same type as the third child property in the old parent
+  ChildPropertyRegistration newChildProperty2( namedActorType, newPropertyName2, newPropertyIndex2, newPropertyType2 );
+
+  // Now move the child actor to the new parent
+  customActor2.Add( childActor );
+
+  // "childProp1" is not a valid child property supported by the new parent, so nothing changed
+  DALI_TEST_EQUALS( childActor.GetPropertyType( propertyIndex ), propertyType, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( propertyName ), propertyIndex, TEST_LOCATION );
+
+  // "childProp3" is a valid child property supported by the new parent
+  // So it should get its new child property index and should just work
+  DALI_TEST_EQUALS( childActor.GetPropertyType( newPropertyIndex2 ), newPropertyType2, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyName( newPropertyIndex2 ), newPropertyName2, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( newPropertyName2 ), newPropertyIndex2, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetProperty< float >( newPropertyIndex2 ), 0.15f, TEST_LOCATION );
+
+  // Now register a custom property called "newChildProp"
+  Property::Index customPropertyIndex3 = childActor.RegisterProperty("newChildProp", Vector2( 10.0f, 10.0f ), Property::READ_WRITE);
+
+  // Check that the custom property is created
+  DALI_TEST_EQUALS( initialChildActorPropertyCount + 5u, childActor.GetPropertyCount(), TEST_LOCATION );
+
+  // This is a valid child property registered to the new parent
+  // So should be able to access it through both its custom property index and its registered child property index
+  DALI_TEST_EQUALS( childActor.GetPropertyType( newPropertyIndex ), newPropertyType, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyType( customPropertyIndex3 ), newPropertyType, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetPropertyName( newPropertyIndex ), newPropertyName, TEST_LOCATION ); // This should return the new name, although the child property index remains the same
+  DALI_TEST_EQUALS( childActor.GetPropertyName( customPropertyIndex3 ), newPropertyName, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetProperty< Vector2 >( newPropertyIndex ), Vector2( 10.0f, 10.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor.GetProperty< Vector2 >( customPropertyIndex3 ), Vector2( 10.0f, 10.0f ), TEST_LOCATION );
+
+  // Should return the child property index by given its name
+  DALI_TEST_EQUALS( childActor.GetPropertyIndex( newPropertyName ), newPropertyIndex, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryChildPropertyRegistrationN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Attempt to register a child property type out-of-bounds index (less than)
+  try
+  {
+    ChildPropertyRegistration property1( customType1, "propName",  CHILD_PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
+  }
+
+  // Attempt to register a child property type out-of-bounds index (greater than)
+  try
+  {
+    ChildPropertyRegistration property1( customType1, "propName",  CHILD_PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
   }
 
   END_TEST;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3438,6 +3438,9 @@ void Actor::SetParent( Actor* parent )
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToStage( parent->GetHierarchyDepth() );
     }
+
+    // Resolve the name and index for the child properties if any
+    ResolveChildProperties();
   }
   else // parent being set to NULL
   {
@@ -4192,6 +4195,11 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
   }
 
   return FLT_MAX;  // Default
+}
+
+Object* Actor::GetParentObject() const
+{
+  return mParent;
 }
 
 } // namespace Internal

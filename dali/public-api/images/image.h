@@ -38,13 +38,15 @@ class Image;
 }
 
 /**
- * @brief An Image object represents an image resource that can be used for rendering
+ * @brief An Image object represents an image resource that can be added to ImageViews.
  *
- * Image objects can be shared between Actors. This is practical if you have a visual element on screen
- * which is repeatedly used.
+ * Image objects can be shared between ImageViews. This is practical if you have a visual element on screen
+ * which is repeatedly used. An example would be a button background image.
+ * The image resource is discarded when all ImageViews using the Image object are discarded.
+ * @SINCE_1_0.0
+ * @note If a resource was shared between Image objects it exists until its last reference is gone.
  *
  * Image objects are responsible for the underlying resource's lifetime.
- * Note: if a resource was shared between Image objects it exists until its last reference is gone.
  *
  * Signals
  * | %Signal Name           | Method                       |
@@ -55,11 +57,16 @@ class Image;
 class DALI_IMPORT_API Image : public BaseHandle
 {
 public:
+  /**
+   * @brief Resource management options.
+   */
 
   /**
    * @DEPRECATED_1_1.3. Image resource is released as soon as last handle is released.
    * @brief ReleasePolicy controls the way images are deleted from memory.
    * @SINCE_1_0.0
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
    */
   enum ReleasePolicy
   {
@@ -78,7 +85,7 @@ public:
   /**
    * @brief Constructor which creates an empty Image handle.
    *
-   * Use Image::New(...) to create an initialised handle.
+   * Use the appropriate New method to create an initialized handle.
    * @SINCE_1_0.0
    */
   Image();
@@ -109,13 +116,13 @@ public:
   Image& operator=(const Image& rhs);
 
   /**
-   * @brief Downcast an Object handle to Image handle.
+   * @brief Downcast a handle to Image handle.
    *
    * If handle points to a Image object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle to An object
-   * @return handle to a Image object or an uninitialized handle
+   * @param[in] handle Handle to an object
+   * @return Handle to a Image object or an uninitialized handle
    */
   static Image DownCast( BaseHandle handle );
 
@@ -125,7 +132,9 @@ public:
    * @brief Return resource release policy.
    *
    * @SINCE_1_0.0
-   * @return resource release policy
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
+   * @return Resource release policy
    */
   ReleasePolicy GetReleasePolicy() const;
 
@@ -135,7 +144,7 @@ public:
    * Returns either the requested width or the actual loaded width if no specific size was requested.
    *
    * @SINCE_1_0.0
-   * @return width of the image in pixels.
+   * @return Width of the image in pixels.
    */
   unsigned int GetWidth() const;
 
@@ -145,7 +154,7 @@ public:
    * Returns either the requested height or the actual loaded height if no specific size was requested.
    *
    * @SINCE_1_0.0
-   * @return height of the image in pixels.
+   * @return Height of the image in pixels.
    */
   unsigned int GetHeight() const;
 

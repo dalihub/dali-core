@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  *
  */
 
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>

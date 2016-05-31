@@ -811,6 +811,7 @@ struct FunctorDispatcherReturn3
 
 /**
  * @brief Dispatcher to call a functor.
+ *
  * This variant calls a specific void() member function.
  * @SINCE_1_0.0
  */

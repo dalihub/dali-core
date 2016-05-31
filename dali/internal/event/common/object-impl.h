@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,6 +312,15 @@ protected:
   void OnSceneObjectRemove();
 
   /**
+   * For overriding by derived classes to return the parent of this object.
+   */
+  virtual Object* GetParentObject() const
+  {
+    // By default the Object does not have a parent
+    return NULL;
+  };
+
+  /**
    * For use in derived classes.
    * This is called after a property is set.
    * @param [in] index The index of the property.
@@ -355,6 +364,11 @@ protected:
    * @return pointer to the property.
    */
   AnimatablePropertyMetadata* RegisterAnimatableProperty(Property::Index index) const;
+
+  /**
+   * Resolve the index and name of child properties if any.
+   */
+  void ResolveChildProperties();
 
 private: // Default property extensions for derived classes
 

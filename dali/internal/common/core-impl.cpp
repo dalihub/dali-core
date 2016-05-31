@@ -45,7 +45,6 @@
 #include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
@@ -138,8 +137,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                           *mDiscardQueue,
                                            renderQueue );
 
-  mTouchResampler = TouchResampler::New();
-
   mUpdateManager = new UpdateManager( *mNotificationManager,
                                       *mAnimationPlaylist,
                                       *mPropertyNotificationManager,
@@ -148,8 +145,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mTextureCacheDispatcher,
-                                      *mTouchResampler );
+                                      *mTextureCacheDispatcher );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
@@ -213,7 +209,6 @@ Core::~Core()
   delete mDiscardQueue;
   delete mTextureCacheDispatcher;
   delete mUpdateManager;
-  delete mTouchResampler;
   delete mRenderManager;
   delete mTextureUploadedQueue;
 }
@@ -349,10 +344,9 @@ void Core::ProcessEvents()
     const bool messagesToProcess = mUpdateManager->FlushQueue();
 
     // Check if the touch or gestures require updates.
-    const bool touchNeedsUpdate = mTouchResampler->NeedsUpdate();
     const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
 
-    if( messagesToProcess || touchNeedsUpdate || gestureNeedsUpdate )
+    if( messagesToProcess || gestureNeedsUpdate )
     {
       // tell the render controller to keep update thread running
       mRenderController.RequestUpdate();
@@ -363,11 +357,6 @@ void Core::ProcessEvents()
 
   // ProcessEvents() may now be called again
   mProcessingEvent = false;
-}
-
-void Core::UpdateTouchData(const Integration::TouchData& touch)
-{
-  mTouchResampler->SendTouchData( touch );
 }
 
 unsigned int Core::GetMaximumUpdateCount() const

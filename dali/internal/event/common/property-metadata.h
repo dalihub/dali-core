@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROPERTY_METADATA_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,7 @@ public:
                           Property::Type newType,
                           const SceneGraph::PropertyBase* newProperty)
   : name(newName),
+    childPropertyIndex(Property::INVALID_INDEX),
     mAccessMode(Property::ANIMATABLE)
   {
     value = Property::Value(newType);
@@ -225,6 +226,7 @@ public:
                           Property::Value newValue,
                           Property::AccessMode accessMode )
   : name(newName),
+    childPropertyIndex(Property::INVALID_INDEX),
     mAccessMode(accessMode)
   {
     value = newValue;
@@ -240,6 +242,7 @@ public:
   }
 
   std::string name;       ///< The name of the property
+  Property::Index childPropertyIndex; ///< The index as a child property
 
 private:
 

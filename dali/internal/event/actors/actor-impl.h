@@ -1772,6 +1772,12 @@ private:
    */
   Vector2 ApplySizeSetPolicy( const Vector2 size );
 
+  /**
+   * Retrieve the parent object of an Actor.
+   * @return The parent object, or NULL if the Actor does not have a parent.
+   */
+  virtual Object* GetParentObject() const;
+
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent

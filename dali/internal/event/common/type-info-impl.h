@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_INFO_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,14 @@ public:
   void AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
 
   /**
+   * Adds a child property to the type.
+   * @param[in] name The name of the property.
+   * @param[in] index The index of the property
+   * @param[in] type The Property::Type.
+   */
+  void AddChildProperty( const std::string& name, Property::Index index, Property::Type type );
+
+  /**
    * Do an action on base object
    * @param [in] object The base object to act upon
    * @param [in] actionName The name of the desired action
@@ -218,6 +226,27 @@ public:
    * @return The Property::Type at that index.
    */
   Property::Type GetPropertyType( Property::Index index ) const;
+
+  /**
+   * Given a child property name, retrieve the index.
+   * @param[in] name The name of the child property.
+   * @return The index associated with that name.
+   */
+  Property::Index GetChildPropertyIndex( const std::string& name ) const;
+
+  /**
+   * Retrieve the name of the child property at the given index.
+   * @param[in] index The property index.
+   * @return The name of the child property.
+   */
+  const std::string& GetChildPropertyName( Property::Index index ) const;
+
+  /**
+   * Retrieve the Property::Type of the child property at the given index.
+   * @param[in] index The property index.
+   * @return The Property::Type at that index.
+   */
+  Property::Type GetChildPropertyType( Property::Index index ) const;
 
   /**
    * Retrieve the default value of the property at the given index.
@@ -306,6 +335,7 @@ private:
   ActionContainer mActions;
   ConnectorContainer mSignalConnectors;
   RegisteredPropertyContainer mRegisteredProperties;
+  RegisteredPropertyContainer mRegisteredChildProperties;
   PropertyDefaultValueContainer mPropertyDefaultValues;
 };
 

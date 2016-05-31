@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_INDEX_RANGES_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,9 @@ enum PropertyRanges
 
   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX  = 20000000,   ///< The index when registering an animatable property should start from this number. (SceneGraph properties per type) @SINCE_1_0.0
   ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX    = 29999999,   ///< The maximum index supported when registering an animatable property @SINCE_1_0.0
+
+  CHILD_PROPERTY_REGISTRATION_START_INDEX       = 45000000,   ///< The index when registering a child property should start from this number. (Event side properties per instance) @SINCE_1_1.35
+  CHILD_PROPERTY_REGISTRATION_MAX_INDEX         = 49999999,   ///< The maximum index supported when registering a child property @SINCE_1_1.35
 
   PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start (SceneGraph and Event side properties per instance) @SINCE_1_0.0
 };
