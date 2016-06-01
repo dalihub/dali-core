@@ -345,6 +345,7 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& renderList = instruction.GetNextFreeRenderList( layer.colorRenderables.Size() );
   renderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
+  renderList.SetSourceLayer( &layer );
   renderList.SetHasColorRenderItems( true );
 
   // try to reuse cached renderitems from last time around
@@ -359,30 +360,13 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
   AddRenderersToRenderList( updateBufferIndex, renderList, layer.colorRenderables, viewMatrix, camera, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
   SortRenderItems( updateBufferIndex, renderList, layer, sortingHelper );
 
-  //Set render flags
-  unsigned int flags = 0u;
+  // Setup the render flags for stencil.
+  renderList.ClearFlags();
   if( stencilRenderablesExist )
   {
-    flags = RenderList::STENCIL_BUFFER_ENABLED;
+    // Note: SetFlags does not overwrite, it ORs, so ClearFlags() is also required.
+    renderList.SetFlags( RenderList::STENCIL_BUFFER_ENABLED );
   }
-
-  // Special optimization. If this layer has got exactly one renderer
-  // and this renderer is not writing to the depth buffer there is no point on enabling
-  // depth buffering
-  if ( ( renderList.Count() == 1 ) &&
-       (( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::OFF ) ||
-        ( renderList.GetRenderer( 0 ).GetDepthWriteMode() == DepthWriteMode::AUTO && !renderList.GetItem(0).mIsOpaque )))
-  {
-    //Nothing to do here
-  }
-  else if( !layer.IsDepthTestDisabled())
-  {
-    flags |= RenderList::DEPTH_BUFFER_ENABLED;
-    flags |= RenderList::DEPTH_CLEAR;
-  }
-
-  renderList.ClearFlags();
-  renderList.SetFlags( flags );
 }
 
 /**
@@ -408,6 +392,7 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& overlayRenderList = instruction.GetNextFreeRenderList( layer.overlayRenderables.Size() );
   overlayRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
+  overlayRenderList.SetSourceLayer( &layer );
   overlayRenderList.SetHasColorRenderItems( false );
 
   //Set render flags
@@ -449,6 +434,7 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& stencilRenderList = instruction.GetNextFreeRenderList( layer.stencilRenderables.Size() );
   stencilRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
+  stencilRenderList.SetSourceLayer( &layer );
   stencilRenderList.SetHasColorRenderItems( false );
 
   //Set render flags

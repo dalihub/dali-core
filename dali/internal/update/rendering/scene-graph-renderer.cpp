@@ -89,16 +89,17 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
 // flags for resending data to renderer
 enum Flags
 {
-  RESEND_DATA_PROVIDER = 1,
-  RESEND_GEOMETRY = 1 << 1,
-  RESEND_FACE_CULLING_MODE = 1 << 2,
-  RESEND_BLEND_COLOR = 1 << 3,
-  RESEND_BLEND_BIT_MASK = 1 << 4,
-  RESEND_PREMULTIPLIED_ALPHA = 1 << 5,
-  RESEND_INDEXED_DRAW_FIRST_ELEMENT = 1 << 6,
+  RESEND_DATA_PROVIDER               = 1,
+  RESEND_GEOMETRY                    = 1 << 1,
+  RESEND_FACE_CULLING_MODE           = 1 << 2,
+  RESEND_BLEND_COLOR                 = 1 << 3,
+  RESEND_BLEND_BIT_MASK              = 1 << 4,
+  RESEND_PREMULTIPLIED_ALPHA         = 1 << 5,
+  RESEND_INDEXED_DRAW_FIRST_ELEMENT  = 1 << 6,
   RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 7,
-  RESEND_DEPTH_WRITE_MODE = 1 << 8,
-  RESEND_DEPTH_FUNCTION = 1 << 9,
+  RESEND_DEPTH_WRITE_MODE            = 1 << 8,
+  RESEND_DEPTH_TEST_MODE             = 1 << 9,
+  RESEND_DEPTH_FUNCTION              = 1 << 10,
 };
 
 }
@@ -116,26 +117,27 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-:mSceneController( 0 ),
- mRenderer( NULL ),
- mTextureSet( NULL ),
- mGeometry( NULL ),
- mShader( NULL ),
- mBlendColor( NULL ),
- mBlendBitmask( 0u ),
- mFaceCullingMode( FaceCullingMode::NONE ),
- mBlendMode( BlendMode::AUTO ),
- mDepthWriteMode( DepthWriteMode::AUTO ),
- mDepthFunction( DepthFunction::LESS ),
- mIndexedDrawFirstElement( 0 ),
- mIndexedDrawElementsCount( 0 ),
- mReferenceCount( 0 ),
- mRegenerateUniformMap( 0 ),
- mResendFlag( 0 ),
- mResourcesReady( false ),
- mFinishedResourceAcquisition( false ),
- mPremultipledAlphaEnabled(false),
- mDepthIndex( 0 )
+: mSceneController( 0 ),
+  mRenderer( NULL ),
+  mTextureSet( NULL ),
+  mGeometry( NULL ),
+  mShader( NULL ),
+  mBlendColor( NULL ),
+  mIndexedDrawFirstElement( 0u ),
+  mIndexedDrawElementsCount( 0u ),
+  mBlendBitmask( 0u ),
+  mReferenceCount( 0u ),
+  mRegenerateUniformMap( 0u ),
+  mResendFlag( 0u ),
+  mDepthFunction( DepthFunction::LESS ),
+  mFaceCullingMode( FaceCullingMode::NONE ),
+  mBlendMode( BlendMode::AUTO ),
+  mDepthWriteMode( DepthWriteMode::AUTO ),
+  mDepthTestMode( DepthTestMode::AUTO ),
+  mResourcesReady( false ),
+  mFinishedResourceAcquisition( false ),
+  mPremultipledAlphaEnabled( false ),
+  mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
   mUniformMapChanged[1] = false;
@@ -289,6 +291,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode );
     }
 
+    if( mResendFlag & RESEND_DEPTH_TEST_MODE )
+    {
+      typedef MessageValue1< Render::Renderer, DepthTestMode::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthTestMode, mDepthTestMode );
+    }
+
     if( mResendFlag & RESEND_DEPTH_FUNCTION )
     {
       typedef MessageValue1< Render::Renderer, DepthFunction::Type > DerivedType;
@@ -404,6 +413,12 @@ void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
   mResendFlag |= RESEND_DEPTH_WRITE_MODE;
 }
 
+void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
+{
+  mDepthTestMode = depthTestMode;
+  mResendFlag |= RESEND_DEPTH_TEST_MODE;
+}
+
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
@@ -423,6 +438,7 @@ void Renderer::OnStageConnect()
                                        static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                        mPremultipledAlphaEnabled,
                                        mDepthWriteMode,
+                                       mDepthTestMode,
                                        mDepthFunction );
 
     mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );

@@ -128,6 +128,21 @@ enum Type
 
 } // namespace DepthWriteMode
 
+namespace DepthTestMode
+{
+
+/**
+ * @brief Depth buffer test (reading) modes.
+ */
+enum Type
+{
+  OFF,  ///< Renderer does not read from the depth buffer @SINCE_1_1.38
+  AUTO, ///< Renderer only reads from the depth buffer if in a 3D layer @SINCE_1_1.38
+  ON    ///< Renderer reads from the depth buffer based on the DepthFunction @SINCE_1_1.38
+};
+
+} // namespace DepthTestMode
+
 namespace DepthFunction
 {
 
@@ -136,7 +151,6 @@ namespace DepthFunction
  */
 enum Type
 {
-  OFF,          ///< Depth test is disabled
   NEVER,        ///< Depth test never passes
   ALWAYS,       ///< Depth test always passes
   LESS,         ///< Depth test passes if the incoming depth value is less than the stored depth value
@@ -253,7 +267,15 @@ public:
        * @see DepthFunction
        * @note The default value is DepthFunction::LESS
        */
-      DEPTH_FUNCTION
+      DEPTH_FUNCTION,
+
+      /**
+       * @brief name "depthTestMode", type INTEGER
+       * @see DepthTestMode
+       * @note The default value is DepthTestMode::AUTO
+       * @SINCE_1_1.38
+       */
+      DEPTH_TEST_MODE
     };
   };
 

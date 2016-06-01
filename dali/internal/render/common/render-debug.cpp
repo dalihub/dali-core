@@ -80,21 +80,6 @@ void PrintRenderList( const RenderList& list )
   {
     debugStream << " with:";
 
-    if( flags & RenderList::DEPTH_BUFFER_ENABLED )
-    {
-      debugStream << " DEPTH_TEST";
-    }
-
-    if( flags & RenderList::DEPTH_WRITE )
-    {
-      debugStream << " DEPTH_WRITE";
-    }
-
-    if( flags & RenderList::DEPTH_CLEAR )
-    {
-      debugStream << " DEPTH_CLEAR";
-    }
-
     if( flags & RenderList::STENCIL_BUFFER_ENABLED )
     {
       debugStream << " STENCIL_TEST";
@@ -112,7 +97,7 @@ void PrintRenderList( const RenderList& list )
   }
   else
   {
-    debugStream << " without any DEPTH_TEST, DEPTH_WRITE etc";
+    debugStream << " without any STENCIL settings";
   }
 
   if( list.IsClipping() )
