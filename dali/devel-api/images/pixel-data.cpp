@@ -21,64 +21,59 @@
 // EXTERNAL INLCUDES
 #include <stdlib.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/images/pixel-data-impl.h>
+
 namespace Dali
 {
 
-PixelData::PixelData( unsigned char* buffer,
-                      unsigned int width,
-                      unsigned int height,
-                      Pixel::Format pixelFormat,
-                      ReleaseFunction releaseFunction )
-: mBuffer( buffer ),
-  mWidth( width ),
-  mHeight( height ),
-  mPixelFormat( pixelFormat ),
-  mReleaseFunction( releaseFunction )
+PixelData PixelData::New(unsigned char* buffer,
+                         unsigned int width,
+                         unsigned int height,
+                         Pixel::Format pixelFormat,
+                         ReleaseFunction releaseFunction)
+{
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, width, height, pixelFormat, releaseFunction );
+  return PixelData( internal.Get() );
+}
+
+PixelData::PixelData()
 {
 }
 
 PixelData::~PixelData()
 {
-  if( mBuffer )
-  {
-    if( mReleaseFunction == FREE)
-    {
-      free( mBuffer );
-    }
-    else
-    {
-      delete[] mBuffer;
-    }
-  }
- }
+}
 
-PixelDataPtr PixelData::New(unsigned char* buffer,
-                            unsigned int width,
-                            unsigned int height,
-                            Pixel::Format pixelFormat,
-                            ReleaseFunction releaseFunction)
+PixelData::PixelData( Internal::PixelData* internal )
+: BaseHandle( internal )
 {
-  return new PixelData( buffer, width, height, pixelFormat, releaseFunction );
+}
+
+PixelData::PixelData(const PixelData& handle)
+: BaseHandle( handle )
+{
+}
+
+PixelData& PixelData::operator=(const PixelData& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
 }
 
 unsigned int PixelData::GetWidth() const
 {
-  return mWidth;
+  return GetImplementation(*this).GetWidth();
 }
 
 unsigned int PixelData::GetHeight() const
 {
-  return mHeight;
+  return GetImplementation(*this).GetHeight();
 }
 
 Pixel::Format PixelData::GetPixelFormat() const
 {
-  return mPixelFormat;
-}
-
-unsigned char* PixelData::GetBuffer() const
-{
-  return mBuffer;
+  return GetImplementation(*this).GetPixelFormat();
 }
 
 } // namespace Dali

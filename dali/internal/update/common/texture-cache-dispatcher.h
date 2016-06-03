@@ -26,8 +26,8 @@
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/pixel.h>
-#include <dali/devel-api/images/pixel-data.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/images/pixel-data-impl.h>
 #include <dali/internal/event/resources/resource-client.h> // For RectArea
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/integration-api/resource-declarations.h>

@@ -25,9 +25,9 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/devel-api/images/pixel-data.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/internal/event/images/pixel-data-impl.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 

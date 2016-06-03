@@ -46,12 +46,12 @@ void PrepareResourceImage( TestApplication& application, unsigned int imageWidth
   platform.SetSynchronouslyLoadedResource( resourcePtr );
 }
 
-PixelDataPtr CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)
+PixelData CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)
 {
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );
   unsigned char* buffer = new unsigned char [ bufferSize ];
 
-  return new PixelData( buffer, width, height, pixelFormat, PixelData::DELETE_ARRAY );
+  return PixelData::New( buffer, width, height, pixelFormat, PixelData::DELETE_ARRAY );
 }
 
 }
@@ -168,7 +168,7 @@ int UtcDaliAtlasUpload01P(void)
   PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 0, 16 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 6,8,Pixel::RGBA8888 );
+  PixelData pixelData = CreatePixelData( 6,8,Pixel::RGBA8888 );
   DALI_TEST_CHECK( atlas.Upload( pixelData, 2, 32 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
@@ -205,7 +205,7 @@ int UtcDaliAtlasUpload02P(void)
   PrepareResourceImage( application, 12, 12, Pixel::A8 );
   DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 6, 6 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 8,8,Pixel::LA88 );
+  PixelData pixelData = CreatePixelData( 8,8,Pixel::LA88 );
   DALI_TEST_CHECK( atlas.Upload( pixelData, 10, 10 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
@@ -242,7 +242,7 @@ int UtcDaliAtlasUploadN(void)
   PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 10, 10 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 6,6,Pixel::RGBA8888 );
+  PixelData pixelData = CreatePixelData( 6,6,Pixel::RGBA8888 );
   DALI_TEST_CHECK( !atlas.Upload( pixelData, 11, 11 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
