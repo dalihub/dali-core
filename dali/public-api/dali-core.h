@@ -60,8 +60,10 @@
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
+#include <dali/public-api/events/point-state.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 

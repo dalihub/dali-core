@@ -39,7 +39,7 @@ namespace Dali
 {
 
 struct KeyEvent;
-struct TouchEvent;
+class TouchData;
 struct HoverEvent;
 struct WheelEvent;
 
@@ -1358,10 +1358,11 @@ public:
 
   /**
    * Used by the EventProcessor to emit touch event signals.
-   * @param[in] event The touch event.
+   * @param[in] event The touch event (Old API).
+   * @param[in] touch The touch data.
    * @return True if the event was consumed.
    */
-  bool EmitTouchEventSignal( const TouchEvent& event );
+  bool EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData& touch );
 
   /**
    * Used by the EventProcessor to emit hover event signals.
@@ -1381,6 +1382,11 @@ public:
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
+
+  /**
+   * @copydoc Dali::Actor::TouchEventSignal()
+   */
+  Dali::Actor::TouchDataSignalType& TouchSignal();
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
@@ -1795,6 +1801,7 @@ protected:
 
   // Signals
   Dali::Actor::TouchSignalType             mTouchedSignal;
+  Dali::Actor::TouchDataSignalType         mTouchSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;
   Dali::Actor::OnStageSignalType           mOnStageSignal;

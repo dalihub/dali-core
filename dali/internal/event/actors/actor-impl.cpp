@@ -27,6 +27,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
@@ -1731,7 +1732,7 @@ bool Actor::IsKeyboardFocusable() const
 
 bool Actor::GetTouchRequired() const
 {
-  return !mTouchedSignal.Empty() || mDerivedRequiresTouch;
+  return !mTouchedSignal.Empty() || !mTouchSignal.Empty() || mDerivedRequiresTouch;
 }
 
 bool Actor::GetHoverRequired() const
@@ -1765,20 +1766,26 @@ bool Actor::IsGestureRequred( Gesture::Type type ) const
   return mGestureData && mGestureData->IsGestureRequred( type );
 }
 
-bool Actor::EmitTouchEventSignal( const TouchEvent& event )
+bool Actor::EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData& touch )
 {
   bool consumed = false;
 
-  if( !mTouchedSignal.Empty() )
+  if( !mTouchSignal.Empty() )
   {
     Dali::Actor handle( this );
-    consumed = mTouchedSignal.Emit( handle, event );
+    consumed = mTouchSignal.Emit( handle, touch );
+  }
+
+  if( !mTouchedSignal.Empty() || !mTouchSignal.Empty() )
+  {
+    Dali::Actor handle( this );
+    consumed |= mTouchedSignal.Emit( handle, event );
   }
 
   if( !consumed )
   {
     // Notification for derived classes
-    consumed = OnTouchEvent( event );
+    consumed = OnTouchEvent( event ); // TODO
   }
 
   return consumed;
@@ -1824,7 +1831,13 @@ bool Actor::EmitWheelEventSignal( const WheelEvent& event )
 
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
+  DALI_LOG_WARNING( "Deprecated: Use TouchSignal() instead\n" );
   return mTouchedSignal;
+}
+
+Dali::Actor::TouchDataSignalType& Actor::TouchSignal()
+{
+  return mTouchSignal;
 }
 
 Dali::Actor::HoverSignalType& Actor::HoveredSignal()

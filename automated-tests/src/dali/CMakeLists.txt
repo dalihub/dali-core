@@ -66,6 +66,7 @@ SET(TC_SOURCES
         utc-Dali-TapGestureDetector.cpp
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
+        utc-Dali-TouchDataProcessing.cpp
         utc-Dali-TypeRegistry.cpp
         utc-Dali-Uint16Pair.cpp
         utc-Dali-Vector.cpp
