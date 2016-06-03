@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ Layer::Layer()
   mLastCamera( NULL ),
   mBehavior( Dali::Layer::LAYER_2D ),
   mIsClipping( false ),
-  mDepthTestDisabled( false ),
+  mDepthTestDisabled( true ),
   mIsDefaultSortFunction( true )
 {
   // layer starts off dirty
@@ -97,7 +97,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
 bool Layer::IsDepthTestDisabled() const
 {
-  return ( mBehavior == Dali::Layer::LAYER_2D ) || mDepthTestDisabled;
+  return mDepthTestDisabled;
 }
 
 void Layer::ClearRenderables()

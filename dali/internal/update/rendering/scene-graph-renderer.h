@@ -174,6 +174,12 @@ public:
   void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
 
   /**
+   * Sets the depth buffer test mode
+   * @param[in] depthTestMode The depth buffer test mode
+   */
+  void SetDepthTestMode( DepthTestMode::Type depthTestMode );
+
+  /**
    * Sets the depth function
    * @param[in] depthFunction The depth function
    */
@@ -319,34 +325,35 @@ private:
 
 private:
 
-  SceneController*   mSceneController; ///< Used for initializing renderers
-  Render::Renderer*  mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*        mTextureSet;      ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*  mGeometry;        ///< The geometry this renderer uses. (Not owned)
-  Shader*            mShader;
+  CollectedUniformMap   mCollectedUniformMap[2];        ///< Uniform maps collected by the renderer
+  SceneController*      mSceneController;               ///< Used for initializing renderers
+  Render::Renderer*     mRenderer;                      ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*           mTextureSet;                    ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*     mGeometry;                      ///< The geometry this renderer uses. (Not owned)
+  Shader*               mShader;                        ///< The shader this renderer uses. (Not owned)
+  Vector4*              mBlendColor;                    ///< The blend color for blending operation
 
-  Vector4*              mBlendColor;      ///< The blend color for blending operation
-  unsigned int          mBlendBitmask;    ///< The bitmask of blending options
-  FaceCullingMode::Type mFaceCullingMode; ///< The mode of face culling
-  BlendMode::Type       mBlendMode;       ///< The mode of blending
-  DepthWriteMode::Type  mDepthWriteMode;  ///< The depth write mode
-  DepthFunction::Type   mDepthFunction;   ///< The depth function
+  size_t                mIndexedDrawFirstElement;       ///< first element index to be drawn using indexed draw
+  size_t                mIndexedDrawElementsCount;      ///< number of elements to be drawn using indexed draw
+  unsigned int          mBlendBitmask;                  ///< The bitmask of blending options
+  unsigned int          mReferenceCount;                ///< Number of nodes currently using this renderer
+  unsigned int          mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
+  unsigned short        mResendFlag;                    ///< Indicate whether data should be resent to the renderer
 
-  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+  DepthFunction::Type   mDepthFunction:3;               ///< The depth function
+  FaceCullingMode::Type mFaceCullingMode:2;             ///< The mode of face culling
+  BlendMode::Type       mBlendMode:2;                   ///< The mode of blending
+  DepthWriteMode::Type  mDepthWriteMode:2;              ///< The depth write mode
+  DepthTestMode::Type   mDepthTestMode:2;               ///< The depth test mode
 
-  size_t mIndexedDrawFirstElement;             ///< first element index to be drawn using indexed draw
-  size_t mIndexedDrawElementsCount;            ///< number of elements to be drawn using indexed draw
-  unsigned int mReferenceCount;                ///< Number of nodes currently using this renderer
-  unsigned int mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
-  unsigned short mResendFlag;                  ///< Indicate whether data should be resent to the renderer
-  bool         mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
-  bool         mResourcesReady;                ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
-  bool         mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
-  bool         mPremultipledAlphaEnabled : 1;  ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-
+  bool                  mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
+  bool                  mResourcesReady;                ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
+  bool                  mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
+  bool                  mPremultipledAlphaEnabled:1;    ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 public:
-  int mDepthIndex; ///< Used only in PrepareRenderInstructions
+
+  int                   mDepthIndex;                    ///< Used only in PrepareRenderInstructions
 };
 
 
@@ -473,6 +480,16 @@ inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, 
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetDepthWriteMode, depthWriteMode );
+}
+
+inline void SetDepthTestModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthTestMode::Type depthTestMode )
+{
+  typedef MessageValue1< Renderer, DepthTestMode::Type > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetDepthTestMode, depthTestMode );
 }
 
 inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthFunction::Type depthFunction )

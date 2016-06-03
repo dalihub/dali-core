@@ -55,22 +55,13 @@ struct RenderList
 public:
 
   /**
-   * The RenderFlags describe how the objects are rendered using the depth and stencil buffer.
-   *
-   * The flags which relate to GL_DEPTH_TEST and GL_STENCIL_TEST are called
-   * DEPTH_BUFFER_ENABLED and STENCIL_BUFFER_ENABLED to avoid any confusion.
-   * E.g. if GL_DEPTH_TEST is not enabled you can't write to the depth buffer, which can cause confusion.
-   *
+   * The RenderFlags describe how the objects are rendered using the stencil buffer.
    */
   enum RenderFlags
   {
-    DEPTH_BUFFER_ENABLED   = 1 << 0, ///< If depth buffer should be used for writing / test operations
-    DEPTH_WRITE            = 1 << 1, ///< If the depth buffer is writable
-    DEPTH_CLEAR            = 1 << 2, ///< If the depth buffer should first be cleared
-    STENCIL_BUFFER_ENABLED = 1 << 3, ///< If stencil buffer should be used for writing / test operation
-    STENCIL_WRITE          = 1 << 4, ///< If the stencil buffer is writable
-    STENCIL_CLEAR          = 1 << 5, ///< If the stencil buffer should first be cleared
-
+    STENCIL_BUFFER_ENABLED = 1 << 0, ///< If stencil buffer should be used for writing / test operation
+    STENCIL_WRITE          = 1 << 1, ///< If the stencil buffer is writable
+    STENCIL_CLEAR          = 1 << 2, ///< If the stencil buffer should first be cleared
   };
 
   /**
@@ -273,13 +264,13 @@ public:
   /**
    * @return the source layer these renderitems originate from
    */
-  Layer* GetSourceLayer()
+  Layer* GetSourceLayer() const
   {
     return mSourceLayer;
   }
 
   /**
-   * @param layer these renderitems originate from
+   * @param layer The layer these RenderItems originate from
    */
   void SetSourceLayer( Layer* layer )
   {

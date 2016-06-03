@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1904,18 +1904,6 @@ int UtcDaliRendererSetDepthFunction(void)
 
   std::ostringstream depthTestStr;
   depthTestStr << GL_DEPTH_TEST;
-
-  //OFF
-  {
-    renderer.SetProperty( Renderer::Property::DEPTH_FUNCTION, DepthFunction::OFF);
-    glEnableDisableStack.Reset();
-    glDepthFunctionStack.Reset();
-    application.SendNotification();
-    application.Render();
-
-    //Depth testing should be disabled
-    DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", depthTestStr.str().c_str() ) );
-  }
 
   //GL_NEVER
   {

@@ -117,9 +117,10 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          FaceCullingMode::Type faceCullingMode,
                          bool preMultipliedAlphaEnabled,
                          DepthWriteMode::Type depthWriteMode,
+                         DepthTestMode::Type depthTestMode,
                          DepthFunction::Type depthFunction )
 {
-  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthFunction );
+  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
@@ -129,6 +130,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     FaceCullingMode::Type faceCullingMode,
                     bool preMultipliedAlphaEnabled,
                     DepthWriteMode::Type depthWriteMode,
+                    DepthTestMode::Type depthTestMode,
                     DepthFunction::Type depthFunction )
 : mRenderDataProvider( dataProvider ),
   mContext(NULL),
@@ -138,11 +140,12 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mUniformIndexMap(),
   mAttributesLocation(),
   mBlendingOptions(),
-  mFaceCullingMode( faceCullingMode  ),
-  mDepthWriteMode( depthWriteMode ),
+  mFaceCullingMode( faceCullingMode ),
   mDepthFunction( depthFunction ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementsCount( 0 ),
+  mDepthWriteMode( depthWriteMode ),
+  mDepthTestMode( depthTestMode ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
@@ -445,9 +448,19 @@ void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
   mDepthWriteMode = depthWriteMode;
 }
 
+void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
+{
+  mDepthTestMode = depthTestMode;
+}
+
 DepthWriteMode::Type Renderer::GetDepthWriteMode() const
 {
   return mDepthWriteMode;
+}
+
+DepthTestMode::Type Renderer::GetDepthTestMode() const
+{
+  return mDepthTestMode;
 }
 
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
