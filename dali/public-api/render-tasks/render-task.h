@@ -296,14 +296,14 @@ public:
 
   /**
    * @brief Set the frame-buffer used as a render target.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    * @param[in] frameBuffer er A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it.
    */
   void SetFrameBuffer( FrameBuffer frameBuffer );
 
   /**
    * @brief Retrieve the frame-buffer used as a render target.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    * @return The framebuffer
    */
   FrameBuffer GetFrameBuffer() const;

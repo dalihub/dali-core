@@ -64,7 +64,7 @@ enum Type
    * @brief Chooses the mipmap that most closely matches the size of the pixel being
    * textured and uses the GL_NEAREST criterion (the texture element closest to
    * the specified texture coordinates) to produce a texture value.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    */
   NEAREST_MIPMAP_NEAREST,
 
@@ -72,7 +72,7 @@ enum Type
    * @brief Chooses the mipmap that most closely matches the size of the pixel being textured
    * and uses the GL_LINEAR criterion (a weighted average of the four texture elements
    * that are closest to the specified texture coordinates) to produce a texture value.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    */
   LINEAR_MIPMAP_NEAREST,
 
@@ -81,7 +81,7 @@ enum Type
    * and uses the GL_NEAREST criterion (the texture element closest to the specified texture
    * coordinates ) to produce a texture value from each mipmap. The final texture value is a
    * weighted average of those two values.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    */
   NEAREST_MIPMAP_LINEAR,
 
@@ -90,7 +90,7 @@ enum Type
    * uses the GL_LINEAR criterion (a weighted average of the texture elements that are closest
    * to the specified texture coordinates) to produce a texture value from each mipmap. The final
    * texture value is a weighted average of those two values.
-   * @SINCE_1_1.37
+   * @SINCE_1_1.38
    */
   LINEAR_MIPMAP_LINEAR
 

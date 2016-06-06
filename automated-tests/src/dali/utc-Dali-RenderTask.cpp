@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/rendering/frame-buffer.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
 #include <test-native-image.h>
@@ -1131,6 +1132,70 @@ int UtcDaliRenderTaskGetTargetFrameBufferN(void)
   // By default render-tasks do not render off-screen
   FrameBufferImage image = task.GetTargetFrameBuffer();
   DALI_TEST_CHECK( !image );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetFrameBufferP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 128u, 128u, FrameBuffer::COLOR );
+  task.SetFrameBuffer( newFrameBuffer );
+  DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetFrameBufferN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+  FrameBuffer newFrameBuffer; // Empty handle
+  task.SetFrameBuffer( newFrameBuffer );
+  DALI_TEST_EQUALS( (bool)task.GetFrameBuffer(), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetFrameBufferP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 1u, 1u, FrameBuffer::COLOR  );
+  task.SetFrameBuffer( newFrameBuffer );
+  DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetFrameBufferN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  // By default render-tasks do not render off-screen
+  FrameBuffer frameBuffer = task.GetFrameBuffer();
+  DALI_TEST_CHECK( !frameBuffer );
 
   END_TEST;
 }
