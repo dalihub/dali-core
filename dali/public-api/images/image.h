@@ -38,11 +38,12 @@ class Image;
 }
 
 /**
- * @brief An Image object represents an image resource that can be added to ImageViews.
+ * @brief An Image object represents an image resource that can be used for rendering.
  *
- * Image objects can be shared between ImageViews. This is practical if you have a visual element on screen
- * which is repeatedly used. An example would be a button background image.
- * The image resource is discarded when all ImageViews using the Image object are discarded.
+ * Image objects can be shared between Actors. This is practical if you have a visual element on screen
+ * which is repeatedly used.
+ *
+ * The image resource is released as soon as the last Image handle is released.
  * @SINCE_1_0.0
  * @note If a resource was shared between Image objects it exists until its last reference is gone.
  *
@@ -57,9 +58,6 @@ class Image;
 class DALI_IMPORT_API Image : public BaseHandle
 {
 public:
-  /**
-   * @brief Resource management options.
-   */
 
   /**
    * @DEPRECATED_1_1.3. Image resource is released as soon as last handle is released.

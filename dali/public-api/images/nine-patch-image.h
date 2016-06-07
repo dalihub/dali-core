@@ -73,8 +73,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] filename File to load synchronously into buffer
    * @return A handle to a new instance of NinePatchImage
-   * @note Default resource management policies are Immediate and Never
-   *
    */
   static NinePatchImage New( const std::string& filename );
 
