@@ -435,10 +435,11 @@ public:
   /**
    * @brief Set whether the render task will cull the actors to the camera's view frustum.
    *
-   * Note that this will only affect image views that use the default vertex shader.
-   * The default mode is to cull actors.
    * @SINCE_1_0.0
    * @param[in] cullMode True if the renderers should be culled.
+   * @note The default mode is to cull actors.
+   * @note If the shader uses @ref Shader::HINT_MODIFIES_GEOMETRY then culling optimizations are disabled.
+   * @see Shader::ShaderHints
    */
   void SetCullMode( bool cullMode );
 
