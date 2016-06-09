@@ -73,8 +73,8 @@ public:
   enum ShaderHints
   {
     HINT_NONE                     = 0x00, ///< no hints
-    HINT_OUTPUT_IS_TRANSPARENT    = 0x02, ///< Might generate transparent alpha from opaque inputs
-    HINT_MODIFIES_GEOMETRY        = 0x08, ///< Might change position of vertices,
+    HINT_OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs
+    HINT_MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices,
                                           ///< this option disables any culling optimizations
   };
 

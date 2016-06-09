@@ -574,14 +574,14 @@ void NewTexture::Initialize(Context& context)
   }
 }
 
-void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const Dali::TextureUploadParams& params  )
+void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params  )
 {
   if( mType == TextureType::TEXTURE_2D )
   {
     context.Bind2dTexture( mId );
     context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-    if( params.x0 == 0 && params.y0 == 0 &&
+    if( params.xOffset == 0 && params.yOffset == 0 &&
         params.width == (unsigned int)(mWidth / (1<<params.mipmap)) &&
         params.height == (unsigned int)(mHeight / (1<<params.mipmap)) )
     {
@@ -591,7 +591,7 @@ void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const 
     else
     {
       //Specifying part of the image for the mipmap
-      context.TexSubImage2D( GL_TEXTURE_2D, params.mipmap, params.x0, params.y0, params.width, params.height, mInternalFormat, mPixelDataType, &buffer[0] );
+      context.TexSubImage2D( GL_TEXTURE_2D, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, mInternalFormat, mPixelDataType, &buffer[0] );
     }
   }
   else if( mType == TextureType::TEXTURE_CUBE )
@@ -599,17 +599,21 @@ void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const 
     context.BindCubeMapTexture( mId );
     context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-    if( params.x0 == 0 && params.y0 == 0 &&
-        params.width == (unsigned int)(mWidth / (1<<params.mipmap)) &&
-        params.height == (unsigned int)(mHeight / (1<<params.mipmap)) )
+    if( params.xOffset == 0 && params.yOffset == 0 &&
+        params.width  == static_cast<unsigned int>(mWidth  / (1<<params.mipmap)) &&
+        params.height == static_cast<unsigned int>(mHeight / (1<<params.mipmap)) )
     {
       //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
-      context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap, mInternalFormat, params.width, params.height, 0, mInternalFormat, mPixelDataType, &buffer[0] );
+      context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap, mInternalFormat,
+                         params.width, params.height, 0,
+                         mInternalFormat, mPixelDataType, &buffer[0] );
     }
     else
     {
       //Specifying part of the image for the mipmap
-      context.TexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap, params.x0, params.y0, params.width, params.height, mInternalFormat, mPixelDataType, &buffer[0] );
+      context.TexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap,
+                             params.xOffset, params.yOffset, params.width, params.height,
+                             mInternalFormat, mPixelDataType, &buffer[0] );
     }
   }
 }

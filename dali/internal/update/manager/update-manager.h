@@ -37,6 +37,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {
@@ -493,7 +494,7 @@ public:
    * @param[in] buffer Vector with the data to be uploaded
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params );
+  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params );
 
   /**
    * Generates mipmaps for a texture owned by the RenderManager
@@ -523,13 +524,6 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int face );
-
-  /**
-   * Attach a texture as depth-stencil to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as depth-stencil buffer when rendering
-   */
-  void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture );
 
 public:
 
@@ -1236,7 +1230,7 @@ public:
   /**
    * Constructor which does a Vector::Swap()
    */
-  UploadTextureDataMessage( T* manager, Render::NewTexture* texture, Dali::Vector<unsigned char>& data, const Dali::TextureUploadParams& params )
+  UploadTextureDataMessage( T* manager, Render::NewTexture* texture, Dali::Vector<unsigned char>& data, const NewTexture::UploadParams& params )
   : MessageBase(),
     mManager( manager ),
     mRenderTexture( texture ),
@@ -1266,10 +1260,10 @@ private:
   T* mManager;
   Render::NewTexture* mRenderTexture;
   Dali::Vector<unsigned char> mData;
-  Dali::TextureUploadParams mParams;
+  NewTexture::UploadParams mParams;
 };
 
-inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, Dali::Vector<unsigned char>& data, const Dali::TextureUploadParams& params )
+inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, Dali::Vector<unsigned char>& data, const NewTexture::UploadParams& params )
 {
   typedef UploadTextureDataMessage< UpdateManager > LocalType;
 

@@ -25,6 +25,7 @@
 #include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {
@@ -282,7 +283,7 @@ public:
    * @param[in] buffer Vector with the data to be uploaded
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params );
+  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params );
 
   /**
    * Generates mipmaps for a given texture
@@ -310,13 +311,6 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer );
-
-  /**
-   * Attach a texture as depth-stencil to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as depth-stencil buffer when rendering
-   */
-  void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

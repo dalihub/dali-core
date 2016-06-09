@@ -102,9 +102,13 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
 
   mNewTextures[index]= texture;
 
+  Render::NewTexture* renderTexture(0);
+  if( texture )
+  {
+    renderTexture = texture->GetRenderObject();
+  }
 
-  SceneGraph::SetTextureMessage( mEventThreadServices, *mSceneObject, index, texture->GetRenderObject() );
-
+  SceneGraph::SetTextureMessage( mEventThreadServices, *mSceneObject, index, renderTexture );
 }
 
 Image* TextureSet::GetImage( size_t index ) const

@@ -43,6 +43,19 @@ class NewTexture : public BaseObject
 public:
 
   /**
+   * @brief Structure used to pass parameters to the Upload method
+   */
+  struct UploadParams
+  {
+    unsigned int layer;    ///< Specifies the layer of a cube map or array texture
+    unsigned int mipmap;   ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+    unsigned int xOffset;  ///< Specifies a texel offset in the x direction within the texture array.
+    unsigned int yOffset;  ///< Specifies a texel offset in the y direction within the texture array.
+    unsigned int width;    ///< Specifies the width of the texture subimage
+    unsigned int height;   ///< Specifies the height of the texture subimage.
+  };
+
+  /**
    * @brief Create a new Texture.
    *
    * @param[in] type The type of the texture
@@ -63,7 +76,15 @@ public:
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  void Upload( Vector<unsigned char>& buffer, const TextureUploadParams& params );
+  void Upload( Vector<unsigned char>& buffer );
+
+  /**
+   * @copydoc Dali::Texture::Upload()
+   */
+  void Upload( Vector<unsigned char>& buffer,
+               unsigned int layer, unsigned int mipmap,
+               unsigned int xOffset, unsigned int yOffset,
+               unsigned int width, unsigned int height );
 
   /**
    * @copydoc Dali::Texture::GenerateMipmaps()
@@ -105,6 +126,13 @@ private: // unimplemented methods
   NewTexture& operator=( const NewTexture& );
 
 private: // data
+
+  /**
+   * @brief Helper method to check that upload parameters are correct
+   * @param[in] buffer A vector with the data to be uploaded
+   * @param[in] parameters The uploading parameters
+   */
+  bool CheckUploadParametres( const Vector<unsigned char>& buffer, const UploadParams& parameters) const;
 
   Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
   Internal::Render::NewTexture* mRenderObject;            ///<The Render::Texture associated to this texture

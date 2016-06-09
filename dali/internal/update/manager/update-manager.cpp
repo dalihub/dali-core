@@ -1312,7 +1312,7 @@ void UpdateManager::RemoveTexture( Render::NewTexture* texture)
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveTexture, texture );
 }
 
-void UpdateManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params )
+void UpdateManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
 {
   typedef UploadTextureDataMessage< RenderManager > DerivedType;
 

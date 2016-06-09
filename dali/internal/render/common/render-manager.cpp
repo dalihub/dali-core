@@ -325,7 +325,7 @@ void RenderManager::RemoveTexture( Render::NewTexture* texture )
 
   TextureOwnerContainer& textures = mImpl->textureContainer;
 
-  // Find the sampler
+  // Find the texture
   for ( TextureOwnerIter iter = textures.Begin(); iter != textures.End(); ++iter )
   {
     if ( *iter == texture )
@@ -337,7 +337,7 @@ void RenderManager::RemoveTexture( Render::NewTexture* texture )
   }
 }
 
-void RenderManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const TextureUploadParams& params )
+void RenderManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
 {
   texture->Upload( mImpl->context, buffer, params );
 }

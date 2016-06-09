@@ -60,6 +60,11 @@ FrameBuffer::FrameBuffer( Internal::FrameBuffer* pointer )
 {
 }
 
+void FrameBuffer::AttachColorTexture( Texture& texture )
+{
+  AttachColorTexture( texture, 0u, 0u );
+}
+
 void FrameBuffer::AttachColorTexture( Texture& texture, unsigned int mipmapLevel, unsigned int layer )
 {
   if( texture )

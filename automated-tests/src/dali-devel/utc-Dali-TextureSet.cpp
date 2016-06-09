@@ -22,15 +22,6 @@ using namespace Dali;
 
 #include <mesh-builder.h>
 
-namespace
-{
-void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
-{
-  current.b = 0.0f;
-}
-}
-
-
 void texture_set_test_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -201,6 +192,96 @@ int UtcDaliTextureSetSetImage02(void)
   END_TEST;
 }
 
+int UtcDaliTextureSetTexture01(void)
+{
+  TestApplication application;
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
+
+  Shader shader = CreateShader();
+  TextureSet textureSet = CreateTextureSet();
+  textureSet.SetTexture( 0u, texture );
+
+  Geometry geometry = Geometry::QUAD();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // There are four calls to TexParameteri when the texture is first created
+  // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetTexture02(void)
+{
+  TestApplication application;
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
+
+  Shader shader = CreateShader();
+  TextureSet textureSet = CreateTextureSet();
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  textureSet.SetTexture( 0u, texture );
+  textureSet.SetSampler( 0u, sampler );
+
+  Geometry geometry = Geometry::QUAD();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // There are four calls to TexParameteri when the texture is first created
+  // Texture minification and magnification filters are now different than default so
+  //there should have been two extra TexParameteri calls to set the new filter mode
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 6, TEST_LOCATION);
+
+  END_TEST;
+}
 int UtcDaliTextureSetSetSampler(void)
 {
   TestApplication application;
@@ -236,7 +317,7 @@ int UtcDaliTextureSetSetSampler(void)
   texParameterTrace.Enable( false );
 
   // Verify gl state
-  // There are three calls to TexParameteri when the texture is first created
+  // There are 4 calls to TexParameteri when the texture is first created
   // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
 
@@ -286,6 +367,35 @@ int UtcDaliTextureSetGetImage(void)
   DALI_TEST_EQUALS( textureSet.GetImage(0), image, TEST_LOCATION );
   DALI_TEST_EQUALS( textureSet.GetImage(1), Image(), TEST_LOCATION );
   DALI_TEST_EQUALS( textureSet.GetImage(2), Image(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetTexture(void)
+{
+  TestApplication application;
+
+  TextureSet textureSet = CreateTextureSet();
+  DALI_TEST_EQUALS( textureSet.GetTexture(0), Texture(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(1), Texture(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(2), Texture(), TEST_LOCATION );
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
+  textureSet.SetTexture( 0u, texture );
+
+  DALI_TEST_EQUALS( textureSet.GetTexture(0), texture, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(1), Texture(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(2), Texture(), TEST_LOCATION );
+
+  textureSet.SetTexture( 2u, texture );
+  DALI_TEST_EQUALS( textureSet.GetTexture(0), texture, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(1), Texture(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(2), texture, TEST_LOCATION );
+
+  textureSet.SetTexture( 2u, Texture() );
+  DALI_TEST_EQUALS( textureSet.GetTexture(0), texture, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(1), Texture(), TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet.GetTexture(2), Texture(), TEST_LOCATION );
 
   END_TEST;
 }

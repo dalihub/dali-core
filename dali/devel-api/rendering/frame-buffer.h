@@ -90,14 +90,22 @@ public:
   FrameBuffer& operator=( const FrameBuffer& handle );
 
   /**
-   * @brief Attach a texture for color rendering
+   * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering
+   * @param[in] texture The texture that will be used as output when rendering
+   * @note The texture has to have the same size than the FrameBuffer
+   * otherwise it won't be attached
+   */
+  void AttachColorTexture( Texture& texture );
+
+  /**
+   * @brief Attach a texture to the framebuffer for color rendering
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    * @note The specified texture mipmap has to have the same size than the FrameBuffer
    * otherwise it won't be attached
    */
-  void AttachColorTexture( Texture& texture, unsigned int mipmapLevel = 0u, unsigned int layer = 0u );
+  void AttachColorTexture( Texture& texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
    * @brief Get the color texture used as output in the FrameBuffer

@@ -64,9 +64,44 @@ NewTexture::~NewTexture()
   }
 }
 
-void NewTexture::Upload( Vector<unsigned char>& buffer, const TextureUploadParams& params )
+bool NewTexture::CheckUploadParametres( const Vector<unsigned char>& buffer, const UploadParams& parameters ) const
 {
-  UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, buffer, params );
+  if(  buffer.Size() < GetBytesPerPixel( mFormat ) * parameters.width * parameters.height )
+  {
+    DALI_LOG_ERROR( "Error: Buffer of an incorrect size when trying to update texture");
+    return false;
+  }
+  else if( ( parameters.xOffset + parameters.width  > static_cast<unsigned int>( mWidth/(1<<parameters.mipmap ))) ||
+           ( parameters.yOffset + parameters.height > static_cast<unsigned int>( mHeight/(1<<parameters.mipmap ))))
+  {
+    DALI_LOG_ERROR( "Error: Out of bounds texture update");
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
+void NewTexture::Upload( Vector<unsigned char>& buffer,
+                         unsigned int layer, unsigned int mipmap,
+                         unsigned int xOffset, unsigned int yOffset,
+                         unsigned int width, unsigned int height )
+{
+  UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
+  if( CheckUploadParametres( buffer, params ) )
+  {
+    UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, buffer, params );
+  }
+}
+
+void NewTexture::Upload( Vector<unsigned char>& buffer )
+{
+  UploadParams params = {0u,0u,0u,0u,mWidth,mHeight};
+  if( CheckUploadParametres( buffer, params ) )
+  {
+    UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, buffer, params );
+  }
 }
 
 void NewTexture::GenerateMipmaps()

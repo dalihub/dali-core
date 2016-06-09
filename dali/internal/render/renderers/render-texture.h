@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/sampler.h>
 #include <dali/devel-api/rendering/texture.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/integration-api/resource-declarations.h>
 
 #include <dali/internal/render/gl-resources/context.h>
@@ -135,9 +136,9 @@ public:
    * Uploads data to the texture.
    * @param[in] context The GL context
    * @param[in] buffer A vector with the data to be uploaded
-   * @param[in] params Upload parameters. See TextureUploadParams
+   * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload( Context& context, Vector<unsigned char>& buffer, const Dali::TextureUploadParams& params );
+  void Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params );
 
   /**
    * Bind the texture to the given texture unit and applies the given sampler
@@ -149,6 +150,7 @@ public:
 
   /**
    * Auto generates mipmaps for the texture
+   * @param[in] context The GL context
    */
   void GenerateMipmaps( Context& context );
 
@@ -158,21 +160,37 @@ public:
    */
   bool HasAlphaChannel();
 
+  /**
+   * Get the id of the texture
+   * @return Id of the texture
+   */
   GLuint GetId()
   {
     return mId;
   }
 
+  /**
+   * Get the width of the texture
+   * @return Width of the texture
+   */
   unsigned int GetWidth() const
   {
     return mWidth;
   }
 
+  /**
+   * Get the height of the texture
+   * @return Height of the texture
+   */
   unsigned int GetHeight() const
   {
     return mHeight;
   }
 
+  /**
+   * Get the type of the texture
+   * @return Type of the texture
+   */
   Type GetType() const
   {
     return mType;

@@ -55,12 +55,20 @@ Texture& Texture::operator=( const Texture& handle )
   return *this;
 }
 
-void Texture::Upload( Vector<unsigned char>& buffer, const TextureUploadParams& params )
+void Texture::Upload( Vector<unsigned char>& buffer )
 {
-  return GetImplementation(*this).Upload( buffer, params );
+  return GetImplementation(*this).Upload( buffer );
 }
 
-void Texture::Upload( PixelData pixelData, const TextureUploadParams& params )
+void Texture::Upload( Vector<unsigned char>& buffer,
+               unsigned int layer, unsigned int mipmap,
+               unsigned int xOffset, unsigned int yOffset,
+               unsigned int width, unsigned int height )
+{
+  return GetImplementation(*this).Upload( buffer, layer, mipmap, xOffset, yOffset, width, height );
+}
+
+void Texture::Upload( PixelData pixelData )
 {
   //TODO: Implement this method once PixelData uses handle/body pattern
   DALI_ASSERT_ALWAYS( false && "Not implemented yet");
