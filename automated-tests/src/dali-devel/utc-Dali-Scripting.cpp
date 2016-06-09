@@ -140,65 +140,6 @@ void TestEnumStrings(
 
 } // anon namespace
 
-
-
-int UtcDaliScriptingGetColorMode(void)
-{
-  for ( unsigned int i = 0; i < COLOR_MODE_VALUES_COUNT; ++i )
-  {
-    tet_printf( "Checking %s == %d\n", COLOR_MODE_VALUES[i].string, COLOR_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].value, (int)GetColorMode( COLOR_MODE_VALUES[i].string ), TEST_LOCATION );
-    DALI_TEST_EQUALS( COLOR_MODE_VALUES[i].string, GetColorMode( (ColorMode) COLOR_MODE_VALUES[i].value ), TEST_LOCATION );
-  }
-
-  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, GetColorMode("INVALID_ARG"), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingGetPositionInheritanceMode(void)
-{
-  for ( unsigned int i = 0; i < POSITION_INHERITANCE_MODE_VALUES_COUNT; ++i )
-  {
-    tet_printf( "Checking %s == %d\n", POSITION_INHERITANCE_MODE_VALUES[i].string, POSITION_INHERITANCE_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].value, (int)GetPositionInheritanceMode( POSITION_INHERITANCE_MODE_VALUES[i].string ), TEST_LOCATION );
-    DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[i].string, GetPositionInheritanceMode( (PositionInheritanceMode) POSITION_INHERITANCE_MODE_VALUES[i].value ), TEST_LOCATION );
-  }
-
-  DALI_TEST_EQUALS( POSITION_INHERITANCE_MODE_VALUES[0].value, (int)GetPositionInheritanceMode("INVALID_ARG"), TEST_LOCATION );
-  END_TEST;
-}
-
-
-int UtcDaliScriptingGetDrawMode(void)
-{
-  for ( unsigned int i = 0; i < DRAW_MODE_VALUES_COUNT; ++i )
-  {
-    tet_printf( "Checking %s == %d\n", DRAW_MODE_VALUES[i].string, DRAW_MODE_VALUES[i].value );
-    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].value, (int)GetDrawMode( DRAW_MODE_VALUES[i].string ), TEST_LOCATION );
-    DALI_TEST_EQUALS( DRAW_MODE_VALUES[i].string, GetDrawMode( (DrawMode::Type) DRAW_MODE_VALUES[i].value ), TEST_LOCATION );
-  }
-
-  DALI_TEST_EQUALS( DRAW_MODE_VALUES[0].value, (int)GetDrawMode( "INVALID_ARG" ), TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliScriptingGetAnchorConstant(void)
-{
-  DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_LEFT, GetAnchorConstant( "TOP_LEFT" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_CENTER, GetAnchorConstant( "TOP_CENTER" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_RIGHT, GetAnchorConstant( "TOP_RIGHT" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::CENTER_LEFT, GetAnchorConstant( "CENTER_LEFT" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::CENTER, GetAnchorConstant( "CENTER" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::CENTER_RIGHT, GetAnchorConstant( "CENTER_RIGHT" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_LEFT, GetAnchorConstant( "BOTTOM_LEFT" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_CENTER, GetAnchorConstant( "BOTTOM_CENTER" ), TEST_LOCATION );
-  DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_RIGHT, GetAnchorConstant( "BOTTOM_RIGHT" ), TEST_LOCATION );
-
-  DALI_TEST_EQUALS( Vector3(), GetAnchorConstant("INVALID_ARG"), TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliScriptingNewImageNegative01(void)
 {
   // Invalid filename

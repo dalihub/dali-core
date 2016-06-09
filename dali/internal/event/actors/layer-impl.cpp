@@ -38,10 +38,10 @@ namespace
 
 typedef Layer::Behavior Behavior;
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Behavior )
-DALI_ENUM_TO_STRING_INSIDE_CLASS( Layer, LAYER_2D )
-DALI_ENUM_TO_STRING_INSIDE_CLASS( Layer, LAYER_3D )
-DALI_ENUM_TO_STRING_TABLE_END( Behavior )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_2D )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_3D )
+DALI_ENUM_TO_STRING_TABLE_END( BEHAVIOR )
 
 } // namespace
 
@@ -482,7 +482,7 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       case Dali::Layer::Property::BEHAVIOR:
       {
         Behavior behavior(Dali::Layer::LAYER_2D);
-        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BehaviorTable, BehaviorTableCount, behavior ) )
+        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
         {
           SetBehavior( behavior );
         }
@@ -521,7 +521,7 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BehaviorTable, BehaviorTableCount );
+        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT );
         break;
       }
       default:
