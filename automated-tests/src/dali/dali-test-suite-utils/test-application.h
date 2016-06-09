@@ -79,7 +79,6 @@ public:
   bool RenderOnly( );
   void ResetContext();
   bool GetRenderNeedsUpdate();
-  bool GetRenderHasRendered();
 
 private:
   void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );

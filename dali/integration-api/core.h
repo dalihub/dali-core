@@ -119,8 +119,7 @@ public:
    * Constructor
    */
   RenderStatus()
-  : needsUpdate(false),
-    hasRendered(false)
+  : needsUpdate(false)
   {
   }
 
@@ -137,21 +136,9 @@ public:
    */
   bool NeedsUpdate() { return needsUpdate; }
 
-  /**
-   * Set whether there were new render instructions.
-   */
-  void SetHasRendered(bool rendered) { hasRendered = rendered; }
-
-  /**
-   * Query whether there were new render instructions.
-   * @return true if there were render instructions
-   */
-  bool HasRendered() { return hasRendered; }
-
 private:
 
   bool needsUpdate;
-  bool hasRendered;
 };
 
 /**
