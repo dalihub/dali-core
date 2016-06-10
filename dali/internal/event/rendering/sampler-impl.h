@@ -34,7 +34,7 @@ namespace Internal
 {
 namespace Render
 {
-class Sampler;
+struct Sampler;
 }
 
 class Sampler;
@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Dali::Sampler::SetWrapMode()
    */
-  void SetWrapMode( Dali::WrapMode::Type uWrap, Dali::WrapMode::Type vWrap );
+  void SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap );
 
   /**
    * Get the render thread sampler

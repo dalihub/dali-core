@@ -23,6 +23,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/devel-api/rendering/frame-buffer.h>
 
 namespace Dali
 {
@@ -124,6 +125,17 @@ void RenderTask::SetTargetFrameBuffer( FrameBufferImage frameBuffer )
 FrameBufferImage RenderTask::GetTargetFrameBuffer() const
 {
   return GetImplementation(*this).GetTargetFrameBuffer();
+}
+
+void RenderTask::SetFrameBuffer( FrameBuffer frameBuffer )
+{
+  GetImplementation(*this).SetFrameBuffer( frameBuffer );
+}
+
+FrameBuffer RenderTask::GetFrameBuffer() const
+{
+  Internal::FrameBuffer* frameBufferPtr( GetImplementation(*this).GetFrameBuffer() );
+  return FrameBuffer( frameBufferPtr );
 }
 
 void RenderTask::SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction )

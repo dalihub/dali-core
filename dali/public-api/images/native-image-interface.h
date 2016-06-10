@@ -72,7 +72,7 @@ public:
   virtual unsigned int TargetTexture() = 0;
 
   /**
-   * @brief Called in internal each NativeTexture::Bind() call to allow implementation specific operations.
+   * @brief Called internally for each Bind call for this texture to allow implementation specific operations.
    *
    * The correct texture sampler has already been bound before the function gets called.
    * @SINCE_1_0.0

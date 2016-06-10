@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/gl-resources/texture.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 // EXTERNAL INCLUDES
 #include <math.h>
@@ -71,13 +71,29 @@ GLint FilterModeToGL( FilterMode::Type filterMode, GLint defaultfilterMode, GLin
     {
       return defaultSystemFilterMode;
     }
+    case FilterMode::NEAREST_MIPMAP_NEAREST:
+    {
+      return GL_NEAREST_MIPMAP_NEAREST;
+    }
+    case FilterMode::LINEAR_MIPMAP_NEAREST:
+    {
+      return GL_LINEAR_MIPMAP_NEAREST;
+    }
+    case FilterMode::NEAREST_MIPMAP_LINEAR:
+    {
+      return GL_NEAREST_MIPMAP_LINEAR;
+    }
+    case FilterMode::LINEAR_MIPMAP_LINEAR:
+    {
+      return GL_LINEAR_MIPMAP_LINEAR;
+    }
     case FilterMode::DEFAULT:
     {
       return defaultfilterMode;
     }
   }
 
-  return GL_LINEAR;
+  return defaultfilterMode;
 }
 
 GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )

@@ -42,8 +42,7 @@ typedef Uint16Pair ImageDimensions;
 
 
 /**
- * @brief EncodedBufferImage represents an image resource that can be added to
- * ImageViews.
+ * @brief EncodedBufferImage represents an image resource as a buffer of encoded pixel data.
  *
  * A memory buffer of encoded image data is provided by the application and
  * decoded asynchronously on a background thread to fill the image's

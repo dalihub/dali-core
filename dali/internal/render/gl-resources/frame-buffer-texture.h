@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
 {

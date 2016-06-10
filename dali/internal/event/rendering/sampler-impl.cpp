@@ -44,11 +44,11 @@ void Sampler::SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode:
   }
 }
 
-void Sampler::SetWrapMode( Dali::WrapMode::Type uWrap, Dali::WrapMode::Type vWrap )
+void Sampler::SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap )
 {
   if( NULL != mRenderObject )
   {
-    SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, (unsigned int)uWrap, (unsigned int)vWrap );
+    SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, (unsigned int)rWrap, (unsigned int)sWrap, (unsigned int)tWrap );
   }
 }
 

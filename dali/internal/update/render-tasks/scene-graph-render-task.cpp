@@ -125,6 +125,17 @@ unsigned int RenderTask::GetFrameBufferId() const
   return mFrameBufferResourceId;
 }
 
+void RenderTask::SetFrameBuffer( Render::FrameBuffer* frameBuffer )
+{
+  mTargetIsNativeFramebuffer = false;
+  mFrameBuffer = frameBuffer;
+}
+
+Render::FrameBuffer* RenderTask::GetFrameBuffer()
+{
+  return mFrameBuffer;
+}
+
 bool RenderTask::QueryViewport( BufferIndex bufferIndex, Viewport& viewport ) const
 {
   if( ! GetViewportEnabled( bufferIndex ) )
@@ -406,6 +417,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
 
   instruction.Reset( mCamera,
                      GetFrameBufferId(),
+                     GetFrameBuffer(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
@@ -505,6 +517,7 @@ RenderTask::RenderTask()
   mCameraNode( NULL ),
   mCamera( NULL ),
   mFrameBufferResourceId( 0 ),
+  mFrameBuffer(0),
   mResourcesFinished( false ),
   mWaitingToRender( false ),
   mNotifyTrigger( false ),

@@ -23,10 +23,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
 {

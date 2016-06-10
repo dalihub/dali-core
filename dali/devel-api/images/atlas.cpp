@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/atlas-impl.h>
 #include <dali/internal/event/images/buffer-image-impl.h>
+#include <dali/internal/event/images/pixel-data-impl.h>
 
 namespace Dali
 {
@@ -59,11 +60,12 @@ bool Atlas::Upload( const std::string& url,
   return GetImplementation(*this).Upload( url, xOffset, yOffset );
 }
 
-bool Atlas::Upload( PixelDataPtr pixelData,
+bool Atlas::Upload( PixelData pixelData,
                     SizeType xOffset,
                     SizeType yOffset )
 {
-  return GetImplementation(*this).Upload( pixelData, xOffset, yOffset );
+  Internal::PixelData& internalPixelData = GetImplementation( pixelData );
+  return GetImplementation(*this).Upload( &internalPixelData, xOffset, yOffset );
 }
 
 Atlas Atlas::DownCast( BaseHandle handle )

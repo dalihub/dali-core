@@ -319,6 +319,7 @@ private: // data
   BlendingOptions mBlendingOptions;                 ///< Local copy of blending options bitmask
   Dali::DepthWriteMode::Type mDepthWriteMode;       ///< Local copy of depth write mode
   Dali::DepthFunction::Type mDepthFunction;         ///< Local copy of depth function
+  Dali::DepthTestMode::Type mDepthTestMode;         ///< Local copy of depth test mode
 
   bool mPremultipledAlphaEnabled : 1;               ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };

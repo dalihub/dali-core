@@ -26,13 +26,13 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-factory.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/texture-observer.h>
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/gl-resources/native-texture.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 using Dali::Internal::Texture;
 using Dali::Internal::FrameBufferTexture;

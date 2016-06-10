@@ -69,10 +69,29 @@ void TextureSet::SetImage( size_t index, Image image )
   }
 }
 
+void TextureSet::SetTexture( size_t index, Texture texture )
+{
+  if( texture )
+  {
+    Internal::NewTexturePtr texturePtr( &GetImplementation( texture ) );
+    GetImplementation(*this).SetTexture( index, texturePtr );
+  }
+  else
+  {
+    GetImplementation(*this).SetTexture( index, NULL );
+  }
+}
+
 Image TextureSet::GetImage( size_t index ) const
 {
   Internal::Image* imagePtr = GetImplementation(*this).GetImage( index );
   return Dali::Image( imagePtr );
+}
+
+Texture TextureSet::GetTexture( size_t index ) const
+{
+  Internal::NewTexture* texturePtr = GetImplementation(*this).GetTexture( index );
+  return Dali::Texture( texturePtr );
 }
 
 void TextureSet::SetSampler( size_t index, Sampler sampler )

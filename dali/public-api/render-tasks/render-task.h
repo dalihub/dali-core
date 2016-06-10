@@ -34,6 +34,7 @@ namespace Dali
 class Actor;
 class CameraActor;
 class FrameBufferImage;
+class FrameBuffer;
 struct Vector4;
 
 namespace Internal DALI_INTERNAL
@@ -294,6 +295,20 @@ public:
   FrameBufferImage GetTargetFrameBuffer() const;
 
   /**
+   * @brief Set the frame-buffer used as a render target.
+   * @SINCE_1_1.38
+   * @param[in] frameBuffer er A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it.
+   */
+  void SetFrameBuffer( FrameBuffer frameBuffer );
+
+  /**
+   * @brief Retrieve the frame-buffer used as a render target.
+   * @SINCE_1_1.38
+   * @return The framebuffer
+   */
+  FrameBuffer GetFrameBuffer() const;
+
+  /**
    * @brief Set the function used to convert screen coordinates to frame-buffer coordinates.
    *
    * This is useful for hit-testing actors which are rendered off-screen.
@@ -420,10 +435,11 @@ public:
   /**
    * @brief Set whether the render task will cull the actors to the camera's view frustum.
    *
-   * Note that this will only affect image views that use the default vertex shader.
-   * The default mode is to cull actors.
    * @SINCE_1_0.0
    * @param[in] cullMode True if the renderers should be culled.
+   * @note The default mode is to cull actors.
+   * @note If the shader uses @ref Shader::HINT_MODIFIES_GEOMETRY then culling optimizations are disabled.
+   * @see Shader::ShaderHints
    */
   void SetCullMode( bool cullMode );
 

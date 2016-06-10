@@ -54,11 +54,10 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
 }
 
 /**
- * @brief FrameBufferImage represents a GLES Frame Buffer Object and contains the result
+ * @brief FrameBufferImage represents an Open GL ES Frame Buffer Object and contains the result
  * of an 'off screen' render pass of a RenderTask.
  *
- * The FrameBufferImage can then be used with an @ref Dali::Toolkit::ImageView (with optional shader
- * effects) and rendered to the screen.
+ * The FrameBufferImage can then be used for rendering to the screen.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API FrameBufferImage : public Image

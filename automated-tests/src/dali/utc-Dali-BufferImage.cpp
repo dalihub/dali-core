@@ -384,7 +384,10 @@ int UtcDaliBufferImageUpdate01(void)
   application.SendNotification();
 
   const TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", "0, 0, 16, 16"), true, TEST_LOCATION);
+
+  std::stringstream out;
+  out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 0u << ", " << 16u <<", "<< 16u;
+  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", out.str().c_str() ), true, TEST_LOCATION);
 
   DALI_TEST_CHECK( SignalReceived == true );
   SignalReceived = false;
@@ -429,9 +432,24 @@ int UtcDaliBufferImageUpdate02(void)
   application.SendNotification();
 
   const TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", "9, 9, 5, 5"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(1, "TexSubImage2D", "2, 2, 4, 4"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", "3, 3, 1, 6"), true, TEST_LOCATION);
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 9u << ", " << 9u << ", " << 5u <<", "<< 5u;
+    DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", out.str().c_str()), true, TEST_LOCATION);
+  }
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 2u << ", " << 2u << ", " << 4u <<", "<< 4u;
+    DALI_TEST_EQUALS( callStack.TestMethodAndParams(1, "TexSubImage2D", out.str().c_str()), true, TEST_LOCATION);
+  }
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 3u << ", " << 3u << ", " << 1u <<", "<< 6u;
+    DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", out.str().c_str()), true, TEST_LOCATION);
+  }
 
   DALI_TEST_CHECK( SignalReceived == true );
   SignalReceived = false;

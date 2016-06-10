@@ -491,6 +491,9 @@ public:
 
   inline void GenerateMipmap(GLenum target)
   {
+    std::stringstream out;
+    out<<target;
+    mTextureTrace.PushCall("GenerateMipmap", out.str());
   }
 
   inline void GenFramebuffers(GLsizei n, GLuint* framebuffers)
@@ -884,7 +887,7 @@ public:
   inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels)
   {
     std::stringstream out;
-    out << width << ", " << height;
+    out << target<<", "<<level<<", "<<width << ", " << height;
     mTextureTrace.PushCall("TexImage2D", out.str());
   }
 
@@ -919,7 +922,7 @@ public:
   inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
   {
     std::stringstream out;
-    out << xoffset << ", " << yoffset << ", " << width << ", " << height;
+    out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
     mTextureTrace.PushCall("TexSubImage2D", out.str());
   }
 

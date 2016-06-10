@@ -125,7 +125,7 @@ public:
    * @param [in] xOffset        Specifies an offset in the x direction within the atlas.
    * @param [in] yOffset        Specifies an offset in the y direction within the atlas.
    */
-  bool Upload( PixelDataPtr pixelData,
+  bool Upload( PixelData pixelData,
                SizeType xOffset,
                SizeType yOffset );
   /**

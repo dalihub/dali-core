@@ -286,6 +286,15 @@ public:
   }
 
   /**
+   * Wrapper for OpenGL ES 2.0 glBindTexture(GL_TEXTURE_CUBE_MAP)
+   */
+  void BindCubeMapTexture( GLuint texture )
+  {
+    LOG_GL("BindTexture GL_TEXTURE_CUBE_MAP %d\n", texture);
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(GL_TEXTURE_CUBE_MAP, texture) );
+  }
+
+  /**
    * Wrapper for OpenGL ES 2.0 glBlendColor()
    */
   void SetDefaultBlendColor()

@@ -38,6 +38,7 @@ RenderInstruction::RenderInstruction()
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
   mOffscreenTextureId( 0 ),
+  mFrameBuffer( 0 ),
   mCamera( 0 ),
   mNextFreeRenderList( 0 )
 {
@@ -106,6 +107,7 @@ const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeTyp
 
 void RenderInstruction::Reset( Camera*         camera,
                                unsigned int    offscreenTextureId,
+                               Render::FrameBuffer* frameBuffer,
                                const Viewport* viewport,
                                const Vector4*  clearColor )
 {
@@ -117,6 +119,7 @@ void RenderInstruction::Reset( Camera*         camera,
   mOffscreenTextureId = offscreenTextureId;
   mRenderTracker = NULL;
   mNextFreeRenderList = 0;
+  mFrameBuffer = frameBuffer;
 
   RenderListContainer::Iterator iter = mRenderLists.Begin();
   RenderListContainer::ConstIterator end = mRenderLists.End();

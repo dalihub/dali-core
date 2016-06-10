@@ -25,6 +25,7 @@
 #include <dali/public-api/images/image.h> // Dali::Image
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/devel-api/rendering/sampler.h> // Dali::Sampler
+#include <dali/devel-api/rendering/texture.h> // Dali::Texture
 #include <dali/devel-api/rendering/shader.h> // Dali::Shader
 
 namespace Dali
@@ -91,11 +92,25 @@ public:
   void SetImage( size_t index, Image image );
 
   /**
+   * @brief Set the texture at position "index"
+   * @param[in] index The position in the texture set of the texture
+   * @param[in] texture The texture
+   */
+  void SetTexture( size_t index, Texture texture );
+
+  /**
    * @brief Get the image at position "index"
    * @param[in] index The position in the texture set of the image
    * @return A handle to the image at the the specified position
    */
   Image GetImage( size_t index ) const;
+
+  /**
+   * @brief Get the image at position "index"
+   * @param[in] index The position in the texture set of the image
+   * @return A handle to the image at the the specified position
+   */
+  Texture GetTexture( size_t index ) const;
 
   /**
    * @brief Set the sampler to be used by the image at position "index"

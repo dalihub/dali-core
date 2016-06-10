@@ -46,12 +46,12 @@ void PrepareResourceImage( TestApplication& application, unsigned int imageWidth
   platform.SetSynchronouslyLoadedResource( resourcePtr );
 }
 
-PixelDataPtr CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)
+PixelData CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)
 {
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );
   unsigned char* buffer = new unsigned char [ bufferSize ];
 
-  return new PixelData( buffer, width, height, pixelFormat, PixelData::DELETE_ARRAY );
+  return PixelData::New( buffer, width, height, pixelFormat, PixelData::DELETE_ARRAY );
 }
 
 }
@@ -146,7 +146,9 @@ int UtcDaliAtlasClear(void)
   application.SendNotification();
   callStack.Enable(false);
 
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 16, 32") );
+  std::stringstream out;
+  out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 0u << ", " << 16u <<", "<< 32u;
+  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
 
   END_TEST;
 }
@@ -168,7 +170,7 @@ int UtcDaliAtlasUpload01P(void)
   PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 0, 16 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 6,8,Pixel::RGBA8888 );
+  PixelData pixelData = CreatePixelData( 6,8,Pixel::RGBA8888 );
   DALI_TEST_CHECK( atlas.Upload( pixelData, 2, 32 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
@@ -182,9 +184,21 @@ int UtcDaliAtlasUpload01P(void)
   application.SendNotification();
   callStack.Enable(false);
 
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 16, 16") );
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "0, 16, 16, 16") );
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "2, 32, 6, 8") );
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 0u << ", " << 16u <<", "<< 16u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 16u << ", " << 16u <<", "<< 16u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 2u << ", " << 32u << ", " << 6u <<", "<< 8u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
 
   END_TEST;
 }
@@ -205,7 +219,7 @@ int UtcDaliAtlasUpload02P(void)
   PrepareResourceImage( application, 12, 12, Pixel::A8 );
   DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 6, 6 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 8,8,Pixel::LA88 );
+  PixelData pixelData = CreatePixelData( 8,8,Pixel::LA88 );
   DALI_TEST_CHECK( atlas.Upload( pixelData, 10, 10 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
@@ -219,9 +233,21 @@ int UtcDaliAtlasUpload02P(void)
   application.SendNotification();
   callStack.Enable(false);
 
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 16, 16") );
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "6, 6, 12, 12") );
-  DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", "10, 10, 8, 8") );
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 0u << ", " << 16u <<", "<< 16u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 6u << ", " << 6u << ", " << 12u <<", "<< 12u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 10u << ", " << 10u << ", " << 8u <<", "<< 8u;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
+  }
 
   END_TEST;
 }
@@ -242,7 +268,7 @@ int UtcDaliAtlasUploadN(void)
   PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
   DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 10, 10 ) );
 
-  PixelDataPtr pixelData = CreatePixelData( 6,6,Pixel::RGBA8888 );
+  PixelData pixelData = CreatePixelData( 6,6,Pixel::RGBA8888 );
   DALI_TEST_CHECK( !atlas.Upload( pixelData, 11, 11 ) );
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();

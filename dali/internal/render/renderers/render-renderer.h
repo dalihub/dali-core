@@ -83,6 +83,7 @@ public:
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthTestMode Depth buffer test mode
    * @param[in] depthFunction Depth function
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
@@ -92,6 +93,7 @@ public:
                         FaceCullingMode::Type faceCullingMode,
                         bool preMultipliedAlphaEnabled,
                         DepthWriteMode::Type depthWriteMode,
+                        DepthTestMode::Type depthTestMode,
                         DepthFunction::Type depthFunction );
 
   /**
@@ -103,6 +105,7 @@ public:
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
+   * @param[in] depthTestMode Depth buffer test mode
    * @param[in] depthFunction Depth function
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
@@ -112,6 +115,7 @@ public:
             FaceCullingMode::Type faceCullingMode,
             bool preMultipliedAlphaEnabled,
             DepthWriteMode::Type depthWriteMode,
+            DepthTestMode::Type depthTestMode,
             DepthFunction::Type depthFunction );
 
   /**
@@ -187,6 +191,18 @@ public:
    * @return The renderer depth write mode
    */
   DepthWriteMode::Type GetDepthWriteMode() const;
+
+  /**
+   * Sets the depth test mode
+   * @param[in] depthTestMode The depth test mode
+   */
+  void SetDepthTestMode( DepthTestMode::Type depthTestMode );
+
+  /**
+   * Query the Renderer's depth test mode
+   * @return The renderer depth test mode
+   */
+  DepthTestMode::Type GetDepthTestMode() const;
 
   /**
    * Sets the depth function
@@ -267,11 +283,12 @@ private:
 
   /**
    * Bind the textures and setup the samplers
+   * @param[in] context The GL context
    * @param[in] textureCache The texture cache
    * @param[in] program The shader program
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures( SceneGraph::TextureCache& textureCache, Program& program );
+  bool BindTextures( Context& context, SceneGraph::TextureCache& textureCache, Program& program );
 
 private:
 
@@ -295,14 +312,16 @@ private:
 
   BlendingOptions       mBlendingOptions; /// Blending options including blend color, blend func and blend equation
   FaceCullingMode::Type mFaceCullingMode; /// Mode of face culling
-  DepthWriteMode::Type  mDepthWriteMode;  /// Depth write mode
   DepthFunction::Type   mDepthFunction;   /// Depth function
 
-  size_t mIndexedDrawFirstElement;                  /// Offset of first element to draw
-  size_t mIndexedDrawElementsCount;                 /// Number of elements to draw
+  size_t mIndexedDrawFirstElement;        /// Offset of first element to draw
+  size_t mIndexedDrawElementsCount;       /// Number of elements to draw
 
-  bool mUpdateAttributesLocation:1;                 ///< Indicates attribute locations have changed
-  bool mPremultipledAlphaEnabled:1;                 ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  DepthWriteMode::Type mDepthWriteMode:2; /// Depth write mode
+  DepthTestMode::Type mDepthTestMode:2;   /// Depth test mode
+
+  bool mUpdateAttributesLocation:1;       ///< Indicates attribute locations have changed
+  bool mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace SceneGraph
