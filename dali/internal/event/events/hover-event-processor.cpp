@@ -168,6 +168,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty HoverEvent sent from Integration\n" );
 
   Stage& stage = mStage;
+  TouchPoint::State state = static_cast< TouchPoint::State >( event.points[0].GetState() );
 
   PRINT_HIERARCHY(gLogFilter);
 
@@ -177,10 +178,10 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
 
-  if ( event.points[0].state == TouchPoint::Interrupted )
+  if ( state == TouchPoint::Interrupted )
   {
     Dali::Actor consumingActor;
-    hoverEvent.points.push_back(event.points[0]);
+    hoverEvent.points.push_back( event.points[0].GetTouchPoint() );
 
     Actor* lastPrimaryHitActor( mLastPrimaryHitActor.GetActor() );
     if ( lastPrimaryHitActor )
@@ -230,20 +231,20 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
 
   Dali::RenderTask currentRenderTask;
 
-  for ( TouchPointContainerConstIterator iter = event.points.begin(), beginIter = event.points.begin(), endIter = event.points.end(); iter != endIter; ++iter )
+  for ( Integration::PointContainerConstIterator iter = event.points.begin(), beginIter = event.points.begin(), endIter = event.points.end(); iter != endIter; ++iter )
   {
     HitTestAlgorithm::Results hitTestResults;
     ActorHoverableCheck actorHoverableCheck;
-    HitTestAlgorithm::HitTest( stage, iter->screen, hitTestResults, actorHoverableCheck );
+    HitTestAlgorithm::HitTest( stage, iter->GetScreenPosition(), hitTestResults, actorHoverableCheck );
 
-    TouchPoint newPoint( iter->deviceId, iter->state, iter->screen.x, iter->screen.y );
+    TouchPoint newPoint( iter->GetTouchPoint() );
     newPoint.hitActor = hitTestResults.actor;
     newPoint.local = hitTestResults.actorCoordinates;
 
     hoverEvent.points.push_back( newPoint );
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "  State(%s), Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
-                   TOUCH_POINT_STATE[iter->state], iter->screen.x, iter->screen.y,
+                   TOUCH_POINT_STATE[iter->GetState()], iter->GetScreenPosition().x, iter->GetScreenPosition().y,
                    ( hitTestResults.actor ? (void*)&hitTestResults.actor.GetBaseObject() : NULL ),
                    ( hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" ),
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );

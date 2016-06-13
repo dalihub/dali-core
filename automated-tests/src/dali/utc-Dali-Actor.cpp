@@ -58,7 +58,9 @@ int SimulateTouchForSetOverlayHitTest(TestApplication& app)
   gTouchCallBackCalled = false;
 
   // simulate a touch event
-  Dali::TouchPoint point( 0, TouchPoint::Down, 25.0f, 25.0f );
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 25.0f, 25.0f ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   app.ProcessEvent( event );
@@ -1968,7 +1970,10 @@ int UtcDaliActorTouchedSignal(void)
 
   // simulate a touch event in the middle of the screen
   Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
-  Dali::TouchPoint point( 1, TouchPoint::Down, touchPoint.x, touchPoint.y );
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );
@@ -1995,7 +2000,10 @@ int UtcDaliActorHoveredSignal(void)
 
   // simulate a hover event in the middle of the screen
   Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
-  Dali::TouchPoint point( 1, TouchPoint::Motion, touchPoint.x, touchPoint.y );
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::MOTION );
+  point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
   Dali::Integration::HoverEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );
@@ -2201,7 +2209,9 @@ int UtcDaliActorHitTest(void)
     // connect to its touch signal
     actor.TouchedSignal().Connect(TestCallback);
 
-    Dali::TouchPoint point( 0, TouchPoint::Down, hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y );
+    Dali::Integration::Point point;
+    point.SetState( PointState::DOWN );
+    point.SetScreenPosition( Vector2( hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y ) );
     Dali::Integration::TouchEvent event;
     event.AddPoint( point );
 

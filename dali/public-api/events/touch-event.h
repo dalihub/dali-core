@@ -30,7 +30,7 @@ namespace Dali
  */
 
 /**
- * @DEPRECATED_1_1.37 Use TouchEventHandle instead
+ * @DEPRECATED_1_1.37 Use TouchData instead
  *
  * @brief Touch events are a collection of touch points at a specific moment in time.
  *

@@ -223,7 +223,10 @@ int UtcDaliLongPressGestureDetectorNew(void)
   actor.TouchedSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
-  TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
+  Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
   touchEvent.AddPoint(point);
   application.ProcessEvent(touchEvent);
 
@@ -1339,7 +1342,7 @@ int UtcDaliLongPressGestureBehindTouchableSystemOverlay(void)
   touchData.Reset();
 
   // Do touch in the same area
-  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoords ) );
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( PointState::DOWN, screenCoords ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
 
@@ -1393,7 +1396,7 @@ int UtcDaliLongPressGestureTouchBehindGesturedSystemOverlay(void)
   touchData.Reset();
 
   // Do touch in the same area
-  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoords ) );
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( PointState::DOWN, screenCoords ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
 

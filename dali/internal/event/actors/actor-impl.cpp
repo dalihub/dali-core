@@ -1823,7 +1823,7 @@ bool Actor::EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData
     consumed = mTouchSignal.Emit( handle, touch );
   }
 
-  if( !mTouchedSignal.Empty() || !mTouchSignal.Empty() )
+  if( !mTouchedSignal.Empty() )
   {
     Dali::Actor handle( this );
     consumed |= mTouchedSignal.Emit( handle, event );
