@@ -147,62 +147,6 @@ const char * GetLinearEnumerationName( T value, const StringEnum* table, unsigne
 }
 
 /**
- * @brief Takes a string and returns the appropriate color mode.
- *
- * @param[in] value The input string
- * @return    The corresponding color-mode.
- */
-DALI_IMPORT_API ColorMode GetColorMode( const std::string& value );
-
-/**
- * @brief Takes a color mode and returns the appropriate string equivalent.
- *
- * @param[in] value The color mode
- * @return    The corresponding string.
- */
-DALI_IMPORT_API std::string GetColorMode( ColorMode value );
-
-/**
- * @brief Takes a string and returns the appropriate position inheritance mode.
- *
- * @param[in] value The input string
- * @return    The corresponding position-inheritance-mode.
- */
-DALI_IMPORT_API PositionInheritanceMode GetPositionInheritanceMode( const std::string& value );
-
-/**
- * @brief Takes a position inheritance mode and returns the string equivalent.
- *
- * @param[in] value The position-inheritance-mode.
- * @return    The corresponding string.
- */
-DALI_IMPORT_API std::string GetPositionInheritanceMode( PositionInheritanceMode value );
-
-/**
- * @brief Takes a string and returns the appropriate draw mode.
- *
- * @param[in] value The input string
- * @return    The corresponding draw-mode.
- */
-DALI_IMPORT_API DrawMode::Type GetDrawMode( const std::string& value );
-
-/**
- * @brief Takes a draw-mode and returns the string equivalent.
- *
- * @param[in] value The draw-mode.
- * @return    The corresponding string.
- */
-DALI_IMPORT_API std::string GetDrawMode( DrawMode::Type value );
-
-/**
- * @brief Takes a string and returns the appropriate anchor-point or parent-origin constant.
- *
- * @param[in] value The input string
- * @return    The corresponding anchor-point or parent-origin constant.
- */
-DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
-
-/**
  * @brief Creates object with data from the property value map.
  *
  * @param[in] property The property value map with the following valid fields:
@@ -223,39 +167,6 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  * @return A pointer to a newly created object.
  */
 DALI_IMPORT_API Image NewImage( const Property::Value& property );
-
-/**
- * @brief Creates object with data from the property value map.
- *
- * @param[in] property The property value map with the following valid fields:
- * @code
- * // a program can be specified as string or a filename.
- * // some fields may be ignored depending on the geometry-type
- * "program":        type Map
- * {
- *   "vertex":                 type std::string
- *   "fragment":               type std::string
- *   "vertexPrefix":           type std::string
- *   "fragmentPrefix":         type std::string
- *   "textVertex":             type std::string
- *   "textFragment":           type std::string
- *   "vertexFilename":         type std::string
- *   "fragmentFilename":       type std::string
- *   "vertexPrefixFilename":   type std::string
- *   "fragmentPrefixFilename": type std::string
- *   "textVertexFilename":     type std::string
- *   "textFragmentFilename":   type std::string
- *   "geometryType":           type std::string (enum)
- *   "geometryHints":          type std::string (enum)
- * }
- * // uniforms must be specified to be registered
- * "uUniform1":       type float,
- * "uUniform2":       type float, etc
- * @endcode
- *
- * @return A pointer to a newly created object.
- */
-DALI_IMPORT_API ShaderEffect NewShaderEffect( const Property::Value& property );
 
 /**
  * @brief Creates an actor with the date from the property value map.

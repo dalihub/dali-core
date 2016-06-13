@@ -77,30 +77,47 @@ struct PropertyDetails
 #endif
 
 /**
- * Macros for creating enumeration to string tables.
+ * Macros for creating value, typically enumerations, to string tables.
  * Example:
  *
- * DALI_ENUM_TO_STRING_TABLE_BEGIN( SizeMode )
+ * DALI_ENUM_TO_STRING_TABLE_BEGIN( SIZE_MODE )
  * DALI_ENUM_TO_STRING( USE_OWN_SIZE )
  * DALI_ENUM_TO_STRING( SIZE_EQUAL_TO_PARENT )
- * DALI_ENUM_TO_STRING_TABLE_END( SizeMode )
+ * DALI_ENUM_TO_STRING_TABLE_END( SIZE_MODE )
  *
  * Creates:
- * const Scripting::StringEnum< SizeMode > SizeModeTable[] = {
+ * const Scripting::StringEnum< SizeMode > SIZE_MODE_TABLE[] = {
  * { "USE_OWN_SIZE", USE_OWN_SIZE },
  * { "SIZE_EQUAL_TO_PARENT", SIZE_EQUAL_TO_PARENT },
- * }; const unsigned int SizeModeTableCount = sizeof( SizeModeTable ) / sizeof( SizeModeTable[0] );
+ * }; const unsigned int SIZE_MODE_TABLE_COUNT = sizeof( SIZE_MODE_TABLE ) / sizeof( SIZE_MODE_TABLE[0] );
+ *
+ * By default, Dali::Scripting::StringEnum is used as the type for the table, however, a different type can be specified by using
+ * DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE.
  */
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) const Dali::Scripting::StringEnum t##Table[] = {
-#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##TableCount = sizeof( t##Table ) / sizeof( t##Table[0] );
+#define DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( type, t ) const type t##_TABLE[] = {
+#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( Dali::Scripting::StringEnum, t )
+#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##_TABLE_COUNT = sizeof( t##_TABLE ) / sizeof( t##_TABLE[0] );
 #define DALI_ENUM_TO_STRING( s ) { #s, s },
 
 /**
- * DALI_ENUM_TO_STRING_INSIDE_CLASS
- * Example converts ( Layer, LAYER_2D) to ( "LAYER_2D", Layer::Layer2D)
+ * Adds a value, typically an enum, to the table within a scope but without the scope name
+ * Example converts ( Layer, LAYER_2D ) to ( "LAYER_2D", Layer::Layer2D )
  */
-#define DALI_ENUM_TO_STRING_INSIDE_CLASS( className, enumName) { #enumName, className::enumName },
+#define DALI_ENUM_TO_STRING_WITH_SCOPE( className, enumName ) { #enumName, className::enumName },
 
+/**
+ * @brief Case insensitive string comparison.
+ *
+ * Additionally, '-' and '_' can be used interchangeably as well.
+ * Returns if both strings have a ',' or a '\0' at the same point.
+ *
+ * @param[in]   first   The first string.
+ * @param[in]   second  The string to compare it to.
+ * @param[out]  size    The size of the string.
+ *
+ * @return true if strings are the same
+ */
+bool CompareTokens( const char * first, const char * second, size_t& size );
 
 } // namespace Internal
 

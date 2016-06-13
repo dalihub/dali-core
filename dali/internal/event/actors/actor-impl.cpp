@@ -32,6 +32,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+
 #include <dali/devel-api/scripting/scripting.h>
 
 #include <dali/internal/common/internal-constants.h>
@@ -59,37 +60,6 @@ using Dali::Internal::SceneGraph::PropertyBase;
 
 namespace Dali
 {
-namespace ResizePolicy
-{
-
-namespace
-{
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )
-DALI_ENUM_TO_STRING( FIXED )
-DALI_ENUM_TO_STRING( USE_NATURAL_SIZE )
-DALI_ENUM_TO_STRING( FILL_TO_PARENT )
-DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
-DALI_ENUM_TO_STRING( SIZE_FIXED_OFFSET_FROM_PARENT )
-DALI_ENUM_TO_STRING( FIT_TO_CHILDREN )
-DALI_ENUM_TO_STRING( DIMENSION_DEPENDENCY )
-DALI_ENUM_TO_STRING( USE_ASSIGNED_SIZE )
-DALI_ENUM_TO_STRING_TABLE_END( Type )
-
-} // unnamed namespace
-} // ResizePolicy
-
-namespace SizeScalePolicy
-{
-namespace
-{
-// Enumeration to / from string conversion tables
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )
-DALI_ENUM_TO_STRING( USE_SIZE_SET )
-DALI_ENUM_TO_STRING( FIT_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING( FILL_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING_TABLE_END( Type )
-} // unnamed namespace
-} // SizeScalePolicy
 
 namespace Internal
 {
@@ -262,6 +232,81 @@ SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConne
 
 TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
 TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
+
+struct AnchorValue
+{
+  const char* name;
+  const Vector3& value;
+};
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( AnchorValue, ANCHOR_CONSTANT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_LEFT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_RIGHT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER_LEFT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER_RIGHT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_LEFT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_RIGHT )
+DALI_ENUM_TO_STRING_TABLE_END( ANCHOR_CONSTANT )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( COLOR_MODE )
+DALI_ENUM_TO_STRING( USE_OWN_COLOR )
+DALI_ENUM_TO_STRING( USE_PARENT_COLOR )
+DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_COLOR )
+DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_ALPHA )
+DALI_ENUM_TO_STRING_TABLE_END( COLOR_MODE )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( POSITION_INHERITANCE_MODE )
+DALI_ENUM_TO_STRING( INHERIT_PARENT_POSITION )
+DALI_ENUM_TO_STRING( USE_PARENT_POSITION )
+DALI_ENUM_TO_STRING( USE_PARENT_POSITION_PLUS_LOCAL_POSITION )
+DALI_ENUM_TO_STRING( DONT_INHERIT_POSITION )
+DALI_ENUM_TO_STRING_TABLE_END( POSITION_INHERITANCE_MODE )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( DRAW_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, NORMAL )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, OVERLAY_2D )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, STENCIL )
+DALI_ENUM_TO_STRING_TABLE_END( DRAW_MODE )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RESIZE_POLICY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FIXED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, USE_NATURAL_SIZE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FILL_TO_PARENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, SIZE_RELATIVE_TO_PARENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, SIZE_FIXED_OFFSET_FROM_PARENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FIT_TO_CHILDREN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, DIMENSION_DEPENDENCY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, USE_ASSIGNED_SIZE )
+DALI_ENUM_TO_STRING_TABLE_END( RESIZE_POLICY )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( SIZE_SCALE_POLICY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, USE_SIZE_SET )
+DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, FIT_WITH_ASPECT_RATIO )
+DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, FILL_WITH_ASPECT_RATIO )
+DALI_ENUM_TO_STRING_TABLE_END( SIZE_SCALE_POLICY )
+
+bool GetAnchorPointConstant( const std::string& value, Vector3& anchor )
+{
+  for( unsigned int i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
+  {
+    size_t sizeIgnored = 0;
+    if( CompareTokens( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name, sizeIgnored ) )
+    {
+      anchor = ANCHOR_CONSTANT_TABLE[ i ].value;
+      return true;
+    }
+  }
+  return false;
+}
+
+inline bool GetParentOriginConstant( const std::string& value, Vector3& parentOrigin )
+{
+  // Values are the same so just use the same table as anchor-point
+  return GetAnchorPointConstant( value, parentOrigin );
+}
 
 /**
  * @brief Extract a given dimension from a Vector2
@@ -2274,7 +2319,21 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
   {
     case Dali::Actor::Property::PARENT_ORIGIN:
     {
-      SetParentOrigin( property.Get< Vector3 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::VECTOR3 )
+      {
+        SetParentOrigin( property.Get< Vector3 >() );
+      }
+      else if ( type == Property::STRING )
+      {
+        std::string parentOriginString;
+        property.Get( parentOriginString );
+        Vector3 parentOrigin;
+        if( GetParentOriginConstant( parentOriginString, parentOrigin ) )
+        {
+          SetParentOrigin( parentOrigin );
+        }
+      }
       break;
     }
 
@@ -2298,7 +2357,21 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::ANCHOR_POINT:
     {
-      SetAnchorPoint( property.Get< Vector3 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::VECTOR3 )
+      {
+        SetAnchorPoint( property.Get< Vector3 >() );
+      }
+      else if ( type == Property::STRING )
+      {
+        std::string anchorPointString;
+        property.Get( anchorPointString );
+        Vector3 anchor;
+        if( GetAnchorPointConstant( anchorPointString, anchor ) )
+        {
+          SetAnchorPoint( anchor );
+        }
+      }
       break;
     }
 
@@ -2472,19 +2545,31 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::COLOR_MODE:
     {
-      SetColorMode( Scripting::GetColorMode( property.Get< std::string >() ) );
+      ColorMode mode;
+      if ( Scripting::GetEnumeration< ColorMode >( property.Get< std::string >().c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode ) )
+      {
+        SetColorMode( mode );
+      }
       break;
     }
 
     case Dali::Actor::Property::POSITION_INHERITANCE:
     {
-      SetPositionInheritanceMode( Scripting::GetPositionInheritanceMode( property.Get< std::string >() ) );
+      PositionInheritanceMode mode;
+      if( Scripting::GetEnumeration< PositionInheritanceMode >( property.Get< std::string >().c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode ) )
+      {
+        SetPositionInheritanceMode( mode );
+      }
       break;
     }
 
     case Dali::Actor::Property::DRAW_MODE:
     {
-      SetDrawMode( Scripting::GetDrawMode( property.Get< std::string >() ) );
+      DrawMode::Type mode;
+      if( Scripting::GetEnumeration< DrawMode::Type >( property.Get< std::string >().c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode ) )
+      {
+        SetDrawMode( mode );
+      }
       break;
     }
 
@@ -2497,7 +2582,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
       ResizePolicy::Type type;
-      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::WIDTH );
       }
@@ -2507,7 +2592,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
       ResizePolicy::Type type;
-      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::HEIGHT );
       }
@@ -2517,7 +2602,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
       SizeScalePolicy::Type type;
-      if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount, type ) )
+      if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
       {
         SetSizeScalePolicy( type );
       }
@@ -2985,19 +3070,19 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::COLOR_MODE:
     {
-      value = Scripting::GetColorMode( GetColorMode() );
+      value = Scripting::GetLinearEnumerationName< ColorMode >( GetColorMode(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
       break;
     }
 
     case Dali::Actor::Property::POSITION_INHERITANCE:
     {
-      value = Scripting::GetPositionInheritanceMode( GetPositionInheritanceMode() );
+      value = Scripting::GetLinearEnumerationName< PositionInheritanceMode >( GetPositionInheritanceMode(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
       break;
     }
 
     case Dali::Actor::Property::DRAW_MODE:
     {
-      value = Scripting::GetDrawMode( GetDrawMode() );
+      value = Scripting::GetEnumerationName< DrawMode::Type >( GetDrawMode(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
       break;
     }
 
@@ -3009,19 +3094,19 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount );
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount );
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount );
+      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT );
       break;
     }
 
