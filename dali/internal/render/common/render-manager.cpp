@@ -514,8 +514,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Core::Render documents that GL context must be current before calling Render
   DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
 
-  status.SetHasRendered( false );
-
   // Increment the frame count at the beginning of each frame
   ++(mImpl->frameCount);
 
@@ -563,12 +561,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
         RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
         DoRender( instruction, *mImpl->defaultShader );
-
-        const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
-        if ( countRenderList > 0 )
-        {
-          status.SetHasRendered( true );
-        }
       }
       GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
       mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);

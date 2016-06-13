@@ -198,10 +198,6 @@ bool TestApplication::GetRenderNeedsUpdate()
 {
   return mRenderStatus.NeedsUpdate();
 }
-bool TestApplication::GetRenderHasRendered()
-{
-  return mRenderStatus.HasRendered();
-}
 
 bool TestApplication::RenderOnly( )
 {
