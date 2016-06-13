@@ -210,6 +210,7 @@ const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
 const char* const SIGNAL_ON_STAGE = "onStage";
 const char* const SIGNAL_OFF_STAGE = "offStage";
 const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
+const char* const SIGNAL_TOUCH = "touch";
 
 // Actions
 
@@ -229,6 +230,7 @@ SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConne
 SignalConnectorType signalConnector4( mType, SIGNAL_ON_STAGE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector5( mType, SIGNAL_OFF_STAGE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector7( mType, SIGNAL_TOUCH, &Actor::DoConnectSignal );
 
 TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
 TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
@@ -1938,6 +1940,10 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if( 0 == signalName.compare( SIGNAL_ON_RELAYOUT ) )
   {
     actor->OnRelayoutSignal().Connect( tracker, functor );
+  }
+  else if( 0 == signalName.compare( SIGNAL_TOUCH ) )
+  {
+    actor->TouchSignal().Connect( tracker, functor );
   }
   else
   {
