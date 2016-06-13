@@ -518,14 +518,28 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
 NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
 :mId( 0 ),
  mType( type ),
+ mSampler(),
+ mNativeImage(),
  mInternalFormat(GL_RGB),
  mPixelDataType(GL_UNSIGNED_BYTE),
  mWidth( width ),
  mHeight( height ),
- mSampler(),
  mHasAlpha( HasAlpha( format ) )
 {
   PixelFormatToGl( format, mPixelDataType, mInternalFormat );
+}
+
+NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
+:mId( 0 ),
+ mType( TextureType::TEXTURE_2D ),
+ mSampler(),
+ mNativeImage( nativeImageInterface ),
+ mInternalFormat(GL_RGB),
+ mPixelDataType(GL_UNSIGNED_BYTE),
+ mWidth( nativeImageInterface->GetWidth() ),
+ mHeight( nativeImageInterface->GetHeight() ),
+ mHasAlpha( nativeImageInterface->RequiresBlending() )
+{
 }
 
 NewTexture::~NewTexture()
@@ -541,41 +555,63 @@ void NewTexture::Destroy( Context& context )
 
 void NewTexture::Initialize(Context& context)
 {
-  context.GenTextures( 1, &mId );
-
-  if( mType == TextureType::TEXTURE_2D )
+  if( mNativeImage )
   {
-    //Creates the texture and reserves memory for the first mipmap level.
-    context.Bind2dTexture( mId );
-    context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
-
-    //Apply default sampling parameters
-    context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
-
-  }
-  else if( mType == TextureType::TEXTURE_CUBE )
-  {
-    //Creates the texture and reserves memory for the first mipmap level.
-    context.BindCubeMapTexture( mId );
-    for( unsigned int i(0); i<6; ++i )
+    if( mNativeImage->GlExtensionCreate() )
     {
-      context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
-    }
+      context.GenTextures( 1, &mId );
+      context.Bind2dTexture( mId );
+      context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data
 
-    //Apply default sampling parameters
-    context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
-    context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+      //Apply default sampling parameters
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+
+      // platform specific implementation decides on what GL extension to use
+      mNativeImage->TargetTexture();
+    }
+  }
+  else
+  {
+    context.GenTextures( 1, &mId );
+
+    if( mType == TextureType::TEXTURE_2D )
+    {
+      //Creates the texture and reserves memory for the first mipmap level.
+      context.Bind2dTexture( mId );
+      context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+
+      //Apply default sampling parameters
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+    }
+    else if( mType == TextureType::TEXTURE_CUBE )
+    {
+      //Creates the texture and reserves memory for the first mipmap level.
+      context.BindCubeMapTexture( mId );
+      for( unsigned int i(0); i<6; ++i )
+      {
+        context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+      }
+
+      //Apply default sampling parameters
+      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
+      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+    }
   }
 }
 
 void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params  )
 {
+  DALI_ASSERT_ALWAYS( mNativeImage == NULL );
+
   if( mType == TextureType::TEXTURE_2D )
   {
     context.Bind2dTexture( mId );
@@ -618,20 +654,27 @@ void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const 
   }
 }
 
-void NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
+bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
 {
-  context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
-
-  if( mType == TextureType::TEXTURE_2D )
+  if( mId != 0 )
   {
-    context.Bind2dTexture( mId );
-  }
-  else if( mType == TextureType::TEXTURE_CUBE )
-  {
-    context.BindCubeMapTexture( mId );
+    context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
+
+    if( mType == TextureType::TEXTURE_2D )
+    {
+      context.Bind2dTexture( mId );
+    }
+    else if( mType == TextureType::TEXTURE_CUBE )
+    {
+      context.BindCubeMapTexture( mId );
+    }
+
+    ApplySampler( context, sampler );
+
+    return true;
   }
 
-  ApplySampler( context, sampler );
+  return false;
 }
 
 void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
