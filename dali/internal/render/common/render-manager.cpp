@@ -337,9 +337,9 @@ void RenderManager::RemoveTexture( Render::NewTexture* texture )
   }
 }
 
-void RenderManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
+void RenderManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
 {
-  texture->Upload( mImpl->context, buffer, params );
+  texture->Upload( mImpl->context, pixelData, params );
 }
 
 void RenderManager::GenerateMipmaps( Render::NewTexture* texture )
