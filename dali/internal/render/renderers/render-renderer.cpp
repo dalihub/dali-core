@@ -369,23 +369,29 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
     Internal::Texture* texture = textureCache.GetTexture( textureId );
     if( texture )
     {
-      result = program.GetSamplerUniformLocation( i, uniformLocation ) &&
-               textureCache.BindTexture( texture, textureId, GL_TEXTURE_2D, (TextureUnit)textureUnit );
+      result = textureCache.BindTexture( texture, textureId, GL_TEXTURE_2D, (TextureUnit)textureUnit );
 
-      if( result && Program::UNIFORM_UNKNOWN != uniformLocation )
+      if( result )
       {
-        program.SetUniform1i( uniformLocation, textureUnit );
+        GLint uniformLocation;
 
-        unsigned int samplerBitfield(ImageSampler::DEFAULT_BITFIELD);
-        const Render::Sampler* sampler(  samplers[i] );
-        if( sampler )
+        //TODO : This is a bug, result variable is being shadowed. Fix it!
+        bool result = program.GetSamplerUniformLocation( i, uniformLocation );
+        if( result && Program::UNIFORM_UNKNOWN != uniformLocation )
         {
-          samplerBitfield = sampler->mBitfield;
+          program.SetUniform1i( uniformLocation, textureUnit );
+
+          unsigned int samplerBitfield(ImageSampler::DEFAULT_BITFIELD);
+          const Render::Sampler* sampler(  samplers[i] );
+          if( sampler )
+          {
+            samplerBitfield = sampler->mBitfield;
+          }
+
+          texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
+
+          ++textureUnit;
         }
-
-        texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
-
-        ++textureUnit;
       }
     }
   }
