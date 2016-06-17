@@ -132,9 +132,10 @@ int UtcDaliTextureUpload01(void)
 
   //Upload data to the texture
   callStack.Reset();
-  Vector<unsigned char> data;
-  data.Resize( width * height * 4 );
-  texture.Upload( data );
+
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
+  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelData );
   application.SendNotification();
   application.Render();
 
@@ -147,9 +148,9 @@ int UtcDaliTextureUpload01(void)
 
   //Upload part of the texture
   callStack.Reset();
-  Vector<unsigned char> subImage;
-  subImage.Resize( width * height * 2 );
-  texture.Upload( subImage, 0u, 0u, width/2, height/2, width/2, height/2 );
+  buffer = reinterpret_cast<unsigned char*>( malloc( width * height * 2 ) );
+  PixelData pixelDataSubImage = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelDataSubImage, 0u, 0u, width/2, height/2, width/2, height/2 );
   application.SendNotification();
   application.Render();
 
@@ -188,12 +189,14 @@ int UtcDaliTextureUpload02(void)
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
 
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
+  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+
   //Upload data to the POSITIVE_X face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::POSITIVE_X, 0u, 0u, 0u, width, height );
+
+    texture.Upload( pixelData, CubeMap::POSITIVE_X, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -208,9 +211,8 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the NEGATIVE_X face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
+
+    texture.Upload( pixelData, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -225,9 +227,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the POSITIVE_Y face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::POSITIVE_Y, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMap::POSITIVE_Y, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -242,9 +242,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the NEGATIVE_Y face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::NEGATIVE_Y, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMap::NEGATIVE_Y, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -259,9 +257,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the POSITIVE_Z face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::POSITIVE_Z, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMap::POSITIVE_Z, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -276,9 +272,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the NEGATIVE_Z face of the texture
   {
     callStack.Reset();
-    Vector<unsigned char> data;
-    data.Resize( width * height * 4 );
-    texture.Upload( data, CubeMap::NEGATIVE_Z, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMap::NEGATIVE_Z, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -321,13 +315,13 @@ int UtcDaliTextureUpload03(void)
 
   //Upload data to the texture mipmap 0 and mipmap 1
   callStack.Reset();
-  Vector<unsigned char> data;
-  data.Resize( width * height * 4 );
-  texture.Upload( data, 0u, 0u, 0u, 0u, width, height );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
+  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelData, 0u, 0u, 0u, 0u, width, height );
 
-  Vector<unsigned char> dataMipmap1;
-  dataMipmap1.Resize( widthMipmap1 * heightMipmap1 * 4 );
-  texture.Upload( dataMipmap1, 0u, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
+  buffer = reinterpret_cast<unsigned char*>( malloc( widthMipmap1 * heightMipmap1 * 4 ) );
+  PixelData pixelDataMipmap1 = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelDataMipmap1, 0u, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
   application.SendNotification();
   application.Render();
 
@@ -362,13 +356,13 @@ int UtcDaliTextureUpload04(void)
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
   //Upload data to the NEGATIVE_X face mipmap 0 and mipmap 1
-  Vector<unsigned char> data;
-  data.Resize( width * height * 4 );
-  texture.Upload( data, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
+  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelData, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
 
-  Vector<unsigned char> dataMipmap1;
-  dataMipmap1.Resize( widthMipmap1 * widthMipmap1 * 4 );
-  texture.Upload( dataMipmap1, CubeMap::NEGATIVE_X, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
+  buffer= reinterpret_cast<unsigned char*>( malloc( widthMipmap1 * heightMipmap1 * 4 ) );
+  PixelData pixelDataMipmap1 = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelDataMipmap1, CubeMap::NEGATIVE_X, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
   application.SendNotification();
   application.Render();
 

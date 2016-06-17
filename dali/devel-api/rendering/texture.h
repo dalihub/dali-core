@@ -120,37 +120,26 @@ public:
   Texture& operator=( const Texture& handle );
 
   /**
-   * @brief Upload data to the texture
-   * @param[in] buffer A vector with the data to be uploaded
-   * @note buffer data will be moved after this call. If the application needs to keep the data,
-   * it will have to pass a copy of the original buffer into this function, otherwise the data
-   * will be lost
-   */
-  void Upload( Vector<unsigned char>& buffer );
-
-  /**
-   * @brief Upload data to the texture
-   * @param[in] buffer A vector with the data to be uploaded
-   * @param[in] layer Specifies the layer of a cube map or array texture. (Unused for 2D textures)
-   * @param[in] mipmap Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image
-   * @param[in] xOffset Specifies a texel offset in the x direction within the texture array
-   * @param[in] yOffset Specifies a texel offset in the y direction within the texture array
-   * @param[in] width Specifies the width of the texture subimage
-   * @param[in] height Specifies the height of the texture subimage
-   * @note buffer data will be moved after this call. If the application needs to keep the data,
-   * it will have to pass a copy of the original buffer into this function, otherwise the data
-   * will be lost
-   */
-  void Upload( Vector<unsigned char>& buffer,
-               unsigned int layer, unsigned int mipmap,
-               unsigned int xOffset, unsigned int yOffset,
-               unsigned int width, unsigned int height );
-
-  /**
    * @brief Upload data to the texture from a PixelData object
    * @param[in] pixelData The pixelData object
    */
   void Upload( PixelData pixelData );
+
+  /**
+   * @brief Upload data to the texture from a PixelData object
+   * @param[in] pixelData The pixelData object
+   * @param[in] layer Specifies the layer of a cube map or array texture. (Unused for 2D textures)
+   * @param[in] mipmap Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image
+   * @param[in] xOffset Specifies an horizontal offset of the rectangular area in the texture that will be updated
+   * @param[in] yOffset Specifies a vertical offset of the rectangular area in the texture that will be updated
+   * @param[in] width Specifies the width of the rectangular area in the texture that will be updated
+   * @param[in] height Specifies the height of the rectangular area in the texture that will be updated
+   * @note Upload does not upsample or downsample pixel data to fit the specified rectangular area in the texture.
+   */
+  void Upload( PixelData pixelData,
+               unsigned int layer, unsigned int mipmap,
+               unsigned int xOffset, unsigned int yOffset,
+               unsigned int width, unsigned int height );
 
   /**
    * @brief Generate mipmaps for the texture
