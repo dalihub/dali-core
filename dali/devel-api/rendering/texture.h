@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/devel-api/images/pixel-data.h>
 
@@ -74,6 +75,15 @@ public:
    * @return A handle to a newly allocated Texture
    */
   static Texture New( TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
+
+  /**
+   * @brief Creates a new Texture object from a native image
+   * @param[in] nativeImageInterface A native image
+   * @return A handle to a newly allocated Texture
+   * @note It is not possible to upload data to textures created from a native image using Upload methods
+   * although there might be platform specific APIs to upload data to a native image.
+   */
+  static Texture New( NativeImageInterface& nativeImageInterface );
 
   /**
    * @brief Default constructor, creates an empty handle

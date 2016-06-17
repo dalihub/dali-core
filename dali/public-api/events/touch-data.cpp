@@ -52,34 +52,54 @@ unsigned long TouchData::GetTime() const
   return GetImplementation( *this ).GetTime();
 }
 
-size_t TouchData::GetPointCount() const
+std::size_t TouchData::GetPointCount() const
 {
   return GetImplementation( *this ).GetPointCount();
 }
 
-int32_t TouchData::GetDeviceId( size_t point ) const
+int32_t TouchData::GetDeviceId( std::size_t point ) const
 {
   return GetImplementation( *this ).GetDeviceId( point );
 }
 
-PointState::Type TouchData::GetState( size_t point ) const
+PointState::Type TouchData::GetState( std::size_t point ) const
 {
   return GetImplementation( *this ).GetState( point );
 }
 
-Actor TouchData::GetHitActor( size_t point ) const
+Actor TouchData::GetHitActor( std::size_t point ) const
 {
   return GetImplementation( *this ).GetHitActor( point );
 }
 
-const Vector2& TouchData::GetLocalPosition( size_t point ) const
+const Vector2& TouchData::GetLocalPosition( std::size_t point ) const
 {
   return GetImplementation( *this ).GetLocalPosition( point );
 }
 
-const Vector2& TouchData::GetScreenPosition( size_t point ) const
+const Vector2& TouchData::GetScreenPosition( std::size_t point ) const
 {
   return GetImplementation( *this ).GetScreenPosition( point );
+}
+
+float TouchData::GetRadius( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetRadius( point );
+}
+
+const Vector2& TouchData::GetEllipseRadius( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetEllipseRadius( point );
+}
+
+float TouchData::GetPressure( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetPressure( point );
+}
+
+Degree TouchData::GetAngle( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetAngle( point );
 }
 
 TouchData::TouchData( Internal::TouchData* internal )

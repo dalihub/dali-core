@@ -362,6 +362,7 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
   std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
 
   std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
+  GLint uniformLocation(-1);
   for( size_t i(0); result && i<textures.size(); ++i )
   {
     ResourceId textureId = textures[i].GetTextureId();
@@ -374,6 +375,7 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
       {
         GLint uniformLocation;
 
+        //TODO : This is a bug, result variable is being shadowed. Fix it!
         bool result = program.GetSamplerUniformLocation( i, uniformLocation );
         if( result && Program::UNIFORM_UNKNOWN != uniformLocation )
         {
@@ -395,15 +397,15 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
   }
 
   std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
-  GLint uniformLocation(0);
   for( size_t i(0); result && i<newTextures.size(); ++i )
   {
     if( newTextures[i] )
     {
-      bool result = program.GetSamplerUniformLocation( i, uniformLocation );
+      result = program.GetSamplerUniformLocation( i, uniformLocation ) &&
+               newTextures[i]->Bind(context, textureUnit, samplers[i] );
+
       if( result )
       {
-        newTextures[i]->Bind(context, textureUnit, samplers[i] );
         program.SetUniform1i( uniformLocation, textureUnit );
         ++textureUnit;
       }

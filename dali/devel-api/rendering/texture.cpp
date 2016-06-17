@@ -31,6 +31,12 @@ Texture Texture::New( TextureType::Type type, Pixel::Format format, unsigned int
   return Texture( texture.Get() );
 }
 
+Texture Texture::New( NativeImageInterface& nativeImageInterface )
+{
+  Internal::NewTexturePtr texture = Internal::NewTexture::New( nativeImageInterface );
+  return Texture( texture.Get() );
+}
+
 Texture::Texture()
 {
 }

@@ -62,10 +62,13 @@ struct TouchEventDataFunctor
   }
 
   // Generate a touch-event
-  Integration::TouchEvent GenerateSingleTouch( TouchPoint::State state, Vector2 screenPosition ) const
+  Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition ) const
   {
     Integration::TouchEvent touchEvent;
-    touchEvent.points.push_back( TouchPoint ( 0, state, screenPosition.x, screenPosition.y ) );
+    Integration::Point point;
+    point.SetState( state );
+    point.SetScreenPosition( screenPosition );
+    touchEvent.points.push_back( point );
     return touchEvent;
   }
 

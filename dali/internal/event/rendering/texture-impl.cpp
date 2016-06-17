@@ -34,6 +34,12 @@ NewTexturePtr NewTexture::New(TextureType::Type type, Pixel::Format format, unsi
   return texture;
 }
 
+NewTexturePtr NewTexture::New( NativeImageInterface& nativeImageInterface )
+{
+  NewTexturePtr texture( new NewTexture( &nativeImageInterface ) );
+  texture->Initialize();
+  return texture;
+}
 
 Render::NewTexture* NewTexture::GetRenderObject() const
 {
@@ -43,6 +49,7 @@ Render::NewTexture* NewTexture::GetRenderObject() const
 NewTexture::NewTexture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
+  mNativeImage(),
   mType( type ),
   mFormat( format ),
   mWidth( width ),
@@ -50,9 +57,28 @@ NewTexture::NewTexture(TextureType::Type type, Pixel::Format format, unsigned in
 {
 }
 
+NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mRenderObject( NULL ),
+  mNativeImage( nativeImageInterface ),
+  mType( TextureType::TEXTURE_2D ),
+  mFormat( Pixel::RGB888 ),
+  mWidth( nativeImageInterface->GetWidth() ),
+  mHeight( nativeImageInterface->GetHeight() )
+{
+}
+
 void NewTexture::Initialize()
 {
-  mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
+  if( mNativeImage )
+  {
+    mRenderObject = new Render::NewTexture( mNativeImage );
+  }
+  else
+  {
+    mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
+  }
+
   AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
@@ -66,7 +92,12 @@ NewTexture::~NewTexture()
 
 bool NewTexture::CheckUploadParametres( const Vector<unsigned char>& buffer, const UploadParams& parameters ) const
 {
-  if(  buffer.Size() < GetBytesPerPixel( mFormat ) * parameters.width * parameters.height )
+  if( mNativeImage )
+  {
+    DALI_LOG_ERROR( "Error: Uploading data to a native texture");
+    return false;
+  }
+  else if(  buffer.Size() < GetBytesPerPixel( mFormat ) * parameters.width * parameters.height )
   {
     DALI_LOG_ERROR( "Error: Buffer of an incorrect size when trying to update texture");
     return false;

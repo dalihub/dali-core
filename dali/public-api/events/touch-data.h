@@ -25,6 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/math/degree.h>
 
 namespace Dali
 {
@@ -70,7 +71,7 @@ public:
    * @brief Copy constructor
    *
    * @SINCE_1_1.37
-   * @param[in]  other  The TouchEventHandle to copy from.
+   * @param[in]  other  The TouchData to copy from.
    */
   TouchData( const TouchData& other );
 
@@ -87,7 +88,7 @@ public:
    * @brief Assignment Operator
    *
    * @SINCE_1_1.37
-   * @param[in]  other  The TouchEventHandle to copy from.
+   * @param[in]  other  The TouchData to copy from.
    */
   TouchData& operator=( const TouchData& other );
 
@@ -102,12 +103,12 @@ public:
   unsigned long GetTime() const;
 
   /**
-   * @brief Returns the total number of points in this TouchEventHandle.
+   * @brief Returns the total number of points in this TouchData.
    *
    * @SINCE_1_1.37
    * @return Total number of Points.
    */
-  size_t GetPointCount() const;
+  std::size_t GetPointCount() const;
 
   /**
    * @brief Returns the ID of the device used for the Point specified.
@@ -120,7 +121,7 @@ public:
    * @return The Device ID of this point.
    * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  int32_t GetDeviceId( size_t point ) const;
+  int32_t GetDeviceId( std::size_t point ) const;
 
   /**
    * @brief Retrieves the State of the point specified.
@@ -128,11 +129,10 @@ public:
    * @SINCE_1_1.37
    * @param[in]  point  The point required.
    * @return The state of the point specified.
-   * @note If point is greater than GetPointCount() then this method will
-   * return PointState::FINISHED.
+   * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
    * @see State
    */
-  PointState::Type GetState( size_t point ) const;
+  PointState::Type GetState( std::size_t point ) const;
 
   /**
    * @brief Retrieve the actor that was underneath the point specified.
@@ -140,10 +140,9 @@ public:
    * @SINCE_1_1.37
    * @param[in]  point  The point required.
    * @return The actor that was underneath the point specified.
-   * @note If point is greater than GetPointCount() then this method will return
-   * an empty handle.
+   * @note If point is greater than GetPointCount() then this method will return an empty handle.
    */
-  Actor GetHitActor( size_t point ) const;
+  Actor GetHitActor( std::size_t point ) const;
 
   /**
    * @brief Retrieve the co-ordinates relative to the top-left of the hit-actor at the point specified.
@@ -157,7 +156,7 @@ public:
    * then you should use Actor::ScreenToLocal().
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetLocalPosition( size_t point ) const;
+  const Vector2& GetLocalPosition( std::size_t point ) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
@@ -167,7 +166,54 @@ public:
    * @return The co-ordinates relative to the top-left of the screen of the point specified.
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetScreenPosition( size_t point ) const;
+  const Vector2& GetScreenPosition( std::size_t point ) const;
+
+  /**
+   * @brief Retrieve the radius of the press point.
+   *
+   * This is the average of both the horizontal and vertical radii of the press point.
+   *
+   * @SINCE_1_1.39
+   * @param[in]  point  The point required.
+   * @return The radius of the press point.
+   * @note If point is greater than GetPointCount() then this method will return 0.0f.
+   */
+  float GetRadius( std::size_t point ) const;
+
+  /**
+   * @brief Retrieve BOTH the horizontal and the vertical radii of the press point.
+   *
+   * @SINCE_1_1.39
+   * @param[in]  point  The point required.
+   * @return The horizontal and vertical radii of the press point.
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetEllipseRadius( std::size_t point ) const;
+
+  /**
+   * @brief Retrieve the touch pressure.
+   *
+   * The pressure range starts at 0.0f.
+   * Normal pressure is defined as 1.0f.
+   * A value between 0.0f and 1.0f means light pressure has been applied.
+   * A value greater than 1.0f means more pressure than normal has been applied.
+   *
+   * @SINCE_1_1.39
+   * @param[in]  point  The point required.
+   * @return The touch pressure.
+   * @note If point is greater than GetPointCount() then this method will return 1.0f.
+   */
+  float GetPressure( std::size_t point ) const;
+
+  /**
+   * @brief Retrieve the angle of the press point relative to the Y-Axis.
+   *
+   * @SINCE_1_1.39
+   * @param[in]  point  The point required.
+   * @return The angle of the press point.
+   * @note If point is greater than GetPointCount() then this method will return Degree().
+   */
+  Degree GetAngle( std::size_t point ) const;
 
 public: // Not intended for application developers
 

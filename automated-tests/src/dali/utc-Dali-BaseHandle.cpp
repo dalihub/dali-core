@@ -410,7 +410,9 @@ int UtcDaliBaseHandleConnectSignal(void)
   application.Render(1000);
 
   // simulate a touch event
-  Dali::TouchPoint point( 0, TouchPoint::Down, 240, 400  );
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );

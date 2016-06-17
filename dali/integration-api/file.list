@@ -18,6 +18,7 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/events/multi-point-event-integ.cpp \
    $(platform_abstraction_src_dir)/events/pan-gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/pinch-gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/point.cpp \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/touch-event-combiner.cpp \
    $(platform_abstraction_src_dir)/events/touch-event-integ.cpp
@@ -55,6 +56,7 @@ platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/multi-point-event-integ.h \
    $(platform_abstraction_src_dir)/events/pan-gesture-event.h \
    $(platform_abstraction_src_dir)/events/pinch-gesture-event.h \
+   $(platform_abstraction_src_dir)/events/point.h \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.h \
    $(platform_abstraction_src_dir)/events/touch-event-combiner.h \
    $(platform_abstraction_src_dir)/events/touch-event-integ.h

@@ -22,8 +22,8 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/events/touch-data.h>
-#include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/events/point.h>
 
 namespace Dali
 {
@@ -33,6 +33,9 @@ struct Vector2;
 
 namespace Internal
 {
+
+class TouchData;
+typedef IntrusivePtr< TouchData > TouchDataPtr;
 
 /**
  * @copydoc Dali::TouchData
@@ -55,6 +58,15 @@ public:
   TouchData( unsigned long time );
 
   /**
+   * @brief Clones the TouchData object.
+   *
+   * Required because base class copy constructor is not implemented.
+   * @param[in]  other  The TouchData to clone from.
+   * @return A new TouchData object which is has the same touch point data.
+   */
+  static TouchDataPtr Clone( const TouchData& other );
+
+  /**
    * @brief Destructor
    */
   ~TouchData();
@@ -69,44 +81,74 @@ public:
   /**
    * @copydoc Dali::TouchData::GetPointCount()
    */
-  size_t GetPointCount() const;
+  std::size_t GetPointCount() const;
 
   /**
    * @copydoc Dali::TouchData::GetDeviceId()
    */
-  int32_t GetDeviceId( size_t point ) const;
+  int32_t GetDeviceId( std::size_t point ) const;
 
   /**
    * @copydoc Dali::TouchData::GetGetState()
    */
-  PointState::Type GetState( size_t point  ) const;
+  PointState::Type GetState( std::size_t point  ) const;
 
   /**
    * @copydoc Dali::TouchData::GetHitActor()
    */
-  Dali::Actor GetHitActor( size_t point ) const;
+  Dali::Actor GetHitActor( std::size_t point ) const;
 
   /**
    * @copydoc Dali::TouchData::GetLocalPosition()
    */
-  const Vector2& GetLocalPosition( size_t point ) const;
+  const Vector2& GetLocalPosition( std::size_t point ) const;
 
   /**
    * @copydoc Dali::TouchData::GetScreenPosition()
    */
-  const Vector2& GetScreenPosition( size_t point ) const;
+  const Vector2& GetScreenPosition( std::size_t point ) const;
+
+  /**
+   * @copydoc Dali::TouchData::GetRadius()
+   */
+  float GetRadius( std::size_t point ) const;
+
+  /**
+   * @copydoc Dali::TouchData::GetEllipseRadius()
+   */
+  const Vector2& GetEllipseRadius( std::size_t point ) const;
+
+  /**
+   * @copydoc Dali::TouchData::GetPressure()
+   */
+  float GetPressure( std::size_t point ) const;
+
+  /**
+   * @copydoc Dali::TouchData::GetAngle()
+   */
+  Degree GetAngle( std::size_t point ) const;
+
+  /**
+   * @brief Returns a const reference to a point at the index requested.
+   *
+   * The first point in the set is always the primary point (i.e. the first point touched in a multi-touch event).
+   *
+   * @param[in]  point  The index of the required Point.
+   * @return A const reference to the Point at the position requested
+   * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
+   */
+  const Integration::Point& GetPoint( std::size_t point ) const;
 
   /**
    * @brief Returns a reference to a point at the index requested.
    *
    * The first point in the set is always the primary point (i.e. the first point touched in a multi-touch event).
    *
-   * @SINCE_1_1.36
    * @param[in]  point  The index of the required Point.
    * @return A reference to the Point at the position requested
    * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
    */
-  const TouchPoint& GetPoint( size_t point ) const;
+  Integration::Point& GetPoint( std::size_t point );
 
   // Setters
 
@@ -114,14 +156,7 @@ public:
    * @brief Adds a point to this touch event handler.
    * @param[in]  point  The point to add to the touch event handler.
    */
-  void AddPoint( const TouchPoint& point );
-
-  /**
-   * @brief Overwrites the internal container with the point container specified.
-   *
-   * @param[in]  points  The point container.
-   */
-  void SetPoints( const TouchPointContainer& points );
+  void AddPoint( const Integration::Point& point );
 
 private:
 
@@ -131,8 +166,8 @@ private:
   /// Undefined
   TouchData& operator=( const TouchData& other );
 
-  TouchPointContainer mPoints;   ///< Container of the points for this touch event.
-  unsigned long       mTime;     ///< The time (in ms) that the touch event occurred.
+  std::vector< Integration::Point > mPoints; ///< Container of the points for this touch event.
+  unsigned long mTime; ///< The time (in ms) that the touch event occurred.
 };
 
 } // namespace Internal

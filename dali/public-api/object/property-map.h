@@ -36,7 +36,7 @@ namespace Dali
 typedef std::pair<std::string, Property::Value> StringValuePair;
 
 /**
- * @brief A Map of property values.
+ * @brief A Map of property values, the key type could be String or Property::Index.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Property::Map
@@ -82,7 +82,7 @@ public:
   bool Empty() const;
 
   /**
-   * @brief Inserts the key-value pair in the Map.
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
    *
    * Does not check for duplicates
    * @SINCE_1_0.0
@@ -92,7 +92,7 @@ public:
   void Insert( const char* key, const Value& value );
 
   /**
-   * @brief Inserts the key-value pair in the Map.
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
    *
    * Does not check for duplicates
    * @SINCE_1_0.0
@@ -102,7 +102,19 @@ public:
   void Insert( const std::string& key, const Value& value );
 
   /**
-   * @brief Retrieve the value at the specified position.
+   * @brief Inserts the key-value pair in the Map, with the key type as index.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_1.39
+   * @param key to insert
+   * @param value to insert
+   */
+  void Insert( Property::Index key, const Value& value );
+
+  /**
+   * DEPRECATED_1_1.39. Retrieve the value with key instead of position, Use Find( key ) instead.
+   *
+   * @brief Retrieve the value of the string-value pair at the specified position.
    *
    * @SINCE_1_0.0
    * @return A reference to the value at the specified position.
@@ -112,6 +124,8 @@ public:
   Value& GetValue( SizeType position ) const;
 
   /**
+   * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
+   *
    * @brief Retrieve the key at the specified position.
    *
    * @SINCE_1_0.0
@@ -122,6 +136,8 @@ public:
   const std::string& GetKey( SizeType position ) const;
 
   /**
+   * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
+   *
    * @brief Retrieve the key & the value at the specified position.
    *
    * @SINCE_1_0.0
@@ -152,6 +168,16 @@ public:
   Value* Find( const std::string& key ) const;
 
   /**
+   * @brief Finds the value for the specified key if it exists.
+   *
+   * @SINCE_1_1.39
+   * @param[in]  key   The key to find.
+   *
+   * @return A const pointer to the value if it exists, NULL otherwise
+   */
+  Value* Find( Property::Index key ) const;
+
+  /**
    * @brief Finds the value for the specified key if it exists and its type is type
    *
    * @SINCE_1_0.0
@@ -161,6 +187,17 @@ public:
    * @return A const pointer to the value if it exists, NULL otherwise
    */
   Value* Find( const std::string& key, Property::Type type ) const;
+
+  /**
+   * @brief Finds the value for the specified key if it exists and its type is type
+   *
+   * @SINCE_1_1.39
+   * @param[in]  key   The key to find.
+   * @param[in]  type  The type to check.
+   *
+   * @return A const pointer to the value if it exists, NULL otherwise
+   */
+  Value* Find( Property::Index key, Property::Type type ) const;
 
   /**
    * @brief Clears the map.
@@ -179,7 +216,7 @@ public:
   void Merge( const Map& from );
 
   /**
-   * @brief Const operator to access element with the specified key.
+   * @brief Const operator to access element with the specified string key.
    *
    * @SINCE_1_0.0
    * @param[in] key The key whose value to access.
@@ -191,7 +228,7 @@ public:
   const Value& operator[]( const std::string& key ) const;
 
   /**
-   * @brief Operator to access the element with the specified key.
+   * @brief Operator to access the element with the specified string key.
    *
    * @SINCE_1_0.0
    * @param[in] key The key whose value to access.
@@ -201,6 +238,30 @@ public:
    * @note If an element with the key does not exist, then it is created.
    */
   Value& operator[]( const std::string& key );
+
+  /**
+   * @brief Const operator to access element with the specified index key.
+   *
+   * @SINCE_1_1.39
+   * @param[in] key The key whose value to access.
+   *
+   * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned.
+   *
+   * @note Will assert if invalid-key is given.
+   */
+  const Value& operator[]( Property::Index key ) const;
+
+  /**
+   * @brief Operator to access the element with the specified index key.
+   *
+   * @SINCE_1_1.39
+   * @param[in] key The key whose value to access.
+   *
+   * @return A reference to the value for the element with the specified key.
+   *
+   * @note If an element with the key does not exist, then it is created.
+   */
+  Value& operator[]( Property::Index key );
 
   /**
    * @brief Assignment Operator

@@ -20,10 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/integration-api/events/point.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -35,7 +35,7 @@ struct HoverEvent;
 /**
  * Dali::Integration::TouchEventCombiner is a utility class, an instance of which, should be created
  * upon initialisation.  It accepts single Point(s) containing information about a touch area and
- * creates a TouchEvent and/or HoverEvent combining the latest event's information with previous TouchPoint(s).
+ * creates a TouchEvent and/or HoverEvent combining the latest event's information with previous Point(s).
  *
  * The created TouchEvent and/or HoverEvent can then be sent to the Dali Core as indicated by the GetNextTouchEvent()
  * method.
@@ -46,7 +46,7 @@ struct HoverEvent;
  * - Motion event throttling is carried out to satisfy the minimum distance and time delta required.
  * - If an interrupted event is received, then any stored Point history is cleared.
  */
-class TouchEventCombiner
+class DALI_IMPORT_API TouchEventCombiner
 {
 public:
 
@@ -105,7 +105,7 @@ public:
    *
    * @return true if the point is beyond the different thresholds set thus, should be sent to core, false otherwise.
    */
-  EventDispatchType GetNextTouchEvent( const TouchPoint& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent );
+  EventDispatchType GetNextTouchEvent( const Point& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent );
 
   /**
    * Sets the minimum time (in ms) that should occur between motion events.
@@ -152,7 +152,7 @@ public:
   /**
    * This resets any information contained by the TouchEventCombiner.
    * This may be required if some platform event has occurred which makes it necessary to reset any
-   * TouchPoint information that the combiner may store.
+   * Point information that the combiner may store.
    */
   void Reset();
 

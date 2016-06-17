@@ -24,10 +24,10 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/internal/common/image-attributes.h>
+#include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/images/buffer-image-impl.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 
 namespace Dali
 {
@@ -39,51 +39,6 @@ namespace
 {
 
 // Tables used here for converting strings to the enumerations and vice versa
-struct AnchorValue
-{
-  const char* name;
-  const Vector3 value;
-};
-const AnchorValue ANCHOR_CONSTANT_TABLE[] =
-{
-  { "TOP_LEFT",               ParentOrigin::TOP_LEFT               },
-  { "TOP_CENTER",             ParentOrigin::TOP_CENTER             },
-  { "TOP_RIGHT",              ParentOrigin::TOP_RIGHT              },
-  { "CENTER_LEFT",            ParentOrigin::CENTER_LEFT            },
-  { "CENTER",                 ParentOrigin::CENTER                 },
-  { "CENTER_RIGHT",           ParentOrigin::CENTER_RIGHT           },
-  { "BOTTOM_LEFT",            ParentOrigin::BOTTOM_LEFT            },
-  { "BOTTOM_CENTER",          ParentOrigin::BOTTOM_CENTER          },
-  { "BOTTOM_RIGHT",           ParentOrigin::BOTTOM_RIGHT           },
-};
-const unsigned int ANCHOR_CONSTANT_TABLE_COUNT = sizeof( ANCHOR_CONSTANT_TABLE ) / sizeof( ANCHOR_CONSTANT_TABLE[0] );
-
-const StringEnum COLOR_MODE_TABLE[] =
-{
-  { "USE_OWN_COLOR",                    USE_OWN_COLOR                    },
-  { "USE_PARENT_COLOR",                 USE_PARENT_COLOR                 },
-  { "USE_OWN_MULTIPLY_PARENT_COLOR",    USE_OWN_MULTIPLY_PARENT_COLOR    },
-  { "USE_OWN_MULTIPLY_PARENT_ALPHA",    USE_OWN_MULTIPLY_PARENT_ALPHA    },
-};
-const unsigned int COLOR_MODE_TABLE_COUNT = sizeof( COLOR_MODE_TABLE ) / sizeof( COLOR_MODE_TABLE[0] );
-
-const StringEnum POSITION_INHERITANCE_MODE_TABLE[] =
-{
-  { "INHERIT_PARENT_POSITION",                    INHERIT_PARENT_POSITION                    },
-  { "USE_PARENT_POSITION",                        USE_PARENT_POSITION                        },
-  { "USE_PARENT_POSITION_PLUS_LOCAL_POSITION",    USE_PARENT_POSITION_PLUS_LOCAL_POSITION    },
-  { "DONT_INHERIT_POSITION",                      DONT_INHERIT_POSITION                      },
-};
-const unsigned int POSITION_INHERITANCE_MODE_TABLE_COUNT = sizeof( POSITION_INHERITANCE_MODE_TABLE ) / sizeof( POSITION_INHERITANCE_MODE_TABLE[0] );
-
-const StringEnum DRAW_MODE_TABLE[] =
-{
-  { "NORMAL",     DrawMode::NORMAL     },
-  { "OVERLAY_2D", DrawMode::OVERLAY_2D },
-  { "STENCIL",    DrawMode::STENCIL    },
-};
-const unsigned int DRAW_MODE_TABLE_COUNT = sizeof( DRAW_MODE_TABLE ) / sizeof( DRAW_MODE_TABLE[0] );
-
 const StringEnum IMAGE_LOAD_POLICY_TABLE[] =
 {
   { "IMMEDIATE", ResourceImage::IMMEDIATE },
@@ -154,53 +109,6 @@ const char* ImageTypeName[] = { "ResourceImage", "FrameBufferImage", "BufferImag
 enum ImageType                { RESOURCE_IMAGE,  FRAME_BUFFER_IMAGE, BUFFER_IMAGE };
 const unsigned int imageTypeCount = sizeof( ImageTypeName ) / sizeof( const char* );
 
-bool CompareEnums( const char * a, const char * b, size_t& size )
-{
-  size = 0;
-  while( ( *a != '\0' ) && ( *b != '\0' ) && ( *a != ',') && ( *b != ',') )
-  {
-    ++size;
-    char ca = *a;
-    char cb = *b;
-
-    if( ( ( ca == '-' ) || ( ca == '_') ) &&
-        ( ( cb == '-' ) || ( cb == '_') ) )
-    {
-      ++a;
-      ++b;
-      continue;
-    }
-
-    if( ( 'A' <= ca ) && ( ca <= 'Z') )
-    {
-      ca = ca + ( 'a' - 'A' );
-    }
-
-    if( ( 'A' <= cb ) && ( cb <= 'Z') )
-    {
-      cb = cb + ( 'a' - 'A' );
-    }
-
-    if( ca != cb )
-    {
-      return false;
-    }
-
-    ++a;
-    ++b;
-  }
-
-  // enums can be comma separated so check ends and comma
-  if( ( ( *a == '\0' ) && ( *b == '\0' ) ) ||
-      ( ( *a == '\0' ) && ( *b == ','  ) ) ||
-      ( ( *a == ','  ) && ( *b == '\0' ) ) )
-  {
-    return true;
-  }
-
-  return false;
-}
-
 } // unnamed namespace
 
 bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, unsigned int tableCount, unsigned int& integerEnum )
@@ -222,7 +130,7 @@ bool EnumStringToInteger( const char * const value, const StringEnum* const enum
 
       for ( unsigned int i = 0; i < tableCount; ++i )
       {
-        if( CompareEnums( pValue, table->string, size ) )
+        if( Internal::CompareTokens( pValue, table->string, size ) )
         {
           found = true;
           ret |= table->value;
@@ -262,7 +170,7 @@ unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned
   for ( unsigned int i = 0; i < tableCount; ++i, ++index )
   {
     size_t sizeIgnored = 0;
-    if( CompareEnums( value, table->string, sizeIgnored ) )
+    if( Internal::CompareTokens( value, table->string, sizeIgnored ) )
     {
       found = true;
       break;
@@ -274,78 +182,6 @@ unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned
     DALI_LOG_ERROR( "Unknown enumeration string %s\n", value );
   }
   return index;
-}
-
-ColorMode GetColorMode( const std::string& value )
-{
-  // return default on error
-  ColorMode mode( USE_OWN_MULTIPLY_PARENT_ALPHA );
-  GetEnumeration< ColorMode >( value.c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode );
-  return mode;
-}
-
-
-std::string GetColorMode( ColorMode value )
-{
-  const char* name = GetEnumerationName< ColorMode >( value, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
-}
-
-PositionInheritanceMode GetPositionInheritanceMode( const std::string& value )
-{
-  // return default on error
-  PositionInheritanceMode mode( INHERIT_PARENT_POSITION );
-  GetEnumeration< PositionInheritanceMode >( value.c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode );
-  return mode;
-}
-
-
-std::string GetPositionInheritanceMode( PositionInheritanceMode value )
-{
-  const char* name = GetEnumerationName< PositionInheritanceMode >( value, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
-}
-
-
-DrawMode::Type GetDrawMode( const std::string& value )
-{
-  // return default on error
-  DrawMode::Type mode( DrawMode::NORMAL );
-  GetEnumeration< DrawMode::Type >( value.c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode );
-  return mode;
-}
-
-
-std::string GetDrawMode( DrawMode::Type value )
-{
-  const char* name = GetEnumerationName< DrawMode::Type >( value, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
-}
-
-
-Vector3 GetAnchorConstant( const std::string& value )
-{
-  for( unsigned int i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
-  {
-    size_t sizeIgnored = 0;
-    if( CompareEnums( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name, sizeIgnored ) )
-    {
-      return ANCHOR_CONSTANT_TABLE[ i ].value;
-    }
-  }
-  return Vector3();
 }
 
 
@@ -516,57 +352,6 @@ Image NewImage( const Property::Value& property )
 } // Image NewImage( Property::Value map )
 
 
-ShaderEffect NewShaderEffect( const Property::Value& property )
-{
-  Internal::ShaderEffectPtr ret;
-
-  const Property::Map* map = property.GetMap();
-  if( map )
-  {
-    ret = Internal::ShaderEffect::New( Dali::ShaderEffect::HINT_NONE ); // hint can be reset if in map
-
-    const Property::Value* value = map->Find( "program" );
-    if( value )
-    {
-      Property::Index index = ret->GetPropertyIndex( "program" );
-      ret->SetProperty( index, *value );
-    }
-
-    for( unsigned int i = 0; i < map->Count(); ++i )
-    {
-      const std::string& key = map->GetKey( i );
-      if( key != "program" )
-      {
-        Property::Index index = ret->GetPropertyIndex( key );
-
-        const Property::Value& value = map->GetValue( i );
-        if( Property::INVALID_INDEX != index )
-        {
-          ret->SetProperty( index, value );
-        }
-        else
-        {
-          // if its not a property then register it as a uniform (making a custom property)
-          if( value.GetType() == Property::INTEGER )
-          {
-            // valid uniforms are floats, vec3's etc so we recast if the user accidentally
-            // set as integer. Note the map could have come from json script.
-            Property::Value asFloat( static_cast<float>( value.Get<int>() ) );
-            ret->SetUniform( key, asFloat, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
-          }
-          else
-          {
-            ret->SetUniform( key, value, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
-          }
-        }
-      }
-    }
-  }
-
-  return Dali::ShaderEffect(ret.Get());
-}
-
-
 Actor NewActor( const Property::Map& map )
 {
   BaseHandle handle;
@@ -611,34 +396,6 @@ Actor NewActor( const Property::Map& map )
         for ( Property::Array::SizeType i = 0; i < actorArray.Size(); ++i)
         {
           actor.Add( NewActor( actorArray[i].Get< Property::Map >() ) );
-        }
-      }
-      else if( key ==  "parentOrigin" )
-      {
-        // Parent Origin can be a string constant as well as a Vector3
-
-        const Property::Type type( value.GetType() );
-        if ( type == Property::VECTOR3 )
-        {
-          actor.SetParentOrigin( value.Get< Vector3 >() );
-        }
-        else if( type == Property::STRING )
-        {
-          actor.SetParentOrigin( GetAnchorConstant( value.Get< std::string >() ) );
-        }
-      }
-      else if( key ==  "anchorPoint" )
-      {
-        // Anchor Point can be a string constant as well as a Vector3
-
-        const Property::Type type( value.GetType() );
-        if ( type == Property::VECTOR3 )
-        {
-          actor.SetAnchorPoint( value.Get< Vector3 >() );
-        }
-        else if( type == Property::STRING )
-        {
-          actor.SetAnchorPoint( GetAnchorConstant( value.Get< std::string >() ) );
         }
       }
       else
