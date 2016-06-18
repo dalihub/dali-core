@@ -62,7 +62,12 @@ void Sampler::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFil
 
 void Sampler::SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap )
 {
-  GetImplementation(*this).SetWrapMode( uWrap, vWrap );
+  GetImplementation(*this).SetWrapMode( uWrap, uWrap, vWrap );
+}
+
+void Sampler::SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap )
+{
+  GetImplementation(*this).SetWrapMode( rWrap, sWrap, tWrap );
 }
 
 Sampler::Sampler(Internal::Sampler* pointer)

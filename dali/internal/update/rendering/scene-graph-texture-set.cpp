@@ -181,6 +181,28 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   NotifyChangeToRenderers();
 }
 
+void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
+{
+  const size_t textureCount( mTextures.Size() );
+  if( textureCount < index + 1 )
+  {
+    mTextures.Resize( index + 1 );
+    mSamplers.Resize( index + 1 );
+
+    for( size_t i(textureCount); i<=index; ++i )
+    {
+      mTextures[i] = 0;
+      mSamplers[i] = 0;
+    }
+  }
+
+  mTextures[index] = texture;
+  mHasAlpha |= texture->HasAlphaChannel();
+
+  mChanged = true;
+  NotifyChangeToRenderers();
+}
+
 bool TextureSet::HasAlpha() const
 {
   return mHasAlpha;

@@ -117,10 +117,13 @@ struct RemoveActorFunctor : public HoverEventFunctor
   }
 };
 
-Integration::HoverEvent GenerateSingleHover( TouchPoint::State state, Vector2 screenPosition )
+Integration::HoverEvent GenerateSingleHover( TouchPoint::State state, const Vector2& screenPosition )
 {
   Integration::HoverEvent hoverEvent;
-  hoverEvent.points.push_back( TouchPoint ( 0, state, screenPosition.x, screenPosition.y ) );
+  Integration::Point point;
+  point.SetState( static_cast< PointState::Type >( state ) );
+  point.SetScreenPosition( screenPosition );
+  hoverEvent.points.push_back( point );
   return hoverEvent;
 }
 

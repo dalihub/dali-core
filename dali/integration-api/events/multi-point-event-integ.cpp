@@ -43,18 +43,18 @@ MultiPointEvent::~MultiPointEvent()
 {
 }
 
-void MultiPointEvent::AddPoint(const TouchPoint& point)
+void MultiPointEvent::AddPoint( const Point& point )
 {
   points.push_back(point);
 }
 
-TouchPoint& MultiPointEvent::GetPoint(unsigned int point)
+Point& MultiPointEvent::GetPoint( unsigned int point )
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];
 }
 
-const TouchPoint& MultiPointEvent::GetPoint(unsigned int point) const
+const Point& MultiPointEvent::GetPoint( unsigned int point ) const
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];

@@ -25,11 +25,11 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
 {

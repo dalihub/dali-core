@@ -37,6 +37,7 @@ class Stage;
 class Actor;
 class Layer;
 class ObjectRegistry;
+class TouchData;
 class RenderTaskList;
 struct Vector2;
 struct Vector3;
@@ -66,12 +67,13 @@ class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 
-  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;     ///< Key event signal type @SINCE_1_0.0
-  typedef Signal< void () > EventProcessingFinishedSignalType;    ///< Event Processing finished signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchEvent&)> TouchedSignalType;    ///< Touched signal type @SINCE_1_0.0
-  typedef Signal< void (const WheelEvent&)> WheelEventSignalType; ///< Touched signal type @SINCE_1_0.0
-  typedef Signal< void () > ContextStatusSignal;                  ///< Context status signal type @SINCE_1_0.0
-  typedef Signal< void () > SceneCreatedSignalType;               ///< Scene created signal type @SINCE_1_0.0
+  typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type @SINCE_1_0.0
+  typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type @SINCE_1_0.0
+  typedef Signal< void (const TouchEvent&) > TouchedSignalType;      ///< @DEPRECATED_1_1.37 @brief Touched signal type @SINCE_1_0.0
+  typedef Signal< void (const TouchData&) > TouchSignalType;                ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Touched signal type @SINCE_1_0.0
+  typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
+  typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -267,12 +269,13 @@ public:
   EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
+   * @DEPRECATED_1_1.37 Use TouchSignal() instead.
    * @brief This signal is emitted when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
    *
    * If there are multiple touch points, then this will be emitted when the first touch occurs and
    * then when the last finger is lifted.
-   * An interrupted event will also be emitted.
+   * An interrupted event will also be emitted (if it occurs).
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName(const TouchEvent& event);
@@ -283,6 +286,24 @@ public:
    * @note Motion events are not emitted.
    */
   TouchedSignalType& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when the screen is touched and when the touch ends
+   * (i.e. the down & up touch events only).
+   *
+   * If there are multiple touch points, then this will be emitted when the first touch occurs and
+   * then when the last finger is lifted.
+   * An interrupted event will also be emitted (if it occurs).
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( TouchData event );
+   * @endcode
+   *
+   * @SINCE_1_1.37
+   * @return The touch signal to connect to.
+   * @note Motion events are not emitted.
+   */
+  TouchSignalType& TouchSignal();
 
   /**
    * @brief This signal is emitted when wheel event is received.

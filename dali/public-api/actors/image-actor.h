@@ -42,7 +42,7 @@ class ImageActor;
 }
 
 /**
- * @DEPRECATED_1_1.11
+ * @DEPRECATED_1_1.11 Use an actor with renderer instead.
  * @brief An actor for displaying images.
  *
  * Allows the developer to add an actor to stage which displays the content of an Image object.
@@ -56,8 +56,6 @@ class ImageActor;
  *
  * @SINCE_1_0.0
  * @remarks This is an experimental feature and might not be supported in the next release. We do recommend not to use it. Use of ImageActor should be avoided unless shader effects need to be applied.
- * For general purpose, use Toolkit::ImageView which has much better performance.
- * @see Toolkit::ImageView
  */
 class DALI_IMPORT_API ImageActor : public Actor
 {
@@ -107,7 +105,7 @@ public:
   };
 
   /**
-   * @DEPRECATED_1_1.11. Only quad style supported, use ImageView instead for nine patch.
+   * @DEPRECATED_1_1.11. Only quad style supported.
    *
    * @brief Style determines how the Image is rendered.
    *
@@ -324,7 +322,7 @@ public:
   PixelArea GetPixelArea() const;
 
   /**
-   * @DEPRECATED_1_1.11. Use ImageView instead.
+   * @DEPRECATED_1_1.11
    *
    * @brief Set how the image is rendered; the default is STYLE_QUAD.
    *
@@ -338,7 +336,7 @@ public:
   void SetStyle(Style style);
 
   /**
-   * @DEPRECATED_1_1.11. Use ImageView instead.
+   * @DEPRECATED_1_1.11
    *
    * @brief Query how the image is rendered.
    *
@@ -352,7 +350,7 @@ public:
   Style GetStyle() const;
 
   /**
-   * @DEPRECATED_1_1.11. Use ImageView instead.
+   * @DEPRECATED_1_1.11
    *
    * @brief Set the border used with ImageActor::STYLE_NINE_PATCH.
    *
@@ -366,7 +364,7 @@ public:
   void SetNinePatchBorder(const Vector4& border);
 
   /**
-   * @DEPRECATED_1_1.11. Use ImageView instead.
+   * @DEPRECATED_1_1.11
    *
    * @brief Retrieve the border used with ImageActor::STYLE_NINE_PATCH.
    *

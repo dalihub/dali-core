@@ -1668,7 +1668,9 @@ int UtcDaliCustomActorOnTouchEvent(void)
   application.Render();
 
   // simulate a touch event
-  Dali::TouchPoint point( 0, TouchPoint::Down, 1, 1 );
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 1, 1 ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );
@@ -1699,7 +1701,9 @@ int UtcDaliCustomActorOnHoverEvent(void)
   application.Render();
 
   // simulate a hover event
-  Dali::TouchPoint point( 0, TouchPoint::Motion, 1, 1 );
+  Dali::Integration::Point point;
+  point.SetState( PointState::MOTION );
+  point.SetScreenPosition( Vector2( 1, 1 ) );
   Dali::Integration::HoverEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );

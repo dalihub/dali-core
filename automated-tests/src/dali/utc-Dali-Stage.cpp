@@ -224,6 +224,16 @@ struct ActorCreatedFunctor
   bool& mSignalVerified;
 };
 
+void GenerateTouch( TestApplication& application, PointState::Type state, const Vector2& screenPosition )
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point point;
+  point.SetState( state );
+  point.SetScreenPosition( screenPosition );
+  touchEvent.points.push_back( point );
+  application.ProcessEvent( touchEvent );
+}
+
 } // unnamed namespace
 
 
@@ -872,17 +882,14 @@ int UtcDaliStageTouchedSignalP(void)
 
   // Basic test: No actors, single touch (down then up).
   {
-    Integration::TouchEvent touchEvent;
-    touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
     DALI_TEST_CHECK( !data.receivedTouchEvent.points[0].hitActor );
     data.Reset();
 
-    touchEvent.points[0].state = TouchPoint::Up;
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::UP, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -904,24 +911,19 @@ int UtcDaliStageTouchedSignalP(void)
 
   // Actor on scene, single touch, down in actor, motion, then up outside actor.
   {
-    Integration::TouchEvent touchEvent;
-    touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
     DALI_TEST_CHECK( data.receivedTouchEvent.points[0].hitActor == actor );
     data.Reset();
 
-    touchEvent.points[0].state = TouchPoint::Motion;
-    touchEvent.points[0].screen.x = 150.0f; // Some motion
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::MOTION, Vector2( 150.0f, 10.0f ) ); // Some motion
 
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
-    touchEvent.points[0].state = TouchPoint::Up;
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::UP, Vector2( 150.0f, 10.0f ) ); // Some motion
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -932,25 +934,30 @@ int UtcDaliStageTouchedSignalP(void)
   // Multiple touch. Should only receive a touch on first down and last up.
   {
     Integration::TouchEvent touchEvent;
+    Integration::Point point;
 
     // 1st point
-    touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+    point.SetState( PointState::DOWN );
+    point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+    touchEvent.points.push_back( point );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
     data.Reset();
 
     // 2nd point
-    touchEvent.points[0].state = TouchPoint::Stationary;
-    touchEvent.points.push_back( TouchPoint( 1, TouchPoint::Down, 50.0f, 50.0f ) );
+    touchEvent.points[0].SetState( PointState::STATIONARY );
+    point.SetDeviceId( 1 );
+    point.SetScreenPosition( Vector2( 50.0f, 50.0f ) );
+    touchEvent.points.push_back( point );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 0u, TEST_LOCATION );
     data.Reset();
 
     // Primary point is up
-    touchEvent.points[0].state = TouchPoint::Up;
-    touchEvent.points[1].state = TouchPoint::Stationary;
+    touchEvent.points[0].SetState( PointState::UP );
+    touchEvent.points[1].SetState( PointState::STATIONARY );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 0u, TEST_LOCATION );
@@ -958,15 +965,15 @@ int UtcDaliStageTouchedSignalP(void)
 
     // Remove 1st point now, 2nd point is now in motion
     touchEvent.points.erase( touchEvent.points.begin() );
-    touchEvent.points[0].state = TouchPoint::Motion;
-    touchEvent.points[0].screen.x = 150.0f;
+    touchEvent.points[0].SetState( PointState::MOTION );
+    touchEvent.points[0].SetScreenPosition( Vector2( 150.0f, 50.0f ) );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 0u, TEST_LOCATION );
     data.Reset();
 
     // Final point Up
-    touchEvent.points[0].state = TouchPoint::Up;
+    touchEvent.points[0].SetState( PointState::UP );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
@@ -993,9 +1000,7 @@ int UtcDaliStageTouchedSignalN(void)
 
   // No actors, single touch, down, motion then up.
   {
-    Integration::TouchEvent touchEvent;
-    touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -1003,16 +1008,13 @@ int UtcDaliStageTouchedSignalN(void)
     data.Reset();
 
     // Confirm there is no signal when the touchpoint is only moved.
-    touchEvent.points[0].state = TouchPoint::Motion;
-    touchEvent.points[0].screen.x = 1200.0f; // Some motion
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::MOTION, Vector2( 1200.0f, 10.0f ) ); // Some motion
 
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     // Confirm a following up event generates a signal.
-    touchEvent.points[0].state = TouchPoint::Up;
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::UP, Vector2( 1200.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -1034,9 +1036,7 @@ int UtcDaliStageTouchedSignalN(void)
 
   // Actor on scene. Interrupted before down and interrupted after down.
   {
-    Integration::TouchEvent touchEvent;
-    touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Interrupted, 10.0f, 10.0f ) );
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -1044,8 +1044,7 @@ int UtcDaliStageTouchedSignalN(void)
     DALI_TEST_CHECK( data.receivedTouchEvent.points[0].state == TouchPoint::Interrupted );
     data.Reset();
 
-    touchEvent.points[0].state = TouchPoint::Down;
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
@@ -1053,8 +1052,7 @@ int UtcDaliStageTouchedSignalN(void)
     DALI_TEST_CHECK( data.receivedTouchEvent.points[0].state == TouchPoint::Down );
     data.Reset();
 
-    touchEvent.points[0].state = TouchPoint::Interrupted;
-    application.ProcessEvent( touchEvent );
+    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );

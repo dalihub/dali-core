@@ -27,9 +27,10 @@ namespace Internal
 {
 namespace Render
 {
-class Sampler
+
+struct Sampler
 {
-public:
+
   typedef Dali::FilterMode::Type FilterMode;
   typedef Dali::WrapMode::Type   WrapMode;
 
@@ -37,10 +38,11 @@ public:
    * Constructor
    */
   Sampler()
-  : mMinFilter( Dali::FilterMode::DEFAULT ),
-    mMagFilter( Dali::FilterMode::DEFAULT ),
-    mUWrapMode( Dali::WrapMode::DEFAULT ),
-    mVWrapMode( Dali::WrapMode::DEFAULT )
+  :mMinificationFilter(FilterMode::DEFAULT),
+   mMagnificationFilter(FilterMode::DEFAULT),
+   mSWrapMode(WrapMode::DEFAULT),
+   mTWrapMode(WrapMode::DEFAULT),
+   mRWrapMode(WrapMode::DEFAULT)
   {}
 
   /**
@@ -49,72 +51,21 @@ public:
   ~Sampler()
   {}
 
-  /**
-   * Set the filter modes for minify and magnify filters
-   * @param[in] bufferIndex The buffer index to use
-   * @param[in] minFilter The minify filter
-   * @param[in] magFilter The magnify filter
-   */
-  void SetFilterMode(FilterMode minFilter, FilterMode magFilter )
+
+  union
   {
-    mMinFilter = minFilter;
-    mMagFilter = magFilter;
-  }
+    unsigned int mBitfield;
 
-  /**
-   * @param[in] bufferIndex The buffer index to use
-   */
-  void SetWrapMode(WrapMode uWrap, WrapMode vWrap )
-  {
-    mUWrapMode = uWrap;
-    mVWrapMode = vWrap;
-  }
+    struct
+    {
+      FilterMode  mMinificationFilter   : 4;    ///< The minify filter
+      FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
+      WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
+      WrapMode    mTWrapMode            : 4;    ///< The vertical wrap mode
+      WrapMode    mRWrapMode            : 4;    ///< The vertical wrap mode
+    };
 
-public:
-
-  /**
-   * Get the filter mode
-   * @return The minify filter mode
-   */
-  FilterMode GetMinifyFilterMode() const
-  {
-    return mMinFilter;
-  }
-
-  /**
-   * Get the filter mode
-   * @return The magnify filter mode
-   */
-  FilterMode GetMagnifyFilterMode() const
-  {
-    return mMagFilter;
-  }
-
-  /**
-   * Get the horizontal wrap mode
-   * @return The horizontal wrap mode
-   */
-  WrapMode GetUWrapMode() const
-  {
-    return mUWrapMode;
-  }
-
-  /**
-   * Get the vertical wrap mode
-   * @return The vertical wrap mode
-   */
-  WrapMode GetVWrapMode() const
-  {
-    return mVWrapMode;
-  }
-
-private:
-
-  FilterMode  mMinFilter;    ///< The minify filter
-  FilterMode  mMagFilter;    ///< The magnify filter
-  WrapMode  mUWrapMode;    ///< The horizontal wrap mode
-  WrapMode  mVWrapMode;    ///< The vertical wrap mode
-
+  };
 };
 
 } // namespace Render

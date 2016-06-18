@@ -114,7 +114,7 @@ public:
      *
      * For the following actor tree of the Layer1 object, D and E hide B, B and C hides A,
      * and F hides C, regardless of their Z positions.
-     * Rendering order between siblings, such as D & E or B & C, is not determined.
+     * Rendering order between siblings, such as D & E or B & C, is determined based on the depth index.
      * If you have two overlapped actors, just make them parent-child, not siblings.
      *
      * @code
@@ -148,14 +148,6 @@ public:
      * Unlike LAYER_2D, parent-child relationship does not affect rendering order at all.
      *
      * @SINCE_1_0.0
-     * @remarks This is an experimental feature. Using 2D UI components of DALi Toolkit
-     * in LAYER_3D mode has not been enoughly tested yet
-     * because they are orginally designed for 2D use cases.
-     * Simple controls such as Toolkit::Control or Toolkit::ImageView might not have any problem with LAYER_3D,
-     * but more complex one like Toolkit::PushButton, you might get unexpected rendered order in LAYER_3D.
-     * Although we'll support 2D controls in LAYER_3D soon, we recommend to use 2D controls with LAYER_2D only at this moment.
-     * Of course, controls rendered in 3D space, such as SpiralLayout of Toolkit::ItemView
-     * (see Toolkit::DefaultItemLayout::New), should be used with LAYER_3D.
      */
     LAYER_3D,
   };

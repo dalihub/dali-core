@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -488,16 +488,17 @@ int UtcDaliLayerSetDepthTestDisabled(void)
   tet_infoline("Testing Dali::Layer::SetDepthTestDisabled() ");
 
   Layer actor = Layer::New();
+  // Note that IsDepthTestDisabled does not depend on layer behavior,
+  // as 2D layers can still have depth tests performed on a per-renderer basis.
+  // Check default.
   DALI_TEST_CHECK( actor.IsDepthTestDisabled() );
 
-  actor.SetBehavior( Layer::LAYER_3D );
-
-  Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
-  DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_3D", TEST_LOCATION );
+  // Check Set / Unset.
+  actor.SetDepthTestDisabled( false );
   DALI_TEST_CHECK( !actor.IsDepthTestDisabled() );
-
   actor.SetDepthTestDisabled( true );
   DALI_TEST_CHECK( actor.IsDepthTestDisabled() );
+
   END_TEST;
 }
 

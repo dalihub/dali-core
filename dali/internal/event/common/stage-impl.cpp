@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
@@ -541,9 +542,10 @@ void Stage::EmitEventProcessingFinishedSignal()
    mEventProcessingFinishedSignal.Emit();
 }
 
-void Stage::EmitTouchedSignal( const TouchEvent& touch )
+void Stage::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch )
 {
-  mTouchedSignal.Emit( touch );
+  mTouchedSignal.Emit( touchEvent );
+  mTouchSignal.Emit( touch );
 }
 
 void Stage::EmitWheelEventSignal(const WheelEvent& event)
@@ -570,7 +572,13 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
 
 Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
 {
+  DALI_LOG_WARNING( "Deprecated. Use TouchSignal() instead." );
   return mTouchedSignal;
+}
+
+Dali::Stage::TouchSignalType& Stage::TouchSignal()
+{
+  return mTouchSignal;
 }
 
 Dali::Stage::WheelEventSignalType& Stage::WheelEventSignal()

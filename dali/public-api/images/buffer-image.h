@@ -40,25 +40,9 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SIN
 
 
 /**
- * @brief BufferImage represents an image resource that can be added to ImageViews.
+ * @brief BufferImage represents an image resource as a pixel data buffer.
  *
  * Its pixel buffer data is provided by the application developer.
- *
- * Care should be taken with pixel data allocated by the application,
- * as the data is copied to GL both when the image is added to the
- * stage and after a call to Update().  In both of these cases, a
- * Image::UploadedSignal will be sent to the application confirming that the
- * operation has completed.
- *
- * The application can free the pixel data after receiving a
- * Image::UploadedSignal.
- *
- * Similarly, once the image is on stage (i.e. it's being used by an
- * ImageView that is on stage), the application should only write to
- * the buffer after receiving a Image::UploadedSignal, then call Update()
- * once the write is finished. This avoids the pixel data being changed
- * whilst it's being copied to GL. Writing to the buffer without waiting
- * for the signal will likely result in visible tearing.
  *
  * If the pixel format of the pixel buffer contains an alpha channel,
  * then the image is considered to be have transparent pixels without

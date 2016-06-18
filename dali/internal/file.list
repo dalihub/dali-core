@@ -35,6 +35,7 @@ internal_src_files = \
   $(internal_src_dir)/event/common/property-conditions-impl.cpp  \
   $(internal_src_dir)/event/common/property-notification-impl.cpp  \
   $(internal_src_dir)/event/common/property-notification-manager.cpp \
+  $(internal_src_dir)/event/common/property-helper.cpp \
   $(internal_src_dir)/event/common/stage-impl.cpp \
   $(internal_src_dir)/event/common/system-overlay-impl.cpp \
   $(internal_src_dir)/event/common/thread-local-storage.cpp \
@@ -61,6 +62,7 @@ internal_src_files = \
   $(internal_src_dir)/event/events/pinch-gesture-processor.cpp \
   $(internal_src_dir)/event/events/tap-gesture-detector-impl.cpp \
   $(internal_src_dir)/event/events/tap-gesture-processor.cpp \
+  $(internal_src_dir)/event/events/touch-data-impl.cpp \
   $(internal_src_dir)/event/events/touch-event-processor.cpp \
   $(internal_src_dir)/event/images/atlas-impl.cpp \
   $(internal_src_dir)/event/images/bitmap-packed-pixel.cpp \
@@ -75,10 +77,13 @@ internal_src_files = \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/images/resource-image-impl.cpp \
   $(internal_src_dir)/event/images/native-image-impl.cpp \
+  $(internal_src_dir)/event/images/pixel-data-impl.cpp \
   $(internal_src_dir)/event/object/custom-object-internal.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \
+  $(internal_src_dir)/event/rendering/frame-buffer-impl.cpp \
   $(internal_src_dir)/event/rendering/geometry-impl.cpp \
+  $(internal_src_dir)/event/rendering/texture-impl.cpp \
   $(internal_src_dir)/event/rendering/texture-set-impl.cpp \
   $(internal_src_dir)/event/rendering/renderer-impl.cpp \
   $(internal_src_dir)/event/rendering/sampler-impl.cpp \
@@ -108,13 +113,15 @@ internal_src_files = \
   $(internal_src_dir)/render/gl-resources/gl-call-debug.cpp \
   $(internal_src_dir)/render/gl-resources/gpu-buffer.cpp \
   $(internal_src_dir)/render/gl-resources/native-texture.cpp \
-  $(internal_src_dir)/render/gl-resources/texture.cpp \
+  $(internal_src_dir)/render/gl-resources/gl-texture.cpp \
   $(internal_src_dir)/render/gl-resources/texture-factory.cpp \
   $(internal_src_dir)/render/gl-resources/texture-cache.cpp \
   $(internal_src_dir)/render/queue/render-queue.cpp \
+  $(internal_src_dir)/render/renderers/render-frame-buffer.cpp \
   $(internal_src_dir)/render/renderers/render-geometry.cpp \
   $(internal_src_dir)/render/renderers/render-property-buffer.cpp \
   $(internal_src_dir)/render/renderers/render-renderer.cpp \
+  $(internal_src_dir)/render/renderers/render-texture.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
   $(internal_src_dir)/render/shaders/program-controller.cpp \

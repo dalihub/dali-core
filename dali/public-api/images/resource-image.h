@@ -42,34 +42,15 @@ class ResourceImage;
 /**
  * @brief ResourceImage is an image loaded using a URL
  *
- * <h3>ResourceImage Loading</h3>
- *
- * When the ResourceImage is created, resource loading will be attempted unless
- * the ResourceImage is created with ResourceImage::IMMEDIATE loading policy or a compatible resource is found in cache.
- * In case of loading images ResourceImage::ON_DEMAND, resource loading will only be attempted if the associated Dali::Toolkit::ImageView
- * is put on Stage.
- * Scaling of images to a desired smaller size can be requested by providing desired dimensions,
- * scaling mode and filter mode to to ResourceImage::New().
- *
- * <i>Custom load requests</i>
+ * <i>Customizing load requests</i>
  *
  * Size, scaling mode, filter mode, and orientation compensation can be set when requesting an image.
- *
- * <i>Compatible resources</i>
- *
- * Before loading a new ResourceImage the internal image resource cache is checked by DALi.
- * If there is an image already loaded in memory and is deemed "compatible" with the requested image,
- * that resource is reused.
- * This happens for example if a loaded image exists with the same URL, scaling and filtering modes,
- * and the difference between both of the dimensions is less than a few pixels.
  *
  * <i>Reloading images</i>
  *
  * The same request used on creating the ResourceImage is re-issued when reloading images.
  * If the file changed since the last load operation, this might result in a different resource.
- * Reload only takes effect if both of these conditions apply:
- * - The ResourceImage has already finished loading
- * - The ResourceImage is either on Stage or using ResourceImage::IMMEDIATE load policy
+ * Reload only takes effect if the ResourceImage has already finished loading.
  *
  * Signals
  * | %Signal Name         | Method                       |
@@ -80,9 +61,6 @@ class ResourceImage;
 class DALI_IMPORT_API ResourceImage : public Image
 {
 public:
-  /**
-   * @brief Resource management options.
-   */
 
   /**
    * @DEPRECATED_1_1.3. Image loading starts immediately in the frame when then ResourceImage object is created.

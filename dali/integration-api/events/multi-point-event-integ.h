@@ -21,13 +21,17 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/integration-api/events/point.h>
 
 namespace Dali DALI_IMPORT_API
 {
 
 namespace Integration
 {
+
+typedef std::vector< Point > PointContainer; ///< Container of points
+typedef PointContainer::iterator PointContainerIterator; ///< Iterator for Dali::Integration::PointContainer
+typedef PointContainer::const_iterator PointContainerConstIterator; ///< Const iterator for Dali::Integration::PointContainer
 
 /**
  * An instance of this structure should be used by the adaptor to send a multi-point event to Dali core.
@@ -58,38 +62,42 @@ protected:
   MultiPointEvent(Type eventType, unsigned long time);
 
 public:
+
   // Data
 
   /**
-   * @copydoc Dali::MultiPointEvent::points
+   * @brief A series of points
    */
-  std::vector<TouchPoint> points;
+  PointContainer points;
 
   /**
-   * @copydoc Dali::MultiPointEvent::time
+   * @brief The time
    */
   unsigned long time;
 
   // Convenience Methods
 
   /**
-   * Adds a point to the MultiPointEvent.
+   * @brief Adds a point to the MultiPointEvent.
    * @param[in]  point  The point to add.
    */
-  void AddPoint(const TouchPoint& point);
+  void AddPoint( const Point& point );
 
   /**
-   * @copydoc Dali::MultiPointEvent::GetPoint()
+   * @brief Retrieves the Point at position point.
+   * @return The Point at position point.
    */
-  TouchPoint& GetPoint(unsigned int point);
+  Point& GetPoint( unsigned int point );
 
   /**
-   * @copydoc Dali::MultiPointEvent::GetPoint()
+   * @brief Retrieves a const ref of the Point at position point.
+   * @return The const ref of the Point at position point.
    */
-  const TouchPoint& GetPoint(unsigned int point) const;
+  const Point& GetPoint( unsigned int point ) const;
 
   /**
-   * @copydoc Dali::MultiPointEvent::GetPointCount() const
+   * @brief The total number of Points in this TouchEvent.
+   * @return The point count.
    */
   unsigned int GetPointCount() const;
 };

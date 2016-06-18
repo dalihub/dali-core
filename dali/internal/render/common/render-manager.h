@@ -25,6 +25,7 @@
 #include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {
@@ -46,10 +47,12 @@ class ShaderSaver;
 
 namespace Render
 {
+class FrameBuffer;
 class Renderer;
-class Sampler;
+struct Sampler;
 class RenderTracker;
 class Geometry;
+class NewTexture;
 }
 
 namespace SceneGraph
@@ -184,10 +187,11 @@ public:
 
   /**
    * Set wrapping mode for a sampler
+   * @param[in] rWrapMode Wrap mode in the z direction
    * @param[in] uWrapMode Wrap mode in the x direction
    * @param[in] vWrapMode Wrap mode in the y direction
    */
-  void SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode );
+  void SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode );
 
   /**
    * Add a property buffer to the render manager.
@@ -260,6 +264,53 @@ public:
    * @param[in] geometryType The new geometry type
    */
   void SetGeometryType( Render::Geometry* geometry, unsigned int geometryType );
+
+  /**
+   * Adds a texture to the render manager
+   * @param[in] texture The texture to add
+   */
+  void AddTexture( Render::NewTexture* texture );
+
+  /**
+   * Removes a texture from the render manager
+   * @param[in] texture The texture to remove
+   */
+  void RemoveTexture( Render::NewTexture* texture );
+
+  /**
+   * Uploads data to an existing texture
+   * @param[in] texture The texture
+   * @param[in] buffer Vector with the data to be uploaded
+   * @param[in] params The parameters for the upload
+   */
+  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params );
+
+  /**
+   * Generates mipmaps for a given texture
+   * @param[in] texture The texture
+   */
+  void GenerateMipmaps( Render::NewTexture* texture );
+
+  /**
+   * Adds a framebuffer to the render manager
+   * @param[in] frameBuffer The framebuffer to add
+   */
+  void AddFrameBuffer( Render::FrameBuffer* frameBuffer );
+
+  /**
+   * Removes a framebuffer from the render manager
+   * @param[in] frameBuffer The framebuffer to remove
+   */
+  void RemoveFrameBuffer( Render::FrameBuffer* frameBuffer );
+
+  /**
+   * Attach a texture as color output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
+   */
+  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

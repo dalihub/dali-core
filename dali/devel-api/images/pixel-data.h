@@ -19,21 +19,23 @@
  */
 
 #include <dali/public-api/images/pixel.h>
-#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
 
+namespace Internal
+{
 class PixelData;
-typedef IntrusivePtr<PixelData> PixelDataPtr;
+}
 
 /**
- * @brief Reference counted pixel data .
+ * @brief The PixelData object holds a pixel buffer .
  *
  * The PixelData takes over the ownership of the pixel buffer.
  * The buffer memory must NOT be released outside of this class, instead, the PixelData object will release it automatically when the reference count falls to zero.
  */
-class DALI_IMPORT_API PixelData : public RefObject
+class DALI_IMPORT_API PixelData : public BaseHandle
 {
 public:
 
@@ -52,11 +54,38 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
-  static PixelDataPtr New( unsigned char* buffer,
-                           unsigned int width,
-                           unsigned int height,
-                           Pixel::Format pixelFormat,
-                           ReleaseFunction releaseFunction);
+  static PixelData New( unsigned char* buffer,
+                        unsigned int width,
+                        unsigned int height,
+                        Pixel::Format pixelFormat,
+                        ReleaseFunction releaseFunction);
+
+  /**
+   * @brief Create an empty handle.
+   *
+   * Use PixelData::New() to create an initialized object.
+   */
+  PixelData();
+
+  /**
+   * Destructor
+   */
+  ~PixelData();
+
+  /**
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param [in] handle A reference to the copied handle
+   */
+  PixelData(const PixelData& handle);
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
+   */
+  PixelData& operator=(const PixelData& rhs);
 
   /**
    * Get the width of the buffer in pixels.
@@ -76,56 +105,9 @@ public:
    */
   Pixel::Format GetPixelFormat() const;
 
-  /**
-   * Get the pixel buffer if it's present.
-   * @return The buffer if exits, or NULL if there is no pixel buffer.
-   */
-  unsigned char* GetBuffer() const;
+public: // Not intended for application developers
 
-public:
-
-  /**
-   * @brief Constructor.
-   *
-   * @param [in] buffer           The raw pixel data.
-   * @param [in] width            Buffer width in pixels
-   * @param [in] height           Buffer height in pixels
-   * @param [in] pixelFormat      The pixel format
-   * @param [in] releaseFunction  The function used to release the memory.
-   */
-  PixelData( unsigned char* buffer,
-             unsigned int width,
-             unsigned int height,
-             Pixel::Format pixelFormat,
-             ReleaseFunction releaseFunction );
-
-  /**
-   * @brief Destructor.
-   *
-   * Release the pixel buffer if exists.
-   */
-  ~PixelData();
-
-
-private:
-
-  /*
-   * Undefined copy constructor.
-   */
-  PixelData(const PixelData& other);
-
-  /*
-   * Undefined assignment operator.
-   */
-  PixelData& operator = (const PixelData& other);
-
-private:
-
-  unsigned char* mBuffer;           ///< The raw pixel data.
-  unsigned int   mWidth;            ///< Buffer width in pixels.
-  unsigned int   mHeight;           ///< Buffer height in pixels.
-  Pixel::Format  mPixelFormat;      ///< Pixel format
-  ReleaseFunction mReleaseFunction;  ///< Function for releasing memory
+  explicit DALI_INTERNAL PixelData( Internal::PixelData* );
 };
 
 

@@ -26,12 +26,17 @@ namespace Dali
 
 namespace
 {
-typedef std::vector< StringValuePair > Container;
+typedef std::vector< StringValuePair > StringValueContainer;
+
+typedef std::pair< Property::Index, Property::Value > IndexValuePair;
+typedef std::vector< IndexValuePair > IndexValueContainer;
+
 }; // unnamed namespace
 
 struct Property::Map::Impl
 {
-  Container mContainer;
+  StringValueContainer mStringValueContainer;
+  IndexValueContainer mIndexValueContainer;
 };
 
 Property::Map::Map()
@@ -42,7 +47,8 @@ Property::Map::Map()
 Property::Map::Map( const Property::Map& other )
 : mImpl( new Impl )
 {
-  mImpl->mContainer = other.mImpl->mContainer;
+  mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
+  mImpl->mIndexValueContainer = other.mImpl->mIndexValueContainer;
 }
 
 Property::Map::~Map()
@@ -52,48 +58,53 @@ Property::Map::~Map()
 
 Property::Map::SizeType Property::Map::Count() const
 {
-  return mImpl->mContainer.size();
+  return mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size();
 }
 
 bool Property::Map::Empty() const
 {
-  return mImpl->mContainer.empty();
+  return mImpl->mStringValueContainer.empty() && mImpl->mIndexValueContainer.empty();
 }
 
 void Property::Map::Insert( const char* key, const Value& value )
 {
-  mImpl->mContainer.push_back( std::make_pair( key, value ) );
+  mImpl->mStringValueContainer.push_back( std::make_pair( key, value ) );
 }
 
 void Property::Map::Insert( const std::string& key, const Value& value )
 {
-  mImpl->mContainer.push_back( std::make_pair( key, value ) );
+  mImpl->mStringValueContainer.push_back( std::make_pair( key, value ) );
+}
+
+void Property::Map::Insert( Property::Index key, const Value& value )
+{
+  mImpl->mIndexValueContainer.push_back( std::make_pair( key, value ) );
 }
 
 Property::Value& Property::Map::GetValue( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
+  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
 
-  return mImpl->mContainer[ position ].second;
+  return mImpl->mStringValueContainer[ position ].second;
 }
 
 const std::string& Property::Map::GetKey( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
+  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
 
-  return mImpl->mContainer[ position ].first;
+  return mImpl->mStringValueContainer[ position ].first;
 }
 
 StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
+  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
 
-  return mImpl->mContainer[ position ];
+  return mImpl->mStringValueContainer[ position ];
 }
 
 Property::Value* Property::Map::Find( const char* key ) const
 {
-  for ( Container::iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
+  for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
     {
@@ -106,14 +117,36 @@ Property::Value* Property::Map::Find( const char* key ) const
 Property::Value* Property::Map::Find( const std::string& key ) const
 {
   return Find( key.c_str() );
+}
 
+Property::Value* Property::Map::Find( Property::Index key ) const
+{
+  for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+  {
+    if ( iter->first == key )
+    {
+      return &iter->second;
+    }
+  }
+  return NULL; // Not found
 }
 
 Property::Value* Property::Map::Find( const std::string& key, Property::Type type ) const
 {
-  for ( Container::iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
+  for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
-    // test type first to shortcut eval (possibly reducing string compares)
+    if( (iter->second.GetType() == type) && (iter->first == key) )
+    {
+      return &iter->second;
+    }
+  }
+  return NULL; // Not found
+}
+
+Property::Value* Property::Map::Find( Property::Index key, Property::Type type ) const
+{
+  for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+  {
     if( (iter->second.GetType() == type) && (iter->first == key) )
     {
       return &iter->second;
@@ -124,7 +157,8 @@ Property::Value* Property::Map::Find( const std::string& key, Property::Type typ
 
 void Property::Map::Clear()
 {
-  mImpl->mContainer.clear();
+  mImpl->mStringValueContainer.clear();
+  mImpl->mIndexValueContainer.clear();
 }
 
 void Property::Map::Merge( const Property::Map& from )
@@ -134,10 +168,14 @@ void Property::Map::Merge( const Property::Map& from )
   {
     if ( Count() )
     {
-      for ( unsigned int i = 0, count = from.Count(); i < count; ++i )
+      for ( StringValueContainer::const_iterator iter = from.mImpl->mStringValueContainer.begin(), endIter = from.mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
       {
-        StringValuePair& pair( from.GetPair( i ) );
-        (*this)[ pair.first ] = pair.second;
+        (*this)[iter->first] = iter->second;
+      }
+
+      for ( IndexValueContainer::const_iterator iter = from.mImpl->mIndexValueContainer.begin(), endIter = from.mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+      {
+        (*this)[iter->first] = iter->second;
       }
     }
     else
@@ -150,7 +188,7 @@ void Property::Map::Merge( const Property::Map& from )
 
 const Property::Value& Property::Map::operator[]( const std::string& key ) const
 {
-  for ( Container::const_iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
+  for ( StringValueContainer::const_iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
     {
@@ -163,7 +201,7 @@ const Property::Value& Property::Map::operator[]( const std::string& key ) const
 
 Property::Value& Property::Map::operator[]( const std::string& key )
 {
-  for ( Container::iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
+  for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
     {
@@ -172,8 +210,36 @@ Property::Value& Property::Map::operator[]( const std::string& key )
   }
 
   // Create and return reference to new value
-  mImpl->mContainer.push_back( std::make_pair( key, Property::Value() ) );
-  return (mImpl->mContainer.end() - 1)->second;
+  mImpl->mStringValueContainer.push_back( std::make_pair( key, Property::Value() ) );
+  return (mImpl->mStringValueContainer.end() - 1)->second;
+}
+
+const Property::Value& Property::Map::operator[]( Property::Index key ) const
+{
+  for ( IndexValueContainer::const_iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+  {
+    if ( iter->first == key )
+    {
+      return iter->second;
+    }
+  }
+
+  DALI_ASSERT_ALWAYS( ! "Invalid Key" );
+}
+
+Property::Value& Property::Map::operator[]( Property::Index key )
+{
+  for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+  {
+    if ( iter->first == key )
+    {
+      return iter->second;
+    }
+  }
+
+  // Create and return reference to new value
+  mImpl->mIndexValueContainer.push_back( std::make_pair( key, Property::Value() ) );
+  return (mImpl->mIndexValueContainer.end() - 1)->second;
 }
 
 Property::Map& Property::Map::operator=( const Property::Map& other )
@@ -182,7 +248,8 @@ Property::Map& Property::Map::operator=( const Property::Map& other )
   {
     delete mImpl;
     mImpl = new Impl;
-    mImpl->mContainer = other.mImpl->mContainer;
+    mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
+    mImpl->mIndexValueContainer = other.mImpl->mIndexValueContainer;
   }
   return *this;
 }
@@ -190,14 +257,28 @@ Property::Map& Property::Map::operator=( const Property::Map& other )
 std::ostream& operator<<( std::ostream& stream, const Property::Map& map )
 {
   stream << "Map(" << map.Count() << ") = {";
-  for( unsigned int i=0; i<map.Count(); ++i )
+
+  int count = 0;
+  // Output the String-Value pairs
+  for ( StringValueContainer::iterator iter = map.mImpl->mStringValueContainer.begin(), endIter = map.mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
-    if( i>0 )
+    if( count++ > 0 )
     {
-      stream << ", ";
+      stream<<", ";
     }
-    stream << map.GetKey(i) << ":" << map.GetValue( i );
+    stream<< iter->first << ":"<<iter->second;
   }
+
+  // Output the Index-Value pairs
+  for ( IndexValueContainer::iterator iter = map.mImpl->mIndexValueContainer.begin(), endIter = map.mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
+  {
+    if( count++ > 0 )
+    {
+      stream<<", ";
+    }
+    stream<< iter->first << ":"<<iter->second;
+  }
+
   stream << "}";
 
   return stream;

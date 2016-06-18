@@ -12,9 +12,11 @@ SET(TC_SOURCES
         utc-Dali-Context.cpp
         utc-Dali-Constrainer.cpp
         utc-Dali-DistanceField.cpp
+        utc-Dali-FrameBuffer.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
+        utc-Dali-Texture.cpp
         utc-Dali-TextureSet.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-PixelData.cpp

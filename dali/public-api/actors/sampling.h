@@ -36,10 +36,64 @@ namespace FilterMode
  */
 enum Type
 {
-  NONE = 0,   ///< Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR) @SINCE_1_0.0
-  DEFAULT,    ///< Use Dali defaults (minification LINEAR, magnification LINEAR) @SINCE_1_0.0
-  NEAREST,    ///< Filter nearest @SINCE_1_0.0
-  LINEAR      ///< Filter linear @SINCE_1_0.0
+  /**
+   * @brief Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR)
+   * @SINCE_1_0.0
+   */
+  NONE = 0,
+
+  /**
+   * @brief Use Dali defaults (minification LINEAR, magnification LINEAR)
+   *  @SINCE_1_0.0
+   */
+  DEFAULT,
+
+  /**
+   * @brief Filter nearest
+   * @SINCE_1_0.0
+   */
+  NEAREST,
+
+  /**
+   * @brief Filter linear
+   * @SINCE_1_0.0
+   */
+  LINEAR,
+
+  /**
+   * @brief Chooses the mipmap that most closely matches the size of the pixel being
+   * textured and uses the GL_NEAREST criterion (the texture element closest to
+   * the specified texture coordinates) to produce a texture value.
+   * @SINCE_1_1.38
+   */
+  NEAREST_MIPMAP_NEAREST,
+
+  /**
+   * @brief Chooses the mipmap that most closely matches the size of the pixel being textured
+   * and uses the GL_LINEAR criterion (a weighted average of the four texture elements
+   * that are closest to the specified texture coordinates) to produce a texture value.
+   * @SINCE_1_1.38
+   */
+  LINEAR_MIPMAP_NEAREST,
+
+  /**
+   * @brief Chooses the two mipmaps that most closely match the size of the pixel being textured
+   * and uses the GL_NEAREST criterion (the texture element closest to the specified texture
+   * coordinates ) to produce a texture value from each mipmap. The final texture value is a
+   * weighted average of those two values.
+   * @SINCE_1_1.38
+   */
+  NEAREST_MIPMAP_LINEAR,
+
+  /**
+   * @brief Chooses the two mipmaps that most closely match the size of the pixel being textured and
+   * uses the GL_LINEAR criterion (a weighted average of the texture elements that are closest
+   * to the specified texture coordinates) to produce a texture value from each mipmap. The final
+   * texture value is a weighted average of those two values.
+   * @SINCE_1_1.38
+   */
+  LINEAR_MIPMAP_LINEAR
+
 };
 
 } //namespace FilterMode

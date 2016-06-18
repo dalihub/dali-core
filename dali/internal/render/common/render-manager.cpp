@@ -36,6 +36,7 @@
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
@@ -58,6 +59,12 @@ typedef GeometryOwnerContainer::Iterator       GeometryOwnerIter;
 
 typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
 typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
+
+typedef OwnerContainer< Render::NewTexture* >   TextureOwnerContainer;
+typedef TextureOwnerContainer::Iterator         TextureOwnerIter;
+
+typedef OwnerContainer< Render::FrameBuffer* >  FrameBufferOwnerContainer;
+typedef FrameBufferOwnerContainer::Iterator     FrameBufferOwnerIter;
 
 typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
 typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
@@ -87,6 +94,8 @@ struct RenderManager::Impl
     defaultSurfaceRect(),
     rendererContainer(),
     samplerContainer(),
+    textureContainer(),
+    frameBufferContainer(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
@@ -147,6 +156,8 @@ struct RenderManager::Impl
 
   RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
   SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
+  TextureOwnerContainer         textureContainer;         ///< List of owned textures
+  FrameBufferOwnerContainer     frameBufferContainer;     ///< List of owned framebuffers
   PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
   GeometryOwnerContainer        geometryContainer;        ///< List of owned Geometries
 
@@ -175,6 +186,16 @@ RenderManager::RenderManager()
 
 RenderManager::~RenderManager()
 {
+  for ( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
+  {
+    (*iter)->Destroy( mImpl->context );
+  }
+
+  for ( FrameBufferOwnerIter iter = mImpl->frameBufferContainer.Begin(); iter != mImpl->frameBufferContainer.End(); ++iter )
+  {
+    (*iter)->Destroy( mImpl->context );
+  }
+
   delete mImpl;
 }
 
@@ -292,14 +313,80 @@ void RenderManager::RemoveSampler( Render::Sampler* sampler )
   }
 }
 
-void RenderManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+void RenderManager::AddTexture( Render::NewTexture* texture )
 {
-  sampler->SetFilterMode( (Dali::FilterMode::Type)minFilterMode, (Dali::FilterMode::Type)magFilterMode );
+  mImpl->textureContainer.PushBack( texture );
+  texture->Initialize(mImpl->context);
 }
 
-void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int uWrapMode, unsigned int vWrapMode )
+void RenderManager::RemoveTexture( Render::NewTexture* texture )
 {
-  sampler->SetWrapMode( (Dali::WrapMode::Type)uWrapMode, (Dali::WrapMode::Type)vWrapMode );
+  DALI_ASSERT_DEBUG( NULL != texture );
+
+  TextureOwnerContainer& textures = mImpl->textureContainer;
+
+  // Find the texture
+  for ( TextureOwnerIter iter = textures.Begin(); iter != textures.End(); ++iter )
+  {
+    if ( *iter == texture )
+    {
+      texture->Destroy( mImpl->context );
+      textures.Erase( iter ); // Texture found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
+{
+  texture->Upload( mImpl->context, buffer, params );
+}
+
+void RenderManager::GenerateMipmaps( Render::NewTexture* texture )
+{
+  texture->GenerateMipmaps( mImpl->context );
+}
+
+void RenderManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+{
+  sampler->mMinificationFilter = static_cast<Dali::FilterMode::Type>(minFilterMode);
+  sampler->mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode );
+}
+
+void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
+{
+  sampler->mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
+  sampler->mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
+  sampler->mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
+}
+
+void RenderManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
+{
+  mImpl->frameBufferContainer.PushBack( frameBuffer );
+  frameBuffer->Initialize(mImpl->context);
+}
+
+void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
+{
+  DALI_ASSERT_DEBUG( NULL != frameBuffer );
+
+  FrameBufferOwnerContainer& framebuffers = mImpl->frameBufferContainer;
+
+  // Find the sampler
+  for ( FrameBufferOwnerIter iter = framebuffers.Begin(); iter != framebuffers.End(); ++iter )
+  {
+    if ( *iter == frameBuffer )
+    {
+      frameBuffer->Destroy( mImpl->context );
+      framebuffers.Erase( iter ); // frameBuffer found; now destroy it
+      break;
+    }
+  }
+}
+
+void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+{
+  frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
 void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
@@ -427,8 +514,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Core::Render documents that GL context must be current before calling Render
   DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
 
-  status.SetHasRendered( false );
-
   // Increment the frame count at the beginning of each frame
   ++(mImpl->frameCount);
 
@@ -476,12 +561,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
         RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
         DoRender( instruction, *mImpl->defaultShader );
-
-        const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
-        if ( countRenderList > 0 )
-        {
-          status.SetHasRendered( true );
-        }
       }
       GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
       mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
@@ -551,6 +630,20 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
     {
       // Offscreen is NULL or could not be prepared.
       return;
+    }
+  }
+  else if( instruction.mFrameBuffer != 0 )
+  {
+    instruction.mFrameBuffer->Bind( mImpl->context );
+    if ( instruction.mIsViewportSet )
+    {
+      // For glViewport the lower-left corner is (0,0)
+      const int y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
+      viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
+    }
+    else
+    {
+      viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
     }
   }
   else // !(instruction.mOffscreenTexture)

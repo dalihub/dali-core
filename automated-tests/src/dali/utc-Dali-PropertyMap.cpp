@@ -39,12 +39,16 @@ int UtcDaliPropertyMapPopulate(void)
   DALI_TEST_CHECK( map.Empty() );
 
   map[ "hello" ] = 1;
+  map[ 10 ] = "DALi";
   map[ "world" ] = "world";
+  map[ 100 ] = 9;
   map[ "world" ] = 3; // same item as line above
   DALI_TEST_CHECK( !map.Empty() ); // Should no longer be empty
-  DALI_TEST_CHECK( map.Count() == 2 ); // Should only have two items, not three!!
+  DALI_TEST_CHECK( map.Count() == 4 ); // Should only have four items, not five!!
   DALI_TEST_CHECK( map["hello"].Get<int>() == 1 );
   DALI_TEST_CHECK( map["world"].Get<int>() == 3 );
+  DALI_TEST_EQUALS( "DALi", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( map[100].Get<int>() == 9 );
 
   map.Clear();
   DALI_TEST_CHECK( map.Empty() );
@@ -56,20 +60,22 @@ int UtcDaliPropertyMapCopyAndAssignment(void)
   Property::Map map;
   map[ "hello" ] = 1;
   map[ "world" ] = 2;
+  map[ 10 ] = "DALi";
 
   Property::Map assignedMap;
   assignedMap[ "foo" ] = 3;
-  DALI_TEST_CHECK( assignedMap.Count() == 1 );
-  assignedMap = map;
+  assignedMap[ 100 ] = 9;
   DALI_TEST_CHECK( assignedMap.Count() == 2 );
+  assignedMap = map;
+  DALI_TEST_CHECK( assignedMap.Count() == 3 );
 
   Property::Map copiedMap( map );
-  DALI_TEST_CHECK( copiedMap.Count() == 2 );
+  DALI_TEST_CHECK( copiedMap.Count() == 3 );
 
   // Self assignment
-  DALI_TEST_CHECK( map.Count() == 2 );
+  DALI_TEST_CHECK( map.Count() == 3 );
   map = map;
-  DALI_TEST_CHECK( map.Count() == 2 );
+  DALI_TEST_CHECK( map.Count() == 3 );
 
   END_TEST;
 }
@@ -78,12 +84,16 @@ int UtcDaliPropertyMapConstOperator(void)
 {
   Property::Map map;
   map[ "hello" ] = 1;
+  map[ 10 ] = "DALi";
   map[ "world" ] = 2;
-  DALI_TEST_CHECK( map.Count() == 2 );
+  DALI_TEST_CHECK( map.Count() == 3 );
 
   const Property::Map& constMap( map );
   DALI_TEST_CHECK( constMap[ "world" ].Get<int>() == 2 );
-  DALI_TEST_CHECK( constMap.Count() == 2 ); // Ensure count hasn't gone up
+  DALI_TEST_CHECK( constMap.Count() == 3 ); // Ensure count hasn't gone up
+
+  DALI_TEST_EQUALS( "DALi", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( constMap.Count() == 3 ); // Ensure count hasn't gone up
 
   // Invalid Key
   try
@@ -99,6 +109,7 @@ int UtcDaliPropertyMapConstOperator(void)
   END_TEST;
 }
 
+// deprecated API, only retrieve the value from string-value pairs
 int UtcDaliPropertyMapGetValue(void)
 {
   Property::Map map;
@@ -124,6 +135,7 @@ int UtcDaliPropertyMapGetValue(void)
   END_TEST;
 }
 
+// deprecated API, only retrieve the key from the string-value pairs
 int UtcDaliPropertyMapGetKey(void)
 {
   Property::Map map;
@@ -147,6 +159,7 @@ int UtcDaliPropertyMapGetKey(void)
   END_TEST;
 }
 
+// deprecated API, only retrieve the string-value pairs
 int UtcDaliPropertyMapGetPair(void)
 {
   Property::Map map;
@@ -176,7 +189,9 @@ int UtcDaliPropertyMapFind(void)
 {
   Property::Map map;
   map[ "hello" ] = 1;
+  map[ 10 ] = "DALi";
   map[ "world" ] = 2;
+  map[ 100 ] = 9;
 
   Property::Value* value = NULL;
 
@@ -187,6 +202,14 @@ int UtcDaliPropertyMapFind(void)
   value = map.Find( "world" );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 2 );
+
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
 
   value = map.Find( "invalidKey" );
   DALI_TEST_CHECK( !value );
@@ -203,11 +226,24 @@ int UtcDaliPropertyMapInsertP(void)
   Property::Value* value = map.Find( "foo" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
   map.Insert( std::string("foo2"), "testing" );
   DALI_TEST_EQUALS( 2u, map.Count(), TEST_LOCATION );
   value = map.Find( "foo2" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Insert( 10, "DALi" );
+  DALI_TEST_EQUALS( 3u, map.Count(), TEST_LOCATION );
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Insert( 100, 9 );
+  DALI_TEST_EQUALS( 4u, map.Count(), TEST_LOCATION );
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
 
   END_TEST;
 }
@@ -216,60 +252,67 @@ int UtcDaliPropertyMapMerge(void)
 {
   Property::Map map;
   map[ "hello" ] = 1;
+  map[ 10 ] = "DALi";
   map[ "world" ] = 2;
 
-  DALI_TEST_CHECK( map.Count() == 2 );
+  DALI_TEST_CHECK( map.Count() == 3 );
 
   // Create another map with the same keys but different values
   Property::Map map2;
-  map[ "hello" ] = 3;
-  map[ "world" ] = 4;
+  map2[ "hello" ] = 3;
+  map2[ "world" ] = 4;
+  map[ 10 ] = "3DEngine";
 
   // Merge map2 into map1, count should still be 2, map values should be from map2
   map.Merge( map2 );
-  DALI_TEST_CHECK( map.Count() == 2 );
+  DALI_TEST_CHECK( map.Count() == 3 );
   DALI_TEST_CHECK( map[ "hello" ].Get< int >() == 3 );
   DALI_TEST_CHECK( map[ "world"].Get< int >() == 4 );
+  DALI_TEST_EQUALS( "3DEngine", map[ 10 ].Get<std::string>(), TEST_LOCATION );
 
   // Create another map with different keys
   Property::Map map3;
   map3[ "foo" ] = 5;
-  map3[ "bar" ] = 6;
+  map3[ 100 ] = 6;
 
   // Merge map3 into map1, count should increase, existing values should match previous and new values should match map3
   map.Merge( map3 );
-  DALI_TEST_CHECK( map.Count() == 4 );
+  DALI_TEST_CHECK( map.Count() == 5 );
   DALI_TEST_CHECK( map[ "hello" ].Get< int >() == 3 );
   DALI_TEST_CHECK( map[ "world"].Get< int >() == 4 );
   DALI_TEST_CHECK( map[ "foo"].Get< int >() == 5 );
-  DALI_TEST_CHECK( map[ "bar"].Get< int >() == 6 );
+  DALI_TEST_EQUALS( "3DEngine", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( map[ 100].Get< int >() == 6 );
 
   // Create an empty map and attempt to merge, should be successful, nothing should change
   Property::Map map4;
   DALI_TEST_CHECK( map4.Empty() );
   map.Merge( map4 );
   DALI_TEST_CHECK( map4.Empty() );
-  DALI_TEST_CHECK( map.Count() == 4 );
+  DALI_TEST_CHECK( map.Count() == 5 );
   DALI_TEST_CHECK( map[ "hello" ].Get< int >() == 3 );
   DALI_TEST_CHECK( map[ "world"].Get< int >() == 4 );
   DALI_TEST_CHECK( map[ "foo"].Get< int >() == 5 );
-  DALI_TEST_CHECK( map[ "bar"].Get< int >() == 6 );
+  DALI_TEST_EQUALS( "3DEngine", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( map[ 100 ].Get< int >() == 6 );
 
   // Merge map into map4, map4 should be the same as map now.
   map4.Merge( map );
-  DALI_TEST_CHECK( map4.Count() == 4 );
+  DALI_TEST_CHECK( map4.Count() == 5 );
   DALI_TEST_CHECK( map4[ "hello" ].Get< int >() == 3 );
   DALI_TEST_CHECK( map4[ "world"].Get< int >() == 4 );
   DALI_TEST_CHECK( map4[ "foo"].Get< int >() == 5 );
-  DALI_TEST_CHECK( map4[ "bar"].Get< int >() == 6 );
+  DALI_TEST_EQUALS( "3DEngine", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( map4[ 100 ].Get< int >() == 6 );
 
   // Attempt to merge into itself, should be successful, nothing should change
   map.Merge( map );
-  DALI_TEST_CHECK( map.Count() == 4 );
+  DALI_TEST_CHECK( map.Count() == 5 );
   DALI_TEST_CHECK( map[ "hello" ].Get< int >() == 3 );
   DALI_TEST_CHECK( map[ "world"].Get< int >() == 4 );
   DALI_TEST_CHECK( map[ "foo"].Get< int >() == 5 );
-  DALI_TEST_CHECK( map[ "bar"].Get< int >() == 6 );
+  DALI_TEST_EQUALS( "3DEngine", map[ 10 ].Get<std::string>(), TEST_LOCATION );
+  DALI_TEST_CHECK( map[ 100 ].Get< int >() == 6 );
 
   END_TEST;
 }
@@ -279,7 +322,9 @@ int UtcDaliPropertyMapOstream01(void)
   Property::Map map;
 
   map.Insert("duration", 5.0f);
+  map.Insert( 10, "DALi" );
   map.Insert("delay", 1.0f);
+  map.Insert( 100, 9 );
   map.Insert("value", 100);
 
   std::ostringstream oss;
@@ -287,7 +332,8 @@ int UtcDaliPropertyMapOstream01(void)
 
   tet_printf("Testing ouput of map: %s\n", oss.str().c_str());
 
-  DALI_TEST_EQUALS( oss.str().compare("Map(3) = {duration:5, delay:1, value:100}"), 0, TEST_LOCATION );
+  // string-value pairs first, then index-value pairs
+  DALI_TEST_EQUALS( oss.str().compare("Map(5) = {duration:5, delay:1, value:100, 10:DALi, 100:9}"), 0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -299,7 +345,9 @@ int UtcDaliPropertyMapOstream02(void)
 
   map2.Insert("duration", 5.0f);
   map2.Insert("delay", 1.0f);
+  map2.Insert( 10, "DALi" );
   map.Insert("timePeriod", map2);
+  map.Insert( 100, 9 );
   map.Insert("value", 100);
 
   std::ostringstream oss;
@@ -307,7 +355,8 @@ int UtcDaliPropertyMapOstream02(void)
 
   tet_printf("Testing ouput of map: %s\n", oss.str().c_str());
 
-  DALI_TEST_EQUALS( oss.str().compare("Map(2) = {timePeriod:Map(2) = {duration:5, delay:1}, value:100}"), 0, TEST_LOCATION );
+  // string-value pairs first, then index-value pairs
+  DALI_TEST_EQUALS( oss.str().compare("Map(3) = {timePeriod:Map(3) = {duration:5, delay:1, 10:DALi}, value:100, 100:9}"), 0, TEST_LOCATION );
 
   END_TEST;
 }

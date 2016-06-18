@@ -55,6 +55,7 @@ DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false
 DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
 DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
 DALI_PROPERTY( "depthFunction",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_FUNCTION )
+DALI_PROPERTY( "depthTestMode",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_TEST_MODE )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -471,7 +472,6 @@ void Renderer::SetDefaultProperty( Property::Index index,
         mDepthWriteMode = mode;
         SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, mode );
       }
-
       break;
     }
     case Dali::Renderer::Property::DEPTH_FUNCTION:
@@ -484,7 +484,18 @@ void Renderer::SetDefaultProperty( Property::Index index,
         mDepthFunction = depthFunction;
         SetDepthFunctionMessage( GetEventThreadServices(), *mSceneObject, depthFunction );
       }
-
+      break;
+    }
+    case Dali::Renderer::Property::DEPTH_TEST_MODE:
+    {
+      int value;
+      propertyValue.Get( value );
+      DepthTestMode::Type mode = static_cast<DepthTestMode::Type>(value);
+      if( mode != mDepthTestMode )
+      {
+        mDepthTestMode = mode;
+        SetDepthTestModeMessage( GetEventThreadServices(), *mSceneObject, mode );
+      }
       break;
     }
   }
@@ -605,6 +616,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mDepthFunction;
       break;
     }
+    case Dali::Renderer::Property::DEPTH_TEST_MODE:
+    {
+      value = mDepthTestMode;
+      break;
+    }
   }
   return value;
 }
@@ -695,6 +711,7 @@ Renderer::Renderer()
   mBlendingOptions(),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthFunction( DepthFunction::LESS ),
+  mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false )
 {
 }

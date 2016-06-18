@@ -58,7 +58,9 @@ int SimulateTouchForSetOverlayHitTest(TestApplication& app)
   gTouchCallBackCalled = false;
 
   // simulate a touch event
-  Dali::TouchPoint point( 0, TouchPoint::Down, 25.0f, 25.0f );
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 25.0f, 25.0f ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   app.ProcessEvent( event );
@@ -1968,7 +1970,10 @@ int UtcDaliActorTouchedSignal(void)
 
   // simulate a touch event in the middle of the screen
   Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
-  Dali::TouchPoint point( 1, TouchPoint::Down, touchPoint.x, touchPoint.y );
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );
@@ -1995,7 +2000,10 @@ int UtcDaliActorHoveredSignal(void)
 
   // simulate a hover event in the middle of the screen
   Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
-  Dali::TouchPoint point( 1, TouchPoint::Motion, touchPoint.x, touchPoint.y );
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::MOTION );
+  point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
   Dali::Integration::HoverEvent event;
   event.AddPoint( point );
   application.ProcessEvent( event );
@@ -2201,7 +2209,9 @@ int UtcDaliActorHitTest(void)
     // connect to its touch signal
     actor.TouchedSignal().Connect(TestCallback);
 
-    Dali::TouchPoint point( 0, TouchPoint::Down, hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y );
+    Dali::Integration::Point point;
+    point.SetState( PointState::DOWN );
+    point.SetScreenPosition( Vector2( hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y ) );
     Dali::Integration::TouchEvent event;
     event.AddPoint( point );
 
@@ -2990,3 +3000,154 @@ int UtcDaliActorGetHierachyDepth(void)
   END_TEST;
 }
 
+int UtcDaliActorAnchorPointPropertyAsString(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+
+  // Invalid should not change anything
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorParentOriginPropertyAsString(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_LEFT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_CENTER" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_RIGHT" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+
+  // Invalid should not change anything
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorColorModePropertyAsString(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_COLOR" );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, "USE_PARENT_COLOR" );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_MULTIPLY_PARENT_COLOR" );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_MULTIPLY_PARENT_ALPHA" );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+
+  // Invalid should not change anything
+  actor.SetProperty( Actor::Property::COLOR_MODE, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorPositionInheritancePropertyAsString(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "INHERIT_PARENT_POSITION" );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), INHERIT_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "USE_PARENT_POSITION" );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "USE_PARENT_POSITION_PLUS_LOCAL_POSITION" );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "DONT_INHERIT_POSITION" );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
+
+  // Invalid should not change anything
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorDrawModePropertyAsString(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, "NORMAL" );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, "OVERLAY_2D" );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, "STENCIL" );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+
+  // Invalid should not change anything
+  actor.SetProperty( Actor::Property::DRAW_MODE, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+
+  END_TEST;
+}

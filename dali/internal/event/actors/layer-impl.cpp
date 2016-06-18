@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ namespace
 
 typedef Layer::Behavior Behavior;
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Behavior )
-DALI_ENUM_TO_STRING_INSIDE_CLASS( Layer, LAYER_2D )
-DALI_ENUM_TO_STRING_INSIDE_CLASS( Layer, LAYER_3D )
-DALI_ENUM_TO_STRING_TABLE_END( Behavior )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_2D )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_3D )
+DALI_ENUM_TO_STRING_TABLE_END( BEHAVIOR )
 
 } // namespace
 
@@ -118,14 +118,14 @@ LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool syst
 
 Layer::Layer( Actor::DerivedType type )
 : Actor( type ),
-  mLayerList(NULL),
-  mClippingBox(0,0,0,0),
-  mSortFunction(Layer::ZValue),
-  mBehavior(Dali::Layer::LAYER_2D),
-  mIsClipping(false),
-  mDepthTestDisabled(false),
-  mTouchConsumed(false),
-  mHoverConsumed(false)
+  mLayerList( NULL ),
+  mClippingBox( 0, 0, 0, 0 ),
+  mSortFunction( Layer::ZValue ),
+  mBehavior( Dali::Layer::LAYER_2D ),
+  mIsClipping( false ),
+  mDepthTestDisabled( true ),
+  mTouchConsumed( false ),
+  mHoverConsumed( false )
 {
 }
 
@@ -224,8 +224,10 @@ void Layer::SetBehavior( Dali::Layer::Behavior behavior )
 {
   mBehavior = behavior;
 
-  // notify update side object
+  // Notify update side object.
   SetBehaviorMessage( GetEventThreadServices(), GetSceneLayerOnStage(), behavior );
+  // By default, disable depth test for LAYER_2D, and enable for LAYER_3D.
+  SetDepthTestDisabled( mBehavior == Dali::Layer::LAYER_2D );
 }
 
 void Layer::SetClipping(bool enabled)
@@ -269,7 +271,7 @@ void Layer::SetDepthTestDisabled( bool disable )
   {
     mDepthTestDisabled = disable;
 
-    // Send message .....
+    // Send message.
     // layerNode is being used in a separate thread; queue a message to set the value
     SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mDepthTestDisabled );
   }
@@ -277,7 +279,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
 bool Layer::IsDepthTestDisabled() const
 {
-  return mDepthTestDisabled || (mBehavior == Dali::Layer::LAYER_2D);
+  return mDepthTestDisabled;
 }
 
 void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
@@ -480,7 +482,7 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       case Dali::Layer::Property::BEHAVIOR:
       {
         Behavior behavior(Dali::Layer::LAYER_2D);
-        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BehaviorTable, BehaviorTableCount, behavior ) )
+        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
         {
           SetBehavior( behavior );
         }
@@ -519,7 +521,7 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BehaviorTable, BehaviorTableCount );
+        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT );
         break;
       }
       default:

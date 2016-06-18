@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 
 namespace Dali
 {
@@ -122,6 +123,18 @@ public:
    * @return The resource ID, or zero if not rendering off-screen.
    */
   unsigned int GetFrameBufferId() const;
+
+  /**
+   * Set the frame-buffer used as a render target.
+   * @param[in] frameBuffer The framebuffer
+   */
+  void SetFrameBuffer( Render::FrameBuffer* frameBuffer );
+
+  /**
+   * Retrieve the resource ID of the frame-buffer.
+   * @return The resource ID, or zero if not rendering off-screen.
+   */
+  Render::FrameBuffer* GetFrameBuffer();
 
   /**
    * Set the value of property viewportPosition
@@ -365,6 +378,7 @@ private:
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;
   unsigned int mFrameBufferResourceId;
+  Render::FrameBuffer* mFrameBuffer;
 
   bool mResourcesFinished:1; ///< True if all resources were available when the render-task was processed
   bool mWaitingToRender:1; ///< True when an render once to FBO is waiting
@@ -397,6 +411,17 @@ inline void SetFrameBufferIdMessage( EventThreadServices& eventThreadServices, R
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &task, &RenderTask::SetFrameBufferId, resourceId, isNativeFBO );
+}
+
+inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, RenderTask& task, Render::FrameBuffer* frameBuffer )
+{
+  typedef MessageValue1< RenderTask, Render::FrameBuffer*> LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &task, &RenderTask::SetFrameBuffer, frameBuffer );
 }
 
 inline void SetClearColorMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Vector4& value )
