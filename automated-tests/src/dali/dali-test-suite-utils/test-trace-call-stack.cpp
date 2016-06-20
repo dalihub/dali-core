@@ -16,9 +16,32 @@
  */
 
 #include "test-trace-call-stack.h"
+#include <sstream>
 
 namespace Dali
 {
+
+std::string ToString(int x)
+{
+  std::stringstream out;
+  out << x;
+  return out.str();
+}
+
+std::string ToString(unsigned int x)
+{
+  std::stringstream out;
+  out << x;
+  return out.str();
+}
+
+std::string ToString(float x)
+{
+  std::stringstream out;
+  out << x;
+  return out.str();
+}
+
 /**
  * Constructor
  */
@@ -45,10 +68,17 @@ void TraceCallStack::PushCall(std::string method, std::string params)
 {
   if(mTraceActive)
   {
-    std::vector< std::string > functionCall;
-    functionCall.push_back(method);
-    functionCall.push_back(params);
-    mCallStack.push_back( functionCall );
+    FunctionCall stackFrame(method, params);
+    mCallStack.push_back( stackFrame );
+  }
+}
+
+void TraceCallStack::PushCall(std::string method, std::string params, const TraceCallStack::NamedParams& altParams)
+{
+  if(mTraceActive)
+  {
+    FunctionCall stackFrame(method, params, altParams);
+    mCallStack.push_back( stackFrame );
   }
 }
 
@@ -62,7 +92,7 @@ bool TraceCallStack::FindMethod(std::string method) const
   bool found = false;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
-    if( 0 == mCallStack[i][0].compare(method) )
+    if( 0 == mCallStack[i].method.compare(method) )
     {
       found = true;
       break;
@@ -76,7 +106,7 @@ int TraceCallStack::CountMethod(std::string method) const
   int numCalls = 0;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
-    if( 0 == mCallStack[i][0].compare(method) )
+    if( 0 == mCallStack[i].method.compare(method) )
     {
       numCalls++;
     }
@@ -95,6 +125,12 @@ bool TraceCallStack::FindMethodAndParams(std::string method, std::string params)
   return FindIndexFromMethodAndParams( method, params ) > -1;
 }
 
+bool TraceCallStack::FindMethodAndParams(std::string method, const NamedParams& params) const
+{
+  return FindIndexFromMethodAndParams( method, params ) > -1;
+}
+
+
 /**
  * Search for a method in the stack with the given parameter list
  * @param[in] method The name of the method
@@ -106,7 +142,7 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string
   int index = -1;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
-    if( 0 == mCallStack[i][0].compare(method) && 0 == mCallStack[i][1].compare(params) )
+    if( 0 == mCallStack[i].method.compare(method) && 0 == mCallStack[i].paramList.compare(params) )
     {
       index = i;
       break;
@@ -114,6 +150,35 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string
   }
   return index;
 }
+
+int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const TraceCallStack::NamedParams& params) const
+{
+  int index = -1;
+  for( size_t i=0; i < mCallStack.size(); i++ )
+  {
+    if( 0 == mCallStack[i].method.compare(method) )
+    {
+      // Test each of the passed in parameters:
+      bool match = true;
+      for( NamedParams::const_iterator iter = params.begin() ; iter != params.end() ; ++iter )
+      {
+        NamedParams::const_iterator paramIter = mCallStack[i].namedParams.find(iter->first);
+        if( paramIter == params.end() || paramIter->second.compare(iter->second) != 0 )
+        {
+          match = false;
+          break;
+        }
+      }
+      if( match == true )
+      {
+        index = i;
+        break;
+      }
+    }
+  }
+  return index;
+}
+
 
 /**
  * Test if the given method and parameters are at a given index in the stack
@@ -123,7 +188,7 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string
  */
 bool TraceCallStack::TestMethodAndParams(int index, std::string method, std::string params) const
 {
-  return ( 0 == mCallStack[index][0].compare(method) && 0 == mCallStack[index][1].compare(params) );
+  return ( 0 == mCallStack[index].method.compare(method) && 0 == mCallStack[index].paramList.compare(params) );
 }
 
 /**

@@ -20,9 +20,13 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Dali
 {
+std::string ToString(int x);
+std::string ToString(unsigned int x);
+std::string ToString(float x);
 
 /**
  * Helper class to track method calls in the abstraction and search for them in test cases
@@ -30,6 +34,9 @@ namespace Dali
 class TraceCallStack
 {
 public:
+  /// Typedef for passing and storing named parameters
+  typedef std::map< std::string, std::string > NamedParams;
+
   /**
    * Constructor
    */
@@ -54,6 +61,13 @@ public:
    */
   void PushCall(std::string method, std::string params);
 
+  /**
+   * Push a call onto the stack if the trace is active
+   * @param[in] method The name of the method
+   * @param[in] params A comma separated list of parameter values
+   * @param[in] altParams A map of named parameter values
+   */
+  void PushCall(std::string method, std::string params, const NamedParams& altParams);
 
   /**
    * Search for a method in the stack
@@ -80,10 +94,26 @@ public:
   /**
    * Search for a method in the stack with the given parameter list
    * @param[in] method The name of the method
+   * @param[in] params A map of named parameters to test for
+   * @return true if the method was in the stack
+   */
+  bool FindMethodAndParams(std::string method, const NamedParams& params) const;
+
+  /**
+   * Search for a method in the stack with the given parameter list
+   * @param[in] method The name of the method
    * @param[in] params A comma separated list of parameter values
    * @return index in the stack where the method was found or -1 otherwise
    */
   int FindIndexFromMethodAndParams(std::string method, std::string params) const;
+
+  /**
+   * Search for a method in the stack with the given parameter list
+   * @param[in] method The name of the method
+   * @param[in] params A map of named parameter values to match
+   * @return index in the stack where the method was found or -1 otherwise
+   */
+  int FindIndexFromMethodAndParams(std::string method, const NamedParams& params) const;
 
   /**
    * Test if the given method and parameters are at a given index in the stack
@@ -98,15 +128,25 @@ public:
    */
   void Reset();
 
-  /**
-   * Get the call stack
-   * @return The call stack object (Vector of vector[2] of method/paramlist strings)
-   */
-  inline const std::vector< std::vector< std::string > >& GetCallStack() { return mCallStack; }
-
 private:
   bool mTraceActive; ///< True if the trace is active
-  std::vector< std::vector< std::string > > mCallStack; ///< The call stack
+
+  struct FunctionCall
+  {
+    std::string method;
+    std::string paramList;
+    NamedParams namedParams;
+    FunctionCall( const std::string& aMethod, const std::string& aParamList )
+    : method( aMethod ), paramList( aParamList )
+    {
+    }
+    FunctionCall( const std::string& aMethod, const std::string& aParamList, const NamedParams& altParams )
+    : method( aMethod ), paramList( aParamList ), namedParams( altParams )
+    {
+    }
+  };
+
+  std::vector< FunctionCall > mCallStack; ///< The call stack
 };
 
 } // namespace dali
