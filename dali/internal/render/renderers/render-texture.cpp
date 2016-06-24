@@ -608,26 +608,56 @@ void NewTexture::Initialize(Context& context)
   }
 }
 
-void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params  )
+void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Internal::NewTexture::UploadParams& params  )
 {
   DALI_ASSERT_ALWAYS( mNativeImage == NULL );
 
+  //Get pointer to the data of the PixelData object
+  unsigned char* buffer( pixelData->GetBuffer() );
+
+  //This buffer is only used if manually converting from RGB to RGBA
+  unsigned char* tempBuffer(0);
+
+  //Get pixel format and data type of the data contained in the PixelData object
+  GLenum pixelDataFormat, pixelDataElementType;
+  PixelFormatToGl( pixelData->GetPixelFormat(), pixelDataElementType, pixelDataFormat );
+
+#if DALI_GLES_VERSION < 30
+  if( pixelDataFormat == GL_RGB && mInternalFormat == GL_RGBA )
+  {
+    //Convert manually from RGB to RGBA if GLES < 3 ( GLES 3 can do the conversion automatically when uploading )
+    size_t dataSize = params.width * params.height;
+    tempBuffer = new unsigned char[dataSize*4u];
+    for( size_t i(0u); i<dataSize; i++ )
+    {
+      tempBuffer[i*4u]   = buffer[i*3u];
+      tempBuffer[i*4u+1] = buffer[i*3u+1];
+      tempBuffer[i*4u+2] = buffer[i*3u+2];
+      tempBuffer[i*4u+3] = 0xFF;
+    }
+
+    buffer = tempBuffer;
+    pixelDataFormat = mInternalFormat;
+  }
+#endif
+
+  //Upload data to the texture
   if( mType == TextureType::TEXTURE_2D )
   {
     context.Bind2dTexture( mId );
     context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
     if( params.xOffset == 0 && params.yOffset == 0 &&
-        params.width == (unsigned int)(mWidth / (1<<params.mipmap)) &&
-        params.height == (unsigned int)(mHeight / (1<<params.mipmap)) )
+        params.width  == static_cast<unsigned int>(mWidth  / (1<<params.mipmap)) &&
+        params.height == static_cast<unsigned int>(mHeight / (1<<params.mipmap)) )
     {
       //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
-      context.TexImage2D(GL_TEXTURE_2D, params.mipmap, mInternalFormat, params.width, params.height, 0, mInternalFormat, mPixelDataType, &buffer[0]  );
+      context.TexImage2D(GL_TEXTURE_2D, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelDataFormat, pixelDataElementType, buffer );
     }
     else
     {
       //Specifying part of the image for the mipmap
-      context.TexSubImage2D( GL_TEXTURE_2D, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, mInternalFormat, mPixelDataType, &buffer[0] );
+      context.TexSubImage2D( GL_TEXTURE_2D, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, pixelDataFormat, pixelDataElementType, buffer );
     }
   }
   else if( mType == TextureType::TEXTURE_CUBE )
@@ -642,16 +672,19 @@ void NewTexture::Upload( Context& context, Vector<unsigned char>& buffer, const 
       //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
       context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap, mInternalFormat,
                          params.width, params.height, 0,
-                         mInternalFormat, mPixelDataType, &buffer[0] );
+                         pixelDataFormat, pixelDataElementType, buffer );
     }
     else
     {
       //Specifying part of the image for the mipmap
       context.TexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap,
                              params.xOffset, params.yOffset, params.width, params.height,
-                             mInternalFormat, mPixelDataType, &buffer[0] );
+                             pixelDataFormat, pixelDataElementType, buffer );
     }
   }
+
+  //Destroy temp buffer used for conversion RGB->RGBA
+  delete[] tempBuffer;
 }
 
 bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
@@ -680,10 +713,7 @@ bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampl
 void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
 {
   Render::Sampler oldSampler = mSampler;
-  if( sampler )
-  {
-    mSampler = *sampler;
-  }
+  mSampler = sampler ? *sampler : Sampler();
 
   if( mSampler.mBitfield != oldSampler.mBitfield )
   {

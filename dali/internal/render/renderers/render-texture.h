@@ -146,10 +146,10 @@ public:
   /**
    * Uploads data to the texture.
    * @param[in] context The GL context
-   * @param[in] buffer A vector with the data to be uploaded
+   * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params );
+  void Upload( Context& context, PixelDataPtr pixelData, const Internal::NewTexture::UploadParams& params );
 
   /**
    * Bind the texture to the given texture unit and applies the given sampler

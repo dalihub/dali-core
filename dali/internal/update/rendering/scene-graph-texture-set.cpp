@@ -50,8 +50,8 @@ TextureSet::TextureSet()
 : mSamplers(),
   mTextureId(),
   mRenderers(),
-  mResourcesReady( false ),
-  mFinishedResourceAcquisition( false ),
+  mResourcesReady( true ),
+  mFinishedResourceAcquisition( true ),
   mChanged( true ),
   mHasAlpha( false )
 {
@@ -68,7 +68,7 @@ void TextureSet::operator delete( void* ptr )
 
 void TextureSet::Prepare( const ResourceManager& resourceManager )
 {
-  if( mChanged )
+  if( mChanged && mTextures.Empty() )
   {
     unsigned int opaqueCount = 0;
     unsigned int completeCount = 0;
@@ -176,8 +176,6 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   }
 
   mSamplers[index] = sampler;
-
-  mChanged = true;
   NotifyChangeToRenderers();
 }
 
@@ -198,8 +196,6 @@ void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
 
   mTextures[index] = texture;
   mHasAlpha |= texture->HasAlphaChannel();
-
-  mChanged = true;
   NotifyChangeToRenderers();
 }
 
