@@ -455,6 +455,7 @@ public:
 
 private:
 
+  /// @cond internal
   /**
    * @brief Set the quaternion from 3 orthonormal axes.
    *
@@ -464,6 +465,7 @@ private:
    * @param[in] zAxis The Z axis
    */
   DALI_INTERNAL void SetFromAxes( const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis );
+  /// @endcond
 
 public:
 

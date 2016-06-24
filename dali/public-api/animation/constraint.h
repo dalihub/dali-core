@@ -515,15 +515,18 @@ public:
 
 public: // Not intended for use by Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Constraint::New() methods
    * @SINCE_1_0.0
    * @param [in] constraint A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Constraint( Internal::ConstraintBase* constraint );
+  /// @endcond
 
 private: // Not intended for use by Application developers
 
+  /// @cond internal
   /**
    * @brief Construct a new constraint which targets a property.
    *
@@ -535,6 +538,7 @@ private: // Not intended for use by Application developers
    * @return The new constraint.
    */
   static Constraint New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function );
+  /// @endcond
 };
 
 /**

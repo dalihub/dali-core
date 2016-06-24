@@ -198,6 +198,7 @@ public: // Signals
 
 public: // Not intended for Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by TapGestureDetector::New() methods.
    *
@@ -205,6 +206,7 @@ public: // Not intended for Application developers
    * @param [in] internal A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL TapGestureDetector(Internal::TapGestureDetector* internal);
+  /// @endcond
 };
 
 /**

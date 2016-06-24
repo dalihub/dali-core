@@ -217,6 +217,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized TouchData handle.
    *
@@ -224,6 +225,7 @@ public: // Not intended for application developers
    * @param [in] touchData A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL TouchData( Internal::TouchData* touchData );
+  /// @endcond
 };
 
 /**
