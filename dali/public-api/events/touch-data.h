@@ -218,6 +218,7 @@ public:
 public: // Not intended for application developers
 
   /**
+   * @internal
    * @brief This constructor is used internally to Create an initialized TouchData handle.
    *
    * @SINCE_1_1.37
