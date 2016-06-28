@@ -39,12 +39,14 @@ public:
    * @brief Create a PixelData object.
    *
    * @param [in] buffer           The raw pixel data.
+   * @param [in] bufferSize       The size of the buffer in bytes
    * @param [in] width            Buffer width in pixels
    * @param [in] height           Buffer height in pixels
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
   static PixelDataPtr New( unsigned char* buffer,
+                           unsigned int bufferSize,
                            unsigned int width,
                            unsigned int height,
                            Pixel::Format pixelFormat,
@@ -54,12 +56,14 @@ public:
    * @brief Constructor.
    *
    * @param [in] buffer           The raw pixel data.
+   * @param [in] bufferSize       The size of the buffer in bytes
    * @param [in] width            Buffer width in pixels
    * @param [in] height           Buffer height in pixels
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
   PixelData( unsigned char* buffer,
+             unsigned int bufferSize,
              unsigned int width,
              unsigned int height,
              Pixel::Format pixelFormat,
@@ -100,6 +104,12 @@ public:
    */
   unsigned char* GetBuffer() const;
 
+  /**
+   * Get the size of the buffer in bytes
+   * @return The size of the buffer
+   */
+  unsigned int GetBufferSize() const;
+
 private:
 
   /*
@@ -114,9 +124,10 @@ private:
 
 private:
 
-  unsigned char* mBuffer;           ///< The raw pixel data.
-  unsigned int   mWidth;            ///< Buffer width in pixels.
-  unsigned int   mHeight;           ///< Buffer height in pixels.
+  unsigned char* mBuffer;           ///< The raw pixel data
+  unsigned int   mBufferSize;       ///< Buffer sized in bytes
+  unsigned int   mWidth;            ///< Buffer width in pixels
+  unsigned int   mHeight;           ///< Buffer height in pixels
   Pixel::Format  mPixelFormat;      ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction;  ///< Function for releasing memory
 };
