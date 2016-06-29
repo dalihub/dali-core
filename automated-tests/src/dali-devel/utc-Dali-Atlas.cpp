@@ -51,7 +51,7 @@ PixelData CreatePixelData(unsigned int width, unsigned int height, Pixel::Format
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );
   unsigned char* buffer = new unsigned char [ bufferSize ];
 
-  return PixelData::New( buffer, width, height, pixelFormat, PixelData::DELETE_ARRAY );
+  return PixelData::New( buffer, bufferSize, width, height, pixelFormat, PixelData::DELETE_ARRAY );
 }
 
 }

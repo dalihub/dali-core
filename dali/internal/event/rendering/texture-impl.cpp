@@ -120,8 +120,8 @@ void NewTexture::Upload( PixelDataPtr pixelData,
         {
           DALI_LOG_ERROR( "Pixel data of an incorrect size when trying to update texture");
         }
-        else if( ( xOffset + width  > static_cast<unsigned int>( mWidth  / (1<<mipmap ))) ||
-            ( yOffset + height > static_cast<unsigned int>( mHeight / (1<<mipmap ))))
+        else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
+                 ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
         {
           DALI_LOG_ERROR( "Texture update area out of bounds");
         }

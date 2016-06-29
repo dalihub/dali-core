@@ -133,8 +133,9 @@ int UtcDaliTextureUpload01(void)
   //Upload data to the texture
   callStack.Reset();
 
-  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelData );
   application.SendNotification();
   application.Render();
@@ -148,8 +149,9 @@ int UtcDaliTextureUpload01(void)
 
   //Upload part of the texture
   callStack.Reset();
-  buffer = reinterpret_cast<unsigned char*>( malloc( width * height * 2 ) );
-  PixelData pixelDataSubImage = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  bufferSize =  width * height * 2;
+  buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelDataSubImage = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelDataSubImage, 0u, 0u, width/2, height/2, width/2, height/2 );
   application.SendNotification();
   application.Render();
@@ -189,8 +191,9 @@ int UtcDaliTextureUpload02(void)
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
 
-  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
 
   //Upload data to the POSITIVE_X face of the texture
   {
@@ -315,12 +318,15 @@ int UtcDaliTextureUpload03(void)
 
   //Upload data to the texture mipmap 0 and mipmap 1
   callStack.Reset();
-  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc(  bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelData, 0u, 0u, 0u, 0u, width, height );
 
-  buffer = reinterpret_cast<unsigned char*>( malloc( widthMipmap1 * heightMipmap1 * 4 ) );
-  PixelData pixelDataMipmap1 = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  bufferSize = widthMipmap1 * heightMipmap1 * 4;
+  buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelDataMipmap1 = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelDataMipmap1, 0u, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
   application.SendNotification();
   application.Render();
@@ -356,12 +362,14 @@ int UtcDaliTextureUpload04(void)
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
   //Upload data to the NEGATIVE_X face mipmap 0 and mipmap 1
-  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( width * height * 4 ) );
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelData, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
 
-  buffer= reinterpret_cast<unsigned char*>( malloc( widthMipmap1 * heightMipmap1 * 4 ) );
-  PixelData pixelDataMipmap1 = PixelData::New( buffer, width, height, Pixel::RGBA8888, PixelData::FREE );
+  bufferSize = widthMipmap1 * heightMipmap1 * 4;
+  buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelDataMipmap1 = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
   texture.Upload( pixelDataMipmap1, CubeMap::NEGATIVE_X, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
   application.SendNotification();
   application.Render();
@@ -377,6 +385,66 @@ int UtcDaliTextureUpload04(void)
     out << GL_TEXTURE_CUBE_MAP_NEGATIVE_X <<", "<< 1u << ", " << widthMipmap1 <<", "<< heightMipmap1;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
+
+  END_TEST;
+}
+
+int UtcDaliTextureUpload05(void)
+{
+  TestApplication application;
+
+  //Create a texture with a compressed format
+  unsigned int width(64);
+  unsigned int height(64);
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, width, height );
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  //CompressedTexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
+  }
+
+  //Upload data to the texture
+  callStack.Reset();
+
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, PixelData::FREE );
+  texture.Upload( pixelData );
+  application.SendNotification();
+  application.Render();
+
+  //CompressedTexImage2D should be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
+  }
+
+  //Upload part of the texture
+  callStack.Reset();
+  bufferSize =  width * height * 2;
+  buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelDataSubImage = PixelData::New( buffer, bufferSize, width, height, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, PixelData::FREE );
+  texture.Upload( pixelDataSubImage, 0u, 0u, width/2, height/2, width/2, height/2 );
+  application.SendNotification();
+  application.Render();
+
+  //CompressedTexSubImage2D should be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width/2 << ", " <<  height/2 << ", " << width/2 << ", " <<  height/2;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexSubImage2D", out.str().c_str() ) );
+  }
+
 
   END_TEST;
 }

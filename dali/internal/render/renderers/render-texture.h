@@ -226,6 +226,7 @@ private:
   unsigned int mWidth;                ///<Widht of the texture
   unsigned int mHeight;               ///<Height of the texture
   bool mHasAlpha : 1;                 ///<Whether the format has an alpha channel
+  bool mIsCompressed : 1;             ///<Whether the format is compressed
 };
 
 

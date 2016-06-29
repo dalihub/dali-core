@@ -28,12 +28,13 @@ namespace Dali
 {
 
 PixelData PixelData::New(unsigned char* buffer,
+                         unsigned int bufferSize,
                          unsigned int width,
                          unsigned int height,
                          Pixel::Format pixelFormat,
                          ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, width, height, pixelFormat, releaseFunction );
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
   return PixelData( internal.Get() );
 }
 
