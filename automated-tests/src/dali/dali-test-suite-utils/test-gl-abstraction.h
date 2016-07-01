@@ -295,10 +295,34 @@ public:
 
   inline void CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data)
   {
+    std::stringstream out;
+    out << target<<", "<<level<<", "<<width << ", " << height;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["internalformat"] = ToString(internalformat);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    namedParams["border"] = ToString(border);
+    namedParams["size"] = ToString(imageSize);
+
+    mTextureTrace.PushCall("CompressedTexImage2D", out.str(), namedParams);
   }
 
   inline void CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void* data)
   {
+    std::stringstream out;
+    out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["xoffset"] = ToString(xoffset);
+    namedParams["yoffset"] = ToString(yoffset);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    mTextureTrace.PushCall("CompressedTexSubImage2D", out.str(), namedParams);
   }
 
   inline void CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)

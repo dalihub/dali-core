@@ -49,12 +49,14 @@ public:
    * @brief Create a PixelData object.
    *
    * @param [in] buffer           The raw pixel data.
+   * @param [in] bufferSize       The size of the buffer in bytes
    * @param [in] width            Buffer width in pixels
    * @param [in] height           Buffer height in pixels
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
   static PixelData New( unsigned char* buffer,
+                        unsigned int bufferSize,
                         unsigned int width,
                         unsigned int height,
                         Pixel::Format pixelFormat,

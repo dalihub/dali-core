@@ -168,29 +168,32 @@ void Shader::SetDefaultProperty( Property::Index index,
       if( propertyValue.GetType() == Property::MAP )
       {
         Dali::Property::Map* map = propertyValue.GetMap();
-        std::string vertex;
-        std::string fragment;
-        Dali::Shader::ShaderHints hints(Dali::Shader::HINT_NONE);
-
-        if( Property::Value* value = map->Find("vertex") )
+        if( map )
         {
-          vertex = value->Get<std::string>();
-        }
+          std::string vertex;
+          std::string fragment;
+          Dali::Shader::ShaderHints hints(Dali::Shader::HINT_NONE);
 
-        if( Property::Value* value = map->Find("fragment") )
-        {
-          fragment = value->Get<std::string>();
-        }
+          if( Property::Value* value = map->Find("vertex") )
+          {
+            vertex = value->Get<std::string>();
+          }
 
-        if( Property::Value* value = map->Find("hints") )
-        {
-          static_cast<void>( // ignore return
-            Scripting::GetEnumeration< Dali::Shader::ShaderHints >(value->Get<std::string>().c_str(),
-                                                                   ShaderHintsTable, ShaderHintsTableSize, hints)
-            );
-        }
+          if( Property::Value* value = map->Find("fragment") )
+          {
+            fragment = value->Get<std::string>();
+          }
 
-        Initialize(vertex, fragment, hints );
+          if( Property::Value* value = map->Find("hints") )
+          {
+            static_cast<void>( // ignore return
+              Scripting::GetEnumeration< Dali::Shader::ShaderHints >(value->Get<std::string>().c_str(),
+                                                                     ShaderHintsTable, ShaderHintsTableSize, hints)
+              );
+          }
+
+          Initialize(vertex, fragment, hints );
+        }
       }
       else
       {

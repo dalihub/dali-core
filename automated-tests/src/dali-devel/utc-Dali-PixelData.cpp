@@ -33,7 +33,7 @@ int UtcDaliPixelData01(void)
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::RGB888 );
 
   unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::RGB888, PixelData::FREE );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGB888, PixelData::FREE );
 
   DALI_TEST_CHECK( pixelData );
   DALI_TEST_CHECK( pixelData.GetWidth() == width );
@@ -53,7 +53,7 @@ int UtcDaliPixelData02(void)
   unsigned char* buffer = new unsigned char [ bufferSize ];
   buffer[0] = 'a';
 
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
 
   DALI_TEST_CHECK( pixelData);
   DALI_TEST_CHECK( pixelData.GetWidth() == width );
@@ -71,7 +71,7 @@ int UtcDaliPixelDataCopyConstructor(void)
   unsigned int height = 10u;
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
   unsigned char* buffer = new unsigned char [ bufferSize ];
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
 
   PixelData pixelDataCopy(pixelData);
 
@@ -87,7 +87,7 @@ int UtcDaliPixelDataAssignmentOperator(void)
   unsigned int height = 10u;
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
   unsigned char* buffer = new unsigned char [ bufferSize ];
-  PixelData pixelData = PixelData::New( buffer, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
 
   PixelData pixelData2;
   DALI_TEST_EQUALS( (bool)pixelData2, false, TEST_LOCATION );

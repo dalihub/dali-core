@@ -511,6 +511,82 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
   }
 }
 
+/**
+ * @brief Whether specified pixel format is compressed.
+ *
+ * @param [in] pixelformat Pixel format
+ * @return true if format is compressed, false otherwise
+ */
+bool IsCompressedFormat(Pixel::Format pixelFormat)
+{
+  switch (pixelFormat)
+  {
+    case Pixel::L8:
+    case Pixel::A8:
+    case Pixel::LA88:
+    case Pixel::RGB565:
+    case Pixel::RGBA4444:
+    case Pixel::RGBA5551:
+    case Pixel::BGR565:
+    case Pixel::BGRA4444:
+    case Pixel::BGRA5551:
+    case Pixel::RGB888:
+    case Pixel::RGB8888:
+    case Pixel::BGR8888:
+    case Pixel::RGBA8888:
+    case Pixel::BGRA8888:
+    case Pixel::INVALID:
+    {
+      return false;
+    }
+
+    case Pixel::COMPRESSED_R11_EAC:
+    case Pixel::COMPRESSED_SIGNED_R11_EAC:
+    case Pixel::COMPRESSED_RG11_EAC:
+    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
+    case Pixel::COMPRESSED_RGB8_ETC2:
+    case Pixel::COMPRESSED_SRGB8_ETC2:
+    case Pixel::COMPRESSED_RGB8_ETC1:
+    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
+    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
+    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
+    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 } //Unnamed namespace
 
@@ -524,7 +600,8 @@ NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, uns
  mPixelDataType(GL_UNSIGNED_BYTE),
  mWidth( width ),
  mHeight( height ),
- mHasAlpha( HasAlpha( format ) )
+ mHasAlpha( HasAlpha( format ) ),
+ mIsCompressed( IsCompressedFormat( format ) )
 {
   PixelFormatToGl( format, mPixelDataType, mInternalFormat );
 }
@@ -538,7 +615,8 @@ NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
  mPixelDataType(GL_UNSIGNED_BYTE),
  mWidth( nativeImageInterface->GetWidth() ),
  mHeight( nativeImageInterface->GetHeight() ),
- mHasAlpha( nativeImageInterface->RequiresBlending() )
+ mHasAlpha( nativeImageInterface->RequiresBlending() ),
+ mIsCompressed( false )
 {
 }
 
@@ -581,7 +659,15 @@ void NewTexture::Initialize(Context& context)
     {
       //Creates the texture and reserves memory for the first mipmap level.
       context.Bind2dTexture( mId );
-      context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+
+      if( !mIsCompressed )
+      {
+        context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+      }
+      else
+      {
+        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
+      }
 
       //Apply default sampling parameters
       context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
@@ -593,9 +679,20 @@ void NewTexture::Initialize(Context& context)
     {
       //Creates the texture and reserves memory for the first mipmap level.
       context.BindCubeMapTexture( mId );
-      for( unsigned int i(0); i<6; ++i )
+
+      if( !mIsCompressed )
       {
-        context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+        for( unsigned int i(0); i<6; ++i )
+        {
+          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+        }
+      }
+      else
+      {
+        for( unsigned int i(0); i<6; ++i )
+        {
+          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
+        }
       }
 
       //Apply default sampling parameters
@@ -642,46 +739,51 @@ void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Interna
 #endif
 
   //Upload data to the texture
+  GLenum target( GL_NONE );
   if( mType == TextureType::TEXTURE_2D )
   {
     context.Bind2dTexture( mId );
-    context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
-    if( params.xOffset == 0 && params.yOffset == 0 &&
-        params.width  == static_cast<unsigned int>(mWidth  / (1<<params.mipmap)) &&
-        params.height == static_cast<unsigned int>(mHeight / (1<<params.mipmap)) )
-    {
-      //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
-      context.TexImage2D(GL_TEXTURE_2D, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelDataFormat, pixelDataElementType, buffer );
-    }
-    else
-    {
-      //Specifying part of the image for the mipmap
-      context.TexSubImage2D( GL_TEXTURE_2D, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, pixelDataFormat, pixelDataElementType, buffer );
-    }
+    target = GL_TEXTURE_2D;
   }
   else if( mType == TextureType::TEXTURE_CUBE )
   {
     context.BindCubeMapTexture( mId );
-    context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer;
+  }
 
-    if( params.xOffset == 0 && params.yOffset == 0 &&
-        params.width  == static_cast<unsigned int>(mWidth  / (1<<params.mipmap)) &&
-        params.height == static_cast<unsigned int>(mHeight / (1<<params.mipmap)) )
+  context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+  if( params.xOffset == 0 && params.yOffset == 0 &&
+      params.width  == ( mWidth  / (1<<params.mipmap) ) &&
+      params.height == ( mHeight / (1<<params.mipmap) ) )
+  {
+    //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
+    if( !mIsCompressed )
     {
-      //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
-      context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap, mInternalFormat,
-                         params.width, params.height, 0,
-                         pixelDataFormat, pixelDataElementType, buffer );
+      context.TexImage2D( target, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelDataFormat, pixelDataElementType, buffer );
     }
     else
     {
-      //Specifying part of the image for the mipmap
-      context.TexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer, params.mipmap,
+      context.CompressedTexImage2D( target, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelData->GetBufferSize(), buffer );
+    }
+  }
+  else
+  {
+    //Specifying part of the image for the mipmap
+    if( !mIsCompressed )
+    {
+      context.TexSubImage2D( target, params.mipmap,
                              params.xOffset, params.yOffset, params.width, params.height,
                              pixelDataFormat, pixelDataElementType, buffer );
     }
+    else
+    {
+      context.CompressedTexSubImage2D( target, params.mipmap,
+                                       params.xOffset, params.yOffset, params.width, params.height,
+                                       pixelDataFormat, pixelData->GetBufferSize(), buffer );
+    }
   }
+
 
   //Destroy temp buffer used for conversion RGB->RGBA
   delete[] tempBuffer;
