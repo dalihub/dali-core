@@ -49,7 +49,8 @@ cov_data:
 	@for i in `find $(COVERAGE_DIR) -name "libdali_la-*.gcda" -o -name "libdali_la-*.gcno"` ;\
 		do mv $$i `echo $$i | sed s/libdali_la-//` ; done
 	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --base-directory . --directory . -c -o dali.info
-	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --remove dali.info "*/dali-env/*" "/usr/include/*" -o dali.info
+	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --remove dali.info "*/dali-env/*" "/usr/include/*" "public-api/shader-effects/*" "*/image-actor*" -o dali.info
+
 	@test -z $(COVERAGE_OUTPUT_DIR) || mkdir -p $(COVERAGE_OUTPUT_DIR)
 
 coverage: cov_data

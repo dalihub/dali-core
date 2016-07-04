@@ -38,4 +38,19 @@ TestNativeImage::~TestNativeImage()
 {
 }
 
+
+TestNativeImageNoExtPointer TestNativeImageNoExt::New(int width, int height)
+{
+  return new TestNativeImageNoExt(width, height);
+}
+
+TestNativeImageNoExt::TestNativeImageNoExt(int width, int height)
+: mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
+{
+}
+
+TestNativeImageNoExt::~TestNativeImageNoExt()
+{
+}
+
 } // namespace dali

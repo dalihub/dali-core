@@ -179,12 +179,15 @@ int UtcDaliTouchNormalProcessing(void)
   screenCoordinates.x = screenCoordinates.y = 12.0f;
   actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Up, screenCoordinates ) );
-  const TouchPoint *point3 = &data.touchEvent.GetPoint(0);
+
+  const TouchPoint *point3ptr = &data.touchEvent.GetPoint(0);
+  TouchPoint point3( point3ptr->deviceId, point3ptr->state, point3ptr->screen.x, point3ptr->screen.y, point3ptr->local.x, point3ptr->local.y );
+
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, data.touchEvent.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( TouchPoint::Up, point3->state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, point3->screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, point3->local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Up, point3.state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, point3.screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, point3.local, 0.1f, TEST_LOCATION );
   data.Reset();
 
   // Emit a down signal where the actor is not present

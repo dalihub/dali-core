@@ -75,7 +75,7 @@ rm -f tct*core-tests.xml
 
 # Clean up old coverage data
 if [ -d ../build/tizen ] ; then
-    rm -f ../build/tizen/dali-toolkit/.libs/*.gcda
+    rm -f ../build/tizen/dali/.libs/*.gcda
 fi
 
 find build \( -name "*.gcda" \) -exec rm '{}' \;
@@ -138,9 +138,9 @@ else
             ret=$?
             if [ $ret -ne 6 ] ; then
                 if [ $opt_debug -ne 0 ] ; then
-                    if [ $ret -eq 0 ] ; then
-                        gdb --args build/src/$mod/tct-$mod-core $1
-                    fi
+                    echo DEBUGGING:
+                    gdb --args build/src/$mod/tct-$mod-core $1
+
                 else
                     echo $output
                     if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi
