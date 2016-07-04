@@ -35,11 +35,6 @@ namespace Dali
 namespace Random
 {
 
-namespace
-{
-  __thread unsigned int seed;
-}
-
 /**
  * @brief Returns a random number between f0 and f1.
  *
@@ -51,10 +46,9 @@ namespace
  */
 inline float Range(float f0, float f1)
 {
-  seed = time(NULL);
   float min = std::min(f0, f1);
   float max = std::max(f0, f1);
-  return min + (rand_r(&seed) & 0xfff) * (max-min) * (1.0f/4095.0f);
+  return min + (rand() & 0xfff) * (max-min) * (1.0f/4095.0f);
 }
 
 /**
