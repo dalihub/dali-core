@@ -134,9 +134,15 @@ else
             output=`build/src/$mod/tct-$mod-core $1`
             ret=$?
             if [ $ret -ne 6 ] ; then
-               echo $output
-               if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi
-               exit $ret
+                if [ $opt_debug -ne 0 ] ; then
+                    echo DEBUGGING:
+                    gdb --args build/src/$mod/tct-$mod-core $1
+
+                else
+                    echo $output
+                    if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi
+                fi
+                exit $ret
             fi
         done
         echo $1 not found
