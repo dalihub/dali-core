@@ -90,16 +90,17 @@ NewTexture::~NewTexture()
   }
 }
 
-void NewTexture::Upload( PixelDataPtr pixelData )
+bool NewTexture::Upload( PixelDataPtr pixelData )
 {
-  Upload( pixelData, 0u, 0u, 0u, 0u, mWidth, mHeight );
+  return Upload( pixelData, 0u, 0u, 0u, 0u, mWidth, mHeight );
 }
 
-void NewTexture::Upload( PixelDataPtr pixelData,
+bool NewTexture::Upload( PixelDataPtr pixelData,
                          unsigned int layer, unsigned int mipmap,
                          unsigned int xOffset, unsigned int yOffset,
                          unsigned int width, unsigned int height )
 {
+  bool result(false);
   if( mNativeImage )
   {
     DALI_LOG_ERROR( "OpenGLES does not support uploading data to native texture");
@@ -130,6 +131,7 @@ void NewTexture::Upload( PixelDataPtr pixelData,
           //Parameters are correct. Send message to upload data to the texture
           UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
           UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+          result = true;
         }
       }
       else
@@ -138,6 +140,8 @@ void NewTexture::Upload( PixelDataPtr pixelData,
       }
     }
   }
+
+  return result;
 }
 
 void NewTexture::GenerateMipmaps()

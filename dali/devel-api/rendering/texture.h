@@ -122,8 +122,9 @@ public:
   /**
    * @brief Upload data to the texture from a PixelData object
    * @param[in] pixelData The pixelData object
+   * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
    */
-  void Upload( PixelData pixelData );
+  bool Upload( PixelData pixelData );
 
   /**
    * @brief Upload data to the texture from a PixelData object
@@ -134,9 +135,10 @@ public:
    * @param[in] yOffset Specifies a vertical offset of the rectangular area in the texture that will be updated
    * @param[in] width Specifies the width of the rectangular area in the texture that will be updated
    * @param[in] height Specifies the height of the rectangular area in the texture that will be updated
+   * @return True if the PixelData object has compatible pixel format and fits in the rectangle specified, false otherwise
    * @note Upload does not upsample or downsample pixel data to fit the specified rectangular area in the texture.
    */
-  void Upload( PixelData pixelData,
+  bool Upload( PixelData pixelData,
                unsigned int layer, unsigned int mipmap,
                unsigned int xOffset, unsigned int yOffset,
                unsigned int width, unsigned int height );

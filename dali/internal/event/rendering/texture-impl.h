@@ -84,12 +84,12 @@ public:
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  void Upload( PixelDataPtr pixelData );
+  bool Upload( PixelDataPtr pixelData );
 
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  void Upload( PixelDataPtr pixelData,
+  bool Upload( PixelDataPtr pixelData,
                unsigned int layer, unsigned int mipmap,
                unsigned int xOffset, unsigned int yOffset,
                unsigned int width, unsigned int height );

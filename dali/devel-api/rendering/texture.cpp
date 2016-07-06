@@ -61,13 +61,13 @@ Texture& Texture::operator=( const Texture& handle )
   return *this;
 }
 
-void Texture::Upload( PixelData pixelData )
+bool Texture::Upload( PixelData pixelData )
 {
   Internal::PixelData& internalPixelData = GetImplementation( pixelData );
   return GetImplementation(*this).Upload( &internalPixelData );
 }
 
-void Texture::Upload( PixelData pixelData,
+bool Texture::Upload( PixelData pixelData,
                unsigned int layer, unsigned int mipmap,
                unsigned int xOffset, unsigned int yOffset,
                unsigned int width, unsigned int height )
