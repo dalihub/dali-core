@@ -2226,3 +2226,20 @@ int UtcDaliCallbackBase(void)
   tet_result( TET_PASS );
   END_TEST;
 }
+
+int UtcDaliSlotDelegateMethods(void)
+{
+  TestSignals signals;
+
+  TestSlotDelegateHandler handlers;
+  DALI_TEST_EQUALS( 0, handlers.mSlotDelegate.GetConnectionCount(), TEST_LOCATION );
+  signals.SignalFloat2Value().Connect(handlers.mSlotDelegate, &TestSlotDelegateHandler::FloatSlotFloatValueFloatValue);
+  DALI_TEST_EQUALS( 1, handlers.mSlotDelegate.GetConnectionCount(), TEST_LOCATION );
+  signals.SignalBool1Value().Connect(handlers.mSlotDelegate, &TestSlotDelegateHandler::BoolSlotFloatValue);
+  DALI_TEST_EQUALS( 2, handlers.mSlotDelegate.GetConnectionCount(), TEST_LOCATION );
+
+  handlers.mSlotDelegate.DisconnectAll();
+  DALI_TEST_EQUALS( 0, handlers.mSlotDelegate.GetConnectionCount(), TEST_LOCATION );
+
+  END_TEST;
+}
