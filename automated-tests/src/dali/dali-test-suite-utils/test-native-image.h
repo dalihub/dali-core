@@ -25,7 +25,9 @@
 namespace Dali
 {
 class TestNativeImage;
+class TestNativeImageNoExt;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
+typedef IntrusivePtr<TestNativeImageNoExt> TestNativeImageNoExtPointer;
 
 class DALI_IMPORT_API TestNativeImageExtension: public Dali::NativeImageInterface::Extension
 {
@@ -63,6 +65,34 @@ public:
 
   bool createResult;
   TestNativeImageExtension* mExtension;
+};
+
+
+class DALI_IMPORT_API TestNativeImageNoExt : public Dali::NativeImageInterface
+{
+public:
+  static TestNativeImageNoExtPointer New(int width, int height);
+
+  inline void SetGlExtensionCreateResult(bool result){ createResult = result;}
+  inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return createResult;};
+  inline virtual void GlExtensionDestroy() { ++mExtensionDestroyCalls; };
+  inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return 1;};
+  inline virtual void PrepareTexture() {};
+  inline virtual unsigned int GetWidth() const {return mWidth;};
+  inline virtual unsigned int GetHeight() const {return mHeight;};
+  inline virtual bool RequiresBlending() const {return true;};
+
+private:
+  TestNativeImageNoExt(int width, int height);
+  virtual ~TestNativeImageNoExt();
+
+  int mWidth;
+  int mHeight;
+public:
+  int mExtensionCreateCalls;
+  int mExtensionDestroyCalls;
+  int mTargetTextureCalls;
+  bool createResult;
 };
 
 } // Dali
