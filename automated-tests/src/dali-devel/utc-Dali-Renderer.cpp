@@ -15,14 +15,16 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
-
+#include <dali/devel-api/images/texture-set-image.h>
 #include <cstdio>
 
-using namespace Dali;
-
+// INTERNAL INCLUDES
+#include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
+
+using namespace Dali;
 
 namespace // unnamed namespace
 {
@@ -808,7 +810,7 @@ int UtcDaliRendererSetBlendColor(void)
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   TextureSet textureSet = TextureSet::New();
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 

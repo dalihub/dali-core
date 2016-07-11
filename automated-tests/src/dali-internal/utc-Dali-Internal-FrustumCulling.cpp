@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,21 @@
  *
  */
 
-#include <iostream>
-#include <algorithm>
-#include <stdlib.h>
+// EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
 #include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/sampler.h>
 #include <dali/devel-api/rendering/shader.h>
+#include <dali/devel-api/images/texture-set-image.h>
+#include <iostream>
+#include <algorithm>
+#include <stdlib.h>
+
+// INTERNAL INCLUDES
+#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 
@@ -64,7 +68,7 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
   Geometry geometry = Geometry::QUAD();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints );
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 

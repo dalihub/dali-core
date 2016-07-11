@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *
  */
 
-#include <unistd.h>
+// EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/texture-set-image.h>
+#include <unistd.h>
+
+// INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <mesh-builder.h>
 
 using namespace Dali;
-
-#include <mesh-builder.h>
 
 void sampler_test_startup(void)
 {
@@ -113,7 +116,6 @@ int UtcDaliSamplerAssignmentOperator(void)
   END_TEST;
 }
 
-
 int UtcSamplerSetFilterMode(void)
 {
   TestApplication application;
@@ -122,7 +124,7 @@ int UtcSamplerSetFilterMode(void)
   Sampler sampler = Sampler::New();
 
   TextureSet textureSet = CreateTextureSet();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();
@@ -253,7 +255,7 @@ int UtcSamplerSetWrapMode(void)
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   TextureSet textureSet = CreateTextureSet();
   Sampler sampler = Sampler::New();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,12 @@
  * limitations under the License.
  *
  */
+
+// CLASS HEADER
 #include "mesh-builder.h"
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/images/texture-set-image.h>
 
 namespace Dali
 {
@@ -28,10 +33,11 @@ TextureSet CreateTextureSet()
 {
   return TextureSet::New();
 }
+
 TextureSet CreateTextureSet( Image image )
 {
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   return textureSet;
 }
 
