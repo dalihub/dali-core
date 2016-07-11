@@ -30,7 +30,9 @@ namespace Dali
 Shader CreateShader();
 TextureSet CreateTextureSet();
 TextureSet CreateTextureSet( Image image );
+Geometry CreateQuadGeometry();
 PropertyBuffer CreatePropertyBuffer();
+
 }
 
 #endif // MESH_BUILDER_H

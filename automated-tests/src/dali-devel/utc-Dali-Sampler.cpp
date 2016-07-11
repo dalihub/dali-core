@@ -128,7 +128,7 @@ int UtcSamplerSetFilterMode(void)
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
   Actor actor = Actor::New();
@@ -259,7 +259,7 @@ int UtcSamplerSetWrapMode(void)
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 

@@ -863,7 +863,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
 
   // Set task to non-exclusive - actor1 should render twice:
   drawTrace.Reset();
@@ -871,7 +871,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2065,7 +2065,7 @@ int UtcDaliRenderTaskContinous05(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2171,7 +2171,7 @@ int UtcDaliRenderTaskOnce02(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2289,7 +2289,7 @@ int UtcDaliRenderTaskOnce04(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2805,7 +2805,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2905,7 +2905,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();

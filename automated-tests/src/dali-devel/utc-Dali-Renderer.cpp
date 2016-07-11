@@ -59,7 +59,7 @@ int UtcDaliRendererNew01(void)
 {
   TestApplication application;
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -79,7 +79,7 @@ int UtcDaliRendererCopyConstructor(void)
 {
   TestApplication application;
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -93,7 +93,7 @@ int UtcDaliRendererAssignmentOperator(void)
 {
   TestApplication application;
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -109,7 +109,7 @@ int UtcDaliRendererDownCast01(void)
 {
   TestApplication application;
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -134,8 +134,8 @@ int UtcDaliRendererSetGetGeometry(void)
   TestApplication application;
   tet_infoline( "Test SetGeometry, GetGeometry" );
 
-  Geometry geometry1 = Geometry::QUAD();
-  Geometry geometry2 = Geometry::QUAD();
+  Geometry geometry1 = CreateQuadGeometry();
+  Geometry geometry2 = CreateQuadGeometry();
 
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry1, shader);
@@ -172,7 +172,7 @@ int UtcDaliRendererSetGetShader(void)
   Shader shader2 = CreateShader();
   shader2.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader1);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -212,7 +212,7 @@ int UtcDaliRendererSetGetDepthIndex(void)
   tet_infoline("Test SetDepthIndex, GetDepthIndex");
 
   Shader shader = CreateShader();
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -243,7 +243,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
   TestApplication application;
 
   tet_infoline("Test SetFaceCullingMode(cullingMode)");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -328,7 +328,7 @@ int UtcDaliRendererBlendOptions01(void)
 
   tet_infoline("Test BLEND_FACTOR properties ");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -374,7 +374,7 @@ int UtcDaliRendererBlendOptions02(void)
 
   tet_infoline("Test BLEND_FACTOR properties ");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -420,7 +420,7 @@ int UtcDaliRendererBlendOptions03(void)
 
   tet_infoline("Test GetBlendEquation() defaults ");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -445,7 +445,7 @@ int UtcDaliRendererBlendOptions04(void)
 
   tet_infoline("Test SetBlendEquation() ");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -490,7 +490,7 @@ int UtcDaliRendererSetBlendMode01(void)
 
   tet_infoline("Test setting the blend mode to on with an opaque color renders with blending enabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -522,7 +522,7 @@ int UtcDaliRendererSetBlendMode02(void)
 
   tet_infoline("Test setting the blend mode to off with a transparent color renders with blending disabled (and not enabled)");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -554,7 +554,7 @@ int UtcDaliRendererSetBlendMode03(void)
 
   tet_infoline("Test setting the blend mode to auto with a transparent color renders with blending enabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -586,7 +586,7 @@ int UtcDaliRendererSetBlendMode04(void)
 
   tet_infoline("Test setting the blend mode to auto with an opaque color renders with blending disabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -617,7 +617,7 @@ int UtcDaliRendererSetBlendMode04b(void)
 
   tet_infoline("Test setting the blend mode to auto with a transparent actor color renders with blending enabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -649,7 +649,7 @@ int UtcDaliRendererSetBlendMode04c(void)
 
   tet_infoline("Test setting the blend mode to auto with an opaque opaque actor color renders with blending disabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -681,7 +681,7 @@ int UtcDaliRendererSetBlendMode05(void)
 
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image with an alpha channel renders with blending enabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   BufferImage image = BufferImage::New( 40, 40, Pixel::RGBA8888 );
 
   Shader shader = CreateShader();
@@ -715,7 +715,7 @@ int UtcDaliRendererSetBlendMode06(void)
   TestApplication application;
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_TRANSPARENT renders with blending enabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
 
   Renderer renderer = Renderer::New( geometry, shader );
@@ -746,7 +746,7 @@ int UtcDaliRendererSetBlendMode07(void)
   TestApplication application;
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_OPAQUE renders with blending disabled");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
 
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
@@ -779,7 +779,7 @@ int UtcDaliRendererGetBlendMode(void)
 
   tet_infoline("Test GetBlendMode()");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -806,7 +806,7 @@ int UtcDaliRendererSetBlendColor(void)
 
   tet_infoline("Test SetBlendColor(color)");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   TextureSet textureSet = TextureSet::New();
   BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
@@ -846,7 +846,7 @@ int UtcDaliRendererGetBlendColor(void)
 
   tet_infoline("Test GetBlendColor()");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -872,7 +872,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   tet_infoline("Test BLEND_PRE_MULTIPLIED_ALPHA property");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -937,7 +937,7 @@ int UtcDaliRendererConstraint01(void)
   tet_infoline("Test that a non-uniform renderer property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -979,7 +979,7 @@ int UtcDaliRendererConstraint02(void)
   tet_infoline("Test that a uniform map renderer property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -1035,7 +1035,7 @@ int UtcDaliRendererAnimatedProperty01(void)
   tet_infoline("Test that a non-uniform renderer property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -1076,7 +1076,7 @@ int UtcDaliRendererAnimatedProperty02(void)
   tet_infoline("Test that a uniform map renderer property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
@@ -1129,7 +1129,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1186,7 +1186,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1244,7 +1244,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1282,7 +1282,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1329,7 +1329,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1377,7 +1377,7 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   tet_infoline("Test the rendering order in a 2D layer is correct");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
 
   Actor actor0 = Actor::New();
   actor0.SetAnchorPoint(AnchorPoint::CENTER);
@@ -1508,7 +1508,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
    */
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
 
   Actor actor0 = Actor::New();
   actor0.SetAnchorPoint(AnchorPoint::CENTER);
@@ -1622,7 +1622,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   tet_infoline("Test the rendering order in a 2D layer is correct for overlays");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
 
   Actor actor0 = Actor::New();
   actor0.SetAnchorPoint(AnchorPoint::CENTER);
@@ -1886,7 +1886,7 @@ int UtcDaliRendererSetDepthFunction(void)
 
   tet_infoline("Test setting the depth function");
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 

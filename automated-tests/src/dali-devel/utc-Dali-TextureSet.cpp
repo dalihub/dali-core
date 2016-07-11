@@ -103,6 +103,7 @@ int UtcDaliTextureSetDownCast02(void)
   END_TEST;
 }
 
+
 int UtcDaliTextureSetTexture01(void)
 {
   TestApplication application;
@@ -113,7 +114,7 @@ int UtcDaliTextureSetTexture01(void)
   TextureSet textureSet = CreateTextureSet();
   textureSet.SetTexture( 0u, texture );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -160,7 +161,7 @@ int UtcDaliTextureSetTexture02(void)
   textureSet.SetTexture( 0u, texture );
   textureSet.SetSampler( 0u, sampler );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -202,7 +203,7 @@ int UtcDaliTextureSetSetSampler(void)
   Shader shader = CreateShader();
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 

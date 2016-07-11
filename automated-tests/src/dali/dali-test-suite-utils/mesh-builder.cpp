@@ -51,4 +51,27 @@ PropertyBuffer CreatePropertyBuffer()
   return vertexData;
 }
 
+Geometry CreateQuadGeometry(void)
+{
+  PropertyBuffer vertexData = CreatePropertyBuffer();
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+  vertexData.SetData(texturedQuadVertexData, 4);
+
+  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexData );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
+
+  return geometry;
+}
+
+
+
 } // namespace Dali

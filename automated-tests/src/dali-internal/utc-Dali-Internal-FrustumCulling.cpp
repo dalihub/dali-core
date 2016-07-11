@@ -30,6 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <mesh-builder.h>
 
 using namespace Dali;
 
@@ -37,6 +38,7 @@ using namespace Dali;
 
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
 uniform   mediump mat4    uMvpMatrix;
 uniform   mediump vec3    uSize;
 varying   mediump vec2    vTexCoord;
@@ -46,7 +48,7 @@ void main()
   mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   vertexPosition.xyz *= uSize;
   vertexPosition = uMvpMatrix * vertexPosition;
-  vTexCoord = aPosition + vec2(0.5);
+  vTexCoord = aTexCoord;
   gl_Position = vertexPosition;
 }
 );
@@ -65,7 +67,7 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
   PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
   BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints );
   TextureSet textureSet = TextureSet::New();
   TextureSetImage( textureSet, 0u, image );
@@ -124,7 +126,7 @@ int UtcFrustumCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -149,7 +151,7 @@ int UtcFrustumLeftCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -168,7 +170,7 @@ int UtcFrustumLeftCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -194,7 +196,7 @@ int UtcFrustumRightCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -213,7 +215,7 @@ int UtcFrustumRightCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -239,7 +241,7 @@ int UtcFrustumTopCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -259,7 +261,7 @@ int UtcFrustumTopCullN(void)
   application.Render( 16 );
 
   // This will be box culled
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -285,7 +287,7 @@ int UtcFrustumBottomCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -304,7 +306,7 @@ int UtcFrustumBottomCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -332,7 +334,7 @@ int UtcFrustumNearCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -358,7 +360,7 @@ int UtcFrustumNearCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -386,7 +388,7 @@ int UtcFrustumFarCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -412,7 +414,7 @@ int UtcFrustumFarCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -431,7 +433,7 @@ int UtcFrustumCullDisabledP(void)
   application.Render( 16 );
 
   // This should not be culled
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
