@@ -70,16 +70,19 @@ NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
 
 void NewTexture::Initialize()
 {
-  if( mNativeImage )
+  if( EventThreadServices::IsCoreRunning() )
   {
-    mRenderObject = new Render::NewTexture( mNativeImage );
-  }
-  else
-  {
-    mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
-  }
+    if( mNativeImage )
+    {
+      mRenderObject = new Render::NewTexture( mNativeImage );
+    }
+    else
+    {
+      mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
+    }
 
-  AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  }
 }
 
 NewTexture::~NewTexture()
@@ -101,42 +104,45 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
                          unsigned int width, unsigned int height )
 {
   bool result(false);
-  if( mNativeImage )
+  if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    DALI_LOG_ERROR( "OpenGLES does not support uploading data to native texture");
-  }
-  else
-  {
-    unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
-    if( pixelData->GetBuffer() == NULL || pixelDataSize == 0 )
+    if( mNativeImage )
     {
-      DALI_LOG_ERROR( "PixelData is empty");
+      DALI_LOG_ERROR( "OpenGL ES does not support uploading data to native texture");
     }
     else
     {
-      Pixel::Format pixelDataFormat = pixelData->GetPixelFormat();
-      if( ( pixelDataFormat == mFormat ) || ( (pixelDataFormat == Pixel::RGB888 ) && ( mFormat == Pixel::RGBA8888 ) ) )
+      unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
+      if( pixelData->GetBuffer() == NULL || pixelDataSize == 0 )
       {
-        if( pixelDataSize < width * height )
-        {
-          DALI_LOG_ERROR( "Pixel data of an incorrect size when trying to update texture");
-        }
-        else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
-                 ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
-        {
-          DALI_LOG_ERROR( "Texture update area out of bounds");
-        }
-        else
-        {
-          //Parameters are correct. Send message to upload data to the texture
-          UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
-          UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
-          result = true;
-        }
+        DALI_LOG_ERROR( "PixelData is empty");
       }
       else
       {
-        DALI_LOG_ERROR( "Bad format");
+        Pixel::Format pixelDataFormat = pixelData->GetPixelFormat();
+        if( ( pixelDataFormat == mFormat ) || ( (pixelDataFormat == Pixel::RGB888 ) && ( mFormat == Pixel::RGBA8888 ) ) )
+        {
+          if( pixelDataSize < width * height )
+          {
+            DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture");
+          }
+          else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
+              ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
+          {
+            DALI_LOG_ERROR( "Texture update area out of bounds");
+          }
+          else
+          {
+            //Parameters are correct. Send message to upload data to the texture
+            UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
+            UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+            result = true;
+          }
+        }
+        else
+        {
+          DALI_LOG_ERROR( "Bad format");
+        }
       }
     }
   }
@@ -146,7 +152,10 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
 
 void NewTexture::GenerateMipmaps()
 {
-  GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  {
+    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  }
 }
 
 unsigned int NewTexture::GetWidth() const
