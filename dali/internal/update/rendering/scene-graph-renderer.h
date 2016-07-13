@@ -18,8 +18,8 @@
  */
 
 
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>

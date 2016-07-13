@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/geometry.h>  // Dali::Geometry
+#include <dali/public-api/rendering/geometry.h>  // Dali::Geometry
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry

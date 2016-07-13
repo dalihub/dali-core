@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef> // std::size_t
-#include <string> // std::string
+#include <string>  // std::string
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h> // Dali::Handle
+#include <dali/public-api/object/handle.h>       // Dali::Handle
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
 
 namespace Dali
@@ -63,6 +63,7 @@ class PropertyBuffer;
  *  texturedQuadGeometry.AddVertexBuffer( texturedQuadVertices );
  *  texturedQuadGeometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0] );
  *
+ * @SINCE_1_1.43
  */
 class DALI_IMPORT_API PropertyBuffer : public BaseHandle
 {
@@ -70,9 +71,9 @@ public:
 
   /**
    * @brief Create a PropertyBuffer
-   *
    * Static property buffers use less memory.
    *
+   * @SINCE_1_1.43
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
    * @return Handle to a newly allocated PropertyBuffer
    */
@@ -80,33 +81,40 @@ public:
 
   /**
    * @brief Default constructor, creates an empty handle
+   *
+   * @SINCE_1_1.43
    */
   PropertyBuffer();
 
   /**
    * @brief Destructor
+   *
+   * @SINCE_1_1.43
    */
   ~PropertyBuffer();
 
   /**
    * @brief Copy constructor, creates a new handle to the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
   PropertyBuffer( const PropertyBuffer& handle );
 
   /**
    * @brief Downcast to a property buffer handle.
-   *
    * If not a property buffer the returned property buffer handle is left uninitialized.
-   * @param[in] handle to an object
-   * @return property buffer handle or an uninitialized handle
+   *
+   * @SINCE_1_1.43
+   * @param[in] handle Handle to an object
+   * @return Property buffer handle or an uninitialized handle
    */
   static PropertyBuffer DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
@@ -130,6 +138,7 @@ public:
    * propertyBuffer.SetData( vertices );
    * </pre>
    *
+   * @SINCE_1_1.43
    * @param[in] data A pointer to the data that will be copied to the buffer.
    * @param[in] size Number of elements to expand or contract the buffer.
    */
@@ -138,15 +147,18 @@ public:
   /**
    * @brief Get the number of elements in the buffer
    *
+   * @SINCE_1_1.43
    * @return Number of elements to expand or contract the buffer
    */
   std::size_t GetSize() const;
 
 public:
+
   /**
    * @brief The constructor
-   *
-   * @param [in] pointer A pointer to a newly allocated PropertyBuffer
+   * @note  Not intended for application developers.
+   * @SINCE_1_1.43
+   * @param[in] pointer A pointer to a newly allocated PropertyBuffer
    */
   explicit DALI_INTERNAL PropertyBuffer( Internal::PropertyBuffer* pointer );
 };

@@ -21,14 +21,13 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/texture.h>
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/integration-api/resource-declarations.h>
-
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/integration-api/gl-defines.h>
+#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {

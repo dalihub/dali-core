@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <cstdlib>
 #include <dali-test-suite-utils.h>
 
-#include <dali/devel-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/common/dali-vector.h>
 
 using namespace Dali;

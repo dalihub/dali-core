@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/devel-api/rendering/frame-buffer.h>
 
 namespace Dali
 {

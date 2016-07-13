@@ -17,12 +17,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/texture-set.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <iostream>
 #include <algorithm>

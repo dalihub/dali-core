@@ -22,9 +22,9 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/rendering/frame-buffer.h>
-#include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {

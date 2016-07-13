@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/texture.h>  // Dali::Texture
+#include <dali/public-api/rendering/texture.h>          // Dali::Texture
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
+#include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
 
 
 namespace Dali

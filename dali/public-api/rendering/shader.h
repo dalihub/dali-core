@@ -2,7 +2,7 @@
 #define DALI_SHADER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <string> // std::string
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h> // Dali::Handle
+#include <dali/public-api/object/handle.h>                // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
 
 /**
@@ -50,6 +50,8 @@
  *   }
  * );
  * </pre>
+ *
+ * @SINCE_1_1.43
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -62,86 +64,105 @@ class Shader;
 }
 
 /**
- * @brief Shaders allows custom vertex and color transformations in the GPU
+ * @brief Shaders allows custom vertex and color transformations in the GPU.
+ *
+ * @SINCE_1_1.43
  */
 class DALI_IMPORT_API Shader : public Handle
 {
 public:
+
   /**
    * @brief Hints for rendering/subdividing geometry.
+   * @SINCE_1_1.43
    */
   enum ShaderHints
   {
-    HINT_NONE                     = 0x00, ///< no hints
-    HINT_OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs
-    HINT_MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices,
-                                          ///< this option disables any culling optimizations
+    HINT_NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.43
+    HINT_OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.43
+    HINT_MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.43
   };
 
   /**
    * @brief An enumeration of properties belonging to the Shader class.
+   * @SINCE_1_1.43
    */
   struct Property
   {
     enum
     {
-      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX  ///< name "program",      type MAP; {"vertex":"","fragment":"",hints:"",
-                                                     ///                                  "vertexPrefix":"","fragmentPrefix":""}
+      /**
+       * @brief Name: "program", Type: MAP
+       * @note  The default value is empty
+       * @note  Format: {"vertex":"","fragment":"",hints:"","vertexPrefix":"","fragmentPrefix":""}
+       * @SINCE_1_1.43
+       */
+      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX
     };
   };
 
   /**
    * @brief Create Shader.
    *
-   * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param fragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param hints GeometryHints to define the geometry of the rendered object
+   * @SINCE_1_1.43
+   * @param[in] vertexShader Vertex shader code for the effect. If you pass in an empty string, the default version will be used
+   * @param[in] fragmentShader fragment shader code for the effect. If you pass in an empty string, the default version will be used
+   * @param[in] hints GeometryHints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
   static Shader New( const std::string& vertexShader,
                      const std::string& fragmentShader,
-                     ShaderHints hints = ShaderHints(HINT_NONE) );
+                     ShaderHints hints = ShaderHints( HINT_NONE ) );
 
   /**
    * @brief Default constructor, creates an empty handle
+   *
+   * @SINCE_1_1.43
    */
   Shader();
 
   /**
    * @brief Destructor
-   *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   *
+   * @SINCE_1_1.43
    */
   ~Shader();
 
   /**
    * @brief Copy constructor
    *
-   * @param handle A handle to a Shader object
+   * @SINCE_1_1.43
+   * @param[in] handle A handle to a Shader object
    */
   Shader( const Shader& handle );
 
   /**
    * @brief Downcast to a shader handle.
-   *
    * If not a shader the returned shader handle is left uninitialized.
-   * @param[in] handle to an object
-   * @return shader handle or an uninitialized handle
+   *
+   * @SINCE_1_1.43
+   * @param[in] handle Handle to an object
+   * @return Shader handle or an uninitialized handle
    */
   static Shader DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
   Shader& operator=( const Shader& handle );
 
-public: // Not intended for application developers
+public:
+
   /**
    * @brief This constructor is used by Dali New() methods.
-   * @param [in] effect A pointer to a newly allocated Dali resource.
+   * @note  Not intended for application developers.
+   * @SINCE_1_1.43
+   * @param[in] effect A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL Shader( Internal::Shader* effect );
 };

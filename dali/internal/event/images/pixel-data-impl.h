@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_PIXEL_DATA_H__
-#define __DALI_INTERNAL_PIXEL_DATA_H__
+#ifndef DALI_INTERNAL_PIXEL_DATA_H
+#define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/images/pixel-data.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
 
 namespace Dali

@@ -76,6 +76,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/pixel-data.h>
 
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/compile-time-math.h>
@@ -89,6 +90,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
+
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
@@ -111,6 +113,15 @@
 
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>
+
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/property-buffer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>

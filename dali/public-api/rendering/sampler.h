@@ -2,7 +2,7 @@
 #define DALI_SAMPLER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h> // Dali::Handle
+#include <dali/public-api/object/handle.h>   // Dali::Handle
 #include <dali/public-api/actors/sampling.h>
 
 namespace Dali
@@ -32,6 +32,8 @@ class Sampler;
 
 /**
  * @brief Sampler is a handle to an object that can be used to provide the sampling parameters to sample textures
+ *
+ * @SINCE_1_1.43
  */
 class DALI_IMPORT_API Sampler : public BaseHandle
 {
@@ -39,38 +41,47 @@ public:
 
   /**
    * @brief Creates a new Sampler object
+   *
+   * @SINCE_1_1.43
    */
   static Sampler New();
 
   /**
    * @brief Default constructor, creates an empty handle
+   *
+   * @SINCE_1_1.43
    */
   Sampler();
 
   /**
    * @brief Destructor
+   *
+   * @SINCE_1_1.43
    */
   ~Sampler();
 
   /**
    * @brief Copy constructor, creates a new handle to the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
   Sampler( const Sampler& handle );
 
   /**
    * @brief Downcast to a sampler handle.
-   *
    * If not the returned handle is left uninitialized.
-   * @param[in] handle to An object
-   * @return handle or an uninitialized handle
+   *
+   * @SINCE_1_1.43
+   * @param[in] handle Handle to an object
+   * @return Handle or an uninitialized handle
    */
   static Sampler DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
@@ -79,10 +90,9 @@ public:
 
   /**
    * @brief Set the filter modes for this sampler
+   * Calling this function sets the properties MINIFICATION_FILTER and MAGNIFICATION_FILTER.
    *
-   * Calling this function sets the properties MINIFICATION_FILTER
-   * and MAGNIFICATION_FILTER
-   *
+   * @SINCE_1_1.43
    * @param[in] minFilter The minification filter that will be used
    * @param[in] magFilter The magnification filter that will be used
    */
@@ -91,6 +101,7 @@ public:
   /**
    * @brief Set the wrap modes for this sampler
    *
+   * @SINCE_1_1.43
    * param[in] uWrap Wrap mode for u coordinates
    * param[in] vWrap Wrap mode for v coordinates
    */
@@ -99,17 +110,20 @@ public:
   /**
    * @brief Set the wrap modes for this sampler
    *
-   * param[in] rWrap Wrap mode in the z direction
-   * param[in] sWrap Wrap mode for x direction
-   * param[in] tWrap Wrap mode for y direction
+   * @SINCE_1_1.43
+   * param[in] rWrap Wrap mode for the z direction
+   * param[in] sWrap Wrap mode for the x direction
+   * param[in] tWrap Wrap mode for the y direction
    */
   void SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap );
 
 public:
+
   /**
    * @brief The constructor
-   *
-   * @param [in] pointer A pointer to a newly allocated Sampler
+   * @note  Not intended for application developers.
+   * @SINCE_1_1.43
+   * @param[in] pointer A pointer to a newly allocated Sampler
    */
   explicit DALI_INTERNAL Sampler( Internal::Sampler* pointer );
 };

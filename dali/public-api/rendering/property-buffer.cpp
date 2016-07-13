@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/object/property-buffer.h> // Dali::PropertyBuffer
+#include <dali/public-api/rendering/property-buffer.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-map.h> // Dali::Property::Map
-#include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
+#include <dali/public-api/object/property-map.h>             // Dali::Property::Map
+#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
 
 namespace Dali
 {

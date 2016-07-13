@@ -115,11 +115,11 @@ publicapieventsdir = $(publicapidir)/events
 publicapiimagesdir = $(publicapidir)/images
 publicapimathdir = $(publicapidir)/math
 publicapiobjectdir = $(publicapidir)/object
+publicapirenderingdir = $(publicapidir)/rendering
 publicapirendertasksdir = $(publicapidir)/render-tasks
-publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapisignalsdir = $(publicapidir)/signals
-
 publicapisizenegotiationdir = $(publicapidir)/size-negotiation
+publicapishadereffectsdir = $(publicapidir)/shader-effects
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
@@ -128,11 +128,12 @@ publicapicommon_HEADERS = $(public_api_core_common_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
 publicapimath_HEADERS = $(public_api_core_math_header_files)
-publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapiobject_HEADERS = $(public_api_core_object_header_files)
+publicapirendering_HEADERS = $(public_api_core_rendering_header_files)
+publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
+publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
 publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
-publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h

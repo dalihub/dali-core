@@ -199,7 +199,7 @@ int UtcDaliTextureUpload02(void)
   {
     callStack.Reset();
 
-    texture.Upload( pixelData, CubeMap::POSITIVE_X, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::POSITIVE_X, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -215,7 +215,7 @@ int UtcDaliTextureUpload02(void)
   {
     callStack.Reset();
 
-    texture.Upload( pixelData, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::NEGATIVE_X, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -230,7 +230,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the POSITIVE_Y face of the texture
   {
     callStack.Reset();
-    texture.Upload( pixelData, CubeMap::POSITIVE_Y, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -245,7 +245,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the NEGATIVE_Y face of the texture
   {
     callStack.Reset();
-    texture.Upload( pixelData, CubeMap::NEGATIVE_Y, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -260,7 +260,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the POSITIVE_Z face of the texture
   {
     callStack.Reset();
-    texture.Upload( pixelData, CubeMap::POSITIVE_Z, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -275,7 +275,7 @@ int UtcDaliTextureUpload02(void)
   //Upload data to the NEGATIVE_Z face of the texture
   {
     callStack.Reset();
-    texture.Upload( pixelData, CubeMap::NEGATIVE_Z, 0u, 0u, 0u, width, height );
+    texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height );
     application.SendNotification();
     application.Render();
 
@@ -365,12 +365,12 @@ int UtcDaliTextureUpload04(void)
   unsigned int bufferSize( width * height * 4 );
   unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
   PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
-  texture.Upload( pixelData, CubeMap::NEGATIVE_X, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_X, 0u, 0u, 0u, width, height );
 
   bufferSize = widthMipmap1 * heightMipmap1 * 4;
   buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
   PixelData pixelDataMipmap1 = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
-  texture.Upload( pixelDataMipmap1, CubeMap::NEGATIVE_X, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
+  texture.Upload( pixelDataMipmap1, CubeMapLayer::NEGATIVE_X, 1u, 0u, 0u, widthMipmap1, heightMipmap1 );
   application.SendNotification();
   application.Render();
 

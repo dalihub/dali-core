@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/texture-set.h>  // Dali::TextureSet
+#include <dali/public-api/rendering/texture-set.h>          // Dali::TextureSet
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
-#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
-#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/rendering/sampler-impl.h>     // Dali::Internal::Sampler
+#include <dali/internal/event/rendering/shader-impl.h>      // Dali::Internal::Shader
 
 namespace Dali
 {

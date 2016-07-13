@@ -16,9 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/sampling.h>
-#include <dali/devel-api/rendering/sampler.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/sampler.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>

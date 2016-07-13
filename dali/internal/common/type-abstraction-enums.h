@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/internal/common/type-abstraction.h>
 
 namespace Dali

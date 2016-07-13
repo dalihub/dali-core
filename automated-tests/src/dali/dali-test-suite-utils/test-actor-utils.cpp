@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
-#include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include "mesh-builder.h"

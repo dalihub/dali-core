@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/rendering/frame-buffer.h>
 
 using namespace Dali;
 
@@ -231,7 +230,7 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
   texture.GenerateMipmaps();
 
   //Attach NEGATIVE_Y face of the cubemap
-  frameBuffer.AttachColorTexture( texture, 0u, CubeMap::NEGATIVE_Y );
+  frameBuffer.AttachColorTexture( texture, 0u, CubeMapLayer::NEGATIVE_Y );
 
   application.SendNotification();
   application.Render();

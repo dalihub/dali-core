@@ -18,7 +18,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/texture-set.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>

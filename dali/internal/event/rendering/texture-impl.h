@@ -23,7 +23,7 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/images/pixel.h>
-#include <dali/devel-api/rendering/texture.h> // Dali::Internal::Render::Texture
+#include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
 

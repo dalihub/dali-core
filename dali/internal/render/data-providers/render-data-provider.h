@@ -19,12 +19,12 @@
  */
 
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-#include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/internal/render/renderers/render-texture.h>
 
 namespace Dali
 {

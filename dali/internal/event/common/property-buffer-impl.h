@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
-#include <dali/devel-api/object/property-buffer.h> // Dali::PropertyBuffer
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 
