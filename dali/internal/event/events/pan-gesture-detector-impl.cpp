@@ -363,7 +363,7 @@ Property::Index PanGestureDetector::GetDefaultPropertyIndex(const std::string& n
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
     {
-      index = i;
+      index = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX + i;
       break;
     }
   }

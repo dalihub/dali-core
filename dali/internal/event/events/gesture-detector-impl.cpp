@@ -212,7 +212,7 @@ const char* GestureDetector::GetDefaultPropertyName( Property::Index index ) con
 
 Property::Index GestureDetector::GetDefaultPropertyIndex(const std::string& name) const
 {
-  return 0;
+  return Property::INVALID_INDEX;
 }
 
 bool GestureDetector::IsDefaultPropertyWritable(Property::Index index) const
