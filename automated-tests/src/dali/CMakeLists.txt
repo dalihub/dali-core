@@ -22,7 +22,9 @@ SET(TC_SOURCES
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
         utc-Dali-EncodedBufferImage.cpp
+        utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameBufferImage.cpp
+        utc-Dali-Geometry.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
@@ -47,8 +49,10 @@ SET(TC_SOURCES
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-Pixel.cpp
-        utc-Dali-PropertyMap.cpp
+        utc-Dali-PixelData.cpp
         utc-Dali-PropertyArray.cpp
+        utc-Dali-PropertyBuffer.cpp
+        utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
         utc-Dali-PropertyTypes.cpp
         utc-Dali-PropertyValue.cpp
@@ -56,14 +60,19 @@ SET(TC_SOURCES
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp
         utc-Dali-Rect.cpp
+        utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
+        utc-Dali-Sampler.cpp
+        utc-Dali-Shader.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
+        utc-Dali-Texture.cpp
+        utc-Dali-TextureSet.cpp
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TouchDataProcessing.cpp
