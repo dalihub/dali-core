@@ -460,6 +460,8 @@ int UtcDaliGestureDetectorProperties(void)
   Property::Value propValue = detector.GetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX );
   DALI_TEST_EQUALS( propValue.GetType(), Property::NONE, TEST_LOCATION );
 
+  DALI_TEST_CHECK( detector.GetPropertyName( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ).empty() );
+
   // For coverage only, not testable
   detector.SetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, true );
 
