@@ -265,11 +265,12 @@ const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index in
 {
   PropertyMetadata* property = NULL;
 
-  if(index >= PROPERTY_CUSTOM_START_INDEX )
+  if( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
+      ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
   {
     property = FindCustomProperty( index );
   }
-  else
+  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     property = FindAnimatableProperty( index );
   }
