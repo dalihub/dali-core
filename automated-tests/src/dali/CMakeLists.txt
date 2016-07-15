@@ -11,16 +11,21 @@ SET(TC_SOURCES
         utc-Dali-AngleAxis.cpp
         utc-Dali-Animation.cpp
         utc-Dali-Any.cpp
+        utc-Dali-Atlas.cpp
         utc-Dali-BaseHandle.cpp
         utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp
+        utc-Dali-ConditionalWait.cpp
+        utc-Dali-ConnectionTracker.cpp
+        utc-Dali-Constrainer.cpp
         utc-Dali-Constraint.cpp
         utc-Dali-ConstraintFunction.cpp
         utc-Dali-Constraints.cpp
         utc-Dali-ConstraintSource.cpp
-        utc-Dali-ConnectionTracker.cpp
+        utc-Dali-Context.cpp
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
+        utc-Dali-DistanceField.cpp
         utc-Dali-EncodedBufferImage.cpp
         utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameBufferImage.cpp
@@ -28,6 +33,8 @@ SET(TC_SOURCES
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
+        utc-Dali-Hash.cpp
+        utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Image.cpp
         utc-Dali-IntrusivePtr.cpp
@@ -40,6 +47,7 @@ SET(TC_SOURCES
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
         utc-Dali-MeshMaterial.cpp
+        utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp
         utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
@@ -65,7 +73,9 @@ SET(TC_SOURCES
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
         utc-Dali-Sampler.cpp
+        utc-Dali-Scripting.cpp
         utc-Dali-Shader.cpp
+        utc-Dali-SignalDelegate.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-Stage.cpp
@@ -73,6 +83,7 @@ SET(TC_SOURCES
         utc-Dali-TapGestureDetector.cpp
         utc-Dali-Texture.cpp
         utc-Dali-TextureSet.cpp
+        utc-Dali-Thread.cpp
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TouchDataProcessing.cpp
@@ -82,8 +93,8 @@ SET(TC_SOURCES
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
+        utc-Dali-WeakHandle.cpp
         utc-Dali-WheelEvent.cpp
-        utc-Dali-Constrainer.cpp
 )
 
 LIST(APPEND TC_SOURCES
@@ -120,6 +131,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
+    -lpthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}
