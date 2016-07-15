@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 // CLASS HEADER
 #include "scene-graph-renderer.h"
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/queue/render-queue.h>
@@ -86,10 +85,10 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
   }
 }
 
-// flags for resending data to renderer
+// Flags for re-sending data to renderer.
 enum Flags
 {
-  RESEND_DATA_PROVIDER               = 1,
+  RESEND_DATA_PROVIDER               = 1 << 0,
   RESEND_GEOMETRY                    = 1 << 1,
   RESEND_FACE_CULLING_MODE           = 1 << 2,
   RESEND_BLEND_COLOR                 = 1 << 3,
@@ -100,9 +99,18 @@ enum Flags
   RESEND_DEPTH_WRITE_MODE            = 1 << 8,
   RESEND_DEPTH_TEST_MODE             = 1 << 9,
   RESEND_DEPTH_FUNCTION              = 1 << 10,
+  RESEND_STENCIL_MODE                = 1 << 11,
+  RESEND_STENCIL_FUNCTION            = 1 << 12,
+  RESEND_STENCIL_FUNCTION_MASK       = 1 << 13,
+  RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 14,
+  RESEND_STENCIL_MASK                = 1 << 15,
+  RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 16,
+  RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 17,
+  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18,
+  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 19
 };
 
-}
+} // Anonymous namespace
 
 namespace Dali
 {
@@ -123,6 +131,7 @@ Renderer::Renderer()
   mGeometry( NULL ),
   mShader( NULL ),
   mBlendColor( NULL ),
+  mStencilParameters( StencilMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
   mBlendBitmask( 0u ),
@@ -133,6 +142,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mWriteToColorBuffer( true ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mPremultipledAlphaEnabled( false ),
@@ -303,6 +313,69 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction );
     }
 
+    if( mResendFlag & RESEND_STENCIL_MODE )
+    {
+      typedef MessageValue1< Render::Renderer, StencilMode::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMode, mStencilParameters.stencilMode );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_FUNCTION )
+    {
+      typedef MessageValue1< Render::Renderer, StencilFunction::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_FUNCTION_MASK )
+    {
+      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_FUNCTION_REFERENCE )
+    {
+      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_MASK )
+    {
+      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_FAIL )
+    {
+      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_FAIL )
+    {
+      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail );
+    }
+
+    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_PASS )
+    {
+      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
+    }
+
+    if( mResendFlag & RESEND_WRITE_TO_COLOR_BUFFER )
+    {
+      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetWriteToColorBuffer, mWriteToColorBuffer );
+    }
+
     mResendFlag = 0;
   }
 }
@@ -423,6 +496,60 @@ void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
   mResendFlag |= RESEND_DEPTH_FUNCTION;
 }
 
+void Renderer::SetStencilMode( StencilMode::Type mode )
+{
+  mStencilParameters.stencilMode = mode;
+  mResendFlag |= RESEND_STENCIL_MODE;
+}
+
+void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
+{
+  mStencilParameters.stencilFunction = stencilFunction;
+  mResendFlag |= RESEND_STENCIL_FUNCTION;
+}
+
+void Renderer::SetStencilFunctionMask( int stencilFunctionMask )
+{
+  mStencilParameters.stencilFunctionMask = stencilFunctionMask;
+  mResendFlag |= RESEND_STENCIL_FUNCTION_MASK;
+}
+
+void Renderer::SetStencilFunctionReference( int stencilFunctionReference )
+{
+  mStencilParameters.stencilFunctionReference = stencilFunctionReference;
+  mResendFlag |= RESEND_STENCIL_FUNCTION_REFERENCE;
+}
+
+void Renderer::SetStencilMask( int stencilMask )
+{
+  mStencilParameters.stencilMask = stencilMask;
+  mResendFlag |= RESEND_STENCIL_MASK;
+}
+
+void Renderer::SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail )
+{
+  mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
+  mResendFlag |= RESEND_STENCIL_OPERATION_ON_FAIL;
+}
+
+void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail )
+{
+  mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
+  mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_FAIL;
+}
+
+void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
+{
+  mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
+  mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
+}
+
+void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
+{
+  mWriteToColorBuffer = writeToColorBuffer;
+  mResendFlag |= RESEND_WRITE_TO_COLOR_BUFFER;
+}
+
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
 {
@@ -430,13 +557,9 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
   mSceneController = &sceneController;
   RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-  mRenderer = Render::Renderer::New( dataProvider, mGeometry,
-                                     mBlendBitmask, mBlendColor,
-                                     static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
-                                     mPremultipledAlphaEnabled,
-                                     mDepthWriteMode,
-                                     mDepthTestMode,
-                                     mDepthFunction );
+  mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, mBlendColor, static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
+                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters, mWriteToColorBuffer );
+
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
 }
 

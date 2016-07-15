@@ -41,9 +41,9 @@ namespace FaceCullingMode
  */
 enum Type
 {
-  NONE,                ///< None of the faces should be culled               @SINCE_1_1.43
-  FRONT,               ///< Cull front face, back face should never be shown @SINCE_1_1.43
-  BACK,                ///< Cull back face, back face should never be shown  @SINCE_1_1.43
+  NONE,                ///< None of the faces should be culled                 @SINCE_1_1.43
+  FRONT,               ///< Cull front face, front faces should never be shown @SINCE_1_1.43
+  BACK,                ///< Cull back face, back faces should never be shown   @SINCE_1_1.43
   FRONT_AND_BACK,      ///< Cull front and back faces; if the geometry is composed of triangles none of the faces will be shown @SINCE_1_1.43
 };
 
