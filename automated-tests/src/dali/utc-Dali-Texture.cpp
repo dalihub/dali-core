@@ -17,6 +17,7 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <test-native-image.h>
 
 using namespace Dali;
 
@@ -49,6 +50,22 @@ int UtcDaliTextureNew02(void)
   TestApplication application;
   Texture texture;
   DALI_TEST_CHECK( !texture );
+  END_TEST;
+}
+
+int UtcDaliTextureNew03(void)
+{
+  TestApplication application;
+
+  // Create a native image source.
+  TestNativeImageNoExtPointer testNativeImage = TestNativeImageNoExt::New( 64u, 64u );
+
+  // Create a texture from the native image source.
+  Texture nativeTexture = Texture::New( *testNativeImage );
+
+  // Check the texture was created OK.
+  DALI_TEST_CHECK( nativeTexture );
+
   END_TEST;
 }
 

@@ -19,6 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <unistd.h>
+#include <string.h>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -73,7 +74,6 @@ int UtcDaliSamplerCopyConstructor(void)
 
   END_TEST;
 }
-
 
 int UtcDaliSamplerDownCast01(void)
 {
@@ -248,7 +248,7 @@ int UtcSamplerSetFilterMode(void)
   END_TEST;
 }
 
-int UtcSamplerSetWrapMode(void)
+int UtcSamplerSetWrapMode1(void)
 {
   TestApplication application;
 
@@ -313,6 +313,71 @@ int UtcSamplerSetWrapMode(void)
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
 
   //Todo: Test the other wrap mode ( REPEAT, MIRRORED_REPEAT )  , currently not support!!
+
+  END_TEST;
+}
+
+int UtcSamplerSetWrapMode2(void)
+{
+  TestApplication application;
+
+  // Create a cube-map texture.
+  unsigned int width = 8u;
+  unsigned int height = 8u;
+  Texture texture = Texture::New( TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height );
+
+  // Create source image data.
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= new unsigned char[ bufferSize ];
+  memset( buffer, 0u, bufferSize );
+
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY );
+
+  // Upload the source image data to all 6 sides of our cube-map.
+  texture.Upload( pixelData, CubeMapLayer::POSITIVE_X, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_X, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height );
+  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height );
+
+  // Finalize the cube-map setup.
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetTexture( 0u, texture );
+
+  Sampler sampler = Sampler::New();
+  textureSet.SetSampler( 0u, sampler );
+
+  Shader shader = CreateShader();
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize( 400, 400 );
+  Stage::GetCurrent().Add( actor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  // Call the 3 dimensional wrap mode API.
+  sampler.SetWrapMode( WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE );
+
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify that 3 TexParameteri calls occurred.
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3u, TEST_LOCATION );
 
   END_TEST;
 }
