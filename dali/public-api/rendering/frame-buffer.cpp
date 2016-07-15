@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer

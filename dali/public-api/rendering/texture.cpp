@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/texture.h>  // Dali::Texture
+#include <dali/public-api/rendering/texture.h>          // Dali::Texture
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
+#include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
 
 
 namespace Dali
@@ -61,13 +62,13 @@ Texture& Texture::operator=( const Texture& handle )
   return *this;
 }
 
-void Texture::Upload( PixelData pixelData )
+bool Texture::Upload( PixelData pixelData )
 {
   Internal::PixelData& internalPixelData = GetImplementation( pixelData );
   return GetImplementation(*this).Upload( &internalPixelData );
 }
 
-void Texture::Upload( PixelData pixelData,
+bool Texture::Upload( PixelData pixelData,
                unsigned int layer, unsigned int mipmap,
                unsigned int xOffset, unsigned int yOffset,
                unsigned int width, unsigned int height )

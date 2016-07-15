@@ -681,11 +681,6 @@ public:
   DrawMode::Type GetDrawMode() const;
 
   /**
-   * @copydoc Dali::Actor::SetOverlay
-   */
-  void SetOverlay( bool enable );
-
-  /**
    * @copydoc Dali::Actor::IsOverlay
    */
   bool IsOverlay() const;

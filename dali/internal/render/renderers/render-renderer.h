@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_RENDERER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,17 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/texture-set.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
-#include <dali/integration-api/debug.h>
-#include <dali/internal/common/type-abstraction-enums.h>
-#include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
+#include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/update/manager/prepare-render-instructions.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@
 #include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/compile-time-assert.h>
+#include <dali/public-api/common/constants.h>
+#include <dali/public-api/rendering/texture-set.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/devel-api/rendering/texture-set.h>
 
 namespace Dali
 {

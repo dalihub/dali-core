@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
@@ -56,6 +55,15 @@ DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false
 DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
 DALI_PROPERTY( "depthFunction",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_FUNCTION )
 DALI_PROPERTY( "depthTestMode",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_TEST_MODE )
+DALI_PROPERTY( "stencilFunction",                 INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION )
+DALI_PROPERTY( "stencilFunctionMask",             INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_MASK )
+DALI_PROPERTY( "stencilFunctionReference",        INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE )
+DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MASK )
+DALI_PROPERTY( "stencilMode",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MODE )
+DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
+DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
+DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
+DALI_PROPERTY( "writeToColorBuffer",              BOOLEAN,   true, false,  false, Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -496,6 +504,10 @@ void Renderer::SetDefaultProperty( Property::Index index,
         mDepthTestMode = mode;
         SetDepthTestModeMessage( GetEventThreadServices(), *mSceneObject, mode );
       }
+      break;
+    }
+    default:
+    {
       break;
     }
   }

@@ -1,5 +1,5 @@
-#ifndef __DALI_TEST_ACTOR_UTILS_H__
-#define __DALI_TEST_ACTOR_UTILS_H__
+#ifndef DALI_TEST_ACTOR_UTILS_H
+#define DALI_TEST_ACTOR_UTILS_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -58,4 +58,4 @@ Image GetTexture( Actor actor );
 
 } // namespace Dali
 
-#endif // __DALI_TEST_ACTOR_UTILS_H__
+#endif // DALI_TEST_ACTOR_UTILS_H

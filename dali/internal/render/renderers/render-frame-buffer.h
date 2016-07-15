@@ -17,14 +17,12 @@
  * limitations under the License.
  */
 
-
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/frame-buffer.h>
-#include <dali/integration-api/resource-declarations.h>
-
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/integration-api/gl-defines.h>
+#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {

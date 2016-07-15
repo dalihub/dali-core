@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,12 @@
  * limitations under the License.
  *
  */
+
+// CLASS HEADER
 #include "mesh-builder.h"
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/images/texture-set-image.h>
 
 namespace Dali
 {
@@ -28,10 +33,11 @@ TextureSet CreateTextureSet()
 {
   return TextureSet::New();
 }
+
 TextureSet CreateTextureSet( Image image )
 {
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   return textureSet;
 }
 
@@ -44,5 +50,28 @@ PropertyBuffer CreatePropertyBuffer()
   PropertyBuffer vertexData = PropertyBuffer::New( texturedQuadVertexFormat );
   return vertexData;
 }
+
+Geometry CreateQuadGeometry(void)
+{
+  PropertyBuffer vertexData = CreatePropertyBuffer();
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+  vertexData.SetData(texturedQuadVertexData, 4);
+
+  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexData );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
+
+  return geometry;
+}
+
+
 
 } // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h> // for EqualToConstraint
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/renderer.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>

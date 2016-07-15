@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/devel-api/rendering/texture.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -32,22 +32,28 @@ class FrameBuffer;
 
 /**
  * @brief FrameBuffer is a collection of textures that can be used as the destination for rendering
+ * @SINCE_1_1.43
  */
 class DALI_IMPORT_API FrameBuffer : public BaseHandle
 {
 public:
 
+  /**
+   * @brief Format of the FrameBuffer to be created.
+   * @SINCE_1_1.43
+   */
   enum Format
   {
-    COLOR,                ///< Framebuffer will be created with color buffer.
-    COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer
-    COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer
-    COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. @note May be not supported in all devices
+    COLOR,                ///< Framebuffer will be created with color buffer                                                               @SINCE_1_1.43
+    COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer                                                     @SINCE_1_1.43
+    COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer                                                   @SINCE_1_1.43
+    COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. @note May be not supported in all devices @SINCE_1_1.43
   };
 
   /**
    * @brief Creates a new FrameBuffer object
    *
+   * @SINCE_1_1.43
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
    * @param[in] format The format of the FrameBuffer
@@ -62,12 +68,14 @@ public:
 
   /**
    * @brief Destructor
+   * @SINCE_1_1.43
    */
   ~FrameBuffer();
 
   /**
    * @brief Copy constructor, creates a new handle to the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
   FrameBuffer( const FrameBuffer& handle );
@@ -75,8 +83,9 @@ public:
   /**
    * @brief Downcast to a FrameBuffer.
    *
+   * @SINCE_1_1.43
    * If not the returned handle is left uninitialized.
-   * @param[in] handle to an object
+   * @param[in] handle Handle to an object
    * @return FrameBuffer handle or an uninitialized handle
    */
   static FrameBuffer DownCast( BaseHandle handle );
@@ -84,6 +93,7 @@ public:
   /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
@@ -91,6 +101,8 @@ public:
 
   /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering
+   *
+   * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
    * @note The texture has to have the same size than the FrameBuffer
    * otherwise it won't be attached
@@ -99,6 +111,8 @@ public:
 
   /**
    * @brief Attach a texture to the framebuffer for color rendering
+   *
+   * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
@@ -109,15 +123,19 @@ public:
 
   /**
    * @brief Get the color texture used as output in the FrameBuffer
+   *
+   * @SINCE_1_1.43
    * @returns A handle to the texture used as color output, or an uninitialized handle
    */
   Texture GetColorTexture();
 
 public:
+
   /**
-   * @brief The constructor
-   *
-   * @param [in] pointer A pointer to a newly allocated FrameBuffer
+   * @brief The constructor.
+   * @note  Not intended for application developers.
+   * @SINCE_1_1.43
+   * @param[in] pointer A pointer to a newly allocated FrameBuffer
    */
   explicit DALI_INTERNAL FrameBuffer( Internal::FrameBuffer* pointer );
 };

@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/texture-set.h>  // Dali::TextureSet
+#include <dali/public-api/rendering/texture-set.h>          // Dali::TextureSet
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
-#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
-#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/rendering/sampler-impl.h>     // Dali::Internal::Sampler
+#include <dali/internal/event/rendering/shader-impl.h>      // Dali::Internal::Shader
 
 namespace Dali
 {
@@ -56,19 +56,6 @@ TextureSet& TextureSet::operator=( const TextureSet& handle )
   return *this;
 }
 
-void TextureSet::SetImage( size_t index, Image image )
-{
-  if( image )
-  {
-    Internal::ImagePtr imagePtr( &GetImplementation( image ) );
-    GetImplementation(*this).SetImage( index, imagePtr );
-  }
-  else
-  {
-    GetImplementation(*this).SetImage( index, NULL );
-  }
-}
-
 void TextureSet::SetTexture( size_t index, Texture texture )
 {
   if( texture )
@@ -80,12 +67,6 @@ void TextureSet::SetTexture( size_t index, Texture texture )
   {
     GetImplementation(*this).SetTexture( index, NULL );
   }
-}
-
-Image TextureSet::GetImage( size_t index ) const
-{
-  Internal::Image* imagePtr = GetImplementation(*this).GetImage( index );
-  return Dali::Image( imagePtr );
 }
 
 Texture TextureSet::GetTexture( size_t index ) const

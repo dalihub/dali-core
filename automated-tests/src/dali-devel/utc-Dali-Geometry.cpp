@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h>
 
 using namespace Dali;
 
@@ -556,42 +554,3 @@ int UtcDaliGeometrySetGetGeometryType02(void)
 
   END_TEST;
 }
-
-int UtcDaliGeometryQUAD(void)
-{
-  TestApplication application;
-
-  tet_infoline("Test Geometry::QUAD()");
-
-  Geometry geometry = Geometry::QUAD();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
-  Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
-  actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
-
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
-
-  drawTrace.Reset();
-  drawTrace.Enable(true);
-  application.SendNotification();
-  application.Render(0);
-  application.Render();
-  application.SendNotification();
-  drawTrace.Enable( false );
-
-  // geometry type is set as GL_TRIANGLE_STRIP, no index buffer
-  // no index buffer, call glDrawArrays,
-  DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
-  std::stringstream out;
-  int numVertex = 4;
-  out << GL_TRIANGLE_STRIP << ", " << 0 << ", " << numVertex;
-  DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
-
-  DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::TRIANGLE_STRIP, TEST_LOCATION);
-
-  END_TEST;
-}
-

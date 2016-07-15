@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@
  */
 
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/rendering/geometry.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-abstraction.h>
-#include <dali/devel-api/rendering/geometry.h>
-
+#include <dali/integration-api/gl-defines.h>
 
 namespace Dali
 {

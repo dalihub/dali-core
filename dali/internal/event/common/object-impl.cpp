@@ -164,7 +164,14 @@ std::string Object::GetPropertyName( Property::Index index ) const
 
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    return GetDefaultPropertyName( index );
+    std::string string;
+
+    const char * propertyName = GetDefaultPropertyName( index );
+    if( propertyName )
+    {
+      string = propertyName;
+    }
+    return string;
   }
 
   if ( ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )

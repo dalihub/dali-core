@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/devel-api/images/atlas.h>
-#include <dali/devel-api/images/pixel-data.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 

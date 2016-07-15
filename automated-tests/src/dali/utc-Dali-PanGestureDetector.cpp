@@ -131,7 +131,8 @@ struct TouchEventFunctor
 struct ConstraintData
 {
   ConstraintData()
-  : called(false)
+  : panning( false ),
+    called( false )
   {
   }
 
@@ -141,11 +142,13 @@ struct ConstraintData
   Vector2 localPosition;
   Vector2 localDisplacement;
   Vector2 localVelocity;
+  bool panning;
   bool called;
 
   void Reset()
   {
     screenPosition = screenDisplacement = screenVelocity = localPosition = localDisplacement = localVelocity = Vector2::ZERO;
+    panning = false;
     called = false;
   }
 };
@@ -163,6 +166,7 @@ struct PanConstraint
     constraintData.localPosition = inputs[3]->GetVector2();
     constraintData.localDisplacement = inputs[4]->GetVector2();
     constraintData.localVelocity = inputs[5]->GetVector2();
+    constraintData.panning = inputs[6]->GetBoolean();
     constraintData.called = true;
     current = Vector3::ZERO;
   }
@@ -2142,6 +2146,7 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
   constraint.Apply();
 
   // Render and notify
@@ -2188,6 +2193,7 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
   constraint.Apply();
 
   // Render and notify
@@ -2236,6 +2242,7 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
   constraint.Apply();
 
   // Render and notify
@@ -2283,6 +2290,7 @@ int UtcDaliPanGesturePredictionSmoothing(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
   constraint.Apply();
 
   // Render and notify
@@ -2322,6 +2330,7 @@ int UtcDaliPanGestureSetProperties(void)
   detector.DetectedSignal().Connect( &application, functor );
 
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index animatableGestureProperty = detector.RegisterProperty( "Dummy Property", Vector3::ZERO ); // For code coverage
 
   ConstraintData constraintData;
   Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
@@ -2331,6 +2340,8 @@ int UtcDaliPanGestureSetProperties(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  constraint.AddSource( Source( detector, animatableGestureProperty ) );
   constraint.Apply();
 
   // Render and notify
@@ -2392,6 +2403,7 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
   constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
   constraint.Apply();
 
   // Render and notify
@@ -2429,6 +2441,107 @@ int UtcDaliPanGesturePropertyIndices(void)
   detector.GetPropertyIndices( indices );
   DALI_TEST_CHECK( indices.Size() );
   DALI_TEST_EQUALS( indices.Size(), detector.GetPropertyCount(), TEST_LOCATION );
+  END_TEST;
+}
+
+namespace
+{
+struct PropertyStringIndex
+{
+  const char * const name;
+  const Property::Index index;
+  const Property::Type type;
+  const Property::Value value;
+};
+
+const PropertyStringIndex PROPERTY_TABLE[] =
+{
+  { "screenPosition",      PanGestureDetector::Property::SCREEN_POSITION,     Property::VECTOR2, Vector2::ZERO },
+  { "screenDisplacement",  PanGestureDetector::Property::SCREEN_DISPLACEMENT, Property::VECTOR2, Vector2::ZERO },
+  { "screenVelocity",      PanGestureDetector::Property::SCREEN_VELOCITY,     Property::VECTOR2, Vector2::ZERO },
+  { "localPosition",       PanGestureDetector::Property::LOCAL_POSITION,      Property::VECTOR2, Vector2::ZERO },
+  { "localDisplacement",   PanGestureDetector::Property::LOCAL_DISPLACEMENT,  Property::VECTOR2, Vector2::ZERO },
+  { "localVelocity",       PanGestureDetector::Property::LOCAL_VELOCITY,      Property::VECTOR2, Vector2::ZERO },
+  { "panning",             PanGestureDetector::Property::PANNING,             Property::BOOLEAN, false         },
+};
+const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
+} // unnamed namespace
+
+
+int UtcDaliPanGestureProperties(void)
+{
+  TestApplication application;
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  {
+    DALI_TEST_EQUALS( detector.GetPropertyName( PROPERTY_TABLE[ i ].index ), std::string( PROPERTY_TABLE[ i ].name ), TEST_LOCATION );
+    DALI_TEST_EQUALS( detector.GetPropertyIndex( PROPERTY_TABLE[ i ].name ), PROPERTY_TABLE[ i ].index, TEST_LOCATION );
+    DALI_TEST_EQUALS( detector.GetPropertyType( PROPERTY_TABLE[ i ].index ), PROPERTY_TABLE[ i ].type, TEST_LOCATION );
+    DALI_TEST_EQUALS( detector.IsPropertyWritable( PROPERTY_TABLE[ i ].index ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( detector.IsPropertyAnimatable( PROPERTY_TABLE[ i ].index ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( detector.IsPropertyAConstraintInput( PROPERTY_TABLE[ i ].index ), true, TEST_LOCATION );
+    detector.SetProperty( PROPERTY_TABLE[ i ].index, Property::Value() ); // Just for Coverage
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureGetProperty(void)
+{
+  TestApplication application;
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  {
+    if( PROPERTY_TABLE[ i ].type == Property::VECTOR2 )
+    {
+      bool value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< bool >();
+      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< bool >(), value, TEST_LOCATION );
+    }
+    else if( PROPERTY_TABLE[ i ].type == Property::BOOLEAN )
+    {
+      Vector2 value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< Vector2 >();
+      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< Vector2 >(), value, TEST_LOCATION );
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureGetPropertyWithSceneObject(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  {
+    detector.SetProperty( PROPERTY_TABLE[ i ].index, Property::Value() ); // Just for Coverage
+
+    if( PROPERTY_TABLE[ i ].type == Property::VECTOR2 )
+    {
+      bool value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< bool >();
+      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< bool >(), value, TEST_LOCATION );
+    }
+    else if( PROPERTY_TABLE[ i ].type == Property::BOOLEAN )
+    {
+      Vector2 value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< Vector2 >();
+      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< Vector2 >(), value, TEST_LOCATION );
+    }
+  }
+
   END_TEST;
 }
 

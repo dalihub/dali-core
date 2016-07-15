@@ -18,7 +18,6 @@
 #include "scene-graph-texture-set.h"
 
 // INTERNAL HEADERS
-#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/update/resources/texture-metadata.h>

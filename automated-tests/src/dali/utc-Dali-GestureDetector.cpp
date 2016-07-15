@@ -437,3 +437,33 @@ int UtcDaliGestureDetectorGetAttachedActors(void)
   DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliGestureDetectorProperties(void)
+{
+  TestApplication application;
+
+  // Use pinch gesture as that doen't currently have any properties. Will need to change it if default properties are added.
+  GestureDetector detector = PinchGestureDetector::New();
+
+  DALI_TEST_EQUALS( detector.GetPropertyCount(), 0u, TEST_LOCATION );
+
+  Property::IndexContainer indices;
+  detector.GetPropertyIndices( indices );
+  DALI_TEST_EQUALS( indices.Size(), 0u, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( detector.IsPropertyWritable( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.IsPropertyAnimatable( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.IsPropertyAConstraintInput( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetPropertyType( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), Property::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetPropertyIndex( "InvalidIndex" ), Property::INVALID_INDEX, TEST_LOCATION );
+
+  Property::Value propValue = detector.GetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX );
+  DALI_TEST_EQUALS( propValue.GetType(), Property::NONE, TEST_LOCATION );
+
+  DALI_TEST_CHECK( detector.GetPropertyName( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ).empty() );
+
+  // For coverage only, not testable
+  detector.SetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, true );
+
+  END_TEST;
+}

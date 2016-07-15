@@ -23,10 +23,10 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
-#include <dali/devel-api/rendering/renderer.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/gl-resources/frame-buffer-state-cache.h>

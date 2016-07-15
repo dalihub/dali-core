@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/sampler.h> // Dali::Internal::Sampler
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/render/renderers/render-sampler.h>

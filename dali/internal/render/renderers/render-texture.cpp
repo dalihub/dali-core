@@ -20,9 +20,6 @@
 // EXTERNAL INCLUDES
 #include <math.h>   //floor, log2
 
-//INTERNAL INCLUDES
-#include <dali/devel-api/rendering/texture.h>  // Dali::Texture
-
 namespace Dali
 {
 namespace Internal

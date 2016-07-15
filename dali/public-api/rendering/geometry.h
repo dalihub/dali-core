@@ -2,7 +2,7 @@
 #define DALI_GEOMETRY_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/devel-api/object/property-buffer.h> // Dali::PropertyBuffer
+#include <dali/public-api/rendering/property-buffer.h> // Dali::PropertyBuffer
 
 namespace Dali
 {
@@ -36,59 +36,73 @@ class Geometry;
 
 /**
  * @brief Geometry is handle to an object that can be used to define a geometric elements.
+ *
+ * @SINCE_1_1.43
  */
 class DALI_IMPORT_API Geometry : public BaseHandle
 {
 public:
 
+  /**
+   * @brief Describes the type of geometry, used to determine how the coordinates will be used.
+   * @SINCE_1_1.43
+   */
   enum GeometryType
   {
-    POINTS,
-    LINES,
-    LINE_LOOP,
-    LINE_STRIP,
-    TRIANGLES,
-    TRIANGLE_FAN,
-    TRIANGLE_STRIP
+    POINTS,        ///< Individual points                                                                                          @SINCE_1_1.43
+    LINES,         ///< Individual lines (made of 2 points each)                                                                   @SINCE_1_1.43
+    LINE_LOOP,     ///< A strip of lines (made of 1 point each) which also joins the first and last point                          @SINCE_1_1.43
+    LINE_STRIP,    ///< A strip of lines (made of 1 point each)                                                                    @SINCE_1_1.43
+    TRIANGLES,     ///< Individual triangles (made of 3 points each)                                                               @SINCE_1_1.43
+    TRIANGLE_FAN,  ///< A fan of triangles around a centre point (after the first triangle, following triangles need only 1 point) @SINCE_1_1.43
+    TRIANGLE_STRIP ///< A strip of triangles (after the first triangle, following triangles need only 1 point)                     @SINCE_1_1.43
   };
 
 
   /**
    * @brief Creates a new Geometry object
    *
-   * @return An handle to a newly allocated Geometry
+   * @SINCE_1_1.43
+   * @return A handle to a newly allocated Geometry object
    */
   static Geometry New();
 
   /**
    * @brief Default constructor, creates an empty handle
+   *
+   * @SINCE_1_1.43
    */
   Geometry();
 
   /**
    * @brief Destructor
+   *
+   * @SINCE_1_1.43
    */
   ~Geometry();
 
   /**
    * @brief Copy constructor, creates a new handle to the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
   Geometry( const Geometry& handle );
 
   /**
    * @brief Downcast to a geometry.
-   *
    * If not the returned handle is left uninitialized.
-   * @param[in] handle to an object
-   * @return geometry handle or an uninitialized handle
+   *
+   * @SINCE_1_1.43
+   * @param[in] handle Handle to an object
+   * @return geometry Handle or an uninitialized handle
    */
   static Geometry DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
@@ -97,6 +111,7 @@ public:
   /**
    * @brief Add a PropertyBuffer to be used as source of geometry vertices
    *
+   * @SINCE_1_1.43
    * @param[in] vertexBuffer PropertyBuffer to be used as source of geometry vertices
    * @return Index of the newly added buffer, can be used with RemoveVertexBuffer to remove
    *         this buffer if no longer required
@@ -106,25 +121,26 @@ public:
   /**
    * @brief Retrieve the number of vertex buffers that have been added to this geometry
    *
+   * @SINCE_1_1.43
    * @return Number of vertex buffers that have been added to this geometry
    */
   std::size_t GetNumberOfVertexBuffers() const;
 
   /**
    * @brief Remove a vertex buffer
-   *
    * The index must be between 0 and GetNumberOfVertexBuffers()
    *
+   * @SINCE_1_1.43
    * @param[in] index Index to the vertex buffer to remove
    */
   void RemoveVertexBuffer( std::size_t index );
 
   /**
    * @brief Set a the index data to be used as a source of indices for the geometry
-   *
    * Setting this buffer will cause the geometry to be rendered using indices.
    * To unset call SetIndexBuffer with a null pointer or count 0
    *
+   * @SINCE_1_1.43
    * @param[in] indices Array of indices
    * @param[in] count Number of indices in the array
    */
@@ -133,34 +149,27 @@ public:
   /**
    * @brief Set the type of primitives this geometry contains
    *
+   * @SINCE_1_1.43
    * @param[in] geometryType Type of primitives this geometry contains
    */
   void SetGeometryType( GeometryType geometryType );
 
   /**
    * @brief Get the type of primitives this geometry contains
-   *
    * Calling this function sets the property GEOMETRY_TYPE
    *
+   * @SINCE_1_1.43
    * @return Type of primitives this geometry contains
    */
   GeometryType GetGeometryType() const;
 
-  /**
-   * @brief Unit quad geometry.
-   *
-   * The quad has its four corners located at [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5] and [0.5, 0.5].
-   * The attribute name for vertex position is 'aPosition'.
-   *
-   * @return The quad geometry.
-   */
-  static Geometry QUAD();
-
 public:
+
   /**
    * @brief The constructor
-   *
-   * @param [in] pointer A pointer to a newly allocated Geometry
+   * @note  Not intended for application developers.
+   * @SINCE_1_1.43
+   * @param[in] pointer A pointer to a newly allocated Geometry
    */
   explicit DALI_INTERNAL Geometry( Internal::Geometry* pointer );
 };
