@@ -64,7 +64,7 @@ DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "writeToColorBuffer",              BOOLEAN,   true, false,  false, Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
