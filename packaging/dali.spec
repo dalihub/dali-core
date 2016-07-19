@@ -59,6 +59,11 @@ LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lg
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
 %endif
 
+%if 0%{?enable_coverage}
+CXXFLAGS+=" --coverage "
+LDFLAGS+=" --coverage "
+%endif
+
 libtoolize --force
 cd %{_builddir}/%{name}-%{version}/build/tizen
 autoreconf --install
