@@ -72,6 +72,22 @@
  * </tr>
  * </table>
  *
+ * \ifnot show_tizen_feature
+ *
+ * @section dali_toolkit_feature Related Features
+ * This API is related with the following features:\n
+ *    - http://tizen.org/feature/opengles.version.2_0\n
+ *
+ * It is recommended to design feature related codes in your application for reliability.\n
+ *
+ * You can check if a device supports the related features for this API by using @ref CAPI_SYSTEM_SYSTEM_INFO_MODULE, thereby controlling the procedure of your application.\n
+ *
+ * To ensure your application is only running on the device with specific features, please define the features in your manifest file using the manifest editor in the SDK.\n
+ *
+ * More details on featuring your application can be found from <a href="https://developer.tizen.org/development/tools/native-tools/manifest-text-editor#feature"><b>Feature Element</b>.</a>
+ *
+ * \endif
+ *
  * @ingroup dali
  * @{
  *   @defgroup dali_core_actors Actors
