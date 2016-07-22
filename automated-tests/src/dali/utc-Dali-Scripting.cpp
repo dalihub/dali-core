@@ -151,70 +151,6 @@ int UtcDaliScriptingNewImageNegative01(void)
   END_TEST;
 }
 
-int UtcDaliScriptingNewImageNegative02(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid load-policy value type
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "loadPolicy" ] = Vector3::ZERO;
-  // will give us a valid image handle with default load policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetLoadPolicy(), ResourceImage::IMMEDIATE, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative03(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid load-policy value
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "loadPolicy" ] = "INVALID";
-  // will give us a valid image with default load policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetLoadPolicy(), ResourceImage::IMMEDIATE, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative04(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid release-policy value type
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "releasePolicy" ] = Vector3::ZERO;
-  // will give us a valid image with default release policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative05(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid release-policy value
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "releasePolicy" ] = "INVALID";
-  // will give us a valid image with default release policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliScriptingNewImageNegative06(void)
 {
   TestApplication application; // Image needs application
@@ -366,42 +302,6 @@ int UtcDaliScriptingNewImage01P(void)
   // Filename only
   ResourceImage image = ResourceImage::DownCast( NewImage( map ) );
   DALI_TEST_EQUALS( "TEST_FILE", image.GetUrl(), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImage02P(void)
-{
-  TestApplication application;
-
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-
-  // load-policy
-  map[ "loadPolicy" ] = "";
-  const StringEnum values[] =
-  {
-    { "IMMEDIATE", ResourceImage::IMMEDIATE },
-    { "ON_DEMAND", ResourceImage::ON_DEMAND }
-  };
-  TestEnumStrings< ResourceImage::LoadPolicy, ResourceImage >( map, "loadPolicy",  values, ( sizeof( values ) / sizeof ( values[0] ) ), &ResourceImage::GetLoadPolicy, &NewResourceImage );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImage03P(void)
-{
-  TestApplication application;
-
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-
-  // release-policy
-  map[ "releasePolicy" ] = "";
-  const StringEnum values[] =
-  {
-    { "UNUSED", Image::UNUSED },
-    { "NEVER", Image::NEVER }
-  };
-  TestEnumStrings< Image::ReleasePolicy, Image >( map, "releasePolicy",  values, ( sizeof( values ) / sizeof ( values[0] ) ), &Image::GetReleasePolicy, &NewImage );
   END_TEST;
 }
 
@@ -836,10 +736,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "ResourceImage", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "filename" ) );
     DALI_TEST_EQUALS( map.Find( "filename" )->Get< std::string >(), "MY_PATH", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "loadPolicy") );
-    DALI_TEST_EQUALS( map.Find( "loadPolicy" )->Get< std::string >(), "IMMEDIATE", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "releasePolicy") );
-    DALI_TEST_EQUALS( map.Find( "releasePolicy" )->Get< std::string >(), "NEVER", TEST_LOCATION );
     DALI_TEST_CHECK( NULL == map.Find( "width" ) );
     DALI_TEST_CHECK( NULL == map.Find( "height" ) );
   }
@@ -856,10 +752,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "ResourceImage", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "filename" ) );
     DALI_TEST_EQUALS( map.Find( "filename" )->Get< std::string >(), "MY_PATH", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "loadPolicy") );
-    DALI_TEST_EQUALS( map.Find( "loadPolicy" )->Get< std::string >(), "ON_DEMAND", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "releasePolicy") );
-    DALI_TEST_EQUALS( map.Find( "releasePolicy" )->Get< std::string >(), "UNUSED", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "width" ) );
     DALI_TEST_EQUALS( map.Find( "width" )->Get< int >(), 300, TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "height" ) );

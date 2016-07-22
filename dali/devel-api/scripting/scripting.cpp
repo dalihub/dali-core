@@ -190,8 +190,6 @@ Image NewImage( const Property::Value& property )
   Image ret;
 
   std::string filename;
-  ResourceImage::LoadPolicy loadPolicy = Dali::Internal::IMAGE_LOAD_POLICY_DEFAULT;
-  Image::ReleasePolicy releasePolicy   = Dali::Internal::IMAGE_RELEASE_POLICY_DEFAULT;
   Internal::ImageAttributes attributes = Internal::ImageAttributes::New();
 
   const Property::Map* map = property.GetMap();
@@ -228,24 +226,6 @@ Image NewImage( const Property::Value& property )
         DALI_LOG_ERROR( "No filename\n" );
         return Image();
       }
-    }
-
-    value = map->Find( "loadPolicy" );
-    if( value )
-    {
-      std::string policy;
-      value->Get( policy );
-      // keep default value on error
-      GetEnumeration< ResourceImage::LoadPolicy >( policy.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT, loadPolicy );
-    }
-
-    value = map->Find( "releasePolicy" );
-    if( value )
-    {
-      std::string policy;
-      value->Get( policy );
-      // keep default value on error
-      GetEnumeration< Image::ReleasePolicy >( policy.c_str(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT, releasePolicy );
     }
 
     // Width and height can be set individually. Dali derives the unspecified
@@ -323,8 +303,7 @@ Image NewImage( const Property::Value& property )
     {
       case RESOURCE_IMAGE :
       {
-        ret = ResourceImage::New( filename, loadPolicy, releasePolicy,
-                                  ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ),
+        ret = ResourceImage::New( filename, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ),
                                   attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
         break;
       }
@@ -332,16 +311,14 @@ Image NewImage( const Property::Value& property )
       {
         ret = BufferImage::New( attributes.GetWidth(),
                                 attributes.GetHeight(),
-                                pixelFormat,
-                                releasePolicy );
+                                pixelFormat );
         break;
       }
       case FRAME_BUFFER_IMAGE :
       {
         ret = FrameBufferImage::New( attributes.GetWidth(),
                                      attributes.GetHeight(),
-                                     pixelFormat,
-                                     releasePolicy );
+                                     pixelFormat );
         break;
       }
     }
