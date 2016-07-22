@@ -126,7 +126,6 @@ Renderer::Renderer()
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
   mBlendBitmask( 0u ),
-  mReferenceCount( 0u ),
   mRegenerateUniformMap( 0u ),
   mResendFlag( 0u ),
   mDepthFunction( DepthFunction::LESS ),
@@ -158,7 +157,6 @@ Renderer::~Renderer()
     mShader->RemoveConnectionObserver(*this);
     mShader=NULL;
   }
-
 }
 
 void Renderer::operator delete( void* ptr )
@@ -425,45 +423,22 @@ void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
   mResendFlag |= RESEND_DEPTH_FUNCTION;
 }
 
-//Called when a node with this renderer is added to the stage
-void Renderer::OnStageConnect()
-{
-  ++mReferenceCount;
-  if( !mRenderer)
-  {
-    RenderDataProvider* dataProvider = NewRenderDataProvider();
-
-    mRenderer = Render::Renderer::New( dataProvider, mGeometry,
-                                       mBlendBitmask, mBlendColor,
-                                       static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
-                                       mPremultipledAlphaEnabled,
-                                       mDepthWriteMode,
-                                       mDepthTestMode,
-                                       mDepthFunction );
-
-    mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
-    mResendFlag = 0;
-  }
-}
-
-//Called when the node with this renderer has gone out of the stage
-void Renderer::OnStageDisconnect()
-{
-  --mReferenceCount;
-  if( mReferenceCount == 0 )
-  {
-    mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
-    mRenderer = NULL;
-  }
-}
-
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
 {
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mSceneController = &sceneController;
-}
+  RenderDataProvider* dataProvider = NewRenderDataProvider();
 
+  mRenderer = Render::Renderer::New( dataProvider, mGeometry,
+                                     mBlendBitmask, mBlendColor,
+                                     static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
+                                     mPremultipledAlphaEnabled,
+                                     mDepthWriteMode,
+                                     mDepthTestMode,
+                                     mDepthFunction );
+  mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
+}
 
 //Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
 void Renderer::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -473,8 +448,8 @@ void Renderer::DisconnectFromSceneGraph( SceneController& sceneController, Buffe
   {
     mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
     mRenderer = NULL;
-    mSceneController = NULL;
   }
+  mSceneController = NULL;
 }
 
 RenderDataProvider* Renderer::NewRenderDataProvider()
@@ -516,7 +491,7 @@ Render::Renderer& Renderer::GetRenderer()
 const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) const
 {
   return mCollectedUniformMap[bufferIndex];
-};
+}
 
 void Renderer::GetReadyAndComplete( bool& ready, bool& complete ) const
 {

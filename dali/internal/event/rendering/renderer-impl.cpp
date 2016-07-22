@@ -695,7 +695,6 @@ void Renderer::Connect()
 {
   if( mOnStageCount == 0 )
   {
-    OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
     mTextureSetConnector.OnStageConnect();
   }
   ++mOnStageCount;
@@ -706,7 +705,6 @@ void Renderer::Disconnect()
   --mOnStageCount;
   if( mOnStageCount == 0 )
   {
-    OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
     mTextureSetConnector.OnStageDisconnect();
   }
 }

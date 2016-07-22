@@ -867,10 +867,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *rendererContainer[i], bufferIndex );
 
-    if( rendererContainer[i]->IsReferenced() )
-    {
-      rendererContainer[i]->PrepareRender( bufferIndex );
-    }
+    rendererContainer[i]->PrepareRender( bufferIndex );
   }
 }
 

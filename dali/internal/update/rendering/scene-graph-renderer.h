@@ -186,16 +186,6 @@ public:
   void SetDepthFunction( DepthFunction::Type depthFunction );
 
   /**
-   * Called when an actor with this renderer is added to the stage
-   */
-  void OnStageConnect();
-
-  /*
-   * Called when an actor with this renderer is removed from the stage
-   */
-  void OnStageDisconnect();
-
-  /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -225,14 +215,6 @@ public:
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
   Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
-
-  /**
-   * Query whether the renderer is currently in use by an actor on the stage
-   */
-  bool IsReferenced() const
-  {
-    return mReferenceCount > 0;
-  }
 
   /**
    * Called by the TextureSet to notify to the renderer that it has changed
@@ -336,7 +318,6 @@ private:
   size_t                mIndexedDrawFirstElement;       ///< first element index to be drawn using indexed draw
   size_t                mIndexedDrawElementsCount;      ///< number of elements to be drawn using indexed draw
   unsigned int          mBlendBitmask;                  ///< The bitmask of blending options
-  unsigned int          mReferenceCount;                ///< Number of nodes currently using this renderer
   unsigned int          mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned short        mResendFlag;                    ///< Indicate whether data should be resent to the renderer
 
@@ -500,28 +481,6 @@ inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, c
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetDepthFunction, depthFunction );
-}
-
-inline void OnStageConnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )
-{
-  typedef Message< Renderer > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::OnStageConnect );
-}
-
-inline void OnStageDisconnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )
-{
-  typedef Message< Renderer > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::OnStageDisconnect );
 }
 
 } // namespace SceneGraph
