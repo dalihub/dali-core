@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.1.43
+Version:    1.1.44
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -57,6 +57,11 @@ LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lg
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
+%endif
+
+%if 0%{?enable_coverage}
+CXXFLAGS+=" --coverage "
+LDFLAGS+=" --coverage "
 %endif
 
 libtoolize --force

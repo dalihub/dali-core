@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>                // Dali::Handle
-#include <dali/public-api/object/property-index-ranges.h> // DEFAULT_OBJECT_PROPERTY_START_INDEX
+#include <dali/public-api/object/property-index-ranges.h> // DEFAULT_RENDERER_PROPERTY_START_INDEX
 #include <dali/public-api/rendering/geometry.h>           // Dali::Geometry
 #include <dali/public-api/rendering/texture-set.h>        // Dali::TextureSet
 
@@ -242,7 +242,7 @@ public:
        * @note The default value is 0
        * @SINCE_1_1.43
        */
-      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,
+      DEPTH_INDEX = DEFAULT_RENDERER_PROPERTY_START_INDEX,
 
       /**
        * @brief name "faceCullingMode", type INTEGER

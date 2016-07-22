@@ -48,6 +48,9 @@ enum PropertyRanges
 
   DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,  ///< Used by PanGestureDetector. @SINCE_1_0.0
 
+  DEFAULT_RENDERER_PROPERTY_START_INDEX         = 9000000,    ///< Start index for Renderer. @SINCE_1_1.44
+  DEFAULT_RENDERER_PROPERTY_MAX_INDEX           = DEFAULT_RENDERER_PROPERTY_START_INDEX + 100000, ///< Renderer range: 9000000 to 9100000 @SINCE_1_1.44
+
   PROPERTY_REGISTRATION_START_INDEX             = 10000000,   ///< The index when registering a property should start from this number. @SINCE_1_0.0
   DEFAULT_PROPERTY_MAX_COUNT                    = PROPERTY_REGISTRATION_START_INDEX,           ///< Default Property Range: 0 to 9999999 @SINCE_1_0.0
 
