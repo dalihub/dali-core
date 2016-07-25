@@ -107,15 +107,23 @@ public:
   enum Behavior
   {
     /**
-     * @brief Layer doesn't make use of the depth test (default mode).
+     * @DEPRECATED_1_1.45, use LAYER_UI instead
+     * @brief UI control rendering mode
+     * @SINCE_1_0.0
+     * @see LAYER_UI
+     */
+    LAYER_2D,
+
+    /**
+     * @brief UI control rendering mode (default mode).
      *
-     * This mode is expected to have better performance than the 3D mode.
-     * When using this mode any ordering would be with respect to tree level of each Actor.
+     * This mode is designed for UI controls. In this mode renderer order will be respective to tree hierarchy of Actors.
+     * This mode is expected to have better performance than LAYER_3D as renderers can be sorted more efficiently.
      *
-     * For the following actor tree of the Layer1 object, D and E hide B, B and C hides A,
-     * and F hides C, regardless of their Z positions.
-     * Rendering order between siblings, such as D & E or B & C, is determined based on the depth index.
-     * If you have two overlapped actors, just make them parent-child, not siblings.
+     * For the following actor tree the rendering order will be A first, then B & C and finally D,E,F regardless of their
+     * Z positions.
+     * Rendering order between siblings, such as D, E & F or B & C, is determined based on the renderers depth index.
+     * In UI we don't normally expect overlap. If you have two overlapped actors, make them parent-child to guarantee order of all renderers.
      *
      * @code
      *
@@ -129,9 +137,9 @@ public:
      *
      * @endcode
      *
-     * @SINCE_1_0.0
+     * @SINCE_1_1.45
      */
-    LAYER_2D,
+    LAYER_UI = LAYER_2D,
 
     /**
      * @brief Layer will use depth test.
@@ -141,15 +149,16 @@ public:
      * those layers regardless of their Z positions (see Layer::Raise() and Layer::Lower()).
      * Opaque renderers are drawn first and write to the depth buffer.
      * Then transparent renderers are drawn with depth test enabled but depth write switched off.
-     * Transparent renderers are drawn based on their distance from the camera (painter's algorithm).
+     * Transparent renderers are drawn based on their distance from the camera.
      * A renderers DEPTH_INDEX property is used to offset the distance to the camera when ordering transparent renderers.
      * This is useful if you want to define the draw order of two or more transparent renderers that are
      * equal distance from the camera.
-     * Unlike LAYER_2D, parent-child relationship does not affect rendering order at all.
+     * Unlike LAYER_UI, parent-child relationship does not affect rendering order at all.
      *
      * @SINCE_1_0.0
      */
-    LAYER_3D,
+    LAYER_3D
+
   };
 
   /**
