@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,9 +111,9 @@ const unsigned int imageTypeCount = sizeof( ImageTypeName ) / sizeof( const char
 
 } // unnamed namespace
 
-bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, unsigned int tableCount, unsigned int& integerEnum )
+bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, unsigned int tableCount, int& integerEnum )
 {
-  unsigned int ret = 0;
+  int ret = 0;
 
   bool found = false;
   bool done = false;

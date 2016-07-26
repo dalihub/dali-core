@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -831,6 +831,85 @@ int UtcDaliScriptingGetLinearEnumerationNameN(void)
   END_TEST;
 }
 
+int UtcDaliScriptingGetEnumerationProperty(void)
+{
+  /*
+   * This test function performs the following checks:
+   *  - An enum can be looked up from a Property::Value of type INTEGER.
+   *  - An enum can be looked up from a Property::Value of type STRING.
+   *  - An enum can NOT be looked up other Property::Value types.
+   *  - The return value is "true" if the property can be successfully converted AND it has changed.
+   *  - The return value is "false" if the property can be successfully converted BUT it has NOT changed.
+   *  - The return value is "false" if the property can not be successfully converted.
+   *  - The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+   */
+
+  // String to Enum property table to test with (equivalent to ones used within DALi).
+  const Dali::Scripting::StringEnum  testTable[] = {
+      { "NONE",           FaceCullingMode::NONE },
+      { "FRONT",          FaceCullingMode::FRONT },
+      { "BACK",           FaceCullingMode::BACK },
+      { "FRONT_AND_BACK", FaceCullingMode::FRONT_AND_BACK }
+  }; const unsigned int testTableCount = sizeof( testTable ) / sizeof( testTable[0] );
+
+  // TEST: An enum can be looked up from a Property::Value of type INTEGER.
+  // Initialise to first element.
+  FaceCullingMode::Type result = FaceCullingMode::NONE;
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueInteger( FaceCullingMode::FRONT );
+
+  // Perform the lookup.
+  bool returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "true" if the property can be successfully converted AND it has changed
+  // Check the property could be converted.
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // Now emulate a property-set with the same value. false should be returned.
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can be successfully converted BUT it has NOT changed.
+  DALI_TEST_CHECK( !returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // TEST: An enum can be looked up from a Property::Value of type STRING.
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueString( "BACK" );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( !returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // TEST: An enum can NOT be looked up other Property::Value types.
+  Property::Value propertyValueBoolean( true );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueBoolean, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can not be successfully converted.
+  // Return value should be false as Property::Value was of an unsupported type for enum properties.
+  DALI_TEST_CHECK( !returnValue );
+
+  // TEST: The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliScriptingFindEnumIndexN(void)
 {
   const Scripting::StringEnum myTable[] =
@@ -859,7 +938,7 @@ int UtcDaliScriptingEnumStringToIntegerP(void)
     };
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( EnumStringToInteger( "ONE", myTable, myTableCount, integerEnum ) );
 
   DALI_TEST_EQUALS( integerEnum, (1<<1), TEST_LOCATION );
@@ -905,7 +984,7 @@ int UtcDaliScriptingEnumStringToIntegerN(void)
   };
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( !EnumStringToInteger( "Foo", myTable, myTableCount, integerEnum ) );
 
   DALI_TEST_CHECK( !EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
@@ -934,7 +1013,7 @@ int UtcDaliScriptingEnumStringToIntegerInvalidEnumP(void)
 
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
   DALI_TEST_EQUALS( integerEnum, 1, TEST_LOCATION );
 
@@ -952,7 +1031,7 @@ int UtcDaliScriptingEnumStringToIntegerInvalidEnumN(void)
 
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( !EnumStringToInteger( NULL, NULL, 0, integerEnum ) );
 
   DALI_TEST_CHECK( !EnumStringToInteger( "ONE", NULL, 0, integerEnum ) );
