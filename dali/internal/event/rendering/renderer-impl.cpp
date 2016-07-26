@@ -65,6 +65,7 @@ DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "writeToColorBuffer",              BOOLEAN,   true, false,  false, Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER )
+DALI_PROPERTY( "batchingEnabled",                 BOOLEAN,   true, false,  false, Dali::Renderer::Property::BATCHING_ENABLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
 // Property string to enumeration tables:
@@ -345,6 +346,11 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
   return mPremultipledAlphaEnabled;
+}
+
+bool Renderer::IsBatchingEnabled() const
+{
+  return mBatchingEnabled;
 }
 
 SceneGraph::Renderer* Renderer::GetRendererSceneObject()
@@ -657,6 +663,19 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case Dali::Renderer::Property::BATCHING_ENABLED:
+    {
+      bool enabled;
+      if( propertyValue.Get( enabled ) )
+      {
+        if( mBatchingEnabled != enabled )
+        {
+          mBatchingEnabled = enabled;
+          SetBatchingEnabledMessage( GetEventThreadServices(), *mSceneObject, mBatchingEnabled );
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -768,6 +787,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
     case Dali::Renderer::Property::DEPTH_WRITE_MODE:
     {
       value = mDepthWriteMode;
+      break;
+    }
+    case Dali::Renderer::Property::BATCHING_ENABLED:
+    {
+      value = mBatchingEnabled;
       break;
     }
     case Dali::Renderer::Property::DEPTH_FUNCTION:
@@ -916,7 +940,8 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mWriteToColorBuffer( true ),
-  mPremultipledAlphaEnabled( false )
+  mPremultipledAlphaEnabled( false ),
+  mBatchingEnabled( false )
 {
 }
 

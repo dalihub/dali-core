@@ -25,11 +25,13 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/update/manager/geometry-batcher.h>
 
 using Dali::Internal::SceneGraph::RenderItem;
 using Dali::Internal::SceneGraph::RenderList;
 using Dali::Internal::SceneGraph::RenderListContainer;
 using Dali::Internal::SceneGraph::RenderInstruction;
+using Dali::Internal::SceneGraph::GeometryBatcher;
 
 namespace Dali
 {
@@ -215,6 +217,7 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool isL
  * @param[in] buffer The current render buffer index (previous update buffer)
  * @param[in] viewMatrix The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
+ * @param[in] geometryBatcher The instance of the geometry batcher
  */
 inline void ProcessRenderList(
   const RenderList& renderList,
@@ -223,7 +226,8 @@ inline void ProcessRenderList(
   SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
   const Matrix& viewMatrix,
-  const Matrix& projectionMatrix )
+  const Matrix& projectionMatrix,
+  GeometryBatcher* geometryBatcher )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -241,14 +245,34 @@ inline void ProcessRenderList(
   if( DALI_LIKELY( !renderList.HasColorRenderItems() || !depthTestEnabled ) )
   {
     size_t count = renderList.Count();
+    bool skip( false );
     for ( size_t index = 0; index < count; ++index )
     {
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
       SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
-      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
-                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+
+      // Check if the node has a valid batch index value ( set previously by
+      // GeometryBatcher ). If so, then it queries the geometry object for this particular batch.
+      // If not, it still checks if the batch parent is set as it is possible, batching may
+      // fail ( for example if vertex format or buffers are not set ). In that case we need
+      // to skip rendering, otherwise unwanted GPU buffers will get uploaded. This is very rare case.
+      uint32_t batchIndex = item.mNode->mBatchIndex;
+      if( batchIndex != BATCH_NULL_HANDLE )
+      {
+        item.mBatchRenderGeometry = geometryBatcher->GetGeometry( batchIndex );
+      }
+      else
+      {
+        skip = item.mNode->GetBatchParent();
+        item.mBatchRenderGeometry = NULL;
+      }
+      if( !skip )
+      {
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, item.mBatchRenderGeometry, !item.mIsOpaque );
+      }
     }
   }
   else
@@ -264,7 +288,7 @@ inline void ProcessRenderList(
       SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
 
       item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
-                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, item.mBatchRenderGeometry, !item.mIsOpaque );
     }
   }
 }
@@ -273,6 +297,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
+                               GeometryBatcher& geometryBatcher,
                                BufferIndex bufferIndex )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
@@ -297,7 +322,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix );
+        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix, &geometryBatcher );
       }
     }
   }

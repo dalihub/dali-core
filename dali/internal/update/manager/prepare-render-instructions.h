@@ -39,6 +39,7 @@ namespace SceneGraph
 class RenderTracker;
 struct RenderItem;
 class Shader;
+class GeometryBatcher;
 
 /**
  * Structure to store information for sorting the renderers.
@@ -89,7 +90,8 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                                RenderTask& renderTask,
                                RendererSortingHelper& sortingHelper,
                                bool cull,
-                               RenderInstructionContainer& instructions );
+                               RenderInstructionContainer& instructions,
+                               GeometryBatcher& geometryBatcher );
 
 } // namespace SceneGraph
 

@@ -171,12 +171,18 @@ public:
     */
    bool IsPreMultipliedAlphaEnabled() const;
 
-  /**
-   * @brief Get the scene graph object
-   *
-   * @return the scene object
-   */
-  SceneGraph::Renderer* GetRendererSceneObject();
+   /**
+    * Returns state of batching mode
+    * @return batching mode state ( true if enabled )
+    */
+   bool IsBatchingEnabled() const;
+
+   /**
+    * @brief Get the scene graph object
+    *
+    * @return the scene object
+    */
+   SceneGraph::Renderer* GetRendererSceneObject();
 
 public: // Default property extensions from Object
 
@@ -314,6 +320,7 @@ private: // data
   DepthTestMode::Type          mDepthTestMode:2;              ///< Local copy of the depth test mode
   bool                         mWriteToColorBuffer:1;         ///< Local copy of the write to color buffer flag
   bool                         mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool                         mBatchingEnabled : 1;          ///< Flag indicating whether render is batchable or not
 };
 
 } // namespace Internal
