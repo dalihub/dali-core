@@ -56,7 +56,7 @@ void main()
 }
 );
 
-Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::ShaderHints shaderHints = Shader::HINT_NONE )
+Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
 {
   PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
   BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
@@ -420,7 +420,7 @@ int UtcFrustumCullDisabledP(void)
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
 
-  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::HINT_MODIFIES_GEOMETRY );
+  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::Hint::MODIFIES_GEOMETRY );
 
   drawTrace.Reset();
   application.SendNotification();

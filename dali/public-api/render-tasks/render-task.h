@@ -438,8 +438,8 @@ public:
    * @SINCE_1_0.0
    * @param[in] cullMode True if the renderers should be culled.
    * @note The default mode is to cull actors.
-   * @note If the shader uses @ref Shader::HINT_MODIFIES_GEOMETRY then culling optimizations are disabled.
-   * @see Shader::ShaderHints
+   * @note If the shader uses @ref Shader::Hint::MODIFIES_GEOMETRY then culling optimizations are disabled.
+   * @see Shader::Hint
    */
   void SetCullMode( bool cullMode );
 

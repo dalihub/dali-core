@@ -35,7 +35,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-Shader::Shader( Dali::Shader::ShaderHints& hints )
+Shader::Shader( Dali::Shader::Hint::Value& hints )
 : mHints( hints ),
   mProgram( NULL ),
   mConnectionObservers()

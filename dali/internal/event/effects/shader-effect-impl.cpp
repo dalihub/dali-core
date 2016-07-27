@@ -137,20 +137,20 @@ std::string GetStringProperty(const std::string& field, const Property::Value& p
   return retval;
 }
 
-Dali::Shader::ShaderHints ConvertHints( Dali::ShaderEffect::GeometryHints hints)
+Dali::Shader::Hint::Value ConvertHints( Dali::ShaderEffect::GeometryHints hints)
 {
-  int convertedHints = Dali::Shader::HINT_NONE;
+  int convertedHints = Dali::Shader::Hint::NONE;
 
   if( hints & Dali::ShaderEffect::HINT_BLENDING )
   {
-    convertedHints |= Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT;
+    convertedHints |= Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT;
   }
   if( !(hints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY) )
   {
-    convertedHints |= Dali::Shader::HINT_MODIFIES_GEOMETRY;
+    convertedHints |= Dali::Shader::Hint::MODIFIES_GEOMETRY;
   }
 
-  return Dali::Shader::ShaderHints( convertedHints );
+  return Dali::Shader::Hint::Value( convertedHints );
 }
 
 } // unnamed namespace

@@ -635,7 +635,7 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
     }
     case BlendMode::AUTO:
     {
-      bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT ) );
+      bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
         opacity = Renderer::TRANSLUCENT;

@@ -737,7 +737,7 @@ int UtcDaliRendererSetBlendMode06(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_TRANSPARENT renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   Renderer renderer = Renderer::New( geometry, shader );
 

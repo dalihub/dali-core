@@ -81,7 +81,7 @@ ShaderFactory::~ShaderFactory()
   }
 }
 
-ShaderDataPtr ShaderFactory::Load( const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::ShaderHints hints, size_t& shaderHash )
+ShaderDataPtr ShaderFactory::Load( const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash )
 {
   // Work out the filename for the binary that the glsl source will be compiled and linked to:
   shaderHash = CalculateHash( vertexSource.c_str(), fragmentSource.c_str() );

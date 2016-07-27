@@ -73,14 +73,17 @@ class DALI_IMPORT_API Shader : public Handle
 public:
 
   /**
-   * @brief Hints for rendering/subdividing geometry.
-   * @SINCE_1_1.43
+   * @brief Hints for rendering.
+   * @SINCE_1_1.45
    */
-  enum ShaderHints
+  struct Hint
   {
-    HINT_NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.43
-    HINT_OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.43
-    HINT_MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.43
+    enum Value
+    {
+      NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.43
+      OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.43
+      MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.43
+    };
   };
 
   /**
@@ -112,7 +115,7 @@ public:
    */
   static Shader New( const std::string& vertexShader,
                      const std::string& fragmentShader,
-                     ShaderHints hints = ShaderHints( HINT_NONE ) );
+                     Hint::Value hints = Hint::NONE );
 
   /**
    * @brief Default constructor, creates an empty handle
