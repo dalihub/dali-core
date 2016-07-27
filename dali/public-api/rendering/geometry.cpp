@@ -75,14 +75,14 @@ void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
   GetImplementation(*this).SetIndexBuffer( indices, count );
 }
 
-void Geometry::SetGeometryType( GeometryType geometryType )
+void Geometry::SetType( Type geometryType )
 {
-  GetImplementation(*this).SetGeometryType( geometryType );
+  GetImplementation(*this).SetType( geometryType );
 }
 
-Geometry::GeometryType Geometry::GetGeometryType() const
+Geometry::Type Geometry::GetType() const
 {
-  return GetImplementation(*this).GetGeometryType();
+  return GetImplementation(*this).GetType();
 }
 
 Geometry::Geometry( Internal::Geometry* pointer )

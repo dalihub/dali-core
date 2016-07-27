@@ -80,9 +80,9 @@ public:
   {
     enum Value
     {
-      NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.43
-      OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.43
-      MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.43
+      NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.45
+      OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.45
+      MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.45
     };
   };
 

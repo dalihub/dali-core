@@ -1802,7 +1802,7 @@ int UtcDaliRendererSetIndexRange(void)
 
   // create geometry
   Geometry geometry = Geometry::New();
-  geometry.SetGeometryType( Geometry::LINE_LOOP );
+  geometry.SetType( Geometry::LINE_LOOP );
 
   // --------------------------------------------------------------------------
   // index buffer
@@ -1867,7 +1867,7 @@ int UtcDaliRendererSetIndexRange(void)
   // LINE_STRIP, first 15, count 6
   {
     renderer.SetIndexRange( 15, 6 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -1878,7 +1878,7 @@ int UtcDaliRendererSetIndexRange(void)
   // Index out of bounds
   {
     renderer.SetIndexRange( 15, 30 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -1889,7 +1889,7 @@ int UtcDaliRendererSetIndexRange(void)
   // drawing whole buffer starting from 15 ( last valid primitive )
   {
     renderer.SetIndexRange( 15, 0 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();

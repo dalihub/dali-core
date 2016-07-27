@@ -128,7 +128,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   {
     geometry->SetIndexBuffer( &indices[0], indices.Size() );
   }
-  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
+  geometry->SetType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
