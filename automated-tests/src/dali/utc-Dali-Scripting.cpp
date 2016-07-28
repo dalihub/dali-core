@@ -837,7 +837,7 @@ int UtcDaliScriptingGetEnumerationProperty(void)
    * This test function performs the following checks:
    *  - An enum can be looked up from a Property::Value of type INTEGER.
    *  - An enum can be looked up from a Property::Value of type STRING.
-   *  - An enum can NOT be looked up other Property::Value types.
+   *  - An enum can NOT be looked up for other Property::Value types.
    *  - The return value is "true" if the property can be successfully converted AND it has changed.
    *  - The return value is "false" if the property can be successfully converted BUT it has NOT changed.
    *  - The return value is "false" if the property can not be successfully converted.
@@ -894,7 +894,7 @@ int UtcDaliScriptingGetEnumerationProperty(void)
   // The result should remain the same.
   DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
 
-  // TEST: An enum can NOT be looked up other Property::Value types.
+  // TEST: An enum can NOT be looked up for other Property::Value types.
   Property::Value propertyValueBoolean( true );
 
   returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueBoolean, testTable, testTableCount, result );
@@ -906,6 +906,132 @@ int UtcDaliScriptingGetEnumerationProperty(void)
   // TEST: The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
   // The result should remain the same.
   DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliScriptingGetBitmaskEnumerationProperty(void)
+{
+  /*
+   * This test function performs the following checks:
+   *  - An enum can be looked up from a Property::Value of type INTEGER.
+   *  - An enum can be looked up from a Property::Value of type STRING.
+   *  - An enum can NOT be looked up from other Property::Value types.
+   *  - The return value is "true" if the property can be successfully converted AND it has changed.
+   *  - The return value is "false" if the property can not be successfully converted.
+   *  - The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+   *  PropertyArrays:
+   *  - The return value when checking an array with 2 INTEGERS is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with 2 INTEGERS is the ORd value of the 2 integers.
+   *  - The return value when checking an array with 2 STRINGS is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with 2 STRINGS is the ORd value of the 2 integer equivalents of the strings.
+   *  - The return value when checking an array with an INTEGER and a STRING is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with an INTEGER and a STRING is the ORd value of the 2 integer equivalents of the strings.
+   *  - The return value when checking an array with an INTEGER and a Vector3 is "false" as the properties can not be successfully converted.
+   *  - The result value when checking an array with an INTEGER and a Vector3 is unchanged.
+   */
+
+  // String to Enum property table to test with (equivalent to ones used within DALi).
+  const Dali::Scripting::StringEnum  testTable[] = {
+      { "NONE",           FaceCullingMode::NONE },
+      { "FRONT",          FaceCullingMode::FRONT },
+      { "BACK",           FaceCullingMode::BACK },
+      { "FRONT_AND_BACK", FaceCullingMode::FRONT_AND_BACK }
+  }; const unsigned int testTableCount = sizeof( testTable ) / sizeof( testTable[0] );
+
+  // TEST: An enum can be looked up from a Property::Value of type INTEGER.
+  // Initialise to first element.
+  FaceCullingMode::Type result = FaceCullingMode::NONE;
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueInteger( FaceCullingMode::FRONT );
+
+  // Perform the lookup.
+  bool returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "true" if the property can be successfully converted AND it has changed
+  // Check the property could be converted.
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // TEST: An enum can be looked up from a Property::Value of type STRING.
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueString( "BACK" );
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // TEST: An enum can NOT be looked up from other Property::Value types.
+  Property::Value propertyValueVector( Vector3::ZERO );
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueVector, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can not be successfully converted.
+  // Return value should be false as Property::Value was of an unsupported type for enum properties.
+  DALI_TEST_CHECK( !returnValue );
+
+  // TEST: The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // Test PropertyArrays:
+
+  // Property array of 2 integers.
+  Property::Array propertyArrayIntegers;
+  propertyArrayIntegers.PushBack( FaceCullingMode::FRONT );
+  propertyArrayIntegers.PushBack( FaceCullingMode::BACK );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayIntegers, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with 2 INTEGERS is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with 2 INTEGERS is the ORd value of the 2 integers.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of 2 strings.
+  Property::Array propertyArrayStrings;
+  propertyArrayStrings.PushBack( "FRONT" );
+  propertyArrayStrings.PushBack( "BACK" );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayStrings, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with 2 STRINGS is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with 2 STRINGS is the ORd value of the 2 integer equivalents of the strings.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of an int and a string.
+  Property::Array propertyArrayMixed;
+  propertyArrayMixed.PushBack( FaceCullingMode::FRONT );
+  propertyArrayMixed.PushBack( "BACK" );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayMixed, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with an INTEGER and a STRING is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with an INTEGER and a STRING is the ORd value of the 2 integer equivalents of the strings.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of an int and a string.
+  Property::Array propertyArrayInvalid;
+  propertyArrayInvalid.PushBack( FaceCullingMode::FRONT );
+  propertyArrayInvalid.PushBack( Vector3::ZERO );
+
+  // Set the initial value to non-zero, so we can test it does not change.
+  result = FaceCullingMode::FRONT_AND_BACK;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayInvalid, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with an INTEGER and a Vector3 is "false" as the properties can not be successfully converted.
+  DALI_TEST_CHECK( !returnValue );
+  // TEST: The result value when checking an array with an INTEGER and a Vector3 is unchanged.
+  DALI_TEST_CHECK( result == FaceCullingMode::FRONT_AND_BACK );
 
   END_TEST;
 }
