@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ namespace Dali
 namespace Internal
 {
 
-FrameBufferPtr FrameBuffer::New( unsigned int width, unsigned int height, Format format  )
+FrameBufferPtr FrameBuffer::New( unsigned int width, unsigned int height, unsigned int attachments  )
 {
-  FrameBufferPtr frameBuffer( new FrameBuffer( width, height, format ) );
+  FrameBufferPtr frameBuffer( new FrameBuffer( width, height, attachments ) );
   frameBuffer->Initialize();
   return frameBuffer;
 }
@@ -41,33 +41,33 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
   return mRenderObject;
 }
 
-FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, Format format )
+FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
-  mColor(NULL),
+  mColor( NULL ),
   mWidth( width ),
   mHeight( height ),
-  mFormat( format )
+  mAttachments( attachments )
 {
 }
 
 void FrameBuffer::Initialize()
 {
-  mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mFormat );
+  mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mAttachments );
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
 void FrameBuffer::AttachColorTexture( NewTexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  if( (unsigned int)(texture->GetWidth() / (1<<mipmapLevel)) != mWidth ||
-      (unsigned int)(texture->GetHeight() / (1<<mipmapLevel)) != mHeight )
-  {
-    DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
-  }
-  else
+  if( (unsigned int)( texture->GetWidth() / ( 1 << mipmapLevel ) ) == mWidth &&
+      (unsigned int)( texture->GetHeight() / ( 1 << mipmapLevel ) ) == mHeight )
   {
     mColor = texture;
     AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
+  }
+  else
+  {
+    DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
   }
 }
 

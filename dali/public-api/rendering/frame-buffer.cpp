@@ -25,9 +25,9 @@
 namespace Dali
 {
 
-FrameBuffer FrameBuffer::New( unsigned int width, unsigned int height, Format format )
+FrameBuffer FrameBuffer::New( unsigned int width, unsigned int height, unsigned int attachments )
 {
-  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, format );
+  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, attachments );
   return FrameBuffer( frameBuffer.Get() );
 }
 

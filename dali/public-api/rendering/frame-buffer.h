@@ -39,15 +39,24 @@ class DALI_IMPORT_API FrameBuffer : public BaseHandle
 public:
 
   /**
-   * @brief Format of the FrameBuffer to be created.
-   * @SINCE_1_1.43
+   * @brief The initial attachments to create the FrameBuffer with.
+   * @note The color attachment is created on calling AttachColorTexture(). If a color attachment is not required, omit this call.
+   * @note With "NONE", no attachments are created initially. However color attachments can still be added as described above.
+   *
+   * @SINCE_1_1.45
    */
-  enum Format
+  struct Attachment
   {
-    COLOR,                ///< Framebuffer will be created with color buffer                                                               @SINCE_1_1.43
-    COLOR_DEPTH,          ///< Framebuffer will be created with color and depth buffer                                                     @SINCE_1_1.43
-    COLOR_STENCIL,        ///< Framebuffer will be created with color and stencil buffer                                                   @SINCE_1_1.43
-    COLOR_DEPTH_STENCIL   ///< Framebuffer will be created with color, depth and stencil buffer. @note May be not supported in all devices @SINCE_1_1.43
+    enum Mask
+    {
+      NONE          = 0,               ///< No attachments are created initially                            @SINCE_1_1.45
+
+      DEPTH         = 1 << 0,          ///< Depth buffer bit-mask value                                     @SINCE_1_1.45
+      STENCIL       = 1 << 1,          ///< Stencil buffer bit-mask value                                   @SINCE_1_1.45
+
+      // Preset bit-mask combinations:
+      DEPTH_STENCIL = DEPTH | STENCIL  ///< The Framebuffer will be created with depth and stencil buffer   @SINCE_1_1.45
+    };
   };
 
   /**
@@ -56,10 +65,10 @@ public:
    * @SINCE_1_1.43
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
-   * @param[in] format The format of the FrameBuffer
+   * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd).
    * @return A handle to a newly allocated FrameBuffer
    */
-  static FrameBuffer New( unsigned int width, unsigned int height, Format format );
+  static FrameBuffer New( unsigned int width, unsigned int height, unsigned int attachments );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -100,7 +109,8 @@ public:
   FrameBuffer& operator=( const FrameBuffer& handle );
 
   /**
-   * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering
+   * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.
+   * @note This causes a color attachment to be added.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
@@ -110,7 +120,8 @@ public:
   void AttachColorTexture( Texture& texture );
 
   /**
-   * @brief Attach a texture to the framebuffer for color rendering
+   * @brief Attach a texture to the framebuffer for color rendering.
+   * @note This causes a color attachment to be added.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
