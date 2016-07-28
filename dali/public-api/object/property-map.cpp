@@ -131,6 +131,16 @@ Property::Value* Property::Map::Find( Property::Index key ) const
   return NULL; // Not found
 }
 
+Property::Value* Property::Map::Find( Property::Index indexKey, const std::string& stringKey ) const
+{
+  Property::Value* valuePtr = Find( indexKey );
+  if( !valuePtr )
+  {
+    valuePtr = Find( stringKey );
+  }
+  return valuePtr;
+}
+
 Property::Value* Property::Map::Find( const std::string& key, Property::Type type ) const
 {
   for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )

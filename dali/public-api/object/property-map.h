@@ -178,6 +178,19 @@ public:
   Value* Find( Property::Index key ) const;
 
   /**
+   * @brief Finds the value for the specified keys if either exist.
+   *
+   * Will search for the index key first.
+   *
+   * @SINCE_1_1.45
+   * @param[in]  indexKey   The index key to find.
+   * @param[in]  stringKey  The string key to find.
+   *
+   * @return A const pointer to the value if it exists, NULL otherwise
+   */
+  Value* Find( Property::Index indexKey, const std::string& stringKey ) const;
+
+  /**
    * @brief Finds the value for the specified key if it exists and its type is type
    *
    * @SINCE_1_0.0
