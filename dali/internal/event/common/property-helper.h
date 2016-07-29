@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_HELPER_H__
-#define __DALI_PROPERTY_HELPER_H__
+#ifndef DALI_PROPERTY_HELPER_H
+#define DALI_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h>
-#include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/enum-helper.h>
 
 namespace Dali
 {
@@ -77,35 +77,6 @@ struct PropertyDetails
 #endif
 
 /**
- * Macros for creating value, typically enumerations, to string tables.
- * Example:
- *
- * DALI_ENUM_TO_STRING_TABLE_BEGIN( SIZE_MODE )
- * DALI_ENUM_TO_STRING( USE_OWN_SIZE )
- * DALI_ENUM_TO_STRING( SIZE_EQUAL_TO_PARENT )
- * DALI_ENUM_TO_STRING_TABLE_END( SIZE_MODE )
- *
- * Creates:
- * const Scripting::StringEnum< SizeMode > SIZE_MODE_TABLE[] = {
- * { "USE_OWN_SIZE", USE_OWN_SIZE },
- * { "SIZE_EQUAL_TO_PARENT", SIZE_EQUAL_TO_PARENT },
- * }; const unsigned int SIZE_MODE_TABLE_COUNT = sizeof( SIZE_MODE_TABLE ) / sizeof( SIZE_MODE_TABLE[0] );
- *
- * By default, Dali::Scripting::StringEnum is used as the type for the table, however, a different type can be specified by using
- * DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE.
- */
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( type, t ) const type t##_TABLE[] = {
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( Dali::Scripting::StringEnum, t )
-#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##_TABLE_COUNT = sizeof( t##_TABLE ) / sizeof( t##_TABLE[0] );
-#define DALI_ENUM_TO_STRING( s ) { #s, s },
-
-/**
- * Adds a value, typically an enum, to the table within a scope but without the scope name
- * Example converts ( Layer, LAYER_2D ) to ( "LAYER_2D", Layer::Layer2D )
- */
-#define DALI_ENUM_TO_STRING_WITH_SCOPE( className, enumName ) { #enumName, className::enumName },
-
-/**
  * @brief Case insensitive string comparison.
  *
  * Additionally, '-' and '_' can be used interchangeably as well.
@@ -123,4 +94,4 @@ bool CompareTokens( const char * first, const char * second, size_t& size );
 
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_HELPER_H__
+#endif // DALI_PROPERTY_HELPER_H

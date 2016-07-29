@@ -21,11 +21,11 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
-#include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace Dali
 {
@@ -506,8 +506,116 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
-    default:
+    case Dali::Renderer::Property::STENCIL_MODE:
     {
+      int value;
+      propertyValue.Get( value );
+      StencilMode::Type stencilMode = static_cast<StencilMode::Type>( value );
+      if( stencilMode != mStencilParameters.stencilMode )
+      {
+        mStencilParameters.stencilMode = stencilMode;
+        SetStencilModeMessage( GetEventThreadServices(), *mSceneObject, stencilMode );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_FUNCTION:
+    {
+      int value;
+      propertyValue.Get( value );
+      StencilFunction::Type stencilFunction = static_cast<StencilFunction::Type>( value );
+      if( stencilFunction != mStencilParameters.stencilFunction )
+      {
+        mStencilParameters.stencilFunction = stencilFunction;
+        SetStencilFunctionMessage( GetEventThreadServices(), *mSceneObject, stencilFunction );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_FUNCTION_MASK:
+    {
+      int stencilFunctionMask;
+      if( propertyValue.Get( stencilFunctionMask ) )
+      {
+        if( stencilFunctionMask != mStencilParameters.stencilFunctionMask )
+        {
+          mStencilParameters.stencilFunctionMask = stencilFunctionMask;
+          SetStencilFunctionMaskMessage( GetEventThreadServices(), *mSceneObject, stencilFunctionMask );
+        }
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE:
+    {
+      int stencilFunctionReference;
+      if( propertyValue.Get( stencilFunctionReference ) )
+      {
+        if( stencilFunctionReference != mStencilParameters.stencilFunctionReference )
+        {
+          mStencilParameters.stencilFunctionReference = stencilFunctionReference;
+          SetStencilFunctionReferenceMessage( GetEventThreadServices(), *mSceneObject, stencilFunctionReference );
+        }
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_MASK:
+    {
+      int stencilMask;
+      if( propertyValue.Get( stencilMask ) )
+      {
+        if( stencilMask != mStencilParameters.stencilMask )
+        {
+          mStencilParameters.stencilMask = stencilMask;
+          SetStencilMaskMessage( GetEventThreadServices(), *mSceneObject, stencilMask );
+        }
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
+    {
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnFail )
+      {
+        mStencilParameters.stencilOperationOnFail = stencilOperation;
+        SetStencilOperationOnFailMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL:
+    {
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnZFail )
+      {
+        mStencilParameters.stencilOperationOnZFail = stencilOperation;
+        SetStencilOperationOnZFailMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
+    {
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnZPass )
+      {
+        mStencilParameters.stencilOperationOnZPass = stencilOperation;
+        SetStencilOperationOnZPassMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
+      }
+      break;
+    }
+    case Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER:
+    {
+      bool writeToColorBuffer;
+      if( propertyValue.Get( writeToColorBuffer ) )
+      {
+        if( mWriteToColorBuffer != writeToColorBuffer )
+        {
+          mWriteToColorBuffer = writeToColorBuffer;
+          SetWriteToColorBufferMessage( GetEventThreadServices(), *mSceneObject, writeToColorBuffer );
+        }
+      }
       break;
     }
   }
@@ -633,6 +741,51 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mDepthTestMode;
       break;
     }
+    case Dali::Renderer::Property::STENCIL_FUNCTION:
+    {
+      value = mStencilParameters.stencilFunction;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_FUNCTION_MASK:
+    {
+      value = mStencilParameters.stencilFunctionMask;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE:
+    {
+      value = mStencilParameters.stencilFunctionReference;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_MASK:
+    {
+      value = mStencilParameters.stencilMask;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_MODE:
+    {
+      value = mStencilParameters.stencilMode;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
+    {
+      value = mStencilParameters.stencilOperationOnFail;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL:
+    {
+      value = mStencilParameters.stencilOperationOnZFail;
+      break;
+    }
+    case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
+    {
+      value = mStencilParameters.stencilOperationOnZPass;
+      break;
+    }
+    case Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER:
+    {
+      value = mWriteToColorBuffer;
+      break;
+    }
   }
   return value;
 }
@@ -695,7 +848,6 @@ void Renderer::Connect()
 {
   if( mOnStageCount == 0 )
   {
-    OnStageConnectMessage( GetEventThreadServices(), *mSceneObject );
     mTextureSetConnector.OnStageConnect();
   }
   ++mOnStageCount;
@@ -706,7 +858,6 @@ void Renderer::Disconnect()
   --mOnStageCount;
   if( mOnStageCount == 0 )
   {
-    OnStageDisconnectMessage( GetEventThreadServices(), *mSceneObject);
     mTextureSetConnector.OnStageDisconnect();
   }
 }
@@ -718,12 +869,14 @@ Renderer::Renderer()
   mOnStageCount( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
+  mStencilParameters( StencilMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
+  mBlendingOptions(),
+  mDepthFunction( DepthFunction::LESS ),
   mFaceCullingMode( FaceCullingMode::NONE ),
   mBlendMode( BlendMode::AUTO ),
-  mBlendingOptions(),
   mDepthWriteMode( DepthWriteMode::AUTO ),
-  mDepthFunction( DepthFunction::LESS ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mWriteToColorBuffer( true ),
   mPremultipledAlphaEnabled( false )
 {
 }

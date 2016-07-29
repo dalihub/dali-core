@@ -221,6 +221,52 @@ int UtcDaliPropertyMapFind(void)
   END_TEST;
 }
 
+int UtcDaliPropertyMapFindIndexThenString(void)
+{
+  // Define the valid keys and values to test with.
+  std::string stringKeyValid = "bar";
+  std::string stringKeyInvalid = "aardvark";
+  int indexKeyValid = 100;
+  int indexKeyInvalid = 101;
+
+  // Define invalid key and value to test with.
+  std::string stringValueValid = "DALi";
+  int indexValueValid = 3;
+
+  // Set up a property map containing the valid keys and values defined above.
+  Property::Map map;
+  map[ "foo" ] = 1;
+  map[ 10 ] = "string";
+  map[ stringKeyValid ] = stringValueValid;
+  map[ indexKeyValid ] = indexValueValid;
+
+  Property::Value* value = NULL;
+
+  // TEST: If both index and string are valid, the Property::Value of the index is returned.
+  value = map.Find( indexKeyValid, stringKeyValid );
+
+  DALI_TEST_EQUALS( value->Get<int>(), indexValueValid, TEST_LOCATION );
+
+
+  // TEST: If only the index is valid, the Property::Value of the index is returned.
+  value = map.Find( indexKeyValid, stringKeyInvalid );
+
+  DALI_TEST_EQUALS( value->Get<int>(), indexValueValid, TEST_LOCATION );
+
+
+  // TEST: If only the string is valid, the Property::Value of the string is returned.
+  value = map.Find( indexKeyInvalid, stringKeyValid );
+
+  DALI_TEST_EQUALS( value->Get<std::string>(), stringValueValid, TEST_LOCATION );
+
+
+  // TEST: If neither the index or string are valid, then a NULL pointer is returned.
+  value = map.Find( indexKeyInvalid, stringKeyInvalid );
+
+  DALI_TEST_CHECK( value == NULL );
+
+  END_TEST;
+}
 
 int UtcDaliPropertyMapOperatorIndex(void)
 {

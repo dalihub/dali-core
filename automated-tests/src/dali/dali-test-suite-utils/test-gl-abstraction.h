@@ -277,10 +277,21 @@ public:
 
   inline void ClearStencil(GLint s)
   {
+    std::stringstream out;
+    out << s;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["s"] = ToString( s );
+
+    mStencilFunctionTrace.PushCall( "ClearStencil", out.str(), namedParams );
   }
 
   inline void ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
   {
+    mColorMaskParams.red = red;
+    mColorMaskParams.green = green;
+    mColorMaskParams.blue = blue;
+    mColorMaskParams.alpha = alpha;
   }
 
   inline void CompileShader(GLuint shader)
@@ -662,6 +673,11 @@ public:
         *type = GL_SAMPLER_2D;
         *size = 1;
         break;
+      case 2:
+        *length = snprintf(name, bufsize, "sGloss");
+        *type = GL_SAMPLER_2D;
+        *size = 1;
+        break;
       default:
         break;
     }
@@ -878,9 +894,10 @@ public:
     namedParams["program"] = ToString(program);
     mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
 
-    mNumberOfActiveUniforms=2;
+    mNumberOfActiveUniforms=3;
     GetUniformLocation(program, "sTexture");
     GetUniformLocation(program, "sEffect");
+    GetUniformLocation(program, "sGloss");
   }
 
   inline void PixelStorei(GLenum pname, GLint param)
@@ -953,26 +970,79 @@ public:
 
   inline void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
+    std::stringstream out;
+    out << func << ", " << ref << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["func"] = ToString( func );
+    namedParams["ref"] = ToString( ref );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilFunc", out.str(), namedParams );
   }
 
   inline void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
   {
+    std::stringstream out;
+    out << face << ", " << func << ", " << ref << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["func"] = ToString( func );
+    namedParams["ref"] = ToString( ref );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilFuncSeparate", out.str(), namedParams );
   }
 
   inline void StencilMask(GLuint mask)
   {
+    std::stringstream out;
+    out << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilMask", out.str(), namedParams );
   }
 
   inline void StencilMaskSeparate(GLenum face, GLuint mask)
   {
+    std::stringstream out;
+    out << face << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilMaskSeparate", out.str(), namedParams );
   }
 
   inline void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
+    std::stringstream out;
+    out << fail << ", " << zfail << ", " << zpass;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["fail"] = ToString( fail );
+    namedParams["zfail"] = ToString( zfail );
+    namedParams["zpass"] = ToString( zpass );
+
+    mStencilFunctionTrace.PushCall( "StencilOp", out.str(), namedParams );
   }
 
   inline void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)
   {
+    std::stringstream out;
+    out << face << ", " << fail << ", " << zfail << "," << zpass;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["fail"] = ToString( fail );
+    namedParams["zfail"] = ToString( zfail );
+    namedParams["zpass"] = ToString( zpass );
+
+    mStencilFunctionTrace.PushCall( "StencilOpSeparate", out.str(), namedParams );
   }
 
   inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels)
@@ -1775,6 +1845,11 @@ public: // TEST FUNCTIONS
   inline void ResetDepthFunctionCallStack() { mDepthFunctionTrace.Reset(); }
   inline TraceCallStack& GetDepthFunctionTrace() { return mDepthFunctionTrace; }
 
+  //Methods for Stencil function verification
+  inline void EnableStencilFunctionCallTrace(bool enable) { mStencilFunctionTrace.Enable(enable); }
+  inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
+  inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
+
   template <typename T>
   inline bool GetUniformValue( const char* name, T& value ) const
   {
@@ -1917,9 +1992,21 @@ public: // TEST FUNCTIONS
   // Methods to check scissor tests
   inline const ScissorParams& GetScissorParams() const { return mScissorParams; }
 
+  struct ColorMaskParams
+  {
+    GLboolean red;
+    GLboolean green;
+    GLboolean blue;
+    GLboolean alpha;
+
+    ColorMaskParams() : red( true ), green( true ), blue( true ), alpha( true ) { }
+  };
+
   inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
 
   inline unsigned int GetClearCountCalled() const { return mClearCount; }
+
+  inline const ColorMaskParams& GetColorMaskParams() const { return mColorMaskParams; }
 
   typedef std::vector<size_t> BufferDataCalls;
   inline const BufferDataCalls& GetBufferDataCalls() const { return mBufferDataCalls; }
@@ -1992,6 +2079,7 @@ private:
   TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;
+  TraceCallStack mStencilFunctionTrace;
 
   // Shaders & Uniforms
   GLuint mLastShaderIdUsed;
@@ -2119,6 +2207,7 @@ private:
   }
 
   ScissorParams mScissorParams;
+  ColorMaskParams mColorMaskParams;
 };
 
 template <>

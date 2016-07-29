@@ -538,7 +538,8 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
     return property;
   }
 
-  if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
+  if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
+       ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
   {
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );

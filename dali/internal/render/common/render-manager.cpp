@@ -484,7 +484,7 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 
 void RenderManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
 {
-  geometry->SetGeometryType( Render::Geometry::GeometryType(geometryType) );
+  geometry->SetType( Render::Geometry::Type(geometryType) );
 }
 
 void RenderManager::AddRenderTracker( Render::RenderTracker* renderTracker )

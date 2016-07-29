@@ -38,7 +38,7 @@ int UtcDaliFrameBufferNew01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
 
   DALI_TEST_CHECK( frameBuffer );
 
@@ -58,7 +58,7 @@ int UtcDaliFrameBufferNew02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR_DEPTH );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH );
 
   DALI_TEST_CHECK( frameBuffer );
 
@@ -78,7 +78,7 @@ int UtcDaliFrameBufferNew03(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR_STENCIL );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::STENCIL );
 
   DALI_TEST_CHECK( frameBuffer );
 
@@ -98,7 +98,7 @@ int UtcDaliFrameBufferNew04(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR_DEPTH_STENCIL );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
 
   DALI_TEST_CHECK( frameBuffer );
 
@@ -120,13 +120,33 @@ int UtcDaliFrameBufferNew05(void)
   END_TEST;
 }
 
+int UtcDaliFrameBufferNew06(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL );
+
+  DALI_TEST_CHECK( frameBuffer );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliFrameBufferCopyConstructor(void)
 {
   TestApplication application;
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
 
   FrameBuffer frameBufferCopy( frameBuffer );
 
@@ -141,7 +161,7 @@ int UtcDaliFrameBufferAssignmentOperator(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
 
   FrameBuffer frameBuffer2;
   DALI_TEST_CHECK( !frameBuffer2 );
@@ -157,7 +177,7 @@ int UtcDaliFrameBufferDownCast01(void)
   TestApplication application;
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
 
   BaseHandle handle(frameBuffer);
   FrameBuffer frameBuffer2 = FrameBuffer::DownCast(handle);
@@ -182,7 +202,7 @@ int UtcDaliFrameBufferAttachColorTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR_DEPTH_STENCIL );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   frameBuffer.AttachColorTexture( texture );
 
@@ -202,7 +222,7 @@ int UtcDaliFrameBufferAttachColorTexture02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   texture.GenerateMipmaps();
 
@@ -225,7 +245,7 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
   Texture texture = Texture::New( TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height );
   texture.GenerateMipmaps();
 
@@ -242,13 +262,33 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
   END_TEST;
 }
 
+int UtcDaliFrameBufferAttachColorTexture04(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliFrameBufferGetColorTexture01(void)
 {
   TestApplication application;
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   frameBuffer.AttachColorTexture( texture );
 
@@ -263,7 +303,7 @@ int UtcDaliFrameBufferGetColorTexture02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::COLOR );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
 

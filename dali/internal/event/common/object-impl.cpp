@@ -648,6 +648,8 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     const PropertyBase* property = newProperty.Get();
     if(index >= PROPERTY_CUSTOM_START_INDEX)
     {
+      DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
+
       mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue.GetType(), property ) );
     }
     else
@@ -1282,10 +1284,9 @@ Object::~Object()
 CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) const
 {
   CustomPropertyMetadata* property( NULL );
-  int arrayIndex;
   if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    for ( arrayIndex = 0; arrayIndex < (int)mCustomProperties.Count(); arrayIndex++ )
+    for ( std::size_t arrayIndex = 0; arrayIndex < mCustomProperties.Count(); arrayIndex++ )
     {
       CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>( mCustomProperties[ arrayIndex ] );
       if( custom->childPropertyIndex == index )
@@ -1296,7 +1297,7 @@ CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) cons
   }
   else
   {
-    arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
+    int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
     if( arrayIndex >= 0 )
     {
       if( arrayIndex < (int)mCustomProperties.Count() ) // we can only access the first 2 billion custom properties

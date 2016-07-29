@@ -63,6 +63,9 @@ enum PropertyRanges
   CHILD_PROPERTY_REGISTRATION_MAX_INDEX         = 49999999,   ///< The maximum index supported when registering a child property @SINCE_1_1.35
 
   PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start (SceneGraph and Event side properties per instance) @SINCE_1_0.0
+  PROPERTY_CUSTOM_MAX_INDEX                     = 59999999,   ///< The maximum index supported for custom properties @SINCE_1_1.45
+
+  CORE_PROPERTY_MAX_INDEX                       = PROPERTY_CUSTOM_MAX_INDEX, ///< The maximum index that Core properties can go up to @SINCE_1_1.45
 };
 
 /**

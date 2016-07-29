@@ -70,7 +70,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      bool cull )
 {
   bool inside( true );
-  if ( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::HINT_MODIFIES_GEOMETRY ) )
+  if ( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
     const Vector4& boundingSphere = renderable.mNode->GetBoundingSphere();
     inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&

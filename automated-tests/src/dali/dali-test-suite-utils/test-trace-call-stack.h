@@ -1,8 +1,8 @@
-#ifndef __TEST_TRACE_CALL_STACK_H__
-#define __TEST_TRACE_CALL_STACK_H__
+#ifndef TEST_TRACE_CALL_STACK_H
+#define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sstream>
 
 namespace Dali
 {
@@ -34,6 +35,7 @@ std::string ToString(float x);
 class TraceCallStack
 {
 public:
+
   /// Typedef for passing and storing named parameters
   typedef std::map< std::string, std::string > NamedParams;
 
@@ -128,6 +130,23 @@ public:
    */
   void Reset();
 
+  /**
+   * Method to display contents of the TraceCallStack.
+   * @return A string containing a list of function calls and parameters (may contain newline characters)
+   */
+  std::string GetTraceString()
+  {
+    std::stringstream traceStream;
+    int functionCount = mCallStack.size();
+    for( int i = 0; i < functionCount; ++i )
+    {
+      Dali::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
+      traceStream << "StackTrace: Index:" << i << ",  Function:" << functionCall.method << ",  ParamList:" << functionCall.paramList << std::endl;
+    }
+
+    return traceStream.str();
+  }
+
 private:
   bool mTraceActive; ///< True if the trace is active
 
@@ -151,4 +170,4 @@ private:
 
 } // namespace dali
 
-#endif //__TEST_TRACE_CALL_STACK_H__
+#endif // TEST_TRACE_CALL_STACK_H

@@ -1144,7 +1144,7 @@ int UtcDaliRenderTaskSetFrameBufferP(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  FrameBuffer newFrameBuffer = FrameBuffer::New( 128u, 128u, FrameBuffer::COLOR );
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 128u, 128u, FrameBuffer::Attachment::NONE );
   task.SetFrameBuffer( newFrameBuffer );
   DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
   END_TEST;
@@ -1175,7 +1175,7 @@ int UtcDaliRenderTaskGetFrameBufferP(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  FrameBuffer newFrameBuffer = FrameBuffer::New( 1u, 1u, FrameBuffer::COLOR  );
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 1u, 1u, FrameBuffer::Attachment::NONE  );
   task.SetFrameBuffer( newFrameBuffer );
   DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
   END_TEST;

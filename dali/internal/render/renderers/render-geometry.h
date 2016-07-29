@@ -46,7 +46,7 @@ class PropertyBuffer;
 class Geometry
 {
 public:
-  typedef Dali::Geometry::GeometryType GeometryType;
+  typedef Dali::Geometry::Type Type;
 
   Geometry();
 
@@ -109,7 +109,7 @@ public:
    * Sets the geometry type
    * @param[in] type The new geometry type
    */
-  void SetGeometryType( GeometryType type )
+  void SetType( Type type )
   {
     mGeometryType = type;
   }
@@ -136,7 +136,7 @@ private:
 
   Dali::Vector< unsigned short> mIndices;
   OwnerPointer< GpuBuffer > mIndexBuffer;
-  GeometryType mGeometryType;
+  Type mGeometryType;
 
   // Booleans
   bool mIndicesChanged : 1;

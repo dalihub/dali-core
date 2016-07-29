@@ -44,6 +44,7 @@ devel_api_core_signals_header_files = \
   $(devel_api_src_dir)/signals/signal-delegate.h
 
 devel_api_core_scripting_header_files = \
+  $(devel_api_src_dir)/scripting/enum-helper.h \
   $(devel_api_src_dir)/scripting/scripting.h
 
 devel_api_core_threading_header_files = \

@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.1.44
+Version:    1.1.45
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -11,6 +11,11 @@ Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
+
+%if "%{tizen_version_major}" == "3"
+BuildRequires:  pkgconfig(libtzplatform-config)
+%endif
+
 
 %description
 The OpenGLES Canvas Core Library provides a 3D scene graph
@@ -43,8 +48,17 @@ Integration development package for the OpenGLES Canvas - headers for integratin
 ##############################
 %prep
 %setup -q
+
+#Use TZ_PATH when tizen version is 3.x
+
+%if "%{tizen_version_major}" == "2"
 %define dali_data_rw_dir /opt/usr/share/dali/
 %define dali_data_ro_dir /usr/share/dali/
+%else
+%define dali_data_rw_dir %TZ_SYS_SHARE/dali/
+%define dali_data_ro_dir %TZ_SYS_RO_SHARE/dali/
+%endif
+
 %define dev_include_path %{_includedir}
 
 ##############################

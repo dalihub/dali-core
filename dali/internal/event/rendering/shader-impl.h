@@ -52,7 +52,7 @@ public:
    */
   static ShaderPtr New( const std::string& vertexShader,
                         const std::string& fragmentShader,
-                        Dali::Shader::ShaderHints hints );
+                        Dali::Shader::Hint::Value hints );
 
   /**
    * @brief Get the shader scene object
@@ -155,7 +155,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::ShaderHints hints );
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
 
 protected:
   /**

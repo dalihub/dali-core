@@ -19,9 +19,11 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <cstdio>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <test-trace-call-stack.h>
 #include <mesh-builder.h>
 
 using namespace Dali;
@@ -36,6 +38,25 @@ const BlendFactor::Type   DEFAULT_BLEND_FACTOR_DEST_ALPHA( BlendFactor::ONE_MINU
 
 const BlendEquation::Type DEFAULT_BLEND_EQUATION_RGB(   BlendEquation::ADD );
 const BlendEquation::Type DEFAULT_BLEND_EQUATION_ALPHA( BlendEquation::ADD );
+
+/**
+ * @brief Get GL stencil test enumeration value as a string.
+ * @return The string representation of the value of GL_STENCIL_TEST
+ */
+std::string GetStencilTestString(void)
+{
+  std::stringstream stream;
+  stream << GL_STENCIL_TEST;
+  return stream.str();
+}
+
+void ResetDebugAndFlush( TestApplication& application, TraceCallStack& glEnableDisableStack, TraceCallStack& glStencilFunctionStack )
+{
+  glEnableDisableStack.Reset();
+  glStencilFunctionStack.Reset();
+  application.SendNotification();
+  application.Render();
+}
 
 void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
 {
@@ -716,7 +737,7 @@ int UtcDaliRendererSetBlendMode06(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_TRANSPARENT renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   Renderer renderer = Renderer::New( geometry, shader );
 
@@ -1781,7 +1802,7 @@ int UtcDaliRendererSetIndexRange(void)
 
   // create geometry
   Geometry geometry = Geometry::New();
-  geometry.SetGeometryType( Geometry::LINE_LOOP );
+  geometry.SetType( Geometry::LINE_LOOP );
 
   // --------------------------------------------------------------------------
   // index buffer
@@ -1846,7 +1867,7 @@ int UtcDaliRendererSetIndexRange(void)
   // LINE_STRIP, first 15, count 6
   {
     renderer.SetIndexRange( 15, 6 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -1857,7 +1878,7 @@ int UtcDaliRendererSetIndexRange(void)
   // Index out of bounds
   {
     renderer.SetIndexRange( 15, 30 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -1868,7 +1889,7 @@ int UtcDaliRendererSetIndexRange(void)
   // drawing whole buffer starting from 15 ( last valid primitive )
   {
     renderer.SetIndexRange( 15, 0 );
-    geometry.SetGeometryType( Geometry::LINE_STRIP );
+    geometry.SetType( Geometry::LINE_STRIP );
     sprintf( buffer, "%u, 6, %u, indices", GL_LINE_STRIP, GL_UNSIGNED_SHORT );
     application.SendNotification();
     application.Render();
@@ -2012,6 +2033,348 @@ int UtcDaliRendererSetDepthFunction(void)
     depthFunctionStr << GL_GEQUAL;
     DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
   }
+
+  END_TEST;
+}
+
+Renderer StencilTestFixture( TestApplication& application )
+{
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400.0f, 400.0f );
+  Stage stage = Stage::GetCurrent();
+  stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
+  stage.Add( actor );
+
+  return renderer;
+}
+
+int UtcDaliRendererCheckStencilDefaults(void)
+{
+  TestApplication application;
+  tet_infoline("Test the stencil defaults");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  glAbstraction.EnableStencilFunctionCallTrace( true );
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  // Check the defaults:
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION ).Get<int>() ), static_cast<int>( StencilFunction::ALWAYS ), TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION_MASK ).Get<int>() ), 0xFF, TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION_REFERENCE ).Get<int>() ), 0x00, TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0xFF, TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL ).Get<int>() ), static_cast<int>( StencilOperation::KEEP ), TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL ).Get<int>() ), static_cast<int>( StencilOperation::KEEP ), TEST_LOCATION );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS ).Get<int>() ), static_cast<int>( StencilOperation::KEEP ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetStencilMode(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the StencilMode");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  glAbstraction.EnableStencilFunctionCallTrace( true );
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  // Set the StencilFunction to something other than the default, to confirm it is set as a property,
+  // but NO GL call has been made while the StencilMode is set to OFF.
+  renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION, StencilFunction::NEVER );
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION ).Get<int>() ), static_cast<int>( StencilFunction::NEVER ), TEST_LOCATION );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  std::string methodString( "StencilFunc" );
+  DALI_TEST_CHECK( !glStencilFunctionStack.FindMethod( methodString ) );
+
+  // Now set the StencilMode to ON and check the StencilFunction has changed.
+  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetStencilTestString() ) );
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethod( methodString ) );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetStencilFunction(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the StencilFunction");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  glAbstraction.EnableStencilFunctionCallTrace( true );
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+
+  // StencilMode must be ON for StencilFunction to operate.
+  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  /*
+   * Lookup table for testing StencilFunction.
+   * Note: This MUST be in the same order as the Dali::StencilFunction enum.
+   */
+  const int StencilFunctionLookupTable[] = {
+      GL_NEVER,
+      GL_LESS,
+      GL_EQUAL,
+      GL_LEQUAL,
+      GL_GREATER,
+      GL_NOTEQUAL,
+      GL_GEQUAL,
+      GL_ALWAYS
+  }; const int StencilFunctionLookupTableCount = sizeof( StencilFunctionLookupTable ) / sizeof( StencilFunctionLookupTable[0] );
+
+  /*
+   * Loop through all types of StencilFunction, checking:
+   *  - The value is cached (set in event thread side)
+   *  - Causes "glStencilFunc" to be called
+   *  - Checks the correct parameters to "glStencilFunc" were used
+   */
+  std::string nonChangingParameters = "0, 255";
+  std::string methodString( "StencilFunc" );
+  for( int i = 0; i < StencilFunctionLookupTableCount; ++i )
+  {
+    // Set the property.
+    renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION, static_cast<Dali::StencilFunction::Type>( i ) );
+
+    // Check GetProperty returns the same value.
+    DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION ).Get<int>() ), i, TEST_LOCATION );
+
+    // Reset the trace debug.
+    ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+    // Check the function is called and the parameters are correct.
+    std::stringstream parameterStream;
+    parameterStream << StencilFunctionLookupTable[ i ] << ", " << nonChangingParameters;
+
+    DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+  }
+
+  // Change the Function Reference only and check the behavior is correct:
+  // 170 is 0xaa in hex / 10101010 in binary (every other bit set).
+  int testValueReference = 170;
+  renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION_REFERENCE, testValueReference );
+
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION_REFERENCE ).Get<int>() ), testValueReference, TEST_LOCATION );
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  std::stringstream parameterStream;
+  parameterStream << StencilFunctionLookupTable[ StencilOperation::DECREMENT_WRAP ] << ", " << testValueReference << ", 255";
+
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+
+
+  // Change the Function Mask only and check the behavior is correct:
+  // 85 is 0x55 in hex / 01010101 in binary (every other bit set).
+  int testValueMask = 85;
+  renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION_MASK, testValueMask );
+
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION_MASK ).Get<int>() ), testValueMask, TEST_LOCATION );
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  // Clear the stringstream.
+  parameterStream.str( std::string() );
+  parameterStream << StencilFunctionLookupTable[ StencilOperation::DECREMENT_WRAP ] << ", " << testValueReference << ", " << testValueMask;
+
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetStencilOperation(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the StencilOperation");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  glAbstraction.EnableStencilFunctionCallTrace( true );
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+
+  // StencilMode must be ON for StencilOperation to operate.
+  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+
+  /*
+   * Lookup table for testing StencilOperation.
+   * Note: This MUST be in the same order as the Dali::StencilOperation enum.
+   */
+  const int StencilOperationLookupTable[] = {
+    GL_ZERO,
+    GL_KEEP,
+    GL_REPLACE,
+    GL_INCR,
+    GL_DECR,
+    GL_INVERT,
+    GL_INCR_WRAP,
+    GL_DECR_WRAP
+  }; const int StencilOperationLookupTableCount = sizeof( StencilOperationLookupTable ) / sizeof( StencilOperationLookupTable[0] );
+
+  // Set all 3 StencilOperation properties to a default.
+  renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::ZERO );
+  renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::ZERO );
+  renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::ZERO );
+
+  // Set our expected parameter list to the equivalent result.
+  int parameters[] = { StencilOperationLookupTable[ StencilOperation::ZERO ], StencilOperationLookupTable[ StencilOperation::ZERO ], StencilOperationLookupTable[ StencilOperation::ZERO ] };
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  /*
+   * Loop through all types of StencilOperation, checking:
+   *  - The value is cached (set in event thread side)
+   *  - Causes "glStencilFunc" to be called
+   *  - Checks the correct parameters to "glStencilFunc" were used
+   *  - Checks the above for all 3 parameter placements of StencilOperation ( OnFail, OnZFail, OnPass )
+   */
+  int stencilOperationPropertyKeys[] = { Renderer::Property::STENCIL_OPERATION_ON_FAIL, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS };
+  std::string methodString( "StencilOp" );
+
+  for( int parameterIndex = 0; parameterIndex < 3; ++parameterIndex )
+  {
+    for( int i = 0; i < StencilOperationLookupTableCount; ++i )
+    {
+      // Set the property (outer loop causes all 3 different properties to be set separately).
+      renderer.SetProperty( stencilOperationPropertyKeys[ parameterIndex ], static_cast<Dali::StencilFunction::Type>( i ) );
+
+      // Check GetProperty returns the same value.
+      DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( stencilOperationPropertyKeys[ parameterIndex ] ).Get<int>() ), i, TEST_LOCATION );
+
+      // Reset the trace debug.
+      ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+      // Check the function is called and the parameters are correct.
+      // Set the expected parameter value at its correct index (only)
+      parameters[ parameterIndex ] = StencilOperationLookupTable[ i ];
+
+      // Build the parameter list.
+      std::stringstream parameterStream;
+      for( int parameterBuild = 0; parameterBuild < 3; ++parameterBuild )
+      {
+        parameterStream << parameters[ parameterBuild ];
+        // Comma-separate the parameters.
+        if( parameterBuild < 2 )
+        {
+          parameterStream << ", ";
+        }
+      }
+
+      // Check the function was called and the parameters were correct.
+      DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetStencilMask(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the StencilMask");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  glAbstraction.EnableStencilFunctionCallTrace( true );
+  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+
+  // StencilMode must be ON for StencilMask to operate.
+  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+
+  // Set the StencilMask property to a value.
+  renderer.SetProperty( Renderer::Property::STENCIL_MASK, 0x00 );
+
+  // Check GetProperty returns the same value.
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0x00, TEST_LOCATION );
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  std::string methodString( "StencilMask" );
+  std::string parameterString = "0";
+
+  // Check the function was called and the parameters were correct.
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterString ) );
+
+  // Set the StencilMask property to another value to ensure it has changed.
+  renderer.SetProperty( Renderer::Property::STENCIL_MASK, 0xFF );
+
+  // Check GetProperty returns the same value.
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0xFF, TEST_LOCATION );
+
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  parameterString = "255";
+
+  // Check the function was called and the parameters were correct.
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterString ) );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetWriteToColorBuffer(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the WriteToColorBuffer flag");
+
+  Renderer renderer = StencilTestFixture( application );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+
+  // Set the StencilMask property to a value.
+  renderer.SetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER, false );
+
+  // Check GetProperty returns the same value.
+  DALI_TEST_CHECK( !renderer.GetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER ).Get<bool>() );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check if ColorMask has been called, and that the values are correct.
+  const TestGlAbstraction::ColorMaskParams& colorMaskParams( glAbstraction.GetColorMaskParams() );
+
+  DALI_TEST_EQUALS<bool>( colorMaskParams.red,   false, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.green, false, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.blue,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.alpha, false, TEST_LOCATION );
+
+  // Set the StencilMask property to true.
+  renderer.SetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER, true );
+
+  // Check GetProperty returns the same value.
+  DALI_TEST_CHECK( renderer.GetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER ).Get<bool>() );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check if ColorMask has been called, and that the values are correct.
+  const TestGlAbstraction::ColorMaskParams& colorMaskParamsChanged( glAbstraction.GetColorMaskParams() );
+
+  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.red,   true, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.green, true, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.blue,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.alpha, true, TEST_LOCATION );
 
   END_TEST;
 }

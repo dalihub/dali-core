@@ -128,7 +128,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   {
     geometry->SetIndexBuffer( &indices[0], indices.Size() );
   }
-  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
+  geometry->SetType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
@@ -178,7 +178,7 @@ ImageActorPtr ImageActor::New()
   GeometryPtr quad  = CreateGeometry( 1u, 1u, Vector2::ONE );
   actor->mRenderer->SetGeometry( *quad );
 
-  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::Hint::NONE );
   actor->mRenderer->SetShader( *shader );
   TextureSetPtr textureSet = TextureSet::New();
   actor->mRenderer->SetTextures( *textureSet );
@@ -703,7 +703,7 @@ void ImageActor::RemoveShaderEffect()
   {
     mShaderEffect->Disconnect( this );
     // change to the standard shader and quad geometry
-    ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+    ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::Hint::NONE );
     mRenderer->SetShader( *shader );
     mShaderEffect.Reset();
 

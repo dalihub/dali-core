@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,70 +148,6 @@ int UtcDaliScriptingNewImageNegative01(void)
   // will give us an empty image handle
   Image image = NewImage( map );
   DALI_TEST_CHECK( !image );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative02(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid load-policy value type
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "loadPolicy" ] = Vector3::ZERO;
-  // will give us a valid image handle with default load policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetLoadPolicy(), ResourceImage::IMMEDIATE, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative03(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid load-policy value
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "loadPolicy" ] = "INVALID";
-  // will give us a valid image with default load policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetLoadPolicy(), ResourceImage::IMMEDIATE, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative04(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid release-policy value type
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "releasePolicy" ] = Vector3::ZERO;
-  // will give us a valid image with default release policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImageNegative05(void)
-{
-  TestApplication application; // Image needs application
-  // Invalid release-policy value
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-  map[ "releasePolicy" ] = "INVALID";
-  // will give us a valid image with default release policy
-  Image image = NewImage( map );
-  DALI_TEST_CHECK( image );
-  ResourceImage resImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resImage );
-  DALI_TEST_EQUALS( resImage.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
   END_TEST;
 }
 
@@ -366,42 +302,6 @@ int UtcDaliScriptingNewImage01P(void)
   // Filename only
   ResourceImage image = ResourceImage::DownCast( NewImage( map ) );
   DALI_TEST_EQUALS( "TEST_FILE", image.GetUrl(), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImage02P(void)
-{
-  TestApplication application;
-
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-
-  // load-policy
-  map[ "loadPolicy" ] = "";
-  const StringEnum values[] =
-  {
-    { "IMMEDIATE", ResourceImage::IMMEDIATE },
-    { "ON_DEMAND", ResourceImage::ON_DEMAND }
-  };
-  TestEnumStrings< ResourceImage::LoadPolicy, ResourceImage >( map, "loadPolicy",  values, ( sizeof( values ) / sizeof ( values[0] ) ), &ResourceImage::GetLoadPolicy, &NewResourceImage );
-  END_TEST;
-}
-
-int UtcDaliScriptingNewImage03P(void)
-{
-  TestApplication application;
-
-  Property::Map map;
-  map[ "filename" ] = "TEST_FILE";
-
-  // release-policy
-  map[ "releasePolicy" ] = "";
-  const StringEnum values[] =
-  {
-    { "UNUSED", Image::UNUSED },
-    { "NEVER", Image::NEVER }
-  };
-  TestEnumStrings< Image::ReleasePolicy, Image >( map, "releasePolicy",  values, ( sizeof( values ) / sizeof ( values[0] ) ), &Image::GetReleasePolicy, &NewImage );
   END_TEST;
 }
 
@@ -836,10 +736,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "ResourceImage", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "filename" ) );
     DALI_TEST_EQUALS( map.Find( "filename" )->Get< std::string >(), "MY_PATH", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "loadPolicy") );
-    DALI_TEST_EQUALS( map.Find( "loadPolicy" )->Get< std::string >(), "IMMEDIATE", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "releasePolicy") );
-    DALI_TEST_EQUALS( map.Find( "releasePolicy" )->Get< std::string >(), "NEVER", TEST_LOCATION );
     DALI_TEST_CHECK( NULL == map.Find( "width" ) );
     DALI_TEST_CHECK( NULL == map.Find( "height" ) );
   }
@@ -856,10 +752,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "ResourceImage", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "filename" ) );
     DALI_TEST_EQUALS( map.Find( "filename" )->Get< std::string >(), "MY_PATH", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "loadPolicy") );
-    DALI_TEST_EQUALS( map.Find( "loadPolicy" )->Get< std::string >(), "ON_DEMAND", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "releasePolicy") );
-    DALI_TEST_EQUALS( map.Find( "releasePolicy" )->Get< std::string >(), "UNUSED", TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "width" ) );
     DALI_TEST_EQUALS( map.Find( "width" )->Get< int >(), 300, TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "height" ) );
@@ -939,6 +831,211 @@ int UtcDaliScriptingGetLinearEnumerationNameN(void)
   END_TEST;
 }
 
+int UtcDaliScriptingGetEnumerationProperty(void)
+{
+  /*
+   * This test function performs the following checks:
+   *  - An enum can be looked up from a Property::Value of type INTEGER.
+   *  - An enum can be looked up from a Property::Value of type STRING.
+   *  - An enum can NOT be looked up for other Property::Value types.
+   *  - The return value is "true" if the property can be successfully converted AND it has changed.
+   *  - The return value is "false" if the property can be successfully converted BUT it has NOT changed.
+   *  - The return value is "false" if the property can not be successfully converted.
+   *  - The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+   */
+
+  // String to Enum property table to test with (equivalent to ones used within DALi).
+  const Dali::Scripting::StringEnum  testTable[] = {
+      { "NONE",           FaceCullingMode::NONE },
+      { "FRONT",          FaceCullingMode::FRONT },
+      { "BACK",           FaceCullingMode::BACK },
+      { "FRONT_AND_BACK", FaceCullingMode::FRONT_AND_BACK }
+  }; const unsigned int testTableCount = sizeof( testTable ) / sizeof( testTable[0] );
+
+  // TEST: An enum can be looked up from a Property::Value of type INTEGER.
+  // Initialise to first element.
+  FaceCullingMode::Type result = FaceCullingMode::NONE;
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueInteger( FaceCullingMode::FRONT );
+
+  // Perform the lookup.
+  bool returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "true" if the property can be successfully converted AND it has changed
+  // Check the property could be converted.
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // Now emulate a property-set with the same value. false should be returned.
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can be successfully converted BUT it has NOT changed.
+  DALI_TEST_CHECK( !returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // TEST: An enum can be looked up from a Property::Value of type STRING.
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueString( "BACK" );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( !returnValue );
+
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // TEST: An enum can NOT be looked up for other Property::Value types.
+  Property::Value propertyValueBoolean( true );
+
+  returnValue = GetEnumerationProperty< FaceCullingMode::Type >( propertyValueBoolean, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can not be successfully converted.
+  // Return value should be false as Property::Value was of an unsupported type for enum properties.
+  DALI_TEST_CHECK( !returnValue );
+
+  // TEST: The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliScriptingGetBitmaskEnumerationProperty(void)
+{
+  /*
+   * This test function performs the following checks:
+   *  - An enum can be looked up from a Property::Value of type INTEGER.
+   *  - An enum can be looked up from a Property::Value of type STRING.
+   *  - An enum can NOT be looked up from other Property::Value types.
+   *  - The return value is "true" if the property can be successfully converted AND it has changed.
+   *  - The return value is "false" if the property can not be successfully converted.
+   *  - The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+   *  PropertyArrays:
+   *  - The return value when checking an array with 2 INTEGERS is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with 2 INTEGERS is the ORd value of the 2 integers.
+   *  - The return value when checking an array with 2 STRINGS is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with 2 STRINGS is the ORd value of the 2 integer equivalents of the strings.
+   *  - The return value when checking an array with an INTEGER and a STRING is "true" if the properties can be successfully converted.
+   *  - The result value when checking an array with an INTEGER and a STRING is the ORd value of the 2 integer equivalents of the strings.
+   *  - The return value when checking an array with an INTEGER and a Vector3 is "false" as the properties can not be successfully converted.
+   *  - The result value when checking an array with an INTEGER and a Vector3 is unchanged.
+   */
+
+  // String to Enum property table to test with (equivalent to ones used within DALi).
+  const Dali::Scripting::StringEnum  testTable[] = {
+      { "NONE",           FaceCullingMode::NONE },
+      { "FRONT",          FaceCullingMode::FRONT },
+      { "BACK",           FaceCullingMode::BACK },
+      { "FRONT_AND_BACK", FaceCullingMode::FRONT_AND_BACK }
+  }; const unsigned int testTableCount = sizeof( testTable ) / sizeof( testTable[0] );
+
+  // TEST: An enum can be looked up from a Property::Value of type INTEGER.
+  // Initialise to first element.
+  FaceCullingMode::Type result = FaceCullingMode::NONE;
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueInteger( FaceCullingMode::FRONT );
+
+  // Perform the lookup.
+  bool returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueInteger, testTable, testTableCount, result );
+
+  // TEST: The return value is "true" if the property can be successfully converted AND it has changed
+  // Check the property could be converted.
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::FRONT ), TEST_LOCATION );
+
+  // TEST: An enum can be looked up from a Property::Value of type STRING.
+  // Set the input property value to a different value (to emulate a change).
+  Property::Value propertyValueString( "BACK" );
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueString, testTable, testTableCount, result );
+
+  DALI_TEST_CHECK( returnValue );
+
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // TEST: An enum can NOT be looked up from other Property::Value types.
+  Property::Value propertyValueVector( Vector3::ZERO );
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyValueVector, testTable, testTableCount, result );
+
+  // TEST: The return value is "false" if the property can not be successfully converted.
+  // Return value should be false as Property::Value was of an unsupported type for enum properties.
+  DALI_TEST_CHECK( !returnValue );
+
+  // TEST: The result value is only updated if the return value is "true" (IE. successful conversion and property value has changed).
+  // The result should remain the same.
+  DALI_TEST_EQUALS( static_cast<int>( result ), static_cast<int>( FaceCullingMode::BACK ), TEST_LOCATION );
+
+  // Test PropertyArrays:
+
+  // Property array of 2 integers.
+  Property::Array propertyArrayIntegers;
+  propertyArrayIntegers.PushBack( FaceCullingMode::FRONT );
+  propertyArrayIntegers.PushBack( FaceCullingMode::BACK );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayIntegers, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with 2 INTEGERS is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with 2 INTEGERS is the ORd value of the 2 integers.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of 2 strings.
+  Property::Array propertyArrayStrings;
+  propertyArrayStrings.PushBack( "FRONT" );
+  propertyArrayStrings.PushBack( "BACK" );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayStrings, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with 2 STRINGS is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with 2 STRINGS is the ORd value of the 2 integer equivalents of the strings.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of an int and a string.
+  Property::Array propertyArrayMixed;
+  propertyArrayMixed.PushBack( FaceCullingMode::FRONT );
+  propertyArrayMixed.PushBack( "BACK" );
+  result = FaceCullingMode::NONE;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayMixed, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with an INTEGER and a STRING is "true" if the properties can be successfully converted.
+  DALI_TEST_CHECK( returnValue );
+  // TEST: The result value when checking an array with an INTEGER and a STRING is the ORd value of the 2 integer equivalents of the strings.
+  DALI_TEST_CHECK( result == ( FaceCullingMode::FRONT | FaceCullingMode::BACK ) );
+
+  // Property array of an int and a string.
+  Property::Array propertyArrayInvalid;
+  propertyArrayInvalid.PushBack( FaceCullingMode::FRONT );
+  propertyArrayInvalid.PushBack( Vector3::ZERO );
+
+  // Set the initial value to non-zero, so we can test it does not change.
+  result = FaceCullingMode::FRONT_AND_BACK;
+
+  returnValue = GetBitmaskEnumerationProperty< FaceCullingMode::Type >( propertyArrayInvalid, testTable, testTableCount, result );
+
+  // TEST: The return value when checking an array with an INTEGER and a Vector3 is "false" as the properties can not be successfully converted.
+  DALI_TEST_CHECK( !returnValue );
+  // TEST: The result value when checking an array with an INTEGER and a Vector3 is unchanged.
+  DALI_TEST_CHECK( result == FaceCullingMode::FRONT_AND_BACK );
+
+  END_TEST;
+}
+
 int UtcDaliScriptingFindEnumIndexN(void)
 {
   const Scripting::StringEnum myTable[] =
@@ -967,7 +1064,7 @@ int UtcDaliScriptingEnumStringToIntegerP(void)
     };
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( EnumStringToInteger( "ONE", myTable, myTableCount, integerEnum ) );
 
   DALI_TEST_EQUALS( integerEnum, (1<<1), TEST_LOCATION );
@@ -1013,7 +1110,7 @@ int UtcDaliScriptingEnumStringToIntegerN(void)
   };
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( !EnumStringToInteger( "Foo", myTable, myTableCount, integerEnum ) );
 
   DALI_TEST_CHECK( !EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
@@ -1042,7 +1139,7 @@ int UtcDaliScriptingEnumStringToIntegerInvalidEnumP(void)
 
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( EnumStringToInteger( "", myTable, myTableCount, integerEnum ) );
   DALI_TEST_EQUALS( integerEnum, 1, TEST_LOCATION );
 
@@ -1060,7 +1157,7 @@ int UtcDaliScriptingEnumStringToIntegerInvalidEnumN(void)
 
   const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
 
-  unsigned int integerEnum = 0;
+  int integerEnum = 0;
   DALI_TEST_CHECK( !EnumStringToInteger( NULL, NULL, 0, integerEnum ) );
 
   DALI_TEST_CHECK( !EnumStringToInteger( "ONE", NULL, 0, integerEnum ) );

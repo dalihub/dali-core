@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-renderer.h>
-
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/image-sampler.h>
@@ -118,9 +117,13 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          bool preMultipliedAlphaEnabled,
                          DepthWriteMode::Type depthWriteMode,
                          DepthTestMode::Type depthTestMode,
-                         DepthFunction::Type depthFunction )
+                         DepthFunction::Type depthFunction,
+                         StencilParameters& stencilParameters,
+                         bool writeToColorBuffer )
 {
-  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction );
+  return new Renderer( dataProvider, geometry, blendingBitmask, blendColor,
+                       faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode,
+                       depthFunction, stencilParameters, writeToColorBuffer );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
@@ -131,21 +134,25 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     bool preMultipliedAlphaEnabled,
                     DepthWriteMode::Type depthWriteMode,
                     DepthTestMode::Type depthTestMode,
-                    DepthFunction::Type depthFunction )
+                    DepthFunction::Type depthFunction,
+                    StencilParameters& stencilParameters,
+                    bool writeToColorBuffer )
 : mRenderDataProvider( dataProvider ),
-  mContext(NULL),
+  mContext( NULL),
   mTextureCache( NULL ),
   mUniformNameCache( NULL ),
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
+  mStencilParameters( stencilParameters ),
   mBlendingOptions(),
-  mFaceCullingMode( faceCullingMode ),
-  mDepthFunction( depthFunction ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementsCount( 0 ),
+  mDepthFunction( depthFunction ),
+  mFaceCullingMode( faceCullingMode ),
   mDepthWriteMode( depthWriteMode ),
   mDepthTestMode( depthTestMode ),
+  mWriteToColorBuffer( writeToColorBuffer ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
@@ -473,6 +480,96 @@ void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 DepthFunction::Type Renderer::GetDepthFunction() const
 {
   return mDepthFunction;
+}
+
+void Renderer::SetStencilMode( StencilMode::Type stencilMode )
+{
+  mStencilParameters.stencilMode = stencilMode;
+}
+
+StencilMode::Type Renderer::GetStencilMode() const
+{
+  return mStencilParameters.stencilMode;
+}
+
+void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
+{
+  mStencilParameters.stencilFunction = stencilFunction;
+}
+
+StencilFunction::Type Renderer::GetStencilFunction() const
+{
+  return mStencilParameters.stencilFunction;
+}
+
+void Renderer::SetStencilFunctionMask( int stencilFunctionMask )
+{
+  mStencilParameters.stencilFunctionMask = stencilFunctionMask;
+}
+
+int Renderer::GetStencilFunctionMask() const
+{
+  return mStencilParameters.stencilFunctionMask;
+}
+
+void Renderer::SetStencilFunctionReference( int stencilFunctionReference )
+{
+  mStencilParameters.stencilFunctionReference = stencilFunctionReference;
+}
+
+int Renderer::GetStencilFunctionReference() const
+{
+  return mStencilParameters.stencilFunctionReference;
+}
+
+void Renderer::SetStencilMask( int stencilMask )
+{
+  mStencilParameters.stencilMask = stencilMask;
+}
+
+int Renderer::GetStencilMask() const
+{
+  return mStencilParameters.stencilMask;
+}
+
+void Renderer::SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail )
+{
+  mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
+}
+
+StencilOperation::Type Renderer::GetStencilOperationOnFail() const
+{
+  return mStencilParameters.stencilOperationOnFail;
+}
+
+void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail )
+{
+  mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
+}
+
+StencilOperation::Type Renderer::GetStencilOperationOnZFail() const
+{
+  return mStencilParameters.stencilOperationOnZFail;
+}
+
+void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
+{
+  mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
+}
+
+StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
+{
+  return mStencilParameters.stencilOperationOnZPass;
+}
+
+void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
+{
+  mWriteToColorBuffer = writeToColorBuffer;
+}
+
+bool Renderer::GetWriteToColorBuffer() const
+{
+  return mWriteToColorBuffer;
 }
 
 void Renderer::Render( Context& context,

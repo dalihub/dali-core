@@ -36,15 +36,13 @@ class FrameBuffer
 {
 public:
 
-  typedef Dali::FrameBuffer::Format Format;
-
   /**
    * Constructor
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
-   * @param[in] format The format of the FrameBuffer
+   * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( unsigned int width, unsigned int height, Format format );
+  FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments );
 
   /**
    * Destructor
@@ -64,7 +62,7 @@ public:
   void Destroy( Context& context );
 
   /**
-   * @brief Attach a texture for color rendering
+   * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
    * param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
@@ -107,4 +105,4 @@ private:
 } // namespace Dali
 
 
-#endif //  DALI_INTERNAL_RENDER_FRAME_BUFFER_H
+#endif // DALI_INTERNAL_RENDER_FRAME_BUFFER_H

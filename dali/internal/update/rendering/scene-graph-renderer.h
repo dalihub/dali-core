@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDERER2_H
-#define DALI_INTERNAL_SCENE_GRAPH_RENDERER2_H
+#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
+#define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -17,7 +17,6 @@
  * limitations under the License.
  */
 
-
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/common/blending-options.h>
@@ -27,6 +26,7 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 namespace Dali
 {
@@ -162,7 +162,6 @@ public:
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
-   *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
   void EnablePreMultipliedAlpha( bool preMultipled );
@@ -186,14 +185,58 @@ public:
   void SetDepthFunction( DepthFunction::Type depthFunction );
 
   /**
-   * Called when an actor with this renderer is added to the stage
+   * Sets the stencil mode
+   * @param[in] mode The stencil function
    */
-  void OnStageConnect();
+  void SetStencilMode( StencilMode::Type mode );
 
-  /*
-   * Called when an actor with this renderer is removed from the stage
+  /**
+   * Sets the stencil function
+   * @param[in] stencilFunction The stencil function
    */
-  void OnStageDisconnect();
+  void SetStencilFunction( StencilFunction::Type stencilFunction );
+
+  /**
+   * Sets the stencil function mask
+   * @param[in] stencilFunctionMask The stencil function mask
+   */
+  void SetStencilFunctionMask( int stencilFunctionMask );
+
+  /**
+   * Sets the stencil function reference
+   * @param[in] stencilFunctionReference The stencil function reference
+   */
+  void SetStencilFunctionReference( int stencilFunctionReference );
+
+  /**
+   * Sets the stencil mask
+   * @param[in] stencilMask The stencil mask
+   */
+  void SetStencilMask( int stencilMask );
+
+  /**
+   * Sets the stencil operation for when the stencil test fails
+   * @param[in] stencilOperationOnFail The stencil operation
+   */
+  void SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail );
+
+  /**
+   * Sets the stencil operation for when the depth test fails
+   * @param[in] stencilOperationOnZFail The stencil operation
+   */
+  void SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail );
+
+  /**
+   * Sets the stencil operation for when the depth test passes
+   * @param[in] stencilOperationOnZPass The stencil operation
+   */
+  void SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass );
+
+  /**
+   * Sets whether or not to write to the color buffer
+   * @param[in] writeToColorBuffer True to write to the color buffer
+   */
+  void SetWriteToColorBuffer( bool writeToColorBuffer );
 
   /**
    * Prepare the object for rendering.
@@ -225,14 +268,6 @@ public:
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
   Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
-
-  /**
-   * Query whether the renderer is currently in use by an actor on the stage
-   */
-  bool IsReferenced() const
-  {
-    return mReferenceCount > 0;
-  }
 
   /**
    * Called by the TextureSet to notify to the renderer that it has changed
@@ -325,35 +360,37 @@ private:
 
 private:
 
-  CollectedUniformMap   mCollectedUniformMap[2];        ///< Uniform maps collected by the renderer
-  SceneController*      mSceneController;               ///< Used for initializing renderers
-  Render::Renderer*     mRenderer;                      ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*           mTextureSet;                    ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*     mGeometry;                      ///< The geometry this renderer uses. (Not owned)
-  Shader*               mShader;                        ///< The shader this renderer uses. (Not owned)
-  Vector4*              mBlendColor;                    ///< The blend color for blending operation
+  CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
+  SceneController*             mSceneController;                  ///< Used for initializing renderers
+  Render::Renderer*            mRenderer;                         ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*            mGeometry;                         ///< The geometry this renderer uses. (Not owned)
+  Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+  Vector4*                     mBlendColor;                       ///< The blend color for blending operation
 
-  size_t                mIndexedDrawFirstElement;       ///< first element index to be drawn using indexed draw
-  size_t                mIndexedDrawElementsCount;      ///< number of elements to be drawn using indexed draw
-  unsigned int          mBlendBitmask;                  ///< The bitmask of blending options
-  unsigned int          mReferenceCount;                ///< Number of nodes currently using this renderer
-  unsigned int          mRegenerateUniformMap;          ///< 2 if the map should be regenerated, 1 if it should be copied.
-  unsigned short        mResendFlag;                    ///< Indicate whether data should be resent to the renderer
+  Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
 
-  DepthFunction::Type   mDepthFunction:3;               ///< The depth function
-  FaceCullingMode::Type mFaceCullingMode:2;             ///< The mode of face culling
-  BlendMode::Type       mBlendMode:2;                   ///< The mode of blending
-  DepthWriteMode::Type  mDepthWriteMode:2;              ///< The depth write mode
-  DepthTestMode::Type   mDepthTestMode:2;               ///< The depth test mode
+  size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
+  size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
+  unsigned int                 mBlendBitmask;                     ///< The bitmask of blending options
+  unsigned int                 mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
+  unsigned int                 mResendFlag;                       ///< Indicate whether data should be resent to the renderer
 
-  bool                  mUniformMapChanged[2];          ///< Records if the uniform map has been altered this frame
-  bool                  mResourcesReady;                ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
-  bool                  mFinishedResourceAcquisition;   ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
-  bool                  mPremultipledAlphaEnabled:1;    ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  DepthFunction::Type          mDepthFunction:3;                  ///< Local copy of the depth function
+  FaceCullingMode::Type        mFaceCullingMode:2;                ///< Local copy of the mode of face culling
+  BlendMode::Type              mBlendMode:2;                      ///< Local copy of the mode of blending
+  DepthWriteMode::Type         mDepthWriteMode:2;                 ///< Local copy of the depth write mode
+  DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
+  bool                         mWriteToColorBuffer:1;             ///< Local copy of the write to color buffer flag
+
+  bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
+  bool                         mResourcesReady;                   ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
+  bool                         mFinishedResourceAcquisition;      ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
+  bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 public:
 
-  int                   mDepthIndex;                    ///< Used only in PrepareRenderInstructions
+  int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
 };
 
 
@@ -502,26 +539,94 @@ inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, c
   new (slot) LocalType( &renderer, &Renderer::SetDepthFunction, depthFunction );
 }
 
-inline void OnStageConnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )
+inline void SetStencilModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilMode::Type mode )
 {
-  typedef Message< Renderer > LocalType;
+  typedef MessageValue1< Renderer, StencilMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::OnStageConnect );
+  new (slot) LocalType( &renderer, &Renderer::SetStencilMode, mode );
 }
 
-inline void OnStageDisconnectMessage( EventThreadServices& eventThreadServices, const Renderer& renderer )
+inline void SetStencilFunctionMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilFunction::Type stencilFunction )
 {
-  typedef Message< Renderer > LocalType;
+  typedef MessageValue1< Renderer, StencilFunction::Type > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::OnStageDisconnect );
+  new (slot) LocalType( &renderer, &Renderer::SetStencilFunction, stencilFunction );
+}
+
+inline void SetStencilFunctionMaskMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int mask )
+{
+  typedef MessageValue1< Renderer, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilFunctionMask, mask );
+}
+
+inline void SetStencilFunctionReferenceMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int stencilFunctionReference )
+{
+  typedef MessageValue1< Renderer, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilFunctionReference, stencilFunctionReference );
+}
+
+inline void SetStencilMaskMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int stencilMask )
+{
+  typedef MessageValue1< Renderer, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilMask, stencilMask );
+}
+
+inline void SetStencilOperationOnFailMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
+{
+  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnFail, stencilOperation );
+}
+
+inline void SetStencilOperationOnZFailMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
+{
+  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZFail, stencilOperation );
+}
+
+inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
+{
+  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZPass, stencilOperation );
+}
+
+inline void SetWriteToColorBufferMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool writeToColorBuffer )
+{
+  typedef MessageValue1< Renderer, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetWriteToColorBuffer, writeToColorBuffer );
 }
 
 } // namespace SceneGraph

@@ -17,7 +17,7 @@
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/internal/render/renderers/render-texture.h>
 
 namespace Dali
@@ -27,10 +27,10 @@ namespace Internal
 namespace Render
 {
 
-FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, Format format )
+FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
 :mId( 0u ),
- mDepthBuffer( (format == Dali::FrameBuffer::COLOR_DEPTH || format == Dali::FrameBuffer::COLOR_DEPTH_STENCIL ) ? 1u : 0u ),
- mStencilBuffer( (format == Dali::FrameBuffer::COLOR_STENCIL || format == Dali::FrameBuffer::COLOR_DEPTH_STENCIL ) ? 1u : 0u ),
+ mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
+ mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
  mWidth( width ),
  mHeight( height )
 {
@@ -54,20 +54,20 @@ void FrameBuffer::Initialize(Context& context)
 
   if( mDepthBuffer )
   {
-    //Create a depth render target
-    context.GenRenderbuffers(1, &mDepthBuffer );
-    context.BindRenderbuffer(GL_RENDERBUFFER, mDepthBuffer);
-    context.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
-    context.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBuffer);
+    // Create a depth render target.
+    context.GenRenderbuffers( 1, &mDepthBuffer );
+    context.BindRenderbuffer( GL_RENDERBUFFER, mDepthBuffer );
+    context.RenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight );
+    context.FramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBuffer );
   }
 
   if( mStencilBuffer )
   {
-    //Create a stencil render target
-    context.GenRenderbuffers(1, &mStencilBuffer );
-    context.BindRenderbuffer(GL_RENDERBUFFER, mStencilBuffer);
-    context.RenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, mWidth, mHeight);
-    context.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mStencilBuffer );
+    // Create a stencil render target.
+    context.GenRenderbuffers( 1, &mStencilBuffer );
+    context.BindRenderbuffer( GL_RENDERBUFFER, mStencilBuffer );
+    context.RenderbufferStorage( GL_RENDERBUFFER, GL_STENCIL_INDEX8, mWidth, mHeight );
+    context.FramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mStencilBuffer );
   }
 
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -77,6 +77,7 @@ void FrameBuffer::AttachColorTexture( Context& context, Render::NewTexture* text
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 
+  // Create a color attachment.
   if( texture->GetType() == TextureType::TEXTURE_2D )
   {
     context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetId(), mipmapLevel );

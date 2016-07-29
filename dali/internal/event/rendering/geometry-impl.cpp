@@ -68,19 +68,19 @@ void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
   SceneGraph::SetIndexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData );
 }
 
-void Geometry::SetGeometryType( Dali::Geometry::GeometryType geometryType )
+void Geometry::SetType( Dali::Geometry::Type geometryType )
 {
-  if( geometryType != mGeometryType )
+  if( geometryType != mType )
   {
     SceneGraph::SetGeometryTypeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, geometryType );
 
-    mGeometryType = geometryType;
+    mType = geometryType;
   }
 }
 
-Dali::Geometry::GeometryType Geometry::GetGeometryType() const
+Dali::Geometry::Type Geometry::GetType() const
 {
-  return mGeometryType;
+  return mType;
 }
 
 const Render::Geometry* Geometry::GetRenderObject() const
@@ -91,7 +91,7 @@ const Render::Geometry* Geometry::GetRenderObject() const
 Geometry::Geometry()
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
-  mGeometryType(Dali::Geometry::TRIANGLES)
+  mType(Dali::Geometry::TRIANGLES)
 {
 }
 
