@@ -2045,6 +2045,59 @@ int UtcDaliRendererSetDepthFunction(void)
   END_TEST;
 }
 
+/**
+ * @brief This templatized function checks an enumeration property is setting and getting correctly.
+ * The checks performed are as follows:
+ *  - Check the initial/default value.
+ *  - Set a different value via enum.
+ *  - Check it was set.
+ *  - Set a different value via string.
+ *  - Check it was set.
+ */
+template< typename T >
+void CheckEnumerationProperty( Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
+{
+  DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( initialValue ) );
+  renderer.SetProperty( propertyIndex, firstCheckEnumeration );
+  DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+  renderer.SetProperty( propertyIndex, secondCheckString );
+  DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
+}
+
+int UtcDaliRendererEnumProperties(void)
+{
+  TestApplication application;
+  tet_infoline( "Test Renderer enumeration properties can be set with both integer and string values" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  /*
+   * Here we use a templatized function to perform several checks on each enumeration property.
+   * @see CheckEnumerationProperty for details of the checks performed.
+   */
+
+  CheckEnumerationProperty< FaceCullingMode::Type >( renderer, Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::NONE, FaceCullingMode::FRONT, FaceCullingMode::BACK, "BACK" );
+  CheckEnumerationProperty< BlendMode::Type >( renderer, Renderer::Property::BLEND_MODE, BlendMode::AUTO, BlendMode::OFF, BlendMode::ON, "ON" );
+  CheckEnumerationProperty< BlendEquation::Type >( renderer, Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
+  CheckEnumerationProperty< BlendEquation::Type >( renderer, Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
+  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< DepthWriteMode::Type >( renderer, Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::AUTO, DepthWriteMode::OFF, DepthWriteMode::ON, "ON" );
+  CheckEnumerationProperty< DepthFunction::Type >( renderer, Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS, DepthFunction::ALWAYS, DepthFunction::GREATER, "GREATER" );
+  CheckEnumerationProperty< DepthTestMode::Type >( renderer, Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO, DepthTestMode::OFF, DepthTestMode::ON, "ON" );
+  CheckEnumerationProperty< StencilFunction::Type >( renderer, Renderer::Property::STENCIL_FUNCTION, StencilFunction::ALWAYS, StencilFunction::LESS, StencilFunction::EQUAL, "EQUAL" );
+  CheckEnumerationProperty< StencilMode::Type >( renderer, Renderer::Property::STENCIL_MODE, StencilMode::AUTO, StencilMode::OFF, StencilMode::ON, "ON" );
+  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+
+  END_TEST;
+}
+
 Renderer RendererTestFixture( TestApplication& application )
 {
   Geometry geometry = CreateQuadGeometry();
