@@ -54,7 +54,8 @@ struct TapGesture;
  * @endcode
  *
  * @SINCE_1_0.0
- * @note Multi-touch taps are not currently supported. However, multiple taps (double & triple tap etc.) are supported.
+ * @note Multi-touch taps (two or more points of contact with the surface) are not currently
+ * supported. However, multiple taps (double & triple tap etc.) are supported.
  *
  * Signals
  * | %Signal Name | Method                |

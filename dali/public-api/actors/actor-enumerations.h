@@ -82,7 +82,7 @@ namespace ResizePolicy
 enum Type
 {
   FIXED,                 ///< Size is fixed as set by SetSize @SINCE_1_0.0
-  USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size @SINCE_1_0.0
+  USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size @SINCE_1_0.0 @see Actor::GetNaturalSize()
   FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio is not maintained. @SINCE_1_0.0
   SIZE_RELATIVE_TO_PARENT,        ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ). @SINCE_1_0.0
   SIZE_FIXED_OFFSET_FROM_PARENT,  ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ). @SINCE_1_0.0
