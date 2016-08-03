@@ -50,7 +50,7 @@ Archive::~Archive()
 {
   if(!mChunkStack.empty())
   {
-    DALI_LOG_ERROR("mChunkStack should be empty!");
+    DALI_LOG_ERROR("mChunkStack should be empty!\n");
   }
 }
 
