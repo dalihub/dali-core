@@ -308,7 +308,7 @@ public:
       MINIMUM_SIZE,                                       ///< name "minimumSize",           type Vector2 @SINCE_1_0.0
       MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2 @SINCE_1_0.0
       INHERIT_POSITION,                                   ///< name "inheritPosition",       type bool @SINCE_1_1.24
-      BATCH_PARENT,                                       ///< name "batchParent",           type bool
+      BATCH_PARENT,                                       ///< name "batchParent",           type bool @SINCE_1_1.46
     };
   };
 
