@@ -424,6 +424,7 @@ public:
 
       /**
        * @brief name "batchingEnabled", type BOOLEAN
+       * @SINCE_1_2.0
        * @see Batching
        * @note The default value is 'false'
        */
