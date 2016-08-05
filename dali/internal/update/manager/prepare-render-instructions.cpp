@@ -34,6 +34,8 @@
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/update/manager/geometry-batcher.h>
 
 namespace
 {
@@ -58,6 +60,7 @@ namespace SceneGraph
  * @param renderable Node-Renderer pair
  * @param viewMatrix used to calculate modelview matrix for the item
  * @param camera The camera used to render
+ * @param geometryBatcher The instance of the geometry batcher
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
@@ -66,19 +69,37 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      Renderable& renderable,
                                      const Matrix& viewMatrix,
                                      SceneGraph::Camera& camera,
+                                     GeometryBatcher& geometryBatcher,
                                      bool isLayer3d,
                                      bool cull )
 {
+  // discard renderable early if it belongs to the batch which has been consumed in during frame
+  Node* renderableNode = renderable.mNode;
+  const bool batchingValid( renderable.mRenderer->IsBatchingEnabled() && renderableNode->mBatchIndex != BATCH_NULL_HANDLE );
+  if( batchingValid && geometryBatcher.HasRendered( renderableNode->mBatchIndex ) )
+  {
+    return;
+  }
+
   bool inside( true );
+  const Node* batchParentNode = renderable.mNode->GetBatchParent();
+  const Node* node = ( renderable.mRenderer->IsBatchingEnabled() && batchParentNode ) ?
+        batchParentNode : renderableNode;
+
   if ( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
-    const Vector4& boundingSphere = renderable.mNode->GetBoundingSphere();
+    const Vector4& boundingSphere = node->GetBoundingSphere();
     inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
              (camera.CheckSphereInFrustum( updateBufferIndex, Vector3(boundingSphere), boundingSphere.w ) );
   }
 
-  if ( inside )
+  if( inside )
   {
+    if( batchingValid )
+    {
+      geometryBatcher.SetRendered( renderableNode->mBatchIndex );
+    }
+
     Renderer::Opacity opacity = renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode );
     if( opacity != Renderer::TRANSPARENT )
     {
@@ -97,7 +118,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
         item.mDepthIndex = renderable.mRenderer->GetDepthIndex() + static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER;
       }
       // save MV matrix onto the item
-      renderable.mNode->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+      node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
       Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
     }
   }
@@ -111,6 +132,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
  * NodeRendererContainer Node-Renderer pairs
  * @param viewMatrix used to calculate modelview matrix for the items
  * @param camera The camera used to render
+ * @param geometryBatcher The instance of the geometry batcher
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
@@ -119,6 +141,7 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
                                       RenderableContainer& renderers,
                                       const Matrix& viewMatrix,
                                       SceneGraph::Camera& camera,
+                                      GeometryBatcher* geometryBatcher,
                                       bool isLayer3d,
                                       bool cull)
 {
@@ -127,7 +150,7 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
   unsigned int rendererCount( renderers.Size() );
   for( unsigned int i(0); i<rendererCount; ++i )
   {
-    AddRendererToRenderList( updateBufferIndex, renderList, renderers[i], viewMatrix, camera, isLayer3d, cull );
+    AddRendererToRenderList( updateBufferIndex, renderList, renderers[i], viewMatrix, camera, *geometryBatcher, isLayer3d, cull );
   }
 }
 
@@ -330,6 +353,7 @@ inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, La
  * @param stencilRenderablesExist is true if there are stencil renderers on this layer
  * @param instruction to fill in
  * @param sortingHelper to use for sorting the renderitems (to avoid reallocating)
+ * @param geometryBatcher the instance of the geometry batcher
  * @param tryReuseRenderList whether to try to reuse the cached items from the instruction
  * @param cull Whether frustum culling is enabled or not
  */
@@ -340,6 +364,7 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
                                bool stencilRenderablesExist,
                                RenderInstruction& instruction,
                                RendererSortingHelper& sortingHelper,
+                               GeometryBatcher& geometryBatcher,
                                bool tryReuseRenderList,
                                bool cull)
 {
@@ -357,7 +382,7 @@ inline void AddColorRenderers( BufferIndex updateBufferIndex,
     }
   }
 
-  AddRenderersToRenderList( updateBufferIndex, renderList, layer.colorRenderables, viewMatrix, camera, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
+  AddRenderersToRenderList( updateBufferIndex, renderList, layer.colorRenderables, viewMatrix, camera, &geometryBatcher, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
   SortRenderItems( updateBufferIndex, renderList, layer, sortingHelper );
 
   // Setup the render flags for stencil.
@@ -410,7 +435,7 @@ inline void AddOverlayRenderers( BufferIndex updateBufferIndex,
       return;
     }
   }
-  AddRenderersToRenderList( updateBufferIndex, overlayRenderList, layer.overlayRenderables, viewMatrix, camera, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
+  AddRenderersToRenderList( updateBufferIndex, overlayRenderList, layer.overlayRenderables, viewMatrix, camera, NULL, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
   SortRenderItems( updateBufferIndex, overlayRenderList, layer, sortingHelper );
 }
 
@@ -449,7 +474,7 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
       return;
     }
   }
-  AddRenderersToRenderList( updateBufferIndex, stencilRenderList, layer.stencilRenderables, viewMatrix, camera, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
+  AddRenderersToRenderList( updateBufferIndex, stencilRenderList, layer.stencilRenderables, viewMatrix, camera, NULL, layer.GetBehavior() == Dali::Layer::LAYER_3D, cull );
 }
 
 void PrepareRenderInstruction( BufferIndex updateBufferIndex,
@@ -457,7 +482,8 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                                RenderTask& renderTask,
                                RendererSortingHelper& sortingHelper,
                                bool cull,
-                               RenderInstructionContainer& instructions )
+                               RenderInstructionContainer& instructions,
+                               GeometryBatcher& geometryBatcher )
 {
   // Retrieve the RenderInstruction buffer from the RenderInstructionContainer
   // then populate with instructions.
@@ -494,6 +520,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                          stencilRenderablesExist,
                          instruction,
                          sortingHelper,
+                         geometryBatcher,
                          tryReuseRenderList,
                          cull );
     }

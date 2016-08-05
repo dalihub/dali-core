@@ -1833,6 +1833,8 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 
+  bool mIsBatchParent : 1;              ///< Flag indicating that the actor is a batch parent
+
 };
 
 } // namespace Internal

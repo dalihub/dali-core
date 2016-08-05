@@ -349,7 +349,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
     }
     else
     {
-      DALI_LOG_WARNING("Action already exists in TypeRegistry Type", actionName.c_str());
+      DALI_LOG_WARNING("Action already exists in TypeRegistry Type\n", actionName.c_str());
     }
   }
 }
@@ -371,7 +371,7 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
     }
     else
     {
-      DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function", signalName.c_str());
+      DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
     }
   }
 }
