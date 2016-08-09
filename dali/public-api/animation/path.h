@@ -185,6 +185,7 @@ public:
 
 public: // Not intended for application developers
   /**
+   * @internal
    * @brief This constructor is used by Path::New() methods.
    *
    * @SINCE_1_0.0

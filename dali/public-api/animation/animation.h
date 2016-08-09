@@ -698,6 +698,7 @@ public:
 public: // Not intended for use by Application developers
 
   /**
+   * @internal
    * @brief This constructor is used by Animation::New() methods
    * @SINCE_1_0.0
    * @param [in] animation A pointer to a newly allocated Dali resource

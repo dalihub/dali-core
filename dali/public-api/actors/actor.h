@@ -1560,6 +1560,7 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
+   * @internal
    * @brief This constructor is used by Actor::New() methods.
    *
    * @SINCE_1_0.0
@@ -1569,6 +1570,7 @@ public: // Not intended for application developers
 };
 
 /**
+ * @internal
  * @brief Helper for discarding an actor handle.
  *
  * If the handle is empty, this method does nothing.  Otherwise
