@@ -207,11 +207,8 @@ int UtcDaliNativeImageExtensionP(void)
 
   TestNativeImagePointer testNativeImage = TestNativeImage::New( 16, 16 );
   DALI_TEST_CHECK( testNativeImage );
-  DALI_TEST_CHECK( NULL != testNativeImage->GetExtension() );
 
-  TestNativeImageNoExtPointer testNativeImage2 = TestNativeImageNoExt::New( 16, 16 );
-  DALI_TEST_CHECK( testNativeImage2 );
-  DALI_TEST_CHECK( NULL == testNativeImage2->GetExtension() );
+  DALI_TEST_CHECK( NULL != testNativeImage->GetExtension() );
 
   END_TEST;
 }

@@ -799,7 +799,7 @@ int UtcDaliEncodedBufferImageDownCastP(void)
 }
 
 // Positive test case for constructors:
-int UtcDaliEncodedBufferImageNewP1(void)
+int UtcDaliEncodedBufferImageNew01(void)
 {
   TestApplication application;
 
@@ -827,35 +827,8 @@ int UtcDaliEncodedBufferImageNewP1(void)
   END_TEST;
 }
 
-// Positive test case for constructors:
-int UtcDaliEncodedBufferImageNewP2(void)
-{
-  TestApplication application;
-
-  tet_infoline( "UtcDaliEncodedBufferImageNew01() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type scalingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol, bool orientationCorrection )" );
-
-  // Invoke default handle constructor for the Image base class:
-  Image image;
-
-  DALI_TEST_CHECK( !image );
-
-  // Trigger image decode to initialise the handle
-  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
-
-  DALI_TEST_CHECK( image );
-
-  Image image2;
-  DALI_TEST_CHECK( !image2 );
-  // Trigger image decode to initialise the handle
-  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength);
-
-  DALI_TEST_CHECK( image2 );
-  END_TEST;
-}
-
-
 // Negative test case for constructor - null pointer:
-int UtcDaliEncodedBufferImageNewN1(void)
+int UtcDaliEncodedBufferImageNew02(void)
 {
   TestApplication application;
 
@@ -882,7 +855,7 @@ int UtcDaliEncodedBufferImageNewN1(void)
 }
 
 // Negative test case for constructor - zero-length input buffer:
-int UtcDaliEncodedBufferImageNewN2(void)
+int UtcDaliEncodedBufferImageNew03(void)
 {
   TestApplication application;
 

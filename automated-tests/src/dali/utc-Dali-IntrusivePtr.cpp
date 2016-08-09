@@ -73,33 +73,7 @@ public:
     ++g_destructionCountUnrelated;
   }
 };
-
-class TestObject : public RefObject
-{
-public:
-  TestObject()
-  : data(201)
-  {
-  }
-
-  TestObject(const TestObject& testObject)
-  : RefObject(testObject),
-    data(testObject.data)
-  {
-  }
-
-  TestObject& Assign(const TestObject& testObject)
-  {
-    RefObject::operator=(testObject);
-    data = testObject.data;
-    return *this;
-  }
-
-  int data;
-};
-
-
-} // Anonymous namespace
+}
 
 /**
  * Test that a default constructed pointer is null and harmless.
@@ -483,51 +457,5 @@ int UtcDaliIntrusivePtrOperatorNotEqualLeftPointerTU(void)
 
   DALI_TEST_EQUALS( operator!=( counted1.Get(), countedSubclass1 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( operator!=( counted2.Get(), countedSubclass2 ), false, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRefObjectCopyConstructor(void)
-{
-  tet_infoline("Test for Dali::RefObject(const RefObject&)");
-
-  {
-    IntrusivePtr<TestObject> testPtr( new TestObject );
-    DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
-
-    const TestObject& testObject=*testPtr.Get();
-    {
-      IntrusivePtr<TestObject> testPtr2( new TestObject(testObject) );
-      DALI_TEST_EQUALS( testPtr2->ReferenceCount(), 1, TEST_LOCATION );
-    }
-    DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
-  }
-  END_TEST;
-}
-
-
-int UtcDaliRefObjectAssignmentOperator(void)
-{
-  tet_infoline("Test for Dali::RefObject::operator=(const RefObject&)");
-
-  {
-    IntrusivePtr<TestObject> testPtr( new TestObject );
-    DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
-
-    const TestObject& testObject=*testPtr.Get();
-    {
-      IntrusivePtr<TestObject> testPtr2( new TestObject() );
-      testPtr->data = 33;
-      IntrusivePtr<TestObject> testPtr3 = testPtr2;
-      DALI_TEST_EQUALS( testPtr2->ReferenceCount(), 2, TEST_LOCATION );
-      DALI_TEST_EQUALS( testPtr2->data, 201, TEST_LOCATION );
-
-      TestObject& testObject2 = *testPtr2.Get();
-      testObject2 = testObject;
-
-      DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
-      DALI_TEST_EQUALS( testPtr2->ReferenceCount(), 2, TEST_LOCATION );
-    }
-    DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
-  }
   END_TEST;
 }

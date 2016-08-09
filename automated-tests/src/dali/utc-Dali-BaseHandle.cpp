@@ -123,6 +123,7 @@ int UtcDaliBaseHandleConstructorVoid(void)
   END_TEST;
 }
 
+
 int UtcDaliBaseHandleCopyConstructor(void)
 {
   TestApplication application;

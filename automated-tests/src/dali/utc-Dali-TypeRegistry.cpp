@@ -356,16 +356,6 @@ class MyTestCustomActor2 : public CustomActor
 {
 public:
 
-  struct Property
-  {
-    enum
-    {
-      P1=Dali::PROPERTY_REGISTRATION_START_INDEX,
-      P2
-    };
-  };
-
-
   MyTestCustomActor2()
   {
   }
@@ -414,60 +404,6 @@ private:
 
 static TypeRegistration customTypeInit( typeid(MyTestCustomActor2), typeid(Dali::CustomActor), CreateCustomInit, true );
 
-PropertyRegistration P1( customTypeInit, "propertyOne", MyTestCustomActor2::Property::P1, Property::INTEGER, &SetProperty, &GetProperty );
-PropertyRegistration P2( customTypeInit, "propertyTwo", MyTestCustomActor2::Property::P2, Property::STRING, &SetProperty, &GetProperty );
-
-
-class MyTestCustomActor3 : public CustomActor
-{
-public:
-  MyTestCustomActor3()
-  {
-  }
-
-  static MyTestCustomActor3 New()
-  {
-    return MyTestCustomActor3(); // takes ownership
-  }
-
-  virtual ~MyTestCustomActor3()
-  {
-  }
-
-  static MyTestCustomActor3 DownCast( BaseHandle handle )
-  {
-    MyTestCustomActor3 result;
-
-    CustomActor custom = Dali::CustomActor::DownCast( handle );
-    if ( custom )
-    {
-      CustomActorImpl& customImpl = custom.GetImplementation();
-
-      Impl::MyTestCustomActor* impl = dynamic_cast<Impl::MyTestCustomActor*>(&customImpl);
-
-      if (impl)
-      {
-        result = MyTestCustomActor3(customImpl.GetOwner());
-      }
-    }
-
-    return result;
-  }
-
-private:
-
-  MyTestCustomActor3(Internal::CustomActor* internal)
-  : CustomActor(internal)
-  {
-  }
-
-  MyTestCustomActor3( Impl::MyTestCustomActor& impl )
-  : CustomActor( impl )
-  {
-  }
-};
-
-static TypeRegistration customTypeBadInit( typeid(MyTestCustomActor3), typeid(Dali::CustomActor), NULL, false );
 
 BaseHandle CreateCustom(void)
 {
@@ -1040,10 +976,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   // Check property count of type-info is 1
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-
-  size_t typePropertyCount = typeInfo.GetPropertyCount();
   DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( indices.Size(), typePropertyCount, TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();
@@ -2141,71 +2074,6 @@ int UtcDaliTypeInfoGetSignalNameN(void)
   std::string name = typeInfo.GetSignalName(std::numeric_limits<size_t>::max());
 
   DALI_TEST_EQUALS( 0u, name.size(), TEST_LOCATION );
-
-  END_TEST;
-}
-
-
-int UtcDaliTypeInfoGetCreatorP(void)
-{
-  TestApplication application;
-  TypeRegistry typeRegistry = TypeRegistry::Get();
-
-  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
-  DALI_TEST_CHECK( typeInfo );
-
-  TypeInfo::CreateFunction createFn = typeInfo.GetCreator();
-  DALI_TEST_EQUALS( createFn != NULL, true, TEST_LOCATION );
-  if( createFn )
-  {
-    // try calling it:
-    BaseHandle handle = createFn();
-    DALI_TEST_EQUALS( (bool)handle, true, TEST_LOCATION );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliTypeInfoGetCreatorN(void)
-{
-  TestApplication application;
-  TypeRegistry typeRegistry = TypeRegistry::Get();
-
-  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "MyTestCustomActor3" );
-  DALI_TEST_CHECK( typeInfo );
-
-  TypeInfo::CreateFunction createFn = typeInfo.GetCreator();
-  DALI_TEST_EQUALS( createFn == NULL, true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliTypeInfoGetPropertyCountP1(void)
-{
-  TestApplication application;
-  TypeRegistry typeRegistry = TypeRegistry::Get();
-
-  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
-  DALI_TEST_CHECK( typeInfo );
-  size_t actorPropertyCount = typeInfo.GetPropertyCount();
-
-  DALI_TEST_EQUALS( actorPropertyCount == 0 , true, TEST_LOCATION ); // No event only props
-  END_TEST;
-}
-
-int UtcDaliTypeInfoGetPropertyCountP2(void)
-{
-  TestApplication application;
-  TypeRegistry typeRegistry = TypeRegistry::Get();
-
-  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "MyTestCustomActor2" );
-  DALI_TEST_CHECK( typeInfo );
-  size_t propertyCount = typeInfo.GetPropertyCount();
-  Property::IndexContainer indices;
-  typeInfo.GetPropertyIndices( indices );
-
-  DALI_TEST_EQUALS( propertyCount > 0 && propertyCount <= indices.Size(), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( propertyCount == 2, true, TEST_LOCATION );
 
   END_TEST;
 }

@@ -149,43 +149,6 @@ struct TouchDataFunctor
   bool returnValue;
 };
 
-struct HandleData
-{
-  bool signalReceived;
-  TouchData touchData;
-
-  HandleData()
-  : signalReceived(false)
-  {
-  }
-};
-
-struct TouchDataHandleFunctor
-{
-  /**
-   * Constructor.
-   * @param[in]  data         Reference to the data to store callback information.
-   * @param[in]  returnValue  What the functor should return.
-   */
-  TouchDataHandleFunctor( HandleData& handleData, bool returnValue = true )
-  : handleData(handleData),
-    returnValue( returnValue )
-  {
-  }
-
-  bool operator()( Actor actor, const TouchData& someTouchData )
-  {
-    handleData.signalReceived = true;
-    TouchData handle(someTouchData);
-    handleData.touchData = handle;
-    return returnValue;
-  }
-
-  HandleData& handleData;
-  bool returnValue;
-};
-
-
 // Functor that removes the actor when called.
 struct RemoveActorFunctor : public TouchDataFunctor
 {
@@ -289,7 +252,7 @@ Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vecto
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int UtcDaliTouchDataNormalProcessing01(void)
+int UtcDaliTouchDataNormalProcessing(void)
 {
   TestApplication application;
 
@@ -349,40 +312,6 @@ int UtcDaliTouchDataNormalProcessing01(void)
   screenCoordinates.x = screenCoordinates.y = 200.0f;
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-  END_TEST;
-}
-
-
-int UtcDaliTouchDataNormalProcessing02(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Connect to actor's touched signal
-  HandleData handleData;
-  TouchDataHandleFunctor functor( handleData );
-  actor.TouchSignal().Connect( &application, functor );
-
-  Vector2 screenCoordinates( 10.0f, 10.0f );
-  Vector2 localCoordinates;
-  actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
-
-  // Emit a down signal
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
-  DALI_TEST_EQUALS( true, handleData.signalReceived, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, handleData.touchData.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, handleData.touchData.GetState(0), TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, handleData.touchData.GetScreenPosition(0), TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, handleData.touchData.GetLocalPosition(0), 0.1f, TEST_LOCATION );
-
   END_TEST;
 }
 

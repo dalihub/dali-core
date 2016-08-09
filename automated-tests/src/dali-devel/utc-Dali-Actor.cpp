@@ -106,31 +106,7 @@ int UtcDaliActorAddRendererOnStage(void)
   END_TEST;
 }
 
-int UtcDaliActorRemoveRendererP1(void)
-{
-  tet_infoline("Testing Actor::RemoveRenderer");
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-
-  Geometry geometry = Geometry::QUAD();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
-
-  actor.AddRenderer( renderer );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
-
-  actor.RemoveRenderer(renderer);
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-
-
-  END_TEST;
-}
-
-int UtcDaliActorRemoveRendererP2(void)
+int UtcDaliActorRemoveRendererP(void)
 {
   tet_infoline("Testing Actor::RemoveRenderer");
   TestApplication application;
@@ -150,31 +126,6 @@ int UtcDaliActorRemoveRendererP2(void)
   actor.RemoveRenderer(0);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-
-  END_TEST;
-}
-
-
-int UtcDaliActorRemoveRendererN(void)
-{
-  tet_infoline("Testing Actor::RemoveRenderer");
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-
-  Geometry geometry = Geometry::QUAD();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
-
-  actor.AddRenderer( renderer );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
-
-  actor.RemoveRenderer(10);
-  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
 
   END_TEST;
 }

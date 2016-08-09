@@ -263,9 +263,6 @@ int UtcDaliNinePatchImageGetStrechBorders(void)
 
      tet_printf("stretchBorders left(%f) right(%f) top(%f) bottom(%f)\n", stretchBorders.x, stretchBorders.z, stretchBorders.y, stretchBorders.w );
      DALI_TEST_CHECK( stretchBorders == requiredStretchBorder );
-
-     Vector4 actualStretchBorders = ninePatchImage.GetStretchBorders();
-     DALI_TEST_EQUALS( actualStretchBorders, requiredStretchBorder, 0.001, TEST_LOCATION );
    }
    else
    {

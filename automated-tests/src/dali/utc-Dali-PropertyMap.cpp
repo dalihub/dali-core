@@ -199,8 +199,7 @@ int UtcDaliPropertyMapFind(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 1 );
 
-  const std::string world("world");
-  value = map.Find( world );
+  value = map.Find( "world" );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 2 );
 
@@ -208,37 +207,12 @@ int UtcDaliPropertyMapFind(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 9 );
 
-  value = map.Find( 10, Property::STRING );
+  value = map.Find( 10 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
 
-  value = map.Find( 10, Property::INTEGER );
-  DALI_TEST_CHECK( value == NULL );
-
   value = map.Find( "invalidKey" );
   DALI_TEST_CHECK( !value );
-
-  END_TEST;
-}
-
-
-int UtcDaliPropertyMapOperatorIndex(void)
-{
-  Property::Map map;
-  map[ "hello" ] = 1;
-  map[ 10 ] = "DALi";
-  map[ "world" ] = 2;
-  map[ 100 ] = 9;
-
-  const Property::Map map2 = map;
-  const Property::Value& value10 = map2[10];
-  DALI_TEST_EQUALS( value10.Get<std::string>(), "DALi", TEST_LOCATION );
-
-  const Property::Value& value100 = map2[100];
-  DALI_TEST_EQUALS( value100.Get<int>(), 9, TEST_LOCATION );
-
-  const Property::Value& valueHello = map2["hello"];
-  DALI_TEST_EQUALS( valueHello.Get<int>(), 1, TEST_LOCATION );
 
   END_TEST;
 }
