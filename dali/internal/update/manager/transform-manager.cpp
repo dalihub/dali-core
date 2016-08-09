@@ -312,6 +312,7 @@ void TransformManager::SwapComponents( unsigned int i, unsigned int j )
   std::swap( mLocal[i], mLocal[j] );
   std::swap( mComponentDirty[i], mComponentDirty[j] );
   std::swap( mBoundingSpheres[i], mBoundingSpheres[j] );
+  std::swap( mWorld[i], mWorld[j] );
 
   mIds[ mComponentId[i] ] = i;
   mIds[ mComponentId[j] ] = j;
@@ -335,10 +336,15 @@ void TransformManager::ReorderComponents()
     }
   }
 
-  std::sort( mOrderedComponents.Begin(), mOrderedComponents.End());
-  for( size_t i(0); i<mComponentCount-1; ++i )
+  std::stable_sort( mOrderedComponents.Begin(), mOrderedComponents.End());
+  unsigned int previousIndex = 0;
+  for( size_t newIndex(0); newIndex<mComponentCount-1; ++newIndex )
   {
-    SwapComponents( mIds[mOrderedComponents[i].id], i);
+    previousIndex = mIds[mOrderedComponents[newIndex].id];
+    if( previousIndex != newIndex )
+    {
+      SwapComponents( previousIndex, newIndex);
+    }
   }
 }
 
