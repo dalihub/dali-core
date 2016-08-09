@@ -70,16 +70,19 @@ NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
 
 void NewTexture::Initialize()
 {
-  if( mNativeImage )
+  if( EventThreadServices::IsCoreRunning() )
   {
-    mRenderObject = new Render::NewTexture( mNativeImage );
-  }
-  else
-  {
-    mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
-  }
+    if( mNativeImage )
+    {
+      mRenderObject = new Render::NewTexture( mNativeImage );
+    }
+    else
+    {
+      mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
+    }
 
-  AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  }
 }
 
 NewTexture::~NewTexture()
@@ -90,54 +93,69 @@ NewTexture::~NewTexture()
   }
 }
 
-bool NewTexture::CheckUploadParametres( const Vector<unsigned char>& buffer, const UploadParams& parameters ) const
+bool NewTexture::Upload( PixelDataPtr pixelData )
 {
-  if( mNativeImage )
-  {
-    DALI_LOG_ERROR( "Error: Uploading data to a native texture");
-    return false;
-  }
-  else if(  buffer.Size() < GetBytesPerPixel( mFormat ) * parameters.width * parameters.height )
-  {
-    DALI_LOG_ERROR( "Error: Buffer of an incorrect size when trying to update texture");
-    return false;
-  }
-  else if( ( parameters.xOffset + parameters.width  > static_cast<unsigned int>( mWidth/(1<<parameters.mipmap ))) ||
-           ( parameters.yOffset + parameters.height > static_cast<unsigned int>( mHeight/(1<<parameters.mipmap ))))
-  {
-    DALI_LOG_ERROR( "Error: Out of bounds texture update");
-    return false;
-  }
-  else
-  {
-    return true;
-  }
+  return Upload( pixelData, 0u, 0u, 0u, 0u, mWidth, mHeight );
 }
 
-void NewTexture::Upload( Vector<unsigned char>& buffer,
+bool NewTexture::Upload( PixelDataPtr pixelData,
                          unsigned int layer, unsigned int mipmap,
                          unsigned int xOffset, unsigned int yOffset,
                          unsigned int width, unsigned int height )
 {
-  UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
-  if( CheckUploadParametres( buffer, params ) )
+  bool result(false);
+  if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, buffer, params );
+    if( mNativeImage )
+    {
+      DALI_LOG_ERROR( "OpenGL ES does not support uploading data to native texture\n");
+    }
+    else
+    {
+      unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
+      if( pixelData->GetBuffer() == NULL || pixelDataSize == 0 )
+      {
+        DALI_LOG_ERROR( "PixelData is empty\n");
+      }
+      else
+      {
+        Pixel::Format pixelDataFormat = pixelData->GetPixelFormat();
+        if( ( pixelDataFormat == mFormat ) || ( (pixelDataFormat == Pixel::RGB888 ) && ( mFormat == Pixel::RGBA8888 ) ) )
+        {
+          if( pixelDataSize < width * height )
+          {
+            DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture\n");
+          }
+          else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
+              ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
+          {
+            DALI_LOG_ERROR( "Texture update area out of bounds\n");
+          }
+          else
+          {
+            //Parameters are correct. Send message to upload data to the texture
+            UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
+            UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+            result = true;
+          }
+        }
+        else
+        {
+          DALI_LOG_ERROR( "Bad format\n");
+        }
+      }
+    }
   }
-}
 
-void NewTexture::Upload( Vector<unsigned char>& buffer )
-{
-  UploadParams params = {0u,0u,0u,0u,mWidth,mHeight};
-  if( CheckUploadParametres( buffer, params ) )
-  {
-    UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, buffer, params );
-  }
+  return result;
 }
 
 void NewTexture::GenerateMipmaps()
 {
-  GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  {
+    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  }
 }
 
 unsigned int NewTexture::GetWidth() const

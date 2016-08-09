@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GEOMETRY_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/devel-api/rendering/geometry.h> // Dali::Geometry
+#include <dali/public-api/rendering/geometry.h> // Dali::Geometry
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -78,14 +78,14 @@ public:
   void SetIndexBuffer( const unsigned short* indices, size_t count );
 
   /**
-   * @copydoc Dali::Geometry::SetGeometryType()
+   * @copydoc Dali::Geometry::SetType()
    */
-  void SetGeometryType( Dali::Geometry::GeometryType geometryType );
+  void SetType( Dali::Geometry::Type geometryType );
 
   /**
-   * @copydoc Dali::Geometry::GetGeometryType()
+   * @copydoc Dali::Geometry::GetType()
    */
-  Dali::Geometry::GeometryType GetGeometryType() const;
+  Dali::Geometry::Type GetType() const;
 
   /**
    * @brief Get the geometry scene object
@@ -123,7 +123,7 @@ private: // data
   Render::Geometry* mRenderObject;
 
   std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
-  Dali::Geometry::GeometryType mGeometryType;      ///< Geometry type (cached)
+  Dali::Geometry::Type mType;      ///< Geometry type (cached)
 };
 
 } // namespace Internal

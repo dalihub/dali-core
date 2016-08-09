@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h> // for EqualToConstraint
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/renderer.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
@@ -128,7 +128,7 @@ GeometryPtr CreateGeometry( unsigned int gridWidth, unsigned int gridHeight, con
   {
     geometry->SetIndexBuffer( &indices[0], indices.Size() );
   }
-  geometry->SetGeometryType( Dali::Geometry::TRIANGLE_STRIP );
+  geometry->SetType( Dali::Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
@@ -178,7 +178,7 @@ ImageActorPtr ImageActor::New()
   GeometryPtr quad  = CreateGeometry( 1u, 1u, Vector2::ONE );
   actor->mRenderer->SetGeometry( *quad );
 
-  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+  ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::Hint::NONE );
   actor->mRenderer->SetShader( *shader );
   TextureSetPtr textureSet = TextureSet::New();
   actor->mRenderer->SetTextures( *textureSet );
@@ -271,25 +271,25 @@ void ImageActor::ClearPixelArea()
 
 void ImageActor::SetStyle( Dali::ImageActor::Style style )
 {
-  DALI_LOG_WARNING( "SetStyle Deprecated. Only STYLE_QUAD supported." );
+  DALI_LOG_WARNING( "SetStyle Deprecated. Only STYLE_QUAD supported.\n" );
   mStyle = style;
 }
 
 Dali::ImageActor::Style ImageActor::GetStyle() const
 {
-  DALI_LOG_WARNING( "GetStyle Deprecated. Only STYLE_QUAD supported." );
+  DALI_LOG_WARNING( "GetStyle Deprecated. Only STYLE_QUAD supported.\n" );
   return mStyle;
 }
 
 void ImageActor::SetNinePatchBorder( const Vector4& border )
 {
-  DALI_LOG_WARNING( "SetNinePatchBorder Deprecated. Only STYLE_QUAD supported." );
+  DALI_LOG_WARNING( "SetNinePatchBorder Deprecated. Only STYLE_QUAD supported.\n" );
   mNinePatchBorder = border;
 }
 
 Vector4 ImageActor::GetNinePatchBorder() const
 {
-  DALI_LOG_WARNING( "GetNinePatchBorder Deprecated. Only STYLE_QUAD supported." );
+  DALI_LOG_WARNING( "GetNinePatchBorder Deprecated. Only STYLE_QUAD supported.\n" );
   return mNinePatchBorder;
 }
 
@@ -703,7 +703,7 @@ void ImageActor::RemoveShaderEffect()
   {
     mShaderEffect->Disconnect( this );
     // change to the standard shader and quad geometry
-    ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::HINT_NONE );
+    ShaderPtr shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, Dali::Shader::Hint::NONE );
     mRenderer->SetShader( *shader );
     mShaderEffect.Reset();
 

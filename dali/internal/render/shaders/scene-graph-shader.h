@@ -49,7 +49,7 @@ public:
    * Constructor
    * @param hints Shader hints
    */
-  Shader( Dali::Shader::ShaderHints& hints );
+  Shader( Dali::Shader::Hint::Value& hints );
 
   /**
    * Virtual destructor
@@ -66,7 +66,7 @@ public:
    * @param[in] hint The hint to check.
    * @return True if the given hint is set.
    */
-  bool HintEnabled( Dali::Shader::ShaderHints hint ) const
+  bool HintEnabled( Dali::Shader::Hint::Value hint ) const
   {
     return mHints & hint;
   }
@@ -155,7 +155,7 @@ public: // UniformMap::Observer
 
 private: // Data
 
-  Dali::Shader::ShaderHints     mHints;
+  Dali::Shader::Hint::Value     mHints;
 
   Program*                       mProgram;
 

@@ -33,6 +33,7 @@ namespace Internal
 namespace Render
 {
 class Renderer;
+class RenderGeometry;
 }
 
 namespace SceneGraph
@@ -59,14 +60,18 @@ struct RenderItem
    */
   void operator delete( void* ptr );
 
-
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
   Vector3           mSize;
   Render::Renderer* mRenderer;
   Node*             mNode;
+
+  mutable Render::Geometry* mBatchRenderGeometry;
+
   int               mDepthIndex;
   bool              mIsOpaque:1;
+  bool              mBatched:1;
+
 
 private:
 

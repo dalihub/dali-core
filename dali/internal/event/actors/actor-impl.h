@@ -681,11 +681,6 @@ public:
   DrawMode::Type GetDrawMode() const;
 
   /**
-   * @copydoc Dali::Actor::SetOverlay
-   */
-  void SetOverlay( bool enable );
-
-  /**
    * @copydoc Dali::Actor::IsOverlay
    */
   bool IsOverlay() const;
@@ -1837,6 +1832,8 @@ private:
 
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
+
+  bool mIsBatchParent : 1;              ///< Flag indicating that the actor is a batch parent
 
 };
 

@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_RENDER_ALGORITHMS_H__
-#define __DALI_INTERNAL_RENDER_ALGORITHMS_H__
+#ifndef DALI_INTERNAL_RENDER_ALGORITHMS_H
+#define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ namespace SceneGraph
 class RenderInstruction;
 class Shader;
 class TextureCache;
+class GeometryBatcher;
 }
 
 namespace Render
@@ -43,12 +44,14 @@ namespace Render
  * @param[in] context The GL context.
  * @param[in] textureCache The texture cache used to get textures.
  * @param[in] defaultShader The default shader.
- * @param[in] buffer The current render buffer index (previous update buffer)
+ * @param[in] geometryBatcher The instace of geometry batcher.
+ * @param[in] bufferIndex The current render buffer index (previous update buffer)
  */
 void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
+                               SceneGraph::GeometryBatcher& geometryBatcher,
                                BufferIndex bufferIndex );
 
 } // namespace Render
@@ -57,4 +60,4 @@ void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_RENDER_ALGORITHMS_H__
+#endif // DALI_INTERNAL_RENDER_ALGORITHMS_H

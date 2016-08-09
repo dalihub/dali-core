@@ -22,9 +22,9 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/rendering/frame-buffer.h>
-#include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {
@@ -42,17 +42,15 @@ class FrameBuffer : public BaseObject
 {
 public:
 
-  typedef Dali::FrameBuffer::Format Format;
-
   /**
    * @brief Create a new FrameBuffer
    *
-   * @param[in] width The width of the FrameBuffer
-   * @param[in] height The height of the FrameBuffer
-   * @param[in] format The format of the FrameBuffer
+   * @param[in] width       The width of the FrameBuffer
+   * @param[in] height      The height of the FrameBuffer
+   * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static FrameBufferPtr New( unsigned int width, unsigned int height, Format format );
+  static FrameBufferPtr New( unsigned int width, unsigned int height, unsigned int attachments );
 
   /**
    * @brief Get the FrameBuffer render object
@@ -75,11 +73,11 @@ private: // implementation
 
   /**
    * Constructor
-   * @param[in] width The width of the FrameBuffer
-   * @param[in] height The height of the FrameBuffer
-   * @param[in] format The format of the FrameBuffer
+   * @param[in] width       The width of the FrameBuffer
+   * @param[in] height      The height of the FrameBuffer
+   * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( unsigned int width, unsigned int height, Format format );
+  FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments );
 
   /**
    * Second stage initialization of the Texture
@@ -99,13 +97,13 @@ private: // unimplemented methods
 
 private: // data
 
-  Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Internal::Render::FrameBuffer* mRenderObject;            ///<The Render::Texture associated to this texture
+  Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
+  Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
   NewTexturePtr mColor;
   unsigned int mWidth;
   unsigned int mHeight;
-  Format mFormat;
+  unsigned int mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
 
 };
 

@@ -65,7 +65,7 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   float deltaZ = far - near;
   if ((near <= 0.0f) || (far <= 0.0f) || Equals(right, left) || Equals(bottom, top) || (deltaZ <= 0.0f))
   {
-    DALI_LOG_ERROR("Invalid parameters passed into Frustum!");
+    DALI_LOG_ERROR("Invalid parameters passed into Frustum!\n");
     DALI_ASSERT_DEBUG("Invalid parameters passed into Frustum!");
     return;
   }
@@ -104,7 +104,7 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 {
   if ( Equals(right, left) || Equals(top, bottom) || Equals(far, near) )
   {
-    DALI_LOG_ERROR( "Cannot create orthographic projection matrix with a zero dimension." );
+    DALI_LOG_ERROR( "Cannot create orthographic projection matrix with a zero dimension.\n" );
     DALI_ASSERT_DEBUG( "Cannot create orthographic projection matrix with a zero dimension." );
     return;
   }

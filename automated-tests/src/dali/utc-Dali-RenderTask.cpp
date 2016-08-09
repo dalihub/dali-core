@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
  */
 
 #include <iostream>
-
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
-#include <dali/devel-api/rendering/frame-buffer.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
 #include <test-native-image.h>
@@ -863,7 +861,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
 
   // Set task to non-exclusive - actor1 should render twice:
   drawTrace.Reset();
@@ -871,7 +869,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1146,7 +1144,7 @@ int UtcDaliRenderTaskSetFrameBufferP(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  FrameBuffer newFrameBuffer = FrameBuffer::New( 128u, 128u, FrameBuffer::COLOR );
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 128u, 128u, FrameBuffer::Attachment::NONE );
   task.SetFrameBuffer( newFrameBuffer );
   DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
   END_TEST;
@@ -1177,7 +1175,7 @@ int UtcDaliRenderTaskGetFrameBufferP(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  FrameBuffer newFrameBuffer = FrameBuffer::New( 1u, 1u, FrameBuffer::COLOR  );
+  FrameBuffer newFrameBuffer = FrameBuffer::New( 1u, 1u, FrameBuffer::Attachment::NONE  );
   task.SetFrameBuffer( newFrameBuffer );
   DALI_TEST_CHECK( task.GetFrameBuffer() == newFrameBuffer );
   END_TEST;
@@ -2065,7 +2063,7 @@ int UtcDaliRenderTaskContinous05(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2171,7 +2169,7 @@ int UtcDaliRenderTaskOnce02(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2289,7 +2287,7 @@ int UtcDaliRenderTaskOnce04(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2805,7 +2803,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
@@ -2905,7 +2903,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   TextureSet textureSet = CreateTextureSet( image );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/shader-effects/shader-effect.h> // Dali::ShaderEffect::GeometryHints // TODO: MESH_REWORK REMOVE
-#include <dali/devel-api/rendering/shader.h> // Dali::Shader
 #include <dali/devel-api/scripting/scripting.h>
-
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -49,9 +47,9 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
 Dali::Scripting::StringEnum ShaderHintsTable[] =
-  { { "HINT_NONE",                     Dali::Shader::HINT_NONE},
-    { "HINT_OUTPUT_IS_TRANSPARENT",    Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT},
-    { "HINT_MODIFIES_GEOMETRY",        Dali::Shader::HINT_MODIFIES_GEOMETRY}
+  { { "NONE",                     Dali::Shader::Hint::NONE},
+    { "OUTPUT_IS_TRANSPARENT",    Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT},
+    { "MODIFIES_GEOMETRY",        Dali::Shader::Hint::MODIFIES_GEOMETRY}
   };
 
 const unsigned int ShaderHintsTableSize = sizeof( ShaderHintsTable ) / sizeof( ShaderHintsTable[0] );
@@ -74,23 +72,23 @@ void AppendString(std::string& to, const std::string& append)
   to += append;
 }
 
-Property::Value HintString(const Dali::Shader::ShaderHints& hints)
+Property::Value HintString(const Dali::Shader::Hint::Value& hints)
 {
   std::string s;
 
-  if(hints == Dali::Shader::HINT_NONE)
+  if(hints == Dali::Shader::Hint::NONE)
   {
-    s = "HINT_NONE";
+    s = "NONE";
   }
 
-  if(hints & Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT)
+  if(hints & Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT)
   {
-    AppendString(s, "HINT_OUTPUT_IS_TRANSPARENT");
+    AppendString(s, "OUTPUT_IS_TRANSPARENT");
   }
 
-  if(hints & Dali::Shader::HINT_MODIFIES_GEOMETRY)
+  if(hints & Dali::Shader::Hint::MODIFIES_GEOMETRY)
   {
-    AppendString(s, "HINT_MODIFIES_GEOMETRY");
+    AppendString(s, "MODIFIES_GEOMETRY");
   }
 
   return Property::Value(s);
@@ -101,7 +99,7 @@ Property::Value HintString(const Dali::Shader::ShaderHints& hints)
 
 ShaderPtr Shader::New( const std::string& vertexShader,
                        const std::string& fragmentShader,
-                       Dali::Shader::ShaderHints hints )
+                       Dali::Shader::Hint::Value hints )
 {
   ShaderPtr shader( new Shader() );
   shader->Initialize( vertexShader, fragmentShader, hints );
@@ -168,29 +166,32 @@ void Shader::SetDefaultProperty( Property::Index index,
       if( propertyValue.GetType() == Property::MAP )
       {
         Dali::Property::Map* map = propertyValue.GetMap();
-        std::string vertex;
-        std::string fragment;
-        Dali::Shader::ShaderHints hints(Dali::Shader::HINT_NONE);
-
-        if( Property::Value* value = map->Find("vertex") )
+        if( map )
         {
-          vertex = value->Get<std::string>();
-        }
+          std::string vertex;
+          std::string fragment;
+          Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
 
-        if( Property::Value* value = map->Find("fragment") )
-        {
-          fragment = value->Get<std::string>();
-        }
+          if( Property::Value* value = map->Find("vertex") )
+          {
+            vertex = value->Get<std::string>();
+          }
 
-        if( Property::Value* value = map->Find("hints") )
-        {
-          static_cast<void>( // ignore return
-            Scripting::GetEnumeration< Dali::Shader::ShaderHints >(value->Get<std::string>().c_str(),
-                                                                   ShaderHintsTable, ShaderHintsTableSize, hints)
-            );
-        }
+          if( Property::Value* value = map->Find("fragment") )
+          {
+            fragment = value->Get<std::string>();
+          }
 
-        Initialize(vertex, fragment, hints );
+          if( Property::Value* value = map->Find("hints") )
+          {
+            static_cast<void>( // ignore return
+              Scripting::GetEnumeration< Dali::Shader::Hint::Value >(value->Get<std::string>().c_str(),
+                                                                     ShaderHintsTable, ShaderHintsTableSize, hints)
+              );
+          }
+
+          Initialize(vertex, fragment, hints );
+        }
       }
       else
       {
@@ -264,11 +265,12 @@ const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index in
 {
   PropertyMetadata* property = NULL;
 
-  if(index >= PROPERTY_CUSTOM_START_INDEX )
+  if( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
+      ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
   {
     property = FindCustomProperty( index );
   }
-  else
+  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     property = FindAnimatableProperty( index );
   }
@@ -291,7 +293,7 @@ Shader::Shader()
 void Shader::Initialize(
   const std::string& vertexSource,
   const std::string& fragmentSource,
-  Dali::Shader::ShaderHints hints )
+  Dali::Shader::Hint::Value hints )
 {
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
@@ -307,7 +309,7 @@ void Shader::Initialize(
   mShaderData = shaderFactory.Load( vertexSource, fragmentSource, hints, shaderHash );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( updateManager, *mSceneObject, mShaderData, (hints & Dali::Shader::HINT_MODIFIES_GEOMETRY) != 0x0 );
+  SetShaderProgramMessage( updateManager, *mSceneObject, mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
   eventThreadServices.RegisterObject( this );
 }
 

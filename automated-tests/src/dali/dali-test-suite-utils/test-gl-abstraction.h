@@ -1,8 +1,8 @@
-#ifndef __TEST_GL_ABSTRACTION_H__
-#define __TEST_GL_ABSTRACTION_H__
+#ifndef TEST_GL_ABSTRACTION_H
+#define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,11 @@ public:
   {
     std::stringstream out;
     out << program << ", " << shader;
-    mShaderTrace.PushCall("AttachShader", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["program"] = ToString(program);
+    namedParams["shader"] = ToString(shader);
+    mShaderTrace.PushCall("AttachShader", out.str(), namedParams);
   }
 
   inline void BindAttribLocation( GLuint program, GLuint index, const char* name )
@@ -141,7 +145,12 @@ public:
 
     std::stringstream out;
     out << target << ", " << texture;
-    mTextureTrace.PushCall("BindTexture", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["texture"] = ToString(texture);
+
+    mTextureTrace.PushCall("BindTexture", out.str(), namedParams);
   }
 
   inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -268,25 +277,63 @@ public:
 
   inline void ClearStencil(GLint s)
   {
+    std::stringstream out;
+    out << s;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["s"] = ToString( s );
+
+    mStencilFunctionTrace.PushCall( "ClearStencil", out.str(), namedParams );
   }
 
   inline void ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
   {
+    mColorMaskParams.red = red;
+    mColorMaskParams.green = green;
+    mColorMaskParams.blue = blue;
+    mColorMaskParams.alpha = alpha;
   }
 
   inline void CompileShader(GLuint shader)
   {
     std::stringstream out;
     out << shader;
-    mShaderTrace.PushCall("CompileShader", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["shader"] = ToString(shader);
+
+    mShaderTrace.PushCall("CompileShader", out.str(), namedParams);
   }
 
   inline void CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data)
   {
+    std::stringstream out;
+    out << target<<", "<<level<<", "<<width << ", " << height;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["internalformat"] = ToString(internalformat);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    namedParams["border"] = ToString(border);
+    namedParams["size"] = ToString(imageSize);
+
+    mTextureTrace.PushCall("CompressedTexImage2D", out.str(), namedParams);
   }
 
   inline void CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void* data)
   {
+    std::stringstream out;
+    out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["xoffset"] = ToString(xoffset);
+    namedParams["yoffset"] = ToString(yoffset);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    mTextureTrace.PushCall("CompressedTexSubImage2D", out.str(), namedParams);
   }
 
   inline void CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
@@ -310,7 +357,10 @@ public:
   {
     std::stringstream out;
     out << type;
-    mShaderTrace.PushCall("CreateShader", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["type"] = ToString(type);
+    mShaderTrace.PushCall("CreateShader", out.str(), namedParams);
 
     return ++mLastShaderIdUsed;
   }
@@ -319,7 +369,11 @@ public:
   {
     std::stringstream out;
     out << mode;
-    mCullFaceTrace.PushCall("CullFace", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["program"] = ToString(mode);
+
+    mCullFaceTrace.PushCall("CullFace", out.str(), namedParams);
   }
 
   inline void DeleteBuffers(GLsizei n, const GLuint* buffers)
@@ -334,7 +388,11 @@ public:
   {
     std::stringstream out;
     out << program;
-    mShaderTrace.PushCall("DeleteProgram", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["program"] = ToString(program);
+
+    mShaderTrace.PushCall("DeleteProgram", out.str(), namedParams);
   }
 
   inline void DeleteRenderbuffers(GLsizei n, const GLuint* renderbuffers)
@@ -345,7 +403,11 @@ public:
   {
     std::stringstream out;
     out << shader;
-    mShaderTrace.PushCall("DeleteShader", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["shader"] = ToString(shader);
+
+    mShaderTrace.PushCall("DeleteShader", out.str(), namedParams);
   }
 
   inline void DeleteTextures(GLsizei n, const GLuint* textures)
@@ -353,13 +415,19 @@ public:
     std::stringstream out;
     out << n << ", " << textures << " = [";
 
+    TraceCallStack::NamedParams namedParams;
+
     for(GLsizei i=0; i<n; i++)
     {
       out << textures[i] << ", ";
+      std::stringstream paramName;
+      paramName<<"texture["<<i<<"]";
+      namedParams[paramName.str()] = ToString(textures[i]);
       mDeletedTextureIds.push_back(textures[i]);
     }
     out << "]";
-    mTextureTrace.PushCall("DeleteTextures", out.str());
+
+    mTextureTrace.PushCall("DeleteTextures", out.str(), namedParams);
   }
 
   inline bool CheckNoTexturesDeleted()
@@ -391,11 +459,21 @@ public:
   {
     std::stringstream out;
     out << func;
-    mDepthFunctionTrace.PushCall("DepthFunc", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["func"] = ToString(func);
+
+    mDepthFunctionTrace.PushCall("DepthFunc", out.str(), namedParams);
   }
 
   inline void DepthMask(GLboolean flag)
   {
+    mLastDepthMask = flag;
+  }
+
+  inline bool GetLastDepthMask() const
+  {
+    return mLastDepthMask;
   }
 
   inline void DepthRangef(GLclampf zNear, GLclampf zFar)
@@ -406,14 +484,19 @@ public:
   {
     std::stringstream out;
     out << program << ", " << shader;
-    mShaderTrace.PushCall("DetachShader", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["program"] = ToString(program);
+    namedParams["shader"] = ToString(shader);
+    mShaderTrace.PushCall("DetachShader", out.str(), namedParams);
   }
 
   inline void Disable(GLenum cap)
   {
     std::stringstream out;
     out << cap;
-    mEnableDisableTrace.PushCall("Disable", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["cap"] = ToString(cap);
+    mEnableDisableTrace.PushCall("Disable", out.str(), namedParams);
   }
 
   inline void DisableVertexAttribArray(GLuint index)
@@ -425,21 +508,33 @@ public:
   {
     std::stringstream out;
     out << mode << ", " << first << ", " << count;
-    mDrawTrace.PushCall("DrawArrays", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mode"] = ToString(mode);
+    namedParams["first"] = ToString(first);
+    namedParams["count"] = ToString(count);
+    mDrawTrace.PushCall("DrawArrays", out.str(), namedParams);
   }
 
   inline void DrawElements(GLenum mode, GLsizei count, GLenum type, const void* indices)
   {
     std::stringstream out;
     out << mode << ", " << count << ", " << type << ", indices";
-    mDrawTrace.PushCall("DrawElements", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mode"] = ToString(mode);
+    namedParams["count"] = ToString(count);
+    namedParams["type"] = ToString(type);
+    // Skip void pointers - are they of any use?
+    mDrawTrace.PushCall("DrawElements", out.str(), namedParams);
   }
 
   inline void Enable(GLenum cap)
   {
     std::stringstream out;
     out << cap;
-    mEnableDisableTrace.PushCall("Enable", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["cap"] = ToString(cap);
+    mEnableDisableTrace.PushCall("Enable", out.str(), namedParams);
   }
 
   inline void EnableVertexAttribArray(GLuint index)
@@ -493,7 +588,10 @@ public:
   {
     std::stringstream out;
     out<<target;
-    mTextureTrace.PushCall("GenerateMipmap", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+
+    mTextureTrace.PushCall("GenerateMipmap", out.str(), namedParams);
   }
 
   inline void GenFramebuffers(GLsizei n, GLuint* framebuffers)
@@ -529,9 +627,9 @@ public:
     return mNextTextureIds;
   }
 
-  inline void GenTextures(GLsizei n, GLuint* textures)
+  inline void GenTextures(GLsizei count, GLuint* textures)
   {
-    for( int i=0; i<n; ++i )
+    for( int i=0; i<count; ++i )
     {
       if( !mNextTextureIds.empty() )
       {
@@ -544,16 +642,23 @@ public:
       }
     }
 
+    TraceCallStack::NamedParams namedParams;
+    namedParams["count"] = ToString(count);
+
     std::stringstream out;
-    for(int i=0; i<n; i++)
+    for(int i=0; i<count; i++)
     {
       out << textures[i];
-      if(i<n-1)
+      if(i<count-1)
       {
         out << ", ";
       }
+      std::ostringstream oss;
+      oss<<"indices["<<i<<"]";
+      namedParams[oss.str()] = ToString(textures[i]);
     }
-    mTextureTrace.PushCall("GenTextures", out.str());
+
+    mTextureTrace.PushCall("GenTextures", out.str(), namedParams);
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
@@ -571,6 +676,11 @@ public:
         break;
       case 1:
         *length = snprintf(name, bufsize, "sEffect");
+        *type = GL_SAMPLER_2D;
+        *size = 1;
+        break;
+      case 2:
+        *length = snprintf(name, bufsize, "sGloss");
         *type = GL_SAMPLER_2D;
         *size = 1;
         break;
@@ -785,11 +895,15 @@ public:
   {
     std::stringstream out;
     out << program;
-    mShaderTrace.PushCall("LinkProgram", out.str());
 
-    mNumberOfActiveUniforms=2;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["program"] = ToString(program);
+    mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
+
+    mNumberOfActiveUniforms=3;
     GetUniformLocation(program, "sTexture");
     GetUniformLocation(program, "sEffect");
+    GetUniformLocation(program, "sGloss");
   }
 
   inline void PixelStorei(GLenum pname, GLint param)
@@ -862,68 +976,160 @@ public:
 
   inline void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
+    std::stringstream out;
+    out << func << ", " << ref << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["func"] = ToString( func );
+    namedParams["ref"] = ToString( ref );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilFunc", out.str(), namedParams );
   }
 
   inline void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
   {
+    std::stringstream out;
+    out << face << ", " << func << ", " << ref << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["func"] = ToString( func );
+    namedParams["ref"] = ToString( ref );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilFuncSeparate", out.str(), namedParams );
   }
 
   inline void StencilMask(GLuint mask)
   {
+    std::stringstream out;
+    out << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilMask", out.str(), namedParams );
   }
 
   inline void StencilMaskSeparate(GLenum face, GLuint mask)
   {
+    std::stringstream out;
+    out << face << ", " << mask;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["mask"] = ToString( mask );
+
+    mStencilFunctionTrace.PushCall( "StencilMaskSeparate", out.str(), namedParams );
   }
 
   inline void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
+    std::stringstream out;
+    out << fail << ", " << zfail << ", " << zpass;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["fail"] = ToString( fail );
+    namedParams["zfail"] = ToString( zfail );
+    namedParams["zpass"] = ToString( zpass );
+
+    mStencilFunctionTrace.PushCall( "StencilOp", out.str(), namedParams );
   }
 
   inline void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)
   {
+    std::stringstream out;
+    out << face << ", " << fail << ", " << zfail << "," << zpass;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["face"] = ToString( face );
+    namedParams["fail"] = ToString( fail );
+    namedParams["zfail"] = ToString( zfail );
+    namedParams["zpass"] = ToString( zpass );
+
+    mStencilFunctionTrace.PushCall( "StencilOpSeparate", out.str(), namedParams );
   }
 
   inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels)
   {
     std::stringstream out;
     out << target<<", "<<level<<", "<<width << ", " << height;
-    mTextureTrace.PushCall("TexImage2D", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["internalformat"] = ToString(internalformat);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    namedParams["border"] = ToString(border);
+    namedParams["format"] = ToString(format);
+    namedParams["type"] = ToString(type);
+
+    mTextureTrace.PushCall("TexImage2D", out.str(), namedParams);
   }
 
   inline void TexParameterf(GLenum target, GLenum pname, GLfloat param)
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << param;
-    mTexParamaterTrace.PushCall("TexParameterf", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["pname"] = ToString(pname);
+    namedParams["param"] = ToString(param);
+
+    mTexParamaterTrace.PushCall("TexParameterf", out.str(), namedParams);
   }
 
   inline void TexParameterfv(GLenum target, GLenum pname, const GLfloat* params)
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << params[0];
-    mTexParamaterTrace.PushCall("TexParameterfv", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["pname"] = ToString(pname);
+    namedParams["params[0]"] = ToString(params[0]);
+
+    mTexParamaterTrace.PushCall("TexParameterfv", out.str(), namedParams);
   }
 
   inline void TexParameteri(GLenum target, GLenum pname, GLint param)
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << param;
-    mTexParamaterTrace.PushCall("TexParameteri", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["pname"] = ToString(pname);
+    namedParams["param"] = ToString(param);
+    mTexParamaterTrace.PushCall("TexParameteri", out.str(), namedParams);
   }
 
   inline void TexParameteriv(GLenum target, GLenum pname, const GLint* params)
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << params[0];
-    mTexParamaterTrace.PushCall("TexParameteriv", out.str());
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["pname"] = ToString(pname);
+    namedParams["params[0]"] = ToString(params[0]);
+    mTexParamaterTrace.PushCall("TexParameteriv", out.str(), namedParams);
   }
 
   inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
   {
     std::stringstream out;
     out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
-    mTextureTrace.PushCall("TexSubImage2D", out.str());
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = ToString(target);
+    namedParams["level"] = ToString(level);
+    namedParams["xoffset"] = ToString(xoffset);
+    namedParams["yoffset"] = ToString(yoffset);
+    namedParams["width"] = ToString(width);
+    namedParams["height"] = ToString(height);
+    mTextureTrace.PushCall("TexSubImage2D", out.str(), namedParams);
   }
 
   inline void Uniform1f(GLint location, GLfloat x)
@@ -1645,6 +1851,11 @@ public: // TEST FUNCTIONS
   inline void ResetDepthFunctionCallStack() { mDepthFunctionTrace.Reset(); }
   inline TraceCallStack& GetDepthFunctionTrace() { return mDepthFunctionTrace; }
 
+  //Methods for Stencil function verification
+  inline void EnableStencilFunctionCallTrace(bool enable) { mStencilFunctionTrace.Enable(enable); }
+  inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
+  inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
+
   template <typename T>
   inline bool GetUniformValue( const char* name, T& value ) const
   {
@@ -1787,9 +1998,21 @@ public: // TEST FUNCTIONS
   // Methods to check scissor tests
   inline const ScissorParams& GetScissorParams() const { return mScissorParams; }
 
+  struct ColorMaskParams
+  {
+    GLboolean red;
+    GLboolean green;
+    GLboolean blue;
+    GLboolean alpha;
+
+    ColorMaskParams() : red( true ), green( true ), blue( true ), alpha( true ) { }
+  };
+
   inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
 
   inline unsigned int GetClearCountCalled() const { return mClearCount; }
+
+  inline const ColorMaskParams& GetColorMaskParams() const { return mColorMaskParams; }
 
   typedef std::vector<size_t> BufferDataCalls;
   inline const BufferDataCalls& GetBufferDataCalls() const { return mBufferDataCalls; }
@@ -1842,6 +2065,8 @@ private:
   GLenum  mLastBlendFuncSrcAlpha;
   GLenum  mLastBlendFuncDstAlpha;
 
+  GLboolean mLastDepthMask;
+
   // Data for manipulating the IDs returned by GenTextures
   GLuint mLastAutoTextureIdUsed;
   std::vector<GLuint> mNextTextureIds;
@@ -1862,6 +2087,7 @@ private:
   TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;
+  TraceCallStack mStencilFunctionTrace;
 
   // Shaders & Uniforms
   GLuint mLastShaderIdUsed;
@@ -1989,6 +2215,7 @@ private:
   }
 
   ScissorParams mScissorParams;
+  ColorMaskParams mColorMaskParams;
 };
 
 template <>
@@ -2039,6 +2266,4 @@ bool BlendEnabled(const Dali::TraceCallStack& callStack);
 bool BlendDisabled(const Dali::TraceCallStack& callStack);
 
 
-
-
-#endif // __TEST_GL_ES_H__
+#endif // TEST_GL_ABSTRACTION_H

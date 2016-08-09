@@ -349,7 +349,6 @@ int UtcDaliCameraActorGetFieldOfViewN(void)
   END_TEST;
 }
 
-//todor
 int UtcDaliCameraActorSetAspectRatioP(void)
 {
   TestApplication application;

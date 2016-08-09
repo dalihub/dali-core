@@ -363,7 +363,7 @@ Property::Index PanGestureDetector::GetDefaultPropertyIndex(const std::string& n
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
     {
-      index = i;
+      index = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX + i;
       break;
     }
   }
@@ -538,7 +538,8 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
     return property;
   }
 
-  if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
+  if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
+       ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
   {
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );

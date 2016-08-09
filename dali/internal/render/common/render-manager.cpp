@@ -81,7 +81,8 @@ struct RenderManager::Impl
   Impl( Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
         LockedResourceQueue& textureUploadedQ,
-        TextureUploadedDispatcher& postProcessDispatcher )
+        TextureUploadedDispatcher& postProcessDispatcher,
+        GeometryBatcher& geometryBatcher )
   : context( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
@@ -99,7 +100,8 @@ struct RenderManager::Impl
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
-    programController( glAbstraction )
+    programController( glAbstraction ),
+    geometryBatcher( geometryBatcher )
   {
   }
 
@@ -168,14 +170,17 @@ struct RenderManager::Impl
   bool                          firstRenderCompleted;     ///< False until the first render is done
   Shader*                       defaultShader;            ///< Default shader to use
   ProgramController             programController;        ///< Owner of the GL programs
+
+  SceneGraph::GeometryBatcher&  geometryBatcher;          ///< Instance of geometry batcher
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
                                    Integration::GlSyncAbstraction& glSyncAbstraction,
+                                   SceneGraph::GeometryBatcher& geometryBatcher,
                                    LockedResourceQueue& textureUploadedQ )
 {
   RenderManager* manager = new RenderManager;
-  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, textureUploadedQ, *manager );
+  manager->mImpl = new Impl( glAbstraction, glSyncAbstraction, textureUploadedQ, *manager, geometryBatcher );
   return manager;
 }
 
@@ -337,9 +342,9 @@ void RenderManager::RemoveTexture( Render::NewTexture* texture )
   }
 }
 
-void RenderManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
+void RenderManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
 {
-  texture->Upload( mImpl->context, buffer, params );
+  texture->Upload( mImpl->context, pixelData, params );
 }
 
 void RenderManager::GenerateMipmaps( Render::NewTexture* texture )
@@ -484,7 +489,7 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 
 void RenderManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
 {
-  geometry->SetGeometryType( Render::Geometry::GeometryType(geometryType) );
+  geometry->SetType( Render::Geometry::Type(geometryType) );
 }
 
 void RenderManager::AddRenderTracker( Render::RenderTracker* renderTracker )
@@ -685,6 +690,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
                                     mImpl->context,
                                     mImpl->textureCache,
                                     defaultShader,
+                                    mImpl->geometryBatcher,
                                     mImpl->renderBufferIndex );
 
   if(instruction.mOffscreenTextureId != 0)

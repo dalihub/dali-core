@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/devel-api/rendering/shader.h> // Dali::Shader
+#include <dali/public-api/rendering/shader.h> // Dali::Shader
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
@@ -52,7 +52,7 @@ public:
    */
   static ShaderPtr New( const std::string& vertexShader,
                         const std::string& fragmentShader,
-                        Dali::Shader::ShaderHints hints );
+                        Dali::Shader::Hint::Value hints );
 
   /**
    * @brief Get the shader scene object
@@ -155,7 +155,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::ShaderHints hints );
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
 
 protected:
   /**

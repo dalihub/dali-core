@@ -58,15 +58,14 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/resources/resource-manager.h>
+#include <dali/internal/update/manager/geometry-batcher.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -131,7 +130,8 @@ struct UpdateManager::Impl
         RenderController& renderController,
         RenderManager& renderManager,
         RenderQueue& renderQueue,
-        SceneGraphBuffers& sceneGraphBuffers )
+        SceneGraphBuffers& sceneGraphBuffers,
+        GeometryBatcher& geometryBatcher )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
     transformManager(),
@@ -145,6 +145,7 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
+    geometryBatcher( geometryBatcher ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     taskList( renderMessageDispatcher, resourceManager ),
     systemLevelTaskList( renderMessageDispatcher, resourceManager ),
@@ -164,6 +165,8 @@ struct UpdateManager::Impl
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
     renderers.SetSceneController( *sceneController );
+
+    discardQueue.SetGeometryBatcher( &geometryBatcher );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -227,6 +230,7 @@ struct UpdateManager::Impl
   RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
+  GeometryBatcher&                    geometryBatcher;               ///< An instance of the GeometryBatcher
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -278,7 +282,8 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              TextureCacheDispatcher& textureCacheDispatcher )
+                              TextureCacheDispatcher& textureCacheDispatcher,
+                              GeometryBatcher& geometryBatcher )
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
@@ -289,9 +294,11 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     controller,
                     renderManager,
                     renderQueue,
-                    mSceneGraphBuffers );
+                    mSceneGraphBuffers,
+                    geometryBatcher );
 
   textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
+  mImpl->geometryBatcher.SetUpdateManager( this );
 }
 
 UpdateManager::~UpdateManager()
@@ -308,13 +315,13 @@ void UpdateManager::InstallRoot( SceneGraph::Layer* layer, bool systemLevel )
   {
     DALI_ASSERT_DEBUG( mImpl->root == NULL && "Root Node already installed" );
     mImpl->root = layer;
-    mImpl->root->CreateTransform( &mImpl->transformManager);
+    mImpl->root->CreateTransform( &mImpl->transformManager );
   }
   else
   {
     DALI_ASSERT_DEBUG( mImpl->systemLevelRoot == NULL && "System-level Root Node already installed" );
     mImpl->systemLevelRoot = layer;
-    mImpl->systemLevelRoot->CreateTransform( &mImpl->transformManager);
+    mImpl->systemLevelRoot->CreateTransform( &mImpl->transformManager );
   }
 
   layer->SetRoot(true);
@@ -332,7 +339,8 @@ void UpdateManager::AddNode( Node* node )
     if(node > (*iter))
     {
       mImpl->nodes.Insert((iter+1), node);
-      node->CreateTransform( &mImpl->transformManager);
+      node->CreateTransform( &mImpl->transformManager );
+      node->mGeometryBatcher = &mImpl->geometryBatcher;
       break;
     }
   }
@@ -867,10 +875,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *rendererContainer[i], bufferIndex );
 
-    if( rendererContainer[i]->IsReferenced() )
-    {
-      rendererContainer[i]->PrepareRender( bufferIndex );
-    }
+    rendererContainer[i]->PrepareRender( bufferIndex );
   }
 }
 
@@ -982,6 +987,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
+    //Update geometry batcher
+    mImpl->geometryBatcher.Update( bufferIndex );
+
     //Process the RenderTasks; this creates the instructions for rendering the next frame.
     //reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
@@ -994,6 +1002,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                            *mImpl->root,
                            mImpl->sortedLayers,
                            mImpl->renderSortingHelper,
+                           mImpl->geometryBatcher,
                            mImpl->renderInstructions );
 
       // Process the system-level RenderTasks last
@@ -1004,6 +1013,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                              *mImpl->systemLevelRoot,
                              mImpl->systemLevelSortedLayers,
                              mImpl->renderSortingHelper,
+                             mImpl->geometryBatcher,
                              mImpl->renderInstructions );
       }
     }
@@ -1312,15 +1322,15 @@ void UpdateManager::RemoveTexture( Render::NewTexture* texture)
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveTexture, texture );
 }
 
-void UpdateManager::UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params )
+void UpdateManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
 {
-  typedef UploadTextureDataMessage< RenderManager > DerivedType;
+  typedef MessageValue3< RenderManager, Render::NewTexture*, PixelDataPtr, NewTexture::UploadParams > DerivedType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, texture, buffer, params );
+  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::UploadTexture, texture, pixelData, params );
 }
 
 void UpdateManager::GenerateMipmaps( Render::NewTexture* texture )

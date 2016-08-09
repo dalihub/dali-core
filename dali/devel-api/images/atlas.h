@@ -1,8 +1,8 @@
-#ifndef __DALI_ATLAS_H__
-#define __DALI_ATLAS_H__
+#ifndef DALI_ATLAS_H
+#define DALI_ATLAS_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/devel-api/images/pixel-data.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/pixel-data.h>
 
 namespace Dali
 {
@@ -168,4 +168,4 @@ public: // Not intended for application developers
 
 } // namespace Dali
 
-#endif // __DALI_ATLAS_H__
+#endif // DALI_ATLAS_H

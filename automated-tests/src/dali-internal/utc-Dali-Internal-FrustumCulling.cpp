@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/texture-set-image.h>
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
-#include <dali/public-api/dali-core.h>
+
+// INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/texture-set.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <mesh-builder.h>
 
 using namespace Dali;
 
@@ -33,6 +32,7 @@ using namespace Dali;
 
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
 uniform   mediump mat4    uMvpMatrix;
 uniform   mediump vec3    uSize;
 varying   mediump vec2    vTexCoord;
@@ -42,7 +42,7 @@ void main()
   mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   vertexPosition.xyz *= uSize;
   vertexPosition = uMvpMatrix * vertexPosition;
-  vTexCoord = aPosition + vec2(0.5);
+  vTexCoord = aTexCoord;
   gl_Position = vertexPosition;
 }
 );
@@ -56,15 +56,15 @@ void main()
 }
 );
 
-Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::ShaderHints shaderHints = Shader::HINT_NONE )
+Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
 {
   PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
   BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints );
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -120,7 +120,7 @@ int UtcFrustumCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -145,7 +145,7 @@ int UtcFrustumLeftCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -164,7 +164,7 @@ int UtcFrustumLeftCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -190,7 +190,7 @@ int UtcFrustumRightCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -209,7 +209,7 @@ int UtcFrustumRightCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -235,7 +235,7 @@ int UtcFrustumTopCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -255,7 +255,7 @@ int UtcFrustumTopCullN(void)
   application.Render( 16 );
 
   // This will be box culled
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -281,7 +281,7 @@ int UtcFrustumBottomCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -300,7 +300,7 @@ int UtcFrustumBottomCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -328,7 +328,7 @@ int UtcFrustumNearCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -354,7 +354,7 @@ int UtcFrustumNearCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -382,7 +382,7 @@ int UtcFrustumFarCullP(void)
   application.Render( 16 );
 
   // This will be sphere culled
-  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -408,7 +408,7 @@ int UtcFrustumFarCullN(void)
   application.SendNotification();
   application.Render( 16 );
 
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -420,14 +420,14 @@ int UtcFrustumCullDisabledP(void)
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
 
-  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::HINT_MODIFIES_GEOMETRY );
+  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::Hint::MODIFIES_GEOMETRY );
 
   drawTrace.Reset();
   application.SendNotification();
   application.Render( 16 );
 
   // This should not be culled
-  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
 
   END_TEST;
 }

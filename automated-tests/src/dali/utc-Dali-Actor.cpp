@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali-test-suite-utils.h>
+#include <mesh-builder.h>
 
 //& set: DaliActor
 
@@ -603,6 +604,42 @@ int UtcDaliActorSetParentOrigin(void)
   END_TEST;
 }
 
+int UtcDaliActorSetParentOriginIndividual(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector3 vector(0.7f, 0.8f, 0.9f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentParentOrigin());
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN_X, vector.x );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentParentOrigin().x, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN_Y, vector.y );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentParentOrigin().y, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN_Z, vector.z );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentParentOrigin().z, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliActorGetCurrentParentOrigin(void)
 {
   TestApplication application;
@@ -649,6 +686,42 @@ int UtcDaliActorSetAnchorPoint(void)
   DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentAnchorPoint(), TEST_LOCATION );
 
   Stage::GetCurrent().Remove( actor );
+  END_TEST;
+}
+
+int UtcDaliActorSetAnchorPointIndividual(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector3 vector(0.7f, 0.8f, 0.9f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentAnchorPoint());
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT_X, vector.x );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentAnchorPoint().x, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT_Y, vector.y );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentAnchorPoint().y, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::ANCHOR_POINT_Z, vector.z );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentAnchorPoint().z, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -760,6 +833,43 @@ int UtcDaliActorSetSize04(void)
   Stage::GetCurrent().Remove( actor );
   END_TEST;
 }
+
+int UtcDaliActorSetSizeIndividual(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector3 vector(0.7f, 0.8f, 0.9f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+
+  actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_HEIGHT, vector.height );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_DEPTH, vector.depth );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentSize().depth, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliActorGetCurrentSize(void)
 {
@@ -984,6 +1094,42 @@ int UtcDaliActorSetZ(void)
   application.Render();
 
   DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  END_TEST;
+}
+
+int UtcDaliActorSetPositionProperties(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector3 vector(0.7f, 0.8f, 0.9f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+
+  actor.SetProperty( Actor::Property::POSITION_X, vector.x );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentPosition().x, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_Y, vector.y );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentPosition().y, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_Z, vector.z );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentPosition().z, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1226,6 +1372,24 @@ int UtcDaliActorSetOrientation02(void)
   END_TEST;
 }
 
+// SetOrientation(float angleRadians, Vector3 axis)
+int UtcDaliActorSetOrientationProperty(void)
+{
+  TestApplication application;
+
+  Quaternion rotation( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::ORIENTATION, rotation );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
 // RotateBy(float angleRadians, Vector3 axis)
 int UtcDaliActorRotateBy01(void)
 {
@@ -1405,6 +1569,42 @@ int UtcDaliActorSetScale03(void)
   application.Render();
 
   DALI_TEST_CHECK(actor.GetCurrentScale() == scale);
+  END_TEST;
+}
+
+int UtcDaliActorSetScaleIndividual(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector3 vector(0.7f, 0.8f, 0.9f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentScale());
+
+  actor.SetProperty( Actor::Property::SCALE_X, vector.x );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentScale().x, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SCALE_Y, vector.y );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentScale().y, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SCALE_Z, vector.z );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentScale().z, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1671,6 +1871,51 @@ int UtcDaliActorSetColor(void)
   Stage::GetCurrent().Remove( actor );
   END_TEST;
 }
+
+int UtcDaliActorSetColorIndividual(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  Vector4 vector(0.7f, 0.8f, 0.9f, 0.6f);
+  DALI_TEST_CHECK(vector != actor.GetCurrentColor());
+
+  actor.SetProperty( Actor::Property::COLOR_RED, vector.r );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.r, actor.GetCurrentColor().r, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_GREEN, vector.g );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.g, actor.GetCurrentColor().g, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_BLUE, vector.b );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.b, actor.GetCurrentColor().b, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_ALPHA, vector.a );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliActorGetCurrentColor(void)
 {
@@ -3148,6 +3393,160 @@ int UtcDaliActorDrawModePropertyAsString(void)
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::DRAW_MODE, "INVALID_ARG" );
   DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorAddRendererP(void)
+{
+  tet_infoline("Testing Actor::AddRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  actor.AddRenderer( renderer );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorAddRendererN(void)
+{
+  tet_infoline("Testing Actor::AddRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Renderer renderer;
+
+  // try illegal Add
+  try
+  {
+    actor.AddRenderer( renderer );
+    tet_printf("Assertion test failed - no Exception\n" );
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "Renderer handle is empty", TEST_LOCATION);
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n" );
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliActorAddRendererOnStage(void)
+{
+  tet_infoline("Testing Actor::AddRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  application.SendNotification();
+  application.Render(0);
+
+  try
+  {
+    actor.AddRenderer( renderer );
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliActorRemoveRendererP1(void)
+{
+  tet_infoline("Testing Actor::RemoveRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  actor.AddRenderer( renderer );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+
+  actor.RemoveRenderer(renderer);
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliActorRemoveRendererP2(void)
+{
+  tet_infoline("Testing Actor::RemoveRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  actor.AddRenderer( renderer );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+
+  actor.RemoveRenderer(0);
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
+int UtcDaliActorRemoveRendererN(void)
+{
+  tet_infoline("Testing Actor::RemoveRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  actor.AddRenderer( renderer );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+
+  actor.RemoveRenderer(10);
+  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
 
   END_TEST;
 }

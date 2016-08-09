@@ -1,8 +1,8 @@
-#ifndef __DALI_SCRIPTING_H__
-#define __DALI_SCRIPTING_H__
+#ifndef DALI_SCRIPTING_H
+#define DALI_SCRIPTING_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/devel-api/animation/animation-data.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
 
@@ -68,7 +69,7 @@ DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum*
  * @param[out] integerEnum The value of the enum.
  * @return     true if one or more enums in value.
  */
-DALI_IMPORT_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, unsigned int& integerEnum );
+DALI_IMPORT_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, int& integerEnum );
 
 /**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
@@ -86,7 +87,7 @@ bool GetEnumeration( const char* value, const StringEnum* table, unsigned int ta
   bool retVal( false );
   if( table )
   {
-    unsigned int integerEnum = 0;
+    int integerEnum = 0;
     // check to avoid crash, not asserting on purpose, error is logged instead
     if( EnumStringToInteger( value, table, tableCount, integerEnum ) )
     {
@@ -95,6 +96,112 @@ bool GetEnumeration( const char* value, const StringEnum* table, unsigned int ta
     }
   }
   return retVal;
+}
+
+/**
+ * @brief Gets the enumeration value from an enumeration property.
+ * An enumeration property is a property that can be set with either an INTEGER or STRING.
+ *
+ * @param[in]  propertyValue The property containing the int or string value.
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ * @param[out] result      The enum value. This is not modified if the enumeration could not be converted.
+ * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
+ */
+template< typename T >
+bool GetEnumerationProperty( const Property::Value& propertyValue, const StringEnum* table, unsigned int tableCount, T& result )
+{
+  int newValue;
+  bool set = false;
+  Property::Type type = propertyValue.GetType();
+
+  if( type == Property::INTEGER )
+  {
+    // Attempt to fetch the property as an INTEGER type.
+    if( propertyValue.Get( newValue ) )
+    {
+      // Success.
+      set = true;
+    }
+  }
+  else if( type == Property::STRING )
+  {
+    // Attempt to fetch the property as an STRING type, and convert it from string to enumeration value.
+    std::string propertyString;
+    if( table && propertyValue.Get( propertyString ) && EnumStringToInteger( propertyString.c_str(), table, tableCount, newValue ) )
+    {
+      // Success.
+      set = true;
+    }
+  }
+
+  // If the property was converted OK, AND the value has changed, update the result and return true.
+  if( set && ( result != static_cast<T>( newValue ) ) )
+  {
+    result = static_cast<T>( newValue );
+    return true;
+  }
+
+  // No change.
+  return false;
+}
+
+/**
+ * @brief Gets the enumeration value from a bitmask enumeration property.
+ * An enumeration property is a property that can be set with either an INTEGER, STRING or an ARRAY of STRING.
+ *
+ * @param[in]  propertyValue The property containing the int, string or and array of string values.
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ * @param[out] result      The enum value. This is not modified if the enumeration could not be converted.
+ * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
+ */
+template< typename T >
+bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const Scripting::StringEnum* table, unsigned int tableCount, T& result )
+{
+  bool returnValue = true;
+
+  // Evaluate as a single INTEGER or STRING first.
+  if( !GetEnumerationProperty( propertyValue, table, tableCount, result ) )
+  {
+    // If not, then check if it's an ARRAY
+    if ( propertyValue.GetType() == Property::ARRAY )
+    {
+      int newValue = 0;
+      Property::Array array;
+      propertyValue.Get( array );
+      for( Property::Array::SizeType i = 0; i < array.Count(); ++i )
+      {
+        Property::Value currentValue = array[ i ];
+        // Use an initial value of -1 so any successful property conversion
+        // causes a change (and true to be returned).
+        T current = static_cast< T >( -1 );
+        if( GetEnumerationProperty( currentValue, table, tableCount, current ) )
+        {
+          newValue |= current;
+        }
+        else
+        {
+          // We hit an invalid type.
+          returnValue = false;
+          break;
+        }
+      }
+
+      // If we didn't hit an invalid type and the value has changed, update the result.
+      if( returnValue && ( result != static_cast<T>( newValue ) ) )
+      {
+        result = static_cast<T>( newValue );
+      }
+    }
+    else
+    {
+      // Property type was not ARRAY, and the single property evaluation also failed.
+      returnValue = false;
+    }
+  }
+
+  return returnValue;
 }
 
 /**
@@ -222,4 +329,4 @@ DALI_IMPORT_API void NewAnimation( const Property::Map& map, Dali::AnimationData
 
 } // namespace Dali
 
-#endif // __DALI_SCRIPTING_H__
+#endif // DALI_SCRIPTING_H

@@ -25,11 +25,13 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/update/manager/geometry-batcher.h>
 
 using Dali::Internal::SceneGraph::RenderItem;
 using Dali::Internal::SceneGraph::RenderList;
 using Dali::Internal::SceneGraph::RenderListContainer;
 using Dali::Internal::SceneGraph::RenderInstruction;
+using Dali::Internal::SceneGraph::GeometryBatcher;
 
 namespace Dali
 {
@@ -42,9 +44,19 @@ namespace Render
 
 namespace
 {
+
 // Table for fast look-up of Dali::DepthFunction enum to a GL depth function.
 // Note: These MUST be in the same order as Dali::DepthFunction enum.
-const short DaliDepthToGLDepthTable[] = { GL_NEVER, GL_ALWAYS, GL_LESS, GL_GREATER, GL_EQUAL, GL_NOTEQUAL, GL_LEQUAL, GL_GEQUAL };
+const int DaliDepthToGLDepthTable[]  = { GL_NEVER, GL_ALWAYS, GL_LESS, GL_GREATER, GL_EQUAL, GL_NOTEQUAL, GL_LEQUAL, GL_GEQUAL };
+
+// Table for fast look-up of Dali::StencilFunction enum to a GL stencil function.
+// Note: These MUST be in the same order as Dali::StencilFunction enum.
+const int DaliStencilFunctionToGL[]  = { GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS };
+
+// Table for fast look-up of Dali::StencilOperation enum to a GL stencil operation.
+// Note: These MUST be in the same order as Dali::StencilOperation enum.
+const int DaliStencilOperationToGL[] = { GL_ZERO, GL_KEEP, GL_REPLACE, GL_INCR, GL_DECR, GL_INVERT, GL_INCR_WRAP, GL_DECR_WRAP };
+
 } // Unnamed namespace
 
 /**
@@ -89,12 +101,13 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context, bool
     context.StencilFunc( ( enableStencilWrite ? GL_ALWAYS : GL_EQUAL ), 1, 0xFF );
     context.StencilOp( GL_KEEP, GL_REPLACE, GL_REPLACE );
 
+    // Write to stencil buffer or color buffer, but not both.
+    // These should only be set if the Actor::DrawMode is managing the stencil (and color) buffer.
+    context.StencilMask( enableStencilWrite ? 0xFF : 0x00 );
+    context.ColorMask( !enableStencilWrite );
+
     clearMask |= ( renderFlags & RenderList::STENCIL_CLEAR ) ? GL_STENCIL_BUFFER_BIT : 0u;
   }
-
-  // Write to stencil buffer or color buffer, but not both
-  context.StencilMask( enableStencilWrite ? 0xFF : 0x00 );
-  context.ColorMask( !enableStencilWrite );
 
   // Enable and Clear the depth buffer if required.
   // DepthTest must be enabled for the layer, else testing is turned off.
@@ -115,6 +128,55 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context, bool
   // Clear Depth and/or stencil buffers as required.
   // Note: The buffers will only be cleared if written to since a previous clear.
   context.Clear( clearMask, Context::CHECK_CACHED_VALUES );
+}
+
+/**
+ * @brief This method sets up the stencil and color buffer based on the current Renderers flags.
+ * @param[in]     item                     The current RenderItem about to be rendered
+ * @param[in]     context                  The context
+ * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList
+ * @param[in]     stencilManagedByDrawMode True if the stencil and color buffer is being managed by DrawMode::STENCIL
+ */
+inline void SetupPerRendererFlags( const RenderItem& item, Context& context, bool& usedStencilBuffer, bool stencilManagedByDrawMode )
+{
+  // DrawMode::STENCIL is deprecated, however to support it we must not set
+  // flags based on the renderer properties if it is in use.
+  if( stencilManagedByDrawMode )
+  {
+    return;
+  }
+
+  // Setup the color buffer based on the renderers properties.
+  Renderer *renderer = item.mRenderer;
+  context.ColorMask( renderer->GetWriteToColorBuffer() );
+
+  // If the stencil buffer is disabled for this renderer, exit now to save unnecessary value setting.
+  if( renderer->GetStencilMode() != StencilMode::ON )
+  {
+    // No per-renderer stencil setup, exit.
+    context.EnableStencilBuffer( false );
+    return;
+  }
+
+  // At this point, the stencil buffer is enabled.
+  context.EnableStencilBuffer( true );
+
+  // If this is the first use of the stencil buffer within this RenderList, clear it now.
+  // This avoids unnecessary clears.
+  if( !usedStencilBuffer )
+  {
+    context.Clear( GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
+    usedStencilBuffer = true;
+  }
+
+  // Setup the stencil buffer based on the renderers properties.
+  context.StencilFunc( DaliStencilFunctionToGL[ renderer->GetStencilFunction() ],
+      renderer->GetStencilFunctionReference(),
+      renderer->GetStencilFunctionMask() );
+  context.StencilOp( DaliStencilOperationToGL[ renderer->GetStencilOperationOnFail() ],
+      DaliStencilOperationToGL[ renderer->GetStencilOperationOnZFail() ],
+      DaliStencilOperationToGL[ renderer->GetStencilOperationOnZPass() ] );
+  context.StencilMask( renderer->GetStencilMask() );
 }
 
 /**
@@ -155,6 +217,7 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool isL
  * @param[in] buffer The current render buffer index (previous update buffer)
  * @param[in] viewMatrix The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
+ * @param[in] geometryBatcher The instance of the geometry batcher
  */
 inline void ProcessRenderList(
   const RenderList& renderList,
@@ -163,12 +226,15 @@ inline void ProcessRenderList(
   SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
   const Matrix& viewMatrix,
-  const Matrix& projectionMatrix )
+  const Matrix& projectionMatrix,
+  GeometryBatcher* geometryBatcher )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
   bool depthTestEnabled = !( renderList.GetSourceLayer()->IsDepthTestDisabled() );
   bool isLayer3D = renderList.GetSourceLayer()->GetBehavior() == Dali::Layer::LAYER_3D;
+  bool usedStencilBuffer = false;
+  bool stencilManagedByDrawMode = renderList.GetFlags() & RenderList::STENCIL_BUFFER_ENABLED;
 
   SetScissorTest( renderList, context );
   SetRenderFlags( renderList, context, depthTestEnabled, isLayer3D );
@@ -179,13 +245,34 @@ inline void ProcessRenderList(
   if( DALI_LIKELY( !renderList.HasColorRenderItems() || !depthTestEnabled ) )
   {
     size_t count = renderList.Count();
+    bool skip( false );
     for ( size_t index = 0; index < count; ++index )
     {
       const RenderItem& item = renderList.GetItem( index );
       DALI_PRINT_RENDER_ITEM( item );
 
-      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
-                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+      SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
+
+      // Check if the node has a valid batch index value ( set previously by
+      // GeometryBatcher ). If so, then it queries the geometry object for this particular batch.
+      // If not, it still checks if the batch parent is set as it is possible, batching may
+      // fail ( for example if vertex format or buffers are not set ). In that case we need
+      // to skip rendering, otherwise unwanted GPU buffers will get uploaded. This is very rare case.
+      uint32_t batchIndex = item.mNode->mBatchIndex;
+      if( batchIndex != BATCH_NULL_HANDLE )
+      {
+        item.mBatchRenderGeometry = geometryBatcher->GetGeometry( batchIndex );
+      }
+      else
+      {
+        skip = item.mNode->GetBatchParent();
+        item.mBatchRenderGeometry = NULL;
+      }
+      if( !skip )
+      {
+        item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, item.mBatchRenderGeometry, !item.mIsOpaque );
+      }
     }
   }
   else
@@ -198,9 +285,10 @@ inline void ProcessRenderList(
 
       // Set up the depth buffer based on per-renderer flags.
       SetupDepthBuffer( item, context, isLayer3D );
+      SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
 
       item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
-                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, item.mBatchRenderGeometry, !item.mIsOpaque );
     }
   }
 }
@@ -209,6 +297,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
+                               GeometryBatcher& geometryBatcher,
                                BufferIndex bufferIndex )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
@@ -233,7 +322,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix );
+        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, *viewMatrix, *projectionMatrix, &geometryBatcher );
       }
     }
   }

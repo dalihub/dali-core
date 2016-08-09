@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SHADER_DATA_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/devel-api/rendering/shader.h> // ShaderHints
+#include <dali/public-api/rendering/shader.h> // ShaderHints
 
 namespace Dali
 {
@@ -48,7 +48,7 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    */
-  ShaderData(const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::ShaderHints hints)
+  ShaderData(const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::Hint::Value hints)
   : mShaderHash( -1 ),
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource),
@@ -106,7 +106,7 @@ public: // API
   /**
    * @return the hints
    */
-  Dali::Shader::ShaderHints GetHints() const
+  Dali::Shader::Hint::Value GetHints() const
   {
     return mHints;
   }
@@ -166,7 +166,7 @@ private: // Data
   size_t                      mShaderHash;     ///< hash key created with vertex and fragment shader code
   std::string                 mVertexShader;   ///< source code for vertex program
   std::string                 mFragmentShader; ///< source code for fragment program
-  Dali::Shader::ShaderHints   mHints;    ///< take a hint
+  Dali::Shader::Hint::Value  mHints;          ///< take a hint
   Dali::Vector<unsigned char> mBuffer;         ///< buffer containing compiled binary bytecode
 };
 

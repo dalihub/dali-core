@@ -21,14 +21,13 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/texture.h>
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/integration-api/resource-declarations.h>
-
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/integration-api/gl-defines.h>
+#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
@@ -146,10 +145,10 @@ public:
   /**
    * Uploads data to the texture.
    * @param[in] context The GL context
-   * @param[in] buffer A vector with the data to be uploaded
+   * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload( Context& context, Vector<unsigned char>& buffer, const Internal::NewTexture::UploadParams& params );
+  void Upload( Context& context, PixelDataPtr pixelData, const Internal::NewTexture::UploadParams& params );
 
   /**
    * Bind the texture to the given texture unit and applies the given sampler
@@ -226,6 +225,7 @@ private:
   unsigned int mWidth;                ///<Widht of the texture
   unsigned int mHeight;               ///<Height of the texture
   bool mHasAlpha : 1;                 ///<Whether the format has an alpha channel
+  bool mIsCompressed : 1;             ///<Whether the format is compressed
 };
 
 

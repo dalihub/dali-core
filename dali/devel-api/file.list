@@ -7,16 +7,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/events/hit-test-algorithm.cpp \
   $(devel_api_src_dir)/images/atlas.cpp \
   $(devel_api_src_dir)/images/distance-field.cpp \
-  $(devel_api_src_dir)/images/pixel-data.cpp \
-  $(devel_api_src_dir)/object/property-buffer.cpp \
+  $(devel_api_src_dir)/images/texture-set-image.cpp \
   $(devel_api_src_dir)/object/weak-handle.cpp \
-  $(devel_api_src_dir)/rendering/frame-buffer.cpp \
-  $(devel_api_src_dir)/rendering/geometry.cpp \
-  $(devel_api_src_dir)/rendering/texture.cpp \
-  $(devel_api_src_dir)/rendering/texture-set.cpp \
-  $(devel_api_src_dir)/rendering/renderer.cpp \
-  $(devel_api_src_dir)/rendering/sampler.cpp \
-  $(devel_api_src_dir)/rendering/shader.cpp \
   $(devel_api_src_dir)/scripting/scripting.cpp \
   $(devel_api_src_dir)/signals/signal-delegate.cpp \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
@@ -42,26 +34,17 @@ devel_api_core_events_header_files = \
 devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/atlas.h \
   $(devel_api_src_dir)/images/distance-field.h \
-  $(devel_api_src_dir)/images/pixel-data.h \
-  $(devel_api_src_dir)/images/native-image-interface-extension.h
+  $(devel_api_src_dir)/images/native-image-interface-extension.h \
+  $(devel_api_src_dir)/images/texture-set-image.h
 
 devel_api_core_object_header_files = \
-  $(devel_api_src_dir)/object/property-buffer.h \
   $(devel_api_src_dir)/object/weak-handle.h
-
-devel_api_core_rendering_header_files = \
-  $(devel_api_src_dir)/rendering/frame-buffer.h \
-  $(devel_api_src_dir)/rendering/geometry.h \
-  $(devel_api_src_dir)/rendering/texture.h \
-  $(devel_api_src_dir)/rendering/texture-set.h \
-  $(devel_api_src_dir)/rendering/renderer.h \
-  $(devel_api_src_dir)/rendering/sampler.h \
-  $(devel_api_src_dir)/rendering/shader.h
 
 devel_api_core_signals_header_files = \
   $(devel_api_src_dir)/signals/signal-delegate.h
 
 devel_api_core_scripting_header_files = \
+  $(devel_api_src_dir)/scripting/enum-helper.h \
   $(devel_api_src_dir)/scripting/scripting.h
 
 devel_api_core_threading_header_files = \

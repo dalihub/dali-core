@@ -42,7 +42,7 @@ RefObject::~RefObject()
 #ifdef ENABLE_DEBUG
   if(mCount)
   {
-    DALI_LOG_ERROR("mCount should be zero, deleting referenced object!");
+    DALI_LOG_ERROR("mCount should be zero, deleting referenced object!\n");
   }
 #endif // ENABLE_DEBUG
 }

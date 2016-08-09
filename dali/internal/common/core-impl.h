@@ -66,6 +66,7 @@ class UpdateManager;
 class RenderManager;
 class DiscardQueue;
 class TextureCacheDispatcher;
+class GeometryBatcher;
 }
 
 /**
@@ -294,7 +295,7 @@ private:
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-
+  SceneGraph::GeometryBatcher*              mGeometryBatcher;             ///< Instance of the geometry batcher
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEMP=`getopt -o hsSm --long help,serial,tct,modules -n 'execute.sh' -- "$@"`
+TEMP=`getopt -o dhsSm --long debug,help,serial,tct,modules -n 'execute.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -9,8 +9,9 @@ eval set -- "$TEMP"
 
 function usage
 {
-    echo -e "Usage: execute.sh [-s|-S|-r] [module|testcase]"
+    echo -e "Usage: execute.sh [-d][-s|-S|-r] [module|testcase]"
     echo -e "       execute.sh\t\tExecute test cases from all modules in parallel"
+    echo -e "       execute.sh -d <testcase>\tDebug testcase"
     echo -e "       execute.sh [module]\tExecute test cases from the given module in parallel"
     echo -e "       execute.sh -s [module]\t\tExecute test cases in serial using Testkit-Lite"
     echo -e "       execute.sh -S [module]\t\tExecute test cases in serial"
@@ -21,9 +22,11 @@ function usage
 opt_tct=0
 opt_serial=""
 opt_modules=0
+opt_debug=0
 while true ; do
     case "$1" in
         -h|--help)     usage ;;
+        -d|--debug)    opt_debug=1 ; shift ;;
         -s|--tct)      opt_tct=1 ; shift ;;
         -S|--serial)   opt_serial="-s" ; shift ;;
         -m|--modules)  opt_modules=1 ; shift ;;
@@ -72,7 +75,7 @@ rm -f tct*core-tests.xml
 
 # Clean up old coverage data
 if [ -d ../build/tizen ] ; then
-    rm -f ../build/tizen/dali-core/.libs/*.gcda
+    rm -f ../build/tizen/dali/.libs/*.gcda
 fi
 
 find build \( -name "*.gcda" \) -exec rm '{}' \;
@@ -127,16 +130,22 @@ else
         summary_end
 
     else
-       # First argument is not an executable. Is it a test case name?
-       # Try executing each executable with the test case name until success/known failure
+        # First argument is not an executable. Is it a test case name?
+        # Try executing each executable with the test case name until success/known failure
         for mod in $modules
         do
             output=`build/src/$mod/tct-$mod-core $1`
             ret=$?
             if [ $ret -ne 6 ] ; then
-               echo $output
-               if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi
-               exit $ret
+                if [ $opt_debug -ne 0 ] ; then
+                    echo DEBUGGING:
+                    gdb --args build/src/$mod/tct-$mod-core $1
+
+                else
+                    echo $output
+                    if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi
+                fi
+                exit $ret
             fi
         done
         echo $1 not found

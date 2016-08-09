@@ -48,6 +48,9 @@ enum PropertyRanges
 
   DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,  ///< Used by PanGestureDetector. @SINCE_1_0.0
 
+  DEFAULT_RENDERER_PROPERTY_START_INDEX         = 9000000,    ///< Start index for Renderer. @SINCE_1_1.44
+  DEFAULT_RENDERER_PROPERTY_MAX_INDEX           = DEFAULT_RENDERER_PROPERTY_START_INDEX + 100000, ///< Renderer range: 9000000 to 9100000 @SINCE_1_1.44
+
   PROPERTY_REGISTRATION_START_INDEX             = 10000000,   ///< The index when registering a property should start from this number. @SINCE_1_0.0
   DEFAULT_PROPERTY_MAX_COUNT                    = PROPERTY_REGISTRATION_START_INDEX,           ///< Default Property Range: 0 to 9999999 @SINCE_1_0.0
 
@@ -60,6 +63,9 @@ enum PropertyRanges
   CHILD_PROPERTY_REGISTRATION_MAX_INDEX         = 49999999,   ///< The maximum index supported when registering a child property @SINCE_1_1.35
 
   PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start (SceneGraph and Event side properties per instance) @SINCE_1_0.0
+  PROPERTY_CUSTOM_MAX_INDEX                     = 59999999,   ///< The maximum index supported for custom properties @SINCE_1_1.45
+
+  CORE_PROPERTY_MAX_INDEX                       = PROPERTY_CUSTOM_MAX_INDEX, ///< The maximum index that Core properties can go up to @SINCE_1_1.45
 };
 
 /**

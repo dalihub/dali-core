@@ -23,8 +23,9 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/images/pixel.h>
-#include <dali/devel-api/rendering/texture.h> // Dali::Internal::Render::Texture
+#include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/images/pixel-data-impl.h>
 
 namespace Dali
 {
@@ -83,12 +84,12 @@ public:
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  void Upload( Vector<unsigned char>& buffer );
+  bool Upload( PixelDataPtr pixelData );
 
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  void Upload( Vector<unsigned char>& buffer,
+  bool Upload( PixelDataPtr pixelData,
                unsigned int layer, unsigned int mipmap,
                unsigned int xOffset, unsigned int yOffset,
                unsigned int width, unsigned int height );
@@ -143,13 +144,6 @@ private: // unimplemented methods
   NewTexture& operator=( const NewTexture& );
 
 private: // data
-
-  /**
-   * @brief Helper method to check that upload parameters are correct
-   * @param[in] buffer A vector with the data to be uploaded
-   * @param[in] parameters The uploading parameters
-   */
-  bool CheckUploadParametres( const Vector<unsigned char>& buffer, const UploadParams& parameters) const;
 
   Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
   Internal::Render::NewTexture* mRenderObject;            ///<The Render::Texture associated to this texture

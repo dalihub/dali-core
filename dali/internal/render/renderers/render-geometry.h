@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@
  */
 
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/rendering/geometry.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-abstraction.h>
-#include <dali/devel-api/rendering/geometry.h>
-
+#include <dali/integration-api/gl-defines.h>
 
 namespace Dali
 {
@@ -48,7 +46,7 @@ class PropertyBuffer;
 class Geometry
 {
 public:
-  typedef Dali::Geometry::GeometryType GeometryType;
+  typedef Dali::Geometry::Type Type;
 
   Geometry();
 
@@ -80,10 +78,23 @@ public:
   void SetIndexBuffer( Dali::Vector<unsigned short>& indices );
 
   /**
+   * Obtains pointer to the storage of indexed elements
+   * @return Pointer to the index buffer
+   */
+  const Dali::Vector<unsigned short>* GetIndexBuffer() const;
+
+  /**
    * Removes a PropertyBuffer from the geometry
    * @param[in] propertyBuffer The property buffer to be removed
    */
   void RemovePropertyBuffer(  const Render::PropertyBuffer* propertyBuffer );
+
+  /**
+   * Returns property buffer at specified index
+   * @param[in] index of the property buffer
+   * @return pointer to the property buffer or NULL
+   */
+  const Render::PropertyBuffer* GetPropertyBuffer( size_t index ) const;
 
   /**
    * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
@@ -111,7 +122,7 @@ public:
    * Sets the geometry type
    * @param[in] type The new geometry type
    */
-  void SetGeometryType( GeometryType type )
+  void SetType( Type type )
   {
     mGeometryType = type;
   }
@@ -138,13 +149,12 @@ private:
 
   Dali::Vector< unsigned short> mIndices;
   OwnerPointer< GpuBuffer > mIndexBuffer;
-  GeometryType mGeometryType;
+  Type mGeometryType;
 
   // Booleans
   bool mIndicesChanged : 1;
   bool mHasBeenUpdated : 1;
   bool mAttributesChanged : 1;
-
 };
 
 } // namespace Render

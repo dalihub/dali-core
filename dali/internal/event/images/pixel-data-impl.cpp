@@ -28,11 +28,13 @@ namespace Internal
 {
 
 PixelData::PixelData( unsigned char* buffer,
+                      unsigned int bufferSize,
                       unsigned int width,
                       unsigned int height,
                       Pixel::Format pixelFormat,
                       Dali::PixelData::ReleaseFunction releaseFunction )
 : mBuffer( buffer ),
+  mBufferSize( bufferSize ),
   mWidth( width ),
   mHeight( height ),
   mPixelFormat( pixelFormat ),
@@ -56,12 +58,13 @@ PixelData::~PixelData()
  }
 
 PixelDataPtr PixelData::New(unsigned char* buffer,
+                            unsigned int bufferSize,
                             unsigned int width,
                             unsigned int height,
                             Pixel::Format pixelFormat,
                             Dali::PixelData::ReleaseFunction releaseFunction)
 {
-  return new PixelData( buffer, width, height, pixelFormat, releaseFunction );
+  return new PixelData( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
 }
 
 unsigned int PixelData::GetWidth() const
@@ -82,6 +85,11 @@ Pixel::Format PixelData::GetPixelFormat() const
 unsigned char* PixelData::GetBuffer() const
 {
   return mBuffer;
+}
+
+unsigned int PixelData::GetBufferSize() const
+{
+  return mBufferSize;
 }
 
 }// namespace Internal

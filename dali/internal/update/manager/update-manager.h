@@ -104,6 +104,7 @@ public:
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] textureCacheDispatcher Used for sending messages to texture cache.
+   * @param[in] geometryBatcher Used when geometry batching is enabled.
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationFinishedNotifier,
@@ -113,7 +114,8 @@ public:
                  Integration::RenderController& controller,
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
-                 TextureCacheDispatcher& textureCacheDispatcher );
+                 TextureCacheDispatcher& textureCacheDispatcher,
+                 GeometryBatcher& geometryBatcher );
 
   /**
    * Destructor.
@@ -491,10 +493,10 @@ public:
   /**
    * Uploads data to a texture owned by the RenderManager
    * @param[in] texture The texture
-   * @param[in] buffer Vector with the data to be uploaded
+   * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture( Render::NewTexture* texture, Vector<unsigned char>& buffer, const NewTexture::UploadParams& params );
+  void UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params );
 
   /**
    * Generates mipmaps for a texture owned by the RenderManager
@@ -1222,56 +1224,15 @@ inline void RemoveTexture( UpdateManager& manager, Render::NewTexture& texture )
   new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
 }
 
-template< typename T >
-class UploadTextureDataMessage : public MessageBase
+inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
 {
-public:
-
-  /**
-   * Constructor which does a Vector::Swap()
-   */
-  UploadTextureDataMessage( T* manager, Render::NewTexture* texture, Dali::Vector<unsigned char>& data, const NewTexture::UploadParams& params )
-  : MessageBase(),
-    mManager( manager ),
-    mRenderTexture( texture ),
-    mParams( params )
-  {
-    mData.Swap( data );
-  }
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~UploadTextureDataMessage()
-  {
-  }
-
-  /**
-   * @copydoc MessageBase::Process
-   */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
-  {
-    DALI_ASSERT_DEBUG( mManager && "Message does not have an object" );
-    mManager->UploadTexture( mRenderTexture, mData, mParams );
-  }
-
-private:
-
-  T* mManager;
-  Render::NewTexture* mRenderTexture;
-  Dali::Vector<unsigned char> mData;
-  NewTexture::UploadParams mParams;
-};
-
-inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, Dali::Vector<unsigned char>& data, const NewTexture::UploadParams& params )
-{
-  typedef UploadTextureDataMessage< UpdateManager > LocalType;
+  typedef MessageValue3< UpdateManager, Render::NewTexture*, PixelDataPtr, NewTexture::UploadParams > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &texture, data, params );
+  new (slot) LocalType( &manager, &UpdateManager::UploadTexture, &texture, pixelData, params );
 }
 
 inline void GenerateMipmapsMessage( UpdateManager& manager, Render::NewTexture& texture )

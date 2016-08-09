@@ -207,7 +207,6 @@ int UtcDaliPinchGestureDetectorNew(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-  point.SetLocalPosition( Vector2( 20.0f, 20.0f ) );
   touchEvent.AddPoint(point2);
   application.ProcessEvent(touchEvent);
   END_TEST;

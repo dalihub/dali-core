@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/rendering/texture-set.h> // Dali::Internal::Render::TextureSet
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
@@ -41,7 +40,7 @@ void TextureSet::SetImage( size_t index, ImagePtr image )
 {
   if( !mNewTextures.empty() )
   {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same TextureSet");
+    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same TextureSet\n");
     return;
   }
 
@@ -84,7 +83,7 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
 {
   if( !mImages.empty() )
   {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same texture set");
+    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same texture set\n");
     return;
   }
 
@@ -120,7 +119,7 @@ Image* TextureSet::GetImage( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage\n");
   }
 
   return result;
@@ -135,7 +134,7 @@ NewTexture* TextureSet::GetTexture( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetTexture");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetTexture\n");
   }
 
   return result;
@@ -177,7 +176,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetSampler");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetSampler\n");
   }
 
   return result;

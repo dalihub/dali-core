@@ -18,7 +18,6 @@
 #include "scene-graph-texture-set.h"
 
 // INTERNAL HEADERS
-#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/update/resources/texture-metadata.h>
@@ -50,8 +49,8 @@ TextureSet::TextureSet()
 : mSamplers(),
   mTextureId(),
   mRenderers(),
-  mResourcesReady( false ),
-  mFinishedResourceAcquisition( false ),
+  mResourcesReady( true ),
+  mFinishedResourceAcquisition( true ),
   mChanged( true ),
   mHasAlpha( false )
 {
@@ -68,7 +67,7 @@ void TextureSet::operator delete( void* ptr )
 
 void TextureSet::Prepare( const ResourceManager& resourceManager )
 {
-  if( mChanged )
+  if( mChanged && mTextures.Empty() )
   {
     unsigned int opaqueCount = 0;
     unsigned int completeCount = 0;
@@ -176,8 +175,6 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   }
 
   mSamplers[index] = sampler;
-
-  mChanged = true;
   NotifyChangeToRenderers();
 }
 
@@ -198,8 +195,6 @@ void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
 
   mTextures[index] = texture;
   mHasAlpha |= texture->HasAlphaChannel();
-
-  mChanged = true;
   NotifyChangeToRenderers();
 }
 
