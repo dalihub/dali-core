@@ -515,7 +515,6 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param [in] renderTask A pointer to a newly allocated render-task

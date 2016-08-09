@@ -150,7 +150,6 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief This constructor is used by Dali Get() method.
    *
    * @SINCE_1_0.0
