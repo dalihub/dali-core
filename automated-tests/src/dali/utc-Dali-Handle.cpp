@@ -592,7 +592,7 @@ int UtcDaliHandleSetProperty02(void)
   END_TEST;
 }
 
-int UtcDaliHandleRegisterProperty(void)
+int UtcDaliHandleRegisterProperty01(void)
 {
   tet_infoline("Positive Test Dali::Handle::RegisterProperty()");
   TestApplication application;
@@ -626,6 +626,108 @@ int UtcDaliHandleRegisterProperty(void)
   DALI_TEST_EQUALS( actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION ); // Property count should be the same
   DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index2 ), Vector3::ZAXIS, TEST_LOCATION ); // Value should be what we sent on second RegisterProperty call
 
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterProperty02(void)
+{
+  tet_infoline("Positive Test Dali::Handle::RegisterProperty() int key");
+  TestApplication application;
+
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX+1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float withFlake(99.f);
+
+  Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
+  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterProperty( key2, "iceCream", withFlake );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index1 ), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( index2 ), testColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index3 ), withFlake, TEST_LOCATION );
+
+  // No new property should be registered when we call the below functions
+  Property::Index testIndex2 = actor.RegisterProperty( "iceCream", 2200.f );
+  Property::Index testIndex1 = actor.RegisterProperty( "sideColor", Color::BLACK );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( index2, testIndex1, TEST_LOCATION ); // We should have the same index as per the first registration
+  DALI_TEST_EQUALS( index3, testIndex2, TEST_LOCATION ); // We should have the same index as per the first registration
+  DALI_TEST_EQUALS( actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION ); // Property count should be the same
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( index2 ), Color::BLACK, TEST_LOCATION ); // Value should be what we sent on second RegisterProperty call
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index3 ), 2200.f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliHandleGetPropertyIndex02(void)
+{
+  tet_infoline("Positive Test Dali::Handle::GetPropertyIndex() int key");
+  TestApplication application;
+
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX+1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float withFlake(99.f);
+
+  Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
+  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterProperty( "MyPropertyTwo", Vector3::ONE );
+  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
+  Property::Index index5 = actor.RegisterProperty( "MyPropertyThree", Vector3::ONE );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test that we can get the property index from the integer key
+  Property::Index testIndex1 = actor.GetPropertyIndex( key1 );
+  Property::Index testIndex2 = actor.GetPropertyIndex( key2 );
+
+  DALI_TEST_EQUALS( index2, testIndex1, TEST_LOCATION );
+  DALI_TEST_EQUALS( index4, testIndex2, TEST_LOCATION );
+
+  // Test that we keep the same indices on the named properties
+  Property::Index testIndex = actor.GetPropertyIndex("MyPropertyOne");
+  DALI_TEST_EQUALS(testIndex, index1, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("MyPropertyTwo");
+  DALI_TEST_EQUALS(testIndex, index3, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("MyPropertyThree");
+  DALI_TEST_EQUALS(testIndex, index5, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("sideColor");
+  DALI_TEST_EQUALS(testIndex, index2, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("iceCream");
+  DALI_TEST_EQUALS(testIndex, index4, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(defaultPropertyCount+5, actor.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -692,8 +794,27 @@ int UtcDaliHandleGetPropertyIndices(void)
   // Actor
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.Size() );
-  DALI_TEST_EQUALS( indices.Size(), actor.GetPropertyCount(), TEST_LOCATION );
+  int numDefaultProperties = indices.Size();
+  DALI_TEST_CHECK( numDefaultProperties > 0 );
+  DALI_TEST_EQUALS( numDefaultProperties, actor.GetPropertyCount(), TEST_LOCATION );
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float withFlake(99.f);
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX+1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
+
+  actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
+  actor.RegisterProperty( key1, "sideColor", testColor);
+  actor.RegisterProperty( "MyPropertyTwo", 1234 );
+  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
+  actor.RegisterProperty( "MyPropertyThree", Vector2(.2f,.7f) );
+
+  actor.GetPropertyIndices( indices );
+
+  DALI_TEST_EQUALS( indices.Size(), numDefaultProperties + 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices[indices.Size()-2], index4, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -785,4 +906,3 @@ int UtcDaliHandleWeightNew(void)
 
   END_TEST;
 }
-

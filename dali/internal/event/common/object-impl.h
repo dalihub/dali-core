@@ -151,6 +151,11 @@ public:
   virtual Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
+   * @copydoc Dali::Handle::GetPropertyIndex()
+   */
+  virtual Property::Index GetPropertyIndex( Property::Index key ) const;
+
+  /**
    * @copydoc Dali::Handle::IsPropertyWritable()
    */
   virtual bool IsPropertyWritable( Property::Index index ) const;
@@ -191,9 +196,19 @@ public:
   virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
 
   /**
+   * @copydoc Dali::Handle::RegisterProperty()
+   */
+  virtual Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
+
+  /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
   virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
+
+  /**
+   * @brief Implementing method for this override
+   */
+  virtual Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
    * @copydoc Dali::Handle::AddPropertyNotification()
@@ -352,11 +367,12 @@ protected:
   /**
    * Helper to register a scene-graph property
    * @param [in] name The name of the property.
+   * @param [in] key The key of the property
    * @param [in] index The index of the property
    * @param [in] value The value of the property.
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
-  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const;
+  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const;
 
   /**
    * Check whether the animatable property is registered already, if not then register one.
