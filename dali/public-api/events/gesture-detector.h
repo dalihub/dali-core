@@ -151,6 +151,7 @@ public: // Actor related
 
 protected:
 
+  /// @cond internal
   /**
    * @brief This constructor is used by New() methods of derived classes (For example, PanGestureDetector::New()).
    *
@@ -158,6 +159,7 @@ protected:
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL GestureDetector(Internal::GestureDetector* internal);
+  /// @endcond
 };
 
 /**

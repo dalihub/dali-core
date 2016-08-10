@@ -1559,6 +1559,7 @@ public: // Signals
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Actor::New() methods.
    *
@@ -1566,6 +1567,7 @@ public: // Not intended for application developers
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Actor(Internal::Actor* actor);
+  /// @endcond
 };
 
 /**

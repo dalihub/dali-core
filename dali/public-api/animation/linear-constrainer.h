@@ -144,6 +144,7 @@ public:
   void Remove( Dali::Handle& target );
 
 public: // Not intended for application developers
+  /// @cond internal
   /**
    * @brief This constructor is used by LinearConstrainer::New() methods.
    *
@@ -151,6 +152,7 @@ public: // Not intended for application developers
    * @param[in] internal A pointer to an internal LinearConstrainer resource
    */
   explicit DALI_INTERNAL LinearConstrainer(Internal::LinearConstrainer* internal);
+  /// @endcond
 };
 
 /**

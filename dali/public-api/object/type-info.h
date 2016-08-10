@@ -217,6 +217,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Dali Get() method.
    *
@@ -224,6 +225,7 @@ public: // Not intended for application developers
    * @param [in] typeInfo A pointer to a Dali resource
    */
   explicit DALI_INTERNAL TypeInfo(Internal::TypeInfo* typeInfo);
+  /// @endcond
 
 };
 

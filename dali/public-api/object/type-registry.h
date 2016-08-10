@@ -169,6 +169,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Dali Get() method.
    *
@@ -176,6 +177,7 @@ public: // Not intended for application developers
    * @param [in] typeRegistry A pointer to a Dali resource
    */
   explicit DALI_INTERNAL TypeRegistry(Internal::TypeRegistry*typeRegistry);
+  /// @endcond
 };
 
 /**
