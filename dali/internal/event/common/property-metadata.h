@@ -201,13 +201,16 @@ public:
   /**
    * Constructor for metadata of scene graph based properties
    * @param [in] newName The name of the custom property.
+   * @param [in] newKey  The key of the custom property.
    * @param [in] newType The type ID of the custom property.
    * @param [in] newProperty A pointer to the scene-graph owned property.
    */
   CustomPropertyMetadata( const std::string& newName,
+                          Property::Index newKey,
                           Property::Type newType,
                           const SceneGraph::PropertyBase* newProperty)
   : name(newName),
+    key(newKey),
     childPropertyIndex(Property::INVALID_INDEX),
     mAccessMode(Property::ANIMATABLE)
   {
@@ -226,6 +229,7 @@ public:
                           Property::Value newValue,
                           Property::AccessMode accessMode )
   : name(newName),
+    key(Property::INVALID_KEY),
     childPropertyIndex(Property::INVALID_INDEX),
     mAccessMode(accessMode)
   {
@@ -242,6 +246,7 @@ public:
   }
 
   std::string name;       ///< The name of the property
+  Property::Index key;    ///< The key of the property
   Property::Index childPropertyIndex; ///< The index as a child property
 
 private:

@@ -243,6 +243,36 @@ Property::Index Object::GetPropertyIndex(const std::string& name) const
   return index;
 }
 
+Property::Index Object::GetPropertyIndex( Property::Index key ) const
+{
+  Property::Index index = Property::INVALID_INDEX;
+
+  if( mCustomProperties.Count() > 0 )
+  {
+    Property::Index count = PROPERTY_CUSTOM_START_INDEX;
+    const PropertyMetadataLookup::ConstIterator end = mCustomProperties.End();
+    for( PropertyMetadataLookup::ConstIterator iter = mCustomProperties.Begin(); iter != end; ++iter, ++count )
+    {
+      CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
+      if( custom->key == key )
+      {
+        if( custom->childPropertyIndex != Property::INVALID_INDEX )
+        {
+          // If it is a child property, return the child property index
+          index = custom->childPropertyIndex;
+        }
+        else
+        {
+          index = count;
+        }
+        break;
+      }
+    }
+  }
+
+  return index;
+}
+
 bool Object::IsPropertyWritable( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
@@ -567,7 +597,7 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const
+Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -650,7 +680,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     {
       DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
 
-      mCustomProperties.PushBack( new CustomPropertyMetadata( name, propertyValue.GetType(), property ) );
+      mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue.GetType(), property ) );
     }
     else
     {
@@ -675,14 +705,33 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
 {
-  return RegisterProperty( name, propertyValue, Property::ANIMATABLE );
+  return RegisterProperty( name, Property::INVALID_KEY, propertyValue, Property::ANIMATABLE );
+}
+
+Property::Index Object::RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue )
+{
+  return RegisterProperty( name, key, propertyValue, Property::ANIMATABLE );
 }
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
-  // If property with the required name already exists, then just set it.
-  Property::Index index = GetPropertyIndex( name );
-  if( index != Property::INVALID_INDEX )
+  return RegisterProperty( name, Property::INVALID_KEY, propertyValue, accessMode );
+}
+
+Property::Index Object::RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode )
+{
+  // If property with the required key already exists, then just set it.
+  Property::Index index = Property::INVALID_INDEX;
+  if( key != Property::INVALID_KEY ) // Try integer key first if it's valid
+  {
+    index = GetPropertyIndex( key );
+  }
+  if( index == Property::INVALID_INDEX ) // If it wasn't valid, or doesn't exist, try name
+  {
+    index = GetPropertyIndex( name );
+  }
+
+  if( index != Property::INVALID_INDEX ) // If there was a valid index found by either key, set it.
   {
     SetProperty( index, propertyValue );
   }
@@ -690,9 +739,9 @@ Property::Index Object::RegisterProperty( const std::string& name, const Propert
   {
     // Otherwise register the property
 
-    if(Property::ANIMATABLE == accessMode)
+    if( Property::ANIMATABLE == accessMode )
     {
-      index = RegisterSceneGraphProperty( name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue );
+      index = RegisterSceneGraphProperty( name, key, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue );
       AddUniformMapping( index, name );
     }
     else
@@ -1329,28 +1378,29 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
 
   // check whether the animatable property is registered already, if not then register one.
   AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
-  if(!animatableProperty)
+  if( !animatableProperty )
   {
     const TypeInfo* typeInfo( GetTypeInfo() );
-    if (typeInfo)
+    if( typeInfo )
     {
       Property::Index basePropertyIndex = typeInfo->GetBasePropertyIndex(index);
-      if(basePropertyIndex == Property::INVALID_INDEX)
+      if( basePropertyIndex == Property::INVALID_INDEX )
       {
         // If the property is not a component of a base property, register the whole property itself.
         const  std::string& propertyName = typeInfo->GetPropertyName(index);
-        RegisterSceneGraphProperty(propertyName, index, typeInfo->GetPropertyDefaultValue(index));
+        RegisterSceneGraphProperty(propertyName, Property::INVALID_KEY, index, typeInfo->GetPropertyDefaultValue(index));
         AddUniformMapping( index, propertyName );
       }
       else
       {
-        // Since the property is a component of a base property, check whether the base property is regsitered.
+        // Since the property is a component of a base property, check whether the base property is registered.
         animatableProperty = FindAnimatableProperty( basePropertyIndex );
-        if(!animatableProperty)
+        if( !animatableProperty )
         {
           // If the base property is not registered yet, register the base property first.
           const  std::string& basePropertyName = typeInfo->GetPropertyName(basePropertyIndex);
-          if(Property::INVALID_INDEX != RegisterSceneGraphProperty(basePropertyName, basePropertyIndex, Property::Value(typeInfo->GetPropertyType(basePropertyIndex))))
+
+          if( Property::INVALID_INDEX != RegisterSceneGraphProperty( basePropertyName, Property::INVALID_KEY, basePropertyIndex, Property::Value(typeInfo->GetPropertyType( basePropertyIndex ) ) ) )
           {
             animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size()-1]);
             AddUniformMapping( basePropertyIndex, basePropertyName );
