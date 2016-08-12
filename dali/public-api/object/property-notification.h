@@ -175,6 +175,7 @@ public:
 
 public: // Not intended for use by Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
    *
@@ -182,6 +183,7 @@ public: // Not intended for use by Application developers
    * @param [in] propertyNotification A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);
+  /// @endcond
 };
 
 /**

@@ -90,6 +90,11 @@ Property::Index Handle::GetPropertyIndex( const std::string& name ) const
   return GetImplementation(*this).GetPropertyIndex( name );
 }
 
+Property::Index Handle::GetPropertyIndex( Property::Index key ) const
+{
+  return GetImplementation(*this).GetPropertyIndex( key );
+}
+
 bool Handle::IsPropertyWritable( Property::Index index ) const
 {
   return GetImplementation(*this).IsPropertyWritable( index );
@@ -118,6 +123,11 @@ void Handle::SetProperty( Property::Index index, const Property::Value& property
 Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
 {
   return GetImplementation(*this).RegisterProperty( name, propertyValue );
+}
+
+Property::Index Handle::RegisterProperty( Property::Index key, const std::string& name, const Property::Value& propertyValue )
+{
+  return GetImplementation(*this).RegisterProperty( name, key, propertyValue );
 }
 
 Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )

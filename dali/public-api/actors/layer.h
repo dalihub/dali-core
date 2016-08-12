@@ -470,6 +470,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Layer::New() methods.
    *
@@ -477,6 +478,7 @@ public: // Not intended for application developers
    * @param [in] Layer A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Layer(Internal::Layer* Layer);
+  /// @endcond
 };
 
 /**

@@ -184,6 +184,7 @@ public:
   size_t GetPointCount() const;
 
 public: // Not intended for application developers
+  /// @cond internal
   /**
    * @brief This constructor is used by Path::New() methods.
    *
@@ -191,6 +192,7 @@ public: // Not intended for application developers
    * @param[in] path A pointer to an internal path resource
    */
   explicit DALI_INTERNAL Path(Internal::Path* path);
+  /// @endcond
 };
 
 /**

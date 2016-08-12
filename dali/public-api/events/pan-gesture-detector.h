@@ -335,6 +335,7 @@ public: // Pan Properties Setters
 
 public: // Not intended for Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by PanGestureDetector::New() methods.
    *
@@ -342,6 +343,7 @@ public: // Not intended for Application developers
    * @param [in] internal A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
+  /// @endcond
 
 };
 
