@@ -25,7 +25,6 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/render/gl-resources/gl-texture.h>
@@ -140,7 +139,6 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
 : mRenderDataProvider( dataProvider ),
   mContext( NULL),
   mTextureCache( NULL ),
-  mUniformNameCache( NULL ),
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
@@ -167,11 +165,10 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   }
 }
 
-void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache )
+void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache )
 {
   mContext = &context;
   mTextureCache = &textureCache;
-  mUniformNameCache = &uniformNameCache;
 }
 
 Renderer::~Renderer()
