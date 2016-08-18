@@ -39,7 +39,6 @@ struct LongPressGesture;
 /**
  * @brief This class emits a signals when a long press gesture occurs that meets the requirements set by the application.
  * @SINCE_1_0.0
- * @see LongPressGestureDetector::SetTouchesRequired.
  *
  * For any valid long press, two signals will be emitted:
  * - First identifying the beginning (state = Started) i.e. when fingers held down for the required time.
