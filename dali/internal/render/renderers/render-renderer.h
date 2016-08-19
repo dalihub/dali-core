@@ -53,7 +53,6 @@ class NodeDataProvider;
 
 namespace Render
 {
-class UniformNameCache;
 
 /**
  * Renderers are used to render meshes
@@ -181,9 +180,8 @@ public:
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
    * @param[in] textureCache The texture cache to use
-   * @param[in] uniformNameCache Cache of uniform names to use
    */
-  void Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache );
+  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
 
   /**
    * Destructor
@@ -461,7 +459,6 @@ private:
 
   Context*                     mContext;
   SceneGraph::TextureCache*    mTextureCache;
-  Render::UniformNameCache*    mUniformNameCache;
   Render::Geometry*            mGeometry;
 
   struct UniformIndexMap

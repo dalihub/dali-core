@@ -40,7 +40,7 @@
  * </tr>
  * <tr>
  *    <td>@ref dali_core_animation</td>
- *    <td>Animation allows your objects to move around / change their properties for a specified duration.</td>
+ *    <td>Classes for animation which allows your objects to move around / change their properties for a specified duration.</td>
  * </tr>
  * <tr>
  *    <td>@ref dali_core_common</td>
@@ -48,7 +48,7 @@
  * </tr>
  * <tr>
  *    <td>@ref dali_core_events</td>
- *    <td>Input events and gestures supported by DALi.</td>
+ *    <td>Classes for input events and gestures supported by DALi.</td>
  * </tr>
  * <tr>
  *    <td>@ref dali_core_images</td>
@@ -56,7 +56,7 @@
  * </tr>
  * <tr>
  *    <td>@ref dali_core_math</td>
- *    <td>Basic math classes.</td>
+ *    <td>Classes for basic math.</td>
  * </tr>
  * <tr>
  *    <td>@ref dali_core_object</td>
@@ -64,7 +64,7 @@
  * </tr>
  * <tr>
  *    <td>@ref dali_core_rendering_effects</td>
- *    <td>Render task and shader effect classes.</td>
+ *    <td>Classes for render task and shader effect.</td>
  * </tr>
  * <tr>
  *    <td>@ref dali_core_signals</td>
@@ -94,25 +94,25 @@
  *   @brief Actor is the primary object for interaction in DALi applications.
 
  *   @defgroup dali_core_animation Animation
- *   @brief Animation allows your objects to move around / change their properties for a specified duration.
+ *   @brief Classes for animation which allows your objects to move around / change their properties for a specified duration.
 
  *   @defgroup dali_core_common Common
  *   @brief Common classes for using DALi.
 
  *   @defgroup dali_core_events Events
- *   @brief Input events and gestures supported by DALi.
+ *   @brief Classes for input events and gestures supported by DALi.
 
  *   @defgroup dali_core_images Images
  *   @brief Classes for handling resource images.
 
  *   @defgroup dali_core_math Math
- *   @brief Basic math classes.
+ *   @brief Classes for basic math.
 
  *   @defgroup dali_core_object Object
  *   @brief Classes for the handle/body pattern and property system.
 
  *   @defgroup dali_core_rendering_effects Rendering & Effect
- *   @brief Render task and shader effect classes.
+ *   @brief Classes for render task and shader effect.
 
  *   @defgroup dali_core_signals Signal
  *   @brief Classes for the signal and slot structure.
