@@ -35,7 +35,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-class GeometryBatcher;
 class RenderQueue;
 class Shader;
 class Camera;
@@ -108,12 +107,6 @@ public:
    */
   void Clear( BufferIndex updateBufferIndex );
 
-  /**
-   * Sets pointer to the GeometryBatcher instance
-   * @param[in] geometryBatcher Instance of the GeometryBatcher
-   */
-  void SetGeometryBatcher( GeometryBatcher* geometryBatcher );
-
 private:
 
   // Undefined
@@ -126,14 +119,17 @@ private:
 
   RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
 
-  // Messages are queued here following the current update buffer number
-  NodeOwnerContainer           mNodeQueue[2];
-  ShaderQueue                  mShaderQueue[2];
-  RendererQueue                mRendererQueue[2];
-  CameraQueue                  mCameraQueue[2];
+  // Messages are queued here when the update buffer index == 0
+  NodeOwnerContainer           mNodeQueue0;
+  ShaderQueue                  mShaderQueue0;
+  RendererQueue                mRendererQueue0;
+  CameraQueue                  mCameraQueue0;
 
-
-  GeometryBatcher*             mGeometryBatcher; ///< Geometry batcher needed to clean up batches upon node deletion
+  // Messages are queued here when the update buffer index == 1
+  NodeOwnerContainer           mNodeQueue1;
+  ShaderQueue                  mShaderQueue1;
+  RendererQueue                mRendererQueue1;
+  CameraQueue                  mCameraQueue1;
 };
 
 } // namespace SceneGraph

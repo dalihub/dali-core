@@ -420,15 +420,7 @@ public:
        * @note The default value is True
        * @SINCE_1_1.43
        */
-      WRITE_TO_COLOR_BUFFER,
-
-      /**
-       * @brief name "batchingEnabled", type BOOLEAN
-       * @SINCE_1_2.0
-       * @see Batching
-       * @note The default value is 'false'
-       */
-      BATCHING_ENABLED
+      WRITE_TO_COLOR_BUFFER
     };
   };
 

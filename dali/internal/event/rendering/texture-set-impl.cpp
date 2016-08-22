@@ -40,7 +40,7 @@ void TextureSet::SetImage( size_t index, ImagePtr image )
 {
   if( !mNewTextures.empty() )
   {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same TextureSet\n");
+    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same TextureSet");
     return;
   }
 
@@ -83,7 +83,7 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
 {
   if( !mImages.empty() )
   {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same texture set\n");
+    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same texture set");
     return;
   }
 
@@ -119,7 +119,7 @@ Image* TextureSet::GetImage( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage\n");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage");
   }
 
   return result;
@@ -134,7 +134,7 @@ NewTexture* TextureSet::GetTexture( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetTexture\n");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetTexture");
   }
 
   return result;
@@ -176,7 +176,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
   }
   else
   {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetSampler\n");
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetSampler");
   }
 
   return result;

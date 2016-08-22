@@ -153,7 +153,7 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       case ResourceNativeImage:
       case ResourceTargetImage:
       {
-        DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer.\n" );
+        DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
       }
     }
 

@@ -189,7 +189,7 @@ void BitmapTexture::Update( Integration::Bitmap* bitmap )
   DALI_ASSERT_DEBUG( bitmap != 0 );
   if( !bitmap )
   {
-    DALI_LOG_ERROR( "Passed a null bitmap to update this bitmap texture.\n" );
+    DALI_LOG_ERROR( "Passed a null bitmap to update this bitmap texture." );
     return;
   }
 
@@ -199,7 +199,7 @@ void BitmapTexture::Update( Integration::Bitmap* bitmap )
   if( !bitmapPackedPixels )
   {
     ///! This should never happen.
-    DALI_LOG_ERROR("Passed an incompatible bitmap type to update this bitmap texture.\n");
+    DALI_LOG_ERROR("Passed an incompatible bitmap type to update this bitmap texture.");
     return;
   }
   mBitmap = bitmap;

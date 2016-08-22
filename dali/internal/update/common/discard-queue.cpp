@@ -26,7 +26,6 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 
 namespace Dali
 {
@@ -53,21 +52,14 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
   // The GL resources will now be freed in frame N
   // The Update for frame N+1 may occur in parallel with the rendering of frame N
   // Queue the node for destruction in frame N+2
-  mNodeQueue[ updateBufferIndex ].PushBack( node );
-
-  // If batching, then mark corresponding batch to be destroyed too
-  if( node->GetIsBatchParent() )
+  if ( 0u == updateBufferIndex )
   {
-    mGeometryBatcher->RemoveBatchParent( node );
+    mNodeQueue0.PushBack( node );
   }
-  else if( node->GetBatchParent() )
+  else
   {
-    if( node->mBatchIndex != BATCH_NULL_HANDLE )
-    {
-      mGeometryBatcher->RemoveNode( node );
-    }
+    mNodeQueue1.PushBack( node );
   }
-
 }
 
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
@@ -79,7 +71,14 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
   // The GL resources will now be freed in frame N
   // The Update for frame N+1 may occur in parallel with the rendering of frame N
   // Queue the node for destruction in frame N+2
-  mShaderQueue[ updateBufferIndex ].PushBack( shader );
+  if ( 0u == updateBufferIndex )
+  {
+    mShaderQueue0.PushBack( shader );
+  }
+  else
+  {
+    mShaderQueue1.PushBack( shader );
+  }
 }
 
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
@@ -89,28 +88,48 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Renderer* renderer )
   // The GL resources will now be freed in frame N
   // The Update for frame N+1 may occur in parallel with the rendering of frame N
   // Queue the node for destruction in frame N+2
-  mRendererQueue[ updateBufferIndex ].PushBack( renderer );
+  if ( 0u == updateBufferIndex )
+  {
+    mRendererQueue0.PushBack( renderer );
+  }
+  else
+  {
+    mRendererQueue1.PushBack( renderer );
+  }
 }
 
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Camera* camera )
 {
   DALI_ASSERT_DEBUG( NULL != camera );
 
-  mCameraQueue[ updateBufferIndex ].PushBack( camera );
+  if ( 0u == updateBufferIndex )
+  {
+    mCameraQueue0.PushBack( camera );
+  }
+  else
+  {
+    mCameraQueue1.PushBack( camera );
+  }
 }
 
 void DiscardQueue::Clear( BufferIndex updateBufferIndex )
 {
   // Destroy some discarded objects; these should no longer own any GL resources
-  mNodeQueue[ updateBufferIndex ].Clear();
-  mShaderQueue[ updateBufferIndex ].Clear();
-  mRendererQueue[ updateBufferIndex ].Clear();
-  mCameraQueue[ updateBufferIndex ].Clear();
-}
 
-void DiscardQueue::SetGeometryBatcher( GeometryBatcher* geometryBatcher )
-{
-  mGeometryBatcher = geometryBatcher;
+  if ( 0u == updateBufferIndex )
+  {
+    mNodeQueue0.Clear();
+    mShaderQueue0.Clear();
+    mRendererQueue0.Clear();
+    mCameraQueue0.Clear();
+  }
+  else
+  {
+    mNodeQueue1.Clear();
+    mShaderQueue1.Clear();
+    mRendererQueue1.Clear();
+    mCameraQueue1.Clear();
+  }
 }
 
 } // namespace SceneGraph

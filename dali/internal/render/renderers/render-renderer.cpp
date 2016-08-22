@@ -154,8 +154,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mDepthTestMode( depthTestMode ),
   mWriteToColorBuffer( writeToColorBuffer ),
   mUpdateAttributesLocation( true ),
-  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
-  mBatchingEnabled( false )
+  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
   if(  blendingBitmask != 0u )
   {
@@ -573,11 +572,6 @@ bool Renderer::GetWriteToColorBuffer() const
   return mWriteToColorBuffer;
 }
 
-void Renderer::SetBatchingEnabled( bool batchingEnabled )
-{
-  mBatchingEnabled = batchingEnabled;
-}
-
 void Renderer::Render( Context& context,
                        SceneGraph::TextureCache& textureCache,
                        BufferIndex bufferIndex,
@@ -588,7 +582,6 @@ void Renderer::Render( Context& context,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
                        const Vector3& size,
-                       Render::Geometry* externalGeometry,
                        bool blend )
 {
   // Get the program to use:
@@ -600,7 +593,7 @@ void Renderer::Render( Context& context,
     DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
     if( !program )
     {
-      DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
+      DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*)&mRenderDataProvider->GetShader() );
       return;
     }
   }
@@ -637,15 +630,14 @@ void Renderer::Render( Context& context,
     }
 
     SetUniforms( bufferIndex, node, size, *program );
-    Render::Geometry* geometry = externalGeometry ? externalGeometry : mGeometry;
 
-    if( mUpdateAttributesLocation || geometry->AttributesChanged() )
+    if( mUpdateAttributesLocation || mGeometry->AttributesChanged() )
     {
-      geometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
+      mGeometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
       mUpdateAttributesLocation = false;
     }
 
-    geometry->UploadAndDraw( context, bufferIndex, mAttributesLocation, mIndexedDrawFirstElement, mIndexedDrawElementsCount );
+    mGeometry->UploadAndDraw( context, bufferIndex, mAttributesLocation, mIndexedDrawFirstElement, mIndexedDrawElementsCount );
   }
 }
 

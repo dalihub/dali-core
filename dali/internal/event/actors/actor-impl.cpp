@@ -200,7 +200,6 @@ DALI_PROPERTY( "padding",           VECTOR4,  true,  false, false, Dali::Actor::
 DALI_PROPERTY( "minimumSize",       VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE )
 DALI_PROPERTY( "maximumSize",       VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY( "inheritPosition",   BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
-DALI_PROPERTY( "batchParent",          BOOLEAN,  true,  false, false, Dali::Actor::Property::BATCH_PARENT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -1975,8 +1974,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritScale( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
-  mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mIsBatchParent( false )
+  mColorMode( Node::DEFAULT_COLOR_MODE )
 {
 }
 
@@ -2650,20 +2648,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::BATCH_PARENT:
-    {
-      bool value;
-
-      if( property.Get( value ) )
-      {
-        if( value != mIsBatchParent )
-        {
-          mIsBatchParent = value;
-          SetIsBatchParentMessage( GetEventThreadServices(), *mNode, mIsBatchParent );
-        }
-      }
-      break;
-    }
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -3152,12 +3136,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::MAXIMUM_SIZE:
     {
       value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::Actor::Property::BATCH_PARENT:
-    {
-      value = mIsBatchParent;
       break;
     }
 

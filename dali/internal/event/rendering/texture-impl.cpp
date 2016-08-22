@@ -108,14 +108,14 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
   {
     if( mNativeImage )
     {
-      DALI_LOG_ERROR( "OpenGL ES does not support uploading data to native texture\n");
+      DALI_LOG_ERROR( "OpenGL ES does not support uploading data to native texture");
     }
     else
     {
       unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
       if( pixelData->GetBuffer() == NULL || pixelDataSize == 0 )
       {
-        DALI_LOG_ERROR( "PixelData is empty\n");
+        DALI_LOG_ERROR( "PixelData is empty");
       }
       else
       {
@@ -124,12 +124,12 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
         {
           if( pixelDataSize < width * height )
           {
-            DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture\n");
+            DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture");
           }
           else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
               ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
           {
-            DALI_LOG_ERROR( "Texture update area out of bounds\n");
+            DALI_LOG_ERROR( "Texture update area out of bounds");
           }
           else
           {
@@ -141,7 +141,7 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
         }
         else
         {
-          DALI_LOG_ERROR( "Bad format\n");
+          DALI_LOG_ERROR( "Bad format");
         }
       }
     }

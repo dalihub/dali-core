@@ -87,14 +87,6 @@ public:
    */
   void SetTextures( TextureSet* textureSet );
 
-  /**
-   * Returns current texture set object
-   * @return Pointer to the texture set
-   */
-  const TextureSet* GetTextures() const
-  {
-    return mTextureSet;
-  }
 
   /**
    * Set the shader for the renderer
@@ -106,7 +98,7 @@ public:
    * Get the shader used by this renderer
    * @return the shader this renderer uses
    */
-  const Shader& GetShader() const
+  Shader& GetShader()
   {
     return *mShader;
   }
@@ -116,15 +108,6 @@ public:
    * @param[in] geometry The geometry this renderer will use
    */
   void SetGeometry( Render::Geometry* geometry );
-
-  /**
-   * Get the geometry of this renderer
-   * @return the geometry this renderer uses
-   */
-  const Render::Geometry& GetGeometry() const
-  {
-    return *mGeometry;
-  }
 
   /**
    * Set the depth index
@@ -254,21 +237,6 @@ public:
    * @param[in] writeToColorBuffer True to write to the color buffer
    */
   void SetWriteToColorBuffer( bool writeToColorBuffer );
-
-  /**
-   * Turns on batching feature for the renderer
-   * @param[in] batchingEnabled if true, enables the batching mode for the renderer
-   */
-  void SetBatchingEnabled( bool batchingEnabled );
-
-  /**
-   * Tests whether batching feature is enabled for this renderer
-   * @return batching state
-   */
-  bool IsBatchingEnabled() const
-  {
-    return mBatchingEnabled;
-  }
 
   /**
    * Prepare the object for rendering.
@@ -422,7 +390,6 @@ private:
 
 public:
 
-  bool                         mBatchingEnabled : 1;              ///< Flag indicating whether the render supports batching
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
 };
 
@@ -660,16 +627,6 @@ inline void SetWriteToColorBufferMessage( EventThreadServices& eventThreadServic
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetWriteToColorBuffer, writeToColorBuffer );
-}
-
-inline void SetBatchingEnabledMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool batchable )
-{
-  typedef MessageValue1< Renderer, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  new (slot) LocalType( &renderer, &Renderer::SetBatchingEnabled, batchable );
 }
 
 } // namespace SceneGraph

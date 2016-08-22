@@ -1,8 +1,8 @@
-#ifndef TEST_GL_ABSTRACTION_H
-#define TEST_GL_ABSTRACTION_H
+#ifndef __TEST_GL_ABSTRACTION_H__
+#define __TEST_GL_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -468,12 +468,6 @@ public:
 
   inline void DepthMask(GLboolean flag)
   {
-    mLastDepthMask = flag;
-  }
-
-  inline bool GetLastDepthMask() const
-  {
-    return mLastDepthMask;
   }
 
   inline void DepthRangef(GLclampf zNear, GLclampf zFar)
@@ -2065,8 +2059,6 @@ private:
   GLenum  mLastBlendFuncSrcAlpha;
   GLenum  mLastBlendFuncDstAlpha;
 
-  GLboolean mLastDepthMask;
-
   // Data for manipulating the IDs returned by GenTextures
   GLuint mLastAutoTextureIdUsed;
   std::vector<GLuint> mNextTextureIds;
@@ -2266,4 +2258,6 @@ bool BlendEnabled(const Dali::TraceCallStack& callStack);
 bool BlendDisabled(const Dali::TraceCallStack& callStack);
 
 
-#endif // TEST_GL_ABSTRACTION_H
+
+
+#endif // __TEST_GL_ES_H__

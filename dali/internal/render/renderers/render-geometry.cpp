@@ -50,7 +50,7 @@ void Geometry::GlContextDestroyed()
 {
 }
 
-void Geometry::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer)
+void Geometry::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
   mVertexBuffers.PushBack( propertyBuffer );
   mAttributesChanged = true;
@@ -62,11 +62,6 @@ void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
   mIndicesChanged = true;
 }
 
-const Dali::Vector<unsigned short>* Geometry::GetIndexBuffer() const
-{
-  return &mIndices;
-}
-
 void Geometry::RemovePropertyBuffer( const Render::PropertyBuffer* propertyBuffer )
 {
   size_t bufferCount = mVertexBuffers.Size();
@@ -75,20 +70,11 @@ void Geometry::RemovePropertyBuffer( const Render::PropertyBuffer* propertyBuffe
     if( propertyBuffer == mVertexBuffers[i] )
     {
       //This will delete the gpu buffer associated to the RenderPropertyBuffer if there is one
-      mVertexBuffers.Remove( mVertexBuffers.Begin()+i );
+      mVertexBuffers.Remove( mVertexBuffers.Begin()+i);
       mAttributesChanged = true;
       break;
     }
   }
-}
-
-const Render::PropertyBuffer* Geometry::GetPropertyBuffer( size_t index ) const
-{
-  if( index < mVertexBuffers.Size() )
-  {
-    return mVertexBuffers[ index ];
-  }
-  return NULL;
 }
 
 void Geometry::GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex ) const
@@ -150,10 +136,8 @@ void Geometry::UploadAndDraw(
       mIndicesChanged = false;
     }
 
-    size_t count = mVertexBuffers.Count();
-    for( unsigned int i = 0; i < count; ++i )
+    for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
     {
-
       if( !mVertexBuffers[i]->Update( context ) )
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )

@@ -95,6 +95,16 @@ public:
    */
   int GetDepthIndex() const;
 
+  /**
+    * @copydoc Dali::Renderer::SetFaceCullingMode()
+    */
+   void SetFaceCullingMode( FaceCullingMode::Type cullingMode );
+
+   /**
+    * @copydoc Dali::Renderer::GetFaceCullingMode()
+    */
+   FaceCullingMode::Type GetFaceCullingMode();
+
    /**
     * @copydoc Dali::Renderer::SetBlendMode()
     */
@@ -171,18 +181,12 @@ public:
     */
    bool IsPreMultipliedAlphaEnabled() const;
 
-   /**
-    * Returns state of batching mode
-    * @return batching mode state ( true if enabled )
-    */
-   bool IsBatchingEnabled() const;
-
-   /**
-    * @brief Get the scene graph object
-    *
-    * @return the scene object
-    */
-   SceneGraph::Renderer* GetRendererSceneObject();
+  /**
+   * @brief Get the scene graph object
+   *
+   * @return the scene object
+   */
+  SceneGraph::Renderer* GetRendererSceneObject();
 
 public: // Default property extensions from Object
 
@@ -320,7 +324,6 @@ private: // data
   DepthTestMode::Type          mDepthTestMode:2;              ///< Local copy of the depth test mode
   bool                         mWriteToColorBuffer:1;         ///< Local copy of the write to color buffer flag
   bool                         mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                         mBatchingEnabled : 1;          ///< Flag indicating whether render is batchable or not
 };
 
 } // namespace Internal

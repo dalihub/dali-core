@@ -163,6 +163,8 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
     }
   }
 
+
+
   // Recurse children
   NodeContainer& children = node.GetChildren();
   const NodeIter endIter = children.End();
@@ -182,7 +184,6 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                          Layer& rootNode,
                          SortedLayerPointers& sortedLayers,
                          RendererSortingHelper& sortingHelper,
-                         GeometryBatcher& geometryBatcher,
                          RenderInstructionContainer& instructions )
 {
   RenderTaskList::RenderTaskContainer& taskContainer = renderTasks.GetTasks();
@@ -257,8 +258,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 renderTask,
                                 sortingHelper,
                                 renderTask.GetCullMode(),
-                                instructions,
-                                geometryBatcher );
+                                instructions );
     }
     else
     {
@@ -321,8 +321,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 renderTask,
                                 sortingHelper,
                                 renderTask.GetCullMode(),
-                                instructions,
-                                geometryBatcher );
+                                instructions );
     }
 
     renderTask.SetResourcesFinished( resourcesFinished );

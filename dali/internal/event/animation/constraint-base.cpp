@@ -71,7 +71,7 @@ void ConstraintBase::AddSource( Source source )
     }
     else
     {
-      DALI_LOG_ERROR( "Constraint source object not found\n" );
+      DALI_LOG_ERROR( "Constraint source object not found" );
     }
   }
 }
