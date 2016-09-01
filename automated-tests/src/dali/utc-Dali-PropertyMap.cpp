@@ -320,6 +320,107 @@ int UtcDaliPropertyMapInsertP(void)
   END_TEST;
 }
 
+
+int UtcDaliPropertyMapAddP(void)
+{
+  Property::Map map;
+  DALI_TEST_EQUALS( 0u, map.Count(), TEST_LOCATION );
+  map.Add( "foo", "bar");
+  DALI_TEST_EQUALS( 1u, map.Count(), TEST_LOCATION );
+  Property::Value* value = map.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( std::string("foo2"), "testing" );
+  DALI_TEST_EQUALS( 2u, map.Count(), TEST_LOCATION );
+  value = map.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( 10, "DALi" );
+  DALI_TEST_EQUALS( 3u, map.Count(), TEST_LOCATION );
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( 100, 9 );
+  DALI_TEST_EQUALS( 4u, map.Count(), TEST_LOCATION );
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapAddChainP(void)
+{
+  Property::Map map;
+  DALI_TEST_EQUALS( 0u, map.Count(), TEST_LOCATION );
+  map
+    .Add( "foo", "bar")
+    .Add( std::string("foo2"), "testing" )
+    .Add( 10, "DALi" )
+    .Add( 100, 9 );
+
+  DALI_TEST_EQUALS( 4u, map.Count(), TEST_LOCATION );
+
+  Property::Value* value = map.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapAnonymousAddChainP(void)
+{
+  class TestMap
+  {
+  public:
+    TestMap(Property::Map map)
+    : mMap(map)
+    {
+    }
+    Property::Map mMap;
+  };
+
+  TestMap mapTest( Property::Map().Add( "foo", "bar")
+                                  .Add( std::string("foo2"), "testing" )
+                                  .Add( 10, "DALi" )
+                                  .Add( 100, 9 ));
+
+
+  Property::Value* value = mapTest.mMap.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+
 int UtcDaliPropertyMapMerge(void)
 {
   Property::Map map;
