@@ -117,12 +117,11 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          DepthWriteMode::Type depthWriteMode,
                          DepthTestMode::Type depthTestMode,
                          DepthFunction::Type depthFunction,
-                         StencilParameters& stencilParameters,
-                         bool writeToColorBuffer )
+                         StencilParameters& stencilParameters )
 {
   return new Renderer( dataProvider, geometry, blendingBitmask, blendColor,
                        faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode,
-                       depthFunction, stencilParameters, writeToColorBuffer );
+                       depthFunction, stencilParameters );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
@@ -134,8 +133,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     DepthWriteMode::Type depthWriteMode,
                     DepthTestMode::Type depthTestMode,
                     DepthFunction::Type depthFunction,
-                    StencilParameters& stencilParameters,
-                    bool writeToColorBuffer )
+                    StencilParameters& stencilParameters )
 : mRenderDataProvider( dataProvider ),
   mContext( NULL),
   mTextureCache( NULL ),
@@ -150,7 +148,6 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode( faceCullingMode ),
   mDepthWriteMode( depthWriteMode ),
   mDepthTestMode( depthTestMode ),
-  mWriteToColorBuffer( writeToColorBuffer ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
   mBatchingEnabled( false )
@@ -480,14 +477,14 @@ DepthFunction::Type Renderer::GetDepthFunction() const
   return mDepthFunction;
 }
 
-void Renderer::SetStencilMode( StencilMode::Type stencilMode )
+void Renderer::SetRenderMode( RenderMode::Type renderMode )
 {
-  mStencilParameters.stencilMode = stencilMode;
+  mStencilParameters.renderMode = renderMode;
 }
 
-StencilMode::Type Renderer::GetStencilMode() const
+RenderMode::Type Renderer::GetRenderMode() const
 {
-  return mStencilParameters.stencilMode;
+  return mStencilParameters.renderMode;
 }
 
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
@@ -558,16 +555,6 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
 StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
 {
   return mStencilParameters.stencilOperationOnZPass;
-}
-
-void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
-{
-  mWriteToColorBuffer = writeToColorBuffer;
-}
-
-bool Renderer::GetWriteToColorBuffer() const
-{
-  return mWriteToColorBuffer;
 }
 
 void Renderer::SetBatchingEnabled( bool batchingEnabled )

@@ -56,15 +56,14 @@ DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false
 DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
 DALI_PROPERTY( "depthFunction",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_FUNCTION )
 DALI_PROPERTY( "depthTestMode",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_TEST_MODE )
+DALI_PROPERTY( "renderMode",                      INTEGER,   true, false,  false, Dali::Renderer::Property::RENDER_MODE )
 DALI_PROPERTY( "stencilFunction",                 INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION )
 DALI_PROPERTY( "stencilFunctionMask",             INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_MASK )
 DALI_PROPERTY( "stencilFunctionReference",        INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE )
 DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MASK )
-DALI_PROPERTY( "stencilMode",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MODE )
 DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
-DALI_PROPERTY( "writeToColorBuffer",              BOOLEAN,   true, false,  false, Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER )
 DALI_PROPERTY( "batchingEnabled",                 BOOLEAN,   true, false,  false, Dali::Renderer::Property::BATCHING_ENABLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
@@ -141,11 +140,13 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, GREATER_EQUAL )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, ALWAYS )
 DALI_ENUM_TO_STRING_TABLE_END( STENCIL_FUNCTION )
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( STENCIL_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, OFF )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, AUTO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, ON )
-DALI_ENUM_TO_STRING_TABLE_END( STENCIL_MODE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RENDER_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( RenderMode, NONE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( RenderMode, AUTO )
+DALI_ENUM_TO_STRING_WITH_SCOPE( RenderMode, COLOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( RenderMode, STENCIL )
+DALI_ENUM_TO_STRING_WITH_SCOPE( RenderMode, COLOR_STENCIL )
+DALI_ENUM_TO_STRING_TABLE_END( RENDER_MODE )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( STENCIL_OPERATION )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, ZERO )
@@ -561,13 +562,13 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
-    case Dali::Renderer::Property::STENCIL_MODE:
+    case Dali::Renderer::Property::RENDER_MODE:
     {
-      StencilMode::Type convertedValue = mStencilParameters.stencilMode;
-      if( Scripting::GetEnumerationProperty< StencilMode::Type >( propertyValue, STENCIL_MODE_TABLE, STENCIL_MODE_TABLE_COUNT, convertedValue ) )
+      RenderMode::Type convertedValue = mStencilParameters.renderMode;
+      if( Scripting::GetEnumerationProperty< RenderMode::Type >( propertyValue, RENDER_MODE_TABLE, RENDER_MODE_TABLE_COUNT, convertedValue ) )
       {
-        mStencilParameters.stencilMode = convertedValue;
-        SetStencilModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.renderMode = convertedValue;
+        SetRenderModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
       }
       break;
     }
@@ -647,19 +648,6 @@ void Renderer::SetDefaultProperty( Property::Index index,
       {
         mStencilParameters.stencilOperationOnZPass = convertedValue;
         SetStencilOperationOnZPassMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
-      }
-      break;
-    }
-    case Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER:
-    {
-      bool writeToColorBuffer;
-      if( propertyValue.Get( writeToColorBuffer ) )
-      {
-        if( mWriteToColorBuffer != writeToColorBuffer )
-        {
-          mWriteToColorBuffer = writeToColorBuffer;
-          SetWriteToColorBufferMessage( GetEventThreadServices(), *mSceneObject, writeToColorBuffer );
-        }
       }
       break;
     }
@@ -824,9 +812,9 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mStencilParameters.stencilMask;
       break;
     }
-    case Dali::Renderer::Property::STENCIL_MODE:
+    case Dali::Renderer::Property::RENDER_MODE:
     {
-      value = mStencilParameters.stencilMode;
+      value = mStencilParameters.renderMode;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
@@ -842,11 +830,6 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
     {
       value = mStencilParameters.stencilOperationOnZPass;
-      break;
-    }
-    case Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER:
-    {
-      value = mWriteToColorBuffer;
       break;
     }
   }
@@ -932,14 +915,13 @@ Renderer::Renderer()
   mOnStageCount( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
-  mStencilParameters( StencilMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
+  mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mBlendingOptions(),
   mDepthFunction( DepthFunction::LESS ),
   mFaceCullingMode( FaceCullingMode::NONE ),
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
-  mWriteToColorBuffer( true ),
   mPremultipledAlphaEnabled( false ),
   mBatchingEnabled( false )
 {

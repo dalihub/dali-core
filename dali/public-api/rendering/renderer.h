@@ -162,6 +162,24 @@ enum Type
 
 } // namespace DepthFunction
 
+namespace RenderMode
+{
+
+/**
+ * @brief Controls how this renderer uses its stencil properties and writes to the color buffer.
+ * @SINCE_1_2.5
+ */
+enum Type
+{
+  NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2.5
+  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                      @SINCE_1_2.5
+  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                       @SINCE_1_2.5
+  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                @SINCE_1_2.5
+  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                    @SINCE_1_2.5
+};
+
+} // namespace RenderMode
+
 namespace StencilFunction
 {
 
@@ -182,22 +200,6 @@ enum Type
 };
 
 } // namespace StencilFunction
-
-namespace StencilMode
-{
-
-/**
- * @brief How the stencil buffer will be managed.
- * @SINCE_1_1.43
- */
-enum Type
-{
-  OFF,       ///< Off for this renderer                                  @SINCE_1_1.43
-  AUTO,      ///< Managed by the Actor clipping API. This is the default @SINCE_1_1.43
-  ON         ///< On for this renderer. Select this to use the Renderer stencil properties to manage behavior. Note that Actor clipping management is bypassed for this renderer @SINCE_1_1.43
-};
-
-} // namespace StencilMode
 
 namespace StencilOperation
 {
@@ -353,6 +355,14 @@ public:
       DEPTH_TEST_MODE,
 
       /**
+       * @brief name "renderMode", type INTEGER
+       * @see RenderMode
+       * @note The default value is RenderMode::AUTO
+       * @SINCE_1_2.5
+       */
+      RENDER_MODE,
+
+      /**
        * @brief name "stencilFunction", type INTEGER
        * @see StencilFunction
        * @note The default value is StencilFunction::ALWAYS
@@ -382,14 +392,6 @@ public:
       STENCIL_MASK,
 
       /**
-       * @brief name "stencilMode", type INTEGER
-       * @see StencilMode
-       * @note The default value is StencilMode::AUTO
-       * @SINCE_1_1.43
-       */
-      STENCIL_MODE,
-
-      /**
        * @brief name "stencilOperationOnFail", type INTEGER
        * @see StencilOperation
        * @note The default value is StencilOperation::KEEP
@@ -412,15 +414,6 @@ public:
        * @SINCE_1_1.43
        */
       STENCIL_OPERATION_ON_Z_PASS,
-
-      /**
-       * @brief name "writeToColorBuffer", type BOOLEAN
-       * This allows per-renderer control of writing to the color buffer.
-       * For example: This can be turned off to write to the stencil or depth buffers only.
-       * @note The default value is True
-       * @SINCE_1_1.43
-       */
-      WRITE_TO_COLOR_BUFFER,
 
       /**
        * @brief name "batchingEnabled", type BOOLEAN

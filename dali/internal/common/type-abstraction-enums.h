@@ -33,7 +33,7 @@ template <> struct ParameterType< Dali::BlendMode::Type >        : public BasicT
 template <> struct ParameterType< Dali::DepthWriteMode::Type >   : public BasicType< Dali::DepthWriteMode::Type > {};
 template <> struct ParameterType< Dali::DepthTestMode::Type >    : public BasicType< Dali::DepthTestMode::Type > {};
 template <> struct ParameterType< Dali::DepthFunction::Type >    : public BasicType< Dali::DepthFunction::Type > {};
-template <> struct ParameterType< Dali::StencilMode::Type >      : public BasicType< Dali::StencilMode::Type > {};
+template <> struct ParameterType< Dali::RenderMode::Type >       : public BasicType< Dali::RenderMode::Type > {};
 template <> struct ParameterType< Dali::StencilFunction::Type >  : public BasicType< Dali::StencilFunction::Type > {};
 template <> struct ParameterType< Dali::StencilOperation::Type > : public BasicType< Dali::StencilOperation::Type > {};
 

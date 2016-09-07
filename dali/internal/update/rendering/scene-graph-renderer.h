@@ -202,10 +202,10 @@ public:
   void SetDepthFunction( DepthFunction::Type depthFunction );
 
   /**
-   * Sets the stencil mode
-   * @param[in] mode The stencil function
+   * Sets the render mode
+   * @param[in] mode The render mode
    */
-  void SetStencilMode( StencilMode::Type mode );
+  void SetRenderMode( RenderMode::Type mode );
 
   /**
    * Sets the stencil function
@@ -248,12 +248,6 @@ public:
    * @param[in] stencilOperationOnZPass The stencil operation
    */
   void SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass );
-
-  /**
-   * Sets whether or not to write to the color buffer
-   * @param[in] writeToColorBuffer True to write to the color buffer
-   */
-  void SetWriteToColorBuffer( bool writeToColorBuffer );
 
   /**
    * Turns on batching feature for the renderer
@@ -413,7 +407,6 @@ private:
   BlendMode::Type              mBlendMode:2;                      ///< Local copy of the mode of blending
   DepthWriteMode::Type         mDepthWriteMode:2;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
-  bool                         mWriteToColorBuffer:1;             ///< Local copy of the write to color buffer flag
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mResourcesReady;                   ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
@@ -572,14 +565,14 @@ inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, c
   new (slot) LocalType( &renderer, &Renderer::SetDepthFunction, depthFunction );
 }
 
-inline void SetStencilModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilMode::Type mode )
+inline void SetRenderModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, RenderMode::Type mode )
 {
-  typedef MessageValue1< Renderer, StencilMode::Type > LocalType;
+  typedef MessageValue1< Renderer, RenderMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
-  new (slot) LocalType( &renderer, &Renderer::SetStencilMode, mode );
+  new (slot) LocalType( &renderer, &Renderer::SetRenderMode, mode );
 }
 
 inline void SetStencilFunctionMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilFunction::Type stencilFunction )
@@ -650,16 +643,6 @@ inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadS
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZPass, stencilOperation );
-}
-
-inline void SetWriteToColorBufferMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool writeToColorBuffer )
-{
-  typedef MessageValue1< Renderer, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  new (slot) LocalType( &renderer, &Renderer::SetWriteToColorBuffer, writeToColorBuffer );
 }
 
 inline void SetBatchingEnabledMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool batchable )
