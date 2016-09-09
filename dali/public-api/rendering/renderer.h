@@ -167,15 +167,15 @@ namespace RenderMode
 
 /**
  * @brief Controls how this renderer uses its stencil properties and writes to the color buffer.
- * @SINCE_1_2.5
+ * @SINCE_1_2_5
  */
 enum Type
 {
-  NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2.5
-  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                      @SINCE_1_2.5
-  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                       @SINCE_1_2.5
-  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                @SINCE_1_2.5
-  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                    @SINCE_1_2.5
+  NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2_5
+  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                      @SINCE_1_2_5
+  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                       @SINCE_1_2_5
+  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                @SINCE_1_2_5
+  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                    @SINCE_1_2_5
 };
 
 } // namespace RenderMode
@@ -358,7 +358,7 @@ public:
        * @brief name "renderMode", type INTEGER
        * @see RenderMode
        * @note The default value is RenderMode::AUTO
-       * @SINCE_1_2.5
+       * @SINCE_1_2_5
        */
       RENDER_MODE,
 
