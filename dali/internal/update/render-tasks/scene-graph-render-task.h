@@ -388,7 +388,6 @@ private:
   bool mCullMode: 1; ///< Whether renderers should be frustum culled
 
   FrameBufferTexture* mRenderTarget;
-  Viewport mViewport;
 
   State mState;                     ///< Render state.
   unsigned int mRefreshRate;        ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
