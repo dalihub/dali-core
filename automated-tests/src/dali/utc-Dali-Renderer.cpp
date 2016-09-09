@@ -2090,7 +2090,7 @@ int UtcDaliRendererEnumProperties(void)
   CheckEnumerationProperty< DepthFunction::Type >( renderer, Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS, DepthFunction::ALWAYS, DepthFunction::GREATER, "GREATER" );
   CheckEnumerationProperty< DepthTestMode::Type >( renderer, Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO, DepthTestMode::OFF, DepthTestMode::ON, "ON" );
   CheckEnumerationProperty< StencilFunction::Type >( renderer, Renderer::Property::STENCIL_FUNCTION, StencilFunction::ALWAYS, StencilFunction::LESS, StencilFunction::EQUAL, "EQUAL" );
-  CheckEnumerationProperty< StencilMode::Type >( renderer, Renderer::Property::STENCIL_MODE, StencilMode::AUTO, StencilMode::OFF, StencilMode::ON, "ON" );
+  CheckEnumerationProperty< RenderMode::Type >( renderer, Renderer::Property::RENDER_MODE, RenderMode::AUTO, RenderMode::NONE, RenderMode::STENCIL, "STENCIL" );
   CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
   CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
   CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
@@ -2166,8 +2166,7 @@ int UtcDaliRendererSetDepthTestMode(void)
   // Check depth-test is disabled.
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
 
-  // Turn the layer depth-test flag back on, and confirm that depth testing is *still* off.
-  // This is because our renderer has DepthTestMode::AUTO and our layer behavior is LAYER_2D.
+  // Turn the layer depth-test flag back on, and confirm that depth testing is now on.
   Stage::GetCurrent().GetRootLayer().SetDepthTestDisabled( false );
 
   glEnableDisableStack.Reset();
@@ -2175,7 +2174,7 @@ int UtcDaliRendererSetDepthTestMode(void)
   application.Render();
 
   // Check depth-test is *still* disabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
+  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
 
   END_TEST;
 }
@@ -2252,10 +2251,10 @@ int UtcDaliRendererCheckStencilDefaults(void)
   END_TEST;
 }
 
-int UtcDaliRendererSetStencilMode(void)
+int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
 {
   TestApplication application;
-  tet_infoline("Test setting the StencilMode");
+  tet_infoline("Test setting the RenderMode to use the stencil buffer");
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2264,23 +2263,79 @@ int UtcDaliRendererSetStencilMode(void)
   TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
   TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
 
+  // Set the StencilFunction to something other than the default, to confirm it is set as a property,
+  // but NO GL call has been made while the RenderMode is set to not use the stencil buffer.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::NONE );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
-  // Set the StencilFunction to something other than the default, to confirm it is set as a property,
-  // but NO GL call has been made while the StencilMode is set to OFF.
   renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION, StencilFunction::NEVER );
   DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION ).Get<int>() ), static_cast<int>( StencilFunction::NEVER ), TEST_LOCATION );
-  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
   std::string methodString( "StencilFunc" );
   DALI_TEST_CHECK( !glStencilFunctionStack.FindMethod( methodString ) );
 
-  // Now set the StencilMode to ON and check the StencilFunction has changed.
-  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  // Test the other RenderModes that will not enable the stencil buffer.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::AUTO );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+  DALI_TEST_CHECK( !glStencilFunctionStack.FindMethod( methodString ) );
+
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+  DALI_TEST_CHECK( !glStencilFunctionStack.FindMethod( methodString ) );
+
+  // Now set the RenderMode to modes that will use the stencil buffer, and check the StencilFunction has changed.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::STENCIL );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetStencilTestString() ) );
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethod( methodString ) );
+
+  // Test the COLOR_STENCIL RenderMode as it also enables the stencil buffer.
+  // First set a mode to turn off the stencil buffer, so the enable is required.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR_STENCIL );
+  ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetStencilTestString() ) );
+  DALI_TEST_CHECK( glStencilFunctionStack.FindMethod( methodString ) );
+
+  END_TEST;
+}
+
+// Helper function for the SetRenderModeToUseColorBuffer test.
+void CheckRenderModeColorMask( TestApplication& application, Renderer& renderer, RenderMode::Type renderMode, bool expectedValue )
+{
+  // Set the RenderMode property to a value that should not allow color buffer writes.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, renderMode );
+  application.SendNotification();
+  application.Render();
+
+  // Check if ColorMask has been called, and that the values are correct.
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  const TestGlAbstraction::ColorMaskParams& colorMaskParams( glAbstraction.GetColorMaskParams() );
+
+  DALI_TEST_EQUALS<bool>( colorMaskParams.red,   expectedValue, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.green, expectedValue, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.blue,  expectedValue, TEST_LOCATION );
+  DALI_TEST_EQUALS<bool>( colorMaskParams.alpha, expectedValue, TEST_LOCATION );
+}
+
+int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the RenderMode to use the color buffer");
+
+  Renderer renderer = RendererTestFixture( application );
+
+  // Set the RenderMode property to a value that should not allow color buffer writes.
+  // Then check if ColorMask has been called, and that the values are correct.
+  CheckRenderModeColorMask( application, renderer, RenderMode::AUTO, true );
+  CheckRenderModeColorMask( application, renderer, RenderMode::NONE, false );
+  CheckRenderModeColorMask( application, renderer, RenderMode::COLOR, true );
+  CheckRenderModeColorMask( application, renderer, RenderMode::STENCIL, false );
+  CheckRenderModeColorMask( application, renderer, RenderMode::COLOR_STENCIL, true );
 
   END_TEST;
 }
@@ -2297,8 +2352,8 @@ int UtcDaliRendererSetStencilFunction(void)
   TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
   TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
 
-  // StencilMode must be ON for StencilFunction to operate.
-  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  // RenderMode must use the stencil for StencilFunction to operate.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::STENCIL );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
   /*
@@ -2387,8 +2442,8 @@ int UtcDaliRendererSetStencilOperation(void)
   TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
   TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
 
-  // StencilMode must be ON for StencilOperation to operate.
-  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  // RenderMode must use the stencil for StencilOperation to operate.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::STENCIL );
 
   /*
    * Lookup table for testing StencilOperation.
@@ -2474,8 +2529,8 @@ int UtcDaliRendererSetStencilMask(void)
   TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
   TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
 
-  // StencilMode must be ON for StencilMask to operate.
-  renderer.SetProperty( Renderer::Property::STENCIL_MODE, StencilMode::ON );
+  // RenderMode must use the stencil for StencilMask to operate.
+  renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::STENCIL );
 
   // Set the StencilMask property to a value.
   renderer.SetProperty( Renderer::Property::STENCIL_MASK, 0x00 );
@@ -2503,51 +2558,6 @@ int UtcDaliRendererSetStencilMask(void)
 
   // Check the function was called and the parameters were correct.
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterString ) );
-
-  END_TEST;
-}
-
-int UtcDaliRendererSetWriteToColorBuffer(void)
-{
-  TestApplication application;
-  tet_infoline("Test setting the WriteToColorBuffer flag");
-
-  Renderer renderer = RendererTestFixture( application );
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-
-  // Set the StencilMask property to a value.
-  renderer.SetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER, false );
-
-  // Check GetProperty returns the same value.
-  DALI_TEST_CHECK( !renderer.GetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER ).Get<bool>() );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check if ColorMask has been called, and that the values are correct.
-  const TestGlAbstraction::ColorMaskParams& colorMaskParams( glAbstraction.GetColorMaskParams() );
-
-  DALI_TEST_EQUALS<bool>( colorMaskParams.red,   false, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParams.green, false, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParams.blue,  false, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParams.alpha, false, TEST_LOCATION );
-
-  // Set the StencilMask property to true.
-  renderer.SetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER, true );
-
-  // Check GetProperty returns the same value.
-  DALI_TEST_CHECK( renderer.GetProperty( Renderer::Property::WRITE_TO_COLOR_BUFFER ).Get<bool>() );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check if ColorMask has been called, and that the values are correct.
-  const TestGlAbstraction::ColorMaskParams& colorMaskParamsChanged( glAbstraction.GetColorMaskParams() );
-
-  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.red,   true, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.green, true, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.blue,  true, TEST_LOCATION );
-  DALI_TEST_EQUALS<bool>( colorMaskParamsChanged.alpha, true, TEST_LOCATION );
 
   END_TEST;
 }

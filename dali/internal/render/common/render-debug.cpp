@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/update/nodes/node.h>
 
+using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::RenderList;
 
 namespace Dali
@@ -37,6 +39,10 @@ namespace Internal
 
 namespace Render
 {
+
+// These functions should only be defined if they are being used by the #define in the header.
+// Otherwise they will contribute negatively to code coverage.
+#ifdef DALI_PRINT_RENDER_INFO
 
 void PrintFrameStart( BufferIndex bufferIndex )
 {
@@ -71,34 +77,8 @@ void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction, B
 
 void PrintRenderList( const RenderList& list )
 {
-  unsigned int flags = list.GetFlags();
-
   std::stringstream debugStream;
   debugStream << "Rendering items";
-
-  if( flags )
-  {
-    debugStream << " with:";
-
-    if( flags & RenderList::STENCIL_BUFFER_ENABLED )
-    {
-      debugStream << " STENCIL_TEST";
-    }
-
-    if( flags & RenderList::STENCIL_WRITE )
-    {
-      debugStream << " STENCIL_WRITE";
-    }
-
-    if( flags & RenderList::STENCIL_CLEAR )
-    {
-      debugStream << " STENCIL_CLEAR";
-    }
-  }
-  else
-  {
-    debugStream << " without any STENCIL settings";
-  }
 
   if( list.IsClipping() )
   {
@@ -125,6 +105,8 @@ void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount )
     Debug::LogMessage( Debug::DebugInfo, "Renderer Total # renderers: %u\n", rendererCount );
   }
 }
+
+#endif
 
 } // Render
 

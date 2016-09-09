@@ -46,7 +46,7 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/manager/object-owner-container.h>
-#include <dali/internal/update/manager/process-render-tasks.h>
+#include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
@@ -131,7 +131,8 @@ struct UpdateManager::Impl
         RenderManager& renderManager,
         RenderQueue& renderQueue,
         SceneGraphBuffers& sceneGraphBuffers,
-        GeometryBatcher& geometryBatcher )
+        GeometryBatcher& geometryBatcher,
+        RenderTaskProcessor& renderTaskProcessor )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
     transformManager(),
@@ -146,6 +147,7 @@ struct UpdateManager::Impl
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
     geometryBatcher( geometryBatcher ),
+    renderTaskProcessor( renderTaskProcessor ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     taskList( renderMessageDispatcher, resourceManager ),
     systemLevelTaskList( renderMessageDispatcher, resourceManager ),
@@ -159,7 +161,6 @@ struct UpdateManager::Impl
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     previousUpdateScene( false ),
     frameCounter( 0 ),
-    renderSortingHelper(),
     renderTaskWaiting( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
@@ -231,6 +232,7 @@ struct UpdateManager::Impl
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
   GeometryBatcher&                    geometryBatcher;               ///< An instance of the GeometryBatcher
+  RenderTaskProcessor&                renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -252,7 +254,7 @@ struct UpdateManager::Impl
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
   ObjectOwnerContainer<Renderer>      renderers;
-  TextureSetContainer                 textureSets;                     ///< A container of texture sets
+  TextureSetContainer                 textureSets;                   ///< A container of texture sets
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -268,7 +270,6 @@ struct UpdateManager::Impl
   bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
 
   int                                 frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
-  RendererSortingHelper               renderSortingHelper;           ///< helper used to sort transparent renderers
 
   GestureContainer                    gestures;                      ///< A container of owned gesture detectors
   bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
@@ -283,7 +284,8 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
                               TextureCacheDispatcher& textureCacheDispatcher,
-                              GeometryBatcher& geometryBatcher )
+                              GeometryBatcher& geometryBatcher,
+                              RenderTaskProcessor& renderTaskProcessor )
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
@@ -295,7 +297,8 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     renderManager,
                     renderQueue,
                     mSceneGraphBuffers,
-                    geometryBatcher );
+                    geometryBatcher,
+                    renderTaskProcessor );
 
   textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
   mImpl->geometryBatcher.SetUpdateManager( this );
@@ -997,24 +1000,22 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     if ( NULL != mImpl->root )
     {
-      ProcessRenderTasks(  bufferIndex,
-                           mImpl->taskList,
-                           *mImpl->root,
-                           mImpl->sortedLayers,
-                           mImpl->renderSortingHelper,
-                           mImpl->geometryBatcher,
-                           mImpl->renderInstructions );
+      mImpl->renderTaskProcessor.Process( bufferIndex,
+                                        mImpl->taskList,
+                                        *mImpl->root,
+                                        mImpl->sortedLayers,
+                                        mImpl->geometryBatcher,
+                                        mImpl->renderInstructions );
 
       // Process the system-level RenderTasks last
       if ( NULL != mImpl->systemLevelRoot )
       {
-        ProcessRenderTasks(  bufferIndex,
-                             mImpl->systemLevelTaskList,
-                             *mImpl->systemLevelRoot,
-                             mImpl->systemLevelSortedLayers,
-                             mImpl->renderSortingHelper,
-                             mImpl->geometryBatcher,
-                             mImpl->renderInstructions );
+        mImpl->renderTaskProcessor.Process( bufferIndex,
+                                          mImpl->systemLevelTaskList,
+                                          *mImpl->systemLevelRoot,
+                                          mImpl->systemLevelSortedLayers,
+                                          mImpl->geometryBatcher,
+                                          mImpl->renderInstructions );
       }
     }
   }
