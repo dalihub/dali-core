@@ -255,6 +255,15 @@ public:
    */
   void SurfaceResized(unsigned int width, unsigned int height);
 
+  /**
+   * Notify the Core about the top margin size.
+   * Available stage size is reduced by this size.
+   * The stage is located below the size at the top of the display
+   * It is mainly useful for indicator in mobile device
+   * @param[in] margin margin size
+   */
+  void SetTopMargin( unsigned int margin );
+
   // Core setters
 
   /**
