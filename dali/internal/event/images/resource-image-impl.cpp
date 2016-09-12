@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,10 +57,9 @@ Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED
 
 }
 
-ResourceImage::ResourceImage( LoadPolicy loadPol, ReleasePolicy releasePol )
-: Image( releasePol ),
-  mImageFactory( ThreadLocalStorage::Get().GetImageFactory() ),
-  mLoadPolicy(loadPol)
+ResourceImage::ResourceImage()
+: Image(),
+  mImageFactory( ThreadLocalStorage::Get().GetImageFactory() )
 {
 }
 
@@ -71,29 +70,24 @@ ResourceImagePtr ResourceImage::New()
   return image;
 }
 
-ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
+ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes )
 {
   ResourceImagePtr image;
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    image = NinePatchImage::New( url, releasePol );
+    image = NinePatchImage::New( url );
   }
   else
   {
-    image = new ResourceImage( loadPol, releasePol );
+    image = new ResourceImage();
     image->Initialize();
 
     // consider the requested size as natural size, 0 means we don't (yet) know it
     image->mWidth = attributes.GetWidth();
     image->mHeight = attributes.GetHeight();
     image->mRequest = image->mImageFactory.RegisterRequest( url, &attributes );
-
-    if( Dali::ResourceImage::IMMEDIATE == loadPol )
-    {
-      // Trigger loading of the image on a as soon as it can be done
-      image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
-      image->mTicket->AddObserver( *image );
-    }
+    image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
+    image->mTicket->AddObserver( *image );
   }
   DALI_LOG_SET_OBJECT_STRING( image, url );
 
@@ -236,7 +230,7 @@ void ResourceImage::Disconnect()
 
   DALI_ASSERT_DEBUG( mConnectionCount > 0 );
   --mConnectionCount;
-  if( mConnectionCount == 0 && mReleasePolicy == Dali::ResourceImage::UNUSED )
+  if( mConnectionCount == 0 )
   {
     // release image memory when it's not visible anymore (decrease ref. count of texture)
     SetTicket( NULL );

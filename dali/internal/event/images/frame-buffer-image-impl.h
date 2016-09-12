@@ -63,12 +63,6 @@ public:
    */
   bool IsNativeFbo() const;
 
-  /**
-   * @brief Required for backwards compatibility. Value is just stored but not used internally.
-   * @param[in] releasePolicy The release policy (ignored as not supported).
-   */
-  void SetReleasePolicy( Dali::Image::ReleasePolicy releasePolicy );
-
 public: // From Image
   /**
    * @copydoc Dali::Internal::Image::Connect()

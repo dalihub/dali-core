@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;

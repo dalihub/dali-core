@@ -40,8 +40,7 @@ TypeRegistration mType( typeid( Dali::EncodedBufferImage ), typeid( Dali::Image 
 EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImage,
                                                std::size_t encodedImageByteCount,
                                                ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
-                                               bool orientationCorrection,
-                                               ReleasePolicy releasePol )
+                                               bool orientationCorrection )
 {
   DALI_ASSERT_DEBUG( encodedImage && "Null image pointer passed-in for decoding from memory." );
   DALI_ASSERT_DEBUG( encodedImageByteCount > 0U && "Zero size passed for image resource in memory buffer." );
@@ -50,7 +49,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   // input buffer by reading both ends of it:
   DALI_ASSERT_ALWAYS( static_cast<int>( encodedImage[0] + encodedImage[encodedImageByteCount-1] ) != -1 );
 
-  EncodedBufferImagePtr image( new EncodedBufferImage( releasePol ) );
+  EncodedBufferImagePtr image( new EncodedBufferImage() );
   image->Initialize(); // Second stage initialization
 
   // Replicate the functionality of ImageFactory::load() without the filesystem caching:

@@ -82,32 +82,6 @@ public:
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * @DEPRECATED_1_1.3. Use New( unsigned int width, unsigned int height ) instead.
-   *
-   * @brief Create a new BufferImage.
-   *
-   * Also a pixel buffer for image data is allocated.
-   * Dali has ownership of the buffer.
-   * For better performance and portability use power of two dimensions.
-   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   *
-   * @SINCE_1_0.0
-   * @remarks ReleasePolicy is an experimental feature and might not be supported in the next release.
-   * We do recommend not to use this method.
-   * Please refer the Remarks of ReleasePolicy for more information.
-   * @param [in] width          Image width in pixels
-   * @param [in] height         Image height in pixels
-   * @param [in] pixelFormat    The pixel format
-   * @param [in] releasePolicy  Optionally release memory when image is not visible on screen.
-   * @return A handle to a new instance of BufferImage
-   * @pre width & height are greater than zero
-   */
-  static BufferImage New(unsigned int  width,
-                         unsigned int  height,
-                         Pixel::Format pixelFormat,
-                         ReleasePolicy releasePolicy);
-
-  /**
    * @brief Create a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
@@ -134,44 +108,6 @@ public:
                          unsigned int  height,
                          Pixel::Format pixelFormat=Pixel::RGBA8888,
                          unsigned int  stride=0);
-
-  /**
-   * @DEPRECATED_1_1.3. Use New( PixelBuffer* pixelBuffer, unsigned int width, unsigned int height ) instead.
-   *
-   * @brief Create a new BufferImage, which uses an external data source.
-   *
-   * The PixelBuffer has to be allocated by application.
-   *
-   * The application holds ownership of the buffer. It must not
-   * destroy the PixelBuffer on a staged image if it has called
-   * Update() and hasn't received a Image::UploadedSignal, or if it has just
-   * added it to the stage and has not received a Image::UploadedSignal.
-   *
-   * For better performance and portability use power of two dimensions.
-   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   *
-   * @SINCE_1_0.0
-   * @remarks ReleasePolicy is an experimental feature and might not be supported in the next release.
-   * We do recommend not to use this method.
-   * Please refer the Remarks of ReleasePolicy for more information.
-   * @param [in] pixelBuffer   Pixel buffer. has to be allocated by application.
-   * @param [in] width         Image width in pixels
-   * @param [in] height        Image height in pixels
-   * @param [in] pixelFormat   The pixel format
-   * @param [in] stride        The internal stride of the pixelbuffer in pixels
-   * @param [in] releasePolicy Optionally relase memory when image is not visible on screen.
-   * @return A handle to a new instance of BufferImage
-   * @pre width & height are greater than zero
-   * @note in case releasePolicy is Image::UNUSED, application has to call
-   * BufferImage::Update() whenever image is re-added to the stage
-   *
-   */
-  static BufferImage New(PixelBuffer*  pixelBuffer,
-                         unsigned int  width,
-                         unsigned int  height,
-                         Pixel::Format pixelFormat,
-                         unsigned int  stride,
-                         ReleasePolicy releasePolicy);
 
   /**
    * @brief Downcast a handle to BufferImage handle.
