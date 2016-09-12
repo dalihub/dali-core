@@ -4,11 +4,9 @@
 
 public_api_src_files = \
   $(public_api_src_dir)/actors/actor.cpp \
-  $(public_api_src_dir)/actors/blending.cpp \
   $(public_api_src_dir)/actors/camera-actor.cpp \
   $(public_api_src_dir)/actors/custom-actor.cpp \
   $(public_api_src_dir)/actors/custom-actor-impl.cpp \
-  $(public_api_src_dir)/actors/image-actor.cpp \
   $(public_api_src_dir)/actors/layer.cpp \
   $(public_api_src_dir)/animation/animation.cpp \
   $(public_api_src_dir)/animation/alpha-function.cpp \
@@ -44,7 +42,6 @@ public_api_src_files = \
   $(public_api_src_dir)/images/buffer-image.cpp \
   $(public_api_src_dir)/images/frame-buffer-image.cpp \
   $(public_api_src_dir)/images/encoded-buffer-image.cpp \
-  $(public_api_src_dir)/images/nine-patch-image.cpp \
   $(public_api_src_dir)/images/resource-image.cpp \
   $(public_api_src_dir)/images/native-image.cpp \
   $(public_api_src_dir)/math/compile-time-math.cpp \
@@ -79,7 +76,6 @@ public_api_src_files = \
   $(public_api_src_dir)/rendering/renderer.cpp \
   $(public_api_src_dir)/rendering/sampler.cpp \
   $(public_api_src_dir)/rendering/shader.cpp \
-  $(public_api_src_dir)/shader-effects/shader-effect.cpp \
   $(public_api_src_dir)/signals/callback.cpp \
   $(public_api_src_dir)/signals/connection-tracker.cpp \
   $(public_api_src_dir)/signals/connection-tracker-interface.cpp \
@@ -103,12 +99,10 @@ public_api_header_files = \
 public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/actor.h \
   $(public_api_src_dir)/actors/actor-enumerations.h \
-  $(public_api_src_dir)/actors/blending.h \
   $(public_api_src_dir)/actors/camera-actor.h \
   $(public_api_src_dir)/actors/custom-actor.h \
   $(public_api_src_dir)/actors/custom-actor-impl.h \
   $(public_api_src_dir)/actors/draw-mode.h \
-  $(public_api_src_dir)/actors/image-actor.h \
   $(public_api_src_dir)/actors/layer.h \
   $(public_api_src_dir)/actors/sampling.h
 
@@ -160,7 +154,6 @@ public_api_core_images_header_files = \
   $(public_api_src_dir)/images/frame-buffer-image.h \
   $(public_api_src_dir)/images/image.h \
   $(public_api_src_dir)/images/image-operations.h \
-  $(public_api_src_dir)/images/nine-patch-image.h \
   $(public_api_src_dir)/images/pixel.h \
   $(public_api_src_dir)/images/pixel-data.h \
   $(public_api_src_dir)/images/resource-image.h \
@@ -218,9 +211,6 @@ public_api_core_rendering_header_files = \
   $(public_api_src_dir)/rendering/renderer.h \
   $(public_api_src_dir)/rendering/sampler.h \
   $(public_api_src_dir)/rendering/shader.h
-
-public_api_core_shader_effects_header_files = \
-  $(public_api_src_dir)/shader-effects/shader-effect.h
 
 public_api_core_size_negotiation_header_files = \
   $(public_api_src_dir)/size-negotiation/relayout-container.h

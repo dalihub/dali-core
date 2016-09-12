@@ -38,21 +38,6 @@ namespace Scripting
 namespace
 {
 
-// Tables used here for converting strings to the enumerations and vice versa
-const StringEnum IMAGE_LOAD_POLICY_TABLE[] =
-{
-  { "IMMEDIATE", ResourceImage::IMMEDIATE },
-  { "ON_DEMAND", ResourceImage::ON_DEMAND },
-};
-const unsigned int IMAGE_LOAD_POLICY_TABLE_COUNT = sizeof( IMAGE_LOAD_POLICY_TABLE ) / sizeof( IMAGE_LOAD_POLICY_TABLE[0] );
-
-const StringEnum IMAGE_RELEASE_POLICY_TABLE[] =
-{
-  { "UNUSED", Image::UNUSED },
-  { "NEVER",  Image::NEVER  },
-};
-const unsigned int IMAGE_RELEASE_POLICY_TABLE_COUNT = sizeof( IMAGE_RELEASE_POLICY_TABLE ) / sizeof( IMAGE_RELEASE_POLICY_TABLE[0] );
-
 const StringEnum PIXEL_FORMAT_TABLE[] =
 {
   { "A8",                                           Pixel::A8                                           },
@@ -445,13 +430,11 @@ void CreatePropertyMap( Image image, Property::Map& map )
     }
 
     map[ "type" ] = imageType;
-    map[ "releasePolicy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
     ResourceImage resourceImage = ResourceImage::DownCast( image );
     if( resourceImage )
     {
       map[ "filename" ] = resourceImage.GetUrl();
-      map[ "loadPolicy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     int width( image.GetWidth() );

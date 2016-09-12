@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,91 +71,6 @@ int UtcDaliBufferImageNew02(void)
   DALI_TEST_CHECK( image.GetWidth() == 16);
 
   delete [] buffer;
-  END_TEST;
-}
-
-int UtcDaliBufferImageNewWithPolicy01(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliBufferImageNewWithPolicy01 - BufferImage::New(unsigned int, unsigned int, Pixel::Format, LoadPolicy, ReleasePolicy)");
-
-  // Force texture id's
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  // invoke default handle constructor
-  BufferImage image;
-
-  // initialise handle
-  image = BufferImage::New(16, 16, Pixel::A8, Image::UNUSED);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK( image.GetWidth() == 16);
-  Actor actor = CreateRenderableActor( image );
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-  // testing ReleasePolicy::Unused
-  // fake loading image
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // discard texture when actor comes off stage
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( application.GetGlAbstraction().CheckTextureDeleted(23) );
-  END_TEST;
-}
-
-int UtcDaliBufferImageNewWithPolicy02(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliBufferImageNewWithPolicy02 - BufferImage::New(PixelBuffer*, unsigned int, unsigned int, Pixel::Format, unsigned int, ReleasePolicy)");
-
-  // Force texture id's
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8, 16, Image::UNUSED);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK( image.GetWidth() == 16);
-  Actor actor = CreateRenderableActor( image );
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-  // testing ReleasePolicy::Unused
-  // fake loading image
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // discard texture when actor comes off stage
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( application.GetGlAbstraction().CheckTextureDeleted(23) );
   END_TEST;
 }
 

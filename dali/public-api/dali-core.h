@@ -20,12 +20,10 @@
 
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/blending.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/sampling.h>
 
@@ -74,7 +72,6 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
 
@@ -132,8 +129,6 @@
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>
-
-#include <dali/public-api/shader-effects/shader-effect.h>
 
 #include <dali/public-api/size-negotiation/relayout-container.h>
 

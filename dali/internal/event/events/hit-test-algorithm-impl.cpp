@@ -26,7 +26,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/system-overlay-impl.h>
