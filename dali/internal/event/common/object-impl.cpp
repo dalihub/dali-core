@@ -273,6 +273,20 @@ Property::Index Object::GetPropertyIndex( Property::Index key ) const
   return index;
 }
 
+Property::Index Object::GetPropertyIndex( Property::Key key ) const
+{
+  Property::Index index = Property::INVALID_INDEX;
+  if( key.type == Property::Key::INDEX )
+  {
+    index = GetPropertyIndex( key.indexKey );
+  }
+  else
+  {
+    index = GetPropertyIndex( key.stringKey );
+  }
+  return index;
+}
+
 bool Object::IsPropertyWritable( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");

@@ -342,8 +342,12 @@ Actor NewActor( const Property::Map& map )
     // Now set the properties, or create children
     for ( unsigned int i = 0, mapCount = map.Count(); i < mapCount; ++i )
     {
-      const StringValuePair& pair( map.GetPair( i ) );
-      const std::string& key( pair.first );
+      const KeyValuePair pair( map.GetKeyValue( i ) );
+      if( pair.first.type == Property::Key::INDEX )
+      {
+        continue;
+      }
+      const std::string& key( pair.first.stringKey );
       if ( key == "type" )
       {
         continue;
@@ -459,8 +463,13 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
   // Now set the properties, or create children
   for( unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i )
   {
-    const StringValuePair& pair( map.GetPair( i ) );
-    const std::string& key( pair.first );
+    const KeyValuePair pair( map.GetKeyValue( i ) );
+    if( pair.first.type == Property::Key::INDEX )
+    {
+      continue; // We don't consider index keys.
+    }
+    const std::string& key( pair.first.stringKey );
+
     const Property::Value& value( pair.second );
 
     if( key == "actor" )
@@ -537,12 +546,18 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
       Property::Map timeMap = value.Get< Property::Map >();
       for( unsigned int i = 0; i < timeMap.Count(); ++i )
       {
-        const StringValuePair& pair( timeMap.GetPair( i ) );
-        if( pair.first == "delay" )
+        const KeyValuePair pair( timeMap.GetKeyValue( i ) );
+        if( pair.first.type == Property::Key::INDEX )
+        {
+          continue;
+        }
+        const std::string& key( pair.first.stringKey );
+
+        if( key == "delay" )
         {
           element->timePeriodDelay = pair.second.Get< float >();
         }
-        else if( pair.first == "duration" )
+        else if( key == "duration" )
         {
           element->timePeriodDuration = pair.second.Get< float >();
         }
@@ -556,7 +571,3 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
 } // namespace scripting
 
 } // namespace Dali
-
-
-
-

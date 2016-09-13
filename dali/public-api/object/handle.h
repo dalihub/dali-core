@@ -195,6 +195,19 @@ public:
   Property::Index GetPropertyIndex( Property::Index key ) const;
 
   /**
+   * @brief Query the index of a property using the given key from a Property::Map
+   * @SINCE_1_2.7
+   *
+   * @param[in] key The key of the property to search for.
+   * @return the matching property index of either the string key or the matching
+   * custom property index of the index key, or Property::INVALID_INDEX if no
+   * property matches the given key.
+   *
+   * @note See also, GetPropertyIndex(Property::Index) and GetPropertyIndex(const std::string&)
+   */
+  Property::Index GetPropertyIndex( Property::Key key ) const;
+
+  /**
    * @brief Query whether a property can be set using SetProperty().
    *
    * @SINCE_1_0.0

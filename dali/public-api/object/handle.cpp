@@ -95,6 +95,11 @@ Property::Index Handle::GetPropertyIndex( Property::Index key ) const
   return GetImplementation(*this).GetPropertyIndex( key );
 }
 
+Property::Index Handle::GetPropertyIndex( Property::Key key ) const
+{
+  return GetImplementation(*this).GetPropertyIndex( key );
+}
+
 bool Handle::IsPropertyWritable( Property::Index index ) const
 {
   return GetImplementation(*this).IsPropertyWritable( index );

@@ -171,7 +171,7 @@ int UtcDaliHandleGetPropertyName(void)
   END_TEST;
 }
 
-int UtcDaliHandleGetPropertyIndex(void)
+int UtcDaliHandleGetPropertyIndex01(void)
 {
   tet_infoline("Positive Test Dali::Handle::GetPropertyIndex()");
   TestApplication application;
@@ -185,6 +185,81 @@ int UtcDaliHandleGetPropertyIndex(void)
   DALI_TEST_CHECK( index == actor.GetPropertyIndex( name ) );
   END_TEST;
 }
+
+int UtcDaliHandleGetPropertyIndex02(void)
+{
+  tet_infoline("Positive Test Dali::Handle::GetPropertyIndex() int key");
+  TestApplication application;
+
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX+1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float withFlake(99.f);
+
+  Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
+  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterProperty( "MyPropertyTwo", Vector3::ONE );
+  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
+  Property::Index index5 = actor.RegisterProperty( "MyPropertyThree", Vector3::ONE );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test that we can get the property index from the integer key
+  Property::Index testIndex1 = actor.GetPropertyIndex( key1 );
+  Property::Index testIndex2 = actor.GetPropertyIndex( key2 );
+
+  DALI_TEST_EQUALS( index2, testIndex1, TEST_LOCATION );
+  DALI_TEST_EQUALS( index4, testIndex2, TEST_LOCATION );
+
+  // Test that we keep the same indices on the named properties
+  Property::Index testIndex = actor.GetPropertyIndex("MyPropertyOne");
+  DALI_TEST_EQUALS(testIndex, index1, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("MyPropertyTwo");
+  DALI_TEST_EQUALS(testIndex, index3, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("MyPropertyThree");
+  DALI_TEST_EQUALS(testIndex, index5, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("sideColor");
+  DALI_TEST_EQUALS(testIndex, index2, TEST_LOCATION);
+  testIndex = actor.GetPropertyIndex("iceCream");
+  DALI_TEST_EQUALS(testIndex, index4, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(defaultPropertyCount+5, actor.GetPropertyCount(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyIndex03(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  std::string myName("croydon");
+  Property::Index intKey = CORE_PROPERTY_MAX_INDEX+1;
+  Property::Value value( Color::GREEN );
+  Property::Index myIndex = actor.RegisterProperty( intKey, myName, value );
+
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( intKey ), TEST_LOCATION );
+
+  Property::Key key1(myName);
+  Property::Key key2(intKey);
+
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( key1 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( key2 ), TEST_LOCATION );
+  END_TEST;
+}
+
 
 int UtcDaliHandleIsPropertyWritable(void)
 {
@@ -678,58 +753,6 @@ int UtcDaliHandleRegisterProperty02(void)
 }
 
 
-int UtcDaliHandleGetPropertyIndex02(void)
-{
-  tet_infoline("Positive Test Dali::Handle::GetPropertyIndex() int key");
-  TestApplication application;
-
-  Stage stage = Stage::GetCurrent();
-
-  Actor actor = Actor::New();
-  stage.Add( actor );
-
-  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
-
-  application.SendNotification();
-  application.Render();
-
-  Property::Index key1 = CORE_PROPERTY_MAX_INDEX+1;
-  Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
-
-  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
-  const float withFlake(99.f);
-
-  Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
-  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
-  Property::Index index3 = actor.RegisterProperty( "MyPropertyTwo", Vector3::ONE );
-  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
-  Property::Index index5 = actor.RegisterProperty( "MyPropertyThree", Vector3::ONE );
-
-  application.SendNotification();
-  application.Render();
-
-  // Test that we can get the property index from the integer key
-  Property::Index testIndex1 = actor.GetPropertyIndex( key1 );
-  Property::Index testIndex2 = actor.GetPropertyIndex( key2 );
-
-  DALI_TEST_EQUALS( index2, testIndex1, TEST_LOCATION );
-  DALI_TEST_EQUALS( index4, testIndex2, TEST_LOCATION );
-
-  // Test that we keep the same indices on the named properties
-  Property::Index testIndex = actor.GetPropertyIndex("MyPropertyOne");
-  DALI_TEST_EQUALS(testIndex, index1, TEST_LOCATION);
-  testIndex = actor.GetPropertyIndex("MyPropertyTwo");
-  DALI_TEST_EQUALS(testIndex, index3, TEST_LOCATION);
-  testIndex = actor.GetPropertyIndex("MyPropertyThree");
-  DALI_TEST_EQUALS(testIndex, index5, TEST_LOCATION);
-  testIndex = actor.GetPropertyIndex("sideColor");
-  DALI_TEST_EQUALS(testIndex, index2, TEST_LOCATION);
-  testIndex = actor.GetPropertyIndex("iceCream");
-  DALI_TEST_EQUALS(testIndex, index4, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(defaultPropertyCount+5, actor.GetPropertyCount(), TEST_LOCATION);
-  END_TEST;
-}
 
 int UtcDaliHandleGetProperty(void)
 {

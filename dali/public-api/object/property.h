@@ -59,6 +59,11 @@ struct DALI_IMPORT_API Property
   class Value;
 
   /**
+   * @brief A Key used by Map
+   */
+  struct Key;
+
+  /**
    * @brief A Map of property values.
    */
   class Map;
