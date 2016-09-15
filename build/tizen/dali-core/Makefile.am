@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Samsung Electronics Co., Ltd.
+# Copyright (c) 2016 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 develapisignalsdir = $(develapidir)/signals
 develapithreadingdir = $(develapidir)/threading
+develapishadereffectsdir = $(develapidir)/shader-effects
 
 develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
@@ -104,7 +105,7 @@ develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 develapisignals_HEADERS = $(devel_api_core_signals_header_files)
 develapithreading_HEADERS = $(devel_api_core_threading_header_files)
-
+develapishadereffects_HEADERS = $(devel_api_core_shader_effects_header_files)
 
 #public api
 publicapidir = $(devincludepath)/dali/public-api
@@ -119,7 +120,6 @@ publicapirenderingdir = $(publicapidir)/rendering
 publicapirendertasksdir = $(publicapidir)/render-tasks
 publicapisignalsdir = $(publicapidir)/signals
 publicapisizenegotiationdir = $(publicapidir)/size-negotiation
-publicapishadereffectsdir = $(publicapidir)/shader-effects
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
@@ -133,7 +133,6 @@ publicapirendering_HEADERS = $(public_api_core_rendering_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
-publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h

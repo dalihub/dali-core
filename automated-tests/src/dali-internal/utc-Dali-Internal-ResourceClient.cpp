@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <test-native-image.h>
 
 // Internal headers are allowed here
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/resources/texture-metadata.h>
 #include <dali/internal/update/resources/resource-manager.h>
