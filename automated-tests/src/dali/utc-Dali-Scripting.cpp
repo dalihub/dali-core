@@ -741,7 +741,7 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
 
   // Change values
   {
-    ResourceImage image = ResourceImage::New( "MY_PATH", ResourceImage::ON_DEMAND, Image::UNUSED, ImageDimensions( 300, 400 ), FittingMode::FIT_WIDTH );
+    ResourceImage image = ResourceImage::New( "MY_PATH", ImageDimensions( 300, 400 ), FittingMode::FIT_WIDTH );
 
     Property::Map map;
     CreatePropertyMap( image, map );

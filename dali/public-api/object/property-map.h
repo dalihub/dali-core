@@ -111,6 +111,53 @@ public:
    */
   void Insert( Property::Index key, const Value& value );
 
+
+  /**
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( const char* key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
+  /**
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( const std::string& key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
+
+  /**
+   * @brief Inserts the key-value pair in the Map, with the key type as index.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( Property::Index key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
   /**
    * DEPRECATED_1_1.39. Retrieve the value with key instead of position, Use Find( key ) instead.
    *

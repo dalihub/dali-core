@@ -36,23 +36,12 @@ EncodedBufferImage::EncodedBufferImage(Internal::EncodedBufferImage* internal)
 {
 }
 
-EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage,
-                                            std::size_t encodedImageByteCount,
-                                            ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
-                                            ReleasePolicy releasePol,
-                                            bool orientationCorrection )
-{
-  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, orientationCorrection, releasePol );
-  EncodedBufferImage image(internal.Get());
-  return image;
-}
-
 EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount )
 {
   ImageDimensions size(0, 0);
   FittingMode::Type fittingMode = FittingMode::DEFAULT;
   SamplingMode::Type samplingMode = SamplingMode::DEFAULT;
-  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, true, Dali::Image::NEVER );
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, true );
   EncodedBufferImage image( internal.Get() );
   return image;
 }
@@ -62,7 +51,7 @@ EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage,
                                             ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
                                             bool orientationCorrection )
 {
-  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, orientationCorrection, Dali::Image::NEVER );
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, orientationCorrection );
   EncodedBufferImage image(internal.Get());
   return image;
 }

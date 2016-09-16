@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ int UtcDaliHitTestAlgorithmWithFunctorOnRenderTask(void)
   RenderTask renderTask[2];
   renderTask[0] = taskList.GetTask( 0u );
 
-  FrameBufferImage frameBufferImage =  FrameBufferImage::New(stageSize.width, stageSize.height, Pixel::A8, Image::NEVER);
+  FrameBufferImage frameBufferImage =  FrameBufferImage::New(stageSize.width, stageSize.height, Pixel::A8);
   renderTask[1] = taskList.CreateTask();
   renderTask[1].SetSourceActor( actor[1] );
   renderTask[1].SetExclusive( true );

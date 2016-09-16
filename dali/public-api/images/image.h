@@ -60,19 +60,6 @@ class DALI_IMPORT_API Image : public BaseHandle
 public:
 
   /**
-   * @DEPRECATED_1_1.3. Image resource is released as soon as last handle is released.
-   * @brief ReleasePolicy controls the way images are deleted from memory.
-   * @SINCE_1_0.0
-   * @remarks This is an experimental feature and might not be supported in the next release.
-   * We do recommend not to use it.
-   */
-  enum ReleasePolicy
-  {
-    UNUSED, ///< release resource once image is not in use anymore (eg. all actors using it become offstage). Reload when resource is required again. @SINCE_1_0.0
-    NEVER   ///< keep image data for the lifetime of the object. (default) @SINCE_1_0.0
-  };
-
-  /**
    * @brief Type of signal for Image Uploaded.
    * @SINCE_1_0.0
    */
@@ -123,18 +110,6 @@ public:
    * @return Handle to a Image object or an uninitialized handle
    */
   static Image DownCast( BaseHandle handle );
-
-  /**
-   * @DEPRECATED_1_1.3
-   *
-   * @brief Return resource release policy.
-   *
-   * @SINCE_1_0.0
-   * @remarks This is an experimental feature and might not be supported in the next release.
-   * We do recommend not to use it.
-   * @return Resource release policy
-   */
-  ReleasePolicy GetReleasePolicy() const;
 
   /**
    * @brief Returns the width of the image.
