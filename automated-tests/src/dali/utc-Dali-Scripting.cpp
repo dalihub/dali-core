@@ -549,6 +549,46 @@ int UtcDaliScriptingNewActorProperties(void)
   END_TEST;
 }
 
+int UtcDaliScriptingNewAnimation(void)
+{
+  TestApplication application;
+
+  Property::Map map;
+  map["actor"] = "Actor1";
+  map["property"] = "color";
+  map["value"] = Color::MAGENTA;
+  map["alphaFunction"] = "EASE_IN_OUT";
+
+  Property::Map timePeriod;
+  timePeriod["delay"] = 0.5f;
+  timePeriod["duration"] = 1.0f;
+  map["timePeriod"] = timePeriod;
+
+  Dali::AnimationData data;
+  Scripting::NewAnimation( map, data );
+
+  Actor actor = Actor::New();
+  actor.SetName("Actor1");
+  actor.SetColor(Color::CYAN);
+  Stage::GetCurrent().Add(actor);
+
+  Animation anim = data.CreateAnimation( actor, 0.5f );
+  anim.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(500); // Start animation
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), (Color::MAGENTA+Color::CYAN)*0.5f, TEST_LOCATION);
+
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliScriptingNewActorChildren(void)
 {
   TestApplication application;

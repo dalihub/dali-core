@@ -195,10 +195,14 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 
   for( size_t i = 0u; i < numComponents; ++i )
   {
-    StringValuePair component = mFormat.GetPair( i );
+    KeyValuePair component = mFormat.GetKeyValue( i );
 
     // Get the name
-    format->components[i].name = component.first;
+    if(component.first.type == Property::Key::INDEX)
+    {
+      continue;
+    }
+    format->components[i].name = component.first.stringKey;
 
     // enums are stored in the map as int
     Property::Type type = Property::Type( component.second.Get<int>() );

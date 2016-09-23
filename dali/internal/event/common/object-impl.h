@@ -156,6 +156,11 @@ public:
   virtual Property::Index GetPropertyIndex( Property::Index key ) const;
 
   /**
+   * @copydoc Dali::Handle::GetPropertyIndex()
+   */
+  virtual Property::Index GetPropertyIndex( Property::Key key ) const;
+
+  /**
    * @copydoc Dali::Handle::IsPropertyWritable()
    */
   virtual bool IsPropertyWritable( Property::Index index ) const;
