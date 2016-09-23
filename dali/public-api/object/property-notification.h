@@ -125,6 +125,7 @@ public:
   /**
    * @brief Get the target handle that this notification is observing.
    * @SINCE_1_0.0
+   * @return The target handle
    */
   Dali::Handle GetTarget() const;
 

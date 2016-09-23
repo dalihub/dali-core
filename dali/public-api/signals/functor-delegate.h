@@ -59,6 +59,7 @@ struct FunctorDestroyer
   /**
    * @brief Dispatcher to delete an object
    * @SINCE_1_0.0
+   * @param[in] functorPtr A functor object to delete
    */
   static void Delete( void* functorPtr )
   {
