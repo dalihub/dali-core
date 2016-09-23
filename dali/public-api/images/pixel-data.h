@@ -40,6 +40,10 @@ class DALI_IMPORT_API PixelData : public BaseHandle
 {
 public:
 
+  /**
+   * @brief Function to release the pixel buffer
+   * @SINCE_1_1.43
+   */
   enum ReleaseFunction
   {
     FREE,          ///< Use free function to release the pixel buffer     @SINCE_1_1.43
@@ -56,6 +60,7 @@ public:
    * @param[in] height           Buffer height in pixels
    * @param[in] pixelFormat      The pixel format
    * @param[in] releaseFunction  The function used to release the memory.
+   * @return A handle to the PixelData
    */
   static PixelData New( unsigned char* buffer,
                         unsigned int bufferSize,

@@ -89,6 +89,7 @@ public:
    *
    * @SINCE_1_1.37
    * @param[in]  other  The TouchData to copy from.
+   * @return A reference to this
    */
   TouchData& operator=( const TouchData& other );
 

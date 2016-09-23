@@ -99,6 +99,7 @@ public:
  /**
   * @brief Query whether blending is required
   * @SINCE_1_0.0
+  * @return true if blending is required
   */
   virtual bool RequiresBlending() const = 0;
 
