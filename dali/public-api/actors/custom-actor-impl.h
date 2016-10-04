@@ -325,7 +325,8 @@ protected: // For derived classes
    */
   enum ActorFlags
   {
-    ACTOR_BEHAVIOUR_NONE          = 0,
+    ACTOR_BEHAVIOUR_NONE          = 0,          ///< Use if no change to default behaviour is needed. @DEPRECATED_1_2_10
+    ACTOR_BEHAVIOUR_DEFAULT       = 0,          ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
     DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
     REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required. @SINCE_1_0.0
     REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required. @SINCE_1_0.0
