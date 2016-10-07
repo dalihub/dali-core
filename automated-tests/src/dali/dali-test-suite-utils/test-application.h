@@ -73,6 +73,7 @@ public:
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
   void SetSurfaceWidth( unsigned int width, unsigned height );
+  void SetTopMargin( unsigned int margin );
   bool Render( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
   unsigned int GetUpdateStatus();
   bool UpdateOnly( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL );

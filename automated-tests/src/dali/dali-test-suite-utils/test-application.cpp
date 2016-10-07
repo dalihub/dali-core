@@ -154,6 +154,11 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
 }
 
+void TestApplication::SetTopMargin( unsigned int margin )
+{
+  mCore->SetTopMargin( margin );
+}
+
 void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* location )
 {
   if( GetUpdateStatus() == 0 &&

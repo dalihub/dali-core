@@ -186,22 +186,29 @@ void Stage::Remove( Actor& actor )
   mRootLayer->Remove( actor );
 }
 
-void Stage::SetSize(float width, float height)
+void Stage::SurfaceResized(float width, float height)
 {
+  mSurfaceSize.width = width;
+  mSurfaceSize.height = height;
+
   // Internally we want to report the actual size of the stage.
-  mSize.width  = width;
-  mSize.height = height;
+  mSize.width = width;
+  mSize.height = height - mTopMargin;
 
   // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-  mDefaultCamera->SetPerspectiveProjection( mSize );
+  mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
 
-  // The depth of the stage gets set to the maximun of these values
-  mRootLayer->SetSize( mSize );
+  // Adjust the camera height to allow for top-margin
+  SetDefaultCameraPosition();
+
+  mRootLayer->SetSize( mSize.width, mSize.height );
 
   // Repeat for SystemOverlay actors
   if( mSystemOverlay )
   {
-    mSystemOverlay->GetImpl()->SetSize( mSize.width, mSize.height );
+    // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
+    // This will remain unaffected by changes in SetDefaultCameraPosition()
+    mSystemOverlay->GetImpl()->SetSize( width, height );
   }
 
   SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
@@ -224,6 +231,23 @@ Vector2 Stage::GetSize() const
   return mSize;
 }
 
+void Stage::SetTopMargin( unsigned int margin )
+{
+  if (mTopMargin == margin)
+  {
+    return;
+  }
+  mTopMargin = margin;
+
+  mSize.width = mSurfaceSize.width;
+  mSize.height = mSurfaceSize.height - mTopMargin;
+
+  // Adjust the camera height to allow for top-margin
+  SetDefaultCameraPosition();
+
+  mRootLayer->SetSize( mSize.width, mSize.height );
+}
+
 RenderTaskList& Stage::GetRenderTaskList() const
 {
   return *mRenderTaskList;
@@ -237,6 +261,11 @@ void Stage::CreateDefaultCameraActor()
   mDefaultCamera = CameraActor::New( Size::ZERO );
   mDefaultCamera->SetParentOrigin(ParentOrigin::CENTER);
   Add(*(mDefaultCamera.Get()));
+}
+
+void Stage::SetDefaultCameraPosition()
+{
+  mDefaultCamera->SetY( -(static_cast<float>(mTopMargin) * 0.5f) );
 }
 
 Actor& Stage::GetDefaultRootActor()
@@ -623,6 +652,7 @@ Stage::Stage( AnimationPlaylist& playlist,
   mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
+  mTopMargin( 0 ),
   mSystemOverlay(NULL)
 {
 }
