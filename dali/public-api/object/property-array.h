@@ -102,12 +102,14 @@ public:
   /**
    * @brief Increase the capcity of the array.
    * @SINCE_1_0.0
+   * @param[in] size The size to reserve
    */
   void Reserve( SizeType size );
 
   /**
    * @brief Resize to size.
    * @SINCE_1_0.0
+   * @param[in] size The size to resize
    */
   void Resize( SizeType size );
 
