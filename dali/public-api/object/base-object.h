@@ -75,7 +75,13 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @copydoc Dali::BaseHandle::DoConnectSignal
+   * @brief Not intended for application developers.
+   *
+   * @SINCE_1_0.0
+   * @param [in] connectionTracker A connection tracker which can be used to disconnect.
+   * @param [in] signalName Name of the signal to connect to.
+   * @param [in] functorDelegate A newly allocatated functor delegate (takes ownership).
+   * @return True if the signal was available.
    */
   bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
 

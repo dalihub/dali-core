@@ -43,6 +43,7 @@ public:
    * @brief Creates a new Sampler object
    *
    * @SINCE_1_1.43
+   * @return A handle to the Sampler
    */
   static Sampler New();
 
@@ -102,8 +103,8 @@ public:
    * @brief Set the wrap modes for this sampler
    *
    * @SINCE_1_1.43
-   * param[in] uWrap Wrap mode for u coordinates
-   * param[in] vWrap Wrap mode for v coordinates
+   * @param[in] uWrap Wrap mode for u coordinates
+   * @param[in] vWrap Wrap mode for v coordinates
    */
   void SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap );
 
@@ -111,9 +112,9 @@ public:
    * @brief Set the wrap modes for this sampler
    *
    * @SINCE_1_1.43
-   * param[in] rWrap Wrap mode for the z direction
-   * param[in] sWrap Wrap mode for the x direction
-   * param[in] tWrap Wrap mode for the y direction
+   * @param[in] rWrap Wrap mode for the z direction
+   * @param[in] sWrap Wrap mode for the x direction
+   * @param[in] tWrap Wrap mode for the y direction
    */
   void SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap );
 

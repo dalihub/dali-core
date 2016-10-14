@@ -51,7 +51,11 @@ struct Vector2;
  *
  * The first point is the primary point that's used for hit-testing.
  * @SINCE_1_1.37
- * @note Should not use this in a TouchData container as it is just a handle and the internal object can change.
+ * @note As this is a handle to an internal object, it should not be copied (or used in a container) as all that will do is copy the handle to the same object.
+ * The internal object can change which may not be what an application writer expects.
+ * If data does need to be stored in the application, then only the required data should be saved (retrieved using the methods of this class).
+ *
+ * Should not use this in a TouchData container as it is just a handle and the internal object can change.
  */
 class DALI_IMPORT_API TouchData : public BaseHandle
 {
@@ -89,6 +93,7 @@ public:
    *
    * @SINCE_1_1.37
    * @param[in]  other  The TouchData to copy from.
+   * @return A reference to this
    */
   TouchData& operator=( const TouchData& other );
 

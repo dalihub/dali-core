@@ -431,6 +431,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] geometry Geometry to be used by this renderer
    * @param[in] shader Shader to be used by this renderer
+   * @return A handle to the Renderer
    */
   static Renderer New( Geometry& geometry, Shader& shader );
 
