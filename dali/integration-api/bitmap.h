@@ -97,7 +97,7 @@ public:
    * OWNED_RETAIN means that the data is owned and must be kept in CPU memory
    * e.g. for an image that cannot be reloaded from disk.
    */
-  static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable );
+  static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_DISCARD );
 
   /** \name GeneralFeatures
    * Features that are generic between profiles. */

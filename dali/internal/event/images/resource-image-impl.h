@@ -61,11 +61,6 @@ public:
                           const ImageAttributes& attributes );
 
   /**
-   * @copydoc Dali::ResourceImage::GetLoadingState()
-   */
-  Dali::LoadingState GetLoadingState() const { return mTicket ? mTicket->GetLoadingState() : ResourceLoading; }
-
-  /**
    * @copydoc Dali::ResourceImage::LoadingFinishedSignal()
    */
   Dali::ResourceImage::ResourceImageSignal& LoadingFinishedSignal() { return mLoadingFinished; }
@@ -82,16 +77,6 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
-   * Get the attributes of the image.
-   * Only to be used after the image has finished loading.
-   * (Ticket's LoadingSucceeded callback was called)
-   * Reflects the last cached values after a LoadComplete.
-   * If requested width or height was 0, they are replaced by concrete dimensions.
-   * @return a copy of the attributes
-   */
-  const ImageAttributes& GetAttributes() const;
-
-  /**
    * @copydoc Dali::ResourceImage::GetUrl()
    */
   const std::string& GetUrl() const;
@@ -100,6 +85,11 @@ public:
    * @copydoc Dali::ResourceImage::Reload()
    */
   void Reload();
+
+  LoadingState GetLoadingState() const
+  {
+    return mLoadingState;
+  }
 
   /**
    * @copydoc Dali::Image::GetWidth()
@@ -126,17 +116,10 @@ public:
    */
   virtual void Disconnect();
 
-public: // From ResourceTicketObserver
-
   /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingFailed()
+   * helper to emit signal at end of frame
    */
-  virtual void ResourceLoadingFailed(const ResourceTicket& ticket);
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingSucceeded()
-   */
-  virtual void ResourceLoadingSucceeded(const ResourceTicket& ticket);
+  void EmitSignal();
 
 protected:
 
@@ -152,19 +135,12 @@ protected:
 
 private:
 
-  /**
-   * Helper method to set new resource ticket. Stops observing current ticket if any, and starts observing
-   * the new one or just resets the intrusive pointer.
-   * @param[in] ticket pointer to new resource Ticket or NULL.
-   */
-  void SetTicket( ResourceTicket* ticket );
+  Integration::BitmapPtr          mBitmap;
+  Integration::BitmapResourceType mParameters;
+  std::string                     mUrl;
+  LoadingState                    mLoadingState;
 
-private:
-
-  ImageFactory& mImageFactory;
-
-  ImageFactoryCache::RequestPtr mRequest; ///< contains the initially requested attributes for image. Request is reissued when memory was released.
-
+  SlotDelegate<ResourceImage>     mSlotDelegate;
   Dali::ResourceImage::ResourceImageSignal mLoadingFinished;
 
   // Changes scope, should be at end of class
