@@ -52,7 +52,6 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   EncodedBufferImagePtr image( new EncodedBufferImage() );
   image->Initialize(); // Second stage initialization
 
-  // Replicate the functionality of ImageFactory::load() without the filesystem caching:
   Dali::Integration::BitmapResourceType resourceType( size, fittingMode, samplingMode, orientationCorrection );
   RequestBufferPtr buffer( new RequestBuffer );
   buffer->GetVector().Resize( encodedImageByteCount );

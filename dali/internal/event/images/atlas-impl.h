@@ -179,7 +179,6 @@ private:
 private:
 
   ResourceClient&          mResourceClient;
-  ImageFactory&            mImageFactory;
   Vector4                  mClearColor;       ///< The background clear color
   Vector<Tile*>            mTiles;            ///< The url resources, which would recover automatically when regaining context
   Pixel::Format            mPixelFormat;      ///< The pixel format (rgba 32 bit by default)

@@ -34,7 +34,6 @@ namespace Internal
 {
 
 class Image;
-class ImageFactory;
 typedef IntrusivePtr<Image> ImagePtr;
 
 /**
