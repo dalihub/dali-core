@@ -130,6 +130,18 @@ public:
   void PushBack( const Value& value );
 
   /**
+   * @brief Add an element to the array.
+   *
+   * @SINCE_1_2.11
+   * @param[in] value The value to add to the end of the array
+   */
+  inline Property::Array& Add( const Value& value )
+  {
+    PushBack( value );
+    return *this;
+  }
+
+  /**
    * @brief Const access an element.
    *
    * @SINCE_1_0.0
