@@ -49,6 +49,29 @@ int UtcDaliPropertyArrayPushBackP(void)
   END_TEST;
 }
 
+int UtcDaliPropertyArrayAddP(void)
+{
+  Property::Array array;
+
+  DALI_TEST_CHECK( 0 == array.Size() );
+
+  array.Add( 1 );
+
+  DALI_TEST_CHECK( 1 == array.Size() );
+  DALI_TEST_CHECK( array[0].Get<int>() == 1 );
+
+  array.Add( 2 )
+       .Add( 3 )
+       .Add( 4.f );
+
+  DALI_TEST_EQUALS( 4u, array.Size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( array[1].Get<int>(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( array[2].Get<int>(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( array[3].Get<float>(), 4.f, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliPropertyArrayCapacityP(void)
 {
   Property::Array array;
