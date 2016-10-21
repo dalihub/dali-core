@@ -95,7 +95,7 @@ NewTexture::~NewTexture()
 
 bool NewTexture::Upload( PixelDataPtr pixelData )
 {
-  return Upload( pixelData, 0u, 0u, 0u, 0u, mWidth, mHeight );
+  return Upload( pixelData, 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight() );
 }
 
 bool NewTexture::Upload( PixelDataPtr pixelData,

@@ -466,6 +466,53 @@ int UtcDaliTextureUpload05(void)
   END_TEST;
 }
 
+int UtcDaliTextureUploadSmallerThanSize(void)
+{
+  TestApplication application;
+
+  //Create the texture
+  unsigned int width(64);
+  unsigned int height(64);
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  //TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+    std::string params;
+    DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("TexImage2D", params ) );
+    DALI_TEST_EQUALS( out.str(), params, TEST_LOCATION );
+  }
+
+  //Upload data to the texture
+  callStack.Reset();
+
+  unsigned int bufferSize( width * height * 4 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width/2, height/2, Pixel::RGBA8888, PixelData::FREE );
+  texture.Upload( pixelData );
+  application.SendNotification();
+  application.Render();
+
+  //TexImage2D should be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " <<  0u << ", " << width/2 << ", " <<  height/2;
+    std::string params;
+    DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("TexSubImage2D", params ) );
+    DALI_TEST_EQUALS( out.str(), params, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextureGenerateMipmaps(void)
 {
   TestApplication application;

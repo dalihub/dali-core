@@ -79,6 +79,14 @@ public:
   bool FindMethod(std::string method) const;
 
   /**
+   * Search for a method in the stack and return its parameters if found
+   * @param[in] method The name of the method
+   * @param[out] params of the method
+   * @return true if the method was in the stack
+   */
+  bool FindMethodAndGetParameters(std::string method, std::string& params ) const;
+
+  /**
    * Count how many times a method was called
    * @param[in] method The name of the method
    * @return The number of times it was called

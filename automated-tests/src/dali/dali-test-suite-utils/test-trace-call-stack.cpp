@@ -101,6 +101,21 @@ bool TraceCallStack::FindMethod(std::string method) const
   return found;
 }
 
+bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string& params ) const
+{
+  bool found = false;
+  for( size_t i=0; i < mCallStack.size(); i++ )
+  {
+    if( 0 == mCallStack[i].method.compare(method) )
+    {
+      found = true;
+      params = mCallStack[i].paramList;
+      break;
+    }
+  }
+  return found;
+}
+
 int TraceCallStack::CountMethod(std::string method) const
 {
   int numCalls = 0;
