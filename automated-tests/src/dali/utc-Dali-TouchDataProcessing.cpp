@@ -1542,6 +1542,13 @@ int UtcDaliTouchDataClippedActor(void)
   clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   stage.Add( clippingActor );
 
+  // Add a child to the clipped region.
+  Actor clippingChild = Actor::New();
+  clippingChild.SetSize( 50.0f, 50.0f );
+  clippingChild.SetPosition( 25.0f, 25.0f );
+  clippingChild.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  clippingActor.Add( clippingChild );
+
   // Render and notify.
   application.SendNotification();
   application.Render();
@@ -1551,13 +1558,20 @@ int UtcDaliTouchDataClippedActor(void)
   TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
-  // Emit an event within clipped area.
+  // Emit an event within clipped area - no hit.
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
   // Emit an event outside the clipped area but within the actor area, we should have a hit.
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  clippingChild.TouchSignal().Connect( &application, functor );
+
+  // Emit an event inside part of the child which is within the clipped area, we should have a hit.
+  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 30.0f, 30.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
 

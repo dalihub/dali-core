@@ -233,7 +233,8 @@ HitActor HitTestWithinLayer( Actor& actor,
               // Here we calculate a comparison mask by setting all the bits up to the current depth value.
               // EG. a depth of 4 (10000 binary) = a mask of 1111 binary.
               // This allows us a fast way of comparing all bits are set up to this depth.
-              unsigned int clippingDepthMask = ( 1u << clippingDepth ) - 1u;
+              // Note: If the current Actor has clipping, that is included in the depth mask too.
+              unsigned int clippingDepthMask = ( 1u << newClippingDepth ) - 1u;
 
               // The two masks must be equal to be a hit, as we are already assuming a hit
               // (for non-clipping mode) then they must be not-equal to disqualify the hit.
