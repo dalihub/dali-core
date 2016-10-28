@@ -112,9 +112,9 @@ public:
    * @brief Create Shader.
    *
    * @SINCE_1_1.43
-   * @param[in] vertexShader Vertex shader code for the effect. If you pass in an empty string, the default version will be used
-   * @param[in] fragmentShader fragment shader code for the effect. If you pass in an empty string, the default version will be used
-   * @param[in] hints GeometryHints to define the geometry of the rendered object
+   * @param[in] vertexShader Vertex shader code for the effect.
+   * @param[in] fragmentShader Fragment Shader code for the effect.
+   * @param[in] hints Hints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
   static Shader New( const std::string& vertexShader,
