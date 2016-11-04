@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <iomanip>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -231,16 +232,16 @@ namespace
 struct LocationPosition
 {
   GLint uniformLocation; ///< The location of the uniform (used as an identifier)
-  int characterPosition; ///< the position of the uniform declaration
-  LocationPosition( GLint uniformLocation, int characterPosition )
-  : uniformLocation(uniformLocation), characterPosition(characterPosition)
+  int position;          ///< the position of the uniform declaration
+  LocationPosition( GLint uniformLocation, int position )
+  : uniformLocation(uniformLocation), position(position)
   {
   }
 };
 
 bool sortByPosition( LocationPosition a, LocationPosition b )
 {
-  return a.characterPosition < b.characterPosition;
+  return a.position < b.position;
 }
 }
 
@@ -270,29 +271,55 @@ void Program::GetActiveSamplerUniforms()
       {
         GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
         samplerNames.push_back(name);
-        samplerUniformLocations.push_back(LocationPosition(location, 0u));
+        samplerUniformLocations.push_back(LocationPosition(location, -1));
       }
     }
   }
 
-  if( samplerUniformLocations.size() > 1 )
+  //Determine declaration order of each sampler
+  char* fragShader = strdup( mProgramData->GetFragmentShader() );
+  const char* token = strtok( fragShader, " ;\n");
+  int samplerPosition = 0;
+  while( token )
   {
-    // Now, re-order according to declaration order in the fragment source.
-    std::string fragShader( mProgramData->GetFragmentShader() );
-    for( unsigned int i=0; i<samplerUniformLocations.size(); ++i )
+    if( ( strncmp( token, "sampler2D", 9u ) == 0 ) || ( strncmp( token, "samplerCube", 11u ) == 0 ) )
     {
-      // Better to write own search algorithm that searches for all of
-      // the sampler names simultaneously, ensuring only one iteration
-      // over fragShader.
-      size_t characterPosition = fragShader.find( samplerNames[i] );
-      samplerUniformLocations[i].characterPosition = characterPosition;
+      bool found( false );
+      token = strtok( NULL, " ;\n");
+      for( size_t i=0; i<samplerUniformLocations.size(); ++i )
+      {
+        if( samplerUniformLocations[i].position == -1 &&
+            strncmp( token, samplerNames[i].c_str(), samplerNames[i].size() ) == 0 )
+        {
+          samplerUniformLocations[i].position = samplerPosition++;
+          found = true;
+          break;
+        }
+      }
+      if( !found )
+      {
+        DALI_LOG_ERROR("Sampler uniform %s declared but not used in the shader\n", token );
+      }
     }
+    else
+    {
+      token = strtok( NULL, " ;\n");
+    }
+  }
+
+  free( fragShader );
+
+  // Re-order according to declaration order in the fragment source.
+  size_t samplerUniformCount = samplerUniformLocations.size();
+  if( samplerUniformCount > 1 )
+  {
     std::sort( samplerUniformLocations.begin(), samplerUniformLocations.end(), sortByPosition);
   }
 
-  for( unsigned int i=0; i<samplerUniformLocations.size(); ++i )
+  mSamplerUniformLocations.resize( samplerUniformCount );
+  for( size_t i=0; i<samplerUniformCount; ++i )
   {
-    mSamplerUniformLocations.push_back( samplerUniformLocations[i].uniformLocation );
+    mSamplerUniformLocations[i] = samplerUniformLocations[i].uniformLocation;
   }
 }
 
@@ -305,6 +332,11 @@ bool Program::GetSamplerUniformLocation( unsigned int index, GLint& location  )
     result = true;
   }
   return result;
+}
+
+size_t Program::GetActiveSamplerCount() const
+{
+  return mSamplerUniformLocations.size();
 }
 
 void Program::SetUniform1i( GLint location, GLint value0 )

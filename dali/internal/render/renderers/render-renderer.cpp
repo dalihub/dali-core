@@ -398,14 +398,12 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
   }
 
   std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
-  for( size_t i(0); result && i<newTextures.size(); ++i )
+  for( size_t i(0); i<newTextures.size() && result; ++i )
   {
     if( newTextures[i] )
     {
-      result = program.GetSamplerUniformLocation( i, uniformLocation ) &&
-               newTextures[i]->Bind(context, textureUnit, samplers[i] );
-
-      if( result )
+      result = newTextures[i]->Bind(context, textureUnit, samplers[i] );
+      if( result && program.GetSamplerUniformLocation( i, uniformLocation ) )
       {
         program.SetUniform1i( uniformLocation, textureUnit );
         ++textureUnit;

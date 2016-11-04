@@ -2561,3 +2561,53 @@ int UtcDaliRendererSetStencilMask(void)
 
   END_TEST;
 }
+
+int UtcDaliRendererWrongNumberOfTextures(void)
+{
+  TestApplication application;
+  tet_infoline("Test renderer does render even if number of textures is different than active samplers in the shader");
+
+  //Create a TextureSet with 4 textures (One more texture in the texture set than active samplers)
+  //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64u, 64u );
+  TextureSet textureSet = CreateTextureSet();
+  textureSet.SetTexture(0, texture );
+  textureSet.SetTexture(1, texture );
+  textureSet.SetTexture(2, texture );
+  textureSet.SetTexture(3, texture );
+  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  Actor actor= Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetPosition(0.0f,0.0f);
+  actor.SetSize(100, 100);
+  Stage::GetCurrent().Add(actor);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render(0);
+
+  //Test we do the drawcall when TextureSet has more textures than there are active samplers in the shader
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+
+  //Create a TextureSet with 1 texture (two more active samplers than texture in the texture set)
+  //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
+  textureSet = CreateTextureSet();
+  renderer.SetTextures( textureSet );
+  textureSet.SetTexture(0, texture );
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render(0);
+
+  //Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+
+  END_TEST;
+}
