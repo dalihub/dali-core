@@ -93,8 +93,9 @@ public:
 
   /**
    * @copydoc Dali::ResourceImage::GetUrl()
+   * virtual so deriving class can override it
    */
-  const std::string& GetUrl() const;
+  virtual const std::string& GetUrl() const;
 
   /**
    * @copydoc Dali::ResourceImage::Reload()

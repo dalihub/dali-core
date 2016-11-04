@@ -177,6 +177,7 @@ NinePatchImage::NinePatchImage( const std::string& filename )
 : ResourceImage(),
   mParsedBorder(false)
 {
+  mUrl = filename;
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
   mResourceClient = &tls.GetResourceClient();
 
@@ -273,6 +274,11 @@ Internal::BufferImagePtr NinePatchImage::CreateCroppedBufferImage()
     cropped->Update(area); // default area has no width or height
   }
   return cropped;
+}
+
+const std::string& NinePatchImage::GetUrl() const
+{
+  return mUrl;
 }
 
 void NinePatchImage::Connect()
