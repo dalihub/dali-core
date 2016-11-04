@@ -114,6 +114,12 @@ public:
    */
   static bool IsNinePatchUrl( const std::string& url );
 
+private: // from ResourceImage
+
+  /**
+   * @copydoc ResourceImage::GetUrl()
+   */
+  virtual const std::string& GetUrl() const;
 
 protected: // From Resource
   /**
@@ -138,6 +144,7 @@ private:
 private:
   ResourceClient*               mResourceClient;
   Integration::BitmapPtr        mBitmap;
+  std::string                   mUrl;
   StretchRanges                 mStretchPixelsX;  //< The horizontal stretchable pixels in the cropped image space
   StretchRanges                 mStretchPixelsY;  //< The vertical stretchable pixels in the cropped image space
   Rect<int>                     mChildRectangle;
