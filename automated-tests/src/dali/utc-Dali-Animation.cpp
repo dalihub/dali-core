@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -10027,5 +10027,26 @@ int UtcDaliAnimationCustomIntProperty(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), 20, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationDuration(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  Animation animation = Animation::New( 0.0f );
+  DALI_TEST_EQUALS( 0.0f, animation.GetDuration(), TEST_LOCATION );
+
+  // The animation duration should automatically increase depending on the animator time period
+
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 100.0f, TimePeriod( 0.0f, 1.0f ) );
+  DALI_TEST_EQUALS( 1.0f, animation.GetDuration(), TEST_LOCATION );
+
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), 200.0f, TimePeriod( 10.0f, 1.0f ) );
+  DALI_TEST_EQUALS( 11.0f, animation.GetDuration(), TEST_LOCATION );
+
   END_TEST;
 }
