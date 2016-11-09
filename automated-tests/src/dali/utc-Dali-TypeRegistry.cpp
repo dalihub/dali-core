@@ -20,6 +20,7 @@
 #include <limits>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/internal/event/common/type-info-impl.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/events/pinch-gesture-event.h>
@@ -843,7 +844,6 @@ int UtcDaliTypeRegistryTypeRegistrationForNamedTypeP(void)
   END_TEST;
 }
 
-// Note: No negative test case for UtcDaliTypeRegistryRegisteredName can be implemented.
 int UtcDaliTypeRegistryRegisteredNameP(void)
 {
   TestApplication application;
@@ -860,6 +860,32 @@ int UtcDaliTypeRegistryRegisteredNameP(void)
   DALI_TEST_CHECK( type );
   END_TEST;
 }
+
+
+int UtcDaliTypeRegistryRegisteredNameN(void)
+{
+  TestApplication application;
+
+  DALI_TEST_CHECK( scriptedName == scriptedType.RegisteredName() );
+
+  TypeInfo baseType = TypeRegistry::Get().GetTypeInfo( scriptedName );
+  DALI_TEST_CHECK( baseType );
+
+  // should cause an assert because we're registering same type twice
+  // once statically at the start of this file, then again now
+  try
+  {
+    TypeRegistration scriptedType( scriptedName, typeid(Dali::CustomActor), CreateCustomNamedInit );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Duplicate type name for Type Registation", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 
 int UtcDaliTypeRegistrySignalConnectorTypeP(void)
 {
@@ -1491,6 +1517,12 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   // Check property count are not changed because the child properties will not be created for the parent
   DALI_TEST_EQUALS( initialPropertyCount, customActor.GetPropertyCount(), TEST_LOCATION );
 
+  // check the child property type
+  Internal::TypeInfo& typeInfoImpl = GetImplementation( typeInfo );
+  Property::Type type = typeInfoImpl.GetChildPropertyType( typeInfoImpl.GetChildPropertyIndex("childProp4") );
+  DALI_TEST_EQUALS( type, Property::INTEGER, TEST_LOCATION );
+
+
   // Create a child actor
   Actor childActor = Actor::New();
   DALI_TEST_CHECK( childActor );
@@ -1650,6 +1682,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   // Should return the child property index by given its name
   DALI_TEST_EQUALS( childActor.GetPropertyIndex( newPropertyName ), newPropertyIndex, TEST_LOCATION );
 
+
   END_TEST;
 }
 
@@ -1786,7 +1819,7 @@ int UtcDaliPropertyRegistrationAddSameIndex(void)
   END_TEST;
 }
 
-int UtcDaliPropertyRegistrationPropertyWritable(void)
+int UtcDaliPropertyRegistrationPropertyWritableP(void)
 {
   TestApplication application;
   int propertyIndex1 = PROPERTY_REGISTRATION_START_INDEX + 200;
@@ -1807,9 +1840,36 @@ int UtcDaliPropertyRegistrationPropertyWritable(void)
   // Check whether properties are writable
   DALI_TEST_CHECK(   customActor.IsPropertyWritable( propertyIndex1 ) );
   DALI_TEST_CHECK( ! customActor.IsPropertyWritable( propertyIndex2 ) );
+
+
+  // Check the property is writable in the type registry
+  Internal::TypeInfo& typeInfoImpl = GetImplementation( typeInfo );
+
+  DALI_TEST_EQUALS( typeInfoImpl.IsPropertyWritable( propertyIndex1 ), true, TEST_LOCATION );
+
   END_TEST;
 }
 
+int UtcDaliPropertyRegistrationPropertyWritableN(void)
+{
+  // Currently Actors don't register properties with the type registry
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
+  Internal::TypeInfo& typeInfoImpl = GetImplementation( typeInfo );
+
+  try
+  {
+    typeInfoImpl.IsPropertyWritable( Actor::Property::COLOR);
+    tet_result( TET_FAIL );
+
+  }
+  catch ( DaliException& e )
+  {
+     DALI_TEST_ASSERT( e, "Cannot find property index", TEST_LOCATION );
+  }
+  END_TEST;
+
+}
 int UtcDaliPropertyRegistrationPropertyAnimatable(void)
 {
   TestApplication application;
@@ -2091,6 +2151,25 @@ int UtcDaliTypeInfoGetActionNameP(void)
 
   DALI_TEST_EQUALS( name, "show", TEST_LOCATION );
 
+
+  TypeInfo typeInfo2 = typeRegistry.GetTypeInfo( "MyTestCustomActor" );
+
+  //  search for show action in base class, given a derived class
+  bool foundChildAction = false;
+  for( std::size_t i = 0; i < typeInfo2.GetActionCount(); i++ )
+  {
+
+       std::string name = typeInfo2.GetActionName( i );
+       if( name == "show")
+       {
+         foundChildAction = true;
+       }
+
+  }
+
+  DALI_TEST_EQUALS( foundChildAction, true, TEST_LOCATION );
+
+
   END_TEST;
 }
 
@@ -2124,6 +2203,23 @@ int UtcDaliTypeInfoGetSignalNameP(void)
   std::string name = typeInfo.GetSignalName(0);
 
   DALI_TEST_EQUALS( name, "touched", TEST_LOCATION );
+
+  TypeInfo typeInfo2 = typeRegistry.GetTypeInfo( "MyTestCustomActor" );
+
+  //  search for signal in base class, given a derived class
+  bool foundSignal = false;
+  for( std::size_t i = 0; i < typeInfo2.GetSignalCount(); i++ )
+  {
+
+       std::string name = typeInfo2.GetSignalName( i );
+       if( name == "touched")
+       {
+         foundSignal = true;
+       }
+
+  }
+
+  DALI_TEST_EQUALS( foundSignal, true, TEST_LOCATION );
 
   END_TEST;
 }
