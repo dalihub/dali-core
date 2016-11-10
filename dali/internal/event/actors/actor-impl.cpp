@@ -1883,7 +1883,6 @@ bool Actor::EmitWheelEventSignal( const WheelEvent& event )
 
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
-  DALI_LOG_WARNING( "Deprecated: Use TouchSignal() instead\n" );
   return mTouchedSignal;
 }
 

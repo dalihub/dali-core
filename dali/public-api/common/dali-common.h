@@ -53,6 +53,12 @@
 #  define DALI_INTERNAL
 #endif
 
+#ifdef DEPRECATION_WARNING
+#define DALI_DEPRECATED_API __attribute__((__visibility__("default"), deprecated))
+#else
+#define DALI_DEPRECATED_API
+#endif
+
 #if defined (__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus >= 201103L)
 // C++0x support
 #define _CPP11

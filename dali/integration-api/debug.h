@@ -90,6 +90,8 @@ DALI_IMPORT_API void UninstallLogFunction();
 
 #define DALI_LOG_ERROR_NOFN(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ## args)
 
+#define DALI_LOG_WARNING_NOFN(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, format, ## args)
+
 /**
  * Provides unfiltered logging for fps monitor
  */

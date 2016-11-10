@@ -135,7 +135,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  const std::string& GetKey( SizeType position ) const;
+  const std::string& GetKey( SizeType position ) const DALI_DEPRECATED_API;
 
   /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
@@ -146,9 +146,9 @@ public:
    * @param[in] position The specified position
    * @return A reference to the pair of key and value at the specified position.
    *
-   * @note Will assert if position >= Count()
+   * @note Will assert if position >= Count() or key at position is an index key.
    */
-  StringValuePair& GetPair( SizeType position ) const;
+  StringValuePair& GetPair( SizeType position ) const DALI_DEPRECATED_API;
 
   /**
    * @brief Finds the value for the specified key if it exists.

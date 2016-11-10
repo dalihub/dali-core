@@ -771,7 +771,7 @@ public:
    * @pre The Actor has been initialized.
    * @see PositionInheritanceMode
    */
-  void SetPositionInheritanceMode( PositionInheritanceMode mode );
+  void SetPositionInheritanceMode( PositionInheritanceMode mode ) DALI_DEPRECATED_API;
 
   /**
    * @brief Set whether a child actor inherits it's parent's position.
@@ -795,7 +795,7 @@ public:
    * @return Return the position inheritance mode.
    * @pre The Actor has been initialized.
    */
-  PositionInheritanceMode GetPositionInheritanceMode() const;
+  PositionInheritanceMode GetPositionInheritanceMode() const DALI_DEPRECATED_API;
 
   /**
    * @brief Returns whether the actor inherits its parent's position.
@@ -1448,7 +1448,7 @@ public: // Signals
    * @return The signal to connect to.
    * @pre The Actor has been initialized.
    */
-  TouchSignalType& TouchedSignal();
+  TouchSignalType& TouchedSignal() DALI_DEPRECATED_API;
 
   /**
    * @brief This signal is emitted when touch input is received.
