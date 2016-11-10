@@ -303,7 +303,7 @@ public:
    * @return The touch signal to connect to.
    * @note Motion events are not emitted.
    */
-  TouchedSignalType& TouchedSignal();
+  TouchedSignalType& TouchedSignal() DALI_DEPRECATED_API;
 
   /**
    * @brief This signal is emitted when the screen is touched and when the touch ends
