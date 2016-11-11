@@ -144,7 +144,8 @@ NinePatchImage CustomizeNinePatch( TestApplication& application,
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetSynchronouslyLoadedResource( resourcePtr );
 
-  Image image = ResourceImage::New( "blah.#.png" );
+  std::string url( "blah.#.png" );
+  Image image = ResourceImage::New( url );
 
   tet_infoline("Assign image to image rendering actor");
   Actor actor = CreateRenderableActor( image );
@@ -152,6 +153,8 @@ NinePatchImage CustomizeNinePatch( TestApplication& application,
 
   tet_infoline("Downcast Image to a nine-patch image\n");
   NinePatchImage ninePatchImage = NinePatchImage::DownCast( image );
+
+  DALI_TEST_EQUALS( url, ninePatchImage.GetUrl(), TEST_LOCATION );
 
   return ninePatchImage;
 
@@ -170,9 +173,13 @@ int UtcDaliNinePatchImageNew(void)
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  image = NinePatchImage::New( "blah.#.png" );
+  std::string url("blah.#.png");
+  image = NinePatchImage::New( url );
 
   DALI_TEST_CHECK( image );
+
+  DALI_TEST_EQUALS( url, image.GetUrl(), TEST_LOCATION );
+
   END_TEST;
 }
 

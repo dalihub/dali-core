@@ -170,6 +170,12 @@ public:
   bool GetSamplerUniformLocation( unsigned int index, GLint& location );
 
   /**
+   * Get the number of active samplers present in the shader
+   * @return The number of active samplers
+   */
+  size_t GetActiveSamplerCount() const;
+
+  /**
    * Sets the uniform value
    * @param [in] location of uniform
    * @param [in] value0 as int

@@ -18,17 +18,17 @@
 #include "scene-graph-renderer.h"
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/controllers/scene-controller.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
+#include <dali/internal/update/controllers/scene-controller.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/shaders/program.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace // unnamed namespace
 {
@@ -585,7 +585,17 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
 
   if( mTextureSet )
   {
-    size_t textureCount( mTextureSet->GetTextureCount() );
+    size_t textureCount = mTextureSet->GetTextureCount();
+    size_t newTextureCount = mTextureSet->GetNewTextureCount();
+
+    Program* program = mShader->GetProgram();
+    if( program && program->GetActiveSamplerCount() != textureCount + newTextureCount )
+    {
+      DALI_LOG_ERROR("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
+                       program->GetActiveSamplerCount(),
+                       textureCount + newTextureCount );
+    }
+
     dataProvider->mTextures.resize( textureCount );
     dataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )
@@ -594,10 +604,9 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
     }
 
-    textureCount = mTextureSet->GetNewTextureCount();
-    dataProvider->mNewTextures.resize( textureCount );
-    dataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
+    dataProvider->mNewTextures.resize( newTextureCount );
+    dataProvider->mSamplers.resize( newTextureCount );
+    for( unsigned int i(0); i<newTextureCount; ++i )
     {
       dataProvider->mNewTextures[i] = mTextureSet->GetNewTexture(i);
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
