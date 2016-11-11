@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,17 @@ PanGesture::PanGesture( const PanGesture& rhs )
 
 PanGesture& PanGesture::operator=( const PanGesture& rhs )
 {
-  Gesture::operator=(rhs);
-  velocity = rhs.velocity;
-  displacement = rhs.displacement;
-  position = rhs.position;
-  screenVelocity = rhs.screenVelocity;
-  screenDisplacement = rhs.screenDisplacement;
-  screenPosition = rhs.screenPosition;
-  numberOfTouches = rhs.numberOfTouches;
+  if( this != &rhs )
+  {
+    Gesture::operator=(rhs);
+    velocity = rhs.velocity;
+    displacement = rhs.displacement;
+    position = rhs.position;
+    screenVelocity = rhs.screenVelocity;
+    screenDisplacement = rhs.screenDisplacement;
+    screenPosition = rhs.screenPosition;
+    numberOfTouches = rhs.numberOfTouches;
+  }
 
   return *this;
 }

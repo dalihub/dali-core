@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,7 @@ bool TapGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerI
 {
   bool connected( true );
   TapGestureDetector* gesture = dynamic_cast<TapGestureDetector*>(object);
+  DALI_ASSERT_DEBUG( gesture && "object is not the correct type" ); // TypeRegistry should guarantee that this is correct, but confirm with just a debug assert
 
   if ( 0 == strcmp( signalName.c_str(), SIGNAL_TAP_DETECTED ) )
   {

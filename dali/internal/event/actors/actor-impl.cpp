@@ -1386,6 +1386,8 @@ void Actor::SetRelayoutEnabled( bool relayoutEnabled )
   {
     EnsureRelayoutData();
 
+    DALI_ASSERT_DEBUG( mRelayoutData && "mRelayoutData not created" );
+
     mRelayoutData->relayoutEnabled = relayoutEnabled;
   }
 }
@@ -1916,6 +1918,8 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 {
   bool connected( true );
   Actor* actor = dynamic_cast< Actor* >( object );
+
+  DALI_ASSERT_DEBUG( actor && "object is not the correct type" ); // TypeRegistry should guarantee that this is correct, but confirm with just a debug assert
 
   if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
   {

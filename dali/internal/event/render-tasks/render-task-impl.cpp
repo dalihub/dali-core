@@ -790,6 +790,7 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 {
   bool connected( true );
   RenderTask* renderTask = dynamic_cast<RenderTask*>(object);
+  DALI_ASSERT_DEBUG( renderTask && "object is not the correct type" ); // TypeRegistry should guarantee that this is correct, but confirm with just a debug assert
 
   if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
   {

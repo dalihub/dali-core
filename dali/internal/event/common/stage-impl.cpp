@@ -521,6 +521,7 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 {
   bool connected( true );
   Stage* stage = dynamic_cast<Stage*>(object);
+  DALI_ASSERT_DEBUG( stage && "object is not the correct type" ); // TypeRegistry should guarantee that this is correct, but confirm with just a debug assert
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
   {

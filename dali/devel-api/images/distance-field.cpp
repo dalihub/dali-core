@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ void DistanceTransform( float *source, float* dest, unsigned int length )
     {
       ++rightmost;
     }
-    dest[i] = SQUARE( i - parabolas[rightmost] ) + source[parabolas[rightmost]];
+    dest[i] = SQUARE( static_cast< int >( i ) - parabolas[rightmost] ) + source[parabolas[rightmost]];
   }
 }
 
