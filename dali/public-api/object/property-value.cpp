@@ -313,6 +313,7 @@ Property::Value::Value( Property::Map& mapValue )
 }
 
 Property::Value::Value( Type type )
+: mImpl( NULL )
 {
   switch (type)
   {

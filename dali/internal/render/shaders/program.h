@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROGRAM_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -324,10 +324,9 @@ public:
 
 private:
 
-  // default constructor, not defined
-  Program();
-  // assignment operator, not defined
-  Program& operator=( const Program& );
+  Program(); ///< default constructor, not defined
+  Program( const Program& ); ///< copy constructor, not defined
+  Program& operator=( const Program& ); ///< assignment operator, not defined
 
   /**
    * Load the shader, from a precompiled binary if available, else from source code

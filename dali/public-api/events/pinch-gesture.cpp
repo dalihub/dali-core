@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,14 @@ PinchGesture::PinchGesture( const PinchGesture& rhs )
 
 PinchGesture& PinchGesture::operator=( const PinchGesture& rhs )
 {
-  Gesture::operator=(rhs);
-  scale = rhs.scale;
-  speed = rhs.speed;
-  screenCenterPoint = rhs.screenCenterPoint;
-  localCenterPoint = rhs.localCenterPoint;
+  if( this != &rhs )
+  {
+    Gesture::operator=(rhs);
+    scale = rhs.scale;
+    speed = rhs.speed;
+    screenCenterPoint = rhs.screenCenterPoint;
+    localCenterPoint = rhs.localCenterPoint;
+  }
 
   return *this;
 }
