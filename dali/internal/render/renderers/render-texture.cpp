@@ -625,11 +625,6 @@ void NewTexture::Destroy( Context& context )
   if( mId )
   {
     context.DeleteTextures( 1, &mId );
-
-    if( mNativeImage )
-    {
-      mNativeImage->GlExtensionDestroy();
-    }
   }
 }
 
@@ -650,12 +645,7 @@ void NewTexture::Initialize(Context& context)
       context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
 
       // platform specific implementation decides on what GL extension to use
-      if( mNativeImage->TargetTexture() != 0u )
-      {
-        context.DeleteTextures( 1, &mId );
-        mNativeImage->GlExtensionDestroy();
-        mId = 0u;
-      }
+      mNativeImage->TargetTexture();
     }
   }
   else
@@ -812,12 +802,6 @@ bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampl
     }
 
     ApplySampler( context, sampler );
-
-    if( mNativeImage )
-    {
-      //Allow implementation specific operations after binding the texture
-      mNativeImage->PrepareTexture();
-    }
 
     return true;
   }
