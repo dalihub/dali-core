@@ -140,7 +140,6 @@ public: // Signals
 public: // Not intended for Application developers
 
   /**
-   * @internal
    * @brief This constructor is used by PinchGestureDetector::New() methods.
    *
    * @SINCE_1_0.0

@@ -218,7 +218,6 @@ public:
   Type GetType() const;
 
   /**
-   * @internal
    * @brief Retrieve a specific value.
    *
    * Works on a best-effort approach; if value type is not convertible returns a default value of the type

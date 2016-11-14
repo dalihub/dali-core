@@ -456,7 +456,6 @@ public:
 private:
 
   /**
-   * @internal
    * @brief Set the quaternion from 3 orthonormal axes.
    *
    * @SINCE_1_0.0

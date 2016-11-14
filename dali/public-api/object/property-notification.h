@@ -176,7 +176,6 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * @internal
    * @brief This constructor is used by Dali New() methods.
    *
    * @SINCE_1_0.0

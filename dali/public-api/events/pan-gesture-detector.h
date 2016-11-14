@@ -336,7 +336,6 @@ public: // Pan Properties Setters
 public: // Not intended for Application developers
 
   /**
-   * @internal
    * @brief This constructor is used by PanGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
