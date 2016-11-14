@@ -36,8 +36,8 @@ const BlendFactor::Type   DEFAULT_BLEND_FACTOR_DEST_RGB(   BlendFactor::ONE_MINU
 const BlendFactor::Type   DEFAULT_BLEND_FACTOR_SRC_ALPHA(  BlendFactor::ONE );
 const BlendFactor::Type   DEFAULT_BLEND_FACTOR_DEST_ALPHA( BlendFactor::ONE_MINUS_SRC_ALPHA );
 
-const BlendEquation::Type DEFAULT_BLEND_EQUATION_RGB(      BlendEquation::ADD );
-const BlendEquation::Type DEFAULT_BLEND_EQUATION_ALPHA(    BlendEquation::ADD );
+const BlendEquation::Type DEFAULT_BLEND_EQUATION_RGB(   BlendEquation::ADD );
+const BlendEquation::Type DEFAULT_BLEND_EQUATION_ALPHA( BlendEquation::ADD );
 
 /**
  * @brief Get GL stencil test enumeration value as a string.
@@ -47,17 +47,6 @@ std::string GetStencilTestString(void)
 {
   std::stringstream stream;
   stream << GL_STENCIL_TEST;
-  return stream.str();
-}
-
-/**
- * @brief Get GL depth test enumeration value as a string.
- * @return The string representation of the value of GL_DEPTH_TEST
- */
-std::string GetDepthTestString(void)
-{
-  std::stringstream stream;
-  stream << GL_DEPTH_TEST;
   return stream.str();
 }
 
@@ -1058,6 +1047,8 @@ int UtcDaliRendererConstraint02(void)
   END_TEST;
 }
 
+
+
 int UtcDaliRendererAnimatedProperty01(void)
 {
   TestApplication application;
@@ -1399,6 +1390,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   END_TEST;
 }
+
 
 int UtcDaliRendererRenderOrder2DLayer(void)
 {
@@ -2045,7 +2037,7 @@ int UtcDaliRendererSetDepthFunction(void)
   END_TEST;
 }
 
-Renderer RendererTestFixture( TestApplication& application )
+Renderer StencilTestFixture( TestApplication& application )
 {
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -2061,124 +2053,12 @@ Renderer RendererTestFixture( TestApplication& application )
   return renderer;
 }
 
-int UtcDaliRendererSetDepthTestMode(void)
-{
-  TestApplication application;
-  tet_infoline("Test setting the DepthTestMode");
-
-  Renderer renderer = RendererTestFixture( application );
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace( true );
-  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
-
-  glEnableDisableStack.Reset();
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-test is enabled by default.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
-  DALI_TEST_CHECK( !glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
-
-  // Turn off depth-testing. We want to check if the depth buffer has been disabled, so we need to turn off depth-write as well for this case.
-  renderer.SetProperty( Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF );
-  renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF );
-
-  glEnableDisableStack.Reset();
-  application.SendNotification();
-  application.Render();
-
-  // Check the depth buffer was disabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
-
-  // Turn on automatic mode depth-testing.
-  // Layer behavior is currently set to LAYER_3D so AUTO should enable depth-testing.
-  renderer.SetProperty( Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO );
-
-  glEnableDisableStack.Reset();
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-test is now enabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
-  DALI_TEST_CHECK( !glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
-
-  // Change the layer behavior to LAYER_2D.
-  // Note this will also disable depth testing for the layer by default, we test this first.
-  Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_2D );
-
-  glEnableDisableStack.Reset();
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-test is disabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
-
-  // Turn the layer depth-test flag back on, and confirm that depth testing is *still* off.
-  // This is because our renderer has DepthTestMode::AUTO and our layer behavior is LAYER_2D.
-  Stage::GetCurrent().GetRootLayer().SetDepthTestDisabled( false );
-
-  glEnableDisableStack.Reset();
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-test is *still* disabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
-
-  END_TEST;
-}
-
-int UtcDaliRendererSetDepthWriteMode(void)
-{
-  TestApplication application;
-  tet_infoline("Test setting the DepthWriteMode");
-
-  Renderer renderer = RendererTestFixture( application );
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-
-  application.SendNotification();
-  application.Render();
-
-  // Check the default depth-write status first.
-  DALI_TEST_CHECK( glAbstraction.GetLastDepthMask() );
-
-  // Turn off depth-writing.
-  renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-write is now disabled.
-  DALI_TEST_CHECK( !glAbstraction.GetLastDepthMask() );
-
-  // Test the AUTO mode for depth-writing.
-  // As our renderer is opaque, depth-testing should be enabled.
-  renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::AUTO );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-write is now enabled.
-  DALI_TEST_CHECK( glAbstraction.GetLastDepthMask() );
-
-  // Now make the renderer be treated as translucent by enabling blending.
-  // The AUTO depth-write mode should turn depth-write off in this scenario.
-  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check depth-write is now disabled.
-  DALI_TEST_CHECK( !glAbstraction.GetLastDepthMask() );
-
-  END_TEST;
-}
-
 int UtcDaliRendererCheckStencilDefaults(void)
 {
   TestApplication application;
   tet_infoline("Test the stencil defaults");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
   glAbstraction.EnableStencilFunctionCallTrace( true );
@@ -2204,7 +2084,7 @@ int UtcDaliRendererSetStencilMode(void)
   TestApplication application;
   tet_infoline("Test setting the StencilMode");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
   glAbstraction.EnableStencilFunctionCallTrace( true );
@@ -2237,7 +2117,7 @@ int UtcDaliRendererSetStencilFunction(void)
   TestApplication application;
   tet_infoline("Test setting the StencilFunction");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
   glAbstraction.EnableStencilFunctionCallTrace( true );
@@ -2327,7 +2207,7 @@ int UtcDaliRendererSetStencilOperation(void)
   TestApplication application;
   tet_infoline("Test setting the StencilOperation");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
   glAbstraction.EnableStencilFunctionCallTrace( true );
@@ -2414,7 +2294,7 @@ int UtcDaliRendererSetStencilMask(void)
   TestApplication application;
   tet_infoline("Test setting the StencilMask");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
   glAbstraction.EnableStencilFunctionCallTrace( true );
@@ -2459,7 +2339,7 @@ int UtcDaliRendererSetWriteToColorBuffer(void)
   TestApplication application;
   tet_infoline("Test setting the WriteToColorBuffer flag");
 
-  Renderer renderer = RendererTestFixture( application );
+  Renderer renderer = StencilTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
 
   // Set the StencilMask property to a value.
