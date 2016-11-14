@@ -19,7 +19,6 @@
 #include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
@@ -37,7 +36,7 @@ namespace
 {
 
 /**
- * Properties: |name                              |type     |writable|animatable|constraint-input|enum for index-checking|
+ *            |name                              |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "depthIndex",                      INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_INDEX )
@@ -66,96 +65,6 @@ DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "writeToColorBuffer",              BOOLEAN,   true, false,  false, Dali::Renderer::Property::WRITE_TO_COLOR_BUFFER )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
-
-// Property string to enumeration tables:
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( FACE_CULLING_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( FaceCullingMode, NONE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( FaceCullingMode, FRONT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( FaceCullingMode, BACK )
-DALI_ENUM_TO_STRING_WITH_SCOPE( FaceCullingMode, FRONT_AND_BACK )
-DALI_ENUM_TO_STRING_TABLE_END( FACE_CULLING_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( BLEND_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendMode, OFF )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendMode, AUTO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendMode, ON )
-DALI_ENUM_TO_STRING_TABLE_END( BLEND_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( BLEND_EQUATION )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, ADD )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, SUBTRACT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, REVERSE_SUBTRACT )
-DALI_ENUM_TO_STRING_TABLE_END( BLEND_EQUATION )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( BLEND_FACTOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ZERO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, SRC_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_SRC_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, SRC_ALPHA )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_SRC_ALPHA )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, DST_ALPHA )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_DST_ALPHA )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, DST_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_DST_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, SRC_ALPHA_SATURATE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, CONSTANT_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_CONSTANT_COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, CONSTANT_ALPHA )
-DALI_ENUM_TO_STRING_WITH_SCOPE( BlendFactor, ONE_MINUS_CONSTANT_ALPHA )
-DALI_ENUM_TO_STRING_TABLE_END( BLEND_FACTOR )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( DEPTH_WRITE_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthWriteMode, OFF )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthWriteMode, AUTO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthWriteMode, ON )
-DALI_ENUM_TO_STRING_TABLE_END( DEPTH_WRITE_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( DEPTH_TEST_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthTestMode, OFF )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthTestMode, AUTO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthTestMode, ON )
-DALI_ENUM_TO_STRING_TABLE_END( DEPTH_TEST_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( DEPTH_FUNCTION )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, NEVER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, ALWAYS )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, LESS )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, GREATER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, NOT_EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, LESS_EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DepthFunction, GREATER_EQUAL )
-DALI_ENUM_TO_STRING_TABLE_END( DEPTH_FUNCTION )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( STENCIL_FUNCTION )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, NEVER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, LESS )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, LESS_EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, GREATER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, NOT_EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, GREATER_EQUAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilFunction, ALWAYS )
-DALI_ENUM_TO_STRING_TABLE_END( STENCIL_FUNCTION )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( STENCIL_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, OFF )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, AUTO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilMode, ON )
-DALI_ENUM_TO_STRING_TABLE_END( STENCIL_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( STENCIL_OPERATION )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, ZERO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, KEEP )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, REPLACE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INVERT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT_WRAP )
-DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT_WRAP )
-DALI_ENUM_TO_STRING_TABLE_END( STENCIL_OPERATION )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
@@ -224,6 +133,21 @@ void Renderer::SetDepthIndex( int depthIndex )
 int Renderer::GetDepthIndex() const
 {
   return mDepthIndex;
+}
+
+void Renderer::SetFaceCullingMode( FaceCullingMode::Type cullingMode )
+{
+  if( mFaceCullingMode != cullingMode )
+  {
+    mFaceCullingMode = cullingMode;
+
+    SetFaceCullingModeMessage( GetEventThreadServices(), *mSceneObject, mFaceCullingMode );
+  }
+}
+
+FaceCullingMode::Type Renderer::GetFaceCullingMode()
+{
+  return mFaceCullingMode;
 }
 
 void Renderer::SetBlendMode( BlendMode::Type mode )
@@ -404,88 +328,109 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::FACE_CULLING_MODE:
     {
-      FaceCullingMode::Type convertedValue = mFaceCullingMode;
-      if( Scripting::GetEnumerationProperty< FaceCullingMode::Type >( propertyValue, FACE_CULLING_MODE_TABLE, FACE_CULLING_MODE_TABLE_COUNT, convertedValue ) )
+      int faceCullingMode;
+      if( propertyValue.Get( faceCullingMode ) )
       {
-        mFaceCullingMode = convertedValue;
-        SetFaceCullingModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetFaceCullingMode( FaceCullingMode::Type( faceCullingMode ) );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_MODE:
     {
-      BlendMode::Type convertedValue = mBlendMode;
-      if( Scripting::GetEnumerationProperty< BlendMode::Type >( propertyValue, BLEND_MODE_TABLE, BLEND_MODE_TABLE_COUNT, convertedValue ) )
+      int blendingMode;
+      if( propertyValue.Get( blendingMode ) )
       {
-        SetBlendMode( convertedValue );
+        SetBlendMode( BlendMode::Type( blendingMode ) );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
-
-      if( Scripting::GetEnumerationProperty< BlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
+      int blendingEquation;
+      if( propertyValue.Get( blendingEquation ) )
       {
         BlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
-        mBlendingOptions.SetBlendEquation( convertedValue, alphaEquation );
+        mBlendingOptions.SetBlendEquation( static_cast<BlendEquation::Type>( blendingEquation ), alphaEquation );
         SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationAlpha();
-
-      if( Scripting::GetEnumerationProperty< BlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
+      int blendingEquation;
+      if( propertyValue.Get( blendingEquation ) )
       {
         BlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
-        mBlendingOptions.SetBlendEquation( rgbEquation, convertedValue );
+        mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendEquation::Type>( blendingEquation ) );
         SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
     {
-      BlendFactor::Type sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha;
-      GetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
-
-      if( Scripting::GetEnumerationProperty< BlendFactor::Type >( propertyValue, BLEND_FACTOR_TABLE, BLEND_FACTOR_TABLE_COUNT, sourceFactorRgb ) )
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
       {
-        SetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( static_cast<BlendFactor::Type>( blendingFactor ),
+            destFactorRgb,
+            srcFactorAlpha,
+            destFactorAlpha );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
     {
-      BlendFactor::Type sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha;
-      GetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
-
-      if( Scripting::GetEnumerationProperty< BlendFactor::Type >( propertyValue, BLEND_FACTOR_TABLE, BLEND_FACTOR_TABLE_COUNT, destinationFactorRgb ) )
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
       {
-        SetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+            static_cast<BlendFactor::Type>( blendingFactor ),
+            srcFactorAlpha,
+            destFactorAlpha );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
     {
-      BlendFactor::Type sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha;
-      GetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
-
-      if( Scripting::GetEnumerationProperty< BlendFactor::Type >( propertyValue, BLEND_FACTOR_TABLE, BLEND_FACTOR_TABLE_COUNT, sourceFactorAlpha ) )
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
       {
-        SetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+            destFactorRgb,
+            static_cast<BlendFactor::Type>( blendingFactor ),
+            destFactorAlpha );
       }
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
     {
-      BlendFactor::Type sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha;
-      GetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
-
-      if( Scripting::GetEnumerationProperty< BlendFactor::Type >( propertyValue, BLEND_FACTOR_TABLE, BLEND_FACTOR_TABLE_COUNT, destinationFactorAlpha ) )
+      int blendingFactor;
+      if( propertyValue.Get( blendingFactor ) )
       {
-        SetBlendFunc( sourceFactorRgb, destinationFactorRgb, sourceFactorAlpha, destinationFactorAlpha );
+        BlendFactor::Type srcFactorRgb;
+        BlendFactor::Type destFactorRgb;
+        BlendFactor::Type srcFactorAlpha;
+        BlendFactor::Type destFactorAlpha;
+        GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+        SetBlendFunc( srcFactorRgb,
+            destFactorRgb,
+            srcFactorAlpha,
+            static_cast<BlendFactor::Type>( blendingFactor ) );
       }
       break;
     }
@@ -527,51 +472,61 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::DEPTH_WRITE_MODE:
     {
-      DepthWriteMode::Type convertedValue = mDepthWriteMode;
-      if( Scripting::GetEnumerationProperty< DepthWriteMode::Type >( propertyValue, DEPTH_WRITE_MODE_TABLE, DEPTH_WRITE_MODE_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      DepthWriteMode::Type mode = static_cast<DepthWriteMode::Type>(value);
+      if( mode != mDepthWriteMode )
       {
-        mDepthWriteMode = convertedValue;
-        SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mDepthWriteMode = mode;
+        SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, mode );
       }
       break;
     }
     case Dali::Renderer::Property::DEPTH_FUNCTION:
     {
-      DepthFunction::Type convertedValue = mDepthFunction;
-      if( Scripting::GetEnumerationProperty< DepthFunction::Type >( propertyValue, DEPTH_FUNCTION_TABLE, DEPTH_FUNCTION_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      DepthFunction::Type depthFunction = static_cast<DepthFunction::Type>(value);
+      if( depthFunction != mDepthFunction )
       {
-        mDepthFunction = convertedValue;
-        SetDepthFunctionMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mDepthFunction = depthFunction;
+        SetDepthFunctionMessage( GetEventThreadServices(), *mSceneObject, depthFunction );
       }
       break;
     }
     case Dali::Renderer::Property::DEPTH_TEST_MODE:
     {
-      DepthTestMode::Type convertedValue = mDepthTestMode;
-      if( Scripting::GetEnumerationProperty< DepthTestMode::Type >( propertyValue, DEPTH_TEST_MODE_TABLE, DEPTH_TEST_MODE_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      DepthTestMode::Type mode = static_cast<DepthTestMode::Type>(value);
+      if( mode != mDepthTestMode )
       {
-        mDepthTestMode = convertedValue;
-        SetDepthTestModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mDepthTestMode = mode;
+        SetDepthTestModeMessage( GetEventThreadServices(), *mSceneObject, mode );
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_MODE:
     {
-      StencilMode::Type convertedValue = mStencilParameters.stencilMode;
-      if( Scripting::GetEnumerationProperty< StencilMode::Type >( propertyValue, STENCIL_MODE_TABLE, STENCIL_MODE_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      StencilMode::Type stencilMode = static_cast<StencilMode::Type>( value );
+      if( stencilMode != mStencilParameters.stencilMode )
       {
-        mStencilParameters.stencilMode = convertedValue;
-        SetStencilModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.stencilMode = stencilMode;
+        SetStencilModeMessage( GetEventThreadServices(), *mSceneObject, stencilMode );
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION:
     {
-      StencilFunction::Type convertedValue = mStencilParameters.stencilFunction;
-      if( Scripting::GetEnumerationProperty< StencilFunction::Type >( propertyValue, STENCIL_FUNCTION_TABLE, STENCIL_FUNCTION_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      StencilFunction::Type stencilFunction = static_cast<StencilFunction::Type>( value );
+      if( stencilFunction != mStencilParameters.stencilFunction )
       {
-        mStencilParameters.stencilFunction = convertedValue;
-        SetStencilFunctionMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.stencilFunction = stencilFunction;
+        SetStencilFunctionMessage( GetEventThreadServices(), *mSceneObject, stencilFunction );
       }
       break;
     }
@@ -616,31 +571,37 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
     {
-      StencilOperation::Type convertedValue = mStencilParameters.stencilOperationOnFail;
-      if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnFail )
       {
-        mStencilParameters.stencilOperationOnFail = convertedValue;
-        SetStencilOperationOnFailMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.stencilOperationOnFail = stencilOperation;
+        SetStencilOperationOnFailMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL:
     {
-      StencilOperation::Type convertedValue = mStencilParameters.stencilOperationOnZFail;
-      if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnZFail )
       {
-        mStencilParameters.stencilOperationOnZFail = convertedValue;
-        SetStencilOperationOnZFailMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.stencilOperationOnZFail = stencilOperation;
+        SetStencilOperationOnZFailMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
     {
-      StencilOperation::Type convertedValue = mStencilParameters.stencilOperationOnZPass;
-      if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
+      int value;
+      propertyValue.Get( value );
+      StencilOperation::Type stencilOperation = static_cast<StencilOperation::Type>( value );
+      if( stencilOperation != mStencilParameters.stencilOperationOnZPass )
       {
-        mStencilParameters.stencilOperationOnZPass = convertedValue;
-        SetStencilOperationOnZPassMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        mStencilParameters.stencilOperationOnZPass = stencilOperation;
+        SetStencilOperationOnZPassMessage( GetEventThreadServices(), *mSceneObject, stencilOperation );
       }
       break;
     }

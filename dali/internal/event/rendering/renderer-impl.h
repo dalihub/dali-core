@@ -95,6 +95,16 @@ public:
    */
   int GetDepthIndex() const;
 
+  /**
+    * @copydoc Dali::Renderer::SetFaceCullingMode()
+    */
+   void SetFaceCullingMode( FaceCullingMode::Type cullingMode );
+
+   /**
+    * @copydoc Dali::Renderer::GetFaceCullingMode()
+    */
+   FaceCullingMode::Type GetFaceCullingMode();
+
    /**
     * @copydoc Dali::Renderer::SetBlendMode()
     */
