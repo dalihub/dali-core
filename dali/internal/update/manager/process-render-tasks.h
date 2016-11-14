@@ -41,6 +41,7 @@ class RenderTaskList;
  * @param[in] rootNode The root node of the scene-graph.
  * @param[in] sortedLayers The layers containing lists of opaque/transparent renderables.
  * @param[in] sortingHelper Helper container for sorting transparent renderables.
+ * @param[in] geometryBatcher The instance of the geometry batcher
  * @param[out] instructions The instructions for rendering the next frame.
  */
 void ProcessRenderTasks( BufferIndex updateBufferIndex,
@@ -48,6 +49,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                          Layer& rootNode,
                          SortedLayerPointers& sortedLayers,
                          RendererSortingHelper& sortingHelper,
+                         GeometryBatcher& geometryBatcher,
                          RenderInstructionContainer& instructions );
 
 } // namespace SceneGraph

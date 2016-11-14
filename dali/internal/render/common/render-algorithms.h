@@ -32,6 +32,7 @@ namespace SceneGraph
 class RenderInstruction;
 class Shader;
 class TextureCache;
+class GeometryBatcher;
 }
 
 namespace Render
@@ -43,12 +44,14 @@ namespace Render
  * @param[in] context The GL context.
  * @param[in] textureCache The texture cache used to get textures.
  * @param[in] defaultShader The default shader.
+ * @param[in] geometryBatcher The instace of geometry batcher.
  * @param[in] bufferIndex The current render buffer index (previous update buffer)
  */
 void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                Context& context,
                                SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
+                               SceneGraph::GeometryBatcher& geometryBatcher,
                                BufferIndex bufferIndex );
 
 } // namespace Render

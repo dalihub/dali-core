@@ -44,6 +44,7 @@
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/manager/geometry-batcher.h>
 #include <dali/internal/update/resources/resource-manager.h>
 
 #include <dali/internal/render/common/performance-monitor.h>
@@ -97,6 +98,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mNotificationManager(NULL),
   mImageFactory(NULL),
   mShaderFactory(NULL),
+  mGeometryBatcher( NULL ),
   mIsActive(true),
   mProcessingEvent(false)
 {
@@ -114,7 +116,9 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mTextureUploadedQueue = new LockedResourceQueue;
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mTextureUploadedQueue );
+  mGeometryBatcher = new SceneGraph::GeometryBatcher();
+
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mGeometryBatcher, *mTextureUploadedQueue );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
@@ -145,7 +149,8 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mTextureCacheDispatcher );
+                                      *mTextureCacheDispatcher,
+                                      *mGeometryBatcher );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
@@ -210,6 +215,7 @@ Core::~Core()
   delete mTextureCacheDispatcher;
   delete mUpdateManager;
   delete mRenderManager;
+  delete mGeometryBatcher;
   delete mTextureUploadedQueue;
 }
 
@@ -313,7 +319,7 @@ void Core::ProcessEvents()
   // Guard against calls to ProcessEvents() during ProcessEvents()
   if( mProcessingEvent )
   {
-    DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!" );
+    DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!\n" );
     mRenderController.RequestProcessEventsOnIdle();
     return;
   }

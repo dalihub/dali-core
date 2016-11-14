@@ -70,6 +70,7 @@ void TestGlAbstraction::Initialize()
   mLastShaderIdUsed = 0;
   mLastProgramIdUsed = 0;
   mLastUniformIdUsed = 0;
+  mLastDepthMask = false;
 
   mUniforms.clear();
   mProgramUniforms1i.clear();
@@ -79,8 +80,10 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms4f.clear();
 
   mCullFaceTrace.Reset();
+  mDepthFunctionTrace.Reset();
   mEnableDisableTrace.Reset();
   mShaderTrace.Reset();
+  mStencilFunctionTrace.Reset();
   mTextureTrace.Reset();
   mTexParamaterTrace.Reset();
   mDrawTrace.Reset();

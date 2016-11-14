@@ -499,4 +499,45 @@ struct DefaultFunctionCoverage
 BufferImage CreateBufferImage();
 BufferImage CreateBufferImage(int width, int height, const Vector4& color);
 
+// Test namespace to prevent pollution of Dali namespace, add Test helper functions here
+namespace Test
+{
+/**
+ *  @brief
+ *
+ *  Helper to check object destruction occurred
+ *  1) In main part of code create an ObjectDestructionTracker
+ *  2) Within sub section of main create object Actor test and call Start with Actor to test for destruction
+ *  3) Perform code which is expected to destroy Actor
+ *  4) Back in main part of code use IsDestroyed() to test if Actor was destroyed
+ */
+class ObjectDestructionTracker : public ConnectionTracker
+{
+public:
+
+  /**
+   * @brief Call in main part of code
+   */
+  ObjectDestructionTracker();
+
+  /**
+   * @brief Call in sub bock of code where the Actor being checked is still alive.
+   *
+   * @param[in] actor Actor to be checked for destruction
+   */
+  void Start( Actor actor );
+
+  /**
+   * @brief Call to check if Actor alive or destroyed.
+   *
+   * @return bool true if Actor was destroyed
+   */
+  bool IsDestroyed();
+
+private:
+  bool mRefObjectDestroyed;
+};
+
+} // namespace Test
+
 #endif // __DALI_TEST_SUITE_UTILS_H__

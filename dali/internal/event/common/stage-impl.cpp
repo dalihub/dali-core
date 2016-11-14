@@ -412,7 +412,7 @@ void Stage::SetStereoBase( float stereoBase )
 {
   if( ! Equals( mStereoBase, stereoBase ) )
   {
-    DALI_LOG_INFO( Debug::Filter::gActor, Debug::Concise, "old( %.2f) new(%.2f)", mStereoBase, stereoBase );
+    DALI_LOG_INFO( Debug::Filter::gActor, Debug::Concise, "old( %.2f) new(%.2f)\n", mStereoBase, stereoBase );
     mStereoBase = stereoBase;
 
     switch( mViewMode  )
@@ -572,7 +572,7 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
 
 Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
 {
-  DALI_LOG_WARNING( "Deprecated. Use TouchSignal() instead." );
+  DALI_LOG_WARNING( "Deprecated. Use TouchSignal() instead.\n" );
   return mTouchedSignal;
 }
 

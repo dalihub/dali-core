@@ -109,7 +109,7 @@ void Lock( pthread_mutex_t* mutex )
 
   if( pthread_mutex_lock( mutex ) )
   {
-    DALI_LOG_ERROR( "Error calling pthread_mutex_lock" );
+    DALI_LOG_ERROR( "Error calling pthread_mutex_lock\n" );
   }
 }
 
@@ -117,7 +117,7 @@ void Unlock( pthread_mutex_t* mutex )
 {
   if( pthread_mutex_unlock( mutex ) )
   {
-    DALI_LOG_ERROR( "Error calling pthread_mutex_unlock" );
+    DALI_LOG_ERROR( "Error calling pthread_mutex_unlock\n" );
   }
   --gThreadLockCount;
 }

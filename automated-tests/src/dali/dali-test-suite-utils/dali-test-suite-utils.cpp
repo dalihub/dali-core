@@ -337,3 +337,51 @@ BufferImage CreateBufferImage()
 {
   return CreateBufferImage(4, 4, Color::WHITE);
 }
+
+namespace Test
+{
+
+struct ObjectDestructionFunctor
+{
+  // Create a ObjectDestructionFunctor passing in a Dali::RefObject* to be monitored and a bool variable.
+  // Create ObjectRegistry instance and connect to the ObjectDestroyedSignal passing in the above functor for the callback.
+  // Get the ObjectPointer (Actor::GetObjectPtr) of the Actor to be checked for destruction and assign it to the Dali::RefObject*
+  // Check the bool variable which would be true when object destroyed.
+  ObjectDestructionFunctor( Dali::RefObject* objectPtr, bool& refObjectDestroyed )
+  : refObjectPointerToCheck( objectPtr ),
+    refObjectDestroyedBoolean( refObjectDestroyed )
+  {
+    refObjectDestroyed = false;
+  }
+
+  void operator()( const Dali::RefObject* objectPointer )
+  {
+    if ( refObjectPointerToCheck == objectPointer )
+    {
+      refObjectDestroyedBoolean = true;
+    }
+  }
+
+  Dali::RefObject* refObjectPointerToCheck;
+  bool& refObjectDestroyedBoolean;
+};
+
+ObjectDestructionTracker::ObjectDestructionTracker()
+  :mRefObjectDestroyed( false)
+{
+}
+
+void ObjectDestructionTracker::Start( Actor actor )
+{
+  ObjectDestructionFunctor destructionFunctor( actor.GetObjectPtr(), mRefObjectDestroyed );
+
+  ObjectRegistry objectRegistry = Stage::GetCurrent().GetObjectRegistry();
+  objectRegistry.ObjectDestroyedSignal().Connect( this, destructionFunctor );
+}
+
+bool ObjectDestructionTracker::IsDestroyed()
+{
+   return mRefObjectDestroyed;
+}
+
+} // namespace Test
