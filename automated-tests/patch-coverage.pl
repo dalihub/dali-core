@@ -45,14 +45,16 @@ our $repo = Git->repository();
 our $debug=0;
 our $pd_debug=0;
 our $opt_cached;
+our $opt_head;
+#our $opt_workingtree;
+#our $opt_diff=1;
 our $opt_help;
-our $opt_output;
-our $opt_quiet;
 our $opt_verbose;
+our $opt_quiet;
 
 my %options = (
     "cached"       => { "optvar"=>\$opt_cached, "desc"=>"Use index" },
-    "output:s"     => { "optvar"=>\$opt_output, "desc"=>"Generate html output"},
+    "head"         => { "optvar"=>\$opt_head, "desc"=>"Use git show" },
     "help"         => { "optvar"=>\$opt_help, "desc"=>""},
     "quiet"        => { "optvar"=>\$opt_quiet, "desc"=>""},
     "verbose"      => { "optvar"=>\$opt_verbose, "desc"=>"" });
@@ -321,7 +323,6 @@ sub get_coverage
 # output for the patch.
 sub run_diff
 {
-    #print "run_diff(" . join(" ", @_) . ")\n";
     my ($fh, $c) = $repo->command_output_pipe(@_);
     our @patch=();
     while(<$fh>)
@@ -330,8 +331,6 @@ sub run_diff
         push @patch, $_;
     }
     $repo->command_close_pipe($fh, $c);
-
-    print "Patch size: " . scalar(@patch) . "\n" if $debug;
 
     # @patch has slurped diff for all files...
     my $filesref = parse_diff ( \@patch );
@@ -345,7 +344,6 @@ sub run_diff
     for my $file (keys(%$filesref))
     {
         my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
-        next if($path !~ /^dali/);
         if($suffix eq ".cpp" || $suffix eq ".c" || $suffix eq ".h")
         {
             get_coverage($file, $filesref);
@@ -355,6 +353,7 @@ sub run_diff
     return $filesref;
 }
 
+
 sub calc_patch_coverage_percentage
 {
     my $filesref = shift;
@@ -363,9 +362,6 @@ sub calc_patch_coverage_percentage
 
     foreach my $file (keys(%$filesref))
     {
-        my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
-        next if($path !~ /^dali/);
-
         my $covered_lines = 0;
         my $uncovered_lines = 0;
 
@@ -405,7 +401,7 @@ sub calc_patch_coverage_percentage
     my $percent = 0;
     if($total_exec > 0) { $percent = 100 * $total_covered_lines / $total_exec; }
 
-    return [ $total_exec, $percent ];
+    return $percent;
 }
 
 sub patch_output
@@ -484,117 +480,6 @@ sub patch_output
 }
 
 
-sub patch_html_output
-{
-    my $filesref = shift;
-
-    open( my $filehandle, ">", $opt_output ) || die "Can't open $opt_output for writing:$!\n";
-
-    my $OUTPUT_FH = select;
-    select $filehandle;
-    print <<EOH;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-"http://www.w3.org/TR/REC-html40/loose.dtd">
-<html>
-<head>
-<title>Patch Coverage</title>
-</head>
-<body bgcolor="white">
-EOH
-
-    foreach my $file (keys(%$filesref))
-    {
-        my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
-        next if($path !~ /^dali/);
-
-        my $patchref = $filesref->{$file}->{"patch"};
-        my $b_lines_ref = $filesref->{$file}->{"b_lines"};
-        my $coverage_ref = $filesref->{$file}->{"coverage"};
-        print "<h2>$file</h2>\n";
-
-        if($coverage_ref)
-        {
-            if( $coverage_ref->{"covered_lines"} > 0
-                ||
-                $coverage_ref->{"uncovered_lines"} > 0 )
-            {
-                print "<p style=\"color:green;\">Covered: " .
-                    $coverage_ref->{"covered_lines"} . "<p>" .
-                    "<p style=\"color:red;\">Uncovered: " .
-                    $coverage_ref->{"uncovered_lines"} . "</span></p>";
-            }
-        }
-        else
-        {
-            print "<p>";
-            my $span=0;
-            if($suffix eq ".cpp" || $suffix eq ".c" || $suffix eq ".h")
-            {
-                print "<span style=\"color:red;\">";
-                $span=1;
-            }
-            print "No coverage found";
-            print "</span>" if $span;
-        }
-        print "</p>";
-
-        for my $patch (@$patchref)
-        {
-            my $hunkstr="Hunk: " . $patch->[0];
-            if( $patch->[1] > 1 )
-            {
-                $hunkstr .= " - " . ($patch->[0]+$patch->[1]-1);
-            }
-            print "<p style=\"font-weight:bold;\">" . $hunkstr . "</p>";
-
-            print "<pre>";
-            for(my $i = 0; $i < $patch->[1]; $i++ )
-            {
-                my $line = $i + $patch->[0];
-                my $num_line_digits=log($line)/log(10);
-                for $i (0..(6-$num_line_digits-1))
-                {
-                    print " ";
-                }
-                print "$line  ";
-
-                if($coverage_ref)
-                {
-                    my $color;
-                    if($coverage_ref->{"covered"}->{$line})
-                    {
-                        print("<span style=\"color:green;\">");
-                    }
-                    elsif($coverage_ref->{"uncovered"}->{$line})
-                    {
-                        print("<span style=\"color:red;font-weight:bold;\">");
-                    }
-                    else
-                    {
-                        #print("<span style=\"color:black;font-weight:normal;\">");
-                    }
-                    my $src=$coverage_ref->{"src"}->{$line};
-                    chomp($src);
-                    #print $color, "$src\n", RESET;
-                    print "$src</span>\n";
-                }
-                else
-                {
-                    # We don't have coverage data, so print it from the patch instead.
-                    my $src = $b_lines_ref->{$line};
-                    print "$src\n";
-                }
-            }
-            print "<\pre>\n";
-        }
-    }
-
-    print $filehandle "<hr>\n</body>\n</html>\n";
-    close $filehandle;
-    select $OUTPUT_FH;
-}
-
-
 ################################################################################
 ##                                    MAIN                                    ##
 ################################################################################
@@ -607,82 +492,30 @@ chdir "build/tizen";
 my @cmd=('--no-pager','diff','--no-ext-diff','-U0','--no-color');
 
 my $status = $repo->command("status", "-s");
-if( $status eq "" && !scalar(@ARGV))
+if( $status eq "" )
 {
-    # There are no changes in the index or working tree, and
-    # no diff arguments to append. Use the last patch instead.
+    # There are no changes in the index or working tree. Use the last patch instead
     push @cmd, ('HEAD~1','HEAD');
 }
-else
+elsif($opt_cached) # TODO: Remove this option. Instead, need full diff
 {
-    # detect if there are only cached changes or only working tree changes
-    my $cached = 0;
-    my $working = 0;
-    for my $fstat ( split(/\n/, $status) )
-    {
-        if(substr( $fstat, 0, 1 ) ne " "){ $cached++; }
-        if(substr( $fstat, 1, 1 ) ne " "){ $working++; }
-    }
-    if($cached > 0 )
-    {
-        if($working == 0)
-        {
-            push @cmd, "--cached";
-        }
-        else
-        {
-            die "Both cached & working files - cannot get correct patch from git\n";
-            # Would have to diff from separate clone.
-        }
-    }
+    push @cmd, "--cached";
 }
 
 push @cmd, @ARGV;
 my $filesref = run_diff(@cmd);
 
-chdir $cwd;
-
-# Check how many actual source files there are in the patch
-my $filecount = 0;
-foreach my $file (keys(%$filesref))
-{
-    my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
-    next if($path !~ /^dali/);
-    next if($suffix ne ".cpp" && $suffix ne ".c" && $suffix ne ".h");
-    $filecount++;
-}
-if( $filecount == 0 )
-{
-    print "No source files found\n";
-    exit 0;    # Exit with no error.
-}
-
-my $percentref = calc_patch_coverage_percentage($filesref);
-if($percentref->[0] == 0)
-{
-    print "No coverable lines found\n";
-    exit 0;
-}
-my $percent = $percentref->[1];
-
-my $color=BOLD RED;
-if($opt_output)
-{
-    print "Outputing to $opt_output\n" if $debug;
-    patch_html_output($filesref);
-}
-elsif( ! $opt_quiet )
+my $percent = calc_patch_coverage_percentage($filesref);
+if( ! $opt_quiet )
 {
     patch_output($filesref);
+    my $color=BOLD RED;
     if($percent>=90)
     {
         $color=GREEN;
     }
-    print RESET;
+    printf("Percentage of change covered: $color %5.2f%\n" . RESET, $percent);
 }
-
-printf("Percentage of change covered: %5.2f%\n", $percent);
-
 exit($percent<90);
 
 
