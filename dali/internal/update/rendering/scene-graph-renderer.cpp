@@ -99,14 +99,15 @@ enum Flags
   RESEND_DEPTH_WRITE_MODE            = 1 << 8,
   RESEND_DEPTH_TEST_MODE             = 1 << 9,
   RESEND_DEPTH_FUNCTION              = 1 << 10,
-  RESEND_RENDER_MODE                 = 1 << 11,
+  RESEND_STENCIL_MODE                = 1 << 11,
   RESEND_STENCIL_FUNCTION            = 1 << 12,
   RESEND_STENCIL_FUNCTION_MASK       = 1 << 13,
   RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 14,
   RESEND_STENCIL_MASK                = 1 << 15,
   RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 16,
   RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 17,
-  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18
+  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18,
+  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 19
 };
 
 } // Anonymous namespace
@@ -130,7 +131,7 @@ Renderer::Renderer()
   mGeometry( NULL ),
   mShader( NULL ),
   mBlendColor( NULL ),
-  mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
+  mStencilParameters( StencilMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
   mBlendBitmask( 0u ),
@@ -141,6 +142,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mWriteToColorBuffer( true ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mPremultipledAlphaEnabled( false ),
@@ -311,11 +313,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction );
     }
 
-    if( mResendFlag & RESEND_RENDER_MODE )
+    if( mResendFlag & RESEND_STENCIL_MODE )
     {
-      typedef MessageValue1< Render::Renderer, RenderMode::Type > DerivedType;
+      typedef MessageValue1< Render::Renderer, StencilMode::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMode, mStencilParameters.stencilMode );
     }
 
     if( mResendFlag & RESEND_STENCIL_FUNCTION )
@@ -365,6 +367,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
+    }
+
+    if( mResendFlag & RESEND_WRITE_TO_COLOR_BUFFER )
+    {
+      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetWriteToColorBuffer, mWriteToColorBuffer );
     }
 
     mResendFlag = 0;
@@ -487,10 +496,10 @@ void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
   mResendFlag |= RESEND_DEPTH_FUNCTION;
 }
 
-void Renderer::SetRenderMode( RenderMode::Type mode )
+void Renderer::SetStencilMode( StencilMode::Type mode )
 {
-  mStencilParameters.renderMode = mode;
-  mResendFlag |= RESEND_RENDER_MODE;
+  mStencilParameters.stencilMode = mode;
+  mResendFlag |= RESEND_STENCIL_MODE;
 }
 
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
@@ -535,6 +544,12 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
 }
 
+void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
+{
+  mWriteToColorBuffer = writeToColorBuffer;
+  mResendFlag |= RESEND_WRITE_TO_COLOR_BUFFER;
+}
+
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
 {
@@ -543,7 +558,7 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
   RenderDataProvider* dataProvider = NewRenderDataProvider();
 
   mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, mBlendColor, static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
-                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
+                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters, mWriteToColorBuffer );
 
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
 }

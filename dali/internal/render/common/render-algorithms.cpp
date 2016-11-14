@@ -144,12 +144,10 @@ inline void SetupPerRendererFlags( const RenderItem& item, Context& context, boo
 
   // Setup the color buffer based on the renderers properties.
   Renderer *renderer = item.mRenderer;
-  RenderMode::Type renderMode = renderer->GetRenderMode();
-  const bool writeToColorBuffer = ( renderMode == RenderMode::AUTO ) || ( renderMode == RenderMode::COLOR ) || ( renderMode == RenderMode::COLOR_STENCIL );
-  context.ColorMask( writeToColorBuffer );
+  context.ColorMask( renderer->GetWriteToColorBuffer() );
 
   // If the stencil buffer is disabled for this renderer, exit now to save unnecessary value setting.
-  if( ( renderMode != RenderMode::STENCIL ) && ( renderMode != RenderMode::COLOR_STENCIL ) )
+  if( renderer->GetStencilMode() != StencilMode::ON )
   {
     // No per-renderer stencil setup, exit.
     context.EnableStencilBuffer( false );
