@@ -2,7 +2,7 @@
 #define __DALI_ANIMATION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,9 @@ class Animation;
  * If the "Finish" signal is connected to a member function of an object, it must be disconnected before the object is destroyed.
  * This is typically done in the object destructor, and requires either the Dali::Connection object or Dali::Animation handle to be stored.
  *
+ * The overall animation time is superseded by the values given in the TimePeriod structure used when calling the AnimateTo(), AnimateBy(), AnimateBetween() and Animate() methods.
+ * If any of the individual calls to those functions exceeds the overall animation time, then the overall animation time is automatically extended.
+ *
  * Signals
  * | %Signal Name | Method                   |
  * |--------------|--------------------------|
@@ -170,7 +173,7 @@ public:
    * @SINCE_1_0.0
    * @param [in] durationSeconds The duration in seconds.
    * @return A handle to a newly allocated Dali resource.
-   * @pre DurationSeconds must be greater than zero.
+   * @note durationSeconds can not be negative.
    */
   static Animation New(float durationSeconds);
 
@@ -697,12 +700,14 @@ public:
 
 public: // Not intended for use by Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Animation::New() methods
    * @SINCE_1_0.0
    * @param [in] animation A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Animation(Internal::Animation* animation);
+  /// @endcond
 
 };
 

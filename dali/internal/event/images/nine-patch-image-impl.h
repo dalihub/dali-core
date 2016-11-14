@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/nine-patch-image.h>
+#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/buffer-image-impl.h>
 
@@ -57,20 +57,16 @@ public:
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * @param [in] filename    File to load synchronously into buffer
-   * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static NinePatchImagePtr New( const std::string& filename,
-                                ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
+  static NinePatchImagePtr New( const std::string& filename );
 
   /**
    * Create a new NinePatchImage
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] filename    File to load synchronously into buffer
-   * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  NinePatchImage( const std::string& filename,
-                  ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
+  NinePatchImage( const std::string& filename );
 
   /**
    * Convert Image object to a 9 patch image object if possible.
@@ -118,6 +114,12 @@ public:
    */
   static bool IsNinePatchUrl( const std::string& url );
 
+private: // from ResourceImage
+
+  /**
+   * @copydoc ResourceImage::GetUrl()
+   */
+  virtual const std::string& GetUrl() const;
 
 protected: // From Resource
   /**
@@ -142,6 +144,7 @@ private:
 private:
   ResourceClient*               mResourceClient;
   Integration::BitmapPtr        mBitmap;
+  std::string                   mUrl;
   StretchRanges                 mStretchPixelsX;  //< The horizontal stretchable pixels in the cropped image space
   StretchRanges                 mStretchPixelsY;  //< The vertical stretchable pixels in the cropped image space
   Rect<int>                     mChildRectangle;

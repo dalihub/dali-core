@@ -5,7 +5,7 @@ Summary:    Core API unit TC (%{name})
 Version:    0.1
 Release:    0
 Group:      Development/Tools
-License:    Apache License, Version 2.0, Samsung Properietary
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 Requires: dali
 BuildRequires:  dali-integration-devel

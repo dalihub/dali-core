@@ -26,7 +26,6 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
@@ -101,10 +100,6 @@ const int CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraActor ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::Camera ) );
-const int IMAGE_ACTOR_MEMORY_SIZE(
-  sizeof( Internal::ImageActor ) +
-  sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::Render::Renderer ));
 const int LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
   sizeof( Internal::SceneGraph::Layer ) );

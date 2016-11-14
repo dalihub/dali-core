@@ -25,9 +25,7 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/public-api/actors/blending.h>
 #include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
@@ -118,12 +116,11 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          DepthWriteMode::Type depthWriteMode,
                          DepthTestMode::Type depthTestMode,
                          DepthFunction::Type depthFunction,
-                         StencilParameters& stencilParameters,
-                         bool writeToColorBuffer )
+                         StencilParameters& stencilParameters )
 {
   return new Renderer( dataProvider, geometry, blendingBitmask, blendColor,
                        faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode,
-                       depthFunction, stencilParameters, writeToColorBuffer );
+                       depthFunction, stencilParameters );
 }
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
@@ -135,12 +132,10 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     DepthWriteMode::Type depthWriteMode,
                     DepthTestMode::Type depthTestMode,
                     DepthFunction::Type depthFunction,
-                    StencilParameters& stencilParameters,
-                    bool writeToColorBuffer )
+                    StencilParameters& stencilParameters )
 : mRenderDataProvider( dataProvider ),
   mContext( NULL),
   mTextureCache( NULL ),
-  mUniformNameCache( NULL ),
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
@@ -152,7 +147,6 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode( faceCullingMode ),
   mDepthWriteMode( depthWriteMode ),
   mDepthTestMode( depthTestMode ),
-  mWriteToColorBuffer( writeToColorBuffer ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
   mBatchingEnabled( false )
@@ -168,11 +162,10 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   }
 }
 
-void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache )
+void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache )
 {
   mContext = &context;
   mTextureCache = &textureCache;
-  mUniformNameCache = &uniformNameCache;
 }
 
 Renderer::~Renderer()
@@ -405,14 +398,12 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
   }
 
   std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
-  for( size_t i(0); result && i<newTextures.size(); ++i )
+  for( size_t i(0); i<newTextures.size() && result; ++i )
   {
     if( newTextures[i] )
     {
-      result = program.GetSamplerUniformLocation( i, uniformLocation ) &&
-               newTextures[i]->Bind(context, textureUnit, samplers[i] );
-
-      if( result )
+      result = newTextures[i]->Bind(context, textureUnit, samplers[i] );
+      if( result && program.GetSamplerUniformLocation( i, uniformLocation ) )
       {
         program.SetUniform1i( uniformLocation, textureUnit );
         ++textureUnit;
@@ -483,14 +474,14 @@ DepthFunction::Type Renderer::GetDepthFunction() const
   return mDepthFunction;
 }
 
-void Renderer::SetStencilMode( StencilMode::Type stencilMode )
+void Renderer::SetRenderMode( RenderMode::Type renderMode )
 {
-  mStencilParameters.stencilMode = stencilMode;
+  mStencilParameters.renderMode = renderMode;
 }
 
-StencilMode::Type Renderer::GetStencilMode() const
+RenderMode::Type Renderer::GetRenderMode() const
 {
-  return mStencilParameters.stencilMode;
+  return mStencilParameters.renderMode;
 }
 
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
@@ -561,16 +552,6 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
 StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
 {
   return mStencilParameters.stencilOperationOnZPass;
-}
-
-void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
-{
-  mWriteToColorBuffer = writeToColorBuffer;
-}
-
-bool Renderer::GetWriteToColorBuffer() const
-{
-  return mWriteToColorBuffer;
 }
 
 void Renderer::SetBatchingEnabled( bool batchingEnabled )
@@ -649,7 +630,7 @@ void Renderer::Render( Context& context,
   }
 }
 
-void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const
+void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const
 {
   sortAttributes.shader = &( mRenderDataProvider->GetShader() );
   const std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );

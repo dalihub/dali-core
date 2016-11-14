@@ -144,6 +144,7 @@ public: // Actor related
    * @brief Returns an actor by index. An empty handle if the index is not valid.
    *
    * @SINCE_1_0.0
+   * @param[in] index The attached actor's index
    * @return The attached actor or an empty handle.
    * @pre The gesture detector has been initialized.
    */
@@ -151,6 +152,7 @@ public: // Actor related
 
 protected:
 
+  /// @cond internal
   /**
    * @brief This constructor is used by New() methods of derived classes (For example, PanGestureDetector::New()).
    *
@@ -158,6 +160,7 @@ protected:
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL GestureDetector(Internal::GestureDetector* internal);
+  /// @endcond
 };
 
 /**

@@ -33,6 +33,7 @@ typedef std::vector< IndexValuePair > IndexValueContainer;
 
 }; // unnamed namespace
 
+
 struct Property::Map::Impl
 {
   StringValueContainer mStringValueContainer;
@@ -83,23 +84,74 @@ void Property::Map::Insert( Property::Index key, const Value& value )
 
 Property::Value& Property::Map::GetValue( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
+  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+  DALI_ASSERT_ALWAYS( position < ( numStringKeys + numIndexKeys ) && "position out-of-bounds" );
 
-  return mImpl->mStringValueContainer[ position ].second;
+  if( position < numStringKeys )
+  {
+    return mImpl->mStringValueContainer[ position ].second;
+  }
+  else
+  {
+    return mImpl->mIndexValueContainer[ position-numStringKeys ].second;
+  }
 }
 
 const std::string& Property::Map::GetKey( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
+  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  DALI_ASSERT_ALWAYS( position < numStringKeys && "position out-of-bounds" );
 
   return mImpl->mStringValueContainer[ position ].first;
 }
 
+Property::Key Property::Map::GetKeyAt( SizeType position ) const
+{
+  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+  DALI_ASSERT_ALWAYS( position < ( numStringKeys + numIndexKeys ) && "position out-of-bounds" );
+
+  if( position < numStringKeys )
+  {
+    Key key(mImpl->mStringValueContainer[ position ].first);
+    return key;
+  }
+  else
+  {
+    Key key( mImpl->mIndexValueContainer[ position-numStringKeys ].first );
+    return key;
+  }
+}
+
 StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
-  DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
+  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+
+  DALI_ASSERT_ALWAYS( position < ( numStringKeys ) && "position out-of-bounds" );
 
   return mImpl->mStringValueContainer[ position ];
+}
+
+KeyValuePair Property::Map::GetKeyValue( SizeType position ) const
+{
+  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+
+  DALI_ASSERT_ALWAYS( position < ( numStringKeys + numIndexKeys ) && "position out-of-bounds" );
+
+  if( position < numStringKeys )
+  {
+    Key key(mImpl->mStringValueContainer[ position ].first);
+    KeyValuePair keyValue(key, mImpl->mStringValueContainer[ position ].second );
+    return keyValue;
+  }
+  else
+  {
+    Key key( mImpl->mIndexValueContainer[ position-numStringKeys ].first );
+    KeyValuePair keyValue(key, mImpl->mIndexValueContainer[ position-numStringKeys ].second );
+    return keyValue;
+  }
 }
 
 Property::Value* Property::Map::Find( const char* key ) const

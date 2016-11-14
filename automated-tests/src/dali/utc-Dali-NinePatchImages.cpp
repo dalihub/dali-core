@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -143,7 +144,8 @@ NinePatchImage CustomizeNinePatch( TestApplication& application,
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetSynchronouslyLoadedResource( resourcePtr );
 
-  Image image = ResourceImage::New( "blah.#.png" );
+  std::string url( "blah.#.png" );
+  Image image = ResourceImage::New( url );
 
   tet_infoline("Assign image to image rendering actor");
   Actor actor = CreateRenderableActor( image );
@@ -151,6 +153,8 @@ NinePatchImage CustomizeNinePatch( TestApplication& application,
 
   tet_infoline("Downcast Image to a nine-patch image\n");
   NinePatchImage ninePatchImage = NinePatchImage::DownCast( image );
+
+  DALI_TEST_EQUALS( url, ninePatchImage.GetUrl(), TEST_LOCATION );
 
   return ninePatchImage;
 
@@ -169,9 +173,13 @@ int UtcDaliNinePatchImageNew(void)
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  image = NinePatchImage::New( "blah.#.png" );
+  std::string url("blah.#.png");
+  image = NinePatchImage::New( url );
 
   DALI_TEST_CHECK( image );
+
+  DALI_TEST_EQUALS( url, image.GetUrl(), TEST_LOCATION );
+
   END_TEST;
 }
 

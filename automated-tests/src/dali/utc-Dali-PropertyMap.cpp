@@ -109,22 +109,27 @@ int UtcDaliPropertyMapConstOperator(void)
   END_TEST;
 }
 
-// deprecated API, only retrieve the value from string-value pairs
 int UtcDaliPropertyMapGetValue(void)
 {
   Property::Map map;
   map[ "hello" ] = 1;
   map[ "world" ] = 2;
+  map[ Actor::Property::COLOR ] = Color::MAGENTA;
 
   Property::Value& value = map.GetValue( 0 );
   DALI_TEST_CHECK( value.Get<int>() == 1 );
   value = 10; // Allows the actual changing of the value as we have a ref
   DALI_TEST_CHECK( map[ "hello" ].Get<int>() == 10 );
 
+  Property::Value& value2 = map.GetValue( 2 );
+  DALI_TEST_CHECK( value2.Get<Vector4>() == Color::MAGENTA );
+  value2 = Color::CYAN;
+  DALI_TEST_EQUALS( map[ Actor::Property::COLOR].Get<Vector4>(), Color::CYAN, TEST_LOCATION);
+
   // Out of bounds
   try
   {
-    map.GetValue( 2 );
+    map.GetValue( 3 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -141,11 +146,12 @@ int UtcDaliPropertyMapGetKey(void)
   Property::Map map;
   map[ "hello" ] = 1;
   map[ "world" ] = 2;
+  map[ Actor::Property::COLOR ] = Color::MAGENTA;
 
   DALI_TEST_CHECK( map.GetKey( 0 ) == "hello" );
   DALI_TEST_CHECK( map.GetKey( 1 ) == "world" );
 
-  // Out of bounds
+  // Wrong type
   try
   {
     map.GetKey( 2 );
@@ -156,25 +162,101 @@ int UtcDaliPropertyMapGetKey(void)
     DALI_TEST_ASSERT( e, "position", TEST_LOCATION );
   }
 
+  // Out of bounds
+  try
+  {
+    map.GetKey( 3 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "position", TEST_LOCATION );
+  }
+
   END_TEST;
 }
 
-// deprecated API, only retrieve the string-value pairs
+
+int UtcDaliPropertyMapGetKeyAt(void)
+{
+  Property::Map map;
+  map[ "hello" ] = 1;
+  map[ "world" ] = 2;
+  map[ Actor::Property::COLOR ] = Color::MAGENTA;
+
+  DALI_TEST_CHECK( map.GetKeyAt( 0 ) == "hello" );
+  DALI_TEST_CHECK( map.GetKeyAt( 1 ) == "world" );
+  DALI_TEST_CHECK( map.GetKeyAt( 2 ) == Actor::Property::COLOR );
+
+  // Out of bounds
+  try
+  {
+    map.GetKey( 3 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "position", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 int UtcDaliPropertyMapGetPair(void)
 {
   Property::Map map;
   map[ "hello" ] = 1;
   map[ "world" ] = 2;
+  map[ Actor::Property::COLOR ] = Color::MAGENTA;
 
   DALI_TEST_CHECK( map.GetPair( 0 ).first == "hello" );
   DALI_TEST_CHECK( map.GetPair( 0 ).second.Get< int >() == 1 );
   DALI_TEST_CHECK( map.GetPair( 1 ).first == "world" );
   DALI_TEST_CHECK( map.GetPair( 1 ).second.Get< int >() == 2 );
 
-  // Out of bounds
+  // Wrong Type
   try
   {
     map.GetPair( 2 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "position", TEST_LOCATION );
+  }
+
+  // Out of bounds
+  try
+  {
+    map.GetPair( 3 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "position", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapGetKeyValue(void)
+{
+  Property::Map map;
+  map[ "hello" ] = 1;
+  map[ "world" ] = 2;
+  map[ Actor::Property::COLOR ] = Color::MAGENTA;
+
+  DALI_TEST_CHECK( map.GetKeyValue( 0 ).first == "hello" );
+  DALI_TEST_CHECK( map.GetKeyValue( 0 ).second.Get< int >() == 1 );
+  DALI_TEST_CHECK( map.GetKeyValue( 1 ).first == "world" );
+  DALI_TEST_CHECK( map.GetKeyValue( 1 ).second.Get< int >() == 2 );
+  DALI_TEST_CHECK( map.GetKeyValue( 2 ).first == Actor::Property::COLOR );
+  DALI_TEST_CHECK( map.GetKeyValue( 2 ).second.Get< Vector4 >() == Color::MAGENTA );
+
+  // Out of bounds
+  try
+  {
+    map.GetPair( 3 );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -320,6 +402,107 @@ int UtcDaliPropertyMapInsertP(void)
   END_TEST;
 }
 
+
+int UtcDaliPropertyMapAddP(void)
+{
+  Property::Map map;
+  DALI_TEST_EQUALS( 0u, map.Count(), TEST_LOCATION );
+  map.Add( "foo", "bar");
+  DALI_TEST_EQUALS( 1u, map.Count(), TEST_LOCATION );
+  Property::Value* value = map.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( std::string("foo2"), "testing" );
+  DALI_TEST_EQUALS( 2u, map.Count(), TEST_LOCATION );
+  value = map.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( 10, "DALi" );
+  DALI_TEST_EQUALS( 3u, map.Count(), TEST_LOCATION );
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  map.Add( 100, 9 );
+  DALI_TEST_EQUALS( 4u, map.Count(), TEST_LOCATION );
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapAddChainP(void)
+{
+  Property::Map map;
+  DALI_TEST_EQUALS( 0u, map.Count(), TEST_LOCATION );
+  map
+    .Add( "foo", "bar")
+    .Add( std::string("foo2"), "testing" )
+    .Add( 10, "DALi" )
+    .Add( 100, 9 );
+
+  DALI_TEST_EQUALS( 4u, map.Count(), TEST_LOCATION );
+
+  Property::Value* value = map.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  value = map.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapAnonymousAddChainP(void)
+{
+  class TestMap
+  {
+  public:
+    TestMap(Property::Map map)
+    : mMap(map)
+    {
+    }
+    Property::Map mMap;
+  };
+
+  TestMap mapTest( Property::Map().Add( "foo", "bar")
+                                  .Add( std::string("foo2"), "testing" )
+                                  .Add( 10, "DALi" )
+                                  .Add( 100, 9 ));
+
+
+  Property::Value* value = mapTest.mMap.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( 10 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "DALi", value->Get<std::string>(), TEST_LOCATION );
+
+  value = mapTest.mMap.Find( 100 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 9 );
+
+  END_TEST;
+}
+
+
 int UtcDaliPropertyMapMerge(void)
 {
   Property::Map map;
@@ -429,6 +612,77 @@ int UtcDaliPropertyMapOstream02(void)
 
   // string-value pairs first, then index-value pairs
   DALI_TEST_EQUALS( oss.str().compare("Map(3) = {timePeriod:Map(3) = {duration:5, delay:1, 10:DALi}, value:100, 100:9}"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyKeyConstructorP(void)
+{
+  Property::Key key1( "aKey" );
+  DALI_TEST_EQUALS( key1.type, Property::Key::STRING, TEST_LOCATION );
+  DALI_TEST_EQUALS( key1.stringKey, "aKey", TEST_LOCATION );
+  DALI_TEST_EQUALS( key1.indexKey, Property::INVALID_INDEX, TEST_LOCATION );
+
+  Property::Key key2( Actor::Property::COLOR );
+  DALI_TEST_EQUALS( key2.type, Property::Key::INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( key2.indexKey, (Dali::Property::Index)Actor::Property::COLOR, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPropertyKeyEqualityOperatorP(void)
+{
+  Property::Key key1( "aKey" );
+  Property::Key key2( 113 );
+
+  DALI_TEST_CHECK( key1 == "aKey" );
+  DALI_TEST_CHECK( ! (key1 == "notTheKey") );
+  DALI_TEST_CHECK( ! (key1 == 1) );
+
+  DALI_TEST_CHECK( key2 == 113 );
+  DALI_TEST_CHECK( ! (key2 == 0) );
+  DALI_TEST_CHECK( ! (key2 == "One hundred and thirteen" ) );
+
+  DALI_TEST_CHECK( ! (key1 == key2) );
+  DALI_TEST_CHECK( key1 != key2 );
+
+  Property::Key key1B( "aKey" );
+  Property::Key key2B( 113 );
+
+  DALI_TEST_CHECK( key1 == key1B );
+  DALI_TEST_CHECK( key2 == key2B );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyKeyInequalityOperatorP(void)
+{
+  Property::Key key1( "aKey" );
+  Property::Key key2( 113 );
+
+  DALI_TEST_CHECK( key1 != "notTheKey" );
+  DALI_TEST_CHECK( key1 != 1 );
+
+  DALI_TEST_CHECK( key2 != 0 );
+  DALI_TEST_CHECK( key2 != "One hundred and thirteen" );
+
+  DALI_TEST_CHECK( key1 != key2 );
+
+  END_TEST;
+}
+
+
+int UtcDaliPropertyKeyOutputStream(void)
+{
+  Property::Key key1( "aKey" );
+  Property::Key key2( 113 );
+
+  std::ostringstream oss;
+  oss << key1;
+  DALI_TEST_EQUALS( oss.str(), "aKey", TEST_LOCATION );
+
+  std::ostringstream oss2;
+  oss2 << key2;
+  DALI_TEST_EQUALS( oss2.str(), "113", TEST_LOCATION );
 
   END_TEST;
 }

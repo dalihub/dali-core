@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -765,7 +765,7 @@ int UtcDaliEncodedBufferImageCtorsP(void)
   EncodedBufferImage image1;
   DALI_TEST_CHECK( !image1 );
 
-  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   EncodedBufferImage image2( image1 );
 
   DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
@@ -779,7 +779,7 @@ int UtcDaliEncodedBufferImageOperatorAssignmentP(void)
   EncodedBufferImage image1;
   DALI_TEST_CHECK( !image1 );
 
-  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   EncodedBufferImage image2;
   image2 = image1;
 
@@ -791,7 +791,7 @@ int UtcDaliEncodedBufferImageDownCastP(void)
 {
   TestApplication application;
 
-  Image image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  Image image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   EncodedBufferImage image2 = DownCast< EncodedBufferImage >(image1);
 
   DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
@@ -811,19 +811,10 @@ int UtcDaliEncodedBufferImageNewP1(void)
   DALI_TEST_CHECK( !image );
 
   // Trigger image decode to initialise the handle
-  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
 
   DALI_TEST_CHECK( image );
 
-  // Change the release policy to Unused:
-  Image image2;
-
-  DALI_TEST_CHECK( !image2 );
-
-  // Trigger image decode to initialise the handle
-  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::UNUSED );
-
-  DALI_TEST_CHECK( image2 );
   END_TEST;
 }
 

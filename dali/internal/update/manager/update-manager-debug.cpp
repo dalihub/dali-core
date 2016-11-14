@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
+#ifdef DALI_PRINT_UPDATE_INFO
+
 namespace Dali
 {
 
@@ -48,7 +50,6 @@ static Debug::Filter* gNodeLogFilter = Debug::Filter::New(Debug::Verbose, false,
  */
 void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
 {
-#if defined(DEBUG_ENABLED)
   const Vector3& position = node.GetPosition(updateBufferIndex);
   const Vector3& scale = node.GetScale(updateBufferIndex);
   const Vector3& fullPos = node.GetWorldPosition(updateBufferIndex);
@@ -94,13 +95,10 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
   {
     PrintNodes(**iter, updateBufferIndex, level);
   }
-#endif // DEBUG_ENABLED
 }
 
 void PrintNodeTree( const Node& node, BufferIndex bufferIndex, std::string indentation )
 {
-#if defined(DEBUG_ENABLED)
-
   std::cout << "Node " << &node
             << " \"" << node.mDebugString << "\""
             << " Origin: "       << node.GetParentOrigin()
@@ -135,8 +133,6 @@ void PrintNodeTree( const Node& node, BufferIndex bufferIndex, std::string inden
 
     PrintNodeTree(**iter, bufferIndex, nextIndent);
   }
-
-#endif // DEBUG_ENABLED
 }
 
 } // SceneGraph
@@ -144,3 +140,5 @@ void PrintNodeTree( const Node& node, BufferIndex bufferIndex, std::string inden
 } // Internal
 
 } // Dali
+
+#endif

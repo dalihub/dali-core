@@ -54,30 +54,33 @@ Node::Node()
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
   mAnchorPoint( TRANSFORM_PROPERTY_ANCHOR_POINT ),
-  mSize(TRANSFORM_PROPERTY_SIZE),     // zero initialized by default
-  mPosition(TRANSFORM_PROPERTY_POSITION), // zero initialized by default
-  mOrientation(), // initialized to identity by default
+  mSize( TRANSFORM_PROPERTY_SIZE ),                                               // Zero initialized by default
+  mPosition( TRANSFORM_PROPERTY_POSITION ),                                       // Zero initialized by default
+  mOrientation(),                                                                 // Initialized to identity by default
   mScale( TRANSFORM_PROPERTY_SCALE ),
   mVisible( true ),
   mColor( Color::WHITE ),
-  mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(0.0f,0.0f,0.0f)), // zero initialized by default
-  mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(1.0f,1.0f,1.0f) ),
-  mWorldOrientation(), // initialized to identity by default
+  mWorldPosition( TRANSFORM_PROPERTY_WORLD_POSITION, Vector3( 0.0f,0.0f,0.0f ) ), // Zero initialized by default
+  mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3( 1.0f,1.0f,1.0f ) ),
+  mWorldOrientation(),                                                            // Initialized to identity by default
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
   mGeometryBatcher( NULL ),
   mBatchIndex( BATCH_NULL_HANDLE ),
+  mClippingSortModifier( 0u ),
   mIsBatchParent( false ),
   mParent( NULL ),
   mBatchParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),
+  mClippingDepth( 0u ),
   mRegenerateUniformMap( 0 ),
-  mDepth(0u),
-  mDirtyFlags(AllFlags),
-  mIsRoot( false ),
+  mDepth( 0u ),
+  mDirtyFlags( AllFlags ),
   mDrawMode( DrawMode::NORMAL ),
-  mColorMode( DEFAULT_COLOR_MODE )
+  mColorMode( DEFAULT_COLOR_MODE ),
+  mClippingMode( ClippingMode::DISABLED ),
+  mIsRoot( false )
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;
@@ -218,19 +221,19 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode )
 
 void Node::AddRenderer( Renderer* renderer )
 {
-  //Check that it has not been already added
+  // Check that it has not been already added.
   unsigned int rendererCount( mRenderer.Size() );
-  for( unsigned int i(0); i<rendererCount; ++i )
+  for( unsigned int i(0); i < rendererCount; ++i )
   {
     if( mRenderer[i] == renderer )
     {
-      //Renderer already in the list
+      // Renderer is already in the list.
       return;
     }
   }
 
-  //If it is the first renderer added, make sure the world transform will be calculated
-  //in the next update as world transform is not computed if node has no renderers
+  // If it is the first renderer added, make sure the world transform will be calculated
+  // in the next update as world transform is not computed if node has no renderers.
   if( rendererCount == 0 )
   {
     mDirtyFlags |= TransformFlag;

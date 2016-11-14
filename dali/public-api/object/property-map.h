@@ -20,11 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <sstream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/property-key.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -33,6 +35,7 @@ namespace Dali
  * @{
  */
 
+typedef std::pair< Property::Key, Property::Value > KeyValuePair;
 typedef std::pair<std::string, Property::Value> StringValuePair;
 
 /**
@@ -111,12 +114,58 @@ public:
    */
   void Insert( Property::Index key, const Value& value );
 
+
   /**
-   * DEPRECATED_1_1.39. Retrieve the value with key instead of position, Use Find( key ) instead.
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
    *
-   * @brief Retrieve the value of the string-value pair at the specified position.
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( const char* key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
+  /**
+   * @brief Inserts the key-value pair in the Map, with the key type as string.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( const std::string& key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
+
+  /**
+   * @brief Inserts the key-value pair in the Map, with the key type as index.
+   *
+   * Does not check for duplicates
+   * @SINCE_1_2.5
+   * @param key to insert
+   * @param value to insert
+   * @return a reference to this object
+   */
+  inline Property::Map& Add( Property::Index key, const Value& value )
+  {
+    Insert(key, value);
+    return *this;
+  }
+
+  /**
+   * @brief Retrieve the value at the specified position.
    *
    * @SINCE_1_0.0
+   * @param[in] position The specified position
    * @return A reference to the value at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -129,6 +178,7 @@ public:
    * @brief Retrieve the key at the specified position.
    *
    * @SINCE_1_0.0
+   * @param[in] position The specified position
    * @return A const reference to the key at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -136,16 +186,37 @@ public:
   const std::string& GetKey( SizeType position ) const;
 
   /**
+   * @brief Retrieve the key at the specified position.
+   *
+   * @SINCE_1_2.7
+   * @return A copy of the key at the specified position.
+   *
+   * @note Will assert if position >= Count()
+   */
+  Key GetKeyAt( SizeType position ) const;
+
+  /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
    *
    * @brief Retrieve the key & the value at the specified position.
    *
    * @SINCE_1_0.0
+   * @param[in] position The specified position
    * @return A reference to the pair of key and value at the specified position.
+   *
+   * @note Will assert if position >= Count() or key at position is an index key.
+   */
+  StringValuePair& GetPair( SizeType position ) const;
+
+  /**
+   * @brief Retrieve the key & the value at the specified position.
+   *
+   * @SINCE_1_2.7
+   * @return A copy of the pair of key and value at the specified position.
    *
    * @note Will assert if position >= Count()
    */
-  StringValuePair& GetPair( SizeType position ) const;
+  KeyValuePair GetKeyValue( SizeType position ) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -306,7 +377,6 @@ private:
  * @return The output stream operator.
  */
 DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
-
 
 /**
  * @}

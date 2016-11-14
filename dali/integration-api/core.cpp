@@ -69,6 +69,11 @@ void Core::SurfaceResized(unsigned int width, unsigned int height)
   mImpl->SurfaceResized(width, height);
 }
 
+void Core::SetTopMargin( unsigned int margin )
+{
+  mImpl->SetTopMargin(margin);
+}
+
 void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
 {
   mImpl->SetDpi(dpiHorizontal, dpiVertical);

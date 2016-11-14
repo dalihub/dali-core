@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   // testing resource deletion when taken off stage
   tet_infoline( "UtcDaliImageFactoryCachedRequest02 - Discard previously requested resource" );
 
-  Image image = ResourceImage::New( gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED );
+  Image image = ResourceImage::New( gTestImageFilename );
   Actor actor = CreateRenderableActor( image );
 
   application.SendNotification();

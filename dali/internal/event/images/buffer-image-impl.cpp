@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,9 @@ TypeRegistration mType( typeid( Dali::BufferImage ), typeid( Dali::Image ), NULL
 
 BufferImagePtr BufferImage::New( unsigned int width,
                                  unsigned int height,
-                                 Pixel::Format pixelformat,
-                                 ReleasePolicy releasePol )
+                                 Pixel::Format pixelformat )
 {
-  BufferImagePtr internal = new BufferImage( width, height, pixelformat, releasePol );
+  BufferImagePtr internal = new BufferImage( width, height, pixelformat );
   internal->Initialize();
   return internal;
 }
@@ -54,16 +53,15 @@ BufferImagePtr BufferImage::New( PixelBuffer* pixBuf,
                                  unsigned int width,
                                  unsigned int height,
                                  Pixel::Format pixelformat,
-                                 unsigned int stride,
-                                 ReleasePolicy releasePol )
+                                 unsigned int stride )
 {
-  BufferImagePtr internal = new BufferImage( pixBuf, width, height, pixelformat, stride, releasePol );
+  BufferImagePtr internal = new BufferImage( pixBuf, width, height, pixelformat, stride );
   internal->Initialize();
   return internal;
 }
 
-BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
-: Image( releasePol ),
+BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format pixelformat)
+: Image(),
   mInternalBuffer( NULL ),
   mExternalBuffer( NULL ),
   mResourceClient( NULL ),
@@ -74,7 +72,7 @@ BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format 
   mPixelFormat( pixelformat ),
   mResourcePolicy( ResourcePolicy::OWNED_DISCARD )
 {
-  SetupBuffer( width, height, pixelformat, width, releasePol );
+  SetupBuffer( width, height, pixelformat, width );
 
   // Allocate a persistent internal buffer
   mInternalBuffer = new PixelBuffer[ mBufferSize ];
@@ -84,9 +82,8 @@ BufferImage::BufferImage(PixelBuffer* pixBuf,
                          unsigned int width,
                          unsigned int height,
                          Pixel::Format pixelformat,
-                         unsigned int stride,
-                         ReleasePolicy releasePol )
-: Image( releasePol ),
+                         unsigned int stride)
+: Image(),
   mInternalBuffer( NULL ),
   mExternalBuffer( pixBuf ),
   mResourceClient( NULL ),
@@ -97,19 +94,24 @@ BufferImage::BufferImage(PixelBuffer* pixBuf,
   mPixelFormat( pixelformat ),
   mResourcePolicy( ResourcePolicy::OWNED_DISCARD )
 {
-  SetupBuffer( width, height, pixelformat, stride ? stride: width, releasePol );
+  SetupBuffer( width, height, pixelformat, stride ? stride: width );
 }
 
 BufferImage::~BufferImage()
 {
+  if( mTicket )
+  {
+    mTicket->RemoveObserver(*this);
+    mTicket.Reset();
+  }
+
   delete[] mInternalBuffer;
 }
 
 void BufferImage::SetupBuffer( unsigned int width,
                                unsigned int height,
                                Pixel::Format pixelformat,
-                               unsigned int byteStride,
-                               ReleasePolicy releasePol )
+                               unsigned int byteStride )
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
   mResourceClient = &tls.GetResourceClient();
@@ -122,7 +124,7 @@ void BufferImage::SetupBuffer( unsigned int width,
   mBufferSize = height * mByteStride;
 
   // Respect the desired release policy
-  mResourcePolicy = releasePol == Dali::Image::UNUSED ? ResourcePolicy::OWNED_DISCARD : ResourcePolicy::OWNED_RETAIN;
+  mResourcePolicy = ResourcePolicy::OWNED_RETAIN;
 }
 
 bool BufferImage::IsDataExternal() const
@@ -223,7 +225,7 @@ void BufferImage::UpdateBufferArea( PixelBuffer* src, PixelBuffer* dest, const R
 
 void BufferImage::Connect()
 {
-  if ( !mConnectionCount++ )
+  if ( !mConnectionCount++ && !mTicket )
   {
     RectArea area;
     Update( area );
@@ -232,14 +234,7 @@ void BufferImage::Connect()
 
 void BufferImage::Disconnect()
 {
-  if ( mTicket )
-  {
-    if ( !( --mConnectionCount ) && mReleasePolicy == Dali::Image::UNUSED )
-    {
-      mTicket->RemoveObserver(*this);
-      mTicket.Reset();
-    }
-  }
+  --mConnectionCount;
 }
 
 } // namespace Internal

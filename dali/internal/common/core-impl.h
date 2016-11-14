@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_CORE_H__
-#define __DALI_INTERNAL_CORE_H__
+#ifndef DALI_INTERNAL_CORE_H
+#define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ class RenderManager;
 class DiscardQueue;
 class TextureCacheDispatcher;
 class GeometryBatcher;
+class RenderTaskProcessor;
 }
 
 /**
@@ -115,6 +116,11 @@ public:
    * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int)
    */
   void SurfaceResized(unsigned int width, unsigned int height);
+
+  /**
+   * @copydoc Dali::Integration::Core::SetTopMargin( unsigned int margin )
+   */
+  void SetTopMargin( unsigned int margin );
 
   /**
    * @copydoc Dali::Integration::Core::SetDpi(unsigned int, unsigned int)
@@ -296,6 +302,7 @@ private:
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
   SceneGraph::GeometryBatcher*              mGeometryBatcher;             ///< Instance of the geometry batcher
+  SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
@@ -307,4 +314,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_CORE_H__
+#endif // DALI_INTERNAL_CORE_H

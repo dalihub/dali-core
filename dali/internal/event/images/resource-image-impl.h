@@ -33,10 +33,6 @@ namespace Dali
 namespace Internal
 {
 
-typedef Dali::ResourceImage::LoadPolicy LoadPolicy;
-
-const LoadPolicy IMAGE_LOAD_POLICY_DEFAULT = Dali::ResourceImage::IMMEDIATE;
-
 class ResourceImage;
 typedef IntrusivePtr<ResourceImage> ResourceImagePtr;
 
@@ -59,24 +55,15 @@ public:
    * @param [in] url The URL of the image file.
    * @param [in] attributes requested parameters for loading (size, scaling etc.)
    *                        if width or height is specified as 0, the natural size will be used.
-   * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
-   * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    * @return a pointer to a newly created object.
    */
   static ResourceImagePtr New( const std::string& url,
-                          const ImageAttributes& attributes,
-                          LoadPolicy loadPol = IMAGE_LOAD_POLICY_DEFAULT,
-                          ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
+                          const ImageAttributes& attributes );
 
   /**
    * @copydoc Dali::ResourceImage::GetLoadingState()
    */
   Dali::LoadingState GetLoadingState() const { return mTicket ? mTicket->GetLoadingState() : ResourceLoading; }
-
-  /**
-   * @copydoc Dali::ResourceImage::GetLoadPolicy()
-   */
-  LoadPolicy GetLoadPolicy () const { return mLoadPolicy; }
 
   /**
    * @copydoc Dali::ResourceImage::LoadingFinishedSignal()
@@ -106,8 +93,9 @@ public:
 
   /**
    * @copydoc Dali::ResourceImage::GetUrl()
+   * virtual so deriving class can override it
    */
-  const std::string& GetUrl() const;
+  virtual const std::string& GetUrl() const;
 
   /**
    * @copydoc Dali::ResourceImage::Reload()
@@ -161,7 +149,7 @@ protected:
   /**
    * Constructor, with default parameters
    */
-  ResourceImage( LoadPolicy loadPol = IMAGE_LOAD_POLICY_DEFAULT, ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
+  ResourceImage();
 
 private:
 
@@ -179,8 +167,6 @@ private:
   ImageFactoryCache::RequestPtr mRequest; ///< contains the initially requested attributes for image. Request is reissued when memory was released.
 
   Dali::ResourceImage::ResourceImageSignal mLoadingFinished;
-
-  LoadPolicy mLoadPolicy : 2;    ///< 2 bits is enough space
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

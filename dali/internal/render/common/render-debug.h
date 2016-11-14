@@ -64,6 +64,7 @@ class PropertyInputImpl;
 
 namespace SceneGraph
 {
+class Node;
 class RenderInstruction;
 struct RenderList;
 struct RenderItem;
@@ -108,6 +109,13 @@ void PrintRenderItem( const SceneGraph::RenderItem& item );
  * @param[in] rendererCount The number of image renderers
  */
 void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount );
+
+/**
+ * Recursively dumps a Node tree.
+ * @param[in] node The starting node to dump from
+ * @param[in] indent Optional. Leave unset for default indent (used internally while recursing)
+ */
+void DumpNode( const SceneGraph::Node* node, unsigned int indent = 0 );
 
 } // Render
 

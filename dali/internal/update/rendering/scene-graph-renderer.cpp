@@ -18,17 +18,17 @@
 #include "scene-graph-renderer.h"
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/controllers/scene-controller.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
+#include <dali/internal/update/controllers/scene-controller.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/shaders/program.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace // unnamed namespace
 {
@@ -99,7 +99,7 @@ enum Flags
   RESEND_DEPTH_WRITE_MODE            = 1 << 8,
   RESEND_DEPTH_TEST_MODE             = 1 << 9,
   RESEND_DEPTH_FUNCTION              = 1 << 10,
-  RESEND_STENCIL_MODE                = 1 << 11,
+  RESEND_RENDER_MODE                 = 1 << 11,
   RESEND_STENCIL_FUNCTION            = 1 << 12,
   RESEND_STENCIL_FUNCTION_MASK       = 1 << 13,
   RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 14,
@@ -132,7 +132,7 @@ Renderer::Renderer()
   mGeometry( NULL ),
   mShader( NULL ),
   mBlendColor( NULL ),
-  mStencilParameters( StencilMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
+  mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
   mBlendBitmask( 0u ),
@@ -143,7 +143,6 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
-  mWriteToColorBuffer( true ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mPremultipledAlphaEnabled( false ),
@@ -159,15 +158,15 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-  if (mTextureSet)
+  if( mTextureSet )
   {
-    mTextureSet->RemoveObserver(this);
-    mTextureSet=NULL;
+    mTextureSet->RemoveObserver( this );
+    mTextureSet = NULL;
   }
   if( mShader )
   {
-    mShader->RemoveConnectionObserver(*this);
-    mShader=NULL;
+    mShader->RemoveConnectionObserver( *this );
+    mShader = NULL;
   }
 }
 
@@ -315,11 +314,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction );
     }
 
-    if( mResendFlag & RESEND_STENCIL_MODE )
+    if( mResendFlag & RESEND_RENDER_MODE )
     {
-      typedef MessageValue1< Render::Renderer, StencilMode::Type > DerivedType;
+      typedef MessageValue1< Render::Renderer, RenderMode::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMode, mStencilParameters.stencilMode );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode );
     }
 
     if( mResendFlag & RESEND_STENCIL_FUNCTION )
@@ -369,13 +368,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
-    }
-
-    if( mResendFlag & RESEND_WRITE_TO_COLOR_BUFFER )
-    {
-      typedef MessageValue1< Render::Renderer, bool > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetWriteToColorBuffer, mWriteToColorBuffer );
     }
 
     if( mResendFlag & RESEND_BATCHING_MODE )
@@ -505,10 +497,10 @@ void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
   mResendFlag |= RESEND_DEPTH_FUNCTION;
 }
 
-void Renderer::SetStencilMode( StencilMode::Type mode )
+void Renderer::SetRenderMode( RenderMode::Type mode )
 {
-  mStencilParameters.stencilMode = mode;
-  mResendFlag |= RESEND_STENCIL_MODE;
+  mStencilParameters.renderMode = mode;
+  mResendFlag |= RESEND_RENDER_MODE;
 }
 
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
@@ -553,12 +545,6 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
 }
 
-void Renderer::SetWriteToColorBuffer( bool writeToColorBuffer )
-{
-  mWriteToColorBuffer = writeToColorBuffer;
-  mResendFlag |= RESEND_WRITE_TO_COLOR_BUFFER;
-}
-
 void Renderer::SetBatchingEnabled( bool batchingEnabled )
 {
   mBatchingEnabled = batchingEnabled;
@@ -573,7 +559,7 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
   RenderDataProvider* dataProvider = NewRenderDataProvider();
 
   mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, mBlendColor, static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
-                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters, mWriteToColorBuffer );
+                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
 
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
 }
@@ -599,7 +585,17 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
 
   if( mTextureSet )
   {
-    size_t textureCount( mTextureSet->GetTextureCount() );
+    size_t textureCount = mTextureSet->GetTextureCount();
+    size_t newTextureCount = mTextureSet->GetNewTextureCount();
+
+    Program* program = mShader->GetProgram();
+    if( program && program->GetActiveSamplerCount() != textureCount + newTextureCount )
+    {
+      DALI_LOG_ERROR("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
+                       program->GetActiveSamplerCount(),
+                       textureCount + newTextureCount );
+    }
+
     dataProvider->mTextures.resize( textureCount );
     dataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )
@@ -608,10 +604,9 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
     }
 
-    textureCount = mTextureSet->GetNewTextureCount();
-    dataProvider->mNewTextures.resize( textureCount );
-    dataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
+    dataProvider->mNewTextures.resize( newTextureCount );
+    dataProvider->mSamplers.resize( newTextureCount );
+    for( unsigned int i(0); i<newTextureCount; ++i )
     {
       dataProvider->mNewTextures[i] = mTextureSet->GetNewTexture(i);
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
@@ -676,7 +671,6 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
       break;
     }
   }
-
 
   return opacity;
 }

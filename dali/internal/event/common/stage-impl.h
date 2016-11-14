@@ -138,11 +138,20 @@ public:
   void Remove( Actor& actor );
 
   /**
-   * Sets the size of the stage and indirectly, the root actor.
-   * @param [in] width  The new width.
-   * @param [in] height The new height.
+   * Used to calculate the size of the stage and indirectly, the root actor.
+   * @param [in] width  The new surface width.
+   * @param [in] height The new surface height.
    */
-  void SetSize( float width, float height );
+  void SurfaceResized( float width, float height );
+
+  /**
+   * Sets the top margin size.
+   * Available stage size is reduced by this size.
+   * The stage is located below the size at the top of the display
+   * initial size is zero before it is assigned
+   * @param[in] margin margin size
+   */
+  void SetTopMargin( unsigned int margin );
 
   /**
    * Returns the size of the Stage in pixels as a Vector.
@@ -161,6 +170,11 @@ public:
    * Create a default camera actor
    */
   void CreateDefaultCameraActor();
+
+  /**
+   * Set position of default camera for current stage size
+   */
+  void SetDefaultCameraPosition();
 
   /**
    * From RenderTaskDefaults; retrieve the default root actor.
@@ -433,8 +447,9 @@ private:
 
   NotificationManager& mNotificationManager;
 
-  // The Actual size of the stage.
+  // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 mSize;
+  Vector2 mSurfaceSize;
 
   // Cached for public GetBackgroundColor()
   Vector4 mBackgroundColor;
@@ -449,6 +464,7 @@ private:
   ViewMode mViewMode;
   float mStereoBase;
 
+  unsigned int mTopMargin;
   Vector2 mDpi;
 
   // The object registry

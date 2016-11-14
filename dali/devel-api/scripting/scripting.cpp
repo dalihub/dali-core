@@ -38,21 +38,6 @@ namespace Scripting
 namespace
 {
 
-// Tables used here for converting strings to the enumerations and vice versa
-const StringEnum IMAGE_LOAD_POLICY_TABLE[] =
-{
-  { "IMMEDIATE", ResourceImage::IMMEDIATE },
-  { "ON_DEMAND", ResourceImage::ON_DEMAND },
-};
-const unsigned int IMAGE_LOAD_POLICY_TABLE_COUNT = sizeof( IMAGE_LOAD_POLICY_TABLE ) / sizeof( IMAGE_LOAD_POLICY_TABLE[0] );
-
-const StringEnum IMAGE_RELEASE_POLICY_TABLE[] =
-{
-  { "UNUSED", Image::UNUSED },
-  { "NEVER",  Image::NEVER  },
-};
-const unsigned int IMAGE_RELEASE_POLICY_TABLE_COUNT = sizeof( IMAGE_RELEASE_POLICY_TABLE ) / sizeof( IMAGE_RELEASE_POLICY_TABLE[0] );
-
 const StringEnum PIXEL_FORMAT_TABLE[] =
 {
   { "A8",                                           Pixel::A8                                           },
@@ -357,8 +342,12 @@ Actor NewActor( const Property::Map& map )
     // Now set the properties, or create children
     for ( unsigned int i = 0, mapCount = map.Count(); i < mapCount; ++i )
     {
-      const StringValuePair& pair( map.GetPair( i ) );
-      const std::string& key( pair.first );
+      const KeyValuePair pair( map.GetKeyValue( i ) );
+      if( pair.first.type == Property::Key::INDEX )
+      {
+        continue;
+      }
+      const std::string& key( pair.first.stringKey );
       if ( key == "type" )
       {
         continue;
@@ -445,13 +434,11 @@ void CreatePropertyMap( Image image, Property::Map& map )
     }
 
     map[ "type" ] = imageType;
-    map[ "releasePolicy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
     ResourceImage resourceImage = ResourceImage::DownCast( image );
     if( resourceImage )
     {
       map[ "filename" ] = resourceImage.GetUrl();
-      map[ "loadPolicy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     int width( image.GetWidth() );
@@ -476,8 +463,13 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
   // Now set the properties, or create children
   for( unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i )
   {
-    const StringValuePair& pair( map.GetPair( i ) );
-    const std::string& key( pair.first );
+    const KeyValuePair pair( map.GetKeyValue( i ) );
+    if( pair.first.type == Property::Key::INDEX )
+    {
+      continue; // We don't consider index keys.
+    }
+    const std::string& key( pair.first.stringKey );
+
     const Property::Value& value( pair.second );
 
     if( key == "actor" )
@@ -554,12 +546,18 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
       Property::Map timeMap = value.Get< Property::Map >();
       for( unsigned int i = 0; i < timeMap.Count(); ++i )
       {
-        const StringValuePair& pair( timeMap.GetPair( i ) );
-        if( pair.first == "delay" )
+        const KeyValuePair pair( timeMap.GetKeyValue( i ) );
+        if( pair.first.type == Property::Key::INDEX )
+        {
+          continue;
+        }
+        const std::string& key( pair.first.stringKey );
+
+        if( key == "delay" )
         {
           element->timePeriodDelay = pair.second.Get< float >();
         }
-        else if( pair.first == "duration" )
+        else if( key == "duration" )
         {
           element->timePeriodDuration = pair.second.Get< float >();
         }
@@ -573,7 +571,3 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
 } // namespace scripting
 
 } // namespace Dali
-
-
-
-

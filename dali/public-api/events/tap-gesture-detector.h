@@ -54,7 +54,8 @@ struct TapGesture;
  * @endcode
  *
  * @SINCE_1_0.0
- * @note Multi-touch taps are not currently supported. However, multiple taps (double & triple tap etc.) are supported.
+ * @note Multi-touch taps (two or more points of contact with the surface) are not currently
+ * supported. However, multiple taps (double & triple tap etc.) are supported.
  *
  * Signals
  * | %Signal Name | Method                |
@@ -198,6 +199,7 @@ public: // Signals
 
 public: // Not intended for Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by TapGestureDetector::New() methods.
    *
@@ -205,6 +207,7 @@ public: // Not intended for Application developers
    * @param [in] internal A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL TapGestureDetector(Internal::TapGestureDetector* internal);
+  /// @endcond
 };
 
 /**

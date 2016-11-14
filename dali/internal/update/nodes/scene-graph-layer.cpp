@@ -102,7 +102,6 @@ bool Layer::IsDepthTestDisabled() const
 
 void Layer::ClearRenderables()
 {
-  stencilRenderables.Clear();
   colorRenderables.Clear();
   overlayRenderables.Clear();
 }

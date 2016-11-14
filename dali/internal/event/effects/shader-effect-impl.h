@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/devel-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/object-impl.h>

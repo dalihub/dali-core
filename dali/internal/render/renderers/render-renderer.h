@@ -30,7 +30,7 @@
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/update/manager/prepare-render-instructions.h>
+#include <dali/internal/update/manager/render-instruction-processor.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -50,10 +50,8 @@ class TextureCache;
 class NodeDataProvider;
 }
 
-
 namespace Render
 {
-class UniformNameCache;
 
 /**
  * Renderers are used to render meshes
@@ -69,28 +67,28 @@ public:
    */
   struct StencilParameters
   {
-    StencilParameters( StencilMode::Type stencilMode, StencilFunction::Type stencilFunction, int stencilFunctionMask,
+    StencilParameters( RenderMode::Type renderMode, StencilFunction::Type stencilFunction, int stencilFunctionMask,
                        int stencilFunctionReference, int stencilMask, StencilOperation::Type stencilOperationOnFail,
                        StencilOperation::Type stencilOperationOnZFail, StencilOperation::Type stencilOperationOnZPass )
     : stencilFunctionMask      ( stencilFunctionMask      ),
       stencilFunctionReference ( stencilFunctionReference ),
       stencilMask              ( stencilMask              ),
+      renderMode               ( renderMode               ),
       stencilFunction          ( stencilFunction          ),
       stencilOperationOnFail   ( stencilOperationOnFail   ),
       stencilOperationOnZFail  ( stencilOperationOnZFail  ),
-      stencilOperationOnZPass  ( stencilOperationOnZPass  ),
-      stencilMode              ( stencilMode              )
+      stencilOperationOnZPass  ( stencilOperationOnZPass  )
     {
     }
 
     int stencilFunctionMask;                          ///< The stencil function mask
     int stencilFunctionReference;                     ///< The stencil function reference
     int stencilMask;                                  ///< The stencil mask
-    StencilFunction::Type stencilFunction:3;          ///< The stencil function
+    RenderMode::Type       renderMode:3;              ///< The render mode
+    StencilFunction::Type  stencilFunction:3;         ///< The stencil function
     StencilOperation::Type stencilOperationOnFail:3;  ///< The stencil operation for stencil test fail
     StencilOperation::Type stencilOperationOnZFail:3; ///< The stencil operation for depth test fail
     StencilOperation::Type stencilOperationOnZPass:3; ///< The stencil operation for depth test pass
-    StencilMode::Type stencilMode:2;                  ///< The stencil mode
   };
 
   /**
@@ -115,7 +113,6 @@ public:
    * @param[in] depthTestMode Depth buffer test mode
    * @param[in] depthFunction Depth function
    * @param[in] stencilParameters Struct containing all stencil related options
-   * @param[in] writeToColorBuffer Set to True to write to the color buffer
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
                         Render::Geometry* geometry,
@@ -126,8 +123,7 @@ public:
                         DepthWriteMode::Type depthWriteMode,
                         DepthTestMode::Type depthTestMode,
                         DepthFunction::Type depthFunction,
-                        StencilParameters& stencilParameters,
-                        bool writeToColorBuffer );
+                        StencilParameters& stencilParameters );
 
   /**
    * Constructor.
@@ -141,7 +137,6 @@ public:
    * @param[in] depthTestMode Depth buffer test mode
    * @param[in] depthFunction Depth function
    * @param[in] stencilParameters Struct containing all stencil related options
-   * @param[in] writeToColorBuffer Set to True to write to the color buffer
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
             Render::Geometry* geometry,
@@ -152,8 +147,7 @@ public:
             DepthWriteMode::Type depthWriteMode,
             DepthTestMode::Type depthTestMode,
             DepthFunction::Type depthFunction,
-            StencilParameters& stencilParameters,
-            bool writeToColorBuffer );
+            StencilParameters& stencilParameters );
 
   /**
    * Change the data providers of the renderer
@@ -181,9 +175,8 @@ public:
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
    * @param[in] textureCache The texture cache to use
-   * @param[in] uniformNameCache Cache of uniform names to use
    */
-  void Initialize( Context& context, SceneGraph::TextureCache& textureCache, Render::UniformNameCache& uniformNameCache );
+  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
 
   /**
    * Destructor
@@ -264,16 +257,16 @@ public:
   DepthFunction::Type GetDepthFunction() const;
 
   /**
-   * Sets the stencil mode
-   * @param[in] stencilMode The stencil function
+   * Sets the render mode
+   * @param[in] renderMode The render mode
    */
-  void SetStencilMode( StencilMode::Type stencilMode );
+  void SetRenderMode( RenderMode::Type mode );
 
   /**
-   * Gets the stencil mode
-   * @return The stencil function
+   * Gets the render mode
+   * @return The render mode
    */
-  StencilMode::Type GetStencilMode() const;
+  RenderMode::Type GetRenderMode() const;
 
   /**
    * Sets the stencil function
@@ -360,18 +353,6 @@ public:
   StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
-   * Sets whether or not to write to the color buffer
-   * @param[in] writeToColorBuffer True to write to the color buffer
-   */
-  void SetWriteToColorBuffer( bool writeToColorBuffer );
-
-  /**
-   * Gets whether or not to write to the color buffer
-   * @return True to write to the color buffer
-   */
-  bool GetWriteToColorBuffer() const;
-
-  /**
    * Sets batching mode on the renderer
    * @param[in] batchingEnabled batching state
    */
@@ -410,7 +391,7 @@ public:
    * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const;
+  void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const;
 
 private:
 
@@ -461,16 +442,16 @@ private:
 
   Context*                     mContext;
   SceneGraph::TextureCache*    mTextureCache;
-  Render::UniformNameCache*    mUniformNameCache;
   Render::Geometry*            mGeometry;
 
   struct UniformIndexMap
   {
-    unsigned int               uniformIndex;  ///< The index of the cached location in the Program
+    unsigned int               uniformIndex;                ///< The index of the cached location in the Program
     const PropertyInputImpl*   propertyValue;
   };
 
   typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
+
   UniformIndexMappings         mUniformIndexMap;
   Vector<GLint>                mAttributesLocation;
 
@@ -485,10 +466,10 @@ private:
   BlendMode::Type              mBlendMode:2;                ///< The mode of blending
   DepthWriteMode::Type         mDepthWriteMode:2;           ///< The depth write mode
   DepthTestMode::Type          mDepthTestMode:2;            ///< The depth test mode
-  bool                         mWriteToColorBuffer:1;       ///< True if we are writing to the color buffer
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool mBatchingEnabled:1;                ///< Flag indicating if the renderer is batchable
+  bool                         mBatchingEnabled:1;          ///< Flag indicating if the renderer is batchable
+
 };
 
 } // namespace SceneGraph

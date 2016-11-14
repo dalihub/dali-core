@@ -178,6 +178,36 @@ public:
   Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
+   * @brief Query the index of a custom property matching the given key.
+   *
+   * Returns the first custom property that matches the given integer key. This is
+   * useful for other classes that know the key but not the name. Requires the property
+   * to have been registered with the associated key.
+   *
+   * @note This key is not the same as the Property enum found in
+   * objects such as Actor (which is a preset index).
+   *
+   * @SINCE_1_2.1
+   * @param [in] key The integer key of the property
+   * @return The index of the property, or Property::INVALID_INDEX if no property exists with the given key.
+   * @note The key is not the same as the returned index, though it has the same type.
+   */
+  Property::Index GetPropertyIndex( Property::Index key ) const;
+
+  /**
+   * @brief Query the index of a property using the given key from a Property::Map
+   * @SINCE_1_2.7
+   *
+   * @param[in] key The key of the property to search for.
+   * @return the matching property index of either the string key or the matching
+   * custom property index of the index key, or Property::INVALID_INDEX if no
+   * property matches the given key.
+   *
+   * @note See also, GetPropertyIndex(Property::Index) and GetPropertyIndex(const std::string&)
+   */
+  Property::Index GetPropertyIndex( Property::Key key ) const;
+
+  /**
    * @brief Query whether a property can be set using SetProperty().
    *
    * @SINCE_1_0.0
@@ -250,6 +280,40 @@ public:
    * @note If a property with the desired name already exists, then the value given is just set.
    */
   Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
+
+  /**
+   * @brief Register a new animatable property with an integer key.
+   *
+   * @SINCE_1_2.1
+   * @param [in] key  The integer key of the property.
+   * @param [in] name The text key of the property.
+   * @param [in] propertyValue The new value of the property.
+   * @return The index of the property or Property::INVALID_INDEX if registration failed
+   * @pre The object supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
+   * Property names and keys are expected to be unique, but this is not enforced.
+   * Property indices are unique to each registered custom property in a given object.
+   * @note Returns Property::INVALID_INDEX if registration failed. This can happen if you try to register
+   * animatable property on an object that does not have scene graph object.
+   * @note The returned property index is not the same as the integer key (though it shares a type)
+   *
+   * This version of RegisterProperty associates both an integer key
+   * and the text key with the property, allowing for lookup of the
+   * property index by either key or name ( which is useful when other
+   * classes know the key but not the name )
+   *
+   * @note Only the following types can be animated:
+   *       - Property::BOOLEAN
+   *       - Property::FLOAT
+   *       - Property::INTEGER
+   *       - Property::VECTOR2
+   *       - Property::VECTOR3
+   *       - Property::VECTOR4
+   *       - Property::MATRIX3
+   *       - Property::MATRIX
+   *       - Property::ROTATION
+   * @note If a property with the desired name already exists, then the value given is just set.
+   */
+  Property::Index RegisterProperty( Property::Index key, const std::string& name, const Property::Value& propertyValue );
 
   /**
    * @brief Register a new property.

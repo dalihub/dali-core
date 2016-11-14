@@ -48,6 +48,7 @@ struct DALI_IMPORT_API Property
   typedef int Index;
 
   static const int INVALID_INDEX; ///< -1 is not a valid property index
+  static const int INVALID_KEY;   ///< -1 is not a valid property key
   static const int INVALID_COMPONENT_INDEX; ///< -1 is not a valid property index
 
   typedef Dali::Vector< Index > IndexContainer; ///< A vector of property indices @SINCE_1_0.0
@@ -56,6 +57,11 @@ struct DALI_IMPORT_API Property
    * @brief A value-type representing a property value.
    */
   class Value;
+
+  /**
+   * @brief A Key used by Map
+   */
+  struct Key;
 
   /**
    * @brief A Map of property values.

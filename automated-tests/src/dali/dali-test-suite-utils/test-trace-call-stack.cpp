@@ -101,6 +101,21 @@ bool TraceCallStack::FindMethod(std::string method) const
   return found;
 }
 
+bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string& params ) const
+{
+  bool found = false;
+  for( size_t i=0; i < mCallStack.size(); i++ )
+  {
+    if( 0 == mCallStack[i].method.compare(method) )
+    {
+      found = true;
+      params = mCallStack[i].paramList;
+      break;
+    }
+  }
+  return found;
+}
+
 int TraceCallStack::CountMethod(std::string method) const
 {
   int numCalls = 0;
@@ -130,6 +145,18 @@ bool TraceCallStack::FindMethodAndParams(std::string method, const NamedParams& 
   return FindIndexFromMethodAndParams( method, params ) > -1;
 }
 
+bool TraceCallStack::FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const
+{
+  for( size_t i = startIndex; i < mCallStack.size(); ++i )
+  {
+    if( ( mCallStack[i].method.compare( method ) == 0 ) && ( mCallStack[i].paramList.compare( params ) == 0 ) )
+    {
+      startIndex = i;
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Search for a method in the stack with the given parameter list

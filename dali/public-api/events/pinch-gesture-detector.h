@@ -139,6 +139,7 @@ public: // Signals
 
 public: // Not intended for Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by PinchGestureDetector::New() methods.
    *
@@ -146,6 +147,7 @@ public: // Not intended for Application developers
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PinchGestureDetector(Internal::PinchGestureDetector* internal);
+  /// @endcond
 
 };
 

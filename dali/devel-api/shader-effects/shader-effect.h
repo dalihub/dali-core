@@ -368,6 +368,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @DEPRECATED_1_0.47
    * @brief This constructor is used by Dali New() methods.
@@ -375,6 +376,7 @@ public: // Not intended for application developers
    * @param [in] effect A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL ShaderEffect(Internal::ShaderEffect* effect);
+  /// @endcond
 };
 
 /**

@@ -102,12 +102,14 @@ public:
   /**
    * @brief Increase the capcity of the array.
    * @SINCE_1_0.0
+   * @param[in] size The size to reserve
    */
   void Reserve( SizeType size );
 
   /**
    * @brief Resize to size.
    * @SINCE_1_0.0
+   * @param[in] size The size to resize
    */
   void Resize( SizeType size );
 
@@ -126,6 +128,18 @@ public:
    * @param[in] value The value to add to the end of the array
    */
   void PushBack( const Value& value );
+
+  /**
+   * @brief Add an element to the array.
+   *
+   * @SINCE_1_2.11
+   * @param[in] value The value to add to the end of the array
+   */
+  inline Property::Array& Add( const Value& value )
+  {
+    PushBack( value );
+    return *this;
+  }
 
   /**
    * @brief Const access an element.

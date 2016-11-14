@@ -318,7 +318,6 @@ private: // data
   BlendMode::Type              mBlendMode:2;                  ///< Local copy of the mode of blending
   DepthWriteMode::Type         mDepthWriteMode:2;             ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:2;              ///< Local copy of the depth test mode
-  bool                         mWriteToColorBuffer:1;         ///< Local copy of the write to color buffer flag
   bool                         mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                         mBatchingEnabled : 1;          ///< Flag indicating whether render is batchable or not
 };

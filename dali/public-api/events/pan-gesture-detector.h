@@ -268,6 +268,7 @@ public: // Directional Panning
    * @brief Returns the angle by index that this pan gesture detector emits a signal.
    *
    * @SINCE_1_0.0
+   * @param[in] index The angle's index
    * @return An angle threshold pair, or a zero valued angle pair when index is invalid.
    * @pre The gesture detector has been initialized.
    * @pre The index is less than GetAngleCount()
@@ -335,6 +336,7 @@ public: // Pan Properties Setters
 
 public: // Not intended for Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by PanGestureDetector::New() methods.
    *
@@ -342,6 +344,7 @@ public: // Not intended for Application developers
    * @param [in] internal A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
+  /// @endcond
 
 };
 

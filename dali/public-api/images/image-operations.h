@@ -49,19 +49,27 @@ typedef Dali::Uint16Pair ImageDimensions;
  */
 namespace FittingMode
 {
+  /**
+   * @brief The type of FittingMode
+   * @SINCE_1_0.0
+   */
   enum Type
   {
-    SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not @SINCE_1_0.0
+    SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not
                    ///  filling one of either the desired image width or height with
                    ///  pixels.
-    SCALE_TO_FILL, ///< Image fills whole desired width & height with image data. The @SINCE_1_0.0
+                   ///  @SINCE_1_0.0
+    SCALE_TO_FILL, ///< Image fills whole desired width & height with image data. The
                    ///  image is centred in the desired dimensions, exactly touching
                    ///  in one dimension, with image regions outside the other desired
                    ///  dimension cropped away.
-    FIT_WIDTH,     ///< Image fills whole width. Height is scaled proportionately to @SINCE_1_0.0
+                   ///  @SINCE_1_0.0
+    FIT_WIDTH,     ///< Image fills whole width. Height is scaled proportionately to
                    ///  maintain aspect ratio.
-    FIT_HEIGHT     ///< Image fills whole height. Width is scaled proportionately to @SINCE_1_0.0
+                   ///  @SINCE_1_0.0
+    FIT_HEIGHT     ///< Image fills whole height. Width is scaled proportionately to
                    ///  maintain aspect ratio.
+                   ///  @SINCE_1_0.0
   };
   const Type DEFAULT = SHRINK_TO_FIT;
 }
@@ -80,26 +88,37 @@ namespace FittingMode
  */
 namespace SamplingMode
 {
+  /**
+   * @brief The type of SamplingMode
+   * @SINCE_1_0.0
+   */
   enum Type
   {
-    BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4, @SINCE_1_0.0
+    BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4,
                       ///  1/8, etc width and height and approximately the desired
                       ///  size. This is the default.
-    NEAREST,          ///< For each output pixel, read one input pixel. @SINCE_1_0.0
-    LINEAR,           ///< For each output pixel, read a quad of four input pixels @SINCE_1_0.0
+                      ///  @SINCE_1_0.0
+    NEAREST,          ///< For each output pixel, read one input pixel.
+                      ///  @SINCE_1_0.0
+    LINEAR,           ///< For each output pixel, read a quad of four input pixels
                       ///  and write a weighted average of them.
-    BOX_THEN_NEAREST, ///< Iteratively box filter to generate an image of 1/2, 1/4, @SINCE_1_0.0
+                      ///  @SINCE_1_0.0
+    BOX_THEN_NEAREST, ///< Iteratively box filter to generate an image of 1/2, 1/4,
                       ///  1/8 etc width and height and approximately the desired
                       ///  size, then for each output pixel, read one pixel from the
                       ///  last level of box filtering.
-    BOX_THEN_LINEAR,  ///< Iteratively box filter to almost the right size, then for @SINCE_1_0.0
+                      ///  @SINCE_1_0.0
+    BOX_THEN_LINEAR,  ///< Iteratively box filter to almost the right size, then for
                       ///  each output pixel, read four pixels from the last level of
                       ///  box filtering and write their weighted average.
-    NO_FILTER,        ///< No filtering is performed. If the SCALE_TO_FILL scaling mode @SINCE_1_0.0
+                      ///  @SINCE_1_0.0
+    NO_FILTER,        ///< No filtering is performed. If the SCALE_TO_FILL scaling mode
                       ///  is enabled, the borders of the image may be trimmed to
                       ///  match the aspect ratio of the desired dimensions.
-    DONT_CARE         ///< For caching algorithms where a client strongly prefers a @SINCE_1_0.0
+                      ///  @SINCE_1_0.0
+    DONT_CARE         ///< For caching algorithms where a client strongly prefers a
                       ///  cache-hit to reuse a cached image.
+                      ///  @SINCE_1_0.0
   };
   const Type DEFAULT = BOX;
 }

@@ -509,17 +509,20 @@ public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.
    * @SINCE_1_0.0
+   * @return The signal to connect to
    */
   RenderTaskSignalType& FinishedSignal();
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param [in] renderTask A pointer to a newly allocated render-task
    */
   explicit DALI_INTERNAL RenderTask( Internal::RenderTask* renderTask );
+  /// @endcond
 };
 
 /**

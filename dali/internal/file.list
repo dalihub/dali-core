@@ -13,7 +13,6 @@ internal_src_files = \
   \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
-  $(internal_src_dir)/event/actors/image-actor-impl.cpp \
   $(internal_src_dir)/event/actors/layer-impl.cpp \
   $(internal_src_dir)/event/actors/layer-list.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \
@@ -104,7 +103,6 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-tracker.cpp \
   $(internal_src_dir)/render/common/render-manager.cpp \
   $(internal_src_dir)/render/data-providers/render-data-provider.cpp \
-  $(internal_src_dir)/render/data-providers/uniform-name-cache.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/context.cpp \
   $(internal_src_dir)/render/gl-resources/frame-buffer-state-cache.cpp \
@@ -146,9 +144,9 @@ internal_src_files = \
   $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
   $(internal_src_dir)/update/queue/update-message-queue.cpp \
-  $(internal_src_dir)/update/manager/prepare-render-instructions.cpp \
   $(internal_src_dir)/update/manager/geometry-batcher.cpp \
-  $(internal_src_dir)/update/manager/process-render-tasks.cpp \
+  $(internal_src_dir)/update/manager/render-instruction-processor.cpp \
+  $(internal_src_dir)/update/manager/render-task-processor.cpp \
   $(internal_src_dir)/update/manager/transform-manager.cpp \
   $(internal_src_dir)/update/manager/update-algorithms.cpp \
   $(internal_src_dir)/update/manager/update-manager.cpp \

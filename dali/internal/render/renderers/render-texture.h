@@ -45,14 +45,6 @@ class Texture
 public:
 
   /**
-   * Enumeration to tell that this sampler does not have a unique index yet
-   */
-  enum
-  {
-    NOT_INITIALIZED = -1
-  };
-
-  /**
    * Constructor
    */
   Texture()
@@ -86,7 +78,6 @@ public:
 public: // called from RenderThread
 
   /**
-   * @param[in] buffer A vector wit
    * Get the texture ID
    * @return the id of the associated texture
    */

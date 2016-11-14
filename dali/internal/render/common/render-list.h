@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
+#define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,29 +47,17 @@ struct RenderList;
 typedef OwnerContainer< RenderList* > RenderListContainer;
 
 /**
- * The RenderList structure provides the renderer with a list of renderers and
- * a set of flags to tell it what depth buffering is required.
+ * The RenderList structure provides the renderer with a list of renderers.
  */
 struct RenderList
 {
 public:
 
   /**
-   * The RenderFlags describe how the objects are rendered using the stencil buffer.
-   */
-  enum RenderFlags
-  {
-    STENCIL_BUFFER_ENABLED = 1 << 0, ///< If stencil buffer should be used for writing / test operation
-    STENCIL_WRITE          = 1 << 1, ///< If the stencil buffer is writable
-    STENCIL_CLEAR          = 1 << 2, ///< If the stencil buffer should first be cleared
-  };
-
-  /**
    * Constructor
    */
   RenderList()
   : mNextFree( 0 ),
-    mRenderFlags( 0u ),
     mClippingBox( NULL ),
     mSourceLayer( NULL ),
     mHasColorRenderItems( false )
@@ -81,34 +69,8 @@ public:
    */
   ~RenderList()
   {
-    // pointer container deletes the render items
+    // Pointer container deletes the render items
     delete mClippingBox;
-  }
-
-  /**
-   * Clear the render flags
-   */
-  void ClearFlags()
-  {
-    mRenderFlags = 0u;
-  }
-
-  /**
-   * Set particular render flags
-   * @param[in] flags The set of flags to bitwise or with existing flags
-   */
-  void SetFlags( unsigned int flags )
-  {
-    mRenderFlags |= flags;
-  }
-
-  /**
-   * Retrieve the render flags.
-   * @return the render flags.
-   */
-  unsigned int GetFlags() const
-  {
-    return mRenderFlags;
   }
 
   /**
@@ -116,9 +78,8 @@ public:
    */
   void Reset()
   {
-    // we dont want to delete and re-create the render items every frame
+    // We don't want to delete and re-create the render items every frame
     mNextFree = 0;
-    mRenderFlags = 0u;
 
     delete mClippingBox;
     mClippingBox = NULL;
@@ -207,7 +168,7 @@ public:
    */
   bool IsEmpty() const
   {
-    return (mNextFree == 0);
+    return ( mNextFree == 0 );
   }
 
   /**
@@ -219,9 +180,8 @@ public:
   {
     if( clipping )
     {
-      ClippingBox* newBox = new ClippingBox( box );
       delete mClippingBox;
-      mClippingBox = newBox;
+      mClippingBox = new ClippingBox( box );;
     }
   }
 
@@ -230,7 +190,7 @@ public:
    */
   bool IsClipping() const
   {
-    return (NULL != mClippingBox);
+    return ( NULL != mClippingBox );
   }
 
   /**
@@ -306,12 +266,12 @@ private:
   RenderItemContainer mItems; ///< Each item is a renderer and matrix pair
   RenderItemContainer::SizeType mNextFree;              ///< index for the next free item to use
 
-  unsigned int mRenderFlags;    ///< The render flags
-
   ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;              ///< The originating layer where the renderers are from
   bool         mHasColorRenderItems : 1;  ///< True if list contains color render items
+
 };
+
 
 } // namespace SceneGraph
 
@@ -319,4 +279,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H

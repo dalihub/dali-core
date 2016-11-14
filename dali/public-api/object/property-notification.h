@@ -125,6 +125,7 @@ public:
   /**
    * @brief Get the target handle that this notification is observing.
    * @SINCE_1_0.0
+   * @return The target handle
    */
   Dali::Handle GetTarget() const;
 
@@ -175,6 +176,7 @@ public:
 
 public: // Not intended for use by Application developers
 
+  /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
    *
@@ -182,6 +184,7 @@ public: // Not intended for use by Application developers
    * @param [in] propertyNotification A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);
+  /// @endcond
 };
 
 /**
