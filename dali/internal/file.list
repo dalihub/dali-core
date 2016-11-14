@@ -13,6 +13,7 @@ internal_src_files = \
   \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
+  $(internal_src_dir)/event/actors/image-actor-impl.cpp \
   $(internal_src_dir)/event/actors/layer-impl.cpp \
   $(internal_src_dir)/event/actors/layer-list.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \

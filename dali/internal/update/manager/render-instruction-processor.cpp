@@ -19,7 +19,7 @@
 #include <dali/internal/update/manager/render-instruction-processor.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/shader-effects/shader-effect.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function

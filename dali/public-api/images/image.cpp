@@ -53,6 +53,11 @@ Image Image::DownCast( BaseHandle handle )
   return Image( dynamic_cast<Dali::Internal::Image*>(handle.GetObjectPtr()) );
 }
 
+Image::ReleasePolicy Image::GetReleasePolicy() const
+{
+  return GetImplementation(*this).GetReleasePolicy();
+}
+
 unsigned int Image::GetWidth() const
 {
   return GetImplementation(*this).GetWidth();

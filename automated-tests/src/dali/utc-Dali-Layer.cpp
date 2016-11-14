@@ -594,7 +594,7 @@ Actor CreateActor( bool withAlpha )
   }
   else
   {
-    bufferImage = BufferImage::New( 1u, 1u, Pixel::RGB888 );
+    bufferImage = BufferImage::New( 1u, 1u, Pixel::RGB888, Dali::Image::NEVER );
     PixelBuffer* pBuffer = bufferImage.GetBuffer();
     if( pBuffer )
     {

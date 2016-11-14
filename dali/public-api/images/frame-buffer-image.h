@@ -88,6 +88,28 @@ public:
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
+   * @DEPRECATED_1_1.3. Use New() instead.
+   *
+   * @brief Create a new FrameBufferImage.
+   *
+   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
+   * @SINCE_1_0.0
+   * @remarks Image::ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the Remarks of ReleasePolicy for more information.
+   * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
+   * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
+   * @param [in] pixelFormat The pixel format.
+   * @param [in] releasePolicy The releasePolicy to apply to the FrameBufferImage.
+   * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
+   *
+   * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
+   */
+  static FrameBufferImage New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy,
+                              RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
+
+  /**
    * @brief Create a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
@@ -98,6 +120,24 @@ public:
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    */
   static FrameBufferImage New(NativeImageInterface& image);
+
+  /**
+   * @DEPRECATED_1_1.3. Use New( NativeImageInterface& ) instead.
+   *
+   * @brief Create a new FrameBufferImage.
+   *
+   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
+   * @SINCE_1_0.0
+   * @remarks Image::ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the remarks of ReleasePolicy for more information.
+   * @param [in] image       The native image.
+   * @param [in] releasePolicy The releasePolicy to apply to the FrameBufferImage.
+   *
+   * @return A handle to a new instance of a FrameBufferImage.
+   * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
+   */
+  static FrameBufferImage New(NativeImageInterface& image, ReleasePolicy releasePolicy);
 
   /**
    * @brief Downcast a handle to FrameBufferImage handle.

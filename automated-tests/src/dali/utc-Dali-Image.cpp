@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,21 @@ int UtcDaliImageDownCast(void)
 
   Image image5 = DownCast< Image >(unInitializedObject);
   DALI_TEST_CHECK(!image5);
+  END_TEST;
+}
+
+int UtcDaliImageGetReleasePolicy(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliImageGetReleasePolicy");
+
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED);
+
+  DALI_TEST_CHECK( image );
+
+  DALI_TEST_CHECK( Image::UNUSED == image.GetReleasePolicy() );
+
   END_TEST;
 }
 
@@ -323,9 +338,9 @@ int UtcDaliImageContextLoss(void)
 
   platform.SetClosestImageSize(closestImageSize);
 
-  tet_infoline("UtcDaliImageContextLoss - Load image with LoadPolicy::Immediate, bitmap discard. Check that the image is re-requested on context regain\n");
+  tet_infoline("UtcDaliImageContextLoss - Load image with LoadPolicy::Immediate, ReleasePolicy::Never, bitmap discard. Check that the image is re-requested on context regain\n");
 
-  Image image = ResourceImage::New("image.png");
+  Image image = ResourceImage::New("image.png", ResourceImage::IMMEDIATE, Image::NEVER);
 
   DALI_TEST_CHECK( image );
 

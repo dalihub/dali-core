@@ -63,6 +63,20 @@ class DALI_IMPORT_API ResourceImage : public Image
 public:
 
   /**
+   * @DEPRECATED_1_1.3. Image loading starts immediately in the frame when then ResourceImage object is created.
+   *
+   * @brief LoadPolicy controls the way images are loaded into memory.
+   * @SINCE_1_0.0
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
+   */
+  enum LoadPolicy
+  {
+    IMMEDIATE, ///< Load image once it is created (default) @SINCE_1_0.0
+    ON_DEMAND  ///< Delay loading until the image is being used (a related actor is added to Stage) @SINCE_1_0.0
+  };
+
+  /**
    * @brief Type of signal for LoadingFinished and Uploaded.
    * @SINCE_1_0.0
    */
@@ -137,6 +151,21 @@ public:
   static ResourceImage New( const std::string& url, bool orientationCorrection = true );
 
   /**
+   * @DEPRECATED_1_1.3. Use New( const std::string& url ) instead.
+   *
+   * @brief Create an initialised ResourceImage object.
+   *
+   * @SINCE_1_0.0
+   * @REMARK_INTERNET
+   * @param [in] url The URL of the image file to use.
+   * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
+   * @param [in] releasePol The ReleasePolicy to apply to Image.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @return A handle to a newly allocated object
+   */
+  static ResourceImage New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol, bool orientationCorrection = true );
+
+  /**
    * @brief Create an initialised ResourceImage object.
    *
    * @SINCE_1_0.0
@@ -154,6 +183,30 @@ public:
                             SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
                             bool orientationCorrection = true );
 
+  /**
+   * @DEPRECATED_1_1.3. Use New( const std::string& url, ImageDimensions size ) instead.
+   *
+   * @brief Create an initialised ResourceImage object.
+   *
+   * @SINCE_1_0.0
+   * @REMARK_INTERNET
+   * @param [in] url The URL of the image file to use.
+   * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
+   * @param [in] releasePol The ReleasePolicy to apply to Image.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @return A handle to a newly allocated object
+   */
+  static ResourceImage New( const std::string& url,
+                            LoadPolicy loadPol,
+                            ReleasePolicy releasePol,
+                            ImageDimensions size,
+                            FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                            SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
+                            bool orientationCorrection = true );
+
   ///@}
 
   /**
@@ -166,6 +219,18 @@ public:
    * @return Handle to a Image object or an uninitialized handle
    */
   static ResourceImage DownCast( BaseHandle handle );
+
+  /**
+   * @DEPRECATED_1_1.3
+   *
+   * @brief Return load policy.
+   *
+   * @SINCE_1_0.0
+   * @remarks This is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use it.
+   * @return Resource load policy
+   */
+  LoadPolicy GetLoadPolicy() const;
 
   /**
    * @brief Query whether the image data has loaded.

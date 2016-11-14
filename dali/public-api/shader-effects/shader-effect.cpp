@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/shader-effects/shader-effect.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/effects/shader-effect-impl.h>

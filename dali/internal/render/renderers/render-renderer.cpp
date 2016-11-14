@@ -26,6 +26,7 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/public-api/actors/blending.h>
 #include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali

@@ -27,7 +27,8 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/shader-effects/shader-effect.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/images/image-impl.h>
 #include "dali-shaders.h"
@@ -200,7 +201,14 @@ void ShaderEffect::SetEffectImage( Dali::Image image )
   }
 
   //inform connected actors the image has been unset
-  // TODO or CHECK: ImageActor part was removed.
+  for(std::vector< ActorPtr >::iterator it = mConnectedActors.begin(); it != mConnectedActors.end(); ++it )
+  {
+    ImageActor* imageActor = dynamic_cast< ImageActor* >( it->Get() );
+    if( imageActor )
+    {
+      imageActor->EffectImageUpdated();
+    }
+  }
 }
 
 void ShaderEffect::SetUniform( const std::string& name, Property::Value value, UniformCoordinateType uniformCoordinateType )

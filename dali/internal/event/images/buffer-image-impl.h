@@ -54,10 +54,12 @@ public:
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
+   * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   static BufferImagePtr New( unsigned int width,
                              unsigned int height,
-                             Pixel::Format pixelformat );
+                             Pixel::Format pixelformat,
+                             ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * @DEPRECATED_1_1.5. Support for externally owned Pixel Buffers is due to be removed TBA. It is recommended that a BufferImage owned Buffer be used instead.
@@ -76,12 +78,14 @@ public:
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
+   * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   static BufferImagePtr New( PixelBuffer* pixBuf,
                              unsigned int width,
                              unsigned int height,
                              Pixel::Format pixelformat,
-                             unsigned int stride );
+                             unsigned int stride,
+                             ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Create a new BufferImage.
@@ -92,10 +96,12 @@ public:
    * @param [in] width image width in pixels
    * @param [in] height image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
+   * @param [in] releasePol optionally release memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   BufferImage(unsigned int width,
               unsigned int height,
-              Pixel::Format pixelformat );
+              Pixel::Format pixelformat,
+              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT);
 
   /**
    * Create a new BufferImage, which uses external data source.
@@ -111,12 +117,14 @@ public:
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
+   * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   BufferImage(PixelBuffer* pixBuf,
               unsigned int width,
               unsigned int height,
               Pixel::Format pixelformat,
-              unsigned int stride );
+              unsigned int stride,
+              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT);
 
 protected:
   /**
@@ -199,7 +207,8 @@ private:
   void SetupBuffer( unsigned int width,
                     unsigned int height,
                     Pixel::Format pixelformat,
-                    unsigned int byteStride );
+                    unsigned int byteStride,
+                    ReleasePolicy releasePol );
 
   void CreateHostBitmap();
 

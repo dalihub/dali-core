@@ -33,9 +33,13 @@ namespace Dali
 namespace Internal
 {
 
+typedef Dali::Image::ReleasePolicy ReleasePolicy;
+
 class Image;
 class ImageFactory;
 typedef IntrusivePtr<Image> ImagePtr;
+
+const ReleasePolicy IMAGE_RELEASE_POLICY_DEFAULT = Dali::Image::NEVER;
 
 /**
  * Image represents an image resource that can be added to actors etc.
@@ -45,6 +49,11 @@ typedef IntrusivePtr<Image> ImagePtr;
 class Image : public BaseObject, public ResourceTicketObserver
 {
 public:
+
+  /**
+   * @copydoc Dali::Image::GetReleasePolicy()
+   */
+  ReleasePolicy GetReleasePolicy () const { return mReleasePolicy; }
 
   /**
    * @copydoc Dali::Image::UploadedSignal()
@@ -132,7 +141,7 @@ protected:
   /**
    * Constructor, with default parameters
    */
-  Image();
+  Image( ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Second stage initialization
@@ -147,6 +156,8 @@ protected:
   mutable unsigned int mHeight;    ///< natural height of the image, needs to be mutable for lazy resolving and as the API for GetHeight is const
 
   unsigned int mConnectionCount; ///< number of on-stage objects using this image
+
+  ReleasePolicy  mReleasePolicy : 2; ///< 2 bits is enough space
 
 private:
 

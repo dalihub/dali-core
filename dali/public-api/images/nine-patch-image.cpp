@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/images/nine-patch-image.h>
+#include <dali/public-api/images/nine-patch-image.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/image-attributes.h>
@@ -53,7 +53,7 @@ NinePatchImage& NinePatchImage::operator=(const NinePatchImage& rhs)
 
 NinePatchImage NinePatchImage::New( const std::string& filename )
 {
-  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename );
+  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, Image::NEVER );
   return NinePatchImage(internal.Get());
 }
 

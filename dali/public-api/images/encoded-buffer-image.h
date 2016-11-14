@@ -78,6 +78,33 @@ public:
   EncodedBufferImage();
 
   /**
+   * @DEPRECATED_1_1.3. Use New(const uint8_t* const, std::size_t,ImageDimensions,FittingMode::Type,SamplingMode::Type,bool) instead.
+   *
+   * @brief Create an initialised image object from an encoded image buffer in memory.
+   *
+   * @SINCE_1_0.0
+   * @remarks Image::ReleasePolicy is an experimental feature and might not be supported in the next release.
+   * We do recommend not to use this method.
+   * Please refer the remarks of ReleasePolicy for more information.
+   * @param [in] encodedImage The encoded bytes of an image, in a supported
+   * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
+   * exactly as it would be as a file in the filesystem.
+   * The caller retains ownership of this buffer and is free to modify or
+   * discard it as soon as the function returns.
+   * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
+   * by encodedImage.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] releasePol The releasePolicy to apply to Image. The default value is Image::NEVER.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * policy is set, a reload will not be possible, so the Image should never be
+   * used once all actors using it have gone off-stage.
+   * @return A handle to a newly allocated object.
+   */
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol, bool orientationCorrection = true );
+
+  /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
    *
    * @SINCE_1_0.0

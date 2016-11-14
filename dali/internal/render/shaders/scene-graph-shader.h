@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/shader-effects/shader-effect.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>

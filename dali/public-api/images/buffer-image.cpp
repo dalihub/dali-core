@@ -57,7 +57,7 @@ BufferImage& BufferImage::operator=(const BufferImage& rhs)
 
 const BufferImage BufferImage::WHITE()
 {
-  Internal::BufferImage* internal = new Internal::BufferImage(1,1,Pixel::RGBA8888);
+  Internal::BufferImage* internal = new Internal::BufferImage(1,1,Pixel::RGBA8888, Dali::Image::NEVER);
   PixelBuffer* pBuf = internal->GetBuffer();
   if ( pBuf )
   {
@@ -75,12 +75,29 @@ BufferImage BufferImage::New(unsigned int width, unsigned int height, Pixel::For
   return BufferImage(internal.Get());
 }
 
+BufferImage BufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
+{
+  DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BufferImage width requested" );
+  DALI_ASSERT_ALWAYS( 0u != height && "Invalid BufferImage height requested" );
+
+  Internal::BufferImagePtr internal = Internal::BufferImage::New(width, height, pixelformat, releasePol);
+  return BufferImage(internal.Get());
+}
+
 BufferImage BufferImage::New(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride)
 {
   DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BufferImage width requested" );
   DALI_ASSERT_ALWAYS( 0u != height && "Invalid BufferImage height requested" );
 
   Internal::BufferImagePtr internal = Internal::BufferImage::New(pixBuf, width, height, pixelformat, stride);
+  return BufferImage(internal.Get());
+}
+
+BufferImage BufferImage::New(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol)
+{
+  DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BufferImage width requested" );
+  DALI_ASSERT_ALWAYS( 0u != height && "Invalid BufferImage height requested" );
+  Internal::BufferImagePtr internal = Internal::BufferImage::New(pixBuf, width, height, pixelformat, stride, releasePol);
   return BufferImage(internal.Get());
 }
 

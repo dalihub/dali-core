@@ -52,7 +52,7 @@ private:
   /**
    * Construct using the supplied load policy.
    */
-  EncodedBufferImage() : Image() {}
+  EncodedBufferImage( ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT ) : Image( releasePol ) {}
 
 public:
   /**
@@ -65,6 +65,8 @@ public:
    * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
    * by encodedImage.
    * @param [in] attributes Requested parameters for loading (size, scaling etc.).
+   * @param [in] releasePol The ReleasePolicy to apply to image. Since it cannot
+   * be recreated by dali, the default of Never will usually make sense.
    * @return A pointer to a newly allocated object, or null on error.
    */
   static EncodedBufferImagePtr New(const uint8_t * const encodedImage,
@@ -72,7 +74,8 @@ public:
                                    ImageDimensions size = ImageDimensions(0, 0),
                                    FittingMode::Type scalingMode = FittingMode::SHRINK_TO_FIT,
                                    SamplingMode::Type samplingMode = SamplingMode::BOX,
-                                   bool orientationCorrection = true);
+                                   bool orientationCorrection = true,
+                                   const ReleasePolicy releasePol=Dali::Image::NEVER);
 };
 
 } // namespace Internal

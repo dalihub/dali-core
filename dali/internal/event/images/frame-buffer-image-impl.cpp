@@ -110,7 +110,7 @@ void FrameBufferImage::Disconnect()
 
   DALI_ASSERT_DEBUG(mConnectionCount > 0);
   --mConnectionCount;
-  if (mConnectionCount == 0)
+  if (mConnectionCount == 0 && mReleasePolicy == Dali::Image::UNUSED)
   {
     // release image memory when it's not visible anymore (decrease ref. count of texture)
     mTicket->RemoveObserver(*this);
@@ -121,6 +121,11 @@ void FrameBufferImage::Disconnect()
 bool FrameBufferImage::IsNativeFbo() const
 {
   return mIsNativeFbo;
+}
+
+void FrameBufferImage::SetReleasePolicy( Dali::Image::ReleasePolicy releasePolicy )
+{
+  mReleasePolicy = releasePolicy;
 }
 
 FrameBufferImage::~FrameBufferImage()

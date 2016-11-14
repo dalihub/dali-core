@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,10 +100,24 @@ int UtcDaliFrameBufferImageNew03(void)
 
   DALI_TEST_CHECK( !image );
 
-  // initialise handle
-  image = FrameBufferImage::New(*(nativeImage.Get()));
+  // initialise handle with UNUSED release policy
+  image = FrameBufferImage::New(*(nativeImage.Get()), Image::UNUSED);
 
   DALI_TEST_CHECK( image );
+
+  // ReleasePolicy is deprecated. Only set, but not used internally.
+  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::UNUSED, TEST_LOCATION );
+
+  // initialise handle with NEVER release policy
+  image.Reset();
+  DALI_TEST_CHECK( !image );
+
+  image = FrameBufferImage::New(*(nativeImage.Get()), Image::NEVER);
+
+  DALI_TEST_CHECK( image );
+
+  // ReleasePolicy is deprecated. Only set, but not used internally.
+  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
 
   END_TEST;
 }
