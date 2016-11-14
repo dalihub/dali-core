@@ -137,14 +137,14 @@ namespace VerticalAlignment
 
 /**
  * @brief The ClippingMode describes how this Actors children will be clipped against it.
- * @SINCE_1_2_5
+ * @SINCE_1_2.5
  */
 namespace ClippingMode
 {
   enum Type
   {
-    DISABLED,                     ///< This Actor will not clip its children. @SINCE_1_2_5
-    CLIP_CHILDREN,                ///< This Actor will clip all children to within its boundaries (the actor will also be visible itself). @SINCE_1_2_5
+    DISABLED,                     ///< This Actor will not clip its children. @SINCE_1_2.5
+    CLIP_CHILDREN,                ///< This Actor will clip all children to within its boundaries (the actor will also be visible itself). @SINCE_1_2.5
   };
 }
 
