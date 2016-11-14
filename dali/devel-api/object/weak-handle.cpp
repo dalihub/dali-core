@@ -49,15 +49,9 @@ struct WeakHandleBase::Impl : public Internal::Object::Observer
   // Destruction
   ~Impl()
   {
-    Reset();
-  }
-
-  void Reset()
-  {
     if( mObject )
     {
       mObject->RemoveObserver( *this );
-      mObject = NULL;
     }
   }
 
@@ -140,7 +134,8 @@ Handle WeakHandleBase::GetBaseHandle() const
 
 void WeakHandleBase::Reset()
 {
-  mImpl->Reset();
+  delete mImpl;
+  mImpl = NULL;
 }
 
 

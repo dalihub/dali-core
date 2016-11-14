@@ -356,23 +356,6 @@ int UtcDaliWeakHandleBaseGetBaseHandle(void)
   END_TEST;
 }
 
-int UtcDaliWeakHandleBaseReset(void)
-{
-  TestApplication application;
-  tet_infoline( "Testing Daku::WeakHandleBase::Reset()" );
-
-  Actor actor = Actor::New();
-  WeakHandleBase object(actor);
-  DALI_TEST_CHECK(object.GetBaseHandle() == actor);
-
-  object.Reset();
-
-  DALI_TEST_CHECK(object == WeakHandleBase());
-  DALI_TEST_CHECK(object.GetBaseHandle() == Handle());
-
-  END_TEST;
-}
-
 int UtcDaliWeakHandleGetHandle(void)
 {
   TestApplication application;
