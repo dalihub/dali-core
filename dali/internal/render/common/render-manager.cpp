@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/data-providers/uniform-name-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
@@ -139,6 +140,7 @@ struct RenderManager::Impl
   Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
   TextureCache                  textureCache;             ///< Cache for all GL textures
+  Render::UniformNameCache      uniformNameCache;         ///< Cache to provide unique indices for uniforms
   LockedResourceQueue&          textureUploadedQueue;     ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
@@ -262,7 +264,7 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 void RenderManager::AddRenderer( Render::Renderer* renderer )
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize( mImpl->context, mImpl->textureCache );
+  renderer->Initialize( mImpl->context, mImpl->textureCache, mImpl->uniformNameCache );
 
   mImpl->rendererContainer.PushBack( renderer );
 
