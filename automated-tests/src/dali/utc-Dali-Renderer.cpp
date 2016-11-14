@@ -2166,7 +2166,8 @@ int UtcDaliRendererSetDepthTestMode(void)
   // Check depth-test is disabled.
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
 
-  // Turn the layer depth-test flag back on, and confirm that depth testing is now on.
+  // Turn the layer depth-test flag back on, and confirm that depth testing is *still* off.
+  // This is because our renderer has DepthTestMode::AUTO and our layer behavior is LAYER_2D.
   Stage::GetCurrent().GetRootLayer().SetDepthTestDisabled( false );
 
   glEnableDisableStack.Reset();
@@ -2174,7 +2175,7 @@ int UtcDaliRendererSetDepthTestMode(void)
   application.Render();
 
   // Check depth-test is *still* disabled.
-  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
+  DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
 
   END_TEST;
 }

@@ -85,7 +85,7 @@ inline void SetScissorTest( const RenderList& renderList, Context& context )
  * @param[in] depthTestEnabled True if depth test is enabled for the layer
  * @param[in] isLayer3D True if the layer is a 3D layer
  */
-inline void SetRenderFlags( const RenderList& renderList, Context& context, bool depthTestEnabled )
+inline void SetRenderFlags( const RenderList& renderList, Context& context, bool depthTestEnabled, bool isLayer3D )
 {
   const unsigned int renderFlags = renderList.GetFlags();
   GLbitfield clearMask = 0u;
@@ -108,17 +108,19 @@ inline void SetRenderFlags( const RenderList& renderList, Context& context, bool
   }
 
   // Enable and Clear the depth buffer if required.
-  if( depthTestEnabled )
-  {
-    clearMask |= GL_DEPTH_BUFFER_BIT;
-
-    // We need to enable the depth buffer to clear it.
-    // Subsequently it is enabled and disabled on a per-RenderItem basis.
-    context.EnableDepthBuffer( true );
-  }
-  else
+  // DepthTest must be enabled for the layer, else testing is turned off.
+  if( !depthTestEnabled )
   {
     context.EnableDepthBuffer( false );
+  }
+  else if( renderList.HasColorRenderItems() || isLayer3D ) // Also, within the context of this if(), depth test is enabled.
+  {
+
+    clearMask |= GL_DEPTH_BUFFER_BIT;
+    // We need to enable the depth buffer to clear it.
+    // Subsequently it is enabled and disabled on a per-RenderItem basis.
+    // If we do not have color renderers, this is only done for 3D layers.
+    context.EnableDepthBuffer( true );
   }
 
   // Clear Depth and/or stencil buffers as required.
@@ -182,21 +184,21 @@ inline void SetupPerRendererFlags( const RenderItem& item, Context& context, boo
  * If AUTO is selected for writing, the decision will be based on the items opacity.
  * @param item The RenderItem to set up the depth buffer for
  * @param context The context used to execute GL commands.
- * @param depthTestEnabled True if depth testing has been enabled.
+ * @param isLayer3D True if the layer behavior is set to LAYER_3D
  */
-inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool depthTestEnabled )
+inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool isLayer3D )
 {
   // Set up whether or not to write to the depth buffer.
   const DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
   // Most common mode (AUTO) is tested first.
-  bool enableDepthWrite = ( ( depthWriteMode == DepthWriteMode::AUTO ) && depthTestEnabled && item.mIsOpaque ) ||
+  bool enableDepthWrite = ( ( depthWriteMode == DepthWriteMode::AUTO ) && item.mIsOpaque ) ||
                           ( depthWriteMode == DepthWriteMode::ON );
   context.DepthMask( enableDepthWrite );
 
   // Set up whether or not to read from (test) the depth buffer.
   const DepthTestMode::Type depthTestMode = item.mRenderer->GetDepthTestMode();
   // Most common mode (AUTO) is tested first.
-  bool enableDepthTest = ( ( depthTestMode == DepthTestMode::AUTO ) && depthTestEnabled ) ||
+  bool enableDepthTest = ( ( depthTestMode == DepthTestMode::AUTO ) && isLayer3D ) ||
                          ( depthTestMode == DepthTestMode::ON );
   // Look-up the GL depth function from the Dali::DepthFunction enum, and set it.
   context.DepthFunc( DaliDepthToGLDepthTable[ item.mRenderer->GetDepthFunction() ] );
@@ -225,29 +227,45 @@ inline void ProcessRenderList(
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
-  bool autoDepthTestMode = !( renderList.GetSourceLayer()->IsDepthTestDisabled() ) && renderList.HasColorRenderItems();
+  bool depthTestEnabled = !( renderList.GetSourceLayer()->IsDepthTestDisabled() );
+  bool isLayer3D = renderList.GetSourceLayer()->GetBehavior() == Dali::Layer::LAYER_3D;
   bool usedStencilBuffer = false;
   bool stencilManagedByDrawMode = renderList.GetFlags() & RenderList::STENCIL_BUFFER_ENABLED;
 
   SetScissorTest( renderList, context );
-  SetRenderFlags( renderList, context, autoDepthTestMode );
+  SetRenderFlags( renderList, context, depthTestEnabled, isLayer3D );
 
-  const size_t count = renderList.Count();
-  for ( size_t index = 0; index < count; ++index )
+  // The Layers depth enabled flag overrides the per-renderer depth flags.
+  // So if depth test is disabled at the layer level, we ignore per-render flags.
+  // Note: Overlay renderers will not read or write from the depth buffer.
+  if( DALI_LIKELY( !renderList.HasColorRenderItems() || !depthTestEnabled ) )
   {
-    const RenderItem& item = renderList.GetItem( index );
-    DALI_PRINT_RENDER_ITEM( item );
+    size_t count = renderList.Count();
+    for ( size_t index = 0; index < count; ++index )
+    {
+      const RenderItem& item = renderList.GetItem( index );
+      DALI_PRINT_RENDER_ITEM( item );
 
-    // Set up the depth buffer based on per-renderer flags.
-    // If the per renderer flags are set to "ON" or "OFF", they will always override any Layer depth mode or
-    // draw-mode state, such as Overlays.
-    // If the flags are set to "AUTO", the behaviour then depends on the type of renderer. Overlay Renderers will always
-    // disable depth testing and writing. Color Renderers will enable them if the Layer does.
-    SetupDepthBuffer( item, context, autoDepthTestMode );
-    SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
+      SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
+      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+    }
+  }
+  else
+  {
+    size_t count = renderList.Count();
+    for ( size_t index = 0; index < count; ++index )
+    {
+      const RenderItem& item = renderList.GetItem( index );
+      DALI_PRINT_RENDER_ITEM( item );
 
-    item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
-                            item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+      // Set up the depth buffer based on per-renderer flags.
+      SetupDepthBuffer( item, context, isLayer3D );
+      SetupPerRendererFlags( item, context, usedStencilBuffer, stencilManagedByDrawMode );
+
+      item.mRenderer->Render( context, textureCache, bufferIndex, *item.mNode, defaultShader,
+                              item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+    }
   }
 }
 
