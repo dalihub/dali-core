@@ -28,7 +28,6 @@ namespace Dali
 /**
  * @brief Stereoscopic view modes
  * @SINCE_1_0.0
- * @remarks Viewmode is supported in mobile applications only.
  */
 enum ViewMode
 {

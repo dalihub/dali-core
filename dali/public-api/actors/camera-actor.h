@@ -61,7 +61,7 @@ enum ProjectionMode
 } // namespace Camera
 
 /**
- * @brief CameraActor controls a camera.
+ * @brief Controls a camera.
  *
  * Allows the developer to use actor semantics to control a camera.
  *

@@ -129,13 +129,6 @@ public:
   /**
    * @brief Perform action on this object with the given action name and attributes.
    *
-   * Usage example: -
-   * @code
-   * BaseHandle handle = SomeClass::New(); // Initialized with New() method
-   *
-   * Property::Map attributes; // Use empty Property::Map because "show" action doesn't need parameter
-   * handle.DoAction("show", attributes);
-   * @endcode
    * @SINCE_1_0.0
    * @param [in] actionName The command for the action.
    * @param [in] attributes The list of attributes for the action.
@@ -255,8 +248,6 @@ protected:
   /**
    * @brief Used by the safe bool idiom.
    *
-   * The safe bool idiom basically provides a Boolean test for classes. It validates objects
-   * in a boolean context without the usual harmful side effects.
    * @SINCE_1_0.0
    */
   void ThisIsSaferThanReturningVoidStar() const {}
