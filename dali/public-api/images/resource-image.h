@@ -143,7 +143,6 @@ public:
    *
    * @sa Dali::FittingMode::Type Dali::SamplingMode::Type
    * @SINCE_1_0.0
-   * @REMARK_INTERNET
    * @param [in] url The URL of the image file to use.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
@@ -156,7 +155,6 @@ public:
    * @brief Create an initialised ResourceImage object.
    *
    * @SINCE_1_0.0
-   * @REMARK_INTERNET
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
@@ -169,7 +167,6 @@ public:
    * @brief Create an initialised ResourceImage object.
    *
    * @SINCE_1_0.0
-   * @REMARK_INTERNET
    * @param [in] url The URL of the image file to use.
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
@@ -189,7 +186,6 @@ public:
    * @brief Create an initialised ResourceImage object.
    *
    * @SINCE_1_0.0
-   * @REMARK_INTERNET
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
