@@ -89,7 +89,6 @@ public:
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
-   * @return A reference to this
    */
   TextureSet& operator=( const TextureSet& handle );
 

@@ -284,7 +284,6 @@ inline Radian operator*( Radian lhs, float rhs )
 /**
  * @brief Negate the radian
  * @SINCE_1_0.0
- * @param[in] in Radian to negate
  * @return The negative angle
  */
 inline Radian operator-( Radian in )

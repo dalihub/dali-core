@@ -80,7 +80,6 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] rhs Const reference to an IntrusivePtr
    */
   IntrusivePtr( IntrusivePtr const& rhs ) : mPtr( rhs.mPtr )
   {
@@ -208,7 +207,6 @@ public:
    *
    * Use with care.
    * @SINCE_1_0.0
-   * @return Pointer to reference counted object
    */
   T* Detach()
   {

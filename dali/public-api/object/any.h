@@ -104,8 +104,7 @@ public:
    * @brief Assigns a given value to the Any type.
    *
    * @SINCE_1_0.0
-   * @param[in] value The given value
-   * @return A reference to this
+   * @param[in] value The given value.
    * @note If the types are different, then the current container will be re-created.
    *
    */
@@ -140,7 +139,6 @@ public:
    *
    * @SINCE_1_0.0
    * @param [in] any Any to be assigned which contains a value of identical type to current contents.
-   * @return A reference to this
    * @exception DaliException If parameter any is of a different type.
    *
    */

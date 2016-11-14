@@ -163,7 +163,6 @@ public:
    * @brief Get type names by index.
    *
    * @SINCE_1_0.0
-   * @param[in] index The index to get the type name
    * @return The type name or an empty string when index is not valid
    */
   std::string GetTypeName(size_t index) const;

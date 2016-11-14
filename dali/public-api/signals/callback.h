@@ -340,14 +340,11 @@ protected: // Constructors for deriving classes
   /**
    * @brief Copy constructor operator not declared.
    * @SINCE_1_0.0
-   * @param[in] rhs Handle to an object
    */
   CallbackBase( const CallbackBase& rhs );
   /**
    * @brief assignment operator not declared.
    * @SINCE_1_0.0
-   * @param[in] rhs Handle to an object
-   * @return A reference to this
    */
   const CallbackBase& operator=( const CallbackBase& rhs );
 
@@ -406,9 +403,6 @@ public: // Data for deriving classes & Dispatchers
 /**
  * @brief Non-member equality operator
  * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return true if lhs is same as rhs
  */
 bool operator==( const CallbackBase& lhs, const CallbackBase& rhs );
 
@@ -422,7 +416,6 @@ struct Destroyer
   /**
    * @brief Dispatcher to delete an object.
    * @SINCE_1_0.0
-   * @param[in] object An object to delete
    */
   static void Delete( void* object )
   {

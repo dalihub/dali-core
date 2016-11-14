@@ -162,8 +162,6 @@ public:
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] rhs Handle to an object
-   * @return A reference to this
    */
   Uint16Pair& operator=( const Uint16Pair& rhs )
   {

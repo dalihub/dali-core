@@ -319,10 +319,7 @@ public:
 
 protected: // For derived classes
 
-  /**
-   * @brief Flags for the constructor
-   * @SINCE_1_0.0
-   */
+  // Flags for the constructor
   enum ActorFlags
   {
     ACTOR_BEHAVIOUR_NONE          = 0,

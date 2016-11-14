@@ -114,7 +114,6 @@ public: // API
   /**
    * @brief @ return If the vector is empty
    * @SINCE_1_0.0
-   * @return true if the count of elements is empty
    */
   bool Empty() const
   {

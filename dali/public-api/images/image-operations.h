@@ -49,10 +49,6 @@ typedef Dali::Uint16Pair ImageDimensions;
  */
 namespace FittingMode
 {
-  /**
-   * @brief The type of FittingMode
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not @SINCE_1_0.0
@@ -84,10 +80,6 @@ namespace FittingMode
  */
 namespace SamplingMode
 {
-  /**
-   * @brief The type of SamplingMode
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4, @SINCE_1_0.0

@@ -47,10 +47,6 @@ public:
    */
   struct Attachment
   {
-    /**
-     * @brief The bit-mask value
-     * @SINCE_1_1.45
-     */
     enum Mask
     {
       NONE          = 0,               ///< No attachments are created initially                            @SINCE_1_1.45

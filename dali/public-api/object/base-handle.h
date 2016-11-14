@@ -158,8 +158,7 @@ public:
    * @brief Returns the type info for the Handle.
    *
    * @SINCE_1_0.0
-   * @param[in] info The type information
-   * @return The type info
+   * @return The type info.
    */
   bool GetTypeInfo(Dali::TypeInfo& info) const;
 
@@ -287,9 +286,6 @@ inline T DownCast( BaseHandle handle )
 /**
  * @brief Equality operator
  * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return true if the handle handles point to the same Dali resource, or if both are NULL
  */
 template <typename T>
 inline bool operator==(const BaseHandle& lhs, const T& rhs)
@@ -301,9 +297,6 @@ inline bool operator==(const BaseHandle& lhs, const T& rhs)
 /**
  * @brief Equality operator
  * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return true if the handle handles point to the different Dali resources
  */
 template <typename T>
 inline bool operator!=(const BaseHandle& lhs, const T& rhs)
@@ -315,9 +308,6 @@ inline bool operator!=(const BaseHandle& lhs, const T& rhs)
 /**
  * @brief Less than operator
  * @SINCE_1_0.0
- * @param[in] lhs A reference to compare
- * @param[in] rhs A reference to compare to
- * @return true if lhs less than rhs
  */
 inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
 {

@@ -78,10 +78,6 @@ public:
    */
   struct Hint
   {
-    /**
-     * @brief Hint value
-     * @SINCE_1_1.45
-     */
     enum Value
     {
       NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.45

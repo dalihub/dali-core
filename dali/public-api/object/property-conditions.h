@@ -86,7 +86,6 @@ public:
    * @brief Retrieve the arguments that this condition uses.
    *
    * @SINCE_1_0.0
-   * @param[in] index The condition index to get the argument
    * @return The arguments used for this condition
    * @note The container will only be valid as long PropertyCondition is valid.
    */

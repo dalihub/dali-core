@@ -144,7 +144,6 @@ public: // Actor related
    * @brief Returns an actor by index. An empty handle if the index is not valid.
    *
    * @SINCE_1_0.0
-   * @param[in] index The attached actor's index
    * @return The attached actor or an empty handle.
    * @pre The gesture detector has been initialized.
    */

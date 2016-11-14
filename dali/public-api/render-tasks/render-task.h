@@ -509,7 +509,6 @@ public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.
    * @SINCE_1_0.0
-   * @return The signal to connect to
    */
   RenderTaskSignalType& FinishedSignal();
 

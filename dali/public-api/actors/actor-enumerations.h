@@ -59,10 +59,6 @@ enum PositionInheritanceMode
  */
 namespace Dimension
 {
-  /**
-   * @brief The type of Dimension
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     WIDTH  = 0x1,       ///< Width dimension @SINCE_1_0.0
@@ -71,10 +67,6 @@ namespace Dimension
     ALL_DIMENSIONS = 0x3  ///< Mask to cover all flags @SINCE_1_0.0
   };
 
-  /**
-   * @brief The number of dimensions
-   * @SINCE_1_0.0
-   */
   enum Meta
   {
     DIMENSION_COUNT = 2  ///< Number of dimensions - update this if adding new dimension @SINCE_1_0.0
@@ -87,10 +79,6 @@ namespace Dimension
  */
 namespace ResizePolicy
 {
-  /**
-   * @brief The type of ResizePolicy
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     FIXED,                 ///< Size is fixed as set by SetSize @SINCE_1_0.0
@@ -111,10 +99,6 @@ namespace ResizePolicy
  */
 namespace SizeScalePolicy
 {
-  /**
-   * @brief The type of SizeScalePolicy
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     USE_SIZE_SET,                ///< Use the size that was set @SINCE_1_0.0
@@ -129,10 +113,6 @@ namespace SizeScalePolicy
  */
 namespace HorizontalAlignment
 {
-  /**
-   * @brief The type of HorizontalAlignment
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     LEFT,         ///< Align horizontally left @SINCE_1_0.0
@@ -147,10 +127,6 @@ namespace HorizontalAlignment
  */
 namespace VerticalAlignment
 {
-  /**
-   * @brief The type of VerticalAlignment
-   * @SINCE_1_0.0
-   */
   enum Type
   {
     TOP,          ///< Align vertically top @SINCE_1_0.0
@@ -165,10 +141,6 @@ namespace VerticalAlignment
  */
 namespace ClippingMode
 {
-  /**
-   * @brief The type of ClippingMode
-   * @SINCE_1_2_5
-   */
   enum Type
   {
     DISABLED,                     ///< This Actor will not clip its children. @SINCE_1_2_5
