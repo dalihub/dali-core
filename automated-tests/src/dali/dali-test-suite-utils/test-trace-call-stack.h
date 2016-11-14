@@ -102,19 +102,6 @@ public:
   bool FindMethodAndParams(std::string method, const NamedParams& params) const;
 
   /**
-   * Search for a method in the stack with the given parameter list.
-   * The search is done from a given index.
-   * This allows the order of methods and parameters to be checked.
-   * @param[in] method The name of the method
-   * @param[in] params A comma separated list of parameter values
-   * @param[in/out] startIndex The method index to start looking from.
-   *                This is updated if a method is found so subsequent
-   *                calls can search for methods occuring after this one.
-   * @return True if the method was in the stack
-   */
-  bool FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const;
-
-  /**
    * Search for a method in the stack with the given parameter list
    * @param[in] method The name of the method
    * @param[in] params A comma separated list of parameter values

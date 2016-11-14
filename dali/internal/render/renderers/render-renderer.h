@@ -30,7 +30,7 @@
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/update/manager/render-instruction-processor.h>
+#include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -49,6 +49,7 @@ class Shader;
 class TextureCache;
 class NodeDataProvider;
 }
+
 
 namespace Render
 {
@@ -371,7 +372,7 @@ public:
    * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const;
+  void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RendererWithSortAttributes& sortAttributes ) const;
 
 private:
 
@@ -426,12 +427,11 @@ private:
 
   struct UniformIndexMap
   {
-    unsigned int               uniformIndex;                ///< The index of the cached location in the Program
+    unsigned int               uniformIndex;  ///< The index of the cached location in the Program
     const PropertyInputImpl*   propertyValue;
   };
 
   typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
-
   UniformIndexMappings         mUniformIndexMap;
   Vector<GLint>                mAttributesLocation;
 
@@ -448,7 +448,6 @@ private:
   DepthTestMode::Type          mDepthTestMode:2;            ///< The depth test mode
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-
 };
 
 } // namespace SceneGraph

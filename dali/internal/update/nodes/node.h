@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_NODE_H
-#define DALI_INTERNAL_SCENE_GRAPH_NODE_H
+#ifndef __DALI_INTERNAL_SCENE_GRAPH_NODE_H__
+#define __DALI_INTERNAL_SCENE_GRAPH_NODE_H__
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -45,10 +45,9 @@ namespace Dali
 namespace Internal
 {
 
-// Value types used by messages.
+// value types used by messages
 template <> struct ParameterType< ColorMode > : public BasicType< ColorMode > {};
 template <> struct ParameterType< PositionInheritanceMode > : public BasicType< PositionInheritanceMode > {};
-template <> struct ParameterType< ClippingMode::Type > : public BasicType< ClippingMode::Type > {};
 
 namespace SceneGraph
 {
@@ -70,7 +69,7 @@ enum NodePropertyFlags
   SizeFlag             = 0x008,
   OverlayFlag          = 0x010,
   SortModifierFlag     = 0x020,
-  ChildDeletedFlag     = 0x040,
+  ChildDeletedFlag     = 0x040
 };
 
 static const int AllFlags = ( ChildDeletedFlag << 1 ) - 1; // all the flags
@@ -140,65 +139,6 @@ public:
   virtual Layer* GetLayer()
   {
     return NULL;
-  }
-
-  /**
-   * This method sets clipping information on the node based on its hierarchy in the scene-graph.
-   * A value is calculated that can be used during sorting to increase sort speed.
-   * @param[in] clippingId The Clipping ID of the node to set
-   * @param[in] clippingDepth The Clipping Depth of the node to set
-   */
-  void SetClippingInformation( const uint32_t clippingId, const uint32_t clippingDepth )
-  {
-    // We only set up the sort value if we have a clipping depth, IE. At least 1 clipping node has been hit.
-    // If not, if we traverse down a clipping tree and back up, and there is another
-    // node on the parent, this will have a non-zero clipping ID that must be ignored
-    if( DALI_LIKELY( clippingDepth > 0u ) )
-    {
-      mClippingDepth = clippingDepth;
-
-      // Calculate the sort value here on write, as when read (during sort) it may be accessed several times.
-      // The items must be sorted by Clipping ID first (so the ID is kept in the most-significant bits).
-      // For the same ID, the clipping nodes must be first, so we negate the
-      // clipping enabled flag and set it as the least significant bit.
-      mClippingSortModifier = ( clippingId << 1u ) | ( mClippingMode == ClippingMode::DISABLED ? 1u : 0u );
-    }
-  }
-
-  /**
-   * Gets the Clipping ID for this node.
-   * @return The Clipping ID for this node.
-   */
-  uint32_t GetClippingId() const
-  {
-    return mClippingSortModifier >> 1u;
-  }
-
-  /**
-   * Gets the Clipping Depth for this node.
-   * @return The Clipping Depth for this node.
-   */
-  uint32_t GetClippingDepth() const
-  {
-    return mClippingDepth;
-  }
-
-  /**
-   * Sets the clipping mode for this node.
-   * @param[in] clippingMode The ClippingMode to set
-   */
-  void SetClippingMode( const ClippingMode::Type clippingMode )
-  {
-    mClippingMode = clippingMode;
-  }
-
-  /**
-   * Gets the Clipping Mode for this node.
-   * @return The ClippingMode of this node
-   */
-  ClippingMode::Type GetClippingMode() const
-  {
-    return mClippingMode;
   }
 
   /**
@@ -729,11 +669,15 @@ public:
 
   /**
    * Equality operator, checks for identity, not values.
-   * @param[in]
+   *
    */
   bool operator==( const Node* rhs ) const
   {
-    return ( this == rhs );
+    if ( this == rhs )
+    {
+      return true;
+    }
+    return false;
   }
 
   unsigned short GetDepth() const
@@ -837,49 +781,47 @@ private:
 
 public: // Default properties
 
-  TransformManager*                  mTransformManager;
-  TransformId                        mTransformId;
-  TransformManagerPropertyVector3    mParentOrigin;           ///< Local transform; the position is relative to this. Sets the TransformFlag dirty when changed
-  TransformManagerPropertyVector3    mAnchorPoint;            ///< Local transform; local center of rotation. Sets the TransformFlag dirty when changed
-  TransformManagerPropertyVector3    mSize;                   ///< Size is provided for layouting
-  TransformManagerPropertyVector3    mPosition;               ///< Local transform; distance between parent-origin & anchor-point
-  TransformManagerPropertyQuaternion mOrientation;            ///< Local transform; rotation relative to parent node
-  TransformManagerPropertyVector3    mScale;                  ///< Local transform; scale relative to parent node
+  TransformManager* mTransformManager;
+  TransformId mTransformId;
+  TransformManagerPropertyVector3    mParentOrigin;  ///< Local transform; the position is relative to this. Sets the TransformFlag dirty when changed
+  TransformManagerPropertyVector3    mAnchorPoint;   ///< Local transform; local center of rotation. Sets the TransformFlag dirty when changed
+  TransformManagerPropertyVector3    mSize;          ///< Size is provided for layouting
+  TransformManagerPropertyVector3    mPosition;      ///< Local transform; distance between parent-origin & anchor-point
+  TransformManagerPropertyQuaternion mOrientation;   ///< Local transform; rotation relative to parent node
+  TransformManagerPropertyVector3    mScale;         ///< Local transform; scale relative to parent node
 
-  AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
-  AnimatableProperty<Vector4>        mColor;                  ///< Color can be inherited from the Node hierarchy
+  AnimatableProperty<bool>           mVisible;       ///< Visibility can be inherited from the Node hierachy
+  AnimatableProperty<Vector4>        mColor;         ///< Color can be inherited from the Node hierarchy
 
   // Inherited properties; read-only from public API
 
-  TransformManagerVector3Input       mWorldPosition;          ///< Full inherited position
-  TransformManagerVector3Input       mWorldScale;
-  TransformManagerQuaternionInput    mWorldOrientation;       ///< Full inherited orientation
-  TransformManagerMatrixInput        mWorldMatrix;            ///< Full inherited world matrix
-  InheritedColor                     mWorldColor;             ///< Full inherited color
-
-  uint32_t                           mClippingSortModifier;   ///< Contains bit-packed clipping information for quick access when sorting
+  TransformManagerVector3Input    mWorldPosition;     ///< Full inherited position
+  TransformManagerVector3Input    mWorldScale;
+  TransformManagerQuaternionInput mWorldOrientation;  ///< Full inherited orientation
+  TransformManagerMatrixInput     mWorldMatrix;       ///< Full inherited world matrix
+  InheritedColor      mWorldColor;        ///< Full inherited color
 
 protected:
 
-  Node*                              mParent;                 ///< Pointer to parent node (a child is owned by its parent)
-  RenderTask*                        mExclusiveRenderTask;    ///< Nodes can be marked as exclusive to a single RenderTask
+  Node*               mParent;                       ///< Pointer to parent node (a child is owned by its parent)
+  RenderTask*         mExclusiveRenderTask;          ///< Nodes can be marked as exclusive to a single RenderTask
 
-  RendererContainer                  mRenderer;               ///< Container of renderers; not owned
+  RendererContainer   mRenderer;                     ///< Container of renderers; not owned
 
-  NodeContainer                      mChildren;               ///< Container of children; not owned
+  NodeContainer       mChildren;                     ///< Container of children; not owned
 
-  CollectedUniformMap                mCollectedUniformMap[2]; ///< Uniform maps of the node
-  unsigned int                       mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
-  uint32_t                           mClippingDepth;          ///< The number of clipping nodes deep this node is
-  unsigned int                       mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
+  CollectedUniformMap mCollectedUniformMap[2];      ///< Uniform maps of the node
+  unsigned int        mUniformMapChanged[2];        ///< Records if the uniform map has been altered this frame
+  unsigned int        mRegenerateUniformMap : 2;    ///< Indicate if the uniform map has to be regenerated this frame
 
   // flags, compressed to bitfield
-  unsigned short                     mDepth:12;               ///< Depth in the hierarchy
-  int                                mDirtyFlags:8;           ///< A composite set of flags for each of the Node properties
-  DrawMode::Type                     mDrawMode:2;             ///< How the Node and its children should be drawn
-  ColorMode                          mColorMode:2;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
-  ClippingMode::Type                 mClippingMode:2;         ///< The clipping mode of this node
-  bool                               mIsRoot:1;               ///< True if the node cannot have a parent
+  unsigned short mDepth: 12;                        ///< Depth in the hierarchy
+  int  mDirtyFlags:8;                               ///< A composite set of flags for each of the Node properties
+
+  bool mIsRoot:1;                                    ///< True if the node cannot have a parent
+
+  DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn
+  ColorMode               mColorMode:2;              ///< Determines whether mWorldColor is inherited, 2 bits is enough
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -985,23 +927,10 @@ inline void RemoveRendererMessage( EventThreadServices& eventThreadServices, con
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::RemoveRenderer, renderer );
 }
-
-inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode )
-{
-  typedef MessageValue1< Node, ClippingMode::Type > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetClippingMode, clippingMode );
-}
-
-
 } // namespace SceneGraph
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_NODE_H
+#endif // __DALI_INTERNAL_SCENE_GRAPH_NODE_H_

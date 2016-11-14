@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
-#define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
+#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H__
+#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ struct RenderItem
 {
   /**
    * Construct a new RenderItem
-   * @return A pointer to a new RenderItem.
    */
   static RenderItem* New();
 
@@ -57,7 +56,6 @@ struct RenderItem
   /**
    * Overriden delete operator.
    * Deletes the RenderItem from its global memory pool
-   * @param[in] A pointer to the RenderItem to delete.
    */
   void operator delete( void* ptr );
 
@@ -80,7 +78,6 @@ private:
   // RenderItems should not be copied as they are heavy
   RenderItem( const RenderItem& item );
   RenderItem& operator = ( const RenderItem& item );
-
 };
 
 } // namespace SceneGraph
@@ -89,4 +86,4 @@ private:
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
+#endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H__

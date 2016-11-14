@@ -1,8 +1,8 @@
-#ifndef DALI_LAYER_H
-#define DALI_LAYER_H
+#ifndef __DALI_LAYER_H__
+#define __DALI_LAYER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -360,6 +360,7 @@ public:
    * The contents of the layer will not be visible outside this box, when clipping is
    * enabled. The default clipping box is empty (0,0,0,0) which means everything is clipped.
    * You can only do rectangular clipping using this API in window coordinates.
+   * For other kinds of clipping, see Dali::Actor::SetDrawMode().
    * @SINCE_1_0.0
    * @param [in] x The X-coordinate of the top-left corner of the box
    * @param [in] y The Y-coordinate of the top-left corner of the box
@@ -484,4 +485,4 @@ public: // Not intended for application developers
  */
 } // namespace Dali
 
-#endif // DALI_LAYER_H
+#endif //__DALI_LAYER_H__

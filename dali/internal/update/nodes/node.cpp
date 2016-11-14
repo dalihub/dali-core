@@ -53,29 +53,26 @@ Node::Node()
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
   mAnchorPoint( TRANSFORM_PROPERTY_ANCHOR_POINT ),
-  mSize( TRANSFORM_PROPERTY_SIZE ),                                               // Zero initialized by default
-  mPosition( TRANSFORM_PROPERTY_POSITION ),                                       // Zero initialized by default
-  mOrientation(),                                                                 // Initialized to identity by default
+  mSize(TRANSFORM_PROPERTY_SIZE),     // zero initialized by default
+  mPosition(TRANSFORM_PROPERTY_POSITION), // zero initialized by default
+  mOrientation(), // initialized to identity by default
   mScale( TRANSFORM_PROPERTY_SCALE ),
   mVisible( true ),
   mColor( Color::WHITE ),
-  mWorldPosition( TRANSFORM_PROPERTY_WORLD_POSITION, Vector3( 0.0f,0.0f,0.0f ) ), // Zero initialized by default
-  mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3( 1.0f,1.0f,1.0f ) ),
-  mWorldOrientation(),                                                            // Initialized to identity by default
+  mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(0.0f,0.0f,0.0f)), // zero initialized by default
+  mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(1.0f,1.0f,1.0f) ),
+  mWorldOrientation(), // initialized to identity by default
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
-  mClippingSortModifier( 0u ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),
-  mClippingDepth( 0u ),
   mRegenerateUniformMap( 0 ),
-  mDepth( 0u ),
-  mDirtyFlags( AllFlags ),
+  mDepth(0u),
+  mDirtyFlags(AllFlags),
+  mIsRoot( false ),
   mDrawMode( DrawMode::NORMAL ),
-  mColorMode( DEFAULT_COLOR_MODE ),
-  mClippingMode( ClippingMode::DISABLED ),
-  mIsRoot( false )
+  mColorMode( DEFAULT_COLOR_MODE )
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;

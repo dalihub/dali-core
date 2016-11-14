@@ -1248,37 +1248,38 @@ int UtcDaliHoverLeaveActorReadded(void)
   END_TEST;
 }
 
-int UtcDaliHoverClippingActor(void)
+
+int UtcDaliHoverStencilNonRenderableActor(void)
 {
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  stage.Add( actor );
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
 
-  Actor clippingActor = Actor::New();
-  clippingActor.SetSize( 50.0f, 50.0f );
-  clippingActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  stage.Add( clippingActor );
+  Actor stencil = Actor::New();
+  stencil.SetSize(50.0f, 50.0f);
+  stencil.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil.SetDrawMode( DrawMode::STENCIL );
+  stage.Add(stencil);
 
-  // Render and notify.
+  // Render and notify
   application.SendNotification();
   application.Render();
 
-  // Connect to actor's hovered signal.
+  // Connect to actor's hovered signal
   SignalData data;
   HoverEventFunctor functor( data );
   actor.HoveredSignal().Connect( &application, functor );
 
-  // Emit an event within clipped area.
+  // Emit an event within stencil area
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
-  // Emit an event outside the clipped area but within the actor area, we should have a hit.
+  // Emit an event outside the stencil area but within the actor area, we should have a hit!
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, Vector2( 60.0f, 60.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();

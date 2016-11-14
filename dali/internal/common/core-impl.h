@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_CORE_H
-#define DALI_INTERNAL_CORE_H
+#ifndef __DALI_INTERNAL_CORE_H__
+#define __DALI_INTERNAL_CORE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,6 @@ class UpdateManager;
 class RenderManager;
 class DiscardQueue;
 class TextureCacheDispatcher;
-class RenderTaskProcessor;
 }
 
 /**
@@ -296,7 +295,6 @@ private:
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
 
-  SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
@@ -308,4 +306,4 @@ private:
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_CORE_H
+#endif // __DALI_INTERNAL_CORE_H__

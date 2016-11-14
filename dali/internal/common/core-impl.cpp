@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/resources/resource-manager.h>
 
 #include <dali/internal/render/common/performance-monitor.h>
@@ -117,8 +116,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mTextureUploadedQueue );
 
-  mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
-
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
 
@@ -148,8 +145,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mTextureCacheDispatcher,
-                                      *mRenderTaskProcessor );
+                                      *mTextureCacheDispatcher );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
@@ -214,7 +210,6 @@ Core::~Core()
   delete mTextureCacheDispatcher;
   delete mUpdateManager;
   delete mRenderManager;
-  delete mRenderTaskProcessor;
   delete mTextureUploadedQueue;
 }
 
