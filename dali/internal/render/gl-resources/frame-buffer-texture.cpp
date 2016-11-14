@@ -136,7 +136,7 @@ bool FrameBufferTexture::CreateGlTexture()
   if( mNativeImage &&
       !mNativeImage->GlExtensionCreate() )
   {
-    DALI_LOG_ERROR( "Error creating native image!\n" );
+    DALI_LOG_ERROR( "Error creating native image!" );
     return false;
   }
 

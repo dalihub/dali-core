@@ -313,7 +313,7 @@ void Core::ProcessEvents()
   // Guard against calls to ProcessEvents() during ProcessEvents()
   if( mProcessingEvent )
   {
-    DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!\n" );
+    DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!" );
     mRenderController.RequestProcessEventsOnIdle();
     return;
   }

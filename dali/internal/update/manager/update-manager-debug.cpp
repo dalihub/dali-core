@@ -73,7 +73,7 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
         << "  Scale (" << scale.x << ", " << scale.y << ", " << scale.z << ")"
         << std::endl;
 
-    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s\n", oss.str().c_str());
+    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s", oss.str().c_str());
   }
 
   {
@@ -85,7 +85,7 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
         << std::setw(level*2) << std::setfill(' ') << "";
 
     std::string trafoMatrix = Debug::MatrixToString(node.GetWorldMatrix(updateBufferIndex), 2, level*2);
-    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s\n", trafoMatrix.c_str());
+    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s", trafoMatrix.c_str());
   }
 
   ++level;

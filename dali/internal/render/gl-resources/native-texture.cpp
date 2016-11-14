@@ -104,7 +104,7 @@ bool NativeTexture::CreateGlTexture()
   }
   else
   {
-    DALI_LOG_ERROR( "Error creating native image!\n" );
+    DALI_LOG_ERROR( "Error creating native image!" );
   }
 
   return mId != 0;

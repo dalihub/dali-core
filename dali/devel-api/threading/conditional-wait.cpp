@@ -52,11 +52,11 @@ ConditionalWait::ConditionalWait()
 {
   if( pthread_mutex_init( &mImpl->mutex, NULL ) )
   {
-    DALI_LOG_ERROR( "Unable to initialise mutex in ConditionalWait\n" );
+    DALI_LOG_ERROR( "Unable to initialise mutex in ConditionalWait" );
   }
   if( pthread_cond_init( &mImpl->condition, NULL ) )
   {
-    DALI_LOG_ERROR( "Unable to initialise conditional\n" );
+    DALI_LOG_ERROR( "Unable to initialise conditional" );
   }
   mImpl->count = 0;
 }
@@ -65,11 +65,11 @@ ConditionalWait::~ConditionalWait()
 {
   if( pthread_cond_destroy( &mImpl->condition ) )
   {
-    DALI_LOG_ERROR( "Unable to destroy conditional\n" );
+    DALI_LOG_ERROR( "Unable to destroy conditional" );
   }
   if( pthread_mutex_destroy( &mImpl->mutex ) )
   {
-    DALI_LOG_ERROR( "Unable to destroy mutex in ConditionalWait\n" );
+    DALI_LOG_ERROR( "Unable to destroy mutex in ConditionalWait" );
   }
   delete mImpl;
 }
@@ -86,7 +86,7 @@ void ConditionalWait::Notify()
   {
     if( pthread_cond_broadcast( &mImpl->condition ) )
     {
-      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast\n" );
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast" );
     }
   }
   Internal::Mutex::Unlock( &mImpl->mutex );
@@ -105,7 +105,7 @@ void ConditionalWait::Notify( const ScopedLock& scope )
   {
     if( pthread_cond_broadcast( &mImpl->condition ) )
     {
-      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast\n" );
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast" );
     }
   }
 }
@@ -121,7 +121,7 @@ void ConditionalWait::Wait()
     // wait while condition changes
     if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
     {
-      DALI_LOG_ERROR( "Error calling pthread_cond_wait\n" );
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait" );
       break;
     }
   }
@@ -144,7 +144,7 @@ void ConditionalWait::Wait( const ScopedLock& scope )
     // wait while condition changes
     if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
     {
-      DALI_LOG_ERROR( "Error calling pthread_cond_wait\n" );
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait" );
       break;
     }
   }

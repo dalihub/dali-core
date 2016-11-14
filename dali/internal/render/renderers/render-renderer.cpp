@@ -593,7 +593,7 @@ void Renderer::Render( Context& context,
     DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
     if( !program )
     {
-      DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
+      DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*)&mRenderDataProvider->GetShader() );
       return;
     }
   }

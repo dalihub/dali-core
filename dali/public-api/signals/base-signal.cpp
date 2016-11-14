@@ -314,7 +314,7 @@ BaseSignal::EmitGuard::EmitGuard( bool& flag )
   else
   {
     // mFlag is NULL when Emit() is called during Emit()
-    DALI_LOG_ERROR( "Cannot call Emit() from inside Emit()\n" );
+    DALI_LOG_ERROR( "Cannot call Emit() from inside Emit()" );
   }
 }
 

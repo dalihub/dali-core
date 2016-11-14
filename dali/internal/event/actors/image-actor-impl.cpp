@@ -271,25 +271,25 @@ void ImageActor::ClearPixelArea()
 
 void ImageActor::SetStyle( Dali::ImageActor::Style style )
 {
-  DALI_LOG_WARNING( "SetStyle Deprecated. Only STYLE_QUAD supported.\n" );
+  DALI_LOG_WARNING( "SetStyle Deprecated. Only STYLE_QUAD supported." );
   mStyle = style;
 }
 
 Dali::ImageActor::Style ImageActor::GetStyle() const
 {
-  DALI_LOG_WARNING( "GetStyle Deprecated. Only STYLE_QUAD supported.\n" );
+  DALI_LOG_WARNING( "GetStyle Deprecated. Only STYLE_QUAD supported." );
   return mStyle;
 }
 
 void ImageActor::SetNinePatchBorder( const Vector4& border )
 {
-  DALI_LOG_WARNING( "SetNinePatchBorder Deprecated. Only STYLE_QUAD supported.\n" );
+  DALI_LOG_WARNING( "SetNinePatchBorder Deprecated. Only STYLE_QUAD supported." );
   mNinePatchBorder = border;
 }
 
 Vector4 ImageActor::GetNinePatchBorder() const
 {
-  DALI_LOG_WARNING( "GetNinePatchBorder Deprecated. Only STYLE_QUAD supported.\n" );
+  DALI_LOG_WARNING( "GetNinePatchBorder Deprecated. Only STYLE_QUAD supported." );
   return mNinePatchBorder;
 }
 
