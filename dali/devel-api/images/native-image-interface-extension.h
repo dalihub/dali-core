@@ -48,13 +48,6 @@ public:
   virtual const char* GetCustomSamplerTypename() = 0;
 
   /**
-   * @brief Get texture target for binding native image as texture.
-   *
-   * @return Texture target.
-   */
-  virtual int GetEglImageTextureTarget() = 0;
-
-  /**
    * @brief Retrieve the extension for the interface.
    *
    * @return Extension2 pointer if available, NULL otherwise

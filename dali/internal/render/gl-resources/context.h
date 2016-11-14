@@ -286,20 +286,6 @@ public:
   }
 
   /**
-   * Wrapper for OpenGL ES 2.0 glBindTexture( target )
-   */
-  void BindTexture( int target, GLuint texture )
-  {
-    if (mBound2dTextureId[ mActiveTextureUnit ] != texture)
-    {
-      mBound2dTextureId[ mActiveTextureUnit ] = texture;
-
-      LOG_GL("BindTexture target(%d) %d\n", target, texture);
-      CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(target, texture) );
-    }
-  }
-
-  /**
    * Wrapper for OpenGL ES 2.0 glBindTexture(GL_TEXTURE_CUBE_MAP)
    */
   void BindCubeMapTexture( GLuint texture )

@@ -23,7 +23,6 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/gl-resources/gl-texture.h>
-#include <dali/devel-api/images/native-image-interface-extension.h>
 
 namespace Dali
 {
@@ -63,15 +62,8 @@ bool NativeTexture::Bind( GLenum target, TextureUnit textureunit )
   {
     // Bind the texture id
     mContext.ActiveTexture( textureunit );
+    mContext.Bind2dTexture(mId);
 
-    int textureTarget = GL_TEXTURE_2D;
-    NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
-    if( extension )
-    {
-      textureTarget = extension->GetEglImageTextureTarget();
-    }
-
-    mContext.BindTexture( textureTarget, mId );
     mNativeImage->PrepareTexture();
   }
 
@@ -100,15 +92,7 @@ bool NativeTexture::CreateGlTexture()
   {
     mContext.GenTextures( 1, &mId );
     mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );  // bind in unused unit so rebind works the first time
-
-    int textureTarget = GL_TEXTURE_2D;
-    NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
-    if( extension )
-    {
-      textureTarget = extension->GetEglImageTextureTarget();
-    }
-
-    mContext.BindTexture( textureTarget, mId );
+    mContext.Bind2dTexture( mId );
 
     mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data
 
