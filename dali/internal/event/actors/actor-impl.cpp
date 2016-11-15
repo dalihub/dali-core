@@ -31,6 +31,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -198,7 +199,7 @@ DALI_PROPERTY( "minimumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::Actor::Property::BATCH_PARENT )
+DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::DevelActor::Property::BATCH_PARENT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -2661,7 +2662,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::BATCH_PARENT:
+    case Dali::DevelActor::Property::BATCH_PARENT:
     {
       bool value;
 
@@ -3181,7 +3182,7 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::BATCH_PARENT:
+    case Dali::DevelActor::Property::BATCH_PARENT:
     {
       value = mIsBatchParent;
       break;

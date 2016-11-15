@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
@@ -64,7 +65,7 @@ DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
-DALI_PROPERTY( "batchingEnabled",                 BOOLEAN,   true, false,  false, Dali::Renderer::Property::BATCHING_ENABLED )
+DALI_PROPERTY( "batchingEnabled",                 BOOLEAN,   true, false,  false, Dali::DevelRenderer::Property::BATCHING_ENABLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
 // Property string to enumeration tables:
@@ -651,7 +652,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
-    case Dali::Renderer::Property::BATCHING_ENABLED:
+    case Dali::DevelRenderer::Property::BATCHING_ENABLED:
     {
       bool enabled;
       if( propertyValue.Get( enabled ) )
@@ -777,7 +778,7 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mDepthWriteMode;
       break;
     }
-    case Dali::Renderer::Property::BATCHING_ENABLED:
+    case Dali::DevelRenderer::Property::BATCHING_ENABLED:
     {
       value = mBatchingEnabled;
       break;

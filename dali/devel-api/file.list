@@ -18,6 +18,9 @@ devel_api_src_files = \
 
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
 
+devel_api_core_actors_header_files = \
+  $(devel_api_src_dir)/actors/actor-devel.h
+
 devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-data.h \
   $(devel_api_src_dir)/animation/path-constrainer.h
@@ -41,6 +44,9 @@ devel_api_core_images_header_files = \
 
 devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/weak-handle.h
+
+devel_api_core_rendering_header_files = \
+  $(devel_api_src_dir)/rendering/renderer-devel.h
 
 devel_api_core_signals_header_files = \
   $(devel_api_src_dir)/signals/signal-delegate.h

@@ -19,6 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <string>
 #include <cfloat>   // For FLT_MAX
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali-test-suite-utils.h>
@@ -2850,7 +2851,7 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "minimumSize",              Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
-  { "batchParent",              Actor::Property::BATCH_PARENT,             Property::BOOLEAN     },
+  { "batchParent",              DevelActor::Property::BATCH_PARENT,        Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
