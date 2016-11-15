@@ -38,7 +38,12 @@ namespace SceneGraph
 {
 
 DiscardQueue::DiscardQueue( RenderQueue& renderQueue )
-: mRenderQueue( renderQueue )
+: mRenderQueue( renderQueue ),
+  mNodeQueue(),
+  mShaderQueue(),
+  mRendererQueue(),
+  mCameraQueue(),
+  mGeometryBatcher( NULL )
 {
 }
 
