@@ -586,16 +586,6 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
   if( mTextureSet )
   {
     size_t textureCount = mTextureSet->GetTextureCount();
-    size_t newTextureCount = mTextureSet->GetNewTextureCount();
-
-    Program* program = mShader->GetProgram();
-    if( program && program->GetActiveSamplerCount() != textureCount + newTextureCount )
-    {
-      DALI_LOG_ERROR("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
-                       program->GetActiveSamplerCount(),
-                       textureCount + newTextureCount );
-    }
-
     dataProvider->mTextures.resize( textureCount );
     dataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )
@@ -604,9 +594,10 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
     }
 
-    dataProvider->mNewTextures.resize( newTextureCount );
-    dataProvider->mSamplers.resize( newTextureCount );
-    for( unsigned int i(0); i<newTextureCount; ++i )
+    textureCount = mTextureSet->GetNewTextureCount();
+    dataProvider->mNewTextures.resize( textureCount );
+    dataProvider->mSamplers.resize( textureCount );
+    for( unsigned int i(0); i<textureCount; ++i )
     {
       dataProvider->mNewTextures[i] = mTextureSet->GetNewTexture(i);
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
