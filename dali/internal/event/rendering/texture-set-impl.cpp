@@ -184,7 +184,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
 
 size_t TextureSet::GetTextureCount() const
 {
-  return mImages.size();
+  return mSamplers.size();
 }
 
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
