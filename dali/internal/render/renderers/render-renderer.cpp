@@ -176,6 +176,16 @@ void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvid
 {
   mRenderDataProvider = dataProvider;
   mUpdateAttributesLocation = true;
+
+  //Check that the number of textures match the number of samplers in the shader
+  size_t textureCount =  dataProvider->GetTextures().size() + dataProvider->GetNewTextures().size();
+  Program* program = dataProvider->GetShader().GetProgram();
+  if( program && program->GetActiveSamplerCount() != textureCount )
+  {
+    DALI_LOG_ERROR("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
+                   program->GetActiveSamplerCount(),
+                   textureCount );
+  }
 }
 
 void Renderer::SetGeometry( Render::Geometry* geometry )

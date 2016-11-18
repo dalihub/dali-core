@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedAct
 bool LongPressGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  LongPressGestureDetector* gesture = dynamic_cast<LongPressGestureDetector*>(object);
+  LongPressGestureDetector* gesture = static_cast< LongPressGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if ( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESS_DETECTED ) )
   {

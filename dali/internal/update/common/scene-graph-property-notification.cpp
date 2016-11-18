@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,8 @@ PropertyNotification::PropertyNotification(Object& object,
   mConditionType(condition),
   mArguments(arguments),
   mValid(false),
-  mNotifyMode( Dali::PropertyNotification::Disabled )
+  mNotifyMode( Dali::PropertyNotification::Disabled ),
+  mConditionFunction(NULL)
 {
   SetNotifyMode(notifyMode);
 

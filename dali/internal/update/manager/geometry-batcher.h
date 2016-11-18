@@ -121,6 +121,9 @@ public:
 
 private:
 
+  GeometryBatcher( const GeometryBatcher& ); ///< Undefined
+  GeometryBatcher& operator=( const GeometryBatcher& ); ///< Undefined
+
   /**
    * @brief Clones vertex format of source geometry and stores generated data in the batchInfo object
    * @param[in] sourceGeometry Geometry of the very first batched item

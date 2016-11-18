@@ -116,7 +116,7 @@ public:
   // unsigned int GetBufferSize() const
   virtual size_t GetBufferSize() const
   {
-    return mBufferWidth*mBytesPerPixel*mBufferHeight;
+    return static_cast< size_t >( mBufferWidth ) * mBytesPerPixel * mBufferHeight; // need to cast to size_t to avoid possibility of overflow
   }
 
   /**
@@ -124,9 +124,6 @@ public:
    * @return The buffer stride (in bytes).
    */
   virtual unsigned int GetBufferStride() const;
-  //{
-  //  return mBufferWidth*mBytesPerPixel;
-  //}
 
   /**
    * Get the pixel format

@@ -111,8 +111,7 @@ Program* Program::New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, 
   {
     // program not found so create it
     program = new Program( cache, shaderData, modifiesGeometry );
-
-    // we want to lazy load programs so dont do a Load yet, it gets done in Use()
+    program->Load();
     cache.AddProgram( shaderHash, program );
   }
 
@@ -121,11 +120,6 @@ Program* Program::New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, 
 
 void Program::Use()
 {
-  if ( !mLinked )
-  {
-    Load();
-  }
-
   if ( mLinked )
   {
     if ( this != mCache.GetCurrentProgram() )

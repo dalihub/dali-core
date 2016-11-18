@@ -1386,6 +1386,8 @@ void Actor::SetRelayoutEnabled( bool relayoutEnabled )
   {
     EnsureRelayoutData();
 
+    DALI_ASSERT_DEBUG( mRelayoutData && "mRelayoutData not created" );
+
     mRelayoutData->relayoutEnabled = relayoutEnabled;
   }
 }
@@ -1915,7 +1917,7 @@ Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  Actor* actor = dynamic_cast< Actor* >( object );
+  Actor* actor = static_cast< Actor* >( object ); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
   {

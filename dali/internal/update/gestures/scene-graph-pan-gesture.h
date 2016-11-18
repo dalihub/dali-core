@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PAN_GESTURE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,9 +93,12 @@ public:
        */
       Info& operator=( const Info& rhs )
       {
-        velocity = rhs.velocity;
-        displacement = rhs.displacement;
-        position = rhs.position;
+        if( this != &rhs )
+        {
+          velocity = rhs.velocity;
+          displacement = rhs.displacement;
+          position = rhs.position;
+        }
 
         return *this;
       }
@@ -134,10 +137,13 @@ public:
      */
     PanInfo& operator=( const PanInfo& rhs )
     {
-      time = rhs.time;
-      state = rhs.state;
-      local = rhs.local;
-      screen = rhs.screen;
+      if( this != &rhs )
+      {
+        time = rhs.time;
+        state = rhs.state;
+        local = rhs.local;
+        screen = rhs.screen;
+      }
 
       return *this;
     }

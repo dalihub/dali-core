@@ -789,7 +789,7 @@ Dali::RenderTask::RenderTaskSignalType& RenderTask::FinishedSignal()
 bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  RenderTask* renderTask = dynamic_cast<RenderTask*>(object);
+  RenderTask* renderTask = static_cast< RenderTask* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
   {

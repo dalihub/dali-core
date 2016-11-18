@@ -730,7 +730,7 @@ void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Interna
   if( pixelDataFormat == GL_RGB && mInternalFormat == GL_RGBA )
   {
     //Convert manually from RGB to RGBA if GLES < 3 ( GLES 3 can do the conversion automatically when uploading )
-    size_t dataSize = params.width * params.height;
+    size_t dataSize = static_cast< size_t >( params.width ) * params.height;
     tempBuffer = new unsigned char[dataSize*4u];
     for( size_t i(0u); i<dataSize; i++ )
     {

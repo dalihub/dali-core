@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RESOURCE_CLIENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,6 +265,10 @@ public: // Message methods
   void UpdateImageTicket( ResourceId id, const ImageAttributes& imageAttributes ); ///!< Issue #AHC01
 
 private:
+
+  ResourceClient( const ResourceClient& ); ///< Undefined
+  ResourceClient& operator=( const ResourceClient& ); ///< Undefined
+
   ResourceManager& mResourceManager;          ///< The resource manager
   EventThreadServices& mEventThreadServices;        ///< Interface to send messages through
 

@@ -956,10 +956,11 @@ public:
   inline void GetShaderSource(GLuint shader, GLsizei bufsize, GLsizei* length, char* source)
   {
     const std::string shaderSource = mShaderSources[shader];
-    if( static_cast<int>(shaderSource.length()) < bufsize )
+    const int shaderSourceLength = static_cast<int>(shaderSource.length());
+    if( shaderSourceLength < bufsize )
     {
-      strcpy(source, shaderSource.c_str());
-      *length = shaderSource.length();
+      strncpy( source, shaderSource.c_str(), shaderSourceLength );
+      *length = shaderSourceLength;
     }
     else
     {

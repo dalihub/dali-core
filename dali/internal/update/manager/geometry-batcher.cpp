@@ -189,9 +189,12 @@ struct BatchParent
 
 struct Impl
 {
-  Impl() :
+  Impl()
+  : batchParents(),
+    updateManager( NULL ),
     currentFrame( 0 )
-  {}
+  {
+  }
 
   int GetBatchKeyIndex( size_t batchParentIndex, const BatchKey& key )
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -462,6 +462,51 @@ int UtcDaliTextureUpload05(void)
     DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexSubImage2D", out.str().c_str() ) );
   }
 
+
+  END_TEST;
+}
+
+int UtcDaliTextureUpload06(void)
+{
+  TestApplication application;
+
+  //Create the texture
+  unsigned int width(64);
+  unsigned int height(64);
+  tet_infoline( "Creating a Texure with an alpha channel" );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  tet_infoline( "TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu" );
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
+  }
+
+  tet_infoline( "Upload data to the texture" );
+  callStack.Reset();
+
+  tet_infoline( "Creating a RGB pixel buffer and adding that to the texture to ensure it is handled correctly" );
+  unsigned int bufferSize( width * height * 3 );
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGB888, PixelData::FREE );
+  texture.Upload( pixelData );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "TexImage2D should be called to upload the data" );
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+    DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
+  }
 
   END_TEST;
 }
