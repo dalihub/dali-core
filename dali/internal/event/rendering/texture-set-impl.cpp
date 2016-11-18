@@ -55,11 +55,23 @@ void TextureSet::SetImage( size_t index, ImagePtr image )
   else
   {
     mImages.resize(index + 1);
+
+    bool samplerExist = true;
+    if( mSamplers.size() < index + 1 )
+    {
+      mSamplers.resize( index + 1 );
+      samplerExist = false;
+    }
+
     mSamplers.resize(index + 1);
     for( size_t i(textureCount); i<=index; ++i )
     {
       mImages[i] = NULL;
-      mSamplers[i] = NULL;
+
+      if( !samplerExist )
+      {
+        mSamplers[i] = NULL;
+      }
     }
   }
   mImages[index] = image;
@@ -91,11 +103,22 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
   if( index >= textureCount )
   {
     mNewTextures.resize(index + 1);
-    mSamplers.resize(index + 1);
+
+    bool samplerExist = true;
+    if( mSamplers.size() < index + 1 )
+    {
+      mSamplers.resize( index + 1 );
+      samplerExist = false;
+    }
+
     for( size_t i(textureCount); i<=index; ++i )
     {
       mNewTextures[i] = NULL;
-      mSamplers[i] = NULL;
+
+      if( !samplerExist )
+      {
+        mSamplers[i] = NULL;
+      }
     }
   }
 
@@ -146,13 +169,9 @@ void TextureSet::SetSampler( size_t index, SamplerPtr sampler )
   if( samplerCount < index + 1  )
   {
     mSamplers.resize( index + 1 );
-    mNewTextures.resize( index + 1 );
-    mImages.resize( index + 1 );
     for( size_t i(samplerCount); i<=index; ++i )
     {
-      mImages[i] = NULL;
       mSamplers[i] = NULL;
-      mNewTextures[i] = NULL;
     }
   }
 
@@ -184,7 +203,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
 
 size_t TextureSet::GetTextureCount() const
 {
-  return mSamplers.size();
+  return mImages.size() + mNewTextures.size();
 }
 
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
