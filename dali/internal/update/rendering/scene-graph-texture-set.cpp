@@ -147,11 +147,21 @@ void TextureSet::SetImage( size_t index,  ResourceId imageId )
   if( textureCount < index + 1 )
   {
     mTextureId.Resize( index + 1 );
-    mSamplers.Resize( index + 1 );
+
+    bool samplerExist = true;
+    if( mSamplers.Size() < index + 1 )
+    {
+      mSamplers.Resize( index + 1 );
+      samplerExist = false;
+    }
+
     for( size_t i(textureCount); i<=index; ++i )
     {
       mTextureId[i] = Integration::InvalidResourceId;
-      mSamplers[i] = NULL;
+      if( !samplerExist )
+      {
+        mSamplers[i] = NULL;
+      }
     }
   }
 
@@ -166,10 +176,8 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   if( samplerCount < index + 1 )
   {
     mSamplers.Resize( index + 1 );
-    mTextureId.Resize( index + 1 );
     for( size_t i(samplerCount); i<=index; ++i )
     {
-      mTextureId[i] = Integration::InvalidResourceId;
       mSamplers[i] = NULL;
     }
   }
@@ -184,12 +192,22 @@ void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
   if( textureCount < index + 1 )
   {
     mTextures.Resize( index + 1 );
-    mSamplers.Resize( index + 1 );
+
+    bool samplerExist = true;
+    if( mSamplers.Size() < index + 1 )
+    {
+      mSamplers.Resize( index + 1 );
+      samplerExist = false;
+    }
 
     for( size_t i(textureCount); i<=index; ++i )
     {
       mTextures[i] = 0;
-      mSamplers[i] = 0;
+
+      if( !samplerExist )
+      {
+        mSamplers[i] = 0;
+      }
     }
   }
 
