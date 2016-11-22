@@ -64,6 +64,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the LinearConstrainer class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       VALUE     = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "value" type Array of float @SINCE_1_0.0

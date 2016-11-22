@@ -91,6 +91,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the RenderTask class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       /**

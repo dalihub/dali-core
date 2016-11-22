@@ -51,6 +51,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Path class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       POINTS         = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "points",         type Vector3 @SINCE_1_0.0
