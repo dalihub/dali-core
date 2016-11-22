@@ -248,6 +248,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Actor class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3     (constraint-input) @SINCE_1_0.0

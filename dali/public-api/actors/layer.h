@@ -85,11 +85,16 @@ public:
    * @brief An enumeration of properties belonging to the Layer class.
    *
    * Properties additional to Actor.
-   *
    * @SINCE_1_0.0
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Layer class.
+     *
+     * Properties additional to Actor.
+     * @SINCE_1_0.0
+     */
     enum
     {
       CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clippingEnable",   type bool @SINCE_1_0.0
