@@ -536,6 +536,7 @@ public:
    * and (1.0, 1.0, 0.5) is the bottom-right corner.
    * The default parent-origin is Dali::ParentOrigin::TOP_LEFT (0.0, 0.0, 0.5).
    * An actor position is the distance between this origin, and the actors anchor-point.
+   * @image html parent-origin.png
    * @SINCE_1_0.0
    * @param [in] origin The new parent-origin.
    * @pre The Actor has been initialized.
@@ -563,6 +564,7 @@ public:
    * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
    * An actor position is the distance between its parent-origin, and this anchor-point.
    * An actor's orientation is the rotation from its default orientation, the rotation is centered around its anchor-point.
+   * @image html anchor-point.png
    * @SINCE_1_0.0
    * @param [in] anchorPoint The new anchor-point.
    * @pre The Actor has been initialized.
