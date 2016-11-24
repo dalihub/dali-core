@@ -540,7 +540,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] origin The new parent-origin.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentParentOrigin().
    * @see Dali::ParentOrigin for predefined parent origin values
    */
   void SetParentOrigin(const Vector3& origin);
@@ -551,7 +550,6 @@ public:
    * @SINCE_1_0.0
    * @return The current parent-origin.
    * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetParentOrigin().
    */
   Vector3 GetCurrentParentOrigin() const;
 
@@ -562,13 +560,12 @@ public:
    * is the top-left corner of the actor, and (1.0, 1.0, 0.5) is the
    * bottom-right corner.  The default anchor point is
    * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
-   * An actor position is the distance between its parent-origin, and this anchor-point.
+   * An actor position is the distance between its parent-origin and this anchor-point.
    * An actor's orientation is the rotation from its default orientation, the rotation is centered around its anchor-point.
    * @image html anchor-point.png
    * @SINCE_1_0.0
    * @param [in] anchorPoint The new anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentAnchorPoint().
    * @see Dali::AnchorPoint for predefined anchor point values
    */
   void SetAnchorPoint(const Vector3& anchorPoint);
@@ -579,7 +576,6 @@ public:
    * @SINCE_1_0.0
    * @return The current anchor-point.
    * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetAnchorPoint().
    */
   Vector3 GetCurrentAnchorPoint() const;
 
@@ -593,7 +589,6 @@ public:
    * @param [in] width  The new width.
    * @param [in] height The new height.
    * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentSize().
    */
   void SetSize(float width, float height);
 
@@ -607,7 +602,6 @@ public:
    * @param [in] height The size of the actor along the y-axis.
    * @param [in] depth The size of the actor along the z-axis.
    * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentSize().
    */
   void SetSize(float width, float height, float depth);
 
@@ -620,7 +614,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] size The new size.
    * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentSize().
    */
   void SetSize(const Vector2& size);
 
@@ -632,7 +625,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] size The new size.
    * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentSize().
    */
   void SetSize(const Vector3& size);
 
@@ -671,14 +663,14 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   *
    * @image html actor-position.png
    * The Actor's z position will be set to 0.0f.
    * @SINCE_1_0.0
    * @param [in] x The new x position
    * @param [in] y The new y position
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetPosition(float x, float y);
 
@@ -687,14 +679,14 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   *
    * @image html actor-position.png
    * @SINCE_1_0.0
    * @param [in] x The new x position
    * @param [in] y The new y position
    * @param [in] z The new z position
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetPosition(float x, float y, float z);
 
@@ -703,12 +695,12 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   *
    * @image html actor-position.png
    * @SINCE_1_0.0
    * @param [in] position The new position
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetPosition(const Vector3& position);
 
@@ -718,7 +710,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] x The new x position
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetX(float x);
 
@@ -728,7 +719,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] y The new y position.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetY(float y);
 
@@ -738,7 +728,6 @@ public:
    * @SINCE_1_0.0
    * @param [in] z The new z position
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    */
   void SetZ(float z);
 
@@ -767,7 +756,7 @@ public:
    * @SINCE_1_0.0
    * @return The Actor's current position in world coordinates.
    * @pre The Actor has been initialized.
-   * @note The actor will not have a world-position, unless it has previously been added to the stage.
+   * @note The actor may not have a world-position unless it has been added to the stage.
    */
   Vector3 GetCurrentWorldPosition() const;
 
@@ -788,7 +777,8 @@ public:
    * @brief Set whether a child actor inherits it's parent's position.
    *
    * Default is to inherit.
-   * Switching this off means that using SetPosition() sets the actor's world position3
+   * Switching this off means that using SetPosition() sets the actor's world position, i.e. translates from
+   * the world origin (0,0,0) to the anchor point of the actor.
    * @SINCE_1_1.24
    * @param[in] inherit - true if the actor should inherit position, false otherwise.
    * @pre The Actor has been initialized.
