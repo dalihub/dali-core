@@ -665,8 +665,12 @@ public:
   Vector3 GetNaturalSize() const;
 
   /**
-   * @brief Sets the position of the actor.
+   * @brief Sets the position of the Actor.
    *
+   * By default, sets the position vector between the parent origin and anchor point (default).
+   *
+   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * @image html actor-position.png
    * The Actor's z position will be set to 0.0f.
    * @SINCE_1_0.0
    * @param [in] x The new x position
@@ -679,6 +683,10 @@ public:
   /**
    * @brief Sets the position of the Actor.
    *
+   * By default, sets the position vector between the parent origin and anchor point (default).
+   *
+   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * @image html actor-position.png
    * @SINCE_1_0.0
    * @param [in] x The new x position
    * @param [in] y The new y position
@@ -691,6 +699,10 @@ public:
   /**
    * @brief Sets the position of the Actor.
    *
+   * By default, sets the position vector between the parent origin and anchor point (default).
+   *
+   * When SetInheritPosition(true) has called, sets the position vector between the world origin (0,0,0) and anchor point.
+   * @image html actor-position.png
    * @SINCE_1_0.0
    * @param [in] position The new position
    * @pre The Actor has been initialized.
