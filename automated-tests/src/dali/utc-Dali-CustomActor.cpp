@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -823,7 +823,7 @@ int UtcDaliCustomActorImplDestructor(void)
 {
   TestApplication application;
   CustomActorImpl* actor = new Impl::TestCustomActor();
-  delete actor;
+  CustomActor customActor( *actor ); // Will automatically unref at the end of this function
 
   DALI_TEST_CHECK( true );
   END_TEST;
@@ -1747,12 +1747,12 @@ int UtcDaliCustomActorImplOnPropertySet(void)
 {
   TestApplication application;
   CustomActorImpl* impl = new Impl::SimpleTestCustomActor();
+  CustomActor customActor( *impl ); // Will automatically unref at the end of this function
 
   impl->OnPropertySet( 0, 0 );
 
   DALI_TEST_CHECK( true );
 
-  delete impl;
   END_TEST;
 }
 
