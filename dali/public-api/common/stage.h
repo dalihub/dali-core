@@ -49,6 +49,24 @@ struct WheelEvent;
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
  *
+ * Stage is a top-level object that represents the entire screen.
+ * It is used for displaying a hierarchy of actors managed by the scene graph structure,
+ * which means an actor inherits a position relative to its parent,
+ * and can be moved in relation to this point.
+ *
+ * The stage instance is a singleton object (the only instance of its class during the
+ * lifetime of the program). You can get it using a static function.
+ *
+ * To display the contents of an actor, it must be added to a stage.
+ * The following example shows how to connect a new actor to the stage:
+ * @code
+ * Actor actor = Actor::New();
+ * Stage::GetCurrent().Add( actor );
+ * @endcode
+ *
+ * The stage has a 2D size that matches the size of the application window.
+ * The default unit 1 is 1 pixel with the default camera.
+ *
  * Multiple stage/window support is not currently provided.
  *
  * Signals
