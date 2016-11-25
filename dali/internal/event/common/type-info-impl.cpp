@@ -106,7 +106,14 @@ namespace Internal
 {
 
 TypeInfo::TypeInfo(const std::string &name, const std::string &baseTypeName, Dali::TypeInfo::CreateFunction creator)
-  : mTypeName(name), mBaseTypeName(baseTypeName), mCreate(creator)
+  : mTypeName(name), mBaseTypeName(baseTypeName), mCSharpType(false), mCreate(creator)
+{
+  DALI_ASSERT_ALWAYS(!name.empty() && "Type info construction must have a name");
+  DALI_ASSERT_ALWAYS(!baseTypeName.empty() && "Type info construction must have a base type name");
+}
+
+TypeInfo::TypeInfo(const std::string &name, const std::string &baseTypeName, Dali::CSharpTypeInfo::CreateFunction creator)
+  : mTypeName(name), mBaseTypeName(baseTypeName), mCSharpType(true), mCSharpCreate(creator)
 {
   DALI_ASSERT_ALWAYS(!name.empty() && "Type info construction must have a name");
   DALI_ASSERT_ALWAYS(!baseTypeName.empty() && "Type info construction must have a base type name");
@@ -122,7 +129,14 @@ BaseHandle TypeInfo::CreateInstance() const
 
   if(mCreate)
   {
-    ret = mCreate();
+    if ( mCSharpType )
+    {
+      ret = *mCSharpCreate();
+    }
+    else
+    {
+      ret = mCreate();
+    }
 
     if ( ret )
     {
@@ -400,6 +414,33 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
   }
 }
 
+void TypeInfo::AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc)
+{
+
+  // The setter can be empty as a property can be read-only.
+
+  if ( NULL == getFunc )
+  {
+    DALI_ASSERT_ALWAYS( ! "GetProperty Function is empty" );
+  }
+  else
+  {
+    RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+    if ( iter == mRegisteredProperties.end() )
+    {
+      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
+    }
+  }
+
+}
+
+
 void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type )
 {
   RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
@@ -407,7 +448,7 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
   }
   else
   {
@@ -422,7 +463,7 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( defaultValue.GetType(), NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( defaultValue.GetType(), name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
     mPropertyDefaultValues.push_back( PropertyDefaultValuePair( index, defaultValue ) );
   }
   else
@@ -448,7 +489,7 @@ void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, baseIndex, componentIndex ) ) );
+      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, baseIndex, componentIndex ) ) );
       success = true;
     }
   }
@@ -463,7 +504,7 @@ void TypeInfo::AddChildProperty( const std::string& name, Property::Index index,
 
   if ( iter == mRegisteredChildProperties.end() )
   {
-    mRegisteredChildProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mRegisteredChildProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
   }
   else
   {
@@ -755,8 +796,19 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
                                                           PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
   if( iter != mRegisteredProperties.end() )
   {
-    // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
-    return iter->second.getFunc( const_cast< BaseObject* >( object ), index );
+    if( mCSharpType ) // using csharp property get which returns a pointer to a Property::Value
+    {
+       // CSharp can't return any object by value, it can return pointers.
+       // CSharp has ownership of the pointer contents, which is fine because we are returning by value
+       int index = (iter->first );
+       return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), &index  ));
+
+    }
+    else
+    {
+      // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
+      return iter->second.getFunc( const_cast< BaseObject* >( object ), index );
+    }
   }
 
   Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
@@ -774,8 +826,19 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::stri
                                                           PropertyNameFinder< RegisteredPropertyPair >( name ) );
   if( iter != mRegisteredProperties.end() )
   {
-    // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
-    return iter->second.getFunc( const_cast< BaseObject* >( object ), iter->first );
+    if( mCSharpType ) // using csharp property get which returns a pointer to a Property::Value
+    {
+      // CSharp can't return any object by value, it can return pointers.
+      // CSharp has ownership of the pointer contents, which is fine because we are returning by value
+      int index = (iter->first );
+      return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), &index ));
+
+    }
+    else
+    {
+      // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
+      return iter->second.getFunc( const_cast< BaseObject* >( object ), iter->first );
+    }
   }
 
   Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );

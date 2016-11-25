@@ -9,6 +9,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/images/texture-set-image.cpp \
   $(devel_api_src_dir)/images/nine-patch-image.cpp \
   $(devel_api_src_dir)/object/weak-handle.cpp \
+  $(devel_api_src_dir)/object/csharp-type-registry.cpp \
   $(devel_api_src_dir)/scripting/scripting.cpp \
   $(devel_api_src_dir)/signals/signal-delegate.cpp \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
@@ -40,7 +41,9 @@ devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/nine-patch-image.h
 
 devel_api_core_object_header_files = \
-  $(devel_api_src_dir)/object/weak-handle.h
+  $(devel_api_src_dir)/object/weak-handle.h \
+  $(devel_api_src_dir)/object/csharp-type-info.h \
+  $(devel_api_src_dir)/object/csharp-type-registry.h
 
 devel_api_core_signals_header_files = \
   $(devel_api_src_dir)/signals/signal-delegate.h

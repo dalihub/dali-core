@@ -25,6 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/type-info.h>
+#include <dali/devel-api/object/csharp-type-info.h>
 
 namespace Dali
 {
@@ -48,7 +49,15 @@ public:
    * @param [baseName] the base type registered name
    * @param [creator] the creator function for this type
    */
-  TypeInfo(const std::string &name, const std::string &baseName, Dali::TypeInfo::CreateFunction creator);
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator);
+
+  /**
+   * Create TypeInfo for a csharp object
+   * @param [name] the registered name
+   * @param [baseName] the base type registered name
+   * @param [creator] the creator function for this type
+   */
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator);
 
   /**
    *
@@ -137,6 +146,16 @@ public:
    * @param[in] getFunc The function to call to retrieve the value of the property.
    */
   void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
+
+  /**
+   * Adds an event-thread only property to the type.
+   * @param[in] name The name of the property.
+   * @param[in] index The index of the property.
+   * @param[in] type The Property::Type.
+   * @param[in] setFunc The function to call to set the property (Can be NULL).
+   * @param[in] getFunc The function to call to retrieve the value of the property.
+   */
+  void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Adds an animatable property to the type.
@@ -301,6 +320,17 @@ private:
     {
     }
 
+    RegisteredProperty( Property::Type propType, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
+        : type( propType ),
+          setFunc( NULL ),
+          getFunc( NULL ),
+          name( propName ),
+          basePropertyIndex(basePropertyIndex),
+          componentIndex(componentIndex)
+    {
+    }
+
+
     RegisteredProperty( Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
     : type( propType ),
       setFunc( set ),
@@ -311,9 +341,28 @@ private:
     {
     }
 
+    RegisteredProperty( Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
+    : type( propType ),
+      cSharpSetFunc( set ),
+      cSharpGetFunc( get ),
+      name( propName ),
+      basePropertyIndex(basePropertyIndex),
+      componentIndex(componentIndex)
+    {
+    }
+
+
     Property::Type type;
-    Dali::TypeInfo::SetPropertyFunction setFunc;
-    Dali::TypeInfo::GetPropertyFunction getFunc;
+    union
+    {
+      Dali::TypeInfo::SetPropertyFunction setFunc;
+      Dali::CSharpTypeInfo::SetPropertyFunction cSharpSetFunc;
+    };
+    union
+    {
+      Dali::TypeInfo::GetPropertyFunction getFunc;
+      Dali::CSharpTypeInfo::GetPropertyFunction cSharpGetFunc;
+    };
     std::string name;
     Property::Index basePropertyIndex;
     int componentIndex;
@@ -331,7 +380,12 @@ private:
 
   std::string mTypeName;
   std::string mBaseTypeName;
-  Dali::TypeInfo::CreateFunction mCreate;
+  bool        mCSharpType:1;    ///< Whether this type info is for a CSharp control (instead of C++)
+  union
+  {
+    Dali::TypeInfo::CreateFunction mCreate;
+    Dali::CSharpTypeInfo::CreateFunction mCSharpCreate;
+  };
   ActionContainer mActions;
   ConnectorContainer mSignalConnectors;
   RegisteredPropertyContainer mRegisteredProperties;
