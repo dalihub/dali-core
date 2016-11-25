@@ -304,7 +304,6 @@ public:
       MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2     @SINCE_1_0.0
       INHERIT_POSITION,                                   ///< name "inheritPosition",       type bool        @SINCE_1_1.24
       CLIPPING_MODE,                                      ///< name "clippingMode",          type String      @SINCE_1_2_5
-      BATCH_PARENT,                                       ///< name "batchParent",           type bool        @SINCE_1_2.0
     };
   };
 
