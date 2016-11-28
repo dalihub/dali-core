@@ -93,6 +93,7 @@ Layer* FindLayer( Node& node )
  * @param[in] currentLayer The current layer containing lists of opaque/transparent renderables.
  * @param[in] renderTask The current render-task.
  * @param[in] inheritedDrawMode The draw mode of the parent
+ * @param[in] parentDepthIndex The inherited parent node depth index
  * @param[in] currentClippingId The current Clipping Id
  *              Note: ClippingId is passed by reference, so it is permanently modified when traversing back up the tree for uniqueness.
  * @param[in] clippingDepth The current clipping depth

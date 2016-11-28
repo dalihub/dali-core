@@ -21,7 +21,8 @@ devel_api_src_files = \
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
 
 devel_api_core_actors_header_files = \
-  $(devel_api_src_dir)/actors/actor-devel.h
+  $(devel_api_src_dir)/actors/actor-devel.h \
+  $(devel_api_src_dir)/actors/layer-devel.h
 
 devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-data.h \

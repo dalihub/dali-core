@@ -24,6 +24,7 @@
 #include <cfloat>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/events/touch-data.h>
@@ -355,6 +356,10 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
   return GetDimensionValue( values.GetVectorXY(), dimension );
 }
 
+unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
+{
+  return depth * Dali::DevelLayer::TREE_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+}
 
 } // unnamed namespace
 
@@ -1970,6 +1975,7 @@ Actor::Actor( DerivedType derivedType )
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mDepth( 0u ),
+  mSiblingOrder(0u),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
@@ -2071,6 +2077,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned in
 
   mIsOnStage = true;
   mDepth = depth;
+  SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
 
   ConnectToSceneGraph();
 
@@ -2677,6 +2684,24 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
+    case Dali::DevelActor::Property::SIBLING_ORDER:
+       {
+         int value;
+
+         if( property.Get( value ) )
+         {
+           if( static_cast<unsigned int>(value) != mSiblingOrder )
+           {
+             mSiblingOrder = value;
+             if( mIsOnStage )
+             {
+               SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+             }
+           }
+         }
+         break;
+       }
+
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       ClippingMode::Type convertedValue = mClippingMode;
@@ -3184,6 +3209,12 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::DevelActor::Property::BATCH_PARENT:
     {
       value = mIsBatchParent;
+      break;
+    }
+
+    case Dali::DevelActor::Property::SIBLING_ORDER:
+    {
+      value = static_cast<int>(mSiblingOrder);
       break;
     }
 

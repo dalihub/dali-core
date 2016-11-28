@@ -93,6 +93,7 @@ enum Type
      * @note The default value is 'false'
      */
   BATCH_PARENT         = CLIPPING_MODE + 1,
+  SIBLING_ORDER          = CLIPPING_MODE + 2,
 };
 
 } // namespace Property
