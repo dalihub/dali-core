@@ -16,7 +16,8 @@ matrix:
 script:
   - pushd build/tizen/
   - autoreconf --install
-  - ./configure --enable-profile=UBUNTU --enable-gles=20 --enable-debug --coverage
+  - export CXXFLAGS="--coverage "
+  - ./configure --enable-profile=UBUNTU --enable-gles=20 --enable-debug
   - sudo make -j7 install
   - popd
 
