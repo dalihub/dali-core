@@ -12,19 +12,22 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - clang-3.7
-      env: COMPILER=clang++-3.7
+
+before_install:
+  - wget http://download.tizen.org/tct/2.2.1/2.2.1_r1/web-tct_2.2.1_r1.tar.gz
+  - sudo tar xzf web-tct_2.2.1_r1.tar.gz
+  - pushd web-tct_2.2.1_r1/tools
+  - sudo -E ./tct-config-host.sh
+  - popd
 
 script:
-  - cd build/tizen/
+  - pushd build/tizen/
   - autoreconf --install
   - ./configure --enable-profile=UBUNTU --enable-gles=20
   - sudo make -j7 install
+  - popd
 
+after_success:
+  - cd automated-tests/
+  - ./build.sh
+  - ./execute.sh
