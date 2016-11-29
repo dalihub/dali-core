@@ -10,7 +10,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
+            - g++-5  libexpat1-dev libxml-parser-perl
       env: COMPILER=g++-5
 
 script:
@@ -23,4 +23,4 @@ script:
 after_success:
   - cd automated-tests/
   - ./build.sh
-  - ./execute.sh
+  - env LD_LIBRARY_PATH=/usr/local/lib ./execute.sh
