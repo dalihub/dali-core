@@ -82,7 +82,7 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
     }
     default:
     {
-      DALI_ASSERT_DEBUG(!"Type not supported");
+      DALI_ABORT( "Type not animateable" );
       break;
     }
   }

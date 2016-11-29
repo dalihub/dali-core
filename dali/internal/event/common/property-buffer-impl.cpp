@@ -56,14 +56,6 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
 
   switch( propertyType )
   {
-    case Property::NONE:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      DALI_ASSERT_ALWAYS( false && "No size for properties with no type, or dynamic sizes" );
-      break;
-    }
     case Property::BOOLEAN:
     {
       alignment = PropertyImplementationTypeAlignment< Property::BOOLEAN >::VALUE;
@@ -113,6 +105,13 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
     {
       alignment = PropertyImplementationTypeAlignment< Property::ROTATION >::VALUE;
       break;
+    }
+    case Property::NONE:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      // already handled by higher level code
     }
   }
 
@@ -208,6 +207,13 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
     Property::Type type = Property::Type( component.second.Get<int>() );
 
     // Get the size and alignment
+    if( ( type == Property::NONE   ) ||
+        ( type == Property::STRING ) ||
+        ( type == Property::ARRAY  ) ||
+        ( type == Property::MAP    ) )
+    {
+      DALI_ABORT( "Property::Type not supported in PropertyBuffer" );
+    }
     unsigned int elementSize = GetPropertyImplementationSize( type );
     unsigned int elementAlignment = GetPropertyImplementationAlignment( type );
 
@@ -258,14 +264,6 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
 
   switch( propertyType )
   {
-    case Property::NONE:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
-      break;
-    }
     case Property::BOOLEAN:
     {
       size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
@@ -315,6 +313,13 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
     {
       size = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
       break;
+    }
+    case Property::NONE:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      // already handled by higher level code
     }
   }
 

@@ -2850,8 +2850,7 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 
     default:
     {
-      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
-      break;
+      // nothing to do for other types
     }
   } // entry.GetType
 }
@@ -3191,12 +3190,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       value = mClippingMode;
-      break;
-    }
-
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "Actor Property index invalid" ); // should not come here
       break;
     }
   }

@@ -183,6 +183,12 @@ public:
   }
 #endif
 
+#define DALI_ABORT(message)                \
+  { \
+    Dali::DaliAssertMessage( ASSERT_LOCATION, message );   \
+    throw Dali::DaliException( ASSERT_LOCATION, message );  \
+  }
+
 /**
  * @brief An invariant concurrent assertion to ensure its argument evaluates TRUE in debug builds.
  *

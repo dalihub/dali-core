@@ -78,8 +78,7 @@ public:
    */
   virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const bool&>(*this);
   }
 
@@ -91,8 +90,7 @@ public:
    */
   virtual const int& GetInteger( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const int&>(*this);
   }
 
@@ -104,8 +102,7 @@ public:
    */
   virtual const float& GetFloat( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const float&>(*this);
   }
 
@@ -117,8 +114,7 @@ public:
    */
   virtual const Vector2& GetVector2( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector2&>(*this);
   }
 
@@ -130,8 +126,7 @@ public:
    */
   virtual const Vector3& GetVector3( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector3&>(*this);
   }
 
@@ -143,8 +138,7 @@ public:
    */
   virtual const Vector4& GetVector4( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector4&>(*this);
   }
 
@@ -156,8 +150,7 @@ public:
    */
   virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Quaternion&>(*this);
   }
 
@@ -169,8 +162,7 @@ public:
    */
   virtual const Matrix3& GetMatrix3( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix3&>(*this);
   }
 
@@ -182,8 +174,7 @@ public:
    */
   virtual const Matrix& GetMatrix( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
-    // the return will never be executed due to assert above so just keep the compiler happy
+    // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix&>(*this);
   }
 

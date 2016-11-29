@@ -219,7 +219,7 @@ void BaseSignal::SlotDisconnected( CallbackBase* callback )
     }
   }
 
-  DALI_ASSERT_ALWAYS( false && "Callback lost in SlotDisconnected()" );
+  DALI_ABORT( "Callback lost in SlotDisconnected()" );
 }
 
 CallbackBase* BaseSignal::GetCallback( std::size_t connectionIndex ) const
