@@ -10,18 +10,20 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5  libexpat1-dev libxml-parser-perl
+            - g++-5  libexpat1-dev libxml-parser-perl lcov
       env: COMPILER=g++-5
 
 script:
   - pushd build/tizen/
   - autoreconf --install
   - export CXXFLAGS="--coverage "
+  - export LD_LIBRARY_PATH=/usr/local/lib
   - ./configure --enable-profile=UBUNTU --enable-gles=20 --enable-debug
   - sudo make -j7 install
   - popd
-
-after_success:
-  - cd automated-tests/
+  - pushd automated-tests/
   - ./build.sh
-  - env LD_LIBRARY_PATH=/usr/local/lib ./execute.sh
+  - ./execute.sh
+  - ./coverage.sh
+  - popd
+  
