@@ -19,7 +19,8 @@ script:
   - export CXXFLAGS="--coverage "
   - export LD_LIBRARY_PATH=/usr/local/lib
   - ./configure --enable-profile=UBUNTU --enable-gles=20 --enable-debug
-  - sudo make -j7 install
+  - make -j7 
+  - sudo make install
   - popd
   - pushd automated-tests/
   - ./build.sh
