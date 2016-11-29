@@ -12,5 +12,5 @@ script:
   - cd build/tizen/
   - autoreconf --install
   - ./configure --enable-profile=UBUNTU --enable-gles=20
-  - make -j7 install
+  - sudo make -j7 install
 
