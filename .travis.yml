@@ -13,13 +13,6 @@ matrix:
             - g++-5
       env: COMPILER=g++-5
 
-before_install:
-  - wget http://download.tizen.org/tct/2.2.1/2.2.1_r1/web-tct_2.2.1_r1.tar.gz
-  - sudo tar xzf web-tct_2.2.1_r1.tar.gz
-  - pushd web-tct_2.2.1_r1/tools
-  - sudo -E ./tct-config-host.sh
-  - popd
-
 script:
   - pushd build/tizen/
   - autoreconf --install
