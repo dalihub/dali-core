@@ -3,13 +3,14 @@ language: cpp
 dist: trusty
 
 compiler:
-- gcc
+  - gcc
 
 os:
-- linux
+  - linux
 
 script:
   - cd build/tizen/
+  - autoreconf --install
   - ./configure --enable-profile=UBUNTU --enable-gles=20
   - make -j7 install
 
