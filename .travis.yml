@@ -28,8 +28,9 @@ script:
   - pushd automated-tests/
   - ./build.sh
   - ./execute.sh
-  - ./coverage.sh
+  - ./coverage.sh -n
   - popd
   
 after_success:
-  - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
+  - coveralls-lcov --repo-token ${COVERALLS_REPO_TOKEN} `find . -name dali.info` # uploads to coveralls
+  # - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
