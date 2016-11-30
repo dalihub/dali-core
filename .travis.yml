@@ -15,7 +15,6 @@ matrix:
 
 before_install:
   - pip install --user cpp-coveralls
-  - export $COVERALLS_REPO_TOKEN=NatWrPURdzFkcW4UI1AvTo9QEfAPrxTAx
 
 script:
   - pushd build/tizen/
