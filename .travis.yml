@@ -13,6 +13,10 @@ matrix:
             - g++-5  libexpat1-dev libxml-parser-perl lcov
       env: COMPILER=g++-5
 
+before_install:
+  - pip install --user cpp-coveralls
+  - export $COVERALLS_REPO_TOKEN=NatWrPURdzFkcW4UI1AvTo9QEfAPrxTAx
+
 script:
   - pushd build/tizen/
   - autoreconf --install
@@ -28,3 +32,5 @@ script:
   - ./coverage.sh
   - popd
   
+after_success:
+  - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
