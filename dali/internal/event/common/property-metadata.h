@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {

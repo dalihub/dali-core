@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-abstraction.h> // for GLenum
+#include <dali/internal/common/shader-data.h>
 
 namespace Dali
 {

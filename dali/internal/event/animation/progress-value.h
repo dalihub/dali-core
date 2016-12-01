@@ -19,10 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/radian.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {
@@ -62,29 +65,29 @@ public:
   T mValue;          ///< value this animation channel should take
 };
 
-typedef ProgressValue<Quaternion>                       ProgressQuaternion;
-typedef std::vector<ProgressQuaternion>                 ProgressQuaternionContainer;
+typedef ProgressValue<Quaternion>                  ProgressQuaternion;
+typedef Vector<ProgressQuaternion>                 ProgressQuaternionContainer;
 
-typedef ProgressValue<AngleAxis>                        ProgressAngleAxis;
-typedef std::vector<AngleAxis>                          ProgressAngleAxisContainer;
+typedef ProgressValue<AngleAxis>                   ProgressAngleAxis;
+typedef Vector<AngleAxis>                          ProgressAngleAxisContainer;
 
-typedef ProgressValue<bool>                             ProgressBoolean;
-typedef std::vector<ProgressBoolean>                    ProgressBooleanContainer;
+typedef ProgressValue<bool>                        ProgressBoolean;
+typedef Vector<ProgressBoolean>                    ProgressBooleanContainer;
 
-typedef ProgressValue<int>                              ProgressInteger;
-typedef std::vector<ProgressInteger>                    ProgressIntegerContainer;
+typedef ProgressValue<int>                         ProgressInteger;
+typedef Vector<ProgressInteger>                    ProgressIntegerContainer;
 
-typedef ProgressValue<float>                            ProgressNumber;
-typedef std::vector<ProgressNumber>                     ProgressNumberContainer;
+typedef ProgressValue<float>                       ProgressNumber;
+typedef Vector<ProgressNumber>                     ProgressNumberContainer;
 
-typedef ProgressValue<Vector2>                          ProgressVector2;
-typedef std::vector<ProgressVector2>                    ProgressVector2Container;
+typedef ProgressValue<Vector2>                     ProgressVector2;
+typedef Vector<ProgressVector2>                    ProgressVector2Container;
 
-typedef ProgressValue<Vector3>                          ProgressVector3;
-typedef std::vector<ProgressVector3>                    ProgressVector3Container;
+typedef ProgressValue<Vector3>                     ProgressVector3;
+typedef Vector<ProgressVector3>                    ProgressVector3Container;
 
-typedef ProgressValue<Vector4>                          ProgressVector4;
-typedef std::vector<ProgressVector4>                    ProgressVector4Container;
+typedef ProgressValue<Vector4>                     ProgressVector4;
+typedef Vector<ProgressVector4>                    ProgressVector4Container;
 
 inline void Interpolate (Quaternion& result, const Quaternion& a, const Quaternion& b, float progress)
 {
