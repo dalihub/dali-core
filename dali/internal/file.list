@@ -119,7 +119,6 @@ internal_src_files = \
   $(internal_src_dir)/render/renderers/render-property-buffer.cpp \
   $(internal_src_dir)/render/renderers/render-renderer.cpp \
   $(internal_src_dir)/render/renderers/render-texture.cpp \
-  $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
   $(internal_src_dir)/render/shaders/scene-graph-shader.cpp \
