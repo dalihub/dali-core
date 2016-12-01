@@ -82,14 +82,7 @@ void TestEnumStrings(
   }
 }
 
-/// Helper method to create ResourceImage using property
-ResourceImage NewResourceImage( const Property::Value& map )
-{
-  ResourceImage image = ResourceImage::DownCast( NewImage( map ) );
-  return image;
-}
-
-/// Helper method to create ResourceImage using property
+/// Helper method to create BufferImage using property
 BufferImage NewBufferImage( const Property::Value& map )
 {
   BufferImage image = BufferImage::DownCast( NewImage( map ) );
