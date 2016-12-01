@@ -463,7 +463,6 @@ private:
 
   DepthFunction::Type          mDepthFunction:3;            ///< The depth function
   FaceCullingMode::Type        mFaceCullingMode:2;          ///< The mode of face culling
-  BlendMode::Type              mBlendMode:2;                ///< The mode of blending
   DepthWriteMode::Type         mDepthWriteMode:2;           ///< The depth write mode
   DepthTestMode::Type          mDepthTestMode:2;            ///< The depth test mode
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
