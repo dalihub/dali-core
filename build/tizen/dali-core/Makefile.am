@@ -34,26 +34,12 @@ include ../../../doc/file.list
 
 # Build the Dali libtool library
 
-src_files = $(internal_src_files) \
-            $(platform_abstraction_src_files) \
-            $(public_api_src_files) \
-            $(devel_api_src_files)
-
 lib_LTLIBRARIES = libdali-core.la
 
-libdali_core_la_SOURCES = $(dali_shaders_src_file) \
-                          $(src_files)
-
-scripts_dir = ../../scripts
-dali_shaders_script = $(scripts_dir)/generate-shader-strings.pl
-dali_shaders_dir = ../../../dali/internal/render/shader-source
-
-$(nodist_libdali_core_la_OBJECTS): $(dali_shaders_src_file)
-
-dali_shaders_src_file = dali-shaders.cpp
-
-dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
-	$< --shader-dir=$(dali_shaders_dir) --file-name=dali-shaders
+libdali_core_la_SOURCES = $(internal_src_files) \
+                          $(platform_abstraction_src_files) \
+                          $(public_api_src_files) \
+                          $(devel_api_src_files)
 
 dali_core_includes = \
         -I../../..
@@ -91,7 +77,6 @@ develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 develapisignalsdir = $(develapidir)/signals
 develapithreadingdir = $(develapidir)/threading
-develapishadereffectsdir = $(develapidir)/shader-effects
 
 develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
@@ -105,7 +90,6 @@ develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 develapisignals_HEADERS = $(devel_api_core_signals_header_files)
 develapithreading_HEADERS = $(devel_api_core_threading_header_files)
-develapishadereffects_HEADERS = $(devel_api_core_shader_effects_header_files)
 
 #public api
 publicapidir = $(devincludepath)/dali/public-api
@@ -133,9 +117,6 @@ publicapirendering_HEADERS = $(public_api_core_rendering_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
-
-CLEANFILES = dali-shaders.cpp \
-             dali-shaders.h
 
 # package doxygen file (contains doxygen grouping information)
 packagedoxydir = $(devincludepath)/dali/doc
