@@ -22,14 +22,6 @@ using namespace Dali;
 
 #include <mesh-builder.h>
 
-namespace
-{
-void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
-{
-  current.b = 0.0f;
-}
-}
-
 void propertyBuffer_test_startup(void)
 {
   test_return_value = TET_UNDEF;

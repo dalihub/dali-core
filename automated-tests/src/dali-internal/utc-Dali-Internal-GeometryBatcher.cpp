@@ -181,14 +181,6 @@ Actor CreateActor( Actor& parent, Shader& shader, TextureSet& textureSet, Vector
   return actor;
 }
 
-Actor CreateActor( Vector3 position )
-{
-  Actor actor = Actor::New();
-  actor.SetPosition( position );
-  return actor;
-}
-
-
 Actor CreateBatchParent( Vector3 pos )
 {
   Actor actor = Actor::New();
@@ -198,15 +190,7 @@ Actor CreateBatchParent( Vector3 pos )
   return actor;
 }
 
-void AddChildren( Actor parent, Actor* children, size_t size )
-{
-  for( size_t i = 0; i < size; ++i )
-  {
-    parent.Add( children[i] );
-  }
-}
-
-}
+} // namespace
 
 int UtcDaliGeometryBatcherBatchLevel0(void)
 {

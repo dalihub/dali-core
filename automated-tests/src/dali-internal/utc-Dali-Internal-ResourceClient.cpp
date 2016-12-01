@@ -97,26 +97,6 @@ public:
 static TestTicketObserver testTicketObserver;
 static TestTicketLifetimeObserver testTicketLifetimeObserver;
 
-
-Internal::ImagePtr LoadImage(TestApplication& application, char* name)
-{
-  Internal::ResourceImagePtr image = Internal::ResourceImage::New( name, Internal::ImageAttributes::DEFAULT_ATTRIBUTES );
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process resource request
-  Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 80,80,80,80 );
-  Integration::ResourcePointer resourcePtr(bitmap); // reference it
-  application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
-  application.Render();           // Process LoadComplete
-  application.SendNotification(); // Process event messages
-  application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
-  req=NULL;
-  application.GetPlatform().ResetTrace();
-  return image;
-}
-
-
 Internal::ResourceTicketPtr CheckLoadBitmap(TestApplication& application, const char* name, int w, int h)
 {
   Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
