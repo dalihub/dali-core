@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SHADER_FACTORY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/common/shader-saver.h>
@@ -35,9 +34,9 @@ class ShaderData;
 typedef IntrusivePtr<ShaderData> ShaderDataPtr;
 
 /**
- * ShaderFactory is an object which manages shader binary resource load requests,
- * It triggers the load requests during core initialization and sends a message to the
- * render manager with information about all the requested shader binaries.
+ * @brief ShaderFactory loads and saves shader binaries synchronously.
+ *
+ * Binaries loaded or saved are also cached by the ShaderFactory.
  */
 class ShaderFactory : public ShaderSaver
 {
@@ -72,17 +71,13 @@ public:
 
   /**
    * @brief Saves shader to memory cache and filesystem.
+   *
    * This is called when a shader binary is ready to be saved to the memory cache file system.
    * Shaders that pass through here become available to subsequent invocations of Load.
    * @param[in] shader The data to be saved.
    * @sa Load
    */
   virtual void SaveBinary( Internal::ShaderDataPtr shader );
-
-  /**
-   * Called during Core initialization to load the default shader.
-   */
-  void LoadDefaultShaders();
 
 private:
 
@@ -95,7 +90,6 @@ private:
   ShaderFactory& operator=( const ShaderFactory& rhs );
 
 private:
-  ShaderEffectPtr                           mDefaultShader;
   Dali::Vector< Internal::ShaderData* > mShaderBinaryCache; ///< Cache of pre-compiled shaders.
 
 }; // class ShaderFactory

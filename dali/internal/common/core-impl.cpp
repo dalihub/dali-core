@@ -173,7 +173,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mImageFactory = new ImageFactory( *mResourceClient );
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
-  mShaderFactory->LoadDefaultShaders();
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 }
