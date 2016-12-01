@@ -491,24 +491,17 @@ int UtcDaliHandleGetPropertyType(void)
   END_TEST;
 }
 
-int UtcDaliHandleNonAnimtableProperties(void)
+int UtcDaliHandleNonAnimatableProperties(void)
 {
   tet_infoline("Test Non Animatable Properties");
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  Property::Index nonAnimStringIndex = actor.RegisterProperty( "manFromDelmonte",   std::string("no"), Property::READ_WRITE);
+  Property::Index nonAnimStringIndex = actor.RegisterProperty( "manFromDelmonte", std::string("no"), Property::READ_WRITE);
 
   //// modify writable?
-  try
-  {
-    actor.SetProperty( nonAnimStringIndex, Property::Value("yes") );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_CHECK(!"exception");
-  }
+  actor.SetProperty( nonAnimStringIndex, Property::Value("yes") );
 
   DALI_TEST_CHECK( "yes"  == actor.GetProperty( nonAnimStringIndex ).Get<std::string>() );
 
@@ -518,17 +511,8 @@ int UtcDaliHandleNonAnimtableProperties(void)
   DALI_TEST_CHECK(!actor.IsPropertyAnimatable(readonly));
   DALI_TEST_CHECK(!actor.IsPropertyWritable(readonly));
 
-  bool exception = false;
-  try
-  {
-    actor.SetProperty( readonly, Property::Value(1.f) );
-  }
-  catch (Dali::DaliException& e)
-  {
-    exception = true;
-  }
-
-  DALI_TEST_CHECK(!exception);// trying to set a read-only property is a no-op
+  actor.SetProperty( readonly, Property::Value(1.f) );
+  // trying to set a read-only property is a no-op
 
   DALI_TEST_EQUALS( 0.f, actor.GetProperty( readonly ).Get<float>(), TEST_LOCATION );
 
@@ -538,38 +522,21 @@ int UtcDaliHandleNonAnimtableProperties(void)
   DALI_TEST_CHECK(actor.IsPropertyAnimatable(write_anim));
   DALI_TEST_CHECK(actor.IsPropertyWritable(write_anim));
 
-  exception = false;
-  try
-  {
-    actor.SetProperty( write_anim, Property::Value(1.f) );
-  }
-  catch (Dali::DaliException& e)
-  {
-    exception = true;
-  }
+  actor.SetProperty( write_anim, Property::Value(1.f) );
 
-  DALI_TEST_CHECK(!exception);
-
-  //// animate a non animatable property is a noop?
+  //// animate a non animatable property throws
   float durationSeconds(2.0f);
   Animation animation = Animation::New(durationSeconds);
   bool relativeValue(true);
-
-  exception = false;
-
   try
   {
     animation.AnimateBy(Property(actor, nonAnimStringIndex), relativeValue, AlphaFunction::EASE_IN);
-    animation.Play();
-    application.SendNotification();
-    application.Render(static_cast<unsigned int>(durationSeconds*0100.0f)/* some progress */);
   }
-  catch (Dali::DaliException& e)
+  catch ( Dali::DaliException& e )
   {
-    exception = true;
+    DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
   }
 
-  DALI_TEST_CHECK(!exception);
   DALI_TEST_EQUALS( "yes", actor.GetProperty( nonAnimStringIndex ).Get<std::string>(), TEST_LOCATION );
 
   END_TEST;

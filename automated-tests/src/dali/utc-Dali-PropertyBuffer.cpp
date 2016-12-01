@@ -230,9 +230,29 @@ int UtcDaliPropertyBufferSetData02(void)
     if ( bufferSubDataCalls.size() )
     {
       DALI_TEST_EQUALS( bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
-
     }
   }
 
   END_TEST;
 }
+
+int UtcDaliPropertyBufferInvalidTypeN(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat;
+  texturedQuadVertexFormat["aPosition"] = Property::MAP;
+  texturedQuadVertexFormat["aVertexCoord"] = Property::STRING;
+
+  try
+  {
+    PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat );
+    tet_result(TET_FAIL);
+  }
+  catch ( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Property::Type not supported in PropertyBuffer", TEST_LOCATION );
+  }
+  END_TEST;
+}
+

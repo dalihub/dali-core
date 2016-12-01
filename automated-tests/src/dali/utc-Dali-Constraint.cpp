@@ -160,6 +160,41 @@ int UtcDaliConstraintNewFunctionN(void)
 
   END_TEST;
 }
+
+// helper for next test
+void StringConstraintFunction( std::string& /* current */, const PropertyInputContainer& /* inputs */ )
+{
+}
+
+int UtcDaliConstraintNewFunctionNonConstrainableTypeN(void)
+{
+  // Ensure that we can create a constraint using a C function and that it is called.
+
+  TestApplication application;
+  UtcDaliConstraintNewFunction::gConstraintFunctionCalled = false;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  try
+  {
+    // Add a constraint
+    Constraint constraint = Constraint::New< std::string >( actor, Actor::Property::COLOR_MODE, &StringConstraintFunction );
+    DALI_TEST_CHECK( constraint );
+    constraint.Apply();
+    tet_result(TET_FAIL);
+  }
+  catch ( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Property not constrainable", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////

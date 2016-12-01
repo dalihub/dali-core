@@ -259,7 +259,25 @@ int UtcDaliAddPropertyNotificationTypeProperty(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "false && \"Property notification added to event side only property", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Property notification added to event side only property", TEST_LOCATION );
+  }
+  END_TEST;
+}
+
+int UtcDaliAddPropertyNotificationEventSidePropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Currently, Type registry properties cannot be animated
+  try
+  {
+    actor.AddPropertyNotification( PROPERTY_REGISTRATION_MAX_INDEX - 1, GreaterThanCondition( 100.0f ) );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Property notification added to event side only property", TEST_LOCATION );
   }
   END_TEST;
 }
