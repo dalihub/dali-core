@@ -79,7 +79,7 @@ void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* 
     }
   }
 
-  DALI_ASSERT_ALWAYS( false && "Callback lost in SignalDisconnected()" );
+  DALI_ABORT( "Callback lost in SignalDisconnected()" );
 }
 
 std::size_t ConnectionTracker::GetConnectionCount() const

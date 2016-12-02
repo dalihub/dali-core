@@ -2,7 +2,7 @@
 #define __DALI_CUSTOM_ACTOR_IMPL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,6 @@ class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 public:
 
   class Extension; ///< Forward declare future extension interface
-
-  /**
-   * @brief Virtual destructor
-   * @SINCE_1_0.0
-   */
-  virtual ~CustomActorImpl();
 
   /**
    * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
@@ -343,6 +337,12 @@ protected: // For derived classes
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
   CustomActorImpl( ActorFlags flags );
+
+  /**
+   * @brief Virtual destructor
+   * @SINCE_1_0.0
+   */
+  virtual ~CustomActorImpl();
 
   // Size negotiation helpers
 

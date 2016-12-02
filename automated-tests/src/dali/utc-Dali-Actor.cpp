@@ -19,6 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <string>
 #include <cfloat>   // For FLT_MAX
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali-test-suite-utils.h>
@@ -44,35 +45,6 @@ namespace
 {
 bool gTouchCallBackCalled=false;
 bool gHoverCallBackCalled=false;
-
-/**
- * Simulates a Down Touch at 25.0, 25.0.
- * @param[in] app Test Application instance.
- */
-int SimulateTouchForSetOverlayHitTest(TestApplication& app)
-{
-  app.SendNotification();
-  app.Render(1);
-  app.SendNotification();
-  app.Render(1);
-
-  gTouchCallBackCalled = false;
-
-  // simulate a touch event
-  Dali::Integration::Point point;
-  point.SetState( PointState::DOWN );
-  point.SetScreenPosition( Vector2( 25.0f, 25.0f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
-  app.ProcessEvent( event );
-
-  app.SendNotification();
-  app.Render(1);
-  app.SendNotification();
-  app.Render(1);
-  END_TEST;
-}
-
 
 static bool gTestConstraintCalled;
 
@@ -121,13 +93,6 @@ static bool TestCallback3(Actor actor, const HoverEvent& event)
   END_TEST;
 }
 
-static Vector3 gSetSize;
-static bool gSetSizeCallBackCalled;
-void SetSizeCallback( Actor actor, const Vector3& size )
-{
-  gSetSizeCallBackCalled = true;
-  gSetSize = size;
-}
 // validation stuff for onstage & offstage signals
 static std::vector< std::string > gActorNamesOnOffStage;
 static int gOnStageCallBackCalled;
@@ -2850,7 +2815,7 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "minimumSize",              Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
-  { "batchParent",              Actor::Property::BATCH_PARENT,             Property::BOOLEAN     },
+  { "batchParent",              DevelActor::Property::BATCH_PARENT,        Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );

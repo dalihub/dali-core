@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
-#include <dali/internal/event/effects/shader-declarations.h>
-
-// compile time generated shader strings
-#include "dali-shaders.h"
 
 namespace
 {
@@ -144,11 +139,6 @@ void ShaderFactory::SaveBinary( Internal::ShaderDataPtr shaderData )
 
   DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, saved ? "Saved to file: %s\n" : "Save to file failed: %s\n", binaryShaderFilename.c_str() );
   if( saved ) {} // Avoid unused variable warning in release builds
-}
-
-void ShaderFactory::LoadDefaultShaders()
-{
-  mDefaultShader = ShaderEffect::New();
 }
 
 void ShaderFactory::MemoryCacheInsert( ShaderData& shaderData )

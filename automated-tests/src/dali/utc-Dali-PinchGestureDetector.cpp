@@ -977,7 +977,7 @@ int UtcDaliPinchGestureEmitIncorrectStateClear(void)
   }
   catch ( Dali::DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "false", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Incorrect state", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -1010,7 +1010,7 @@ int UtcDaliPinchGestureEmitIncorrectStatePossible(void)
   }
   catch ( Dali::DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "false", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Incorrect state", TEST_LOCATION );
   }
   END_TEST;
 }

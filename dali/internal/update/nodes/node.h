@@ -715,16 +715,23 @@ public:
     return ( this == rhs );
   }
 
-  unsigned short GetDepth() const
-  {
-    return mDepth;
-  }
-
   /**
    * @brief Turns on or off being a batch parent for the node
    * @param[in] enabled If true the node becomes a parent for batch of its children
    */
   void SetIsBatchParent( bool enabled );
+
+  /**
+   * @brief Sets the sibling order of the node
+   * @param[in] order The new order
+   */
+  void SetDepthIndex( unsigned int depthIndex ){ mDepthIndex = depthIndex; }
+
+  /**
+   * @brief Get the depth index of the node
+   * @return Current depth index
+   */
+  unsigned int GetDepthIndex(){ return mDepthIndex; }
 
   /**
    * @brief Tells if the node is a batch parent
@@ -887,10 +894,11 @@ protected:
   CollectedUniformMap                mCollectedUniformMap[2]; ///< Uniform maps of the node
   unsigned int                       mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
   uint32_t                           mClippingDepth;          ///< The number of clipping nodes deep this node is
-  unsigned int                       mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
+
+  uint32_t                           mDepthIndex;             ///< Depth index of the node
 
   // flags, compressed to bitfield
-  unsigned short                     mDepth:12;               ///< Depth in the hierarchy
+  unsigned int                       mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
   int                                mDirtyFlags:8;           ///< A composite set of flags for each of the Node properties
   DrawMode::Type                     mDrawMode:2;             ///< How the Node and its children should be drawn
   ColorMode                          mColorMode:2;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
@@ -1011,6 +1019,17 @@ inline void SetIsBatchParentMessage( EventThreadServices& eventThreadServices, c
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetIsBatchParent, isBatchParent );
+}
+
+inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, unsigned int depthIndex )
+{
+  typedef MessageValue1< Node, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::SetDepthIndex, depthIndex );
 }
 
 inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode )

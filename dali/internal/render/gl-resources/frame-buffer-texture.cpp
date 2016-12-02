@@ -219,7 +219,6 @@ bool FrameBufferTexture::CreateGlTexture()
   if ( GL_FRAMEBUFFER_COMPLETE != status )
   {
     DALI_LOG_ERROR( "status (0x%x), glError (0x%x)\n", status, mContext.GetError() );
-    DALI_ASSERT_ALWAYS( false && "Frame buffer is not complete!" );
   }
 
   return mId != 0;
