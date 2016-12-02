@@ -27,11 +27,11 @@ namespace Dali
 namespace CSharpTypeRegistry
 {
 
-bool RegisterType( const std::string& name, const std::type_info& baseType, CSharpTypeInfo::CreateFunction f, bool callCreateOnInit )
+bool RegisterType( const std::string& name, const std::type_info& baseType, CSharpTypeInfo::CreateFunction f )
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  return impl->Register( name, baseType, f, callCreateOnInit );
+  return impl->Register( name, baseType, f );
 }
 
 bool RegisterProperty( const std::string& objectName,

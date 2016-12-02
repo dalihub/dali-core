@@ -93,11 +93,10 @@ public:
    * @param [in] name The name type to be registered (must be unique)
    * @param [in] baseTypeInfo Type info for its base class
    * @param [in] createInstance Instance creation function
-   * @param [in] callCreateOnInit If true call createInstance on dali initialisation
    * @return true if the name could be registered.
    */
   bool Register( const std::string& name, const std::type_info& baseTypeInfo,
-                 Dali::CSharpTypeInfo::CreateFunction createInstance, bool callCreateOnInit );
+                 Dali::CSharpTypeInfo::CreateFunction createInstance );
 
   /*
    * Register a signal connector function to a type
@@ -223,9 +222,6 @@ private:
 
   typedef std::vector<Dali::TypeInfo::CreateFunction> InitFunctions;
   InitFunctions mInitFunctions;
-
-  typedef std::vector<Dali::CSharpTypeInfo::CreateFunction> CSharpInitFunctions;
-  CSharpInitFunctions mCSharpInitFunctions;
 
 private:
   TypeRegistry();
