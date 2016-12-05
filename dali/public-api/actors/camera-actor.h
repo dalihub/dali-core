@@ -98,6 +98,12 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the CameraActor class.
+     *
+     * Properties additional to Actor.
+     * @SINCE_1_0.0
+     */
     enum
     {
       TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string @SINCE_1_0.0

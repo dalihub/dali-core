@@ -73,6 +73,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the PanGestureDetector class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screenPosition",      type Vector2 @SINCE_1_0.0
