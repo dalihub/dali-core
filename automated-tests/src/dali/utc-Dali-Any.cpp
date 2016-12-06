@@ -117,11 +117,9 @@ int UtcDaliAnyAssignmentOperators(void)
 
   DALI_TEST_EQUALS( fValue, 4.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  Any value2 = 0.f;
+  value1 = 9.f; // Test operator=( const Type& ).
 
-  value2 = 9.f; // Test operator=( const Type& ).
-
-  value2.Get( fValue );
+  value1.Get( fValue );
 
   DALI_TEST_EQUALS( fValue, 9.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
