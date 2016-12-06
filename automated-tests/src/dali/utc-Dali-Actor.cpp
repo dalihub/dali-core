@@ -3771,3 +3771,15 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 
   END_TEST;
 }
+
+int UtcDaliGetPropertyN(void)
+{
+  tet_infoline( "Testing Actor::GetProperty returns a non valid value if property index is out of range" );
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  unsigned int propertyCount = actor.GetPropertyCount();
+  DALI_TEST_EQUALS( actor.GetProperty( Property::Index(propertyCount)).GetType(), Property::NONE, TEST_LOCATION );
+  END_TEST;
+}
