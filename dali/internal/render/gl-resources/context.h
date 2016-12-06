@@ -700,11 +700,12 @@ public:
    */
   void DepthMask(GLboolean flag)
   {
+    bool booleanFlag = flag != GL_FALSE;
     // only change state if needed
-    if( flag != mDepthMaskEnabled )
+    if( booleanFlag != mDepthMaskEnabled )
     {
-      mDepthMaskEnabled = flag;
-      LOG_GL("DepthMask %s\n", flag ? "True" : "False");
+      mDepthMaskEnabled = booleanFlag;
+      LOG_GL("DepthMask %s\n", booleanFlag ? "True" : "False");
       CHECK_GL( mGlAbstraction, mGlAbstraction.DepthMask( mDepthMaskEnabled ) );
     }
   }
