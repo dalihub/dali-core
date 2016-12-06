@@ -312,3 +312,26 @@ int UtcDaliFrameBufferGetColorTexture02(void)
   END_TEST;
 }
 
+int UtcDaliFramebufferContextLoss(void)
+{
+  tet_infoline("UtcDaliFramebufferContextLoss\n");
+  TestApplication application; // Default config: DALI_DISCARDS_ALL_DATA
+
+  //Create the texture
+  unsigned int width(64);
+  unsigned int height(64);
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  DALI_TEST_CHECK( texture );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  DALI_TEST_CHECK( frameBuffer );
+  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Lose & regain context (in render 'thread')
+  application.ResetContext();
+  DALI_TEST_CHECK( frameBuffer );
+
+  END_TEST;
+}
