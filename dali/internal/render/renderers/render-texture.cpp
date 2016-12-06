@@ -633,6 +633,11 @@ void NewTexture::Destroy( Context& context )
   }
 }
 
+void NewTexture::GlContextDestroyed()
+{
+  mId = 0u;
+}
+
 void NewTexture::Initialize(Context& context)
 {
   if( mNativeImage )
