@@ -929,7 +929,7 @@ int UtcDaliRenderTaskIsExclusiveN(void)
   try
   {
     bool x = task.IsExclusive();
-    x=x;
+    (void) x;
   }
   catch (Dali::DaliException(e))
   {
@@ -1266,7 +1266,7 @@ int UtcDaliRenderTaskGetScreenToFrameBufferFunctionN(void)
   try
   {
     RenderTask::ScreenToFrameBufferFunction func = task.GetScreenToFrameBufferFunction();
-    func=func;
+    (void) func;
   }
   catch (Dali::DaliException(e))
   {
@@ -1369,7 +1369,7 @@ int UtcDaliRenderTaskGetViewportN(void)
   try
   {
     Viewport viewport = task.GetViewport();
-    viewport = viewport;
+    (void) viewport;
   }
   catch (Dali::DaliException(e))
   {
@@ -1595,7 +1595,7 @@ int UtcDaliRenderTaskGetClearColorN(void)
   try
   {
     Vector4 color = task.GetClearColor();
-    color = color;
+    (void) color;
   }
   catch (Dali::DaliException(e))
   {
@@ -1667,7 +1667,7 @@ int UtcDaliRenderTaskGetClearEnabledN(void)
   try
   {
     bool x = task.GetClearEnabled();
-    x=x;
+    (void) x;
   }
   catch (Dali::DaliException(e))
   {
@@ -1735,7 +1735,7 @@ int UtcDaliRenderTaskGetCullModeN(void)
   try
   {
     bool x = task.GetCullMode();
-    x=x;
+    (void) x;
   }
   catch (Dali::DaliException(e))
   {
@@ -1853,7 +1853,6 @@ int UtcDaliRenderTaskSignalFinished(void)
   application.Render();
   application.SendNotification();
   DALI_TEST_CHECK( finished );
-  finished = false;
 
   DALI_TEST_EQUALS( application.GetUpdateStatus(), 0, TEST_LOCATION );
   END_TEST;
