@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROGRESS_VALUE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/angle-axis.h>
-#include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -64,30 +61,6 @@ public:
   float mProgress;   ///< Progress this value applies to animation channel
   T mValue;          ///< value this animation channel should take
 };
-
-typedef ProgressValue<Quaternion>                  ProgressQuaternion;
-typedef Vector<ProgressQuaternion>                 ProgressQuaternionContainer;
-
-typedef ProgressValue<AngleAxis>                   ProgressAngleAxis;
-typedef Vector<AngleAxis>                          ProgressAngleAxisContainer;
-
-typedef ProgressValue<bool>                        ProgressBoolean;
-typedef Vector<ProgressBoolean>                    ProgressBooleanContainer;
-
-typedef ProgressValue<int>                         ProgressInteger;
-typedef Vector<ProgressInteger>                    ProgressIntegerContainer;
-
-typedef ProgressValue<float>                       ProgressNumber;
-typedef Vector<ProgressNumber>                     ProgressNumberContainer;
-
-typedef ProgressValue<Vector2>                     ProgressVector2;
-typedef Vector<ProgressVector2>                    ProgressVector2Container;
-
-typedef ProgressValue<Vector3>                     ProgressVector3;
-typedef Vector<ProgressVector3>                    ProgressVector3Container;
-
-typedef ProgressValue<Vector4>                     ProgressVector4;
-typedef Vector<ProgressVector4>                    ProgressVector4Container;
 
 inline void Interpolate (Quaternion& result, const Quaternion& a, const Quaternion& b, float progress)
 {
