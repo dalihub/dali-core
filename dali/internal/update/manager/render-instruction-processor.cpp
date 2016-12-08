@@ -205,7 +205,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
       if( !isLayer3d )
       {
-        item.mDepthIndex += static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER;
+        item.mDepthIndex += renderable.mNode->GetDepthIndex();
       }
 
       // Save ModelView matrix onto the item.

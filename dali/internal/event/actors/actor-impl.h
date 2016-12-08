@@ -1815,7 +1815,9 @@ protected:
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
-  unsigned short mDepth                            :12; ///< Cached: The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
+  uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
+  uint16_t mSiblingOrder;     ///< The sibling order of the actor
+
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
   bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage

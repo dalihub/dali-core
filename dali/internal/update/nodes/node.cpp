@@ -69,8 +69,8 @@ Node::Node()
   mExclusiveRenderTask( NULL ),
   mChildren(),
   mClippingDepth( 0u ),
+  mDepthIndex( 0u ),
   mRegenerateUniformMap( 0 ),
-  mDepth( 0u ),
   mDirtyFlags( AllFlags ),
   mDrawMode( DrawMode::NORMAL ),
   mColorMode( DEFAULT_COLOR_MODE ),
@@ -262,7 +262,6 @@ void Node::SetParent(Node& parentNode)
   DALI_ASSERT_ALWAYS(mParent == NULL);
 
   mParent = &parentNode;
-  mDepth = mParent->GetDepth() + 1u;
 
   if( mTransformId != INVALID_TRANSFORM_ID )
   {
@@ -286,7 +285,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 
   // Remove back-pointer to parent
   mParent = NULL;
-  mDepth = 0u;
 
   // Remove all child pointers
   mChildren.Clear();
