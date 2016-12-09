@@ -189,16 +189,6 @@ RenderManager::RenderManager()
 
 RenderManager::~RenderManager()
 {
-  for ( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
-  {
-    (*iter)->Destroy( mImpl->context );
-  }
-
-  for ( FrameBufferOwnerIter iter = mImpl->frameBufferContainer.Begin(); iter != mImpl->frameBufferContainer.End(); ++iter )
-  {
-    (*iter)->Destroy( mImpl->context );
-  }
-
   delete mImpl;
 }
 
@@ -228,6 +218,18 @@ void RenderManager::ContextDestroyed()
 
   // inform texture cache
   mImpl->textureCache.GlContextDestroyed(); // Clears gl texture ids
+
+  //Inform textures
+  for( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
+  {
+    (*iter)->GlContextDestroyed();
+  }
+
+  //Inform framebuffers
+  for( FrameBufferOwnerIter iter = mImpl->frameBufferContainer.Begin(); iter != mImpl->frameBufferContainer.End(); ++iter )
+  {
+    (*iter)->GlContextDestroyed();
+  }
 
   // inform renderers
   RendererOwnerContainer::Iterator end = mImpl->rendererContainer.End();

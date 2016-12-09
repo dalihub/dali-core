@@ -201,6 +201,7 @@ DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
 DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::DevelActor::Property::BATCH_PARENT )
+DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -2685,22 +2686,22 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     }
 
     case Dali::DevelActor::Property::SIBLING_ORDER:
-       {
-         int value;
+    {
+      int value;
 
-         if( property.Get( value ) )
-         {
-           if( static_cast<unsigned int>(value) != mSiblingOrder )
-           {
-             mSiblingOrder = value;
-             if( mIsOnStage )
-             {
-               SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
-             }
-           }
-         }
-         break;
-       }
+      if( property.Get( value ) )
+      {
+        if( static_cast<unsigned int>(value) != mSiblingOrder )
+        {
+          mSiblingOrder = value;
+          if( mIsOnStage )
+          {
+            SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+          }
+        }
+      }
+      break;
+    }
 
     case Dali::Actor::Property::CLIPPING_MODE:
     {
@@ -2883,6 +2884,11 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
+
+  if( index >= DEFAULT_PROPERTY_COUNT )
+  {
+    return value;
+  }
 
   switch( index )
   {

@@ -47,6 +47,11 @@ void FrameBuffer::Destroy( Context& context )
   }
 }
 
+void FrameBuffer::GlContextDestroyed()
+{
+  mId = 0u;
+}
+
 void FrameBuffer::Initialize(Context& context)
 {
   context.GenFramebuffers( 1, &mId );

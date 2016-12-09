@@ -134,6 +134,11 @@ public:
   void Destroy( Context& context );
 
   /**
+   * Called by RenderManager to inform the texture that the context has been destroyed
+   */
+  void GlContextDestroyed();
+
+  /**
    * Uploads data to the texture.
    * @param[in] context The GL context
    * @param[in] pixelData A pixel data object

@@ -234,9 +234,14 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the Renderer class.
+   * @SINCE_1_1.43
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Renderer class.
+     * @SINCE_1_1.43
+     */
     enum
     {
       /**

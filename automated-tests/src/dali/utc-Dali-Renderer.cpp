@@ -1647,10 +1647,10 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   END_TEST;
 }
 
-int UtcDaliRendererRenderOrder2DLayerDepthIndex(void)
+int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
 {
   TestApplication application;
-  tet_infoline("Test the rendering order in a 2D layer is correct using multiple renderers per actor");
+  tet_infoline("Test the rendering order in a 2D layer is correct using sibling order");
 
   /*
    * Creates the following hierarchy:
@@ -1793,6 +1793,28 @@ int UtcDaliRendererRenderOrder2DLayerDepthIndex(void)
   DALI_TEST_EQUALS( textureBindIndex[4], 2, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[1], 3, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[0], 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
+
+  //Change sibling order of actor1
+  //New Expected rendering order: renderer1 - renderer0 - renderer2 - renderer3 - renderer4  - renderer5
+  actor1.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, 2 );
+
+  gl.GetTextureTrace().Reset();
+  application.SendNotification();
+  application.Render(0);
+
+  for( unsigned int i(0); i<6; ++i )
+  {
+    std::stringstream params;
+    params << GL_TEXTURE_2D<<", "<<i+1;
+    textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str() );
+  }
+
+  DALI_TEST_EQUALS( textureBindIndex[1], 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[0], 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[2], 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[3], 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[4], 4, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
 
   END_TEST;

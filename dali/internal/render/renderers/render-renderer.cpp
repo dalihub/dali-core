@@ -182,7 +182,7 @@ void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvid
   Program* program = dataProvider->GetShader().GetProgram();
   if( program && program->GetActiveSamplerCount() != textureCount )
   {
-    DALI_LOG_ERROR("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
+    DALI_LOG_WARNING("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
                    program->GetActiveSamplerCount(),
                    textureCount );
   }
