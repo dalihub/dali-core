@@ -418,7 +418,7 @@ void ConvertToGlFormat( Format pixelformat, unsigned& pixelDataType, unsigned& i
 }
 
 Bitmap* Bitmap::New( const Profile profile = BITMAP_2D_PACKED_PIXELS,
-                     ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_DISCARD )
+                     ResourcePolicy::Discardable discardable )
 {
   DALI_ASSERT_DEBUG(profile == BITMAP_2D_PACKED_PIXELS || profile == BITMAP_COMPRESSED);
 

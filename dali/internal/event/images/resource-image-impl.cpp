@@ -26,7 +26,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/images/image-factory.h>
+#include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 
@@ -59,7 +59,8 @@ Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED
 
 ResourceImage::ResourceImage()
 : Image(),
-  mImageFactory( ThreadLocalStorage::Get().GetImageFactory() )
+  mLoadingState( Dali::ResourceLoading ),
+  mSlotDelegate( this )
 {
 }
 
@@ -76,18 +77,19 @@ ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttribut
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
     image = NinePatchImage::New( url );
+    image->mUrl = url;
   }
   else
   {
     image = new ResourceImage();
     image->Initialize();
 
-    // consider the requested size as natural size, 0 means we don't (yet) know it
-    image->mWidth = attributes.GetWidth();
-    image->mHeight = attributes.GetHeight();
-    image->mRequest = image->mImageFactory.RegisterRequest( url, &attributes );
-    image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
-    image->mTicket->AddObserver( *image );
+    image->mParameters.size= ImageDimensions::FromFloatVec2( attributes.GetSize() );
+    image->mParameters.scalingMode = attributes.GetScalingMode();
+    image->mParameters.samplingMode = attributes.GetFilterMode();
+    image->mParameters.orientationCorrection = attributes.GetOrientationCorrection();
+    image->mUrl = url;
+    image->Reload(); // reuse code
   }
   DALI_LOG_SET_OBJECT_STRING( image, url );
 
@@ -96,15 +98,6 @@ ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttribut
 
 ResourceImage::~ResourceImage()
 {
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    if( Stage::IsInstalled() )
-    {
-      mImageFactory.ReleaseTicket( mTicket.Get() );
-    }
-    mTicket.Reset();
-  }
 }
 
 bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -126,139 +119,64 @@ bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterf
   return connected;
 }
 
-const ImageAttributes& ResourceImage::GetAttributes() const
-{
-  if( mTicket )
-  {
-    return mImageFactory.GetActualAttributes( mTicket );
-  }
-  else
-  {
-    return mImageFactory.GetRequestAttributes( mRequest );
-  }
-}
-
 const std::string& ResourceImage::GetUrl() const
 {
-  return mImageFactory.GetRequestPath( mRequest );
+  return mUrl;
 }
 
 void ResourceImage::Reload()
 {
-  if ( mRequest )
+  mBitmap.Reset();
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
+  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( mParameters, mUrl );
+  if( resource )
   {
-    ResourceTicketPtr ticket = mImageFactory.Reload( *mRequest.Get() );
-    SetTicket( ticket.Get() );
+    mBitmap = static_cast<Integration::Bitmap*>( resource.Get() );
+    mWidth = mBitmap->GetImageWidth();
+    mHeight = mBitmap->GetImageHeight();
+    mLoadingState = Dali::ResourceLoadingSucceeded;
+
+    ResourceClient& client = tls.GetResourceClient();
+    mTicket = client.AddBitmapImage( mBitmap.Get() );
   }
+  else
+  {
+    mLoadingState = Dali::ResourceLoadingFailed;
+  }
+
+  StagePtr stage = Stage::GetCurrent();
+  stage->EventProcessingFinishedSignal().Connect( mSlotDelegate, &ResourceImage::EmitSignal );
 }
 
 unsigned int ResourceImage::GetWidth() const
 {
-  // if width is 0, it means we've not yet loaded the image
-  if( 0u == mWidth )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mWidth = size.width;
-    if( 0 == mHeight )
-    {
-      mHeight = size.height;
-    }
-  }
   return mWidth;
 }
 
 unsigned int ResourceImage::GetHeight() const
 {
-  if( 0u == mHeight )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mHeight = size.height;
-    if( 0 == mWidth )
-    {
-      mWidth = size.width;
-    }
-  }
   return mHeight;
 }
 
 Vector2 ResourceImage::GetNaturalSize() const
 {
-  Vector2 naturalSize(mWidth, mHeight);
-  if( 0u == mWidth || 0u == mHeight )
-  {
-    mImageFactory.GetImageSize( mRequest, mTicket, naturalSize );
-    mWidth = naturalSize.width;
-    mHeight = naturalSize.height;
-  }
-  return naturalSize;
-}
-
-void ResourceImage::ResourceLoadingFailed(const ResourceTicket& ticket)
-{
-  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
-}
-
-void ResourceImage::ResourceLoadingSucceeded(const ResourceTicket& ticket)
-{
-  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
+  return Size( mWidth, mHeight );
 }
 
 void ResourceImage::Connect()
 {
-  ++mConnectionCount;
-
-  if( mConnectionCount == 1 )
-  {
-    // ticket was thrown away when related actors went offstage or image loading on demand
-    if( !mTicket )
-    {
-      DALI_ASSERT_DEBUG( mRequest.Get() );
-      ResourceTicketPtr newTicket = mImageFactory.Load( *mRequest.Get() );
-      SetTicket( newTicket.Get() );
-    }
-  }
 }
 
 void ResourceImage::Disconnect()
 {
-  if( !mTicket )
-  {
-    return;
-  }
-
-  DALI_ASSERT_DEBUG( mConnectionCount > 0 );
-  --mConnectionCount;
-  if( mConnectionCount == 0 )
-  {
-    // release image memory when it's not visible anymore (decrease ref. count of texture)
-    SetTicket( NULL );
-  }
 }
 
-void ResourceImage::SetTicket( ResourceTicket* ticket )
+void ResourceImage::EmitSignal()
 {
-  if( ticket == mTicket.Get() )
-  {
-    return;
-  }
-
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    mImageFactory.ReleaseTicket( mTicket.Get() );
-  }
-
-  if( ticket )
-  {
-    mTicket.Reset( ticket );
-    mTicket->AddObserver( *this );
-  }
-  else
-  {
-    mTicket.Reset();
-  }
+  StagePtr stage = Stage::GetCurrent();
+  stage->EventProcessingFinishedSignal().Disconnect( mSlotDelegate, &ResourceImage::EmitSignal );
+  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
 }
 
 } // namespace Internal

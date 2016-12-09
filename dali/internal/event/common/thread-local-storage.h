@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_THREAD_LOCAL_STORAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ class Core;
 class NotificationManager;
 class ResourceClient;
 class ResourceManager;
-class ImageFactory;
 class ShaderFactory;
 class GestureEventProcessor;
 class RelayoutController;
@@ -121,12 +120,6 @@ public:
    * @return reference to the Resource Client
    */
   ResourceClient& GetResourceClient();
-
-  /**
-   * Returns the Image Factory
-   * @return reference to the Image Factory
-   */
-  ImageFactory& GetImageFactory();
 
   /**
    * Returns the Shader Factory

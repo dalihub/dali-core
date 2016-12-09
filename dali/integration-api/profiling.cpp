@@ -37,7 +37,6 @@
 
 
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/event/images/image-factory-cache.h>
 
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/resources/image-ticket.h>
@@ -105,7 +104,6 @@ const int LAYER_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::Layer ) );
 const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::Image ) +
-  sizeof( Internal::ImageFactoryCache::Request ) +
   sizeof( Integration::Bitmap ) +
   sizeof( Internal::TextureMetadata ) +
   sizeof( Internal::BitmapTexture ) +
