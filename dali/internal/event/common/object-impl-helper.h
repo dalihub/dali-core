@@ -296,17 +296,9 @@ struct ObjectImplHelper
 
       default:
       {
-        DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
-        break;
+        // ignore non-scene-graph types
       }
     }
-  }
-
-  int GetPropertyComponentIndex( Property::Index index ) const
-  {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-    return 0;
   }
 };
 

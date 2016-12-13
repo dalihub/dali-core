@@ -157,9 +157,42 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
   return ret;
 }
 
+bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
+    Dali::CSharpTypeInfo::CreateFunction createInstance, bool callCreateOnInit  )
+{
+
+  bool ret = false;
+
+  std::string baseTypeName    = DemangleClassName(baseTypeInfo.name());
+
+  RegistryMap::iterator iter = mRegistryLut.find(uniqueTypeName);
+
+  if( iter == mRegistryLut.end() )
+  {
+    mRegistryLut[uniqueTypeName] = Dali::TypeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance));
+    ret = true;
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str());
+  }
+  else
+  {
+    DALI_LOG_WARNING("Duplicate name for TypeRegistry for '%s'\n", + uniqueTypeName.c_str());
+    DALI_ASSERT_ALWAYS(!"Duplicate type name for Type Registation");
+  }
+  if( callCreateOnInit )
+  {
+    mCSharpInitFunctions.push_back(createInstance);
+  }
+  return ret;
+
+}
+
 void TypeRegistry::CallInitFunctions(void) const
 {
   for( InitFunctions::const_iterator iter = mInitFunctions.begin(); iter != mInitFunctions.end(); ++iter)
+  {
+    (*iter)();
+  }
+  for( CSharpInitFunctions::const_iterator iter = mCSharpInitFunctions.begin(); iter != mCSharpInitFunctions.end(); ++iter)
   {
     (*iter)();
   }
@@ -215,6 +248,24 @@ bool TypeRegistry::RegisterProperty( TypeRegistration& registered, const std::st
 
   return false;
 }
+
+bool TypeRegistry::RegisterProperty( const std::string& objectName, const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc )
+{
+  RegistryMap::iterator iter = mRegistryLut.find( objectName );
+
+  if( iter != mRegistryLut.end() )
+  {
+    DALI_ASSERT_DEBUG(iter->second);
+
+    GetImplementation(iter->second).AddProperty( name, index, type, setFunc, getFunc );
+
+    return true;
+  }
+
+  return false;
+
+}
+
 
 bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type )
 {

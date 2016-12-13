@@ -173,7 +173,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mImageFactory = new ImageFactory( *mResourceClient );
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
-  mShaderFactory->LoadDefaultShaders();
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 }
@@ -354,7 +353,7 @@ void Core::ProcessEvents()
   // Avoid allocating MessageBuffers, triggering size-negotiation or sending any other spam whilst paused
   if( mIsActive )
   {
-    // Emit signal here to start size negotiation and control relayout.
+    // Emit signal here to inform listeners that event processing has finished.
     mStage->EmitEventProcessingFinishedSignal();
 
     // Run the size negotiation after event processing finished signal

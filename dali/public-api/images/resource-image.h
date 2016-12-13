@@ -78,6 +78,7 @@ public:
    * loops.
    *
    * @SINCE_1_0.0
+   * @REMARK_STORAGE
    * @param [in] url The URL of the image file.
    * @return The width and height in pixels of the image.
    */
@@ -130,6 +131,7 @@ public:
    * @sa Dali::FittingMode::Type Dali::SamplingMode::Type
    * @SINCE_1_0.0
    * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param [in] url The URL of the image file to use.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
@@ -141,6 +143,7 @@ public:
    *
    * @SINCE_1_0.0
    * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param [in] url The URL of the image file to use.
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.

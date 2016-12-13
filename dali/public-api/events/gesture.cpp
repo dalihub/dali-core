@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,12 @@ Gesture::Gesture( const Gesture& rhs )
 
 Gesture& Gesture::operator=( const Gesture& rhs )
 {
-  type = rhs.type;
-  state = rhs.state;
-  time = rhs.time;
+  if( this != &rhs )
+  {
+    type = rhs.type;
+    state = rhs.state;
+    time = rhs.time;
+  }
 
   return *this;
 }

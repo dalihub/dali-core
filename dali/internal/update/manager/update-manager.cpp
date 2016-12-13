@@ -273,6 +273,11 @@ struct UpdateManager::Impl
 
   GestureContainer                    gestures;                      ///< A container of owned gesture detectors
   bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
+
+private:
+
+  Impl( const Impl& ); ///< Undefined
+  Impl& operator=( const Impl& ); ///< Undefined
 };
 
 UpdateManager::UpdateManager( NotificationManager& notificationManager,

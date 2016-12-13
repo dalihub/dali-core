@@ -65,14 +65,24 @@ enum ProjectionMode
  *
  * Allows the developer to use actor semantics to control a camera.
  *
+ * DALi has a concept of a camera to display its virtual 3D world to a 2D screen. 
+ * There are 2 ways of using the camera in DALi:
+ *
+ * - For 2D applications, you do not need to care about the camera at all. The default camera is already best suited for 2D applications
+ *   (configured to have the origin of the coordinate system at the top-left corner of the screen, and unit 1 as 1 pixel of the screen).
+ *   This is a typical way.
+ *
+ * - For 3D applications, you can change the view by manipulating the camera. You can translate or rotate the camera in this case.
+ *   Note that the top-left corner of the screen and unit 1 no longer are (0,0,0) and 1 pixel after manipulating the camera.
+ *
  * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default
  * the camera actor will be FREE_LOOK.
  *
- * A FREE_LOOK camera uses actor's orientation to control where the camera is looking.
- * If no additional rotations are specified, the camera looks in the negative Z direction.
+ * - A FREE_LOOK camera uses actor's orientation to control where the camera is looking.
+ *   If no additional rotations are specified, the camera looks in the negative Z direction.
  *
- * For LOOK_AT_TARGET the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
- * in world coordinates.
+ * - For LOOK_AT_TARGET the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
+ *   in world coordinates.
  *
  * @SINCE_1_0.0
  */
@@ -88,6 +98,12 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the CameraActor class.
+     *
+     * Properties additional to Actor.
+     * @SINCE_1_0.0
+     */
     enum
     {
       TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string @SINCE_1_0.0

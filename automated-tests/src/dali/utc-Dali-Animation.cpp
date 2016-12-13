@@ -10050,3 +10050,92 @@ int UtcDaliAnimationDuration(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationAnimateByNonAnimateableTypeN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(1);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  try
+  {
+    // Build the animation
+    Animation animation = Animation::New( 2.0f );
+    std::string relativeValue = "relative string";
+    animation.AnimateBy( Property(actor, index), relativeValue );
+    tet_result(TET_FAIL);
+  }
+  catch ( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
+  }
+
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimationAnimateToNonAnimateableTypeN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(1);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  try
+  {
+    // Build the animation
+    Animation animation = Animation::New( 2.0f );
+    std::string relativeValue = "relative string";
+    animation.AnimateTo( Property(actor, index), relativeValue );
+
+    tet_result(TET_FAIL);
+  }
+  catch ( Dali::DaliException& e )
+  {
+   DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNonAnimateableTypeN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(1);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  try
+  {
+    // Build the animation
+    KeyFrames keyFrames = KeyFrames::New();
+    keyFrames.Add( 0.0f, std::string("relative string1") );
+    keyFrames.Add( 1.0f, std::string("relative string2") );
+    // no need to really create the animation as keyframes do the check
+
+    tet_result(TET_FAIL);
+  }
+  catch ( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Type not animateable", TEST_LOCATION );
+  }
+
+  END_TEST;
+}

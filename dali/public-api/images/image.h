@@ -70,7 +70,10 @@ public:
   /**
    * @brief Constructor which creates an empty Image handle.
    *
-   * Use the appropriate New method to create an initialized handle.
+   * This class has no New method.
+   * Use the appropriate New method of its subclasses to create an initialized handle.
+   * (Dali::BufferImage::New(), Dali::EncodedBufferImage::New(), Dali::FrameBufferImage::New(),
+   * Dali::NativeImage::New(), Dali::ResourceImage::New())
    * @SINCE_1_0.0
    */
   Image();

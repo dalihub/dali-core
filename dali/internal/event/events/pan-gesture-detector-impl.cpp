@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,7 +291,7 @@ void PanGestureDetector::SetSceneObject( const SceneGraph::PanGesture* object )
 bool PanGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  PanGestureDetector* gesture = dynamic_cast<PanGestureDetector*>(object);
+  PanGestureDetector* gesture = static_cast< PanGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if ( 0 == strcmp( signalName.c_str(), SIGNAL_PAN_DETECTED ) )
   {

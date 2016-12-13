@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/program-cache.h>
 

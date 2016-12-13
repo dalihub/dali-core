@@ -796,7 +796,7 @@ Dali::PropertyNotification Object::AddPropertyNotification(Property::Index index
   {
     if ( index <= PROPERTY_REGISTRATION_MAX_INDEX )
     {
-      DALI_ASSERT_ALWAYS( false && "Property notification added to event side only property." );
+      DALI_ABORT( "Property notification added to event side only property." );
     }
     else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
     {
@@ -1083,8 +1083,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
       default:
       {
-        DALI_ASSERT_ALWAYS( false && "PropertyType enumeration is out of bounds" );
-        break;
+        // unreachable code due to higher level logic
       }
     } // switch(type)
   } // if animatable

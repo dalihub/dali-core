@@ -228,7 +228,7 @@ Constraint Constraint::New( Handle handle, Property::Index targetIndex, Property
 
     default:
     {
-      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should never come here
+      DALI_ABORT( "Property not constrainable" );
       break;
     }
   }

@@ -88,6 +88,7 @@ SET(TC_SOURCES
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TouchDataProcessing.cpp
         utc-Dali-TypeRegistry.cpp
+        utc-Dali-CSharp-TypeRegistry.cpp
         utc-Dali-Uint16Pair.cpp
         utc-Dali-Vector.cpp
         utc-Dali-Vector2.cpp

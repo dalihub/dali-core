@@ -1,4 +1,6 @@
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/update/manager/geometry-batcher.h>
 
@@ -170,7 +172,7 @@ Actor CreateActor( Actor& parent, Shader& shader, TextureSet& textureSet, Vector
   Renderer renderer = Renderer::New( geometry, shader );
 
   renderer.SetTextures( textureSet );
-  renderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+  renderer.SetProperty( Dali::DevelRenderer::Property::BATCHING_ENABLED, true );
 
   Actor actor = Actor::New();
   actor.SetPosition( position );
@@ -179,32 +181,16 @@ Actor CreateActor( Actor& parent, Shader& shader, TextureSet& textureSet, Vector
   return actor;
 }
 
-Actor CreateActor( Vector3 position )
-{
-  Actor actor = Actor::New();
-  actor.SetPosition( position );
-  return actor;
-}
-
-
 Actor CreateBatchParent( Vector3 pos )
 {
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::BATCH_PARENT, true );
+  actor.SetProperty( DevelActor::Property::BATCH_PARENT, true );
   actor.SetPosition( pos );
   Stage::GetCurrent().Add( actor );
   return actor;
 }
 
-void AddChildren( Actor parent, Actor* children, size_t size )
-{
-  for( size_t i = 0; i < size; ++i )
-  {
-    parent.Add( children[i] );
-  }
-}
-
-}
+} // namespace
 
 int UtcDaliGeometryBatcherBatchLevel0(void)
 {

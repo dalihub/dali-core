@@ -96,6 +96,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Shader class.
+     * @SINCE_1_1.43
+     */
     enum
     {
       /**

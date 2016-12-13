@@ -35,11 +35,6 @@ void geometry_test_cleanup(void)
 namespace
 {
 
-void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
-{
-  current.b = 0.0f;
-}
-
 struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
 
 PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::string& aTexCoord )

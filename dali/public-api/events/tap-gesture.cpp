@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,14 @@ TapGesture::TapGesture( const TapGesture& rhs )
 
 TapGesture& TapGesture::operator=( const TapGesture& rhs )
 {
-  Gesture::operator=(rhs);
-  numberOfTaps = rhs.numberOfTaps;
-  numberOfTouches = rhs.numberOfTouches;
-  screenPoint = rhs.screenPoint;
-  localPoint = rhs.localPoint;
+  if( this != &rhs )
+  {
+    Gesture::operator=(rhs);
+    numberOfTaps = rhs.numberOfTaps;
+    numberOfTouches = rhs.numberOfTouches;
+    screenPoint = rhs.screenPoint;
+    localPoint = rhs.localPoint;
+  }
 
   return *this;
 }

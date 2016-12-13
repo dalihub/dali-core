@@ -139,16 +139,20 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
     }
 
     case Gesture::Continuing:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Continuing\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
       break;
-
+    }
     case Gesture::Finished:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Finished\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Finished\n" );
       break;
-
+    }
     case Gesture::Clear:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Clear\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
       break;
+    }
   }
 }
 

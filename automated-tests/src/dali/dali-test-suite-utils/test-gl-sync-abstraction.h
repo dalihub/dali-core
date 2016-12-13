@@ -2,7 +2,7 @@
 #define __TEST_GL_SYNC_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,10 @@ public: // TEST FUNCTIONS
   int GetNumberOfSyncObjects();
 
 private:
+
+  TestGlSyncAbstraction( const TestGlSyncAbstraction& ); ///< Undefined
+  TestGlSyncAbstraction& operator=( const TestGlSyncAbstraction& ); ///< Undefined
+
   typedef std::vector<TestSyncObject*>   SyncContainer;
   typedef SyncContainer::iterator SyncIter;
   SyncContainer mSyncObjects;  ///< The sync objects

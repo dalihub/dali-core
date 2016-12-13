@@ -201,12 +201,15 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
     }
 
     case Gesture::Continuing:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Continuing\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
       break;
-
+    }
     case Gesture::Clear:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Clear\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
       break;
+    }
   }
 }
 

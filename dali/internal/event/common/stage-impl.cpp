@@ -520,7 +520,7 @@ void Stage::KeepRendering( float durationSeconds )
 bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  Stage* stage = dynamic_cast<Stage*>(object);
+  Stage* stage = static_cast< Stage* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
   {

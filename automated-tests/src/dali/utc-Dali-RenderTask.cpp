@@ -212,15 +212,6 @@ void FailImageLoad(TestApplication& application, Integration::ResourceId resourc
   application.GetPlatform().SetResourceLoadFailed(resourceId, Integration::FailureUnknown);
 }
 
-void ReloadImage(TestApplication& application, ResourceImage image)
-{
-  application.GetPlatform().ClearReadyResources();
-  application.GetPlatform().DiscardRequest();
-  application.GetPlatform().ResetTrace();
-  application.GetPlatform().SetClosestImageSize(Vector2(80.0f, 80.0f)); // Ensure reload is called.
-  image.Reload();
-}
-
 RenderTask CreateRenderTask(TestApplication& application,
                             CameraActor offscreenCamera,
                             Actor rootActor,       // Reset default render task to point at this actor
@@ -2392,81 +2383,6 @@ int UtcDaliRenderTaskOnce05(void)
   END_TEST;
 }
 
-#if 0
-//int UtcDaliRenderTaskOnce06(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask Render Once GlSync\n"
-               "During RenderOnce, make ready resources unready before sending first finished signal\n"
-               "PRE: Everything ready.\n"
-               "POST: Finished signal sent only once");
-
-  // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
-  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
-  drawTrace.Enable(true);
-
-  Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
-
-  CameraActor offscreenCameraActor = CameraActor::New();
-  Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateLoadingActor(application, "aFile.jpg");
-  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
-  Integration::ResourceId imageRequestId = imageRequest->GetId();
-  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  application.Render();
-
-  Stage::GetCurrent().Add(secondRootActor);
-  application.GetPlatform().ClearReadyResources();
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
-  bool finished = false;
-  RenderTaskFinished renderTaskFinished( finished );
-  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
-  application.SendNotification();
-
-  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
-
-  // CHANGE TO RENDER ONCE, RESOURCES BECOME NOT READY
-  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-
-  // Doesn't work...
-  ReloadImage(application, secondRootActor.GetImage());
-  application.SendNotification(); //         Input,    Expected  Input,    Expected
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true, __LINE__ ) );
-  DALI_TEST_EQUALS( secondRootActor.GetImage().GetLoadingState(), Dali::ResourceLoading, TEST_LOCATION);
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true, __LINE__ ) );
-
-  // FINISH RESOURCE LOADING
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
-  application.GetPlatform().ClearReadyResources();
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
-  DALI_TEST_CHECK( lastSyncObj != NULL );
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, true, __LINE__  ) );
-
-  // Finished rendering - expect no more renders, no more signals:
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  END_TEST;
-}
-#endif
-
 int UtcDaliRenderTaskOnce07(void)
 {
   TestApplication application;
@@ -2997,69 +2913,6 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__ ) );
   END_TEST;
 }
-
-#if 0
-//int UtcDaliRenderTaskOnceNoSync06(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask Render Once\n"
-               "During RenderOnce, make ready resources unready before sending first finished signal\n"
-               "PRE: Everything ready.\n"
-               "POST: Finished signal sent only once");
-
-  // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
-  drawTrace.Enable(true);
-
-  Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
-
-  CameraActor offscreenCameraActor = CameraActor::New();
-  Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateLoadingActor(application, "aFile.jpg");
-  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
-  Integration::ResourceId imageRequestId = imageRequest->GetId();
-  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  application.Render();
-  application.GetPlatform().ClearReadyResources();
-
-  Stage::GetCurrent().Add(secondRootActor);
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
-  bool finished = false;
-  RenderTaskFinished renderTaskFinished( finished );
-  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
-  application.SendNotification();
-
-  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
-
-  // CHANGE TO RENDER ONCE, RESOURCES BECOME NOT READY
-  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-
-  // Doesn't work...
-  ReloadImage(application, secondRootActor.GetImage());
-  application.SendNotification(); //         Input,    Expected  Input,    Expected
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true, __LINE__ ) );
-  DALI_TEST_EQUALS( secondRootActor.GetImage().GetLoadingState(), Dali::ResourceLoading, TEST_LOCATION);
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true, __LINE__ ) );
-
-  // FINISH RESOURCE LOADING
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, true, true, __LINE__ ) );
-  application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__ ) );
-  END_TEST;
-}
-#endif
 
 int UtcDaliRenderTaskOnceNoSync07(void)
 {

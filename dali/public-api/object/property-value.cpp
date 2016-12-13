@@ -222,6 +222,11 @@ public: // Data
     Property::Array* arrayValue;
     Property::Map* mapValue;
   };
+
+private:
+
+  Impl( const Impl& ); ///< Undefined
+  Impl& operator=( const Impl& ); ///< Undefined
 };
 
 Property::Value::Value()
@@ -313,6 +318,7 @@ Property::Value::Value( Property::Map& mapValue )
 }
 
 Property::Value::Value( Type type )
+: mImpl( NULL )
 {
   switch (type)
   {

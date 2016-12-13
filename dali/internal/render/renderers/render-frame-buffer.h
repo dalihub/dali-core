@@ -62,6 +62,11 @@ public:
   void Destroy( Context& context );
 
   /**
+   * Called by RenderManager to inform the framebuffer that the context has been destroyed
+   */
+  void GlContextDestroyed();
+
+  /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
    * param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering

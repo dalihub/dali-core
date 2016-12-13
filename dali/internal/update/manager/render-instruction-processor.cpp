@@ -19,7 +19,6 @@
 #include <dali/internal/update/manager/render-instruction-processor.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/shader-effects/shader-effect.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
@@ -225,7 +224,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
       if( !isLayer3d )
       {
-        item.mDepthIndex += static_cast<int>( renderable.mNode->GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER;
+        item.mDepthIndex += renderable.mNode->GetDepthIndex();
       }
 
       // Save ModelView matrix onto the item.

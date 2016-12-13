@@ -234,9 +234,14 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the Renderer class.
+   * @SINCE_1_1.43
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Renderer class.
+     * @SINCE_1_1.43
+     */
     enum
     {
       /**
@@ -414,14 +419,6 @@ public:
        * @SINCE_1_1.43
        */
       STENCIL_OPERATION_ON_Z_PASS,
-
-      /**
-       * @brief name "batchingEnabled", type BOOLEAN
-       * @SINCE_1_2.0
-       * @see Batching
-       * @note The default value is 'false'
-       */
-      BATCHING_ENABLED
     };
   };
 

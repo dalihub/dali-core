@@ -24,6 +24,7 @@
 #include <cfloat>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/events/touch-data.h>
@@ -31,6 +32,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -198,7 +200,8 @@ DALI_PROPERTY( "minimumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::Actor::Property::BATCH_PARENT )
+DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::DevelActor::Property::BATCH_PARENT )
+DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -354,6 +357,10 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
   return GetDimensionValue( values.GetVectorXY(), dimension );
 }
 
+unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
+{
+  return depth * Dali::DevelLayer::TREE_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+}
 
 } // unnamed namespace
 
@@ -1386,6 +1393,8 @@ void Actor::SetRelayoutEnabled( bool relayoutEnabled )
   {
     EnsureRelayoutData();
 
+    DALI_ASSERT_DEBUG( mRelayoutData && "mRelayoutData not created" );
+
     mRelayoutData->relayoutEnabled = relayoutEnabled;
   }
 }
@@ -1915,7 +1924,7 @@ Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  Actor* actor = dynamic_cast< Actor* >( object );
+  Actor* actor = static_cast< Actor* >( object ); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
   {
@@ -1967,6 +1976,7 @@ Actor::Actor( DerivedType derivedType )
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mDepth( 0u ),
+  mSiblingOrder(0u),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
@@ -2068,6 +2078,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned in
 
   mIsOnStage = true;
   mDepth = depth;
+  SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
 
   ConnectToSceneGraph();
 
@@ -2659,7 +2670,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::BATCH_PARENT:
+    case Dali::DevelActor::Property::BATCH_PARENT:
     {
       bool value;
 
@@ -2669,6 +2680,24 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
         {
           mIsBatchParent = value;
           SetIsBatchParentMessage( GetEventThreadServices(), *mNode, mIsBatchParent );
+        }
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::SIBLING_ORDER:
+    {
+      int value;
+
+      if( property.Get( value ) )
+      {
+        if( static_cast<unsigned int>(value) != mSiblingOrder )
+        {
+          mSiblingOrder = value;
+          if( mIsOnStage )
+          {
+            SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+          }
         }
       }
       break;
@@ -2847,8 +2876,7 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 
     default:
     {
-      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
-      break;
+      // nothing to do for other types
     }
   } // entry.GetType
 }
@@ -2856,6 +2884,11 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
+
+  if( index >= DEFAULT_PROPERTY_COUNT )
+  {
+    return value;
+  }
 
   switch( index )
   {
@@ -3179,21 +3212,21 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::BATCH_PARENT:
+    case Dali::DevelActor::Property::BATCH_PARENT:
     {
       value = mIsBatchParent;
+      break;
+    }
+
+    case Dali::DevelActor::Property::SIBLING_ORDER:
+    {
+      value = static_cast<int>(mSiblingOrder);
       break;
     }
 
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       value = mClippingMode;
-      break;
-    }
-
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "Actor Property index invalid" ); // should not come here
       break;
     }
   }

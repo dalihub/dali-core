@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -341,11 +340,14 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Time
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
+  Object& object = GetImplementation( target.object );
+  const Property::Type targetType = object.GetPropertyType( target.propertyIndex );
+  const Property::Type destinationType = relativeValue.GetType();
+  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
   ExtendDuration( period );
 
-  switch ( relativeValue.GetType() )
+  switch ( targetType )
   {
     case Property::BOOLEAN:
     {
@@ -427,8 +429,9 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
     }
 
     default:
-      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should never come here
-      break;
+    {
+      // non animatable types handled already
+    }
   }
 }
 
@@ -449,28 +452,29 @@ void Animation::AnimateTo(Property& target, Property::Value& destinationValue, T
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
+  Object& object = GetImplementation(target.object);
 
   AnimateTo( object, target.propertyIndex, target.componentIndex, destinationValue, alpha, period );
 }
 
 void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  Property::Type type = targetObject.GetPropertyType(targetPropertyIndex);
-  if(componentIndex != Property::INVALID_COMPONENT_INDEX)
+  Property::Type targetType = targetObject.GetPropertyType(targetPropertyIndex);
+  if( componentIndex != Property::INVALID_COMPONENT_INDEX )
   {
-    if( type == Property::VECTOR2
-        || type == Property::VECTOR3
-        || type == Property::VECTOR4 )
+    if( ( targetType == Property::VECTOR2 ) ||
+        ( targetType == Property::VECTOR3 ) ||
+        ( targetType == Property::VECTOR4 ) )
     {
-      type = Property::FLOAT;
+      targetType = Property::FLOAT;
     }
   }
-  DALI_ASSERT_ALWAYS( type == destinationValue.GetType() && "DestinationValue does not match Target Property type" );
+  const Property::Type destinationType = destinationValue.GetType();
+  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
   ExtendDuration( period );
 
-  switch (destinationValue.GetType())
+  switch ( destinationType )
   {
     case Property::BOOLEAN:
     {
@@ -596,8 +600,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
     }
 
     default:
-      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should never come here
-      break;
+    {
+      // non animatable types handled already
+    }
   }
 }
 
@@ -638,7 +643,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
-  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
+  Object& object = GetImplementation( target.object );
 
   ExtendDuration( period );
 
@@ -742,8 +747,10 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       break;
     }
 
-    default: // not all property types are animateable
-      break;
+    default:
+    {
+      // non animatable types handled by keyframes
+    }
   }
 }
 
@@ -791,7 +798,7 @@ void Animation::EmitSignalFinish()
 bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  Animation* animation = dynamic_cast<Animation*>(object);
+  Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == signalName.compare( SIGNAL_FINISHED ) )
   {

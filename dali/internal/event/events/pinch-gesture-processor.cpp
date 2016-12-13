@@ -187,12 +187,15 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
     }
 
     case Gesture::Clear:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Clear\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
       break;
-
+    }
     case Gesture::Possible:
-      DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Possible\n" );
+    {
+      DALI_ABORT( "Incorrect state received from Integration layer: Possible\n" );
       break;
+    }
   }
 }
 

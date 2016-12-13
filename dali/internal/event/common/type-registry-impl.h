@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/object/csharp-type-info.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
@@ -88,6 +89,17 @@ public:
                  Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit  );
 
   /*
+   * Register a creation function under a unique name (used by C# Custom controls).
+   * @param [in] name The name type to be registered (must be unique)
+   * @param [in] baseTypeInfo Type info for its base class
+   * @param [in] createInstance Instance creation function
+   * @param [in] callCreateOnInit If true call createInstance on dali initialisation
+   * @return true if the name could be registered.
+   */
+  bool Register( const std::string& name, const std::type_info& baseTypeInfo,
+                 Dali::CSharpTypeInfo::CreateFunction createInstance, bool callCreateOnInit );
+
+  /*
    * Register a signal connector function to a type
    * @param [in] typeRegistration TypeRegistration object used to register the type
    * @param [in] name Signal name
@@ -115,6 +127,19 @@ public:
    * @return true if registered
    */
   bool RegisterProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
+
+  /**
+   * Register an event-thread only property with a type (used by C# Custom controls)
+   * @param [in] objectName name of the object used to register the type
+   * @param [in] name Property name
+   * @param [in] index Property index
+   * @param [in] type Property type
+   * @param [in] setFunc The function to set the property (Can be NULL).
+   * @param [in] getFunc The function to get the value of a property.
+   * @return true if registered
+   */
+  bool RegisterProperty( const std::string& objectName, const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc );
+
 
   /**
    * Register a scene graph only property with a type
@@ -198,6 +223,9 @@ private:
 
   typedef std::vector<Dali::TypeInfo::CreateFunction> InitFunctions;
   InitFunctions mInitFunctions;
+
+  typedef std::vector<Dali::CSharpTypeInfo::CreateFunction> CSharpInitFunctions;
+  CSharpInitFunctions mCSharpInitFunctions;
 
 private:
   TypeRegistry();

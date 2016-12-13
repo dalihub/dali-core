@@ -16,6 +16,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
+
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <cstdio>
@@ -1641,6 +1643,179 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Check that renderer2 has been rendered after renderer1
   DALI_TEST_GREATER( textureBindIndex[2], textureBindIndex[1], TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
+{
+  TestApplication application;
+  tet_infoline("Test the rendering order in a 2D layer is correct using sibling order");
+
+  /*
+   * Creates the following hierarchy:
+   *
+   *                            Layer
+   *                           /    \
+   *                         /        \
+   *                       /            \
+   *                     /                \
+   *                   /                    \
+   *             actor0 (SIBLING_ORDER:1)     actor1 (SIBLING_ORDER:0)
+   *            /   |   \                    /   |   \
+   *          /     |     \                /     |     \
+   *        /       |       \            /       |       \
+   * renderer0 renderer1  actor2     renderer2 renderer3 renderer4
+   *                        |
+   *                        |
+   *                   renderer5
+   *
+   *  actor0 has sibling order 1
+   *  actor1 has sibling order 0
+   *  actor2 has sibling order 0
+   *
+   *  renderer0 has depth index 2
+   *  renderer1 has depth index 0
+   *
+   *  renderer2 has depth index 0
+   *  renderer3 has depth index 1
+   *  renderer4 has depth index 2
+   *
+   *  renderer5 has depth index -1
+   *
+   *  Expected rendering order: renderer2 - renderer3 - renderer4 - renderer1 - renderer0 - renderer5
+   */
+
+  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Geometry geometry = CreateQuadGeometry();
+
+  Actor actor0 = Actor::New();
+  actor0.SetAnchorPoint(AnchorPoint::CENTER);
+  actor0.SetParentOrigin(AnchorPoint::CENTER);
+  actor0.SetPosition(0.0f,0.0f);
+  actor0.SetSize(1, 1);
+  actor0.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, 1 );
+  DALI_TEST_EQUALS( actor0.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 1, TEST_LOCATION );
+  Stage::GetCurrent().Add(actor0);
+
+  Actor actor1 = Actor::New();
+  actor1.SetAnchorPoint(AnchorPoint::CENTER);
+  actor1.SetParentOrigin(AnchorPoint::CENTER);
+  actor1.SetPosition(0.0f,0.0f);
+  actor1.SetSize(1, 1);
+  DALI_TEST_EQUALS( actor1.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 0, TEST_LOCATION );
+  Stage::GetCurrent().Add(actor1);
+
+  Actor actor2 = Actor::New();
+  actor2.SetAnchorPoint(AnchorPoint::CENTER);
+  actor2.SetParentOrigin(AnchorPoint::CENTER);
+  actor2.SetPosition(0.0f,0.0f);
+  actor2.SetSize(1, 1);
+  DALI_TEST_EQUALS( actor1.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 0, TEST_LOCATION );
+  actor0.Add(actor2);
+
+  //Renderer0
+  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet0 = CreateTextureSet( image0 );
+  Renderer renderer0 = Renderer::New( geometry, shader );
+  renderer0.SetTextures( textureSet0 );
+  renderer0.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
+  actor0.AddRenderer(renderer0);
+  application.SendNotification();
+  application.Render(0);
+
+  //Renderer1
+  Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet1 = CreateTextureSet( image1 );
+  Renderer renderer1 = Renderer::New( geometry, shader );
+  renderer1.SetTextures( textureSet1 );
+  renderer1.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
+  actor0.AddRenderer(renderer1);
+  application.SendNotification();
+  application.Render(0);
+
+  //Renderer2
+  Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet2 = CreateTextureSet( image2 );
+  Renderer renderer2 = Renderer::New( geometry, shader );
+  renderer2.SetTextures( textureSet2 );
+  renderer2.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
+  actor1.AddRenderer(renderer2);
+  application.SendNotification();
+  application.Render(0);
+
+  //Renderer3
+  Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet3 = CreateTextureSet( image3 );
+  Renderer renderer3 = Renderer::New( geometry, shader );
+  renderer3.SetTextures( textureSet3 );
+  renderer3.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
+  actor1.AddRenderer(renderer3);
+  application.SendNotification();
+  application.Render(0);
+
+  //Renderer4
+  Image image4= BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet4 = CreateTextureSet( image4 );
+  Renderer renderer4 = Renderer::New( geometry, shader );
+  renderer4.SetTextures( textureSet4 );
+  renderer4.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
+  actor1.AddRenderer(renderer4);
+  application.SendNotification();
+  application.Render(0);
+
+  //Renderer5
+  Image image5= BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet5 = CreateTextureSet( image5 );
+  Renderer renderer5 = Renderer::New( geometry, shader );
+  renderer5.SetTextures( textureSet5 );
+  renderer5.SetProperty( Renderer::Property::DEPTH_INDEX, -1 );
+  actor2.AddRenderer(renderer5);
+  application.SendNotification();
+  application.Render(0);
+
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace(true);
+  application.SendNotification();
+  application.Render(0);
+
+  int textureBindIndex[6];
+  for( unsigned int i(0); i<6; ++i )
+  {
+    std::stringstream params;
+    params << GL_TEXTURE_2D<<", "<<i+1;
+    textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str() );
+  }
+
+  DALI_TEST_EQUALS( textureBindIndex[2], 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[3], 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[4], 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[1], 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[0], 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
+
+  //Change sibling order of actor1
+  //New Expected rendering order: renderer1 - renderer0 - renderer2 - renderer3 - renderer4  - renderer5
+  actor1.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, 2 );
+
+  gl.GetTextureTrace().Reset();
+  application.SendNotification();
+  application.Render(0);
+
+  for( unsigned int i(0); i<6; ++i )
+  {
+    std::stringstream params;
+    params << GL_TEXTURE_2D<<", "<<i+1;
+    textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str() );
+  }
+
+  DALI_TEST_EQUALS( textureBindIndex[1], 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[0], 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[2], 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[3], 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[4], 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
 
   END_TEST;
 }
