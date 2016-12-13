@@ -16,6 +16,7 @@
 
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/devel-api/images/native-image-interface-extension.h>
 
 // EXTERNAL INCLUDES
 #include <math.h>   //floor, log2
@@ -590,6 +591,7 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 
 NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
 :mId( 0 ),
+ mTarget( (type == TextureType::TEXTURE_2D)? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
  mType( type ),
  mSampler(),
  mNativeImage(),
@@ -605,6 +607,7 @@ NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, uns
 
 NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
 :mId( 0 ),
+ mTarget( GL_TEXTURE_2D ),
  mType( TextureType::TEXTURE_2D ),
  mSampler(),
  mNativeImage( nativeImageInterface ),
@@ -644,15 +647,21 @@ void NewTexture::Initialize(Context& context)
   {
     if( mNativeImage->GlExtensionCreate() )
     {
+      NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
+      if( extension )
+      {
+        mTarget = extension->GetEglImageTextureTarget();
+      }
+
       context.GenTextures( 1, &mId );
-      context.Bind2dTexture( mId );
+      context.BindTexture( mTarget, mId );
       context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data
 
       //Apply default sampling parameters
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+      context.TexParameteri( mTarget, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
+      context.TexParameteri( mTarget, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
 
       // platform specific implementation decides on what GL extension to use
       if( mNativeImage->TargetTexture() != 0u )
@@ -665,13 +674,19 @@ void NewTexture::Initialize(Context& context)
   }
   else
   {
+    //Create the texture and reserve memory for the first mipmap level.
     context.GenTextures( 1, &mId );
+    context.BindTexture( mTarget, mId );
+    context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data
+
+    //Apply default sampling parameters
+    context.TexParameteri( mTarget, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
+    context.TexParameteri( mTarget, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
+    context.TexParameteri( mTarget, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
+    context.TexParameteri( mTarget, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
 
     if( mType == TextureType::TEXTURE_2D )
     {
-      //Creates the texture and reserves memory for the first mipmap level.
-      context.Bind2dTexture( mId );
-
       if( !mIsCompressed )
       {
         context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
@@ -680,18 +695,9 @@ void NewTexture::Initialize(Context& context)
       {
         context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
       }
-
-      //Apply default sampling parameters
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
     }
     else if( mType == TextureType::TEXTURE_CUBE )
     {
-      //Creates the texture and reserves memory for the first mipmap level.
-      context.BindCubeMapTexture( mId );
-
       if( !mIsCompressed )
       {
         for( unsigned int i(0); i<6; ++i )
@@ -706,13 +712,7 @@ void NewTexture::Initialize(Context& context)
           context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
         }
       }
-
-      //Apply default sampling parameters
-      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
     }
   }
 }
@@ -751,15 +751,11 @@ void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Interna
 #endif
 
   //Upload data to the texture
-  GLenum target( GL_NONE );
-  if( mType == TextureType::TEXTURE_2D )
+
+  context.BindTexture( mTarget, mId );
+  GLenum target( mTarget );
+  if( mType == TextureType::TEXTURE_CUBE )
   {
-    context.Bind2dTexture( mId );
-    target = GL_TEXTURE_2D;
-  }
-  else if( mType == TextureType::TEXTURE_CUBE )
-  {
-    context.BindCubeMapTexture( mId );
     target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer;
   }
 
@@ -806,21 +802,11 @@ bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampl
   if( mId != 0 )
   {
     context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
-
-    if( mType == TextureType::TEXTURE_2D )
-    {
-      context.Bind2dTexture( mId );
-    }
-    else if( mType == TextureType::TEXTURE_CUBE )
-    {
-      context.BindCubeMapTexture( mId );
-    }
-
+    context.BindTexture( mTarget, mId );
     ApplySampler( context, sampler );
 
     if( mNativeImage )
     {
-      //Allow implementation specific operations after binding the texture
       mNativeImage->PrepareTexture();
     }
 
@@ -840,31 +826,31 @@ void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
     if( mSampler.mMinificationFilter != oldSampler.mMinificationFilter )
     {
       GLint glFilterMode = FilterModeToGL( mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilterMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_MIN_FILTER, glFilterMode );
     }
 
     if( mSampler.mMagnificationFilter != oldSampler.mMagnificationFilter )
     {
       GLint glFilterMode = FilterModeToGL( mSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilterMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_MAG_FILTER, glFilterMode );
     }
 
     if( mSampler.mSWrapMode != oldSampler.mSWrapMode )
     {
       GLint glWrapMode = WrapModeToGL( mSampler.mSWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrapMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_S, glWrapMode );
     }
 
     if( mSampler.mTWrapMode != oldSampler.mTWrapMode )
     {
       GLint glWrapMode = WrapModeToGL( mSampler.mTWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrapMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_T, glWrapMode );
     }
 
     if( mType == TextureType::TEXTURE_CUBE && mSampler.mRWrapMode != oldSampler.mRWrapMode )
     {
       GLint glWrapMode = WrapModeToGL( mSampler.mRWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, glWrapMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, glWrapMode );
     }
   }
 }
@@ -876,16 +862,8 @@ bool NewTexture::HasAlphaChannel()
 
 void NewTexture::GenerateMipmaps( Context& context )
 {
-  if( mType == TextureType::TEXTURE_2D )
-  {
-    context.Bind2dTexture( mId );
-    context.GenerateMipmap( GL_TEXTURE_2D );
-  }
-  else if( mType == TextureType::TEXTURE_CUBE )
-  {
-    context.BindCubeMapTexture( mId );
-    context.GenerateMipmap( GL_TEXTURE_CUBE_MAP );
-  }
+  context.BindTexture( mTarget, mId );
+  context.GenerateMipmap( mTarget );
 }
 
 } //Render
