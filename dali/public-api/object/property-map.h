@@ -183,7 +183,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  const std::string& GetKey( SizeType position ) const;
+  const std::string& GetKey( SizeType position ) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key at the specified position.
@@ -206,7 +206,7 @@ public:
    *
    * @note Will assert if position >= Count() or key at position is an index key.
    */
-  StringValuePair& GetPair( SizeType position ) const;
+  StringValuePair& GetPair( SizeType position ) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key & the value at the specified position.

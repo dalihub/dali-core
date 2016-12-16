@@ -174,7 +174,7 @@ public:
    * @return True if the event should be consumed.
    * @note CustomActorImpl::REQUIRES_TOUCH_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
    */
-  virtual bool OnTouchEvent(const TouchEvent& event) = 0;
+  virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API = 0;
 
   /**
    * @brief Called after a hover-event is received by the owning actor.

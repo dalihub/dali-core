@@ -158,7 +158,7 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
 }
 
 bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
-    Dali::CSharpTypeInfo::CreateFunction createInstance, bool callCreateOnInit  )
+    Dali::CSharpTypeInfo::CreateFunction createInstance )
 {
 
   bool ret = false;
@@ -178,10 +178,7 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
     DALI_LOG_WARNING("Duplicate name for TypeRegistry for '%s'\n", + uniqueTypeName.c_str());
     DALI_ASSERT_ALWAYS(!"Duplicate type name for Type Registation");
   }
-  if( callCreateOnInit )
-  {
-    mCSharpInitFunctions.push_back(createInstance);
-  }
+
   return ret;
 
 }
@@ -189,10 +186,6 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
 void TypeRegistry::CallInitFunctions(void) const
 {
   for( InitFunctions::const_iterator iter = mInitFunctions.begin(); iter != mInitFunctions.end(); ++iter)
-  {
-    (*iter)();
-  }
-  for( CSharpInitFunctions::const_iterator iter = mCSharpInitFunctions.begin(); iter != mCSharpInitFunctions.end(); ++iter)
   {
     (*iter)();
   }

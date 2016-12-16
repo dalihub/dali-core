@@ -632,3 +632,21 @@ int UtcDaliTextureContextLoss(void)
 
   END_TEST;
 }
+
+int UtcDaliNativeImageTexture(void)
+{
+  TestApplication application;
+  tet_infoline( "UtcDaliNativeImageTexture" );
+
+  TestNativeImagePointer imageInterface = TestNativeImage::New( 16, 16 );
+  Texture texture = Texture::New( *(imageInterface.Get()) );
+  DALI_TEST_CHECK( texture );
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK( texture );
+
+  END_TEST;
+}
+

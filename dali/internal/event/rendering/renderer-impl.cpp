@@ -852,14 +852,11 @@ const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Prop
   DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
   const SceneGraph::PropertyBase* property = NULL;
 
-  if( OnStage() )
-  {
-    property = RENDERER_IMPL.GetRegisteredSceneGraphProperty(
-      this,
-      &Renderer::FindAnimatableProperty,
-      &Renderer::FindCustomProperty,
-      index );
-  }
+  property = RENDERER_IMPL.GetRegisteredSceneGraphProperty(
+    this,
+    &Renderer::FindAnimatableProperty,
+    &Renderer::FindCustomProperty,
+    index );
 
   return property;
 }
@@ -868,15 +865,12 @@ const PropertyInputImpl* Renderer::GetSceneObjectInputProperty( Property::Index 
 {
   const PropertyInputImpl* property = NULL;
 
-  if( OnStage() )
-  {
-    const SceneGraph::PropertyBase* baseProperty =
-      RENDERER_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                     &Renderer::FindAnimatableProperty,
-                                                     &Renderer::FindCustomProperty,
-                                                     index );
-    property = static_cast<const PropertyInputImpl*>( baseProperty );
-  }
+  const SceneGraph::PropertyBase* baseProperty =
+    RENDERER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                   &Renderer::FindAnimatableProperty,
+                                                   &Renderer::FindCustomProperty,
+                                                   index );
+  property = static_cast<const PropertyInputImpl*>( baseProperty );
 
   return property;
 }

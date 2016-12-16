@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/events/touch-event.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -27,24 +30,31 @@ namespace Dali
 TouchEvent::TouchEvent()
 : time(0)
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 TouchEvent::TouchEvent(unsigned long time)
 : time(time)
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 TouchEvent::~TouchEvent()
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: ~TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 unsigned int TouchEvent::GetPointCount() const
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPointCount() is deprecated and will be removed from next release. Use TouchData instead.\n" );
+
   return points.size();
 }
 
 const TouchPoint& TouchEvent::GetPoint(unsigned int point) const
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPoint() is deprecated and will be removed from next release. Use TouchData instead.\n" );
+
   DALI_ASSERT_ALWAYS( point < points.size() && "No point at index" );
   return points[point];
 }
