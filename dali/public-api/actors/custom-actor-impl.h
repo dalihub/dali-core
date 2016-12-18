@@ -63,6 +63,14 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
  */
 class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 {
+protected:
+
+  /**
+   * @brief Virtual destructor
+   * @SINCE_1_0.0
+   */
+  virtual ~CustomActorImpl();
+
 public:
 
   class Extension; ///< Forward declare future extension interface
@@ -337,12 +345,6 @@ protected: // For derived classes
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
   CustomActorImpl( ActorFlags flags );
-
-  /**
-   * @brief Virtual destructor
-   * @SINCE_1_0.0
-   */
-  virtual ~CustomActorImpl();
 
   // Size negotiation helpers
 
