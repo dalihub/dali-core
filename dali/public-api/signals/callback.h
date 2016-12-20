@@ -343,13 +343,14 @@ protected: // Constructors for deriving classes
    * @param[in] rhs Handle to an object
    */
   CallbackBase( const CallbackBase& rhs );
+
   /**
    * @brief assignment operator not declared.
    * @SINCE_1_0.0
    * @param[in] rhs Handle to an object
    * @return A reference to this
    */
-  const CallbackBase& operator=( const CallbackBase& rhs );
+  CallbackBase& operator=( const CallbackBase& rhs );
 
   /**
    * @brief Constructor for function with static linkage.

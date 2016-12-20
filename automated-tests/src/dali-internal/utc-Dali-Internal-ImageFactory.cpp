@@ -542,6 +542,7 @@ int UtcDaliImageFactoryReload05(void)
   application.GetPlatform().ResetTrace();
 
   ticket = imageFactory.Reload( *req.Get() );
+  DALI_TEST_CHECK( ticket );
 
   application.SendNotification();
   application.Render();
@@ -555,6 +556,7 @@ int UtcDaliImageFactoryReload05(void)
   EmulateImageLoaded( application, 80, 80 );
 
   ticket = imageFactory.Reload( *req.Get() );
+  DALI_TEST_CHECK( ticket );
 
   application.SendNotification();
   application.Render();

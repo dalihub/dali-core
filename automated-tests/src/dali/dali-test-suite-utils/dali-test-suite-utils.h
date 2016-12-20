@@ -162,6 +162,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
     return false;
   }
 
+  bool result = false;
   switch(type)
   {
     case Property::BOOLEAN:
@@ -169,7 +170,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       bool a, b;
       q1.Get(a);
       q2.Get(b);
-      return a == b;
+      result =  a == b;
       break;
     }
     case Property::INTEGER:
@@ -177,7 +178,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       int a, b;
       q1.Get(a);
       q2.Get(b);
-      return a == b;
+      result =  a == b;
       break;
     }
     case Property::FLOAT:
@@ -185,7 +186,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       float a, b;
       q1.Get(a);
       q2.Get(b);
-      return CompareType<float>(a, b, epsilon);
+      result =  CompareType<float>(a, b, epsilon);
       break;
     }
     case Property::VECTOR2:
@@ -193,7 +194,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       Vector2 a, b;
       q1.Get(a);
       q2.Get(b);
-      return CompareType<Vector2>(a, b, epsilon);
+      result = CompareType<Vector2>(a, b, epsilon);
       break;
     }
     case Property::VECTOR3:
@@ -201,7 +202,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       Vector3 a, b;
       q1.Get(a);
       q2.Get(b);
-      return CompareType<Vector3>(a, b, epsilon);
+      result = CompareType<Vector3>(a, b, epsilon);
       break;
     }
     case Property::RECTANGLE:
@@ -210,7 +211,7 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       Vector4 a, b;
       q1.Get(a);
       q2.Get(b);
-      return CompareType<Vector4>(a, b, epsilon);
+      result = CompareType<Vector4>(a, b, epsilon);
       break;
     }
     case Property::ROTATION:
@@ -218,14 +219,28 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       Quaternion a, b;
       q1.Get(a);
       q2.Get(b);
-      return CompareType<Quaternion>(a, b, epsilon);
+      result = CompareType<Quaternion>(a, b, epsilon);
       break;
     }
-    default:
-      return false;
+    case Property::MATRIX:
+    case Property::MATRIX3:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      //TODO: Implement this?
+      DALI_ASSERT_ALWAYS( 0 && "Not implemented");
+      result = false;
+      break;
+    }
+    case Property::NONE:
+    {
+      result = false;
+      break;
+    }
   }
 
-  return false;
+  return result;
 }
 
 

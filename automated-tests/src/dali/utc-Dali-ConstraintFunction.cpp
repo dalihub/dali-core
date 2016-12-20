@@ -304,6 +304,8 @@ struct CountFunctor
 
   CountFunctor& operator=( const CountFunctor& other )
   {
+    this->mCount = other.mCount;
+    ++mCount;
     return *this;
   }
 
