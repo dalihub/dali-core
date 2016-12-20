@@ -63,8 +63,11 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
  */
 class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 {
-protected:
+public:
 
+  class Extension; ///< Forward declare future extension interface
+
+protected:
   /**
    * @brief Virtual destructor
    * @SINCE_1_0.0
@@ -72,9 +75,6 @@ protected:
   virtual ~CustomActorImpl();
 
 public:
-
-  class Extension; ///< Forward declare future extension interface
-
   /**
    * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
    *
