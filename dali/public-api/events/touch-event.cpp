@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,31 +30,24 @@ namespace Dali
 TouchEvent::TouchEvent()
 : time(0)
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 TouchEvent::TouchEvent(unsigned long time)
 : time(time)
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 TouchEvent::~TouchEvent()
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: ~TouchEvent() is deprecated and will be removed from next release. Use TouchData instead.\n" );
 }
 
 unsigned int TouchEvent::GetPointCount() const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPointCount() is deprecated and will be removed from next release. Use TouchData instead.\n" );
-
   return points.size();
 }
 
 const TouchPoint& TouchEvent::GetPoint(unsigned int point) const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPoint() is deprecated and will be removed from next release. Use TouchData instead.\n" );
-
   DALI_ASSERT_ALWAYS( point < points.size() && "No point at index" );
   return points[point];
 }
