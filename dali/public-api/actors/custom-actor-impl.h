@@ -67,6 +67,14 @@ public:
 
   class Extension; ///< Forward declare future extension interface
 
+protected:
+  /**
+   * @brief Virtual destructor
+   * @SINCE_1_0.0
+   */
+  virtual ~CustomActorImpl();
+
+public:
   /**
    * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
    *
@@ -337,12 +345,6 @@ protected: // For derived classes
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
   CustomActorImpl( ActorFlags flags );
-
-  /**
-   * @brief Virtual destructor
-   * @SINCE_1_0.0
-   */
-  virtual ~CustomActorImpl();
 
   // Size negotiation helpers
 

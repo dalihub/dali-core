@@ -1091,12 +1091,11 @@ int UtcDaliCustomActorImplGetHeightForWidthBase(void)
   Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
 
   float width = 300.0f;
-  float v = 0.0f;
 
   application.SendNotification();
   application.Render();
 
-  v = custom.TestGetHeightForWidthBase( width );
+  float v = custom.TestGetHeightForWidthBase( width );
 
   DALI_TEST_CHECK( v == width );
 
@@ -1109,12 +1108,11 @@ int UtcDaliCustomActorImplGetWidthForHeightBase(void)
   Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
 
   float height = 300.0f;
-  float v = 0.0f;
 
   application.SendNotification();
   application.Render();
 
-  v = custom.TestGetWidthForHeightBase( height );
+  float v = custom.TestGetWidthForHeightBase( height );
 
   DALI_TEST_CHECK( v == height );
 
@@ -1133,8 +1131,7 @@ int UtcDaliCustomActorImplCalculateChildSizeBase(void)
   application.SendNotification();
   application.Render();
 
-  float v = 9.99f;
-  v = custom.TestCalculateChildSizeBase( child, Dali::Dimension::ALL_DIMENSIONS );
+  float v = custom.TestCalculateChildSizeBase( child, Dali::Dimension::ALL_DIMENSIONS );
   DALI_TEST_CHECK( v == 0.0f );
 
   END_TEST;
@@ -1146,19 +1143,19 @@ int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
   Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
   custom.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
 
-  bool v = false;
+  bool v = custom.TestRelayoutDependentOnChildrenBase( Dali::Dimension::ALL_DIMENSIONS );
+  DALI_TEST_CHECK( v == true );
 
-  v = custom.TestRelayoutDependentOnChildrenBase( Dali::Dimension::ALL_DIMENSIONS );
   application.SendNotification();
   application.Render();
-
-  DALI_TEST_CHECK( v == true );
 
   custom.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
   v = custom.TestRelayoutDependentOnChildrenBase( Dali::Dimension::WIDTH );
+  DALI_TEST_CHECK( v == false );
+
+  // why is this here?
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK( v == false );
 
   END_TEST;
 }
