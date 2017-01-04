@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2563,8 +2563,8 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::COLOR_MODE:
     {
-      ColorMode mode;
-      if ( Scripting::GetEnumeration< ColorMode >( property.Get< std::string >().c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode ) )
+      ColorMode mode = mColorMode;
+      if ( Scripting::GetEnumerationProperty< ColorMode >( property, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode ) )
       {
         SetColorMode( mode );
       }
@@ -2573,8 +2573,8 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::POSITION_INHERITANCE:
     {
-      PositionInheritanceMode mode;
-      if( Scripting::GetEnumeration< PositionInheritanceMode >( property.Get< std::string >().c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode ) )
+      PositionInheritanceMode mode = mPositionInheritanceMode;
+      if( Scripting::GetEnumerationProperty< PositionInheritanceMode >( property, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode ) )
       {
         SetPositionInheritanceMode( mode );
       }
@@ -2583,8 +2583,8 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::DRAW_MODE:
     {
-      DrawMode::Type mode;
-      if( Scripting::GetEnumeration< DrawMode::Type >( property.Get< std::string >().c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode ) )
+      DrawMode::Type mode = mDrawMode;
+      if( Scripting::GetEnumerationProperty< DrawMode::Type >( property, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode ) )
       {
         SetDrawMode( mode );
       }
@@ -2599,8 +2599,8 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      ResizePolicy::Type type;
-      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
+      ResizePolicy::Type type = static_cast< ResizePolicy::Type >( -1 ); // Set to invalid number so it definitely gets set.
+      if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::WIDTH );
       }
@@ -2609,8 +2609,8 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      ResizePolicy::Type type;
-      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
+      ResizePolicy::Type type = static_cast< ResizePolicy::Type >( -1 ); // Set to invalid number so it definitely gets set.
+      if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::HEIGHT );
       }
