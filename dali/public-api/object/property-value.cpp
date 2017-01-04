@@ -150,6 +150,12 @@ struct Property::Value::Impl
   {
   }
 
+  Impl( const std::initializer_list< KeyValuePair >& values )
+  : type( Property::MAP ),
+    mapValue( new Property::Map( values ) )
+  {
+  }
+
   /**
    * Destructor, takes care of releasing the dynamically allocated types
    */
@@ -351,6 +357,11 @@ Property::Value::Value( Property::Map&& mapValue )
 
 Property::Value::Value( const Extents& extentsValue )
 : mImpl( new Impl( extentsValue ) )
+{
+}
+
+Property::Value::Value( const std::initializer_list< KeyValuePair >& values )
+: mImpl( new Impl( values ) )
 {
 }
 

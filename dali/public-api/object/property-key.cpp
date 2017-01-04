@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,22 @@ namespace Dali
 {
 
 Property::Key::Key( const std::string& key )
-: type(Key::STRING),
+: type( Key::STRING ),
   indexKey( Property::INVALID_INDEX ),
   stringKey( key )
 {
 }
 
 Property::Key::Key( Property::Index key )
-: type(Key::INDEX),
+: type( Key::INDEX ),
   indexKey( key )
+{
+}
+
+Property::Key::Key( const char * key )
+: type( Key::STRING ),
+  indexKey( Property::INVALID_INDEX ),
+  stringKey( key )
 {
 }
 
@@ -43,6 +50,11 @@ bool Property::Key::operator== (const std::string& rhs)
     result = (stringKey == rhs);
   }
   return result;
+}
+
+bool Property::Key::operator== ( const char* rhs )
+{
+  return operator==( std::string( rhs ) );
 }
 
 bool Property::Key::operator== (Property::Index rhs)
@@ -70,6 +82,11 @@ bool Property::Key::operator== (const Key& rhs)
 }
 
 bool Property::Key::operator!= (const std::string& rhs)
+{
+  return !operator==(rhs);
+}
+
+bool Property::Key::operator!= ( const char* rhs )
 {
   return !operator==(rhs);
 }

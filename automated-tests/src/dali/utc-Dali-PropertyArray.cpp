@@ -375,3 +375,13 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliPropertyArrayInitializerListConstructor(void)
+{
+  Property::Array array{ 1, 2, "hello" };
+  DALI_TEST_EQUALS( 3u, array.Size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::INTEGER, array.GetElementAt( 0 ).GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::INTEGER, array.GetElementAt( 1 ).GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::STRING,  array.GetElementAt( 2 ).GetType(), TEST_LOCATION );
+
+  END_TEST;
+}

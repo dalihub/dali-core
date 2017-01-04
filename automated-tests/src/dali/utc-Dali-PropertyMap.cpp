@@ -774,3 +774,73 @@ int UtcDaliPropertyKeyOutputStream(void)
 
   END_TEST;
 }
+
+int UtcDaliPropertyMapInitializerListConstructor(void)
+{
+  auto map = Property::Map{
+      {"number mapped to string", 1},
+      {10, "string mapped to number"},
+      {"string mapped", "to string"},
+      {100, 3},
+  };
+
+  DALI_TEST_CHECK( !map.Empty() );    // Should not be empty
+  DALI_TEST_EQUALS( 4, map.Count(), TEST_LOCATION ); // Should have four items
+
+  DALI_TEST_EQUALS( 1, map[ "number mapped to string" ].Get< int >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( "string mapped to number", map[ 10 ].Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( "to string", map[ "string mapped" ].Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, map[ 100 ].Get< int >(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapNestedInitializerListConstructor(void)
+{
+  auto map = Property::Map
+  {
+    {1, 1},
+    {2, {{2, 2}}},
+    {3, {{3, {{3, 3}}}}}
+  };
+
+  DALI_TEST_CHECK( !map.Empty() );
+  DALI_TEST_EQUALS( 3, map.Count(), TEST_LOCATION );
+
+  // Check first item
+  {
+    DALI_TEST_EQUALS( 1, map[ 1 ].Get< int >(), TEST_LOCATION );
+  }
+
+  // Check second item
+  {
+    auto& value1 = map[ 2 ];
+    DALI_TEST_EQUALS( Property::MAP, value1.GetType(), TEST_LOCATION );
+
+    auto& map2 = *(value1.GetMap());
+    DALI_TEST_EQUALS( 1, map2.Count(), TEST_LOCATION );
+
+    // check the value
+    DALI_TEST_EQUALS( 2, map2[ 2 ].Get< int >(), TEST_LOCATION );
+  }
+
+  // Check the third item
+  {
+    auto& value1 = map[ 3 ];
+    DALI_TEST_EQUALS( Property::MAP, value1.GetType(), TEST_LOCATION );
+
+    auto& map2 = *(value1.GetMap());
+    DALI_TEST_EQUALS( 1, map2.Count(), TEST_LOCATION );
+
+    auto& value2 = map2[ 3 ];
+    DALI_TEST_EQUALS( Property::MAP, value2.GetType(), TEST_LOCATION );
+
+    auto& map3 = *(value2.GetMap());
+    DALI_TEST_EQUALS( 1, map3.Count(), TEST_LOCATION );
+
+    // check the value
+    DALI_TEST_EQUALS( 3, map3[ 3 ].Get< int >(), TEST_LOCATION );
+  }
+
+  END_TEST;
+}

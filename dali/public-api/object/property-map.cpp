@@ -48,6 +48,27 @@ Property::Map::Map()
 {
 }
 
+Property::Map::Map( const std::initializer_list< KeyValuePair >& values ) : Map()
+{
+  for( auto&& value : values )
+  {
+    const auto& key = value.first;
+    switch( key.type )
+    {
+      case Property::Key::INDEX:
+      {
+        Property::Map::Insert( key.indexKey, value.second );
+        break;
+      }
+      case Property::Key::STRING:
+      {
+        Property::Map::Insert( key.stringKey, value.second );
+        break;
+      }
+    }
+  }
+}
+
 Property::Map::Map( const Property::Map& other )
 : mImpl( new Impl )
 {

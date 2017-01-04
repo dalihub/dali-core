@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <initializer_list>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -48,6 +49,14 @@ public:
    * @SINCE_1_0.0
    */
   Array();
+
+  /**
+   * @brief Constructor from initializer_list.
+   *
+   * @SINCE_1_4.17
+   * @param[in] values An initializer_list of values
+   */
+  Array( const std::initializer_list< Value >& values );
 
   /**
    * @brief Copy Constructor.

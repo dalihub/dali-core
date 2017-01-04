@@ -40,6 +40,15 @@ Property::Array::Array()
 {
 }
 
+Property::Array::Array( const std::initializer_list< Property::Value >& values )
+: Array()
+{
+  for( auto&& value : values )
+  {
+    PushBack( value );
+  }
+}
+
 Property::Array::Array( const Property::Array& other )
 : mImpl( new Impl )
 {

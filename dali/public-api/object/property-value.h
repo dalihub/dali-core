@@ -1,5 +1,5 @@
-#ifndef __DALI_PROPERTY_VALUE_H__
-#define __DALI_PROPERTY_VALUE_H__
+#ifndef DALI_PROPERTY_VALUE_H
+#define DALI_PROPERTY_VALUE_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <iosfwd>
+#include <utility>
+#include <initializer_list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
@@ -40,6 +42,8 @@ struct Vector4;
 class Matrix3;
 class Matrix;
 struct Extents;
+
+typedef std::pair< Property::Key, Property::Value > KeyValuePair;
 
 /**
  * @brief A value-type representing a property value.
@@ -192,6 +196,14 @@ public:
    * @param[in] mapValue An r-value map
    */
   Value( Property::Map&& mapValue );
+
+  /**
+   * @brief Create a map property value from an initializer_list.
+   *
+   * @SINCE_1_4.16
+   * @param [in] values An initializer_list of pairs of index and value.
+   */
+  Value( const std::initializer_list< KeyValuePair >& values );
 
   /**
    * @brief Creates an extents property value.
@@ -469,4 +481,4 @@ DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Propert
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_VALUE_H__
+#endif // DALI_PROPERTY_VALUE_H
