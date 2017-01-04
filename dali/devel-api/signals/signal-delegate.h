@@ -65,13 +65,14 @@ public:
    */
   bool Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* functorDelegate )
   {
-    if( !mCallbackFunctor )
+    if( !mIsConnected )
     {
       // Note: We have to new the CallbackBaseFunctor rather than have it as a concrete object, as it
       // is converted to a FunctorDelegate again within ConnectSignal. FunctorDelegates gain ownership
       // of any functor they are created from and therefore always attempt to delete them.
-      mCallbackFunctor = new CallbackBaseFunctor( new CallbackFunctorDelegate0( functorDelegate ) );
-      mConnectActor.ConnectSignal( connectionTracker, mSignalName, *mCallbackFunctor );
+      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor( new CallbackFunctorDelegate0( functorDelegate ) );
+      mConnectActor.ConnectSignal( connectionTracker, mSignalName, *callbackFunctor );
+      mIsConnected = true;
 
       return true;
     }
@@ -91,10 +92,11 @@ public:
   template< class T >
   bool Connect( T* object, void ( T::*memberFunction )( void ) )
   {
-    if( !mCallbackFunctor )
+    if( !mIsConnected )
     {
-      mCallbackFunctor = new CallbackBaseFunctor( MakeCallback( object, memberFunction ) );
-      mConnectActor.ConnectSignal( object, mSignalName, *mCallbackFunctor );
+      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor( MakeCallback( object, memberFunction ) );
+      mConnectActor.ConnectSignal( object, mSignalName, *callbackFunctor );
+      mIsConnected = true;
 
       return true;
     }
@@ -159,11 +161,9 @@ private:
   const SignalDelegate& operator=( const SignalDelegate& rhs );
 
 private:
-
-  CallbackBaseFunctor*    mCallbackFunctor;   ///< The functor to allow connection to external callbacks.
-  Dali::Actor             mConnectActor;      ///< The actor owning the signal to connect to.
-  std::string             mSignalName;        ///< The name of the signal to connect to.
-
+  bool mIsConnected;         ///< Boolean to know if it is connected already.
+  Dali::Actor mConnectActor; ///< The actor owning the signal to connect to.
+  std::string mSignalName;   ///< The name of the signal to connect to.
 };
 
 } // namespace Dali

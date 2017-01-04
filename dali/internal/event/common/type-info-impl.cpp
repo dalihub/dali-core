@@ -131,7 +131,9 @@ BaseHandle TypeInfo::CreateInstance() const
   {
     if ( mCSharpType )
     {
-      ret = *mCSharpCreate();
+      // CSharp currently only registers one create function for all custom controls
+      // it uses the type name to decide which one to create
+      ret = *mCSharpCreate( mTypeName.c_str() );
     }
     else
     {
@@ -750,7 +752,17 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
   {
     if( iter->second.setFunc )
     {
-      iter->second.setFunc( object, index, value );
+      if( mCSharpType )
+      {
+        // CSharp wants a property name not an index
+        const std::string& name = (iter->second).name;
+
+        iter->second.cSharpSetFunc( object,name.c_str(), const_cast< Property::Value* >(&value) );
+      }
+      else
+      {
+        iter->second.setFunc( object, index, value );
+      }
     }
   }
   else
@@ -774,7 +786,16 @@ void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const P
   if ( iter != mRegisteredProperties.end() )
   {
     DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
-    iter->second.setFunc( object, iter->first, value );
+
+    if( mCSharpType )
+    {
+      // CSharp wants a property name not an index
+      iter->second.cSharpSetFunc( object,name.c_str(), const_cast< Property::Value* >(&value ));
+    }
+    else
+    {
+      iter->second.setFunc( object, iter->first, value );
+    }
   }
   else
   {
@@ -798,10 +819,12 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
   {
     if( mCSharpType ) // using csharp property get which returns a pointer to a Property::Value
     {
-       // CSharp can't return any object by value, it can return pointers.
-       // CSharp has ownership of the pointer contents, which is fine because we are returning by value
-       int index = (iter->first );
-       return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), &index  ));
+      // CSharp wants a property name not an index
+      // CSharp callback can't return an object by value, it can only return a pointer
+      // CSharp has ownership of the pointer contents, which is fine because we are returning by from this function by value
+      const std::string& name = (iter->second).name;
+
+      return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), name.c_str()) );
 
     }
     else
@@ -823,15 +846,18 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
 Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                          PropertyNameFinder< RegisteredPropertyPair >( name ) );
+                                                            PropertyNameFinder< RegisteredPropertyPair >( name ) );
+
+
+
   if( iter != mRegisteredProperties.end() )
   {
     if( mCSharpType ) // using csharp property get which returns a pointer to a Property::Value
     {
-      // CSharp can't return any object by value, it can return pointers.
-      // CSharp has ownership of the pointer contents, which is fine because we are returning by value
-      int index = (iter->first );
-      return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), &index ));
+       // CSharp wants a property name not an index
+       // CSharp callback can't return an object by value, it can only return a pointer
+       // CSharp has ownership of the pointer contents, which is fine because we are returning by from this function by value
+       return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), name.c_str() ));
 
     }
     else

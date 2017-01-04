@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-map.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -100,6 +103,8 @@ Property::Value& Property::Map::GetValue( SizeType position ) const
 
 const std::string& Property::Map::GetKey( SizeType position ) const
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n" );
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   DALI_ASSERT_ALWAYS( position < numStringKeys && "position out-of-bounds" );
 
@@ -126,6 +131,8 @@ Property::Key Property::Map::GetKeyAt( SizeType position ) const
 
 StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPair() is deprecated and will be removed from next release.\n" );
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
 
   DALI_ASSERT_ALWAYS( position < ( numStringKeys ) && "position out-of-bounds" );

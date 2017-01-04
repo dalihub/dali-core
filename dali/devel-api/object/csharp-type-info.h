@@ -28,28 +28,34 @@ namespace Dali
 namespace CSharpTypeInfo
 {
 
-  typedef BaseHandle* (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type
+  /**
+   * @brief Call back used to create an instance of the associated object type
+   *
+   * @param[in] typeName The type name of the object to be created.
+   * @return Pointer to a BaseHandle
+   */
+  typedef BaseHandle* (*CreateFunction)(const char* const typeName);
 
   /**
    * @brief Callback to set an event-thread only property.
    *
    * @param[in] object The object whose property should be set.
-   * @param[in] index The index of the property being set.
+   * @param[in] propertyName The name of the property required.
    * @param[in] value The new value of the property for the object specified.
    * @see PropertyRegistration.
    */
-  typedef void (*SetPropertyFunction)( BaseObject* object, Property::Index* index, Property::Value* value );
+  typedef void (*SetPropertyFunction)( BaseObject* object, const char* const propertyName , Property::Value* value );
 
 
   /**
    * @brief Callback to get the value of an event-thread only property.
    *
    * @param[in] object The object whose property value is required.
-   * @param[in] index The index of the property required.
+   * @param[in] propertyName The name of the property required.
    * @return The current value of the property for the object specified.
    * @see PropertyRegistration.
    */
-  typedef Property::Value* (*GetPropertyFunction)( BaseObject* object, Property::Index* index );
+  typedef Property::Value* (*GetPropertyFunction)( BaseObject* object, const char* const propertyName );
 }
 
 

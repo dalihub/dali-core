@@ -677,7 +677,7 @@ int UtcDaliRenderTaskGetSourceActorN(void)
   {
     Actor actor = task.GetSourceActor();
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -876,7 +876,7 @@ int UtcDaliRenderTaskSetExclusiveN(void)
   {
     task.SetExclusive(true);
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -929,9 +929,9 @@ int UtcDaliRenderTaskIsExclusiveN(void)
   try
   {
     bool x = task.IsExclusive();
-    x=x;
+    (void) x;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1053,7 +1053,7 @@ int UtcDaliRenderTaskGetCameraActorN(void)
   {
     Actor actor = task.GetCameraActor();
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1229,7 +1229,7 @@ int UtcDaliRenderTaskSetScreenToFrameBufferFunctionN(void)
   {
     task.SetScreenToFrameBufferFunction( TestScreenToFrameBufferFunction );
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1266,9 +1266,9 @@ int UtcDaliRenderTaskGetScreenToFrameBufferFunctionN(void)
   try
   {
     RenderTask::ScreenToFrameBufferFunction func = task.GetScreenToFrameBufferFunction();
-    func=func;
+    (void) func;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1303,7 +1303,7 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorN(void)
     Actor mappingActor;
     task.SetScreenToFrameBufferMappingActor(mappingActor);
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1369,9 +1369,9 @@ int UtcDaliRenderTaskGetViewportN(void)
   try
   {
     Viewport viewport = task.GetViewport();
-    viewport = viewport;
+    (void) viewport;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1416,7 +1416,7 @@ int UtcDaliRenderTaskSetViewportN(void)
     Viewport newViewport( 0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f );
     task.SetViewport( newViewport );
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1565,7 +1565,7 @@ int UtcDaliRenderTaskSetClearColorN(void)
   {
     task.SetClearColor( Vector4::ZERO );
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1595,9 +1595,9 @@ int UtcDaliRenderTaskGetClearColorN(void)
   try
   {
     Vector4 color = task.GetClearColor();
-    color = color;
+    (void) color;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1635,7 +1635,7 @@ int UtcDaliRenderTaskSetClearEnabledN(void)
   {
     task.SetClearEnabled(true);
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1667,9 +1667,9 @@ int UtcDaliRenderTaskGetClearEnabledN(void)
   try
   {
     bool x = task.GetClearEnabled();
-    x=x;
+    (void) x;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1705,7 +1705,7 @@ int UtcDaliRenderTaskSetCullModeN(void)
   {
     task.SetCullMode( false );
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1735,9 +1735,9 @@ int UtcDaliRenderTaskGetCullModeN(void)
   try
   {
     bool x = task.GetCullMode();
-    x=x;
+    (void) x;
   }
-  catch (Dali::DaliException(e))
+  catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
@@ -1853,7 +1853,6 @@ int UtcDaliRenderTaskSignalFinished(void)
   application.Render();
   application.SendNotification();
   DALI_TEST_CHECK( finished );
-  finished = false;
 
   DALI_TEST_EQUALS( application.GetUpdateStatus(), 0, TEST_LOCATION );
   END_TEST;

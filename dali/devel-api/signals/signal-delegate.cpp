@@ -46,7 +46,7 @@ SignalDelegate::CallbackBaseFunctor::~CallbackBaseFunctor()
 // SignalDelegate methods:
 
 SignalDelegate::SignalDelegate( Dali::Actor connectActor, const std::string& signalName )
-: mCallbackFunctor( NULL ),
+: mIsConnected( false ),
   mConnectActor( connectActor ),
   mSignalName( signalName )
 {
@@ -54,7 +54,7 @@ SignalDelegate::SignalDelegate( Dali::Actor connectActor, const std::string& sig
 
 bool SignalDelegate::IsConnected()
 {
-  return mCallbackFunctor;
+  return mIsConnected;
 }
 
 

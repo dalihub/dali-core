@@ -32,7 +32,9 @@ namespace
 
 
 static bool CreateCustomNamedInitCalled = false;
-BaseHandle* CreateCustomNamedInit(void)
+
+
+BaseHandle* CreateCustomNamedInit(const char* const typeName )
 {
   CreateCustomNamedInitCalled = true;
 
@@ -45,14 +47,16 @@ BaseHandle* CreateCustomNamedInit(void)
 bool setPropertyCalled = false;
 bool getPropertyCalled = false;
 int intPropertyValue = 0;
-void SetProperty( BaseObject* object, Property::Index* index, Property::Value* value )
+
+void SetProperty( BaseObject* object, const char* const propertyName , Property::Value* value )
 {
 
   value->Get( intPropertyValue );
 
   setPropertyCalled = true;
 }
-Property::Value* GetProperty( BaseObject* object, Property::Index* index )
+
+Property::Value* GetProperty( BaseObject* object, const char* const propertyName )
 {
   getPropertyCalled = true;
   Property::Value* x = new Property::Value( 10 );
@@ -66,9 +70,11 @@ int UtcDaliRegisterCSharpTypeP(void)
 
   TestApplication application;
 
-  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit  );
 
-  GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
+  Dali::TypeInfo info = Dali::TypeRegistry::Get().GetTypeInfo( "CSharpControl" );
+
+  info.CreateInstance();
 
   DALI_TEST_EQUALS( CreateCustomNamedInitCalled, true, TEST_LOCATION );
 
@@ -79,9 +85,10 @@ int UtcDaliRegisterCSharpTypeNoInitP(void)
 {
 
   TestApplication application;
+
   CreateCustomNamedInitCalled = false;
 
-  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit, false);
+  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 
@@ -94,12 +101,12 @@ int UtcDaliRegisterCSharpTypeN(void)
 {
   TestApplication application;
 
-  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
   // should cause an assert because we're registering same type twice
   try
   {
-    CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+    CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
@@ -116,12 +123,10 @@ int UtcDaliRegisterCSharpTypeCreateP(void)
   TestApplication application;
   CreateCustomNamedInitCalled = false;
 
-  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit, false);
+  CSharpTypeRegistry::RegisterType( "CSharpControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
 
   TypeInfo info = Dali::TypeRegistry::Get().GetTypeInfo( "CSharpControl");
-
-
 
   BaseHandle handle = info.CreateInstance();
 
@@ -136,7 +141,7 @@ int UtcDaliRegisterCSharpPropertyP(void)
 {
   TestApplication application;
 
-  CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+  CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
 
   bool registered = CSharpTypeRegistry::RegisterProperty( "DateControl",
@@ -158,7 +163,7 @@ int UtcDaliRegisterCSharpPropertyN(void)
   TestApplication application;
 
   // register the same property twice
-  CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+  CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
 
   bool registered = CSharpTypeRegistry::RegisterProperty( "DateControl",
@@ -196,7 +201,7 @@ int UtcDaliRegisterCSharpPropertySetP(void)
   TestApplication application;
 
    // register the same property twice
-   CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+   CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit );;
 
    Property::Index index(100001);
 
@@ -238,7 +243,7 @@ int UtcDaliRegisterCSharpPropertyGetP(void)
   TestApplication application;
 
    // register the same property twice
-   CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit, true );
+   CSharpTypeRegistry::RegisterType( "DateControl", typeid( Dali::Actor), &CreateCustomNamedInit );
 
    Property::Index index(100001);
 

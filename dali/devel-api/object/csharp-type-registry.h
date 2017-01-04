@@ -46,13 +46,11 @@ namespace CSharpTypeRegistry
  * @param [in] name the name of the type to be registered
  * @param [in] baseType the base type info of registerType
  * @param [in] f registerType instance creation function
- * @param [in] callCreateOnInit If true the creation function is called as part of Dali initialisation
  * @return true if the name could be registered.
  */
   DALI_IMPORT_API bool RegisterType( const std::string& name,
                                      const std::type_info& baseType,
-                                     CSharpTypeInfo::CreateFunction f,
-                                     bool callCreateOnInit );
+                                     CSharpTypeInfo::CreateFunction f );
 
   /**
    * Register an event-thread only property with a type (used by C# Custom controls)

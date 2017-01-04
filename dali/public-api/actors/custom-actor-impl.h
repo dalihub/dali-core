@@ -67,6 +67,14 @@ public:
 
   class Extension; ///< Forward declare future extension interface
 
+protected:
+  /**
+   * @brief Virtual destructor
+   * @SINCE_1_0.0
+   */
+  virtual ~CustomActorImpl();
+
+public:
   /**
    * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
    *
@@ -174,7 +182,7 @@ public:
    * @return True if the event should be consumed.
    * @note CustomActorImpl::REQUIRES_TOUCH_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
    */
-  virtual bool OnTouchEvent(const TouchEvent& event) = 0;
+  virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API = 0;
 
   /**
    * @brief Called after a hover-event is received by the owning actor.
@@ -337,12 +345,6 @@ protected: // For derived classes
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
   CustomActorImpl( ActorFlags flags );
-
-  /**
-   * @brief Virtual destructor
-   * @SINCE_1_0.0
-   */
-  virtual ~CustomActorImpl();
 
   // Size negotiation helpers
 

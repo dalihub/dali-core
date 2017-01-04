@@ -189,6 +189,7 @@ struct FloatFunctorFloat
   }
 
   FloatFunctorFloat( const FloatFunctorFloat& copyMe )
+  : mLastReceivedValue (copyMe.mLastReceivedValue )
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
@@ -374,7 +375,6 @@ int UtcDaliSignalFunctorsEmitReturn(void)
     DALI_TEST_EQUALS( returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION );
 
     // Test double emission
-    returnValue = 0.0f;
     returnValue = signals.mFloatSignalVoid.Emit();
     DALI_TEST_EQUALS( FloatFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
     DALI_TEST_EQUALS( returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION );

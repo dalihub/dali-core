@@ -212,16 +212,17 @@ private:
    */
   void ApplySampler( Context& context, Render::Sampler* sampler );
 
-  GLuint mId;                         ///<Id of the texture
-  Type mType;                         ///<Type of the texture
-  Render::Sampler mSampler;           ///<The current sampler state
-  NativeImageInterfacePtr mNativeImage; ///<Pointer to native image
-  GLenum mInternalFormat;             ///<The format of the pixel data
-  GLenum mPixelDataType;              ///<The data type of the pixel data
-  unsigned int mWidth;                ///<Widht of the texture
-  unsigned int mHeight;               ///<Height of the texture
-  bool mHasAlpha : 1;                 ///<Whether the format has an alpha channel
-  bool mIsCompressed : 1;             ///<Whether the format is compressed
+  GLuint mId;                           ///< Id of the texture
+  GLuint mTarget;                       ///< Specifies the target to which the texture is bound.
+  Type mType;                           ///< Type of the texture
+  Render::Sampler mSampler;             ///< The current sampler state
+  NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
+  GLenum mInternalFormat;               ///< The format of the pixel data
+  GLenum mPixelDataType;                ///< The data type of the pixel data
+  unsigned int mWidth;                  ///< Widht of the texture
+  unsigned int mHeight;                 ///< Height of the texture
+  bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
+  bool mIsCompressed : 1;               ///< Whether the format is compressed
 };
 
 
