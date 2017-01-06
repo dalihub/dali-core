@@ -3729,6 +3729,56 @@ int UtcDaliActorPropertyClippingActor(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
+{
+  // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
+  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor enable and then disable" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& stencilTrace = glAbstraction.GetStencilFunctionTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  size_t startIndex = 0u;
+
+  // Create a clipping actor.
+  Actor actorDepth1Clip = CreateActorWithContent();
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  Stage::GetCurrent().Add( actorDepth1Clip );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, stencilTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check the stencil buffer was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "2960" ) );                                   // 2960 is GL_STENCIL_TEST
+
+  // Check the stencil buffer was cleared.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "ClearStencil", "0", startIndex ) );
+
+  // Check the correct setup was done to write to the first bit-plane (only) of the stencil buffer.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilFunc",  "514, 1, 0", startIndex ) );     // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "1", startIndex ) );
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilOp", "7680, 7681, 7681", startIndex ) ); // GL_KEEP, GL_REPLACE, GL_REPLACE
+
+  // Now disable the clipping
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, stencilTrace );
+
+  // Check the stencil buffer was disabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Disable", "2960" ) );                                   // 2960 is GL_STENCIL_TEST
+
+  // Ensure all values in stencil-mask are set to 1.
+  startIndex = 0u;
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "255", startIndex ) );
+
+  END_TEST;
+}
+
+
 int UtcDaliActorPropertyClippingNestedChildren(void)
 {
   // This test checks that a hierarchy of actors are clipped correctly by
