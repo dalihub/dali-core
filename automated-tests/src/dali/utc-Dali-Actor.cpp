@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2864,6 +2864,16 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), widthPolicy, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), heightPolicy, TEST_LOCATION );
 
+  // Set individual dimensions using enums
+  ResizePolicy::Type widthPolicyEnum = ResizePolicy::USE_ASSIGNED_SIZE;
+  ResizePolicy::Type heightPolicyEnum = ResizePolicy::SIZE_RELATIVE_TO_PARENT;
+
+  actor.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, widthPolicyEnum );
+  actor.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, heightPolicyEnum );
+
+  DALI_TEST_EQUALS( static_cast< int >( actor.GetResizePolicy( Dimension::WIDTH ) ), static_cast< int >( widthPolicyEnum ), TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< int >( actor.GetResizePolicy( Dimension::HEIGHT ) ), static_cast< int >( heightPolicyEnum ), TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -3354,6 +3364,66 @@ int UtcDaliActorDrawModePropertyAsString(void)
 
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::DRAW_MODE, "INVALID_ARG" );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorColorModePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_PARENT_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorPositionInheritancePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, INHERIT_PARENT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), INHERIT_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, DONT_INHERIT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorDrawModePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::NORMAL );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::STENCIL );
   DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
 
   END_TEST;
