@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTOR_DECLARATIONS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,11 @@ namespace Internal
 class Actor;
 class CameraActor;
 class CustomActor;
-class ImageActor;
 class Layer;
 
 typedef IntrusivePtr<Actor>       ActorPtr;
 typedef IntrusivePtr<CameraActor> CameraActorPtr;
 typedef IntrusivePtr<CustomActor> CustomActorPtr;
-typedef IntrusivePtr<ImageActor>  ImageActorPtr;
 typedef IntrusivePtr<Layer>       LayerPtr;
 
 } // namespace Internal

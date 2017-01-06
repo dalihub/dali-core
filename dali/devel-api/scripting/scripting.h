@@ -2,7 +2,7 @@
 #define DALI_SCRIPTING_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -281,11 +281,8 @@ DALI_IMPORT_API Image NewImage( const Property::Value& property );
  *                 For example:
  * @code
  * {
- *   "type": "ImageActor",
- *   "image":
- *   {
- *     "filename":"my-image-path.png"
- *   },
+ *   "type": "Actor",
+ *   "position": [ 100, 100, 0 ],
  *   "actors":
  *   [
  *     {
