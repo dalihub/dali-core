@@ -30,21 +30,6 @@ namespace
 {
 static const char* gTestImageFilename = "icon_wrt.png";
 
-void PrepareResourceImage( TestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetClosestImageSize(Vector2( imageWidth, imageHeight));
-
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
-  unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
-  unsigned int initialColor = 0xFF;
-  memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
-
-  Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetSynchronouslyLoadedResource( resourcePtr );
-}
-
 PixelData CreatePixelData(unsigned int width, unsigned int height, Pixel::Format pixelFormat)
 {
   unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );

@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/resources/resource-ticket-observer.h>
 
@@ -93,6 +94,14 @@ public:
    */
   virtual Vector2 GetNaturalSize() const;
 
+  /**
+   * Returns a pointer to the internal texture used by the image
+   */
+  NewTexture* GetTexture() const
+  {
+    return mTexture.Get();
+  }
+
 public: // From ResourceTicketObserver
 
   /**
@@ -142,9 +151,10 @@ protected:
 protected:
 
   ResourceTicketPtr mTicket;              ///< smart pointer to the ticket object that gets completed when load finishes
+  NewTexturePtr mTexture;                 ///< smart pointer to the texture used by the image
 
-  mutable unsigned int mWidth;     ///< natural width of the image, needs to be mutable for lazy resolving and as the API for GetWidth is const
-  mutable unsigned int mHeight;    ///< natural height of the image, needs to be mutable for lazy resolving and as the API for GetHeight is const
+  unsigned int mWidth;     ///< natural width of the image
+  unsigned int mHeight;    ///< natural height of the image
 
   unsigned int mConnectionCount; ///< number of on-stage objects using this image
 

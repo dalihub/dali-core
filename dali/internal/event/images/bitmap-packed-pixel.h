@@ -120,6 +120,11 @@ public:
   }
 
   /**
+   * See Dali::Integration::Bitmap::GetReleaseFunction()
+   */
+  ReleaseFunction GetReleaseFunction(){ return FREE; }
+
+  /**
    * Get the pixel buffer stride.
    * @return The buffer stride (in bytes).
    */

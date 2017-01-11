@@ -109,7 +109,8 @@ Vector2 Image::GetNaturalSize() const
 }
 
 Image::Image()
-: mWidth( 0 ),
+: mTexture(),
+  mWidth( 0 ),
   mHeight( 0 ),
   mConnectionCount( 0 )
 {
