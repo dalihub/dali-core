@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ANIMATION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ class Actor;
 class Animation;
 class AnimationPlaylist;
 class Object;
-class ShaderEffect;
 
 typedef IntrusivePtr<Animation> AnimationPtr;
 typedef std::vector<AnimationPtr> AnimationContainer;

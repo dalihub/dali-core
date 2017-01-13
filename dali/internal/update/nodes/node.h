@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,6 +163,11 @@ public:
       // For the same ID, the clipping nodes must be first, so we negate the
       // clipping enabled flag and set it as the least significant bit.
       mClippingSortModifier = ( clippingId << 1u ) | ( mClippingMode == ClippingMode::DISABLED ? 1u : 0u );
+    }
+    else
+    {
+      // If we do not have a clipping depth, then set this to 0 so we do not have a Clipping ID either.
+      mClippingSortModifier = 0u;
     }
   }
 
