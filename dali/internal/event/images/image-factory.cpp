@@ -118,8 +118,6 @@ ResourceTicketPtr ImageFactory::Load( Request& request )
 // new resource of size (96, 96), but reloading Req1 would load a scaled down version
 ResourceTicketPtr ImageFactory::Reload( Request& request )
 {
-  DALI_ASSERT_ALWAYS( &request );
-
   // go through requests, check real size and attributes again. If different, update related ticket.
   ResourceTicketPtr ticket;
 
