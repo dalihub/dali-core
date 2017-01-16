@@ -264,7 +264,7 @@ public:
    * Derived classes should override this if they wish to customize the height returned.
    *
    * @SINCE_1_0.0
-   * @param width Width to use.
+   * @param[in] width Width to use.
    * @return The height based on the width.
    */
   virtual float GetHeightForWidth( float width ) = 0;
@@ -275,7 +275,7 @@ public:
    * Derived classes should override this if they wish to customize the width returned.
    *
    * @SINCE_1_0.0
-   * @param height Height to use.
+   * @param[in] height Height to use.
    * @return The width based on the width.
    */
   virtual float GetWidthForHeight( float height ) = 0;
@@ -284,7 +284,7 @@ public:
    * @brief Determine if this actor is dependent on it's children for relayout.
    *
    * @SINCE_1_0.0
-   * @param dimension The dimension(s) to check for
+   * @param[in] dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children.
    */
   virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) = 0;
@@ -294,7 +294,7 @@ public:
    * met and the size for this object is about to be calculated for the given dimension
    *
    * @SINCE_1_0.0
-   * @param dimension The dimension that is about to be calculated
+   * @param[in] dimension The dimension that is about to be calculated
    */
   virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) = 0;
 
@@ -364,7 +364,7 @@ protected: // For derived classes
   /**
    * @brief Provides the Actor implementation of GetHeightForWidth.
    * @SINCE_1_0.0
-   * @param width Width to use.
+   * @param[in] width Width to use.
    * @return The height based on the width.
    */
   float GetHeightForWidthBase( float width );
@@ -372,7 +372,7 @@ protected: // For derived classes
   /**
    * @brief Provides the Actor implementation of GetWidthForHeight.
    * @SINCE_1_0.0
-   * @param height Height to use.
+   * @param[in] height Height to use.
    * @return The width based on the height.
    */
   float GetWidthForHeightBase( float height );
@@ -391,7 +391,7 @@ protected: // For derived classes
    * @brief Determine if this actor is dependent on it's children for relayout from the base class.
    *
    * @SINCE_1_0.0
-   * @param dimension The dimension(s) to check for
+   * @param[in] dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children.
    */
   bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );

@@ -86,8 +86,8 @@ public:
    *
    * Does not check for duplicates
    * @SINCE_1_0.0
-   * @param key to insert
-   * @param value to insert
+   * @param[in] key to insert
+   * @param[in] value to insert
    */
   void Insert( const char* key, const Value& value );
 
@@ -96,8 +96,8 @@ public:
    *
    * Does not check for duplicates
    * @SINCE_1_0.0
-   * @param key to insert
-   * @param value to insert
+   * @param[in] key to insert
+   * @param[in] value to insert
    */
   void Insert( const std::string& key, const Value& value );
 
@@ -106,8 +106,8 @@ public:
    *
    * Does not check for duplicates
    * @SINCE_1_1.39
-   * @param key to insert
-   * @param value to insert
+   * @param[in] key to insert
+   * @param[in] value to insert
    */
   void Insert( Property::Index key, const Value& value );
 
