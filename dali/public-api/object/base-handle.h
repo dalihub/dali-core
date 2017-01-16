@@ -272,7 +272,7 @@ private:
  * @brief Template wrapper to downcast a base object handle to derived class handle.
  *
  * @SINCE_1_0.0
- * @param handle to a base object
+ * @param[in] handle to a base object
  * @return handle pointer to either a valid deriving handle or an uninitialized handle
  * @pre The BaseHandle has been initialized.
  */
