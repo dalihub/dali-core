@@ -63,18 +63,18 @@ struct TransformVertexBufferData
 template <typename PositionType >
 void TransformVertexBuffer( TransformVertexBufferData& data )
 {
-  const PositionType* source = reinterpret_cast<const PositionType*>( data.sourcePtr );
-  PositionType* destination = reinterpret_cast<PositionType*>( data.destinationPtr );
+  const char* source = reinterpret_cast<const char*>( data.sourcePtr );
+  char* destination = reinterpret_cast<char*>( data.destinationPtr );
 
   size_t componentSize = data.componentSize ? data.componentSize : sizeof( PositionType );
-  const void* sourceEnd = (reinterpret_cast<const char*>( source ) + ( data.vertexCount*componentSize ));
+  const char* sourceEnd = source + data.vertexCount*componentSize;
   for( ; source < sourceEnd;
-       *(reinterpret_cast<char**>( &destination )) += componentSize,
-       *(reinterpret_cast<const char**>( &source )) += componentSize
+       destination += componentSize,
+       source += componentSize
        )
   {
-    Dali::Internal::MultiplyVectorBySize( *destination, *source, data.size );
-    Dali::Internal::MultiplyVectorByMatrix4( *destination, data.transform, *destination );
+    Dali::Internal::MultiplyVectorBySize( *reinterpret_cast<PositionType*>(destination), *reinterpret_cast<const PositionType*>(source), data.size );
+    Dali::Internal::MultiplyVectorByMatrix4( *reinterpret_cast<PositionType*>(destination), data.transform, *reinterpret_cast<PositionType*>(destination) );
   }
 }
 
