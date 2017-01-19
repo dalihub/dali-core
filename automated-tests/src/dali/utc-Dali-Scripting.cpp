@@ -152,6 +152,7 @@ int UtcDaliScriptingNewImageNegative06(void)
   map[ "width" ] = "Invalid";
   map[ "height" ] = 100;
   // will give us a valid image
+  PrepareResourceImage( application, 0u, 100u, Pixel::RGBA8888 );
   Image image = NewImage( map );
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
@@ -170,6 +171,7 @@ int UtcDaliScriptingNewImageNegative07(void)
   map[ "width" ] = 10;
   map[ "height" ] = "Invalid";
   // will give us a valid image
+  PrepareResourceImage( application, 10u, 0u, Pixel::RGBA8888 );
   Image image = NewImage( map );
   DALI_TEST_CHECK( image );
   ResourceImage resImage = ResourceImage::DownCast( image );
@@ -307,6 +309,7 @@ int UtcDaliScriptingNewImage04P(void)
   // float width and height
   map[ "width" ] = (float) 10.0f;
   map[ "height" ] = (float) 20.0f;
+  PrepareResourceImage( application, 10u, 20u, Pixel::RGBA8888 );
   Image image = NewImage( map );
   DALI_TEST_EQUALS( image.GetWidth(), 10u, TEST_LOCATION );
   DALI_TEST_EQUALS( image.GetHeight(), 20u, TEST_LOCATION );
@@ -323,6 +326,7 @@ int UtcDaliScriptingNewImage05P(void)
   // width and height
   map[ "width"] = 50;
   map[ "height" ] = 70;
+  PrepareResourceImage( application, 50u, 70u, Pixel::RGBA8888 );
   Image image = NewImage( map );
   DALI_TEST_EQUALS( image.GetWidth(), 50u, TEST_LOCATION );
   DALI_TEST_EQUALS( image.GetHeight(), 70u, TEST_LOCATION );
@@ -774,6 +778,7 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
 
   // Change values
   {
+    PrepareResourceImage( application, 300, 400, Pixel::RGBA8888 );
     ResourceImage image = ResourceImage::New( "MY_PATH", ImageDimensions( 300, 400 ), FittingMode::FIT_WIDTH );
 
     Property::Map map;

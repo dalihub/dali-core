@@ -88,6 +88,11 @@ public:
     return mBufferSize;
   }
 
+  /**
+   * See Dali::Integration::Bitmap::GetReleaseFunction()
+   */
+  ReleaseFunction GetReleaseFunction(){ return FREE; }
+
 protected:
 
   /**

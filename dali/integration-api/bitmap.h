@@ -86,6 +86,12 @@ public:
     BITMAP_COMPRESSED
   };
 
+  enum ReleaseFunction
+  {
+    FREE,          ///< Use free function to release the buffer
+    DELETE_ARRAY,  ///< Use delete[] operator to release the buffer
+  };
+
   /**
    * Create a new instance of a Bitmap with the required profile.
    * @return Pointer to created Bitmap subclass. Clients should immediately
@@ -173,6 +179,12 @@ public:
     // check pixel format for alpha channel
     return !(HasAlphaChannel() && mAlphaChannelUsed);
   }
+
+  /**
+   * Returns which release function has to be called to release the data in the bitmap
+   * @return FREE if memory has been allocated with malloc DELETE_ARRAY if memory has been allocated with new
+   */
+  virtual ReleaseFunction GetReleaseFunction() = 0;
 
   /**@}*/ ///< End of generic features
 

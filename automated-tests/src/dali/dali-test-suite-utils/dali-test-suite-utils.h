@@ -514,6 +514,9 @@ struct DefaultFunctionCoverage
 BufferImage CreateBufferImage();
 BufferImage CreateBufferImage(int width, int height, const Vector4& color);
 
+// Prepare a resource image to be loaded. Should be called before creating the ResourceImage
+void PrepareResourceImage( TestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat );
+
 // Test namespace to prevent pollution of Dali namespace, add Test helper functions here
 namespace Test
 {

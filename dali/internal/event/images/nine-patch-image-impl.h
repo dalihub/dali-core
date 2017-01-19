@@ -121,18 +121,6 @@ private: // from ResourceImage
    */
   virtual const std::string& GetUrl() const;
 
-protected: // From Resource
-  /**
-   * @copydoc Dali::Internal::Image::Connect
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Image::Disconnect
-   */
-  virtual void Disconnect();
-
-private:
   /**
    * Read the borders of the bitmap and determine the child area
    * and stretch borders

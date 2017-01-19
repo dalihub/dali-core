@@ -28,20 +28,25 @@ namespace Dali
 
 void TextureSetImage( TextureSet textureSet, size_t index, Image image )
 {
-  // Get implementation of the TextureSet to use.
-  Internal::TextureSet& internalTextureSet = GetImplementation( textureSet );
-
   // Check for valid image.
   if( image )
   {
-    // Get image impl and set in TextureSet.
     Internal::ImagePtr imagePointer( &GetImplementation( image ) );
-    internalTextureSet.SetImage( index, imagePointer );
+    Internal::NewTexture* texture = imagePointer->GetTexture();
+    if( texture )
+    {
+      GetImplementation( textureSet ).SetTexture( index, texture );
+    }
+    else
+    {
+      // Get image impl and set in TextureSet.
+      GetImplementation( textureSet ).SetImage( index, imagePointer );
+    }
   }
   else
   {
     // No valid image, Remove texture at this index.
-    internalTextureSet.SetImage( index, NULL );
+    GetImplementation( textureSet ).SetImage( index, NULL );
   }
 }
 
