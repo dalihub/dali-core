@@ -49,14 +49,14 @@ struct DALI_IMPORT_API TapGesture : public Gesture
   /**
    * @brief Copy constructor
    * @SINCE_1_0.0
-   * @param rhs A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    */
   TapGesture( const TapGesture& rhs );
 
   /**
    * @brief Assignment operator
    * @SINCE_1_0.0
-   * @param rhs A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   TapGesture& operator=( const TapGesture& rhs );

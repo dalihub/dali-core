@@ -72,7 +72,7 @@ int UtcDaliImageFactoryUseCachedRequest01(void)
 
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceSynchronouslyFunc ) );
   application.GetPlatform().ResetTrace();
 
   Image image2 = ResourceImage::New( gTestImageFilename );
@@ -80,15 +80,15 @@ int UtcDaliImageFactoryUseCachedRequest01(void)
   application.SendNotification();
   application.Render();
 
-  // check resource is not loaded twice
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
+  // Resource is loaded twice
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceSynchronouslyFunc ) );
   application.GetPlatform().ResetTrace();
 
   Image image3 = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceSynchronouslyFunc ) );
   END_TEST;
 }
 
@@ -106,7 +106,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceSynchronouslyFunc ) );
   application.GetPlatform().ResetTrace();
 
   // Add actor to stage
@@ -130,7 +130,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceSynchronouslyFunc ) );
   application.GetPlatform().ResetTrace();
 
   // Resource is reloaded

@@ -165,15 +165,11 @@ int UtcDaliResourceImageGetLoadingState01(void)
   tet_infoline("UtcDaliResourceImageGetLoadingState01");
 
   ResourceImage image = ResourceImage::New(gTestImageFilename);
-  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
-  application.SendNotification();
-  application.Render(16);
+  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingFailed);
 
   // simulate load success
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  LoadBitmapResource( platform );
-  application.Render(16);
-  application.SendNotification();
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
+  image.Reload();
 
   // Test state == ResourceLoadingSucceeded
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingSucceeded);
@@ -195,22 +191,14 @@ int UtcDaliResourceImageGetLoadingState02(void)
   // initialise handle
   image = ResourceImage::New(gTestImageFilename);
 
-  // Test state == ResourceLoading
-  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
-  application.SendNotification();
-  application.Render(16);
-
-  // simulate load failure
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoadFailed(request->GetId(), Integration::FailureUnknown);
-  }
-  application.Render(16);
-  application.SendNotification();
-
   // Test state == ResourceLoadingFailed
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingFailed);
+
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
+  image.Reload();
+
+  // Test state == ResourceLoadingFailed
+  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingSucceeded);
   END_TEST;
 }
 
@@ -232,9 +220,11 @@ int UtcDaliResourceImageSignalLoadingFinished(void)
 
   SignalLoadFlag = false;
 
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
   ResourceImage image = ResourceImage::New(gTestImageFilename);
 
   image.LoadingFinishedSignal().Connect( SignalLoadHandler );
+  image.Reload();
   application.SendNotification();
   application.Render(16);
 

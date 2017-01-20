@@ -25,10 +25,11 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/resources/resource-client.h>
 
 using namespace Dali::Integration;
 
@@ -45,6 +46,7 @@ namespace
 
 const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
 
+
 BaseHandle CreateImage()
 {
   ImagePtr image = ResourceImage::New();
@@ -59,7 +61,19 @@ Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED
 
 ResourceImage::ResourceImage()
 : Image(),
-  mImageFactory( ThreadLocalStorage::Get().GetImageFactory() )
+  mLoadingFinished(),
+  mAttributes(),
+  mUrl(),
+  mLoadingState( Dali::ResourceLoading )
+{
+}
+
+ResourceImage::ResourceImage( const std::string& url, const ImageAttributes& attributes)
+: Image(),
+  mLoadingFinished(),
+  mAttributes(attributes),
+  mUrl(url),
+  mLoadingState( Dali::ResourceLoading )
 {
 }
 
@@ -73,22 +87,18 @@ ResourceImagePtr ResourceImage::New()
 ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes )
 {
   ResourceImagePtr image;
+
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
     image = NinePatchImage::New( url );
   }
   else
   {
-    image = new ResourceImage();
+    image = new ResourceImage(url, attributes);
     image->Initialize();
-
-    // consider the requested size as natural size, 0 means we don't (yet) know it
-    image->mWidth = attributes.GetWidth();
-    image->mHeight = attributes.GetHeight();
-    image->mRequest = image->mImageFactory.RegisterRequest( url, &attributes );
-    image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
-    image->mTicket->AddObserver( *image );
+    image->Reload();
   }
+
   DALI_LOG_SET_OBJECT_STRING( image, url );
 
   return image;
@@ -96,15 +106,6 @@ ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttribut
 
 ResourceImage::~ResourceImage()
 {
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    if( Stage::IsInstalled() )
-    {
-      mImageFactory.ReleaseTicket( mTicket.Get() );
-    }
-    mTicket.Reset();
-  }
 }
 
 bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -126,140 +127,84 @@ bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterf
   return connected;
 }
 
+
 const ImageAttributes& ResourceImage::GetAttributes() const
 {
-  if( mTicket )
-  {
-    return mImageFactory.GetActualAttributes( mTicket );
-  }
-  else
-  {
-    return mImageFactory.GetRequestAttributes( mRequest );
-  }
+  return mAttributes;
 }
 
 const std::string& ResourceImage::GetUrl() const
 {
-  return mImageFactory.GetRequestPath( mRequest );
+  return mUrl;
 }
 
 void ResourceImage::Reload()
 {
-  if ( mRequest )
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
+  Integration::BitmapResourceType resourceType( ImageDimensions(mAttributes.GetWidth(), mAttributes.GetHeight()),
+                                                mAttributes.GetScalingMode(),
+                                                mAttributes.GetFilterMode(),
+                                                mAttributes.GetOrientationCorrection() );
+
+  // Note, bitmap is only destroyed when the image is destroyed.
+  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, mUrl );
+  if( resource )
   {
-    ResourceTicketPtr ticket = mImageFactory.Reload( *mRequest.Get() );
-    SetTicket( ticket.Get() );
+    Integration::Bitmap* bitmap = static_cast<Integration::Bitmap*>( resource.Get() );
+    unsigned width  = bitmap->GetImageWidth();
+    unsigned height = bitmap->GetImageHeight();
+
+    //Create texture
+    Pixel::Format format = bitmap->GetPixelFormat();
+    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
+
+    //Upload data to the texture
+    size_t bufferSize = bitmap->GetBufferSize();
+    PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
+                                             static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
+    mTexture->Upload( pixelData );
+
+    mWidth = mAttributes.GetWidth();
+    if( mWidth == 0 )
+    {
+      mWidth = width;
+    }
+
+    mHeight = mAttributes.GetHeight();
+    if( mHeight == 0 )
+    {
+      mHeight = height;
+    }
+
+    mLoadingState = Dali::ResourceLoadingSucceeded;
+
   }
+  else
+  {
+    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
+    mWidth = mHeight = 0u;
+    mLoadingState = Dali::ResourceLoadingFailed;
+  }
+
+  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
 }
 
 unsigned int ResourceImage::GetWidth() const
 {
-  // if width is 0, it means we've not yet loaded the image
-  if( 0u == mWidth )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mWidth = size.width;
-    if( 0 == mHeight )
-    {
-      mHeight = size.height;
-    }
-  }
   return mWidth;
 }
 
 unsigned int ResourceImage::GetHeight() const
 {
-  if( 0u == mHeight )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mHeight = size.height;
-    if( 0 == mWidth )
-    {
-      mWidth = size.width;
-    }
-  }
   return mHeight;
 }
 
 Vector2 ResourceImage::GetNaturalSize() const
 {
-  Vector2 naturalSize(mWidth, mHeight);
-  if( 0u == mWidth || 0u == mHeight )
-  {
-    mImageFactory.GetImageSize( mRequest, mTicket, naturalSize );
-    mWidth = naturalSize.width;
-    mHeight = naturalSize.height;
-  }
-  return naturalSize;
+  return Vector2(mWidth, mHeight);
 }
 
-void ResourceImage::ResourceLoadingFailed(const ResourceTicket& ticket)
-{
-  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
-}
-
-void ResourceImage::ResourceLoadingSucceeded(const ResourceTicket& ticket)
-{
-  mLoadingFinished.Emit( Dali::ResourceImage( this ) );
-}
-
-void ResourceImage::Connect()
-{
-  ++mConnectionCount;
-
-  if( mConnectionCount == 1 )
-  {
-    // ticket was thrown away when related actors went offstage or image loading on demand
-    if( !mTicket )
-    {
-      DALI_ASSERT_DEBUG( mRequest.Get() );
-      ResourceTicketPtr newTicket = mImageFactory.Load( *mRequest.Get() );
-      SetTicket( newTicket.Get() );
-    }
-  }
-}
-
-void ResourceImage::Disconnect()
-{
-  if( !mTicket )
-  {
-    return;
-  }
-
-  DALI_ASSERT_DEBUG( mConnectionCount > 0 );
-  --mConnectionCount;
-  if( mConnectionCount == 0 )
-  {
-    // release image memory when it's not visible anymore (decrease ref. count of texture)
-    SetTicket( NULL );
-  }
-}
-
-void ResourceImage::SetTicket( ResourceTicket* ticket )
-{
-  if( ticket == mTicket.Get() )
-  {
-    return;
-  }
-
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    mImageFactory.ReleaseTicket( mTicket.Get() );
-  }
-
-  if( ticket )
-  {
-    mTicket.Reset( ticket );
-    mTicket->AddObserver( *this );
-  }
-  else
-  {
-    mTicket.Reset();
-  }
-}
 
 } // namespace Internal
 

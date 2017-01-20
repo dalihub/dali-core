@@ -504,7 +504,7 @@ public: // API
   /**
    * @brief Subscript operator.
    * @SINCE_1_0.0
-   * @param[in]  index of the element.
+   * @param[in] index Index of the element.
    * @return reference to the element for given index.
    * @pre index must be in the vector's range.
    */

@@ -189,8 +189,16 @@ NinePatchImage::NinePatchImage( const std::string& filename )
   if( resource )
   {
     mBitmap = static_cast<Integration::Bitmap*>( resource.Get());
+
     mWidth = mBitmap->GetImageWidth();
     mHeight = mBitmap->GetImageHeight();
+    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, mBitmap->GetPixelFormat(), mWidth, mHeight );
+
+    size_t bufferSize = mBitmap->GetBufferSize();
+    unsigned char* buffer = new unsigned char[bufferSize];
+    memcpy( buffer, mBitmap->GetBuffer(), bufferSize );
+    PixelDataPtr pixelData = PixelData::New( buffer, bufferSize, mWidth, mHeight, mBitmap->GetPixelFormat(), Dali::PixelData::DELETE_ARRAY );
+    mTexture->Upload( pixelData );
   }
   else
   {
@@ -280,30 +288,6 @@ const std::string& NinePatchImage::GetUrl() const
 {
   return mUrl;
 }
-
-void NinePatchImage::Connect()
-{
-  if( !mTicket )
-  {
-    if( mBitmap )
-    {
-      const ImageTicketPtr& t = mResourceClient->AddBitmapImage(mBitmap.Get());
-      mTicket = t.Get();
-      mTicket->AddObserver(*this);
-    }
-  }
-
-  ++mConnectionCount;
-}
-
-void NinePatchImage::Disconnect()
-{
-  if( mConnectionCount > 0 )
-  {
-    --mConnectionCount;
-  }
-}
-
 
 void NinePatchImage::ParseBorders()
 {

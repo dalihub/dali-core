@@ -1304,7 +1304,7 @@ public:
    * size 0 is treated as aspect ratio 1:1.
    *
    * @SINCE_1_0.0
-   * @param width Width to use
+   * @param[in] width Width to use
    * @return Return the height based on the width.
    */
   float GetHeightForWidth( float width );
@@ -1316,7 +1316,7 @@ public:
    * size 0 is treated as aspect ratio 1:1.
    *
    * @SINCE_1_0.0
-   * @param height Height to use
+   * @param[in] height Height to use
    * @return Return the width based on the height.
    */
   float GetWidthForHeight( float height );
@@ -1325,7 +1325,7 @@ public:
    * @brief Return the value of negotiated dimension for the given dimension.
    *
    * @SINCE_1_0.0
-   * @param dimension The dimension to retrieve
+   * @param[in] dimension The dimension to retrieve
    * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found.
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
@@ -1342,7 +1342,7 @@ public:
    * @brief Return the value of the padding.
    *
    * @SINCE_1_0.0
-   * @param paddingOut The returned padding data
+   * @param[in] paddingOut The returned padding data
    */
   void GetPadding( Padding& paddingOut ) const;
 
