@@ -26,7 +26,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/event/images/image-factory.h>
 
 using namespace Dali::Integration;
 

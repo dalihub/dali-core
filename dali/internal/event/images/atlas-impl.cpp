@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/images/bitmap-packed-pixel.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/bitmap.h>
@@ -156,7 +155,6 @@ Atlas::Atlas( SizeType width,
               Pixel::Format pixelFormat,
               bool recoverContext )
 : mResourceClient( ThreadLocalStorage::Get().GetResourceClient() ),
-  mImageFactory( ThreadLocalStorage::Get().GetImageFactory() ),
   mClearColor( Vector4::ZERO ),
   mPixelFormat( pixelFormat ),
   mClear( false ),
@@ -208,7 +206,6 @@ void Atlas::AllocateAtlas()
   {
     mTicket = mResourceClient.AllocateTexture( mWidth, mHeight, mPixelFormat );
     mTicket->AddObserver( *this );
-    mImageFactory.RegisterForContextRecovery( this );
   }
 }
 
@@ -216,7 +213,6 @@ void Atlas::ReleaseAtlas()
 {
   mTicket.Reset();
   ClearCache();
-  mImageFactory.UnregisterFromContextRecovery( this );
 }
 
 void Atlas::ClearBackground(const Vector4& color )

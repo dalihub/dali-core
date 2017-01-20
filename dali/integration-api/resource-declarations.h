@@ -46,7 +46,6 @@ namespace Integration
  * @sa Dali::Integration::PlatformAbstraction::LoadResource
  * Dali::Integration::PlatformAbstraction::GetResources
  * Dali::Integration::ResourceCache
- * Dali::Internal::ImageFactoryCache::RequestId
  */
 typedef unsigned int ResourceId;
 const ResourceId InvalidResourceId = (ResourceId)-1;
