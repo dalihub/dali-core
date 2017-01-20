@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,25 +33,10 @@ void utc_dali_resource_image_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-static const char* gTestImageFilename = "icon_wrt.png";
-
 namespace
 {
-
-void LoadBitmapResource(TestPlatformAbstraction& platform)
-{
-  Integration::ResourceRequest* request = platform.GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-}
-
-} // namespace
+const char* gTestImageFilename = "icon_wrt.png";
+} // unnamed namespace
 
 
 // 1.1
