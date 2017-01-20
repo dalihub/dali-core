@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2864,6 +2864,16 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), widthPolicy, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), heightPolicy, TEST_LOCATION );
 
+  // Set individual dimensions using enums
+  ResizePolicy::Type widthPolicyEnum = ResizePolicy::USE_ASSIGNED_SIZE;
+  ResizePolicy::Type heightPolicyEnum = ResizePolicy::SIZE_RELATIVE_TO_PARENT;
+
+  actor.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, widthPolicyEnum );
+  actor.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, heightPolicyEnum );
+
+  DALI_TEST_EQUALS( static_cast< int >( actor.GetResizePolicy( Dimension::WIDTH ) ), static_cast< int >( widthPolicyEnum ), TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< int >( actor.GetResizePolicy( Dimension::HEIGHT ) ), static_cast< int >( heightPolicyEnum ), TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -3359,6 +3369,66 @@ int UtcDaliActorDrawModePropertyAsString(void)
   END_TEST;
 }
 
+int UtcDaliActorColorModePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_PARENT_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA );
+  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorPositionInheritancePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, INHERIT_PARENT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), INHERIT_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, DONT_INHERIT_POSITION );
+  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorDrawModePropertyAsEnum(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::NORMAL );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::STENCIL );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliActorAddRendererP(void)
 {
   tet_infoline("Testing Actor::AddRenderer");
@@ -3658,6 +3728,56 @@ int UtcDaliActorPropertyClippingActor(void)
 
   END_TEST;
 }
+
+int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
+{
+  // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
+  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor enable and then disable" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& stencilTrace = glAbstraction.GetStencilFunctionTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  size_t startIndex = 0u;
+
+  // Create a clipping actor.
+  Actor actorDepth1Clip = CreateActorWithContent();
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  Stage::GetCurrent().Add( actorDepth1Clip );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, stencilTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check the stencil buffer was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "2960" ) );                                   // 2960 is GL_STENCIL_TEST
+
+  // Check the stencil buffer was cleared.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "ClearStencil", "0", startIndex ) );
+
+  // Check the correct setup was done to write to the first bit-plane (only) of the stencil buffer.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilFunc",  "514, 1, 0", startIndex ) );     // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "1", startIndex ) );
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilOp", "7680, 7681, 7681", startIndex ) ); // GL_KEEP, GL_REPLACE, GL_REPLACE
+
+  // Now disable the clipping
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, stencilTrace );
+
+  // Check the stencil buffer was disabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Disable", "2960" ) );                                   // 2960 is GL_STENCIL_TEST
+
+  // Ensure all values in stencil-mask are set to 1.
+  startIndex = 0u;
+  DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "255", startIndex ) );
+
+  END_TEST;
+}
+
 
 int UtcDaliActorPropertyClippingNestedChildren(void)
 {

@@ -2,7 +2,7 @@
 #define __DALI_NINE_PATCH_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,7 @@ class NinePatchImage;
  * remove the border from it's bitmap. An API can be used to obtain a BufferImage with
  * the border removed.
  *
- * Adding this image to an ImageActor using an Image handle will automatically convert
- * to use the cropped BufferImage - if you don't retain a handle to this object, it will
- * be automatically destroyed.
+ * If you don't retain a handle to this object, it will be automatically destroyed.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API NinePatchImage : public ResourceImage
