@@ -550,19 +550,11 @@ bool HitTestRenderTaskList( Stage& stage,
   for( RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter )
   {
     RenderTask& renderTask = GetImplementation( *iter );
-    Dali::FrameBufferImage frameBufferImage = renderTask.GetTargetFrameBuffer();
-
-    // Note that if frameBufferImage is NULL we are using the default (on screen) render target
-    if( frameBufferImage )
+    bool isOffscreenRenderTask = ( iter->GetTargetFrameBuffer() || iter->GetFrameBuffer() );
+    if( (onScreen && isOffscreenRenderTask) || (!onScreen && !isOffscreenRenderTask) )
     {
-      ResourceId id = GetImplementation( frameBufferImage ).GetResourceId();
-
-      // Change comparison depending on if on-screen or off-screen.
-      if( onScreen ? ( 0 != id ) : ( 0 == id ) )
-      {
-        // Skip to next task
-        continue;
-      }
+      // Skip to next task
+      continue;
     }
 
     if( HitTestRenderTask( exclusives, stage, layers, renderTask, screenCoordinates, results, hitCheck ) )

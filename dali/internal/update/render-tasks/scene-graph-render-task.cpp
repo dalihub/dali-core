@@ -127,7 +127,6 @@ unsigned int RenderTask::GetFrameBufferId() const
 
 void RenderTask::SetFrameBuffer( Render::FrameBuffer* frameBuffer )
 {
-  mTargetIsNativeFramebuffer = false;
   mFrameBuffer = frameBuffer;
 }
 
@@ -344,6 +343,14 @@ void RenderTask::UpdateState()
           mNotifyTrigger = true;
         }
       }
+      else if( mFrameBuffer )
+      {
+        if( !mRenderSyncTracker || (mRenderSyncTracker && mRenderSyncTracker->IsSynced() ))
+        {
+          mWaitingToRender = false;
+          mNotifyTrigger = true;
+        }
+      }
       else
       {
         mNotifyTrigger = true;
@@ -421,7 +428,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
-  if( mTargetIsNativeFramebuffer && mRequiresSync &&
+  if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE &&
       mResourcesFinished )
   {

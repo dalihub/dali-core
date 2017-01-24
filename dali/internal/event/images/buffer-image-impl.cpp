@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 using namespace Dali::Integration;
@@ -45,6 +45,7 @@ BufferImagePtr BufferImage::New( unsigned int width,
 {
   BufferImagePtr internal = new BufferImage( width, height, pixelformat );
   internal->Initialize();
+  internal->Update( RectArea() );
   return internal;
 }
 
@@ -56,6 +57,7 @@ BufferImagePtr BufferImage::New( PixelBuffer* pixBuf,
 {
   BufferImagePtr internal = new BufferImage( pixBuf, width, height, pixelformat, stride );
   internal->Initialize();
+  internal->Update( RectArea() );
   return internal;
 }
 
@@ -98,12 +100,6 @@ BufferImage::BufferImage(PixelBuffer* pixBuf,
 
 BufferImage::~BufferImage()
 {
-  if( mTicket )
-  {
-    mTicket->RemoveObserver(*this);
-    mTicket.Reset();
-  }
-
   delete[] mInternalBuffer;
 }
 
@@ -131,41 +127,25 @@ bool BufferImage::IsDataExternal() const
   return ( mExternalBuffer ? true : false );
 }
 
-void BufferImage::Update( RectArea& updateArea )
+void BufferImage::Update( const RectArea& updateArea )
 {
-  if ( !mTicket )
+  if ( !mTexture )
   {
-    CreateHostBitmap();
+    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, mPixelFormat, mWidth, mHeight );
   }
   DALI_ASSERT_DEBUG( updateArea.x + updateArea.width <= mWidth && updateArea.y + updateArea.height <= mHeight );
-  UploadArea( mTicket->GetId(), updateArea );
+  UploadArea( updateArea );
 }
 
-void BufferImage::CreateHostBitmap()
+void BufferImage::UploadArea( const RectArea& area )
 {
-  Integration::Bitmap* bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, mResourcePolicy );
-  Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
-  DALI_ASSERT_DEBUG(packedBitmap);
-
-  packedBitmap->ReserveBuffer( mPixelFormat, mWidth, mHeight );
-  DALI_ASSERT_DEBUG(bitmap->GetBuffer() != 0);
-  DALI_ASSERT_DEBUG(bitmap->GetBufferSize() >= mHeight * mWidth * mBytesPerPixel );
-
-  mTicket = mResourceClient->AddBitmapImage( bitmap );
-  mTicket->AddObserver(*this);
-}
-
-void BufferImage::UploadArea( ResourceId destId, const RectArea& area )
-{
-  Integration::Bitmap* bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, mResourcePolicy );
-  Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
-  DALI_ASSERT_DEBUG(packedBitmap);
   DALI_ASSERT_DEBUG( area.width <= mWidth && area.height <= mHeight );
 
   mBufferWidth = area.width ? area.width : mWidth;
-  packedBitmap->ReserveBuffer( mPixelFormat, mBufferWidth, area.height ? area.height : mHeight );
-  DALI_ASSERT_DEBUG(bitmap->GetBuffer() != 0);
-  DALI_ASSERT_DEBUG(bitmap->GetBufferSize() >= mBufferWidth * ( area.height ? area.height : mHeight ) * mBytesPerPixel );
+  uint32_t bufferHeight = area.height ? area.height : mHeight;
+  size_t bufferSize = mBytesPerPixel * mBufferWidth * bufferHeight;
+  unsigned char* buffer = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
+  DALI_ASSERT_DEBUG(buffer != 0);
 
   // Are we uploading from an external or internal buffer ?
   if ( mExternalBuffer )
@@ -173,11 +153,11 @@ void BufferImage::UploadArea( ResourceId destId, const RectArea& area )
     // Check if we're doing the entire area without stride mismatch between source and dest ?
     if( ( mByteStride == mWidth * mBytesPerPixel ) && area.IsEmpty() )
     {
-      memcpy( bitmap->GetBuffer(), mExternalBuffer, mBufferSize );
+      memcpy( buffer, mExternalBuffer, mBufferSize );
     }
     else
     {
-      UpdateBufferArea( mExternalBuffer, bitmap->GetBuffer(), area );
+      UpdateBufferArea( mExternalBuffer, buffer, area );
     }
   }
   else
@@ -185,26 +165,15 @@ void BufferImage::UploadArea( ResourceId destId, const RectArea& area )
     // Check if we're doing the entire internal buffer ?
     if( area.IsEmpty() )
     {
-      memcpy( bitmap->GetBuffer(), mInternalBuffer, bitmap->GetBufferSize() );
+      memcpy( buffer, mInternalBuffer, bufferSize );
     }
     else
     {
-      UpdateBufferArea( mInternalBuffer, bitmap->GetBuffer(), area );
+      UpdateBufferArea( mInternalBuffer, buffer, area );
     }
   }
-  mResourceClient->UploadBitmap( destId, bitmap, area.x, area.y );
-
-}
-
-void BufferImage::UploadBitmap( ResourceId destId, std::size_t xOffset, std::size_t yOffset )
-{
-  RectArea area( xOffset, yOffset, 0, 0 );
-  if ( !mTicket )
-  {
-    CreateHostBitmap();
-  }
-
-  UploadArea( destId, area );
+  PixelDataPtr pixelData = PixelData::New( buffer, bufferSize, mBufferWidth, bufferHeight, mPixelFormat, Dali::PixelData::FREE );
+  mTexture->Upload( pixelData, 0u, 0u, area.x, area.y, mBufferWidth, bufferHeight );
 }
 
 void BufferImage::UpdateBufferArea( PixelBuffer* src, PixelBuffer* dest, const RectArea& area )
@@ -220,20 +189,6 @@ void BufferImage::UpdateBufferArea( PixelBuffer* src, PixelBuffer* dest, const R
     src += mByteStride;
     dest += width;
   }
-}
-
-void BufferImage::Connect()
-{
-  if ( !mConnectionCount++ && !mTicket )
-  {
-    RectArea area;
-    Update( area );
-  }
-}
-
-void BufferImage::Disconnect()
-{
-  --mConnectionCount;
 }
 
 } // namespace Internal

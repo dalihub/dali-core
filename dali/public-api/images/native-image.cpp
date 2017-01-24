@@ -50,7 +50,7 @@ NativeImage& NativeImage::operator=( const NativeImage& rhs )
 
 void NativeImage::CreateGlTexture()
 {
-  GetImplementation(*this).CreateGlTexture();
+  //Nothing to do here. The texture is created immediately.
 }
 
 NativeImage NativeImage::New( NativeImageInterface& resourceData )

@@ -2494,6 +2494,12 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   Actor b = CreateRenderableActor( imageB );
   Actor c = CreateRenderableActor( imageC );
 
+  app.SendNotification();
+  app.Render(1);
+
+  //Textures are bound when first created. Clear bound textures vector
+  app.GetGlAbstraction().ClearBoundTextures();
+
   // Render a,b,c as regular non-overlays. so order will be:
   // a (8)
   // b (9)

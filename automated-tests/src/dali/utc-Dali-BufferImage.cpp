@@ -79,14 +79,7 @@ int UtcDaliBufferImageDownCast(void)
   TestApplication application;
   tet_infoline("Testing Dali::BufferImage::DownCast()");
 
-  BufferImage bitmap = BufferImage::New(1, 1, Dali::Pixel::BGRA8888);
-  Actor actor = CreateRenderableActor( bitmap );
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  Image image = GetTexture( actor );
+  Image image = BufferImage::New(1, 1, Dali::Pixel::BGRA8888);
   BufferImage bufferImage = BufferImage::DownCast( image );
 
   DALI_TEST_CHECK(bufferImage);
@@ -246,17 +239,6 @@ int UtcDaliBufferImageIsDataExternal(void)
   END_TEST;
 }
 
-namespace
-{
-
-static bool SignalReceived;
-static void ImageUploaded(Image image)
-{
-  tet_infoline("Received image uploaded signal");
-  SignalReceived = true;
-}
-}
-
 int UtcDaliBufferImageUpdate01(void)
 {
   TestApplication application;
@@ -269,9 +251,6 @@ int UtcDaliBufferImageUpdate01(void)
   Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
-
-  SignalReceived = false;
-  image.UploadedSignal().Connect( ImageUploaded );
 
   std::vector<GLuint> ids;
   ids.push_back(200);
@@ -301,11 +280,8 @@ int UtcDaliBufferImageUpdate01(void)
   const TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
   std::stringstream out;
-  out << GL_TEXTURE_2D <<", "<< 0u << ", " << 0u << ", " << 0u << ", " << 16u <<", "<< 16u;
-  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexSubImage2D", out.str().c_str() ), true, TEST_LOCATION);
-
-  DALI_TEST_CHECK( SignalReceived == true );
-  SignalReceived = false;
+  out << GL_TEXTURE_2D <<", "<< 0u << ", " << 16u <<", "<< 16u;
+  DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexImage2D", out.str().c_str() ), true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -320,9 +296,6 @@ int UtcDaliBufferImageUpdate02(void)
   Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
-
-  SignalReceived = false;
-  image.UploadedSignal().Connect( ImageUploaded );
 
   application.SendNotification();
   application.Render(0);
@@ -366,78 +339,6 @@ int UtcDaliBufferImageUpdate02(void)
     DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", out.str().c_str()), true, TEST_LOCATION);
   }
 
-  DALI_TEST_CHECK( SignalReceived == true );
-  SignalReceived = false;
   END_TEST;
 }
 
-int UtcDaliBufferImageUploadedSignal01(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliBufferImageUploadedSignal - Test that Uploaded signal is sent when image is staged");
-
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
-  SignalReceived = false;
-  image.UploadedSignal().Connect( ImageUploaded );
-
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  Actor actor = CreateRenderableActor( image );
-  Stage::GetCurrent().Add(actor);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK( SignalReceived == true );
-  END_TEST;
-}
-
-int UtcDaliBufferImageUploadedSignal02(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliBufferImageUploadedSignal - Test that Uploaded signal is sent after Update");
-
-  PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
-  SignalReceived = false;
-  //ScopedConnection connection =
-  image.UploadedSignal().Connect( ImageUploaded );
-
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  Actor actor = CreateRenderableActor( image );
-  Stage::GetCurrent().Add(actor);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK( SignalReceived == true );
-  SignalReceived = false;
-
-  image.Update(RectArea());              // notify Core that the whole image has been updated
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK( SignalReceived == true );
-  END_TEST;
-}

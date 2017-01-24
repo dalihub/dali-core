@@ -62,7 +62,6 @@ internal_src_files = \
   $(internal_src_dir)/event/events/tap-gesture-processor.cpp \
   $(internal_src_dir)/event/events/touch-data-impl.cpp \
   $(internal_src_dir)/event/events/touch-event-processor.cpp \
-  $(internal_src_dir)/event/images/atlas-impl.cpp \
   $(internal_src_dir)/event/images/bitmap-packed-pixel.cpp \
   $(internal_src_dir)/event/images/bitmap-compressed.cpp \
   $(internal_src_dir)/event/images/image-impl.cpp \

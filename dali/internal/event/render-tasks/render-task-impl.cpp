@@ -147,54 +147,28 @@ CameraActor* RenderTask::GetCameraActor() const
   return static_cast< CameraActor* >( mCameraConnector.mActor );
 }
 
-void RenderTask::SetTargetFrameBuffer( Dali::FrameBufferImage image )
+void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
 {
-  if ( mFrameBufferImage != image )
+  mFrameBufferImage = image;
+  FrameBuffer* frameBufferPtr( NULL );
+  if( image )
   {
-    // if we have a scene object we need to track connection status and set frame buffer id as well as updating target frame buffer
-    if ( mSceneObject )
-    {
-      if(mFrameBufferImage)
-      {
-        GetImplementation(mFrameBufferImage).Disconnect();
-      }
-
-      // update target frame buffer
-      mFrameBufferImage = image;
-
-      unsigned int resourceId = 0;
-      bool isNativeFBO = false;
-      if( mFrameBufferImage )
-      {
-        Dali::Internal::FrameBufferImage& impl = GetImplementation( mFrameBufferImage );
-        impl.Connect();
-        resourceId = impl.GetResourceId();
-        isNativeFBO = impl.IsNativeFbo();
-      }
-
-      // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId, isNativeFBO );
-    }
-    else
-    {
-      // update target frame buffer
-      mFrameBufferImage = image;
-    }
+    frameBufferPtr = image->GetFrameBuffer();
   }
+
+  SetFrameBuffer( frameBufferPtr );
 }
 
-void RenderTask::SetFrameBuffer( Dali::FrameBuffer frameBuffer )
+void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
+  mFrameBuffer = frameBuffer;
+  Render::FrameBuffer* renderFrameBufferPtr( NULL );
   if( frameBuffer )
   {
-    mFrameBuffer = Internal::FrameBufferPtr( &GetImplementation( frameBuffer ) );
-    SetFrameBufferMessage( GetEventThreadServices(), *mSceneObject, mFrameBuffer->GetRenderObject() );
+    renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
   }
-  else
-  {
-    mFrameBuffer.Reset();
-    SetFrameBufferMessage( GetEventThreadServices(), *mSceneObject, NULL );
-  }
+
+  SetFrameBufferMessage( GetEventThreadServices(), *mSceneObject, renderFrameBufferPtr );
 }
 
 FrameBuffer* RenderTask::GetFrameBuffer() const
@@ -202,9 +176,9 @@ FrameBuffer* RenderTask::GetFrameBuffer() const
   return mFrameBuffer.Get();
 }
 
-Dali::FrameBufferImage RenderTask::GetTargetFrameBuffer() const
+FrameBufferImage* RenderTask::GetTargetFrameBuffer() const
 {
-  return mFrameBufferImage;
+  return mFrameBufferImage.Get();
 }
 
 void RenderTask::SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction )
@@ -262,8 +236,8 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
     if ( mFrameBufferImage )
     {
       viewPort.x = viewPort.y = 0;
-      viewPort.width = mFrameBufferImage.GetWidth();
-      viewPort.height = mFrameBufferImage.GetHeight();
+      viewPort.width = mFrameBufferImage->GetWidth();
+      viewPort.height = mFrameBufferImage->GetHeight();
     }
     else
     {
@@ -505,26 +479,14 @@ SceneGraph::RenderTask* RenderTask::CreateSceneObject()
   // Keep the raw-pointer until DiscardSceneObject is called
   mSceneObject = SceneGraph::RenderTask::New();
 
-  // if we have a frame buffer we need to track connection status then send a message to set the frame buffer id in case it has changed since last time we were on stage
-  unsigned int resourceId = 0;
-  bool isNativeFBO = false;
-  if( mFrameBufferImage )
-  {
-    Dali::Internal::FrameBufferImage& impl = GetImplementation( mFrameBufferImage );
-    impl.Connect();
-    resourceId = impl.GetResourceId();
-    isNativeFBO = impl.IsNativeFbo();
-  }
-
-  // mSceneObject is being used in a separate thread; queue a message to set the value
-  SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId, isNativeFBO );
-
   // Send messages to set other properties that may have changed since last time we were on stage
   SetExclusiveMessage( GetEventThreadServices(), *mSceneObject, mExclusive );
   SetClearColorMessage(  GetEventThreadServices(), *mSceneObject, mClearColor );
   SetClearEnabledMessage(  GetEventThreadServices(), *mSceneObject, mClearEnabled );
   SetCullModeMessage(  GetEventThreadServices(), *mSceneObject, mCullMode );
   SetRefreshRateMessage(  GetEventThreadServices(), *mSceneObject, mRefreshRate );
+  SetSyncRequiredMessage( GetEventThreadServices(), *mSceneObject, mRequiresSync );
+  SetFrameBuffer( mFrameBuffer );
 
   // Caller takes ownership
   return mSceneObject;
@@ -539,12 +501,6 @@ void RenderTask::DiscardSceneObject()
 {
   // mSceneObject is not owned; throw away the raw-pointer
   mSceneObject = NULL;
-
-  // if we have a frame buffer we need to track connection status
-  if(mFrameBufferImage)
-  {
-    GetImplementation(mFrameBufferImage).Disconnect();
-  }
 }
 
 /********************************************************************************

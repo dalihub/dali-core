@@ -11,7 +11,6 @@ SET(TC_SOURCES
         utc-Dali-AngleAxis.cpp
         utc-Dali-Animation.cpp
         utc-Dali-Any.cpp
-        utc-Dali-Atlas.cpp
         utc-Dali-BaseHandle.cpp
         utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp

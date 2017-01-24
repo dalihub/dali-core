@@ -390,19 +390,11 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
 
   Stage stage = Stage::GetCurrent();
-
-  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-
   RenderTaskList taskList = stage.GetRenderTaskList();
-
   RenderTask task = taskList.GetTask( 0u );
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
-
-  std::vector<GLuint> ids;
-  ids.push_back( 7 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
@@ -418,13 +410,17 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   DALI_TEST_CHECK( task.GetSourceActor() != actor );
   DALI_TEST_CHECK( task.GetSourceActor() == nonRenderableActor );
 
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
   // Update & Render nothing!
   application.GetGlAbstraction().ClearBoundTextures();
   application.SendNotification();
   application.Render();
 
   // Check that nothing was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -438,8 +434,6 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   Stage stage = Stage::GetCurrent();
 
-  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-
   RenderTaskList taskList = stage.GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
@@ -447,9 +441,6 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
 
-  std::vector<GLuint> ids;
-  ids.push_back( 7 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
@@ -458,6 +449,10 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   Actor nonRenderableActor = Actor::New();
   stage.Add( nonRenderableActor );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
 
   // Stop the newActor from being rendered by changing the source actor
   DALI_TEST_CHECK( nonRenderableActor );
@@ -471,7 +466,8 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   application.Render();
 
   // Check that nothing was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
+  drawTrace.Reset();
 
   // Set newActor as the new source Actor
   task.SetSourceActor( newActor );
@@ -484,11 +480,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   application.Render();
 
   // Check that the newActor was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 1u, TEST_LOCATION );
-  if ( boundTextures.size() )
-  {
-    DALI_TEST_EQUALS( boundTextures[0], 7u, TEST_LOCATION );
-  }
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
   END_TEST;
 }
 
@@ -499,20 +491,15 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   tet_infoline("Testing RenderTask::SetSourceActor (on/off stage testing)");
 
   Stage stage = Stage::GetCurrent();
-
-  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-
   RenderTaskList taskList = stage.GetRenderTaskList();
-
   RenderTask task = taskList.GetTask( 0u );
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
 
-  std::vector<GLuint> ids;
-  GLuint expectedTextureId( 3 );
-  ids.push_back( expectedTextureId );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
@@ -521,12 +508,11 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   // Don't add newActor to stage yet   //'
 
   // Update & Render with the actor initially off-stage
-  application.GetGlAbstraction().ClearBoundTextures();
   application.SendNotification();
   application.Render();
 
   // Check that nothing was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
 
   // Now add to stage
   stage.Add( newActor );
@@ -537,19 +523,17 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   application.Render();
 
   // Check that the newActor was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 1u, TEST_LOCATION );
-  if ( boundTextures.size() )
-  {
-    DALI_TEST_EQUALS( boundTextures[0], expectedTextureId, TEST_LOCATION );
-  }
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+  drawTrace.Reset();
 
   // Now remove from stage
   stage.Remove( newActor );
 
   // Update & Render with the actor off-stage
-  application.GetGlAbstraction().ClearBoundTextures();
   application.SendNotification();
   application.Render();
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -560,20 +544,11 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   tet_infoline("Testing RenderTask::SetSourceActor (empty handle case)");
 
   Stage stage = Stage::GetCurrent();
-
-  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-
   RenderTaskList taskList = stage.GetRenderTaskList();
-
   RenderTask task = taskList.GetTask( 0u );
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
-
-  std::vector<GLuint> ids;
-  GLuint expectedTextureId( 5 );
-  ids.push_back( expectedTextureId );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
@@ -587,13 +562,16 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   task.SetSourceActor( Actor() );
   DALI_TEST_CHECK( ! task.GetSourceActor() );
 
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
   // Update & Render nothing!
-  application.GetGlAbstraction().ClearBoundTextures();
   application.SendNotification();
   application.Render();
 
   // Check that nothing was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
 
   // Set with non-empty handle
   task.SetSourceActor( newActor );
@@ -605,11 +583,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   application.Render();
 
   // Check that the newActor was rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 1u, TEST_LOCATION );
-  if ( boundTextures.size() )
-  {
-    DALI_TEST_EQUALS( boundTextures[0], expectedTextureId, TEST_LOCATION );
-  }
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2414,15 +2388,14 @@ int UtcDaliRenderTaskOnceChain01(void)
 
   application.SendNotification();
 
+  //Both render tasks are executed.
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false, true, __LINE__ ) );
   DALI_TEST_CHECK( firstFinished == false );
   DALI_TEST_CHECK( secondFinished == false );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, true, true, __LINE__ ) );
+  //Nothing else to render and both render task should have finished now
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, true, false, __LINE__ ) );
   DALI_TEST_CHECK( firstFinished == true );
-  DALI_TEST_CHECK( secondFinished == false );
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  secondFinished, true, false, __LINE__ ) );
   DALI_TEST_CHECK( secondFinished == true );
 
   END_TEST;

@@ -231,7 +231,7 @@ int UtcDaliTextureSetSetSampler(void)
   // Verify gl state
   // There are 4 calls to TexParameteri when the texture is first created
   // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
 
   texParameterTrace.Reset();
   texParameterTrace.Enable( true );
