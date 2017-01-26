@@ -837,16 +837,6 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
   }
 }
 
-void UpdateManager::PrepareTextureSets( BufferIndex bufferIndex )
-{
-  size_t textureSetCount( mImpl->textureSets.Size() );
-  for( size_t i(0); i<textureSetCount; ++i )
-  {
-    //Prepare texture set
-    mImpl->textureSets[i]->Prepare( mImpl->resourceManager );
-  }
-}
-
 void UpdateManager::ForwardCompiledShadersToEventThread()
 {
   DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
@@ -963,9 +953,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     //Constraint custom objects
     ConstrainCustomObjects( bufferIndex );
-
-    //Prepare texture sets and apply constraints to them
-    PrepareTextureSets( bufferIndex );
 
     //Clear the lists of renderers from the previous update
     for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )

@@ -49,7 +49,6 @@ class RenderDataProvider
 {
 public:
   typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
-  typedef std::vector< Render::Texture > Textures;
   typedef std::vector< Render::Sampler* > Samplers;
 
   /**
@@ -90,12 +89,6 @@ public:
   Shader& GetShader() const;
 
   /**
-   * Returns the list of textures
-   * @return The list of textures
-   */
-  Textures& GetTextures();
-
-  /**
    * Returns the list of samplers
    * @return The list of samplers
    */
@@ -111,7 +104,6 @@ private:
 
   const UniformMapDataProvider*       mUniformMapDataProvider;
   Shader*                             mShader;
-  Textures                            mTextures;
   std::vector<Render::NewTexture*>    mNewTextures;
   Samplers                            mSamplers;
 

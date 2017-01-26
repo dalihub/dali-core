@@ -36,69 +36,8 @@ TextureSetPtr TextureSet::New()
   return textureSet;
 }
 
-void TextureSet::SetImage( size_t index, ImagePtr image )
-{
-  if( !mNewTextures.empty() )
-  {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same TextureSet\n");
-    return;
-  }
-
-  size_t textureCount( mImages.size() );
-  if( index < textureCount )
-  {
-    if( mImages[index] && mOnStage )
-    {
-      mImages[index]->Disconnect();
-    }
-  }
-  else
-  {
-    mImages.resize(index + 1);
-
-    bool samplerExist = true;
-    if( mSamplers.size() < index + 1 )
-    {
-      mSamplers.resize( index + 1 );
-      samplerExist = false;
-    }
-
-    mSamplers.resize(index + 1);
-    for( size_t i(textureCount); i<=index; ++i )
-    {
-      mImages[i] = NULL;
-
-      if( !samplerExist )
-      {
-        mSamplers[i] = NULL;
-      }
-    }
-  }
-  mImages[index] = image;
-
-
-  if( image )
-  {
-    if( mOnStage )
-    {
-      image->Connect();
-    }
-    SceneGraph::SetImageMessage( mEventThreadServices, *mSceneObject, index, image->GetResourceId() );
-  }
-  else
-  {
-    SceneGraph::SetImageMessage( mEventThreadServices, *mSceneObject, index, Integration::InvalidResourceId );
-  }
-}
-
 void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
 {
-  if( !mImages.empty() )
-  {
-    DALI_LOG_ERROR( "Error: Cannot mix images and textures in the same texture set\n");
-    return;
-  }
-
   size_t textureCount( mNewTextures.size() );
   if( index >= textureCount )
   {
@@ -131,21 +70,6 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
   }
 
   SceneGraph::SetTextureMessage( mEventThreadServices, *mSceneObject, index, renderTexture );
-}
-
-Image* TextureSet::GetImage( size_t index ) const
-{
-  Image* result(0);
-  if( index < mImages.size() )
-  {
-    result = mImages[index].Get();
-  }
-  else
-  {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage\n");
-  }
-
-  return result;
 }
 
 NewTexture* TextureSet::GetTexture( size_t index ) const
@@ -203,7 +127,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
 
 size_t TextureSet::GetTextureCount() const
 {
-  return mImages.size() + mNewTextures.size();
+  return mNewTextures.size();
 }
 
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
@@ -211,46 +135,9 @@ const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
   return mSceneObject;
 }
 
-bool TextureSet::OnStage() const
-{
-  return mOnStage;
-}
-
-void TextureSet::Connect()
-{
-  mOnStage = true;
-
-  for( size_t i(0); i<mImages.size(); ++i )
-  {
-    if( mImages[i] )
-    {
-      mImages[i]->Connect();
-      SceneGraph::SetImageMessage( mEventThreadServices, *mSceneObject, i, mImages[i]->GetResourceId() );
-    }
-    else
-    {
-      SceneGraph::SetImageMessage( mEventThreadServices, *mSceneObject, i, Integration::InvalidResourceId );
-    }
-  }
-}
-
-void TextureSet::Disconnect()
-{
-  for( size_t i(0); i<mImages.size(); ++i )
-  {
-    if( mImages[i] )
-    {
-      mImages[i]->Disconnect();
-    }
-  }
-
-  mOnStage = false;
-}
-
 TextureSet::TextureSet()
 :mEventThreadServices( *Stage::GetCurrent() ),
- mSceneObject( NULL ),
- mOnStage( false )
+ mSceneObject( NULL )
 {
 }
 

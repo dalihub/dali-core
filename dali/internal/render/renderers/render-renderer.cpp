@@ -178,7 +178,7 @@ void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvid
   mUpdateAttributesLocation = true;
 
   //Check that the number of textures match the number of samplers in the shader
-  size_t textureCount =  dataProvider->GetTextures().size() + dataProvider->GetNewTextures().size();
+  size_t textureCount =  dataProvider->GetNewTextures().size();
   Program* program = dataProvider->GetShader().GetProgram();
   if( program && program->GetActiveSamplerCount() != textureCount )
   {
@@ -370,43 +370,8 @@ bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& texture
   unsigned int textureUnit = 0;
   bool result = true;
 
-  std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
-
-  std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
   GLint uniformLocation(-1);
-  for( size_t i(0); result && i<textures.size(); ++i )
-  {
-    ResourceId textureId = textures[i].GetTextureId();
-    Internal::Texture* texture = textureCache.GetTexture( textureId );
-    if( texture )
-    {
-      result = textureCache.BindTexture( texture, textureId, GL_TEXTURE_2D, (TextureUnit)textureUnit );
-
-      if( result )
-      {
-        GLint uniformLocation;
-
-        //TODO : This is a bug, result variable is being shadowed. Fix it!
-        bool result = program.GetSamplerUniformLocation( i, uniformLocation );
-        if( result && Program::UNIFORM_UNKNOWN != uniformLocation )
-        {
-          program.SetUniform1i( uniformLocation, textureUnit );
-
-          unsigned int samplerBitfield(ImageSampler::DEFAULT_BITFIELD);
-          const Render::Sampler* sampler(  samplers[i] );
-          if( sampler )
-          {
-            samplerBitfield = sampler->mBitfield;
-          }
-
-          texture->ApplySampler( (TextureUnit)textureUnit, samplerBitfield );
-
-          ++textureUnit;
-        }
-      }
-    }
-  }
-
+  std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
   std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
   for( size_t i(0); i<newTextures.size() && result; ++i )
   {
@@ -643,16 +608,6 @@ void Renderer::Render( Context& context,
 void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const
 {
   sortAttributes.shader = &( mRenderDataProvider->GetShader() );
-  const std::vector<Render::Texture>& textures( mRenderDataProvider->GetTextures() );
-  if( !textures.empty() )
-  {
-    sortAttributes.textureResourceId = textures[0].GetTextureId();
-  }
-  else
-  {
-    sortAttributes.textureResourceId = Integration::InvalidResourceId;
-  }
-
   sortAttributes.geometry = mGeometry;
 }
 

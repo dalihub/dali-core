@@ -193,14 +193,14 @@ Geometry* Renderer::GetGeometry() const
 
 void Renderer::SetTextures( TextureSet& textureSet )
 {
-  mTextureSetConnector.Set( textureSet, OnStage() );
+  mTextureSet = &textureSet;
   const SceneGraph::TextureSet* textureSetSceneObject = textureSet.GetTextureSetSceneObject();
   SetTexturesMessage( GetEventThreadServices(), *mSceneObject, *textureSetSceneObject );
 }
 
 TextureSet* Renderer::GetTextures() const
 {
-  return mTextureSetConnector.Get().Get();
+  return mTextureSet.Get();
 }
 
 void Renderer::SetShader( Shader& shader )
@@ -880,34 +880,10 @@ int Renderer::GetPropertyComponentIndex( Property::Index index ) const
   return Property::INVALID_COMPONENT_INDEX;
 }
 
-bool Renderer::OnStage() const
-{
-  return mOnStageCount > 0;
-}
-
-void Renderer::Connect()
-{
-  if( mOnStageCount == 0 )
-  {
-    mTextureSetConnector.OnStageConnect();
-  }
-  ++mOnStageCount;
-}
-
-void Renderer::Disconnect()
-{
-  --mOnStageCount;
-  if( mOnStageCount == 0 )
-  {
-    mTextureSetConnector.OnStageDisconnect();
-  }
-}
-
 Renderer::Renderer()
 : mSceneObject(NULL ),
   mBlendColor( NULL ),
   mDepthIndex( 0 ),
-  mOnStageCount( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
