@@ -56,7 +56,7 @@ void PrintFrameEnd()
 
 void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction, BufferIndex index )
 {
-  const char* target = (0 != instruction.mOffscreenTextureId) ? "FrameBuffer" : "Screen";
+  const char* target = (nullptr != instruction.mFrameBuffer) ? "FrameBuffer" : "Screen";
 
   std::stringstream debugStream;
   debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix(index)) << " Projection: " << *(instruction.GetProjectionMatrix(index));
