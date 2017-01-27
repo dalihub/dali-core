@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 
 namespace Dali
 {
@@ -32,6 +31,13 @@ namespace Internal
 namespace
 {
 TypeRegistration mType( typeid( Dali::FrameBufferImage ), typeid( Dali::Image ), NULL );
+
+const int RenderBufferFormatToFrameBufferAttachments[]  = { Dali::FrameBuffer::Attachment::NONE,
+                                                            Dali::FrameBuffer::Attachment::DEPTH,
+                                                            Dali::FrameBuffer::Attachment::STENCIL,
+                                                            Dali::FrameBuffer::Attachment::DEPTH_STENCIL
+                                                          };
+
 } // unnamed namespace
 
 FrameBufferImagePtr FrameBufferImage::New( unsigned int width,
@@ -39,8 +45,13 @@ FrameBufferImagePtr FrameBufferImage::New( unsigned int width,
                                            Pixel::Format pixelFormat,
                                            RenderBuffer::Format bufferformat )
 {
-  FrameBufferImagePtr image = new FrameBufferImage( width, height, pixelFormat, bufferformat );
+  FrameBufferImagePtr image = new FrameBufferImage( width, height );
   image->Initialize();
+
+  image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height );
+  image->mFrameBufferObject = FrameBuffer::New( width, height, RenderBufferFormatToFrameBufferAttachments[bufferformat] );
+  image->mFrameBufferObject->AttachColorTexture( image->mTexture, 0u, 0u );
+
   return image;
 }
 
@@ -48,18 +59,17 @@ FrameBufferImagePtr FrameBufferImage::New( NativeImageInterface& nativeImage )
 {
   FrameBufferImagePtr image = new FrameBufferImage( nativeImage );
   image->Initialize();
+
+  image->mTexture = NewTexture::New( nativeImage );
+  image->mFrameBufferObject = FrameBuffer::New( image->mTexture->GetWidth(), image->mTexture->GetHeight(), Dali::FrameBuffer::Attachment::NONE );
+  image->mFrameBufferObject->AttachColorTexture( image->mTexture, 0u, 0u );
+
   return image;
 }
 
-
-FrameBufferImage::FrameBufferImage( unsigned int width,
-                                    unsigned int height,
-                                    Pixel::Format pixelFormat,
-                                    RenderBuffer::Format bufferformat )
+FrameBufferImage::FrameBufferImage( unsigned int width, unsigned int height)
 : Image(),
   mNativeImage(0),
-  mPixelFormat( pixelFormat ),
-  mBufferFormat( bufferformat ),
   mIsNativeFbo( false )
 {
   mWidth  = width;
@@ -69,54 +79,12 @@ FrameBufferImage::FrameBufferImage( unsigned int width,
 FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage )
 : Image(),
   mNativeImage( &nativeImage ),
-  mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
-  mBufferFormat( RenderBuffer::COLOR ),
   mIsNativeFbo( true )
 {
   mWidth = nativeImage.GetWidth();
   mHeight = nativeImage.GetHeight();
 }
 
-void FrameBufferImage::Connect()
-{
-  ++mConnectionCount;
-
-  if (mConnectionCount == 1)
-  {
-    // ticket was thrown away when related actors went offstage
-    if (!mTicket)
-    {
-      ResourceClient& resourceClient = ThreadLocalStorage::Get().GetResourceClient();
-      if (mNativeImage)
-      {
-        mTicket = resourceClient.AddFrameBufferImage(*mNativeImage);
-        mTicket->AddObserver(*this);
-      }
-      else
-      {
-        mTicket = resourceClient.AddFrameBufferImage(mWidth, mHeight, mPixelFormat, mBufferFormat);
-        mTicket->AddObserver(*this);
-      }
-    }
-  }
-}
-
-void FrameBufferImage::Disconnect()
-{
-  if(!mTicket)
-  {
-    return;
-  }
-
-  DALI_ASSERT_DEBUG(mConnectionCount > 0);
-  --mConnectionCount;
-  if (mConnectionCount == 0)
-  {
-    // release image memory when it's not visible anymore (decrease ref. count of texture)
-    mTicket->RemoveObserver(*this);
-    mTicket.Reset();
-  }
-}
 
 bool FrameBufferImage::IsNativeFbo() const
 {

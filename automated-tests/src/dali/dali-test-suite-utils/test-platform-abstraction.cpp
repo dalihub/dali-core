@@ -93,7 +93,7 @@ Integration::ResourcePointer TestPlatformAbstraction::LoadResourceSynchronously(
 Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::ResourceType& resourceType, uint8_t * buffer, size_t size )
 {
   mTrace.PushCall("DecodeBuffer", "");
-  return Integration::BitmapPtr();
+  return mDecodedBitmap;
 }
 
 void TestPlatformAbstraction::CancelLoad(Integration::ResourceId id, Integration::ResourceTypeId typeId)
@@ -181,6 +181,7 @@ void TestPlatformAbstraction::Initialize()
   mResourceRequests.Clear();
   mIsLoadingResult=false;
   mSynchronouslyLoadedResource.Reset();
+  mDecodedBitmap.Reset();
 }
 
 bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
@@ -214,6 +215,7 @@ void TestPlatformAbstraction::ClearReadyResources()
   mLoadedResourcesQueue.clear();
   mFailedLoadQueue.clear();
   mSynchronouslyLoadedResource.Reset();
+  mDecodedBitmap.Reset();
 }
 
 void TestPlatformAbstraction::SetResourceLoaded(Integration::ResourceId  loadedId,
@@ -305,6 +307,11 @@ void TestPlatformAbstraction::SetSaveFileResult( bool result )
 void TestPlatformAbstraction::SetSynchronouslyLoadedResource( Integration::ResourcePointer resource )
 {
   mSynchronouslyLoadedResource = resource;
+}
+
+void TestPlatformAbstraction::SetDecodedBitmap( Integration::BitmapPtr bitmap )
+{
+  mDecodedBitmap = bitmap;
 }
 
 } // namespace Dali

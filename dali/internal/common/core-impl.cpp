@@ -37,7 +37,6 @@
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
-#include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
@@ -97,7 +96,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mDiscardQueue(NULL),
   mTextureUploadedQueue(),
   mNotificationManager(NULL),
-  mImageFactory(NULL),
   mShaderFactory(NULL),
   mGeometryBatcher( NULL ),
   mIsActive(true),
@@ -170,7 +168,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
-  mImageFactory = new ImageFactory( *mResourceClient );
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
 
@@ -210,7 +207,6 @@ Core::~Core()
   delete mEventProcessor;
   delete mGestureEventProcessor;
   delete mNotificationManager;
-  delete mImageFactory;
   delete mShaderFactory;
   delete mResourceClient;
   delete mResourceManager;
@@ -232,7 +228,6 @@ void Core::RecoverFromContextLoss()
 {
   DALI_LOG_INFO(gCoreFilter, Debug::Verbose, "Core::RecoverFromContextLoss()\n");
 
-  mImageFactory->RecoverFromContextLoss(); // Reload images from files
   mStage->GetRenderTaskList().RecoverFromContextLoss(); // Re-trigger render-tasks
 }
 
@@ -359,9 +354,6 @@ void Core::ProcessEvents()
     // Run the size negotiation after event processing finished signal
     mRelayoutController->Relayout();
 
-    // Flush discard queue for image factory
-    mImageFactory->FlushReleaseQueue();
-
     // Flush any queued messages for the update-thread
     const bool messagesToProcess = mUpdateManager->FlushQueue();
 
@@ -444,11 +436,6 @@ ResourceManager& Core::GetResourceManager()
 ResourceClient& Core::GetResourceClient()
 {
   return *(mResourceClient);
-}
-
-ImageFactory& Core::GetImageFactory()
-{
-  return *(mImageFactory);
 }
 
 ShaderFactory& Core::GetShaderFactory()

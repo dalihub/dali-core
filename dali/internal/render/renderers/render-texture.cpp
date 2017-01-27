@@ -799,6 +799,11 @@ void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Interna
 
 bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
 {
+  if( mNativeImage && mId == 0 )
+  {
+    Initialize( context );
+  }
+
   if( mId != 0 )
   {
     context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
@@ -823,34 +828,37 @@ void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
 
   if( mSampler.mBitfield != oldSampler.mBitfield )
   {
-    if( mSampler.mMinificationFilter != oldSampler.mMinificationFilter )
+    GLint mode = FilterModeToGL( mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT );
+    if( mode != FilterModeToGL( oldSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT ) )
     {
-      GLint glFilterMode = FilterModeToGL( mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT );
-      context.TexParameteri( mTarget, GL_TEXTURE_MIN_FILTER, glFilterMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_MIN_FILTER, mode );
     }
 
-    if( mSampler.mMagnificationFilter != oldSampler.mMagnificationFilter )
+    mode = FilterModeToGL( mSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT );
+    if( mode != FilterModeToGL( oldSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT ) )
     {
-      GLint glFilterMode = FilterModeToGL( mSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT );
-      context.TexParameteri( mTarget, GL_TEXTURE_MAG_FILTER, glFilterMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_MAG_FILTER, mode );
     }
 
-    if( mSampler.mSWrapMode != oldSampler.mSWrapMode )
+    mode = WrapModeToGL( mSampler.mSWrapMode, GL_WRAP_DEFAULT );
+    if( mode != WrapModeToGL( oldSampler.mSWrapMode, GL_WRAP_DEFAULT ) )
     {
-      GLint glWrapMode = WrapModeToGL( mSampler.mSWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_S, glWrapMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_S, mode );
     }
 
-    if( mSampler.mTWrapMode != oldSampler.mTWrapMode )
+    mode = WrapModeToGL( mSampler.mTWrapMode, GL_WRAP_DEFAULT );
+    if( mode != WrapModeToGL( oldSampler.mTWrapMode, GL_WRAP_DEFAULT ) )
     {
-      GLint glWrapMode = WrapModeToGL( mSampler.mTWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_T, glWrapMode );
+      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_T, mode );
     }
 
-    if( mType == TextureType::TEXTURE_CUBE && mSampler.mRWrapMode != oldSampler.mRWrapMode )
+    if( mType == TextureType::TEXTURE_CUBE )
     {
-      GLint glWrapMode = WrapModeToGL( mSampler.mRWrapMode, GL_WRAP_DEFAULT );
-      context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, glWrapMode );
+      mode = WrapModeToGL( mSampler.mRWrapMode, GL_WRAP_DEFAULT );
+      if( mode != WrapModeToGL( oldSampler.mRWrapMode, GL_WRAP_DEFAULT ) )
+      {
+        context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, mode );
+      }
     }
   }
 }

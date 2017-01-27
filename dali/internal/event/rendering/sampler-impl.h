@@ -26,7 +26,6 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/images/image-connector.h> // Dali::Internal::ImageConnector
 
 namespace Dali
 {

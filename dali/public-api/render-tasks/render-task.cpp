@@ -23,6 +23,7 @@
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
+#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
@@ -117,19 +118,32 @@ CameraActor RenderTask::GetCameraActor() const
   return Dali::CameraActor(GetImplementation(*this).GetCameraActor());
 }
 
-void RenderTask::SetTargetFrameBuffer( FrameBufferImage frameBuffer )
+void RenderTask::SetTargetFrameBuffer( Dali::FrameBufferImage frameBuffer )
 {
-  GetImplementation(*this).SetTargetFrameBuffer( frameBuffer );
+  Internal::FrameBufferImage* frameBufferPtr( NULL );
+  if( frameBuffer )
+  {
+    frameBufferPtr = &GetImplementation( frameBuffer );
+  }
+
+  GetImplementation(*this).SetTargetFrameBuffer( frameBufferPtr );
 }
 
 FrameBufferImage RenderTask::GetTargetFrameBuffer() const
 {
-  return GetImplementation(*this).GetTargetFrameBuffer();
+  Internal::FrameBufferImage* frameBufferPtr = GetImplementation(*this).GetTargetFrameBuffer();
+  return Dali::FrameBufferImage( frameBufferPtr );
 }
 
 void RenderTask::SetFrameBuffer( FrameBuffer frameBuffer )
 {
-  GetImplementation(*this).SetFrameBuffer( frameBuffer );
+  Internal::FrameBuffer* frameBufferPtr( NULL );
+  if( frameBuffer )
+  {
+    frameBufferPtr = &GetImplementation( frameBuffer );
+  }
+
+  GetImplementation(*this).SetFrameBuffer( frameBufferPtr );
 }
 
 FrameBuffer RenderTask::GetFrameBuffer() const

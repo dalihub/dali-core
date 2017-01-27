@@ -154,20 +154,19 @@ int UtcSamplerSetFilterMode(void)
 
   // Verify gl state
 
-  // There are three calls to TexParameteri when the texture is first created
-  // Texture mag filter is not called as the first time set it uses the system default
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+  // There are 4 calls to TexParameteri when the texture is first created
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
 
   std::stringstream out;
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
-  // Default/Default
+  // Linear/Linear
   texParameterTrace.Reset();
   texParameterTrace.Enable( true );
 
-  sampler.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+  sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
 
   // Flush the queue and render once
   application.SendNotification();
@@ -177,7 +176,7 @@ int UtcSamplerSetFilterMode(void)
 
   // Verify gl state
 
-  // Should not make any calls when settings are the same
+  // Should not make any calls when settings are the same (DEFAULT = LINEAR )
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
 
   /**************************************************************/
@@ -284,22 +283,21 @@ int UtcSamplerSetWrapMode1(void)
 
   // Verify gl state
 
-  // There are three calls to TexParameteri when the texture is first created
-  // Texture mag filter is not called as the first time set it uses the system default
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+  // There are 4 calls to TexParameteri when the texture is first created
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
 
   std::stringstream out;
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_CLAMP_TO_EDGE;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_CLAMP_TO_EDGE;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(3, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   texParameterTrace.Reset();
   texParameterTrace.Enable( true );
 
-  sampler.SetWrapMode( WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE );
+  sampler.SetWrapMode( WrapMode::DEFAULT, WrapMode::DEFAULT );
 
   // Flush the queue and render once
   application.SendNotification();
@@ -374,10 +372,18 @@ int UtcSamplerSetWrapMode2(void)
   application.SendNotification();
   application.Render();
 
+  // Verify that no TexParameteri calls occurred since wrap mode hasn't changed.
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0u, TEST_LOCATION );
+
+
+  sampler.SetWrapMode( WrapMode::REPEAT, WrapMode::REPEAT, WrapMode::REPEAT );
+  texParameterTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
   texParameterTrace.Enable( false );
 
   // Verify that 3 TexParameteri calls occurred.
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3u, TEST_LOCATION );
-
   END_TEST;
 }

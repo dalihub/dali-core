@@ -29,6 +29,7 @@
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/event/images/image-impl.h> // Dali::Internal::Image
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 #include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader

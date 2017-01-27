@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 
@@ -96,17 +96,17 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetTargetFrameBuffer()
    */
-  void SetTargetFrameBuffer( Dali::FrameBufferImage frameBuffer );
+  void SetTargetFrameBuffer( FrameBufferImagePtr frameBuffer );
 
   /**
    * @copydoc Dali::RenderTask::GetTargetFrameBuffer
    */
-  Dali::FrameBufferImage GetTargetFrameBuffer() const;
+  FrameBufferImage* GetTargetFrameBuffer() const;
 
   /**
     * @copydoc Dali::RenderTask::SetFrameBuffer()
     */
-   void SetFrameBuffer( Dali::FrameBuffer frameBuffer );
+   void SetFrameBuffer( FrameBufferPtr frameBuffer );
 
    /**
     * @copydoc Dali::RenderTask::GetFrameBuffer
@@ -461,7 +461,7 @@ private:
 
   unsigned int mRefreshOnceCounter;
 
-  Dali::FrameBufferImage mFrameBufferImage;  ///< Optional off-screen render target.
+  FrameBufferImagePtr mFrameBufferImage;  ///< Optional off-screen render target.
   FrameBufferPtr  mFrameBuffer;
 
 

@@ -264,6 +264,12 @@ public: // TEST FUNCTIONS
    */
   void SetSynchronouslyLoadedResource( Integration::ResourcePointer resource );
 
+  /**
+   * @brief Sets the bitmap returned by DecodeBuffer()
+   * @param[in] bitmap The decoded bitmap
+   */
+  void SetDecodedBitmap( Integration::BitmapPtr bitmap );
+
 private:
 
   struct LoadedResource
@@ -307,6 +313,7 @@ private:
   bool                          mSaveFileResult;
 
   Integration::ResourcePointer  mSynchronouslyLoadedResource;
+  Integration::BitmapPtr        mDecodedBitmap;
 };
 
 } // Dali

@@ -49,11 +49,6 @@ public:
    */
   static NativeImagePtr New( NativeImageInterface& nativeImageInterface );
 
-  /**
-   * @copydoc Dali::NativeImage::CreateGlTexture
-   */
-  void CreateGlTexture();
-
 protected:
 
   /**

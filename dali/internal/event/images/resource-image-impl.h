@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/event/images/image-factory-cache.h>
 #include <dali/integration-api/debug.h> // For DALI_LOG_OBJECT_STRING_DECLARATION
 
 namespace Dali

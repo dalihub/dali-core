@@ -699,7 +699,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
   }
 
-  if( instruction.mRenderTracker && offscreen != NULL )
+  if( instruction.mRenderTracker && ( offscreen != NULL || instruction.mFrameBuffer != NULL ) )
   {
     // This will create a sync object every frame this render tracker
     // is alive (though it should be now be created only for

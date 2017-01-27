@@ -109,7 +109,6 @@ public:
    */
   unsigned int GetHeight() const;
 
-
 private: // implementation
 
   /**

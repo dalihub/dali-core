@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 namespace Dali
 {
@@ -51,7 +52,7 @@ public:
   /**
    * @copydoc Dali::FrameBufferImage::FrameBufferImage
    */
-  FrameBufferImage( unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferformat );
+  FrameBufferImage( unsigned int width, unsigned int height );
 
   /**
    * @copydoc Dali::FrameBufferImage::FrameBufferImage
@@ -63,16 +64,13 @@ public:
    */
   bool IsNativeFbo() const;
 
-public: // From Image
   /**
-   * @copydoc Dali::Internal::Image::Connect()
+   * @return Internal FrameBuffer used by this FrameBufferImage
    */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Image::Disconnect()
-   */
-  virtual void Disconnect();
+  FrameBuffer* GetFrameBuffer() const
+  {
+    return mFrameBufferObject.Get();
+  }
 
 protected:
   /**
@@ -82,9 +80,8 @@ protected:
 
 private:
   // cached values for the size / pixel format we were created with. Needed to recreate us when we Connect() to stage and mTicket was reset from a previous call to Disconnect().
+  FrameBufferPtr  mFrameBufferObject;
   NativeImageInterfacePtr mNativeImage;
-  Pixel::Format mPixelFormat;
-  RenderBuffer::Format mBufferFormat;
   bool mIsNativeFbo;
 }; // class FrameBufferImage
 
