@@ -49,13 +49,6 @@ Actor CreateRenderableActor( Image texture );
  */
 Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader );
 
-/**
- * @brief Retrieves the texture used in a renderable actor (if available).
- * @return The texture used by the actor.
- * @note Assumes the actor only has one renderer, and that renderer only has one texture.
- */
-Image GetTexture( Actor actor );
-
 } // namespace Dali
 
 #endif // DALI_TEST_ACTOR_UTILS_H

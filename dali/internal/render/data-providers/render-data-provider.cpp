@@ -34,7 +34,6 @@ RenderDataProvider::~RenderDataProvider()
 {
 }
 
-
 void RenderDataProvider::SetUniformMap(const UniformMapDataProvider& uniformMapDataProvider)
 {
   mUniformMapDataProvider = &uniformMapDataProvider;
@@ -53,11 +52,6 @@ void RenderDataProvider::SetShader( Shader& shader )
 Shader& RenderDataProvider::GetShader() const
 {
   return *mShader;
-}
-
-RenderDataProvider::Textures& RenderDataProvider::GetTextures()
-{
-  return mTextures;
 }
 
 RenderDataProvider::Samplers& RenderDataProvider::GetSamplers()

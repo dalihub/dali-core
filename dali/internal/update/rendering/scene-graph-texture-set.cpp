@@ -18,10 +18,7 @@
 #include "scene-graph-texture-set.h"
 
 // INTERNAL HEADERS
-#include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/internal-constants.h>
-#include <dali/internal/update/resources/texture-metadata.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
@@ -47,11 +44,7 @@ TextureSet* TextureSet::New()
 
 TextureSet::TextureSet()
 : mSamplers(),
-  mTextureId(),
   mRenderers(),
-  mResourcesReady( true ),
-  mFinishedResourceAcquisition( true ),
-  mChanged( true ),
   mHasAlpha( false )
 {
 }
@@ -63,111 +56,6 @@ TextureSet::~TextureSet()
 void TextureSet::operator delete( void* ptr )
 {
   gTextureSetMemoryPool.FreeThreadSafe( static_cast<TextureSet*>( ptr ) );
-}
-
-void TextureSet::Prepare( const ResourceManager& resourceManager )
-{
-  if( mChanged && mTextures.Empty() )
-  {
-    unsigned int opaqueCount = 0;
-    unsigned int completeCount = 0;
-    unsigned int failedCount = 0;
-    unsigned int frameBufferCount = 0;
-    const std::size_t textureCount( mTextureId.Count() );
-    if( textureCount > 0 )
-    {
-      for( unsigned int i(0); i<textureCount; ++i )
-      {
-        const ResourceId textureId = mTextureId[ i ];
-        TextureMetadata* metadata = NULL;
-        if( textureId != Integration::InvalidResourceId )
-        {
-          // if there is metadata, resource is loaded
-          if( resourceManager.GetTextureMetadata( textureId, metadata ) )
-          {
-            DALI_ASSERT_DEBUG( metadata );
-            // metadata is valid pointer from now on
-            if( metadata->IsFullyOpaque() )
-            {
-              ++opaqueCount;
-            }
-
-            if( metadata->IsFramebuffer() )
-            {
-              if( metadata->HasFrameBufferBeenRenderedTo() )
-              {
-                ++completeCount;
-              }
-              else
-              {
-                frameBufferCount++;
-              }
-            }
-            else
-            {
-              // loaded so will complete this frame
-              ++completeCount;
-            }
-            // no point checking failure as there is no metadata for failed loads
-          }
-          // if no metadata, loading can be failed
-          else if( resourceManager.HasResourceLoadFailed( textureId ) )
-          {
-            ++failedCount;
-          }
-        }
-        else
-        {
-          //If the texture is not valid it is considerer opaque and complete
-          ++opaqueCount;
-          ++completeCount;
-        }
-      }
-    }
-
-    mHasAlpha = ( opaqueCount != textureCount );
-
-    // ready for rendering when all textures are either successfully loaded or they are FBOs
-    mResourcesReady = (completeCount + frameBufferCount >= textureCount);
-
-    // Texture set is complete if all resources are either loaded or failed or, if they are FBOs have been rendererd to
-    mFinishedResourceAcquisition = ( completeCount + failedCount == textureCount );
-
-    if( mFinishedResourceAcquisition )
-    {
-      // Texture set is now considered not changed
-      mChanged = false;
-    }
-  }
-}
-
-void TextureSet::SetImage( size_t index,  ResourceId imageId )
-{
-  size_t textureCount( mTextureId.Size() );
-  if( textureCount < index + 1 )
-  {
-    mTextureId.Resize( index + 1 );
-
-    bool samplerExist = true;
-    if( mSamplers.Size() < index + 1 )
-    {
-      mSamplers.Resize( index + 1 );
-      samplerExist = false;
-    }
-
-    for( size_t i(textureCount); i<=index; ++i )
-    {
-      mTextureId[i] = Integration::InvalidResourceId;
-      if( !samplerExist )
-      {
-        mSamplers[i] = NULL;
-      }
-    }
-  }
-
-  mTextureId[index] = imageId;
-  mChanged = true;
-  NotifyChangeToRenderers();
 }
 
 void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
@@ -212,19 +100,17 @@ void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
   }
 
   mTextures[index] = texture;
-  mHasAlpha |= texture->HasAlphaChannel();
+  if( texture )
+  {
+    mHasAlpha |= texture->HasAlphaChannel();
+  }
+
   NotifyChangeToRenderers();
 }
 
 bool TextureSet::HasAlpha() const
 {
   return mHasAlpha;
-}
-
-void TextureSet::GetResourcesStatus( bool& resourcesReady, bool& finishedResourceAcquisition )
-{
-  resourcesReady = mResourcesReady;
-  finishedResourceAcquisition = mFinishedResourceAcquisition;
 }
 
 void TextureSet::AddObserver( Renderer* renderer )

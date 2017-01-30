@@ -98,9 +98,7 @@ int UtcDaliBufferImageDownCast2(void)
   application.Render(16);
   application.SendNotification();
 
-  Image image1 = GetTexture( actor );
-
-  BufferImage bufferImage = BufferImage::DownCast( image1 );
+  BufferImage bufferImage = BufferImage::DownCast( image );
   DALI_TEST_CHECK(!bufferImage);
 
   Actor unInitialzedActor;

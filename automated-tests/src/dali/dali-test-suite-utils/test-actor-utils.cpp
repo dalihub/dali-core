@@ -94,23 +94,4 @@ Actor CreateRenderableActor( Image texture, const std::string& vertexShader, con
   return actor;
 }
 
-Image GetTexture( Actor actor )
-{
-  Image image;
-  if( actor && actor.GetRendererCount() )
-  {
-    Renderer renderer = actor.GetRendererAt( 0u );
-    if( renderer )
-    {
-      TextureSet textureSet = renderer.GetTextures();
-      if( textureSet && textureSet.GetTextureCount() )
-      {
-        image = TextureGetImage( textureSet, 0u );
-      }
-    }
-  }
-
-  return image;
-}
-
 } // namespace Dali

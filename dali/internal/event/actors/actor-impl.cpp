@@ -1456,12 +1456,6 @@ unsigned int Actor::AddRenderer( Renderer& renderer )
   RendererPtr rendererPtr = RendererPtr( &renderer );
   mRenderers->push_back( rendererPtr );
   AddRendererMessage( GetEventThreadServices(), *mNode, renderer.GetRendererSceneObject() );
-
-  if( mIsOnStage)
-  {
-    rendererPtr->Connect();
-  }
-
   return index;
 }
 
@@ -2114,12 +2108,6 @@ void Actor::ConnectToSceneGraph()
     ConnectNodeMessage( GetEventThreadServices().GetUpdateManager(), *(mParent->mNode), *mNode );
   }
 
-  unsigned int rendererCount( GetRendererCount() );
-  for( unsigned int i(0); i<rendererCount; ++i )
-  {
-    GetRendererAt(i)->Connect();
-  }
-
   // Request relayout on all actors that are added to the scenegraph
   RelayoutRequest();
 
@@ -2200,12 +2188,6 @@ void Actor::DisconnectFromSceneGraph()
 {
   // Notification for Object::Observers
   OnSceneObjectRemove();
-
-  unsigned int rendererCount( GetRendererCount() );
-  for( unsigned int i(0); i<rendererCount; ++i )
-  {
-    GetRendererAt(i)->Disconnect();
-  }
 }
 
 void Actor::NotifyStageDisconnection()
