@@ -35,7 +35,6 @@
 
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/resources/resource-type-path.h>
-#include <dali/internal/event/resources/resource-client.h>
 
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/texture-cache-dispatcher.h>
@@ -85,7 +84,6 @@ struct ResourceManager::ResourceManagerImpl
                        RenderQueue& renderQueue )
   : mPlatformAbstraction(platformAbstraction),
     mNotificationManager(notificationManager),
-    mResourceClient(NULL),
     mTextureCacheDispatcher(textureCacheDispatcher),
     mTextureUploadedQueue(textureUploadedQueue),
     mTextureUploadedProcessingQueue(),
@@ -103,7 +101,6 @@ struct ResourceManager::ResourceManagerImpl
 
   PlatformAbstraction&        mPlatformAbstraction;
   NotificationManager&        mNotificationManager;
-  ResourceClient*             mResourceClient; // (needs to be a ptr - it's not instantiated yet)
   TextureCacheDispatcher&     mTextureCacheDispatcher;
   LockedResourceQueue&        mTextureUploadedQueue;
   TextureUploadedQueue        mTextureUploadedProcessingQueue;
@@ -158,15 +155,6 @@ ResourceManager::~ResourceManager()
 }
 
 /********************************************************************************
- ************************ ResourceClient direct interface  **********************
- ********************************************************************************/
-
-void ResourceManager::SetClient( ResourceClient& client )
-{
-  mImpl->mResourceClient = &client;
-}
-
-/********************************************************************************
  ************************ UpdateManager direct interface  ***********************
  ********************************************************************************/
 
@@ -185,25 +173,6 @@ bool ResourceManager::UpdateCache( BufferIndex updateBufferIndex )
 
   return mImpl->cacheUpdated;
 }
-
-void ResourceManager::PostProcessResources( BufferIndex updateBufferIndex )
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::Verbose, "ResourceManager: PostProcessResources()\n");
-
-  mImpl->mTextureUploadedQueue.SwapQueue( mImpl->mTextureUploadedProcessingQueue );
-
-  unsigned int numIds = mImpl->mTextureUploadedProcessingQueue.Size();
-  unsigned int i;
-
-  // process the list where RenderManager put post process requests
-  for ( i = 0; i < numIds; ++i )
-  {
-    ResourceId resourceId = mImpl->mTextureUploadedProcessingQueue[i];
-    SendToClient( UploadedMessage( *mImpl->mResourceClient, resourceId ) );
-  }
-}
-
 
 /********************************************************************************
  *************************** CoreImpl direct interface  *************************
@@ -255,7 +224,6 @@ void ResourceManager::HandleDecodeResourceRequest(
 
 void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, BitmapPtr bitmap )
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddBitmapImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
@@ -265,7 +233,6 @@ void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, BitmapPtr bitm
 
 void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInterfacePtr nativeImage)
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddNativeImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
@@ -276,7 +243,6 @@ void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInte
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
@@ -290,7 +256,6 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImageInterfacePtr nativeImage )
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
@@ -349,10 +314,7 @@ void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, PixelDataPtr
 
 void ResourceManager::HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, LoadResourcePriority priority, bool resetFinishedStatus )
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO( Debug::Filter::gResource, Debug::General, "ResourceManager: HandleReloadRequest(id:%u, path:%s)\n", id, typePath.path.c_str() );
-
-  bool resourceIsAlreadyLoading = true;
 
   if( resetFinishedStatus )
   {
@@ -368,14 +330,6 @@ void ResourceManager::HandleReloadResourceRequest( ResourceId id, const Resource
   {
     // Add ID to the loading set
     mImpl->loadingRequests.insert(id);
-    resourceIsAlreadyLoading = false;
-  }
-
-  if ( !resourceIsAlreadyLoading )
-  {
-    // load resource again
-    mImpl->mPlatformAbstraction.LoadResource(ResourceRequest(id, *typePath.type, typePath.path, priority));
-    SendToClient( LoadingMessage( *mImpl->mResourceClient, id ) );
   }
 }
 
@@ -561,7 +515,6 @@ bool ResourceManager::GetTextureMetadata( ResourceId id, TextureMetadata*& metad
 
 void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, ResourcePointer resource, LoadStatus loadStatus )
 {
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: LoadResponse(id:%u, status=%s)\n", id, loadStatus==RESOURCE_LOADING?"LOADING":loadStatus==RESOURCE_PARTIALLY_LOADED?"PARTIAL":"COMPLETE");
 
   // ID might be in the loading set
@@ -598,7 +551,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
           bitmapHeight = packedBitmap->GetBufferHeight();
         }
         ImageAttributes attrs = ImageAttributes::New( bitmapWidth, bitmapHeight ); ///!< Issue #AHC01
-        UpdateImageTicket (id, attrs);
 
         // Check for reloaded bitmap
         TextureMetadataCache::Iterator iter = mImpl->mTextureMetadata.Begin();
@@ -633,7 +585,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
         mImpl->mTextureMetadata.PushBack( TextureMetadata::New( id, nativeImg ) );
         mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImg );
 
-        UpdateImageTicket (id, attrs);
         break;
       }
 
@@ -642,9 +593,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
         break;
       }
     }
-
-    // Let ResourceClient know that the resource manager has loaded something that its clients might want to hear about:
-    NotifyTickets();
 
     // flag that a load has completed and the cache updated
     mImpl->cacheUpdated = true;
@@ -671,9 +619,6 @@ void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
     // Add the ID to the failed set, this will trigger a notification during UpdateTickets
     mImpl->newFailedRequests.insert(id);
 
-    // Let NotificationManager know that the resource manager needs to do some processing
-    NotifyTickets();
-
     mImpl->cacheUpdated = true;
   }
 }
@@ -681,46 +626,6 @@ void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
 /********************************************************************************
  ********************************* Private Methods  *****************************
  ********************************************************************************/
-
-void ResourceManager::NotifyTickets()
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  // Success notifications
-  for (LiveRequestIter iter = mImpl->newCompleteRequests.begin(); iter != mImpl->newCompleteRequests.end(); ++iter)
-  {
-    // Move to oldCompleteRequests
-    mImpl->oldCompleteRequests.insert(*iter);
-
-    SendToClient( LoadingSucceededMessage( *mImpl->mResourceClient, *iter ) );
-  }
-  mImpl->newCompleteRequests.clear();
-
-  // Failure notifications
-  for (LiveRequestIter iter = mImpl->newFailedRequests.begin(); iter != mImpl->newFailedRequests.end(); ++iter)
-  {
-    // Move to oldFailedRequests
-    mImpl->oldFailedRequests.insert(*iter);
-
-    // We should have a matching request ticket
-    SendToClient( LoadingFailedMessage( *mImpl->mResourceClient, *iter ) );
-  }
-  mImpl->newFailedRequests.clear();
-}
-
-void ResourceManager::UpdateImageTicket( ResourceId id, ImageAttributes& attributes ) ///!< Issue #AHC01
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  // ResourceLoader should load images considering the requested size
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: UpdateImageTicket(id:%u)\n", id);
-
-  // Let NotificationManager know that the resource manager needs to do some processing
-  SendToClient( UpdateImageTicketMessage( *mImpl->mResourceClient, id, attributes) );
-}
-
-void ResourceManager::SendToClient( MessageBase* message )
-{
-  mImpl->mNotificationManager.QueueMessage( message );
-}
 
 void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
 {

@@ -32,7 +32,6 @@ namespace Internal
 class NinePatchImage;
 typedef IntrusivePtr<NinePatchImage> NinePatchImagePtr;
 
-class ResourceClient;
 class ResourceManager;
 
 namespace SceneGraph
@@ -130,7 +129,6 @@ private: // from ResourceImage
   Uint16Pair ParseRange( unsigned int& index, unsigned int width, const PixelBuffer* & pixel, unsigned int pixelStride, int testByte, int testBits, int testValue );
 
 private:
-  ResourceClient*               mResourceClient;
   Integration::BitmapPtr        mBitmap;
   std::string                   mUrl;
   StretchRanges                 mStretchPixelsX;  //< The horizontal stretchable pixels in the cropped image space

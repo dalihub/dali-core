@@ -25,7 +25,6 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/resource-types.h>
@@ -178,7 +177,6 @@ NinePatchImage::NinePatchImage( const std::string& filename )
 {
   mUrl = filename;
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mResourceClient = &tls.GetResourceClient();
 
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
   Integration::BitmapResourceType resourceType;

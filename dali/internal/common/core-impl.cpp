@@ -163,8 +163,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mStage->Initialize();
 
-  mResourceClient = new ResourceClient( *mResourceManager, *mStage );
-
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
@@ -208,7 +206,6 @@ Core::~Core()
   delete mGestureEventProcessor;
   delete mNotificationManager;
   delete mShaderFactory;
-  delete mResourceClient;
   delete mResourceManager;
   delete mDiscardQueue;
   delete mTextureCacheDispatcher;
@@ -431,11 +428,6 @@ NotificationManager& Core::GetNotificationManager()
 ResourceManager& Core::GetResourceManager()
 {
   return *(mResourceManager);
-}
-
-ResourceClient& Core::GetResourceClient()
-{
-  return *(mResourceClient);
 }
 
 ShaderFactory& Core::GetShaderFactory()
