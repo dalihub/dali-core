@@ -184,15 +184,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   // Can only be considered ready when all the scene graph objects are connected to the renderer
   if( mGeometry && mShader )
   {
-    if( mTextureSet )
-    {
-      mTextureSet->GetResourcesStatus( mResourcesReady, mFinishedResourceAcquisition );
-    }
-    else
-    {
-      mResourcesReady = true;
-      mFinishedResourceAcquisition = true;
-    }
+    mResourcesReady = true;
+    mFinishedResourceAcquisition = true;
   }
 
   if( mRegenerateUniformMap > UNIFORM_MAP_READY )
@@ -585,16 +578,7 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
 
   if( mTextureSet )
   {
-    size_t textureCount = mTextureSet->GetTextureCount();
-    dataProvider->mTextures.resize( textureCount );
-    dataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
-    {
-      dataProvider->mTextures[i] = Render::Texture( mTextureSet->GetTextureId(i),0);
-      dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
-    }
-
-    textureCount = mTextureSet->GetNewTextureCount();
+    size_t textureCount = mTextureSet->GetNewTextureCount();
     dataProvider->mNewTextures.resize( textureCount );
     dataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )

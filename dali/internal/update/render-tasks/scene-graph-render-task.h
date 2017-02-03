@@ -377,7 +377,6 @@ private:
   Node* mSourceNode;
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;
-  unsigned int mFrameBufferResourceId;
   Render::FrameBuffer* mFrameBuffer;
 
   bool mResourcesFinished:1; ///< True if all resources were available when the render-task was processed
@@ -394,24 +393,11 @@ private:
   unsigned int mFrameCounter;       ///< counter for rendering every N frames
 
   unsigned int mRenderedOnceCounter;  ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
-  bool mTargetIsNativeFramebuffer; ///< Tells if our target is a native framebuffer
   bool mRequiresSync;              ///< Whether sync is needed to track the render
 
 };
 
 // Messages for RenderTask
-
-inline void SetFrameBufferIdMessage( EventThreadServices& eventThreadServices, RenderTask& task, unsigned int resourceId, bool isNativeFBO )
-{
-  typedef MessageValue2< RenderTask, unsigned int, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetFrameBufferId, resourceId, isNativeFBO );
-}
-
 inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, RenderTask& task, Render::FrameBuffer* frameBuffer )
 {
   typedef MessageValue1< RenderTask, Render::FrameBuffer*> LocalType;

@@ -23,7 +23,6 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
@@ -266,22 +265,6 @@ public: // Default property extensions from Object
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
-public: // Functions from Connectable
-  /**
-   * @copydoc Dali::Internal::Connectable::OnStage()
-   */
-  virtual bool OnStage() const;
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Connect()
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Disconnect()
-   */
-  virtual void Disconnect();
-
 private: // implementation
   Renderer();
 
@@ -299,13 +282,12 @@ private: // unimplemented methods
 
 private: // data
   SceneGraph::Renderer* mSceneObject;
-  Vector4* mBlendColor;                                       ///< Local copy of blend color, pointer only as its rarely used
-  GeometryPtr mGeometry;                                      ///< Connector that holds the geometry used by this renderer
-  ObjectConnector<TextureSet> mTextureSetConnector;           ///< Connector that holds the texture set used by this renderer
-  IntrusivePtr<Shader> mShader;                               ///< Connector that holds the shader used by this renderer
+  Vector4* mBlendColor;               ///< Local copy of blend color, pointer only as its rarely used
+  GeometryPtr mGeometry;              ///< Connector that holds the geometry used by this renderer
+  TextureSetPtr mTextureSet;          ///< Connector that holds the texture set used by this renderer
+  ShaderPtr mShader;                  ///< Connector that holds the shader used by this renderer
 
   int mDepthIndex;
-  int mOnStageCount;
 
   size_t mIndexedDrawFirstElement;                            ///< Offset of first element to draw from bound index buffer
   size_t mIndexedDrawElementCount;                            ///< Number of elements to draw

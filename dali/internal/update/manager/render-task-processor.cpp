@@ -229,8 +229,7 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
     RenderTask& renderTask = **iter;
 
     // Off screen only.
-    if( ( ( 0 == renderTask.GetFrameBufferId() ) && ( renderTask.GetFrameBuffer() == 0 ) ) ||
-        ( !renderTask.ReadyToRender( updateBufferIndex ) ) )
+    if( ( renderTask.GetFrameBuffer() == 0 ) || ( !renderTask.ReadyToRender( updateBufferIndex ) ) )
     {
       // Skip to next task.
       continue;
@@ -298,9 +297,7 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
     RenderTask& renderTask = **iter;
 
     // On screen only.
-    if( ( 0 != renderTask.GetFrameBufferId() ) ||
-        ( renderTask.GetFrameBuffer() != 0 )   ||
-        ( !renderTask.ReadyToRender( updateBufferIndex ) ) )
+    if( ( renderTask.GetFrameBuffer() != 0 )   || ( !renderTask.ReadyToRender( updateBufferIndex ) ) )
     {
       // Skip to next task.
       continue;

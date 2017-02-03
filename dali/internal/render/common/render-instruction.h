@@ -98,7 +98,6 @@ public:
    * @param[in] clearColor A pointer to a color to clear with, or NULL if no clear is required.
    */
   void Reset( Camera* camera,
-              unsigned int offscreenId,
               Render::FrameBuffer* frameBuffer,
               const Viewport* viewport,
               const Vector4* clearColor );
@@ -141,7 +140,6 @@ public: // Data
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
   bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
 
-  unsigned int mOffscreenTextureId;     ///< Optional offscreen target
   Render::FrameBuffer* mFrameBuffer;
 
 private: // Data
