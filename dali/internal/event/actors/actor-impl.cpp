@@ -1295,6 +1295,9 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
 {
   EnsureRelayoutData();
 
+  ResizePolicy::Type originalWidthPolicy = GetResizePolicy(Dimension::WIDTH);
+  ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
+
   for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
@@ -1318,6 +1321,34 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
 
   // If calling SetResizePolicy, assume we want relayout enabled
   SetRelayoutEnabled( true );
+
+  // If the resize policy is set to be FIXED, the preferred size
+  // should be overrided by the target size. Otherwise the target
+  // size should be overrided by the preferred size.
+
+  if( dimension & Dimension::WIDTH )
+  {
+    if( originalWidthPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
+    {
+      mRelayoutData->preferredSize.width = mTargetSize.width;
+    }
+    else if( originalWidthPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
+    {
+      mTargetSize.width = mRelayoutData->preferredSize.width;
+    }
+  }
+
+  if( dimension & Dimension::HEIGHT )
+  {
+    if( originalHeightPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
+    {
+      mRelayoutData->preferredSize.height = mTargetSize.height;
+    }
+    else if( originalHeightPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
+    {
+      mTargetSize.height = mRelayoutData->preferredSize.height;
+    }
+  }
 
   OnSetResizePolicy( policy, dimension );
 
@@ -2911,19 +2942,48 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::SIZE:
     {
-      value = GetTargetSize();
+      Vector3 size = GetTargetSize();
+
+      // Should return preferred size if size is fixed as set by SetSize
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        size.width = GetPreferredSize().width;
+      }
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        size.height = GetPreferredSize().height;
+      }
+
+      value = size;
+
       break;
     }
 
     case Dali::Actor::Property::SIZE_WIDTH:
     {
-      value = GetTargetSize().width;
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().width;
+      }
+      else
+      {
+        value = GetTargetSize().width;
+      }
       break;
     }
 
     case Dali::Actor::Property::SIZE_HEIGHT:
     {
-      value = GetTargetSize().height;
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().height;
+      }
+      else
+      {
+        value = GetTargetSize().height;
+      }
       break;
     }
 
