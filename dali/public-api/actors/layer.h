@@ -167,6 +167,8 @@ public:
   };
 
   /**
+   * @DEPRECATED_1_2.26. Not intended for application use.
+   *
    * @brief TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
    * @SINCE_1_0.0
    */
@@ -174,6 +176,7 @@ public:
   {
     TREE_DEPTH_MULTIPLIER = 10000,
   };
+
   /**
    * @brief The sort function type
    *
