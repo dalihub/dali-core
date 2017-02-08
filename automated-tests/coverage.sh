@@ -1,5 +1,10 @@
 #!/bin/bash
 
+opt_genhtml=true
+if [ $1 == -n ] ; then
+  opt_genhtml=false
+fi
+
 ( cd ../build/tizen ; make cov_data )
 
 # From lcov version 1.10 onwards, branch coverage is off by default and earlier versions do not support the rc option
@@ -23,8 +28,9 @@ for i in `find . -name "*.dir"` ; do
 done
 
 (
-    cd .. ;
-    genhtml $LCOV_OPTS -o build/tizen/doc/coverage `find . -name dali.info`
+    if [ $opt_genhtml == true ] ; then
+        cd .. ;
+        genhtml $LCOV_OPTS -o build/tizen/doc/coverage `find . -name dali.info`
+        echo "Coverage output: ../build/tizen/doc/coverage/index.html"
+    fi
 )
-
-echo "Coverage output: ../build/tizen/doc/coverage/index.html"
