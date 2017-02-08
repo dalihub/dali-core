@@ -67,6 +67,7 @@ struct RenderItem
   Vector3           mSize;
   Render::Renderer* mRenderer;
   Node*             mNode;
+  const void*       mTextureSet;        //< Used only for sorting
 
   mutable Render::Geometry* mBatchRenderGeometry;
 
