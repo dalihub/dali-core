@@ -56,8 +56,28 @@ namespace
 {
 
 /**
+ * Function which compares render items by shader/textureSet/geometry
+ * @param[in] lhs Left hand side item
+ * @param[in] rhs Right hand side item
+ * @return True if left item is greater than right
+ */
+bool PartialCompareItems( const RenderInstructionProcessor::SortAttributes& lhs,
+                          const RenderInstructionProcessor::SortAttributes& rhs )
+{
+  if( lhs.shader == rhs.shader )
+  {
+    if( lhs.textureSet == rhs.textureSet )
+    {
+      return lhs.geometry < rhs.geometry;
+    }
+    return lhs.textureSet < rhs.textureSet;
+  }
+  return lhs.shader < rhs.shader;
+}
+
+/**
  * Function which sorts render items by depth index then by instance
- * ptrs of shader/geometry/material.
+ * ptrs of shader/textureSet/geometry.
  * @param[in] lhs Left hand side item
  * @param[in] rhs Right hand side item
  * @return True if left item is greater than right
@@ -68,15 +88,7 @@ bool CompareItems( const RenderInstructionProcessor::SortAttributes& lhs, const 
   // encapsulates the same data (e.g. the middle-order bits of the ptrs).
   if( lhs.renderItem->mDepthIndex == rhs.renderItem->mDepthIndex )
   {
-    if( lhs.shader == rhs.shader )
-    {
-      if( lhs.textureResourceId == rhs.textureResourceId )
-      {
-        return lhs.geometry < rhs.geometry;
-      }
-      return lhs.textureResourceId < rhs.textureResourceId;
-    }
-    return lhs.shader < rhs.shader;
+    return PartialCompareItems(lhs, rhs);
   }
   return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
 }
@@ -114,30 +126,14 @@ bool CompareItems3D( const RenderInstructionProcessor::SortAttributes& lhs, cons
     if( lhsIsOpaque )
     {
       // If both RenderItems are opaque, sort using shader, then material then geometry.
-      if( lhs.shader == rhs.shader )
-      {
-        if( lhs.textureResourceId == rhs.textureResourceId )
-        {
-          return lhs.geometry < rhs.geometry;
-        }
-        return lhs.textureResourceId < rhs.textureResourceId;
-      }
-      return lhs.shader < rhs.shader;
+      return PartialCompareItems( lhs, rhs );
     }
     else
     {
       // If both RenderItems are transparent, sort using Z, then shader, then material, then geometry.
       if( Equals( lhs.zValue, rhs.zValue ) )
       {
-        if( lhs.shader == rhs.shader )
-        {
-          if( lhs.textureResourceId == rhs.textureResourceId )
-          {
-            return lhs.geometry < rhs.geometry;
-          }
-          return lhs.textureResourceId < rhs.textureResourceId;
-        }
-        return lhs.shader < rhs.shader;
+        return PartialCompareItems( lhs, rhs );
       }
       return lhs.zValue > rhs.zValue;
     }
@@ -219,6 +215,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       RenderItem& item = renderList.GetNextFreeItem();
       item.mRenderer = &renderable.mRenderer->GetRenderer();
       item.mNode = renderable.mNode;
+      item.mTextureSet = renderable.mRenderer->GetTextures();
       item.mIsOpaque = ( opacity == Renderer::OPAQUE );
       item.mDepthIndex = renderable.mRenderer->GetDepthIndex();
 
@@ -366,6 +363,9 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
 
       item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
 
+      // texture set
+      mSortingHelper[ index ].textureSet = item.mTextureSet;
+
       // The default sorting function should get inlined here.
       mSortingHelper[ index ].zValue = Internal::Layer::ZValue( item.mModelViewMatrix.GetTranslation3() ) - item.mDepthIndex;
 
@@ -381,6 +381,11 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
       RenderItem& item = renderList.GetItem( index );
 
       item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
+
+      // texture set
+      mSortingHelper[ index ].textureSet = item.mTextureSet;
+
+
       mSortingHelper[ index ].zValue = (*sortFunction)( item.mModelViewMatrix.GetTranslation3() ) - item.mDepthIndex;
 
       // Keep the RenderItem pointer in the helper so we can quickly reorder items after sort.

@@ -605,7 +605,8 @@ void Renderer::Render( Context& context,
   }
 }
 
-void Renderer::SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const
+void Renderer::SetSortAttributes( BufferIndex bufferIndex,
+                                  SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const
 {
   sortAttributes.shader = &( mRenderDataProvider->GetShader() );
   sortAttributes.geometry = mGeometry;
