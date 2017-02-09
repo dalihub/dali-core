@@ -40,6 +40,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
 
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
+  DiscardRequest();
 }
 
 void TestPlatformAbstraction::Suspend()
@@ -264,6 +265,7 @@ void TestPlatformAbstraction::SetAllResourceRequestsAsLoaded()
     Integration::ResourcePointer resource(bitmap);
     bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
     SetResourceLoaded( request->GetId(), request->GetType()->id, resource );
+    delete request;
   }
   mResourceRequests.Clear();
 }
@@ -273,13 +275,21 @@ void TestPlatformAbstraction::SetAllResourceRequestsAsFailed( Integration::Resou
   for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
        iter != endIter; ++iter )
   {
+    Integration::ResourceRequest* request = *iter;
     SetResourceLoadFailed( (*iter)->GetId(), failure);
+    delete request;
   }
   mResourceRequests.Clear();
 }
 
 void TestPlatformAbstraction::DiscardRequest()
 {
+  for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
+       iter != endIter; ++iter )
+  {
+    Integration::ResourceRequest* request = *iter;
+    delete request;
+  }
   mResourceRequests.Clear();
 }
 
