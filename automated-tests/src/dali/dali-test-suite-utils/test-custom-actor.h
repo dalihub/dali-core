@@ -1,7 +1,7 @@
 #ifndef TEST_CUSTOM_ACTOR_H
 #define TEST_CUSTOM_ACTOR_H
 
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 
 extern std::vector< std::string > MasterCallStack;
