@@ -249,7 +249,7 @@ HitActor HitTestWithinLayer( Actor& actor,
               hit.actor = &actor;
               hit.hitPosition = hitPointLocal;
               hit.distance = distance;
-              hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
+              hit.depth = actor.GetSortingDepth() ;
 
               if( actor.GetRendererCount() > 0 )
               {

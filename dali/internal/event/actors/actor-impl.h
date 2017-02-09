@@ -743,7 +743,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetHierarchyDepth()
    */
-  int GetHierarchyDepth() const
+  inline int GetHierarchyDepth() const
   {
     if( mIsOnStage )
     {
@@ -752,6 +752,14 @@ public:
 
     return -1;
   }
+
+  /**
+   * Get the actor's sorting depth (The hierarchy depth combined with
+   * the sibling order)
+   *
+   * @return The depth used for hit-testing and renderer sorting
+   */
+  unsigned int GetSortingDepth();
 
 public:
 

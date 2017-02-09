@@ -359,7 +359,7 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 
 unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
 {
-  return depth * Dali::DevelLayer::TREE_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+  return depth * Dali::DevelLayer::ACTOR_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
 }
 
 } // unnamed namespace
@@ -1015,6 +1015,11 @@ float Actor::GetCurrentOpacity() const
 ClippingMode::Type Actor::GetClippingMode() const
 {
   return mClippingMode;
+}
+
+unsigned int Actor::GetSortingDepth()
+{
+  return GetDepthIndex( mDepth, mSiblingOrder );
 }
 
 const Vector4& Actor::GetCurrentWorldColor() const
