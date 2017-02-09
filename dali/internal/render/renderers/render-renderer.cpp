@@ -148,8 +148,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mDepthWriteMode( depthWriteMode ),
   mDepthTestMode( depthTestMode ),
   mUpdateAttributesLocation( true ),
-  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
-  mBatchingEnabled( false )
+  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
   if(  blendingBitmask != 0u )
   {
@@ -529,11 +528,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
-void Renderer::SetBatchingEnabled( bool batchingEnabled )
-{
-  mBatchingEnabled = batchingEnabled;
-}
-
 void Renderer::Render( Context& context,
                        SceneGraph::TextureCache& textureCache,
                        BufferIndex bufferIndex,
@@ -544,7 +538,6 @@ void Renderer::Render( Context& context,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
                        const Vector3& size,
-                       Render::Geometry* externalGeometry,
                        bool blend )
 {
   // Get the program to use:
@@ -593,15 +586,18 @@ void Renderer::Render( Context& context,
     }
 
     SetUniforms( bufferIndex, node, size, *program );
-    Render::Geometry* geometry = externalGeometry ? externalGeometry : mGeometry;
 
-    if( mUpdateAttributesLocation || geometry->AttributesChanged() )
+    if( mUpdateAttributesLocation || mGeometry->AttributesChanged() )
     {
-      geometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
+      mGeometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
       mUpdateAttributesLocation = false;
     }
 
-    geometry->UploadAndDraw( context, bufferIndex, mAttributesLocation, mIndexedDrawFirstElement, mIndexedDrawElementsCount );
+    mGeometry->UploadAndDraw( context,
+                              bufferIndex,
+                              mAttributesLocation,
+                              mIndexedDrawFirstElement,
+                              mIndexedDrawElementsCount );
   }
 }
 

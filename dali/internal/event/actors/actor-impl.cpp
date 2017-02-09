@@ -200,7 +200,6 @@ DALI_PROPERTY( "minimumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::DevelActor::Property::BATCH_PARENT )
 DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
@@ -1992,8 +1991,7 @@ Actor::Actor( DerivedType derivedType )
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mClippingMode( ClippingMode::DISABLED ),
-  mIsBatchParent( false )
+  mClippingMode( ClippingMode::DISABLED )
 {
 }
 
@@ -2656,21 +2654,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::DevelActor::Property::BATCH_PARENT:
-    {
-      bool value;
-
-      if( property.Get( value ) )
-      {
-        if( value != mIsBatchParent )
-        {
-          mIsBatchParent = value;
-          SetIsBatchParentMessage( GetEventThreadServices(), *mNode, mIsBatchParent );
-        }
-      }
-      break;
-    }
-
     case Dali::DevelActor::Property::SIBLING_ORDER:
     {
       int value;
@@ -3195,12 +3178,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::MAXIMUM_SIZE:
     {
       value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::DevelActor::Property::BATCH_PARENT:
-    {
-      value = mIsBatchParent;
       break;
     }
 

@@ -33,7 +33,6 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 namespace
@@ -168,7 +167,6 @@ bool CompareItems3DWithClipping( const RenderInstructionProcessor::SortAttribute
  * @param renderable Node-Renderer pair
  * @param viewMatrix used to calculate modelview matrix for the item
  * @param camera The camera used to render
- * @param geometryBatcher The instance of the geometry batcher
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
@@ -177,22 +175,11 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      Renderable& renderable,
                                      const Matrix& viewMatrix,
                                      SceneGraph::Camera& camera,
-                                     GeometryBatcher& geometryBatcher,
                                      bool isLayer3d,
                                      bool cull )
 {
-  // Discard renderable early if it belongs to the batch which has been consumed in during frame.
-  Node* renderableNode = renderable.mNode;
-  const bool batchingValid( renderable.mRenderer->IsBatchingEnabled() && renderableNode->mBatchIndex != BATCH_NULL_HANDLE );
-  if( batchingValid && geometryBatcher.HasRendered( renderableNode->mBatchIndex ) )
-  {
-    return;
-  }
-
   bool inside( true );
-  const Node* batchParentNode = renderable.mNode->GetBatchParent();
-  const Node* node = ( renderable.mRenderer->IsBatchingEnabled() && batchParentNode ) ?
-        batchParentNode : renderableNode;
+  const Node* node = renderable.mNode;
 
   if( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
@@ -203,11 +190,6 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if( inside )
   {
-    if( batchingValid )
-    {
-      geometryBatcher.SetRendered( renderableNode->mBatchIndex );
-    }
-
     Renderer::Opacity opacity = renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode );
     if( opacity != Renderer::TRANSPARENT )
     {
@@ -240,7 +222,6 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
  * NodeRendererContainer Node-Renderer pairs
  * @param viewMatrix used to calculate modelview matrix for the items
  * @param camera The camera used to render
- * @param geometryBatcher The instance of the geometry batcher
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
@@ -249,7 +230,6 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
                                       RenderableContainer& renderers,
                                       const Matrix& viewMatrix,
                                       SceneGraph::Camera& camera,
-                                      GeometryBatcher* geometryBatcher,
                                       bool isLayer3d,
                                       bool cull )
 {
@@ -258,7 +238,13 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
   unsigned int rendererCount( renderers.Size() );
   for( unsigned int i(0); i < rendererCount; ++i )
   {
-    AddRendererToRenderList( updateBufferIndex, renderList, renderers[i], viewMatrix, camera, *geometryBatcher, isLayer3d, cull );
+    AddRendererToRenderList( updateBufferIndex,
+                             renderList,
+                             renderers[i],
+                             viewMatrix,
+                             camera,
+                             isLayer3d,
+                             cull );
   }
 }
 
@@ -416,7 +402,6 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
                                           SortedLayerPointers& sortedLayers,
                                           RenderTask& renderTask,
                                           bool cull,
-                                          GeometryBatcher& geometryBatcher,
                                           bool hasClippingNodes,
                                           RenderInstructionContainer& instructions )
 {
@@ -444,7 +429,13 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
       if( !SetupRenderList( renderables, layer, instruction, tryReuseRenderList, &renderList ) )
       {
         renderList->SetHasColorRenderItems( true );
-        AddRenderersToRenderList( updateBufferIndex, *renderList, renderables, viewMatrix, camera, &geometryBatcher, isLayer3D, cull );
+        AddRenderersToRenderList( updateBufferIndex,
+                                  *renderList,
+                                  renderables,
+                                  viewMatrix,
+                                  camera,
+                                  isLayer3D,
+                                  cull );
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
         SortRenderItems( updateBufferIndex, *renderList, layer, hasClippingNodes );
@@ -458,7 +449,13 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
       if( !SetupRenderList( renderables, layer, instruction, tryReuseRenderList, &renderList ) )
       {
         renderList->SetHasColorRenderItems( false );
-        AddRenderersToRenderList( updateBufferIndex, *renderList, renderables, viewMatrix, camera, NULL, isLayer3D, cull );
+        AddRenderersToRenderList( updateBufferIndex,
+                                  *renderList,
+                                  renderables,
+                                  viewMatrix,
+                                  camera,
+                                  isLayer3D,
+                                  cull );
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
         SortRenderItems( updateBufferIndex, *renderList, layer, false );

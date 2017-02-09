@@ -63,7 +63,6 @@ class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
 class PropertyBufferDataProvider;
-class GeometryBatcher;
 
 /**
  * RenderManager is responsible for rendering the result of the previous "update", which
@@ -77,12 +76,10 @@ public:
    * Construct a new RenderManager.
    * @param[in]  glAbstraction The GL abstraction used for rendering.
    * @param[in]  glSyncAbstraction The GL sync abstraction used fence sync creation/deletion.
-   * @param[in]  geometryBatcher The geometry batcher instance
    * @param[out] resourcePostProcessQueue A queue for sending rendered texture ids to the update-thread.*
    */
   static RenderManager* New( Integration::GlAbstraction& glAbstraction,
                              Integration::GlSyncAbstraction& glSyncAbstraction,
-                             SceneGraph::GeometryBatcher& geometryBatcher,
                              LockedResourceQueue& resourcePostProcessQueue );
 
   /**

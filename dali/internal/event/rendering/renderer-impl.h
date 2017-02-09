@@ -171,12 +171,6 @@ public:
    bool IsPreMultipliedAlphaEnabled() const;
 
    /**
-    * Returns state of batching mode
-    * @return batching mode state ( true if enabled )
-    */
-   bool IsBatchingEnabled() const;
-
-   /**
     * @brief Get the scene graph object
     *
     * @return the scene object
@@ -301,7 +295,6 @@ private: // data
   DepthWriteMode::Type         mDepthWriteMode:2;             ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:2;              ///< Local copy of the depth test mode
   bool                         mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                         mBatchingEnabled : 1;          ///< Flag indicating whether render is batchable or not
 };
 
 } // namespace Internal

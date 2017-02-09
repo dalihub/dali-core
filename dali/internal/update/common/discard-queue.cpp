@@ -26,7 +26,6 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 
 namespace Dali
 {
@@ -42,8 +41,7 @@ DiscardQueue::DiscardQueue( RenderQueue& renderQueue )
   mNodeQueue(),
   mShaderQueue(),
   mRendererQueue(),
-  mCameraQueue(),
-  mGeometryBatcher( NULL )
+  mCameraQueue()
 {
 }
 
@@ -59,20 +57,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
   // The Update for frame N+1 may occur in parallel with the rendering of frame N
   // Queue the node for destruction in frame N+2
   mNodeQueue[ updateBufferIndex ].PushBack( node );
-
-  // If batching, then mark corresponding batch to be destroyed too
-  if( node->GetIsBatchParent() )
-  {
-    mGeometryBatcher->RemoveBatchParent( node );
-  }
-  else if( node->GetBatchParent() )
-  {
-    if( node->mBatchIndex != BATCH_NULL_HANDLE )
-    {
-      mGeometryBatcher->RemoveNode( node );
-    }
-  }
-
 }
 
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
@@ -111,11 +95,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   mShaderQueue[ updateBufferIndex ].Clear();
   mRendererQueue[ updateBufferIndex ].Clear();
   mCameraQueue[ updateBufferIndex ].Clear();
-}
-
-void DiscardQueue::SetGeometryBatcher( GeometryBatcher* geometryBatcher )
-{
-  mGeometryBatcher = geometryBatcher;
 }
 
 } // namespace SceneGraph

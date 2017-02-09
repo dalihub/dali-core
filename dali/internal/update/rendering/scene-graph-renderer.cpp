@@ -108,7 +108,6 @@ enum Flags
   RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 17,
   RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18,
   RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 19,
-  RESEND_BATCHING_MODE               = 1 << 20,
 };
 
 } // Anonymous namespace
@@ -146,7 +145,6 @@ Renderer::Renderer()
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mPremultipledAlphaEnabled( false ),
-  mBatchingEnabled( false ),
   mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -363,13 +361,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
     }
 
-    if( mResendFlag & RESEND_BATCHING_MODE )
-    {
-      typedef MessageValue1< Render::Renderer, bool > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBatchingEnabled, mBatchingEnabled );
-    }
-
     mResendFlag = 0;
   }
 }
@@ -536,12 +527,6 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
-}
-
-void Renderer::SetBatchingEnabled( bool batchingEnabled )
-{
-  mBatchingEnabled = batchingEnabled;
-  mResendFlag |= RESEND_BATCHING_MODE;
 }
 
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
