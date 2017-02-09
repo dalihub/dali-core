@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,25 +33,10 @@ void utc_dali_resource_image_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-static const char* gTestImageFilename = "icon_wrt.png";
-
 namespace
 {
-
-void LoadBitmapResource(TestPlatformAbstraction& platform)
-{
-  Integration::ResourceRequest* request = platform.GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-}
-
-} // namespace
+const char* gTestImageFilename = "icon_wrt.png";
+} // unnamed namespace
 
 
 // 1.1
@@ -165,15 +150,11 @@ int UtcDaliResourceImageGetLoadingState01(void)
   tet_infoline("UtcDaliResourceImageGetLoadingState01");
 
   ResourceImage image = ResourceImage::New(gTestImageFilename);
-  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
-  application.SendNotification();
-  application.Render(16);
+  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingFailed);
 
   // simulate load success
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  LoadBitmapResource( platform );
-  application.Render(16);
-  application.SendNotification();
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
+  image.Reload();
 
   // Test state == ResourceLoadingSucceeded
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingSucceeded);
@@ -195,22 +176,14 @@ int UtcDaliResourceImageGetLoadingState02(void)
   // initialise handle
   image = ResourceImage::New(gTestImageFilename);
 
-  // Test state == ResourceLoading
-  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
-  application.SendNotification();
-  application.Render(16);
-
-  // simulate load failure
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoadFailed(request->GetId(), Integration::FailureUnknown);
-  }
-  application.Render(16);
-  application.SendNotification();
-
   // Test state == ResourceLoadingFailed
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingFailed);
+
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
+  image.Reload();
+
+  // Test state == ResourceLoadingFailed
+  DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoadingSucceeded);
   END_TEST;
 }
 
@@ -232,9 +205,11 @@ int UtcDaliResourceImageSignalLoadingFinished(void)
 
   SignalLoadFlag = false;
 
+  PrepareResourceImage( application, 100u, 100u, Pixel::RGBA8888 );
   ResourceImage image = ResourceImage::New(gTestImageFilename);
 
   image.LoadingFinishedSignal().Connect( SignalLoadHandler );
+  image.Reload();
   application.SendNotification();
   application.Render(16);
 

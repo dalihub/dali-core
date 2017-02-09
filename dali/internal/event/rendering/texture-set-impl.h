@@ -25,8 +25,6 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/rendering/texture-set.h> // Dali::TextureSet
-#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
-#include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
@@ -49,7 +47,7 @@ typedef IntrusivePtr<TextureSet> TextureSetPtr;
 /**
  * TextureSet is an object that holds all the textures used by a renderer
  */
-class TextureSet : public BaseObject, public Connectable
+class TextureSet : public BaseObject
 {
 public:
 
@@ -59,19 +57,9 @@ public:
   static TextureSetPtr New();
 
   /**
-   * @copydoc Dali::TextureSet::SetImage()
-   */
-  void SetImage( size_t index, ImagePtr image );
-
-  /**
    * @copydoc Dali::TextureSet::SetTexture()
    */
   void SetTexture( size_t index, NewTexturePtr texture );
-
-  /**
-   * @copydoc Dali::TextureSet::GetImage()
-   */
-  Image* GetImage( size_t index ) const;
 
   /**
    * @copydoc Dali::TextureSet::GetTexture()
@@ -100,22 +88,6 @@ public:
    */
   const SceneGraph::TextureSet* GetTextureSetSceneObject() const;
 
-public: // Functions from Connectable
-  /**
-   * @copydoc Dali::Internal::Connectable::OnStage()
-   */
-  virtual bool OnStage() const;
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Connect()
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Connectable::Disconnect()
-   */
-  virtual void Disconnect();
-
 private: // implementation
 
   TextureSet();
@@ -138,11 +110,8 @@ private: // unimplemented methods
 private: // Data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the update thread
   SceneGraph::TextureSet* mSceneObject;
-  std::vector<ImagePtr> mImages;
   std::vector<SamplerPtr> mSamplers;
   std::vector<NewTexturePtr> mNewTextures;
-  bool mOnStage;
-
 };
 
 } // namespace Internal

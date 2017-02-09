@@ -19,7 +19,6 @@
 
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <dali/internal/render/renderers/render-sampler.h>
 
 namespace Dali
 {

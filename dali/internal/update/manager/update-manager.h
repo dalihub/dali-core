@@ -632,11 +632,6 @@ private:
   void ProcessPropertyNotifications( BufferIndex bufferIndex );
 
   /**
-   * Prepare textures for rendering
-   */
-  void PrepareTextureSets( BufferIndex bufferIndex );
-
-  /**
    * Pass shader binaries queued here on to event thread.
    */
   void ForwardCompiledShadersToEventThread();

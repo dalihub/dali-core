@@ -91,8 +91,9 @@ public:
   }
 
   /**
-   * @brief @returns the x dimension stored in this 2-tuple.
+   * @brief Get the width.
    * @SINCE_1_0.0
+   * @return the x dimension stored in this 2-tuple
    */
   uint16_t GetWidth() const
   {

@@ -55,7 +55,6 @@ class EventProcessor;
 class GestureEventProcessor;
 class ResourceClient;
 class ResourceManager;
-class ImageFactory;
 class ShaderFactory;
 class TouchResampler;
 class RelayoutController;
@@ -244,12 +243,6 @@ private:  // for use by ThreadLocalStorage
   ResourceClient& GetResourceClient();
 
   /**
-   * Returns the Image factory
-   * @return A reference to the Image factory.
-   */
-  ImageFactory& GetImageFactory();
-
-  /**
    * Returns the Shader factory
    * @return A reference to the Shader binary factory.
    */
@@ -296,7 +289,6 @@ private:
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  ImageFactory*                             mImageFactory;                ///< Image resource factory
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading

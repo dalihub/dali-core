@@ -78,7 +78,7 @@ public:
   PixelData();
 
   /**
-   * Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
@@ -102,7 +102,7 @@ public:
   PixelData& operator=(const PixelData& rhs);
 
   /**
-   * Get the width of the buffer in pixels.
+   * @brief Get the width of the buffer in pixels.
    *
    * @SINCE_1_1.43
    * @return The width of the buffer in pixels
@@ -110,7 +110,7 @@ public:
   unsigned int GetWidth() const;
 
   /**
-   * Get the height of the buffer in pixels
+   * @brief Get the height of the buffer in pixels.
    *
    * @SINCE_1_1.43
    * @return The height of the buffer in pixels
@@ -118,7 +118,7 @@ public:
   unsigned int GetHeight() const;
 
   /**
-   * Get the pixel format
+   * @brief Get the pixel format.
    *
    * @SINCE_1_1.43
    * @return The pixel format

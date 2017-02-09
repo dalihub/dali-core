@@ -611,33 +611,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   FrameBufferTexture* offscreen = NULL;
 
-  if ( instruction.mOffscreenTextureId != 0 )
-  {
-    offscreen = mImpl->textureCache.GetFramebuffer( instruction.mOffscreenTextureId );
-    DALI_ASSERT_DEBUG( NULL != offscreen );
-
-    if( NULL != offscreen &&
-        offscreen->Prepare() )
-    {
-      // Check whether a viewport is specified, otherwise the full surface size is used
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        const int y = ( offscreen->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect.Set( 0, 0, offscreen->GetWidth(), offscreen->GetHeight() );
-      }
-    }
-    else
-    {
-      // Offscreen is NULL or could not be prepared.
-      return;
-    }
-  }
-  else if( instruction.mFrameBuffer != 0 )
+  if( instruction.mFrameBuffer != 0 )
   {
     instruction.mFrameBuffer->Bind( mImpl->context );
     if ( instruction.mIsViewportSet )
@@ -693,13 +667,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
                                     mImpl->geometryBatcher,
                                     mImpl->renderBufferIndex );
 
-  if(instruction.mOffscreenTextureId != 0)
-  {
-    GLenum attachments[] = { GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
-    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-  }
-
-  if( instruction.mRenderTracker && offscreen != NULL )
+  if( instruction.mRenderTracker && ( offscreen != NULL || instruction.mFrameBuffer != NULL ) )
   {
     // This will create a sync object every frame this render tracker
     // is alive (though it should be now be created only for

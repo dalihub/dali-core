@@ -62,16 +62,12 @@ internal_src_files = \
   $(internal_src_dir)/event/events/tap-gesture-processor.cpp \
   $(internal_src_dir)/event/events/touch-data-impl.cpp \
   $(internal_src_dir)/event/events/touch-event-processor.cpp \
-  $(internal_src_dir)/event/images/atlas-impl.cpp \
   $(internal_src_dir)/event/images/bitmap-packed-pixel.cpp \
   $(internal_src_dir)/event/images/bitmap-compressed.cpp \
   $(internal_src_dir)/event/images/image-impl.cpp \
   $(internal_src_dir)/event/images/buffer-image-impl.cpp \
   $(internal_src_dir)/event/images/frame-buffer-image-impl.cpp \
   $(internal_src_dir)/event/images/encoded-buffer-image-impl.cpp \
-  $(internal_src_dir)/event/images/image-connector.cpp \
-  $(internal_src_dir)/event/images/image-factory.cpp \
-  $(internal_src_dir)/event/images/image-factory-cache.cpp \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/images/resource-image-impl.cpp \
   $(internal_src_dir)/event/images/native-image-impl.cpp \

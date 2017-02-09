@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/event/images/image-factory-cache.h>
 #include <dali/integration-api/debug.h> // For DALI_LOG_OBJECT_STRING_DECLARATION
 
 namespace Dali
@@ -63,7 +62,7 @@ public:
   /**
    * @copydoc Dali::ResourceImage::GetLoadingState()
    */
-  Dali::LoadingState GetLoadingState() const { return mTicket ? mTicket->GetLoadingState() : ResourceLoading; }
+  Dali::LoadingState GetLoadingState() const { return mLoadingState; }
 
   /**
    * @copydoc Dali::ResourceImage::LoadingFinishedSignal()
@@ -117,27 +116,6 @@ public:
    */
   virtual Vector2 GetNaturalSize() const;
 
-  /**
-   * Indicates that the image is used.
-   */
-  virtual void Connect();
-
-  /**
-   * Indicates that the image is not used anymore.
-   */
-  virtual void Disconnect();
-
-public: // From ResourceTicketObserver
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingFailed()
-   */
-  virtual void ResourceLoadingFailed(const ResourceTicket& ticket);
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingSucceeded()
-   */
-  virtual void ResourceLoadingSucceeded(const ResourceTicket& ticket);
 
 protected:
 
@@ -151,22 +129,16 @@ protected:
    */
   ResourceImage();
 
-private:
-
   /**
-   * Helper method to set new resource ticket. Stops observing current ticket if any, and starts observing
-   * the new one or just resets the intrusive pointer.
-   * @param[in] ticket pointer to new resource Ticket or NULL.
+   * Constructor, with url and attributes
    */
-  void SetTicket( ResourceTicket* ticket );
+  ResourceImage( const std::string& url, const ImageAttributes& attributes);
 
 private:
-
-  ImageFactory& mImageFactory;
-
-  ImageFactoryCache::RequestPtr mRequest; ///< contains the initially requested attributes for image. Request is reissued when memory was released.
-
   Dali::ResourceImage::ResourceImageSignal mLoadingFinished;
+  ImageAttributes mAttributes;
+  std::string mUrl;
+  Dali::LoadingState mLoadingState;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

@@ -113,21 +113,8 @@ void RenderTask::SetCamera( Node* cameraNode, Camera* camera )
   mCamera = camera;
 }
 
-void RenderTask::SetFrameBufferId( unsigned int resourceId, bool isNativeFBO )
-{
-  // note that we might already have a RenderTracker
-  mTargetIsNativeFramebuffer = isNativeFBO;
-  mFrameBufferResourceId = resourceId;
-}
-
-unsigned int RenderTask::GetFrameBufferId() const
-{
-  return mFrameBufferResourceId;
-}
-
 void RenderTask::SetFrameBuffer( Render::FrameBuffer* frameBuffer )
 {
-  mTargetIsNativeFramebuffer = false;
   mFrameBuffer = frameBuffer;
 }
 
@@ -201,8 +188,6 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
     mState = RENDER_ONCE_WAITING_FOR_RESOURCES;
     mWaitingToRender = true;
     mNotifyTrigger = false;
-    // need at least on other render on the FBO
-    mResourceManager->SetFrameBufferBeenRenderedTo( mFrameBufferResourceId, false );
   }
 
   mFrameCounter = 0u;
@@ -240,8 +225,6 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
   }
 
   mCamera->Update( updateBufferIndex, *mCameraNode );
-
-  TASK_LOG_FMT(Debug::General, " =T (FBO ID:%d) FC:%d\n", mFrameBufferResourceId , mFrameCounter );
   return true;
 }
 
@@ -277,10 +260,6 @@ void RenderTask::SetResourcesFinished( bool resourcesFinished )
 {
   // resourcesFinished tells us that this render task will render to its FBO
   mResourcesFinished = resourcesFinished;
-  if( mResourcesFinished )
-  {
-    mResourceManager->SetFrameBufferBeenRenderedTo( mFrameBufferResourceId, true );
-  }
 }
 
 // Called every frame regardless of whether render was required.
@@ -328,17 +307,9 @@ void RenderTask::UpdateState()
     {
       mWaitingToRender = true;
       mNotifyTrigger = false;
-      if( mFrameBufferResourceId > 0 )
+      if( mFrameBuffer )
       {
-        if( mTargetIsNativeFramebuffer )
-        {
-          if( mRenderSyncTracker && mRenderSyncTracker->IsSynced() )
-          {
-            mWaitingToRender = false;
-            mNotifyTrigger = true;
-          }
-        }
-        else if( mResourceManager->HasFrameBufferBeenRenderedTo( mFrameBufferResourceId ) )
+        if( !mRenderSyncTracker || (mRenderSyncTracker && mRenderSyncTracker->IsSynced() ))
         {
           mWaitingToRender = false;
           mNotifyTrigger = true;
@@ -416,12 +387,11 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
   instruction.Reset( mCamera,
-                     GetFrameBufferId(),
                      GetFrameBuffer(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
-  if( mTargetIsNativeFramebuffer && mRequiresSync &&
+  if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE &&
       mResourcesFinished )
   {
@@ -516,7 +486,6 @@ RenderTask::RenderTask()
   mSourceNode( NULL ),
   mCameraNode( NULL ),
   mCamera( NULL ),
-  mFrameBufferResourceId( 0 ),
   mFrameBuffer(0),
   mResourcesFinished( false ),
   mWaitingToRender( false ),
@@ -531,7 +500,6 @@ RenderTask::RenderTask()
   mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
   mFrameCounter( 0u ),
   mRenderedOnceCounter( 0u ),
-  mTargetIsNativeFramebuffer( false ),
   mRequiresSync( false )
 {
 }

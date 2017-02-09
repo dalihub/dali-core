@@ -129,7 +129,7 @@ public:
    * Notify Dali that the contents of the buffer have changed.
    * @param [in] updateArea area that has changed in buffer. An empty rect means the whole buffer has changed.
    */
-  void Update (RectArea& updateArea);
+  void Update( const RectArea& updateArea);
 
   /**
    * @copydoc Dali::BufferImage::IsDataExternal
@@ -174,26 +174,6 @@ public:
     return mPixelFormat;
   }
 
-  /**
-   * @brief Upload pixel data to another resource at an offset
-   *
-   * @param destId ResourceId of the destination
-   * @param xOffset x offset in the destination
-   * @param yOffset y offset in the destination
-   */
-  void UploadBitmap( ResourceId destId, std::size_t xOffset, std::size_t yOffset );
-
-protected: // From Image
-  /**
-   * @copydoc Dali::Internal::Image::Connect
-   */
-  virtual void Connect();
-
-  /**
-   * @copydoc Dali::Internal::Image::Disconnect
-   */
-  virtual void Disconnect();
-
 private:
 
   void SetupBuffer( unsigned int width,
@@ -201,9 +181,7 @@ private:
                     Pixel::Format pixelformat,
                     unsigned int byteStride );
 
-  void CreateHostBitmap();
-
-  void UploadArea( ResourceId destId, const RectArea& area );
+  void UploadArea( const RectArea& area );
 
   void UpdateBufferArea( PixelBuffer* src, PixelBuffer* dest, const RectArea& area );
 

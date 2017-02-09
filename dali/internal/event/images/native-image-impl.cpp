@@ -22,9 +22,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/devel-api/images/native-image-interface-extension.h>
 
@@ -57,27 +54,15 @@ NativeImagePtr NativeImage::New( NativeImageInterface& resourceData )
   NativeImagePtr image = new NativeImage( resourceData );
   image->Initialize();
 
-  ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
-
   image->mWidth  = resourceData.GetWidth();
   image->mHeight = resourceData.GetHeight();
 
-  const ResourceTicketPtr& ticket = resourceClient.AddNativeImage( resourceData );
-  DALI_ASSERT_DEBUG( dynamic_cast<ImageTicket*>( ticket.Get() ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
-  image->mTicket = static_cast<ImageTicket*>(ticket.Get());
-  image->mTicket->AddObserver( *image );
-
+  image->mTexture = NewTexture::New( resourceData );
   return image;
 }
 
 NativeImage::~NativeImage()
 {
-}
-
-void NativeImage::CreateGlTexture()
-{
-  ResourceClient& resourceClient = ThreadLocalStorage::Get().GetResourceClient();
-  resourceClient.CreateGlTexture( GetResourceId() );
 }
 
 const char* NativeImage::GetCustomFragmentPreFix()

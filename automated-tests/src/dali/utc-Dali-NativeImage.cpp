@@ -116,90 +116,6 @@ int UtcDaliNativeImageDownCast(void)
   END_TEST;
 }
 
-int UtcDaliNativeImageCreateGlTextureN(void)
-{
-  TestApplication application;
-  tet_infoline( "Testing Dali::NativeImage::GenerateGlTexture()" );
-
-  NativeImage image;
-  try
-  {
-    image.CreateGlTexture();
-    tet_printf( "Assertion test failed - no Exception\n" );
-    tet_result( TET_FAIL );
-  }
-  catch( Dali::DaliException& e )
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "image &&", TEST_LOCATION );
-  }
-  END_TEST;
-}
-
-int UtcDaliNativeImageCreateGlTextureP(void)
-{
-  TestApplication application;
-  tet_infoline( "Testing Dali::NativeImage::GenerateGlTexture()" );
-
-  TestNativeImagePointer imageInterface = TestNativeImage::New( 16, 16 );
-  NativeImage image = NativeImage::New( *(imageInterface.Get()) );
-  DALI_TEST_CHECK( image );
-
-  image.CreateGlTexture();
-
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_EQUALS( imageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageInterface->mTargetTextureCalls, 1, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliNativeImageContextLoss(void)
-{
-  TestApplication application;
-  tet_infoline( "Testing Dali::NativeImage behaviour through a context lost/regained cycle." );
-
-  // Build an image that is expected to have a GL texture created for it and
-  // recreated in a GL context recovery:
-  TestNativeImagePointer eagerImageInterface = TestNativeImage::New( 16, 16 );
-  NativeImage eagerImage = NativeImage::New( *(eagerImageInterface.Get()) );
-  DALI_TEST_CHECK( eagerImage );
-
-  // Build a regular lazy-allocated image for comparison:
-  TestNativeImagePointer lazyImageInterface = TestNativeImage::New( 16, 16 );
-  NativeImage lazyImage = NativeImage::New( *(lazyImageInterface.Get()) );
-  DALI_TEST_CHECK( lazyImage );
-
-  eagerImage.CreateGlTexture();
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Cycle through a context loss and regain, asserting that the texture is
-  // not reallocated if it already existed before the cycle and is never allocated
-  // throughout the cycle if of the regular lazy kind:
-
-  // Call render thread context destroyed / created functions:
-  application.ResetContext();
-
-  // Call event thread function:
-  application.GetCore().RecoverFromContextLoss();
-
-  // Run update/render loop
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_EQUALS( eagerImageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( eagerImageInterface->mTargetTextureCalls, 1, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( lazyImageInterface->mExtensionCreateCalls, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( lazyImageInterface->mTargetTextureCalls, 0, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliNativeImageExtensionP(void)
 {
   TestApplication application;
@@ -267,7 +183,8 @@ int UtcDaliNativeImageTestCreationFailure(void)
   application.Render();
 
   // Test that nothing was rendered
-  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
+  //GlExtensionCreate() called twice, once at initialization and once when trying to bind the texture
+  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 2, TEST_LOCATION );
   DALI_TEST_EQUALS( nativeImageInterface->mTargetTextureCalls, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), false, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION );
@@ -281,7 +198,7 @@ int UtcDaliNativeImageTestCreationFailure(void)
   application.Render();
 
   // This time around, the bind and draw should occur following the call to nativeImage->GlExtensionCreate.
-  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( nativeImageInterface->mExtensionCreateCalls, 3, TEST_LOCATION );
   DALI_TEST_EQUALS( nativeImageInterface->mTargetTextureCalls, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION );

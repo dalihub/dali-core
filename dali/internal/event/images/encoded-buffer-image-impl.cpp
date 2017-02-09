@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/platform-abstraction.h>
 
 namespace Dali
@@ -52,7 +51,6 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   EncodedBufferImagePtr image( new EncodedBufferImage() );
   image->Initialize(); // Second stage initialization
 
-  // Replicate the functionality of ImageFactory::load() without the filesystem caching:
   Dali::Integration::BitmapResourceType resourceType( size, fittingMode, samplingMode, orientationCorrection );
   RequestBufferPtr buffer( new RequestBuffer );
   buffer->GetVector().Resize( encodedImageByteCount );
@@ -72,9 +70,35 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
 
   if( bitmap )
   {
-    ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
-    image->mTicket = resourceClient.AddBitmapImage( bitmap.Get() );
-    image->mTicket->AddObserver( *image );
+    unsigned width  = bitmap->GetImageWidth();
+    unsigned height = bitmap->GetImageHeight();
+
+    //Create texture
+    Pixel::Format format = bitmap->GetPixelFormat();
+    image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
+
+    //Upload data to the texture
+    size_t bufferSize = bitmap->GetBufferSize();
+    PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
+                                             static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
+    image->mTexture->Upload( pixelData );
+
+    image->mWidth = size.GetWidth();
+    if( image->mWidth == 0 )
+    {
+      image->mWidth = width;
+    }
+
+    image->mHeight = size.GetHeight();
+    if( image->mHeight == 0 )
+    {
+      image->mHeight = height;
+    }
+  }
+  else
+  {
+    image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
+    image->mWidth = image->mHeight = 0u;
   }
 
   return image;

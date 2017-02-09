@@ -755,6 +755,15 @@ const unsigned char sEncodedBufferImageDataPNG[] = {
 
 static const unsigned int sEncodedBufferImageDataPNGLength = sizeof( sEncodedBufferImageDataPNG );
 
+void PrepareDecodeBuffer( TestApplication& application, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+{
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, width, height, width, height );
+  Integration::BitmapPtr bitmapPtr(bitmap);
+  platform.SetDecodedBitmap( bitmapPtr );
+}
+
 } // anonymous namespace
 
 
@@ -831,6 +840,7 @@ int UtcDaliEncodedBufferImageNewP2(void)
   DALI_TEST_CHECK( !image );
 
   // Trigger image decode to initialise the handle
+  PrepareDecodeBuffer( application, 720u, 1280u, Pixel::RGBA8888 );
   image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT );
 
   DALI_TEST_CHECK( image );
