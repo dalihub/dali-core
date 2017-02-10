@@ -25,7 +25,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/event/resources/resource-client.h>
+#include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/resource-ticket-observer.h>
 
 namespace Dali

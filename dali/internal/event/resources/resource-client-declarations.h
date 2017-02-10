@@ -19,8 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <stdint.h> // for uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/type-abstraction.h>
 
@@ -29,6 +31,15 @@ namespace Dali
 
 namespace Internal
 {
+
+typedef Integration::ResourceId ResourceId;
+
+/** Raw bytes of a resource laid out exactly as it wouldbe in a file, but in memory. */
+typedef Dali::RefCountedVector<uint8_t> RequestBuffer;
+/** Counting smart pointer for managing a buffer of raw bytes. */
+typedef IntrusivePtr<RequestBuffer>     RequestBufferPtr;
+
+typedef Rect<unsigned int> RectArea;
 
 template <> struct ParameterType< Integration::LoadStatus >
 : public BasicType< Integration::LoadStatus > {};

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <stdint.h> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h> // For Integration::BitmapPtr
 #include <dali/public-api/object/ref-object.h>
@@ -34,7 +37,6 @@ namespace Internal
 class BufferImage;
 typedef IntrusivePtr<BufferImage> BufferImagePtr;
 
-class ResourceClient;
 class ResourceManager;
 
 /**
@@ -189,7 +191,6 @@ private:
 
   PixelBuffer*                 mInternalBuffer;       ///< NULL if the data is supplied by an external buffer.
   PixelBuffer*                 mExternalBuffer;       ///< NULL if there is no external pixel data (this is never owned by BufferImage).
-  ResourceClient*              mResourceClient;       ///< pointer to the resource client.
   uint32_t                     mBufferSize;           ///< size of the pixel buffer.
   uint32_t                     mByteStride;           ///< width of the pixel buffer in bytes.
   uint32_t                     mBytesPerPixel;        ///< width of a pixel in bytes.

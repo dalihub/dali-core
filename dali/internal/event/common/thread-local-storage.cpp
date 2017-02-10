@@ -92,11 +92,6 @@ ResourceManager& ThreadLocalStorage::GetResourceManager()
   return mCore->GetResourceManager();
 }
 
-ResourceClient& ThreadLocalStorage::GetResourceClient()
-{
-  return mCore->GetResourceClient();
-}
-
 ShaderFactory& ThreadLocalStorage::GetShaderFactory()
 {
   return mCore->GetShaderFactory();

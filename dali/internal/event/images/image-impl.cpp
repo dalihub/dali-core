@@ -28,7 +28,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/common/stage-impl.h>
 
 using namespace Dali::Integration;

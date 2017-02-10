@@ -937,9 +937,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   //Process the queued scene messages
   mImpl->messageQueue.ProcessMessages( bufferIndex );
 
-  //Post Process Ids of resources updated by renderer
-  mImpl->resourceManager.PostProcessResources( bufferIndex );
-
   //Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 

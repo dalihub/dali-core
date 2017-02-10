@@ -24,6 +24,46 @@
 #include <mesh-builder.h>
 
 using namespace Dali;
+
+namespace
+{
+
+enum SetSampler
+{
+  SET_SAMPLER,
+  DONT_SET_SAMPLER
+};
+
+Actor CreateActor( SetSampler setSamplerOption )
+{
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
+
+  Shader shader = CreateShader();
+  TextureSet textureSet = CreateTextureSet();
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  textureSet.SetTexture( 0u, texture );
+  if( setSamplerOption == SET_SAMPLER )
+  {
+    textureSet.SetSampler( 0u, sampler );
+  }
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+
+  return actor;
+}
+
+} // namespace
+
+
 void texture_set_test_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -108,20 +148,7 @@ int UtcDaliTextureSetTexture01(void)
 {
   TestApplication application;
 
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
-
-  Shader shader = CreateShader();
-  TextureSet textureSet = CreateTextureSet();
-  textureSet.SetTexture( 0u, texture );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
+  Actor actor = CreateActor( DONT_SET_SAMPLER );
 
   Stage::GetCurrent().Add( actor );
 
@@ -151,24 +178,7 @@ int UtcDaliTextureSetTexture02(void)
 {
   TestApplication application;
 
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
-
-  Shader shader = CreateShader();
-  TextureSet textureSet = CreateTextureSet();
-
-  Sampler sampler = Sampler::New();
-  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
-  textureSet.SetTexture( 0u, texture );
-  textureSet.SetSampler( 0u, sampler );
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
-
-  Actor actor = Actor::New();
-  actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
+  Actor actor = CreateActor(SET_SAMPLER);
 
   Stage::GetCurrent().Add( actor );
 
@@ -194,6 +204,40 @@ int UtcDaliTextureSetTexture02(void)
 
   END_TEST;
 }
+
+int UtcDaliTextureSetMultiple(void)
+{
+  TestApplication application;
+
+  Actor actor1 = CreateActor(SET_SAMPLER);
+  Actor actor2 = CreateActor(SET_SAMPLER);
+
+  Stage::GetCurrent().Add( actor1 );
+  Stage::GetCurrent().Add( actor2 );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit=-1;
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  texParameterTrace.Enable( false );
+
+  // Verify gl state
+  // For each actor there are four calls to TexParameteri when the texture is first created
+  // Texture minification and magnification filters are now different than default so
+  //there should have been two extra TexParameteri calls to set the new filter mode
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2 * 6, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTextureSetSetSampler(void)
 {
   TestApplication application;

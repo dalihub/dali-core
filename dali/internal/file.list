@@ -83,7 +83,6 @@ internal_src_files = \
   $(internal_src_dir)/event/rendering/sampler-impl.cpp \
   $(internal_src_dir)/event/rendering/shader-impl.cpp \
   $(internal_src_dir)/event/resources/image-ticket.cpp \
-  $(internal_src_dir)/event/resources/resource-client.cpp \
   $(internal_src_dir)/event/resources/resource-ticket.cpp \
   $(internal_src_dir)/event/resources/resource-type-path.cpp \
   $(internal_src_dir)/event/size-negotiation/memory-pool-relayout-container.cpp \
