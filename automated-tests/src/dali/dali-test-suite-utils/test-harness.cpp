@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -329,8 +329,9 @@ void Usage(const char* program)
   printf("Usage: \n"
          "   %s <testcase name>\t\t Execute a test case\n"
          "   %s \t\t Execute all test cases in parallel\n"
-         "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n",
-         program, program, program);
+         "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n"
+         "   %s -s\t\t Execute all test cases serially\n",
+         program, program, program, program);
 }
 
 } // namespace
