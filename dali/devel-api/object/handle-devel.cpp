@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-key.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/type-info-impl.h>
 
 namespace Dali
 {
@@ -41,6 +42,11 @@ Property::Index GetPropertyIndex( const Handle& handle, Property::Key key )
 Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue )
 {
   return GetImplementation( handle ).RegisterProperty( name, key, propertyValue );
+}
+
+void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )
+{
+  GetImplementation( handle ).SetTypeInfo( &GetImplementation( typeInfo ) );
 }
 
 } // namespace DevelHandle
