@@ -87,6 +87,14 @@ inline const Vector2& GetDefaultDimensionPadding()
 
 const SizeScalePolicy::Type DEFAULT_SIZE_SCALE_POLICY = SizeScalePolicy::USE_SIZE_SET;
 
+int GetSiblingOrder( ActorPtr actor )
+{
+  Property::Value value  = actor->GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  int order;
+  value.Get( order );
+  return order;
+}
+
 } // unnamed namespace
 
 /**
@@ -2699,11 +2707,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       {
         if( static_cast<unsigned int>(value) != mSiblingOrder )
         {
-          mSiblingOrder = value;
-          if( mIsOnStage )
-          {
-            SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
-          }
+          SetSiblingOrder( value );
         }
       }
       break;
@@ -4417,6 +4421,453 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
 Object* Actor::GetParentObject() const
 {
   return mParent;
+}
+
+void Actor::SetSiblingOrder( unsigned int order )
+{
+  mSiblingOrder = std::min( order, static_cast<unsigned int>( DevelLayer::SIBLING_ORDER_MULTIPLIER ) );
+  if( mIsOnStage )
+  {
+    SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+  }
+}
+
+void Actor::DefragmentSiblingIndexes( ActorContainer& siblings )
+{
+  // Sibling index may not be in consecutive order as the sibling range is limited ( DevelLayer::SIBLING_ORDER_MULTIPLIER )
+  // we need to remove the gaps and ensure the number start from 0 and consecutive hence have a full range.
+
+  // Start at index 0, while index <= highest order
+  // Find next index higher than 0
+  //   if nextHigher > index+1
+  //      set all nextHigher orders to index+1
+
+  // Limitation: May reach the ceiling of DevelLayer::SIBLING_ORDER_MULTIPLIER with highest sibling.
+
+  ActorIter end = siblings.end();
+  int highestOrder = 0;
+  for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+  {
+    ActorPtr sibling = (*iter);
+    int siblingOrder = sibling->mSiblingOrder;
+    highestOrder = std::max( highestOrder, siblingOrder );
+  }
+
+  for ( int index = 0; index <= highestOrder; index++ )
+  {
+    int nextHighest = -1;
+
+    // Find Next highest
+    for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      int siblingOrder = sibling->mSiblingOrder;
+
+      if ( siblingOrder > index )
+      {
+        if ( nextHighest == -1 )
+        {
+          nextHighest = siblingOrder;
+        }
+        nextHighest = std::min( nextHighest, siblingOrder );
+      }
+    }
+
+    // Check if a gap exists between indexes, if so set next index to consecutive number
+    if ( ( nextHighest - index ) > 1 )
+    {
+      for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+      {
+        ActorPtr sibling = (*iter);
+        int siblingOrder = sibling->mSiblingOrder;
+        if ( siblingOrder == nextHighest )
+        {
+          sibling->mSiblingOrder =  index + 1;
+          if ( sibling->mSiblingOrder >= Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER )
+          {
+            DALI_LOG_WARNING( "Reached max sibling order level for raising / lowering actors\n" );
+            sibling->mSiblingOrder = Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+          }
+          sibling->SetSiblingOrder( sibling->mSiblingOrder );
+        }
+      }
+    }
+  }
+}
+
+bool Actor::ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom )
+{
+  // Allows exclusive levels for an actor by shifting all sibling levels at the target and above by 1
+  bool defragmentationRequired( false );
+  ActorIter end = siblings.end();
+  for( ActorIter iter = siblings.begin(); ( iter != end ) ; ++iter )
+  {
+    // Move actors at nearest order and above up by 1
+    ActorPtr sibling = (*iter);
+    if ( sibling != this )
+    {
+      // Iterate through container of actors, any actor with a sibling order of the target or greater should
+      // be incremented by 1.
+      if ( sibling->mSiblingOrder >= targetLevelToShiftFrom )
+      {
+        sibling->mSiblingOrder++;
+        if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+        {
+          // If a sibling order raises so that it is only 1 from the maximum allowed then set flag so
+          // can re-order all sibling orders.
+          defragmentationRequired = true;
+        }
+        sibling->SetSiblingOrder( sibling->mSiblingOrder );
+      }
+    }
+  }
+  return defragmentationRequired;
+}
+
+void Actor::Raise()
+{
+  /*
+     1) Check if already at top and nothing to be done.
+        This Actor can have highest sibling order but if not exclusive then another actor at same sibling
+        order can be positioned above it due to insertion order of actors.
+     2) Find nearest sibling level above, these are the siblings this actor needs to be above
+     3) a) There may be other levels above this target level
+        b) Increment all sibling levels at the level above nearest(target)
+        c) Now have a vacant sibling level
+     4) Set this actor's sibling level to nearest +1 as now vacated.
+
+     Note May not just be sibling level + 1 as could be empty levels in-between
+
+     Example:
+
+     1 ) Initial order
+        ActorC ( sibling level 4 )
+        ActorB ( sibling level 3 )
+        ActorA ( sibling level 1 )
+
+     2 )  ACTION: Raise A above B
+        a) Find nearest level above A = Level 3
+        b) Increment levels above Level 3
+
+           ActorC ( sibling level 5 )
+           ActorB ( sibling level 3 )  NEAREST
+           ActorA ( sibling level 1 )
+
+     3 ) Set Actor A sibling level to nearest +1 as vacant
+
+         ActorC ( sibling level 5 )
+         ActorA ( sibling level 4 )
+         ActorB ( sibling level 3 )
+
+     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+         remove any empty sibling order gaps and start from sibling level 0 again.
+         If the number of actors reaches this maximum and all using exclusive sibling order values then
+         defragmention will stop and new sibling orders will be set to same max value.
+  */
+  if ( mParent )
+  {
+    int nearestLevel = mSiblingOrder;
+    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
+    bool defragmentationRequired( false );
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    // Find Nearest sibling level above this actor
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int order = GetSiblingOrder( sibling );
+
+        if ( ( order >= mSiblingOrder ) )
+        {
+          int distanceToNextLevel =  order - mSiblingOrder;
+          if ( distanceToNextLevel < shortestDistanceToNextLevel )
+          {
+            nearestLevel = order;
+            shortestDistanceToNextLevel = distanceToNextLevel;
+          }
+        }
+      }
+    }
+
+    if ( nearestLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at top
+    {
+      mSiblingOrder = nearestLevel + 1; // Set sibling level to that above the nearest level
+      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+      // Move current actor to newly vacated order level
+      SetSiblingOrder( mSiblingOrder );
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+    SetSiblingOrder( mSiblingOrder );
+  }
+}
+
+void Actor::Lower()
+{
+  /**
+    1) Check if actor already at bottom and if nothing needs to be done
+       This Actor can have lowest sibling order but if not exclusive then another actor at same sibling
+       order can be positioned above it due to insertion order of actors so need to move this actor below it.
+    2) Find nearest sibling level below, this Actor needs to be below it
+    3) a) Need to vacate a sibling level below nearest for this actor to occupy
+       b) Shift up all sibling order values of actor at the nearest level and levels above it to vacate a level.
+       c) Set this actor's sibling level to this newly vacated level.
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+       If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+       remove any empty sibling order gaps and start from sibling level 0 again.
+       If the number of actors reaches this maximum and all using exclusive sibling order values then
+       defragmention will stop and new sibling orders will be set to same max value.
+  */
+
+  if ( mParent )
+  {
+    // 1) Find nearest level below
+    int nearestLevel = mSiblingOrder;
+    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int order = GetSiblingOrder( sibling );
+
+        if ( order <= mSiblingOrder )
+        {
+          int distanceToNextLevel =  mSiblingOrder - order;
+          if ( distanceToNextLevel < shortestDistanceToNextLevel )
+          {
+            nearestLevel = order;
+            shortestDistanceToNextLevel = distanceToNextLevel;
+          }
+        }
+      }
+    }
+
+    bool defragmentationRequired ( false );
+
+    // 2) If actor already not at bottom, raise all actors at required level and above
+    if ( shortestDistanceToNextLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at bottom
+    {
+      mSiblingOrder = nearestLevel;
+      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+      // Move current actor to newly vacated order
+      SetSiblingOrder( mSiblingOrder );
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+  }
+}
+
+void Actor::RaiseToTop()
+{
+  /**
+    1 ) Find highest sibling order actor
+    2 ) If highest sibling level not itself then set sibling order to that + 1
+    3 ) highest sibling order can be same as itself so need to increment over that
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    int maxOrder = 0;
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        maxOrder = std::max( GetSiblingOrder( sibling ), maxOrder );
+      }
+    }
+
+    bool defragmentationRequired( false );
+
+    if ( maxOrder >= mSiblingOrder )
+    {
+      mSiblingOrder = maxOrder + 1;
+      if ( mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+      {
+        defragmentationRequired = true;
+      }
+    }
+
+    SetSiblingOrder( mSiblingOrder );
+
+    if ( defragmentationRequired )
+    {
+      DefragmentSiblingIndexes( *siblings );
+    }
+  }
+}
+
+void Actor::LowerToBottom()
+{
+  /**
+    See Actor::LowerToBottom()
+
+    1 ) Check if this actor already at exclusively at the bottom, if so then no more to be done.
+    2 ) a ) Check if the bottom position 0 is vacant.
+        b ) If 0 position is not vacant then shift up all sibling order values from 0 and above
+        c ) 0 sibling position is vacant.
+    3 ) Set this actor to vacant sibling order 0;
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    bool defragmentationRequired( false );
+    bool orderZeroFree ( true );
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    bool actorAtLowestOrder = true;
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int siblingOrder = GetSiblingOrder( sibling );
+        if ( siblingOrder <= mSiblingOrder )
+        {
+          actorAtLowestOrder = false;
+        }
+
+        if ( siblingOrder == 0 )
+        {
+          orderZeroFree = false;
+        }
+      }
+    }
+
+    if ( ! actorAtLowestOrder  )
+    {
+      if ( ! orderZeroFree )
+      {
+        defragmentationRequired = ShiftSiblingsLevels( *siblings, 0 );
+      }
+      mSiblingOrder = 0;
+      SetSiblingOrder( mSiblingOrder );
+
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+  }
+}
+
+void Actor::RaiseAbove( Dali::Actor target )
+{
+  /**
+    1 ) a) Find target actor's sibling order
+        b) If sibling order of target is the same as this actor then need to this Actor's sibling order
+           needs to be above it or the insertion order will determine which is drawn on top.
+    2 ) Shift up by 1 all sibling order greater than target sibling order
+    3 ) Set this actor to the sibling order to target +1 as will be a newly vacated gap above
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( this != target )
+  {
+     // Find target's sibling order
+     // Set actor sibling order to this number +1
+    int targetSiblingOrder = GetSiblingOrder( &GetImplementation( target ) );
+    ActorContainer* siblings = mParent->mChildren;
+    mSiblingOrder = targetSiblingOrder + 1;
+    bool defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+
+    SetSiblingOrder( mSiblingOrder );
+
+    if ( defragmentationRequired )
+    {
+      DefragmentSiblingIndexes( *(mParent->mChildren) );
+    }
+  }
+}
+
+void Actor::LowerBelow( Dali::Actor target )
+{
+  /**
+     1 ) a) Find target actor's sibling order
+         b) If sibling order of target is the same as this actor then need to this Actor's sibling order
+            needs to be below it or the insertion order will determine which is drawn on top.
+     2 ) Shift the target sibling order and all sibling orders at that level or above by 1
+     3 ) Set this actor to the sibling order of the target before it changed.
+     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+         remove any empty sibling order gaps and start from sibling level 0 again.
+         If the number of actors reaches this maximum and all using exclusive sibling order values then
+         defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( this != target  )
+  {
+    bool defragmentationRequired ( false );
+    // Find target's sibling order
+    // Set actor sibling order to target sibling order - 1
+    int targetSiblingOrder = GetSiblingOrder( &GetImplementation( target ) );
+    ActorContainer* siblings = mParent->mChildren;
+    if ( targetSiblingOrder == 0 )
+    {
+      //lower to botton
+      ActorIter end = siblings->end();
+      for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+      {
+        ActorPtr sibling = (*iter);
+        if ( sibling != this )
+        {
+          sibling->mSiblingOrder++;
+          if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+          {
+            defragmentationRequired = true;
+          }
+          sibling->SetSiblingOrder( sibling->mSiblingOrder );
+        }
+      }
+      mSiblingOrder = 0;
+    }
+    else
+    {
+      defragmentationRequired = ShiftSiblingsLevels( *siblings, targetSiblingOrder );
+
+      mSiblingOrder = targetSiblingOrder;
+    }
+    SetSiblingOrder( mSiblingOrder );
+
+    if ( defragmentationRequired )
+    {
+      DefragmentSiblingIndexes( *(mParent->mChildren) );
+    }
+  }
 }
 
 } // namespace Internal

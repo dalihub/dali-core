@@ -87,6 +87,14 @@ enum Type
   INHERIT_POSITION     = Dali::Actor::Property::INHERIT_POSITION,
   CLIPPING_MODE        = Dali::Actor::Property::CLIPPING_MODE,
 
+  /**
+   * @brief name "siblingOrder", type INTEGER
+   *
+   * @details Sets the sibling order of the actor so depth position can be defined within the same parent.
+   *
+   * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
+   * sibling order. The values set by this Property will likey change.
+   */
   SIBLING_ORDER        = CLIPPING_MODE + 1,
 
   /**
@@ -98,6 +106,75 @@ enum Type
 };
 
 } // namespace Property
+
+/**
+ * @brief Raise actor above the next highest level of actor(s)
+ *
+ * @param[in] actor the Actor to lower
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Initially actors added to a parent will have the same sibling order and shown in relation to insertion order.
+ * Raising this actor above actors with the same sibling order as each other will raise this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ *
+ */
+DALI_IMPORT_API void Raise( Actor actor );
+
+/**
+ * @brief Lower the actor to underneath the level below actor(s)
+ *
+ * @param[in] actor the Actor to lower
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void Lower( Actor actor );
+
+/**
+ * @brief Raise actor above all other actors
+ *
+ * @param[in] actor the Actor to lower
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void RaiseToTop( Actor actor );
+
+/**
+ * @brief Lower actor to the bottom of all actors
+ *
+ * @param[in] actor the Actor to lower
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void LowerToBottom( Actor actor );
+
+/**
+ * @brief Raise the actor to above the target actor
+ *
+ * @param[in] actor the Actor to lower
+ * @param[in] target the target Actor to raise above
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Actors on the level above the target actor will still be shown above this actor.
+ * Raising this actor above actors with the same sibling order as each other will raise this actor above them.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void RaiseAbove( Actor actor, Dali::Actor target );
+
+/**
+ * @brief Lower the actor to below the target actor
+ *
+ * @param[in] actor the Actor to lower
+ * @param[in] target the target Actor to lower below
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void LowerBelow( Actor actor, Dali::Actor target );
 
 } // namespace DevelActor
 

@@ -1652,6 +1652,36 @@ public:
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
+  /**
+   * @copydoc Dali::DevelActor::Raise()
+   */
+  void Raise();
+
+  /**
+   * @copydoc Dali::DevelActor::Lower()
+   */
+  void Lower();
+
+  /**
+   * @copydoc Dali::DevelActor::RaiseToTop()
+   */
+  void RaiseToTop();
+
+  /**
+   * @copydoc Dali::DevelActor::LowerToBottom()
+   */
+  void LowerToBottom();
+
+  /**
+   * @copydoc Dali::DevelActor::RaiseAbove()
+   */
+  void RaiseAbove( Dali::Actor target );
+
+  /**
+   * @copydoc Dali::DevelActor::LowerBelow()
+   */
+  void LowerBelow( Dali::Actor target );
+
 private:
 
   // Undefined
@@ -1792,6 +1822,30 @@ private:
    * @return The parent object, or NULL if the Actor does not have a parent.
    */
   virtual Object* GetParentObject() const;
+
+  /**
+   * Set Sibling order
+   * @param[in] order The sibling order this Actor should be
+   */
+  void SetSiblingOrder( unsigned int order);
+
+  /**
+   * @brief Re-orders the sibling order when any actor raised to the max level
+   * @param[in] siblings the container of sibling actors
+   */
+  void DefragmentSiblingIndexes( ActorContainer& siblings );
+
+  /**
+   * @brief Shifts all siblings levels from the target level up by 1 to make space for a newly insert sibling
+   * at an exclusive level.
+   *
+   * @note Used with Raise and Lower API
+   *
+   * @param[in] siblings the actor container of the siblings
+   * @param[in] targetLevelToShiftFrom the sibling level to start shifting from
+   */
+  bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
+
 
 protected:
 

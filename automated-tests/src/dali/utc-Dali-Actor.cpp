@@ -44,6 +44,9 @@ void utc_dali_actor_cleanup(void)
 namespace
 {
 bool gTouchCallBackCalled=false;
+bool gTouchCallBackCalled2=false;
+bool gTouchCallBackCalled3=false;
+
 bool gHoverCallBackCalled=false;
 
 static bool gTestConstraintCalled;
@@ -84,6 +87,34 @@ static bool TestCallback(Actor actor, const TouchEvent& event)
   gTouchCallBackCalled = true;
   return false;
   END_TEST;
+}
+
+static bool TestTouchCallback(Actor actor, const TouchData& touchData )
+{
+  gTouchCallBackCalled = true;
+  return true;
+  END_TEST;
+}
+
+static bool TestTouchCallback2(Actor actor, const TouchData& touchData )
+{
+  gTouchCallBackCalled2 = true;
+  return true;
+  END_TEST;
+}
+
+static bool TestTouchCallback3(Actor actor, const TouchData& touchData )
+{
+  gTouchCallBackCalled3 = true;
+  return true;
+  END_TEST;
+}
+
+static void ResetTouchCallbacks()
+{
+  gTouchCallBackCalled = false;
+  gTouchCallBackCalled2 = false;
+  gTouchCallBackCalled3 = false;
 }
 
 static bool TestCallback3(Actor actor, const HoverEvent& event)
@@ -2287,7 +2318,7 @@ int UtcDaliActorTouchedSignal(void)
 {
   TestApplication application;
 
-  gTouchCallBackCalled = false;
+  ResetTouchCallbacks();
 
   // get the root layer
   Actor actor = Stage::GetCurrent().GetRootLayer();
@@ -2523,7 +2554,7 @@ int UtcDaliActorHitTest(void)
 
   Stage::GetCurrent().Add( actor );
 
-  gTouchCallBackCalled = false;
+  ResetTouchCallbacks();
 
   unsigned int index = 0;
   while( NULL != hitTestData[index] )
@@ -2559,7 +2590,7 @@ int UtcDaliActorHitTest(void)
                  hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y,
                  hitTestData[index]->mResult );
 
-    gTouchCallBackCalled = false;
+    ResetTouchCallbacks();
     ++index;
   }
   END_TEST;
@@ -4063,5 +4094,644 @@ int UtcDaliGetPropertyN(void)
 
   unsigned int propertyCount = actor.GetPropertyCount();
   DALI_TEST_EQUALS( actor.GetProperty( Property::Index(propertyCount)).GetType(), Property::NONE, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliActorRaiseLower(void)
+{
+  tet_infoline( "UtcDaliActor Raise and Lower test\n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  stage.Add( actorA );
+  stage.Add( actorB );
+  stage.Add( actorC );
+
+  ResetTouchCallbacks();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Testing Raising of Actor\n" );
+
+  int preActorOrder( 0 );
+  int postActorOrder( 0 );
+
+  Property::Value value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  value.Get( preActorOrder );
+
+  DevelActor::Raise( actorB );
+
+  value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  value.Get( postActorOrder );
+
+  tet_printf( "Raised ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  true , TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false, TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Testing Lowering of Actor\n" );
+
+  value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  value.Get( preActorOrder );
+
+  DevelActor::Lower( actorB );
+
+  value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  value.Get( postActorOrder );
+
+  tet_printf( "Lowered ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false , TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true, TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+int UtcDaliActorRaiseToTopLowerToBottom(void)
+{
+  tet_infoline( "UtcDaliActorRaiseToTop and LowerToBottom test \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
+  // enables checking of which actor the uniform is assigned too
+  Shader shaderA = CreateShader();
+  shaderA.RegisterProperty( "uRendererColor",1.f);
+
+  Shader shaderB = CreateShader();
+  shaderB.RegisterProperty( "uRendererColor", 2.f );
+
+  Shader shaderC = CreateShader();
+  shaderC.RegisterProperty( "uRendererColor", 3.f );
+
+  Geometry geometry = CreateQuadGeometry();
+
+  // Add renderers to Actors so ( uRendererColor, 1 ) is A, ( uRendererColor, 2 ) is B, and ( uRendererColor, 3 ) is C,
+  Renderer rendererA = Renderer::New(geometry, shaderA);
+  actorA.AddRenderer(rendererA);
+
+  Renderer rendererB = Renderer::New(geometry, shaderB);
+  actorB.AddRenderer(rendererB);
+
+  Renderer rendererC = Renderer::New(geometry, shaderC);
+  actorC.AddRenderer(rendererC);
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  stage.Add( actorA );
+  stage.Add( actorB );
+  stage.Add( actorC );
+
+  ResetTouchCallbacks();
+
+  // Set up gl abstraction trace so can query the set uniform order
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableSetUniformCallTrace(true);
+  glAbstraction.ResetSetUniformCallStack();
+
+  TraceCallStack& glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Trace Output:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+
+  // Test order of uniforms in stack
+  int indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  int indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  int indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  bool CBA = ( indexC > indexB) &&  ( indexB > indexA );
+
+  DALI_TEST_EQUALS( CBA, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "RaiseToTop ActorA\n" );
+
+  DevelActor::RaiseToTop( actorA );
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  tet_infoline( "Testing A above C and B at bottom\n" );
+  bool ACB = ( indexA > indexC) && ( indexC > indexB );
+
+  DALI_TEST_EQUALS( ACB, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "RaiseToTop ActorB\n" );
+
+  DevelActor::RaiseToTop( actorB );
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  tet_infoline( "Testing B above A and C at bottom\n" );
+  bool BAC = ( indexB > indexA ) && ( indexA > indexC );
+
+  DALI_TEST_EQUALS( BAC, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "LowerToBottom ActorA then ActorB leaving Actor C at Top\n" );
+
+  DevelActor::LowerToBottom( actorA );
+  application.SendNotification();
+  application.Render();
+
+  DevelActor::LowerToBottom( actorB );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  tet_infoline( "Testing C above A and B at bottom\n" );
+  bool CAB = ( indexC > indexA ) && ( indexA > indexB );
+
+  DALI_TEST_EQUALS( CAB, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+int UtcDaliActorRaiseAboveLowerBelow(void)
+{
+  tet_infoline( "UtcDaliActor RaiseToAbove and LowerBelow test \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  stage.Add( actorA );
+  stage.Add( actorB );
+  stage.Add( actorC );
+
+  ResetTouchCallbacks();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Raise actor B Above Actor C\n" );
+
+  DevelActor::RaiseAbove( actorB, actorC );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Raise actor A Above Actor B\n" );
+
+  DevelActor::RaiseAbove( actorA, actorB );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+int UtcDaliActorLowerBelow(void)
+{
+  tet_infoline( "UtcDaliActor LowerBelow test \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
+  // enables checking of which actor the uniform is assigned too
+  Shader shaderA = CreateShader();
+  shaderA.RegisterProperty( "uRendererColor",1.f);
+
+  Shader shaderB = CreateShader();
+  shaderB.RegisterProperty( "uRendererColor", 2.f );
+
+  Shader shaderC = CreateShader();
+  shaderC.RegisterProperty( "uRendererColor", 3.f );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  // Add renderers to Actors so ( uRendererColor, 1 ) is A, ( uRendererColor, 2 ) is B, and ( uRendererColor, 3 ) is C,
+  Geometry geometry = CreateQuadGeometry();
+
+  Renderer rendererA = Renderer::New(geometry, shaderA);
+  actorA.AddRenderer(rendererA);
+
+  Renderer rendererB = Renderer::New(geometry, shaderB);
+  actorB.AddRenderer(rendererB);
+
+  Renderer rendererC = Renderer::New(geometry, shaderC);
+  actorC.AddRenderer(rendererC);
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  stage.Add( actorA );
+  stage.Add( actorB );
+  stage.Add( actorC );
+
+  ResetTouchCallbacks();
+
+  // Set up gl abstraction trace so can query the set uniform order
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableSetUniformCallTrace(true);
+  glAbstraction.ResetSetUniformCallStack();
+  TraceCallStack& glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  glAbstraction.ResetSetUniformCallStack();
+
+  application.SendNotification();
+  application.Render();
+
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  int indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  int indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  int indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  tet_infoline( "Testing C above B and A at bottom\n" );
+  bool CBA = ( indexC > indexB) &&  ( indexB > indexA );
+
+  DALI_TEST_EQUALS( CBA, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  tet_infoline( "UtcDaliActor Test Set up completed \n" );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
+
+  DevelActor::LowerBelow( actorC, actorB );
+
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  tet_infoline( "Testing B above A and C at bottom\n" );
+  bool BAC = ( indexB > indexA) &&  ( indexA > indexC );
+
+  DALI_TEST_EQUALS( BAC, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor B below Actor C leaving A on top\n" );
+
+  DevelActor::LowerBelow( actorB, actorC );
+
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.Render();
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  bool ACB = ( indexA > indexC) &&  ( indexC > indexB );
+
+  DALI_TEST_EQUALS( ACB, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+int UtcDaliActorMaxSiblingOrder(void)
+{
+  tet_infoline( "UtcDaliActor De-fragment of sibling order once max index reached\n" );
+
+  TestApplication application;
+
+  int testOrders[] = { 0,1,3,5,17,998, 999 };
+  int resultingOrders[] = { 0,1,2,3,4,6,5 };
+
+  const int TEST_ORDERS_COUNT = sizeof( testOrders ) / sizeof( testOrders[0] );
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor parent = Actor::New();
+
+  for ( int index = 0; index < TEST_ORDERS_COUNT; index++ )
+  {
+    Actor newActor = Actor::New();
+    newActor.SetProperty(Dali::DevelActor::Property::SIBLING_ORDER, testOrders[index] );
+    parent.Add( newActor );
+  }
+  stage.Add( parent );
+
+  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
+  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
+  {
+    Actor sibling = parent.GetChildAt( index );
+    int siblingOrder = 0;
+    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+    value.Get( siblingOrder );
+    tet_printf( "%d, ", siblingOrder );
+  }
+  tet_printf( "\n" );
+
+  Actor sibling = parent.GetChildAt( 5 );
+  DevelActor::RaiseToTop( sibling );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
+  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
+  {
+    Actor sibling = parent.GetChildAt( index );
+    int siblingOrder = 0;
+    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+    value.Get( siblingOrder );
+    tet_printf( "%d, ", siblingOrder );
+    DALI_TEST_EQUALS( siblingOrder,  resultingOrders[ index] , TEST_LOCATION );
+  }
+
+  tet_printf( "\n" );
+
   END_TEST;
 }

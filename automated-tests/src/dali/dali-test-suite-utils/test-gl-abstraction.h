@@ -1135,9 +1135,12 @@ public:
     mTextureTrace.PushCall("TexSubImage2D", out.str(), namedParams);
   }
 
-  inline void Uniform1f(GLint location, GLfloat x)
+  inline void Uniform1f(GLint location, GLfloat value )
   {
-    if( ! mProgramUniforms1f.SetUniformValue( mCurrentProgram, location, x ) )
+    std::string params = ToString( value );
+    AddUniformCallToTraceStack( location, params );
+
+    if( ! mProgramUniforms1f.SetUniformValue( mCurrentProgram, location, value ) )
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1145,6 +1148,14 @@ public:
 
   inline void Uniform1fv(GLint location, GLsizei count, const GLfloat* v)
   {
+    std::string params;
+    for( int i = 0; i < count; ++i )
+    {
+      params = params + ToString( v[i] ) + ",";
+    }
+
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniforms1f.SetUniformValue( mCurrentProgram, location, v[i] ) )
@@ -1157,6 +1168,10 @@ public:
 
   inline void Uniform1i(GLint location, GLint x)
   {
+    std::string params = ToString( x );
+
+    AddUniformCallToTraceStack( location,  params );
+
     if( ! mProgramUniforms1i.SetUniformValue( mCurrentProgram, location, x ) )
     {
       mGetErrorResult = GL_INVALID_OPERATION;
@@ -1165,6 +1180,9 @@ public:
 
   inline void Uniform1iv(GLint location, GLsizei count, const GLint* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniforms1i.SetUniformValue( mCurrentProgram,
@@ -1179,6 +1197,9 @@ public:
 
   inline void Uniform2f(GLint location, GLfloat x, GLfloat y)
   {
+    std::string params = ToString( x ) + "," + ToString( y );
+    AddUniformCallToTraceStack( location, params );
+
     if( ! mProgramUniforms2f.SetUniformValue( mCurrentProgram,
                                                location,
                                                Vector2( x, y ) ) )
@@ -1189,6 +1210,9 @@ public:
 
   inline void Uniform2fv(GLint location, GLsizei count, const GLfloat* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniforms2f.SetUniformValue( mCurrentProgram,
@@ -1203,14 +1227,21 @@ public:
 
   inline void Uniform2i(GLint location, GLint x, GLint y)
   {
+    std::string params = ToString( x ) + "," + ToString( y );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void Uniform2iv(GLint location, GLsizei count, const GLint* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)
   {
+    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
+    AddUniformCallToTraceStack( location, params );
+
     if( ! mProgramUniforms3f.SetUniformValue( mCurrentProgram,
                                                location,
                                                Vector3( x, y, z ) ) )
@@ -1221,6 +1252,9 @@ public:
 
   inline void Uniform3fv(GLint location, GLsizei count, const GLfloat* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniforms3f.SetUniformValue(
@@ -1236,14 +1270,21 @@ public:
 
   inline void Uniform3i(GLint location, GLint x, GLint y, GLint z)
   {
+    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void Uniform3iv(GLint location, GLsizei count, const GLint* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
   {
+    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
+    AddUniformCallToTraceStack( location, params );
+
     if( ! mProgramUniforms4f.SetUniformValue( mCurrentProgram,
                                               location,
                                               Vector4( x, y, z, w ) ) )
@@ -1254,6 +1295,9 @@ public:
 
   inline void Uniform4fv(GLint location, GLsizei count, const GLfloat* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniforms4f.SetUniformValue(
@@ -1269,18 +1313,27 @@ public:
 
   inline void Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w)
   {
+    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void Uniform4iv(GLint location, GLsizei count, const GLint* v)
   {
+    std::string params = ToString( v );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
   {
+    std::string params = ToString( value );
+    AddUniformCallToTraceStack( location, params );
   }
 
   inline void UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
   {
+    std::string params = ToString( value );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniformsMat3.SetUniformValue(
@@ -1296,6 +1349,9 @@ public:
 
   inline void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
   {
+    std::string params = ToString( value );
+    AddUniformCallToTraceStack( location, params );
+
     for( int i = 0; i < count; ++i )
     {
       if( ! mProgramUniformsMat4.SetUniformValue(
@@ -1789,6 +1845,31 @@ public:
   {
   }
 
+private:
+
+  inline void AddUniformCallToTraceStack( GLint location, std::string& value )
+    {
+    std::string name = "<not found>";
+    bool matched = false;
+
+    UniformIDMap& map = mUniforms[mCurrentProgram];
+    for (UniformIDMap::iterator it=map.begin(); it!=map.end(); ++it)
+    {
+      if( it->second == location )
+      {
+        name = it->first;
+        matched = true;
+        break;
+      }
+    }
+
+    if ( matched )
+    {
+      mSetUniformTrace.PushCall( name, value );
+    }
+  }
+
+
 public: // TEST FUNCTIONS
   inline void SetCompileStatus( GLuint value ) { mCompileStatus = value; }
   inline void SetLinkStatus( GLuint value ) { mLinkStatus = value; }
@@ -1858,6 +1939,11 @@ public: // TEST FUNCTIONS
   inline void EnableStencilFunctionCallTrace(bool enable) { mStencilFunctionTrace.Enable(enable); }
   inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
   inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
+
+  //Methods for Uniform function verification
+  inline void EnableSetUniformCallTrace(bool enable) { mSetUniformTrace.Enable(enable); }
+  inline void ResetSetUniformCallStack() { mSetUniformTrace.Reset(); }
+  inline TraceCallStack& GetSetUniformTrace() { return mSetUniformTrace; }
 
   template <typename T>
   inline bool GetUniformValue( const char* name, T& value ) const
@@ -2091,6 +2177,7 @@ private:
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;
   TraceCallStack mStencilFunctionTrace;
+  TraceCallStack mSetUniformTrace;
 
   // Shaders & Uniforms
   GLuint mLastShaderIdUsed;
@@ -2177,9 +2264,6 @@ private:
   ProgramUniformValue<Vector4> mProgramUniforms4f;
   ProgramUniformValue<Matrix> mProgramUniformsMat4;
   ProgramUniformValue<Matrix3> mProgramUniformsMat3;
-
-
-
 
   inline const ProgramUniformValue<int>& GetProgramUniformsForType( const int ) const
   {
