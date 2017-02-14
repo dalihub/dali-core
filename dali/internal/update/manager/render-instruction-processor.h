@@ -41,7 +41,6 @@ namespace SceneGraph
 class RenderTracker;
 struct RenderItem;
 class Shader;
-class GeometryBatcher;
 struct RenderList;
 class RenderTask;
 class RenderInstructionContainer;
@@ -101,7 +100,6 @@ public:
    * @param[in]  sortedLayers      The layers containing lists of opaque/transparent renderables.
    * @param[in]  renderTask        The rendering task information.
    * @param[in]  cull              Whether frustum culling is enabled or not
-   * @param[in]  geometryBatcher   The instance of the geometry batcher
    * @param[in]  hasClippingNodes  Whether any clipping nodes exist within this layer, to optimize sorting if not
    * @param[out] instructions      The rendering instructions for the next frame.
    */
@@ -109,7 +107,6 @@ public:
                 SortedLayerPointers& sortedLayers,
                 RenderTask& renderTask,
                 bool cull,
-                GeometryBatcher& geometryBatcher,
                 bool hasClippingNodes,
                 RenderInstructionContainer& instructions );
 

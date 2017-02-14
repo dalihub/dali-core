@@ -64,7 +64,6 @@ class UpdateManager;
 class RenderManager;
 class DiscardQueue;
 class TextureCacheDispatcher;
-class GeometryBatcher;
 class RenderTaskProcessor;
 }
 
@@ -285,7 +284,6 @@ private:
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-  SceneGraph::GeometryBatcher*              mGeometryBatcher;             ///< Instance of the geometry batcher
   SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()

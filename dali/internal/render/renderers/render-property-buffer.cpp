@@ -125,11 +125,6 @@ void PropertyBuffer::SetData( Dali::Vector<char>* data, size_t size )
   mDataChanged = true;
 }
 
-void PropertyBuffer::UpdateData()
-{
-  mDataChanged = true;
-}
-
 bool PropertyBuffer::Update( Context& context )
 {
   if( !mData || !mFormat || !mSize )

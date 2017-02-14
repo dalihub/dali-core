@@ -57,7 +57,6 @@ class DiscardQueue;
 class Layer;
 class RenderTask;
 class UpdateManager;
-class GeometryBatcher;
 
 /**
  * Flag whether property has changed, during the Update phase.
@@ -721,12 +720,6 @@ public:
   }
 
   /**
-   * @brief Turns on or off being a batch parent for the node
-   * @param[in] enabled If true the node becomes a parent for batch of its children
-   */
-  void SetIsBatchParent( bool enabled );
-
-  /**
    * @brief Sets the sibling order of the node
    * @param[in] order The new order
    */
@@ -737,30 +730,6 @@ public:
    * @return Current depth index
    */
   unsigned int GetDepthIndex(){ return mDepthIndex; }
-
-  /**
-   * @brief Tells if the node is a batch parent
-   * @return True if node is a batch parent, false otherwise.
-   */
-  inline bool GetIsBatchParent()
-  {
-    return mIsBatchParent;
-  }
-
-  /**
-   * Set the batch parent of a Node.
-   * @param[in] batchParentNode The new batch parent.
-   */
-  void SetBatchParent( Node* batchParentNode );
-
-  /**
-   * Retrieve the batch parent of a Node.
-   * @return The batch parent node, or NULL if the Node has not been added to the scene-graph.
-   */
-  Node* GetBatchParent() const
-  {
-    return mBatchParent;
-  }
 
 public:
   /**
@@ -880,16 +849,11 @@ public: // Default properties
   TransformManagerMatrixInput        mWorldMatrix;            ///< Full inherited world matrix
   InheritedColor                     mWorldColor;             ///< Full inherited color
 
-  GeometryBatcher*                   mGeometryBatcher;        ///< A pointer to an instance of geometry batcher
-  uint32_t                           mBatchIndex;             ///< Batch 32bit handle, BATCH_NULL_HANDLE by default
   uint32_t                           mClippingSortModifier;   ///< Contains bit-packed clipping information for quick access when sorting
-
-  bool                               mIsBatchParent:1;        ///< Marks node as a batch parent
 
 protected:
 
   Node*                              mParent;                 ///< Pointer to parent node (a child is owned by its parent)
-  Node*                              mBatchParent;            ///< Pointer to batch parent node
   RenderTask*                        mExclusiveRenderTask;    ///< Nodes can be marked as exclusive to a single RenderTask
 
   RendererContainer                  mRenderer;               ///< Container of renderers; not owned
@@ -1013,17 +977,6 @@ inline void RemoveRendererMessage( EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::RemoveRenderer, renderer );
-}
-
-inline void SetIsBatchParentMessage( EventThreadServices& eventThreadServices, const Node& node, bool isBatchParent )
-{
-  typedef MessageValue1< Node, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetIsBatchParent, isBatchParent );
 }
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, unsigned int depthIndex )

@@ -105,7 +105,6 @@ public:
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] textureCacheDispatcher Used for sending messages to texture cache.
-   * @param[in] geometryBatcher Used when geometry batching is enabled.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    */
   UpdateManager( NotificationManager& notificationManager,
@@ -117,7 +116,6 @@ public:
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
                  TextureCacheDispatcher& textureCacheDispatcher,
-                 GeometryBatcher& geometryBatcher,
                  RenderTaskProcessor& renderTaskProcessor );
 
   /**

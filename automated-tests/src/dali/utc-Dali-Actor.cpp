@@ -2821,7 +2821,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "minimumSize",              Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
-  { "batchParent",              DevelActor::Property::BATCH_PARENT,        Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );

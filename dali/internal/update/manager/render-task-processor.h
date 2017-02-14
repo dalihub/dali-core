@@ -58,14 +58,12 @@ public:
    * @param[in]  renderTasks       The list of render-tasks.
    * @param[in]  rootNode          The root node of the scene-graph.
    * @param[in]  sortedLayers      The layers containing lists of opaque / transparent renderables.
-   * @param[in]  geometryBatcher   The instance of the geometry batcher
    * @param[out] instructions      The instructions for rendering the next frame.
    */
   void Process( BufferIndex updateBufferIndex,
                 RenderTaskList& renderTasks,
                 Layer& rootNode,
                 SortedLayerPointers& sortedLayers,
-                GeometryBatcher& geometryBatcher,
                 RenderInstructionContainer& instructions );
 
 private:
