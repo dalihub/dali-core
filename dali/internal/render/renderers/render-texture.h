@@ -27,7 +27,6 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/integration-api/gl-defines.h>
-#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
@@ -37,64 +36,7 @@ namespace Render
 {
 struct Sampler;
 
-/**
- * This class is the mapping between texture id, sampler and sampler uniform name
- */
 class Texture
-{
-public:
-
-  /**
-   * Constructor
-   */
-  Texture()
-  : mSampler( 0 ),
-    mTextureId( Integration::InvalidResourceId )
-  {}
-
-  /**
-   * Constructor
-   */
-  Texture( Integration::ResourceId textureId, Render::Sampler* sampler )
-  : mSampler( sampler ),
-    mTextureId( textureId)
-  {}
-
-  /**
-   * Destructor
-   */
-  ~Texture()
-  {}
-
-  /*
-   * Get the Render::Sampler used by the texture
-   * @Return The Render::Sampler being used or 0 if using the default
-   */
-  inline const Render::Sampler* GetSampler() const
-  {
-    return mSampler;
-  }
-
-public: // called from RenderThread
-
-  /**
-   * Get the texture ID
-   * @return the id of the associated texture
-   */
-  inline Integration::ResourceId GetTextureId() const
-  {
-    return mTextureId;
-  }
-
-private:
-
-  Render::Sampler*        mSampler;
-  Integration::ResourceId mTextureId;
-};
-
-
-//TODO : Remove the old Render::Texture class (see above) once it is no longer needed by Image
-class NewTexture
 {
 public:
 
@@ -107,18 +49,18 @@ public:
    * @param[in] width The width of the texture
    * @param[in] height The height of the texture
    */
-  NewTexture( Type type, Pixel::Format format, unsigned int width, unsigned int height );
+  Texture( Type type, Pixel::Format format, unsigned int width, unsigned int height );
 
   /**
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  NewTexture( NativeImageInterfacePtr nativeImageInterface );
+  Texture( NativeImageInterfacePtr nativeImageInterface );
 
   /**
    * Destructor
    */
-  ~NewTexture();
+  ~Texture();
 
   /**
    * Creates the texture in the GPU.
@@ -144,7 +86,7 @@ public:
    * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload( Context& context, PixelDataPtr pixelData, const Internal::NewTexture::UploadParams& params );
+  void Upload( Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params );
 
   /**
    * Bind the texture to the given texture unit and applies the given sampler

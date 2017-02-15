@@ -32,8 +32,6 @@ namespace Internal
 class NinePatchImage;
 typedef IntrusivePtr<NinePatchImage> NinePatchImagePtr;
 
-class ResourceManager;
-
 namespace SceneGraph
 {
 class UpdateManager;

@@ -36,12 +36,12 @@ TextureSetPtr TextureSet::New()
   return textureSet;
 }
 
-void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
+void TextureSet::SetTexture( size_t index, TexturePtr texture )
 {
-  size_t textureCount( mNewTextures.size() );
+  size_t textureCount( mTextures.size() );
   if( index >= textureCount )
   {
-    mNewTextures.resize(index + 1);
+    mTextures.resize(index + 1);
 
     bool samplerExist = true;
     if( mSamplers.size() < index + 1 )
@@ -52,7 +52,7 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
 
     for( size_t i(textureCount); i<=index; ++i )
     {
-      mNewTextures[i] = NULL;
+      mTextures[i] = NULL;
 
       if( !samplerExist )
       {
@@ -61,9 +61,9 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
     }
   }
 
-  mNewTextures[index]= texture;
+  mTextures[index]= texture;
 
-  Render::NewTexture* renderTexture(0);
+  Render::Texture* renderTexture(0);
   if( texture )
   {
     renderTexture = texture->GetRenderObject();
@@ -72,12 +72,12 @@ void TextureSet::SetTexture( size_t index, NewTexturePtr texture )
   SceneGraph::SetTextureMessage( mEventThreadServices, *mSceneObject, index, renderTexture );
 }
 
-NewTexture* TextureSet::GetTexture( size_t index ) const
+Texture* TextureSet::GetTexture( size_t index ) const
 {
-  NewTexture* result(0);
-  if( index < mNewTextures.size() )
+  Texture* result(0);
+  if( index < mTextures.size() )
   {
-    result = mNewTextures[index].Get();
+    result = mTextures[index].Get();
   }
   else
   {
@@ -127,7 +127,7 @@ Sampler* TextureSet::GetSampler( size_t index ) const
 
 size_t TextureSet::GetTextureCount() const
 {
-  return mNewTextures.size();
+  return mTextures.size();
 }
 
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const

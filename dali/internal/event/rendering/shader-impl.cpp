@@ -25,7 +25,6 @@
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
-#include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali

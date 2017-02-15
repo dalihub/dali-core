@@ -25,7 +25,6 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
@@ -106,7 +105,6 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
 inline int UpdateNodes( Node& node,
                         int parentFlags,
                         BufferIndex updateBufferIndex,
-                        ResourceManager& resourceManager,
                         RenderQueue& renderQueue,
                         Layer& currentLayer,
                         int inheritedDrawMode )
@@ -171,7 +169,6 @@ inline int UpdateNodes( Node& node,
     cumulativeDirtyFlags |=UpdateNodes( child,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
-                                        resourceManager,
                                         renderQueue,
                                         *layer,
                                         inheritedDrawMode );
@@ -185,7 +182,6 @@ inline int UpdateNodes( Node& node,
  */
 int UpdateNodeTree( Layer& rootNode,
                     BufferIndex updateBufferIndex,
-                    ResourceManager& resourceManager,
                     RenderQueue& renderQueue )
 {
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
@@ -221,7 +217,6 @@ int UpdateNodeTree( Layer& rootNode,
     cumulativeDirtyFlags |= UpdateNodes( child,
                                          nodeDirtyFlags,
                                          updateBufferIndex,
-                                         resourceManager,
                                          renderQueue,
                                          rootNode,
                                          drawMode );

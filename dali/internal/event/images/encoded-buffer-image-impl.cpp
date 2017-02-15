@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/integration-api/platform-abstraction.h>
 
@@ -33,7 +34,14 @@ namespace Internal
 
 namespace
 {
+
 TypeRegistration mType( typeid( Dali::EncodedBufferImage ), typeid( Dali::Image ), NULL );
+
+/** Raw bytes of a resource laid out exactly as it would be in a file, but in memory. */
+typedef Dali::RefCountedVector<uint8_t> RequestBuffer;
+/** Counting smart pointer for managing a buffer of raw bytes. */
+typedef IntrusivePtr<RequestBuffer>     RequestBufferPtr;
+
 } // unnamed namespace
 
 EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImage,
@@ -75,7 +83,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
 
     //Create texture
     Pixel::Format format = bitmap->GetPixelFormat();
-    image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
+    image->mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
     size_t bufferSize = bitmap->GetBufferSize();
@@ -97,7 +105,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   }
   else
   {
-    image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
+    image->mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
     image->mWidth = image->mHeight = 0u;
   }
 

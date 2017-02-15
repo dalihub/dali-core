@@ -27,12 +27,11 @@ namespace Dali
 {
 namespace Internal
 {
-class ResourceManager;
 
 namespace Render
 {
 struct Sampler;
-class NewTexture;
+class Texture;
 }
 namespace SceneGraph
 {
@@ -70,7 +69,7 @@ public:
    * @param[in] index The index of the texture
    * @param[in] texture The texture
    */
-  void SetTexture( size_t index, Render::NewTexture* texture );
+  void SetTexture( size_t index, Render::Texture* texture );
 
   /**
    * Return whether any texture in the texture set has an alpha channel
@@ -104,20 +103,20 @@ public:
   }
 
   /**
-   * Get the number of NewTextures in the texture set
-   * @return The number of NewTextures
+   * Get the number of Textures in the texture set
+   * @return The number of Textures
    */
-  size_t GetNewTextureCount()
+  size_t GetTextureCount()
   {
     return mTextures.Size();
   }
 
   /**
-   * Get the pointer to  a NewTexture in the TextureSet
+   * Get the pointer to  a Texture in the TextureSet
    * @param[in] index The index of the texture in the textures array
-   * @return the pointer to the NewTexture in that position
+   * @return the pointer to the Texture in that position
    */
-  Render::NewTexture* GetNewTexture( size_t index )
+  Render::Texture* GetTexture( size_t index )
   {
     return mTextures[index];
   }
@@ -138,14 +137,14 @@ private:
 private: // Data
 
   Vector< Render::Sampler* >      mSamplers;                    ///< List of samplers used by each texture. Not owned
-  Vector< Render::NewTexture* >   mTextures;                    ///< List of NewTextures. Not owned
+  Vector< Render::Texture* >   mTextures;                    ///< List of Textures. Not owned
   Vector<Renderer*>               mRenderers;                   ///< List of renderers using the TextureSet
   bool                            mHasAlpha;                    ///< if any of the textures has an alpha channel
 };
 
-inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, Render::NewTexture* texture )
+inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, Render::Texture* texture )
 {
-  typedef MessageValue2< TextureSet, size_t, Render::NewTexture* > LocalType;
+  typedef MessageValue2< TextureSet, size_t, Render::Texture* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

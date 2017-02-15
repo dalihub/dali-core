@@ -55,7 +55,6 @@ namespace Internal
 class PropertyNotifier;
 class NotificationManager;
 class CompleteNotificationInterface;
-class ResourceManager;
 class TouchResampler;
 
 namespace Render
@@ -77,7 +76,6 @@ class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
 class RenderQueue;
-class TextureCacheDispatcher;
 class PropertyBuffer;
 class TextureSet;
 class Camera;
@@ -99,23 +97,19 @@ public:
    * @param[in] notificationManager This should be notified when animations have finished.
    * @param[in] animationFinishedNotifier The CompleteNotificationInterface that handles animation completions
    * @param[in] propertyNotifier The PropertyNotifier
-   * @param[in] resourceManager The resource manager used to load textures etc.
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
-   * @param[in] textureCacheDispatcher Used for sending messages to texture cache.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationFinishedNotifier,
                  PropertyNotifier& propertyNotifier,
-                 ResourceManager& resourceManager,
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
-                 TextureCacheDispatcher& textureCacheDispatcher,
                  RenderTaskProcessor& renderTaskProcessor );
 
   /**
@@ -482,14 +476,14 @@ public:
    * @param[in] texture The texture to add
    * The texture will be owned by RenderManager
    */
-  void AddTexture( Render::NewTexture* texture );
+  void AddTexture( Render::Texture* texture );
 
   /**
    * Removes a texture from the render manager
    * @param[in] texture The texture to remove
    * @post The texture will be destroyed in the render thread
    */
-  void RemoveTexture( Render::NewTexture* texture );
+  void RemoveTexture( Render::Texture* texture );
 
   /**
    * Uploads data to a texture owned by the RenderManager
@@ -497,13 +491,13 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params );
+  void UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params );
 
   /**
    * Generates mipmaps for a texture owned by the RenderManager
    * @param[in] texture The texture
    */
-  void GenerateMipmaps( Render::NewTexture* texture );
+  void GenerateMipmaps( Render::Texture* texture );
 
   /**
    * Adds a framebuffer to the render manager
@@ -526,7 +520,7 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int face );
+  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int face );
 
 public:
 
@@ -1198,9 +1192,9 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
   new (slot) LocalType( &manager, &UpdateManager::SetGeometryType, &geometry, geometryType );
 }
 
-inline void AddTexture( UpdateManager& manager, Render::NewTexture& texture )
+inline void AddTexture( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1209,9 +1203,9 @@ inline void AddTexture( UpdateManager& manager, Render::NewTexture& texture )
   new (slot) LocalType( &manager, &UpdateManager::AddTexture, &texture );
 }
 
-inline void RemoveTexture( UpdateManager& manager, Render::NewTexture& texture )
+inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1220,9 +1214,9 @@ inline void RemoveTexture( UpdateManager& manager, Render::NewTexture& texture )
   new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
 }
 
-inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
+inline void UploadTextureMessage( UpdateManager& manager, Render::Texture& texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
 {
-  typedef MessageValue3< UpdateManager, Render::NewTexture*, PixelDataPtr, NewTexture::UploadParams > LocalType;
+  typedef MessageValue3< UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1231,9 +1225,9 @@ inline void UploadTextureMessage( UpdateManager& manager, Render::NewTexture& te
   new (slot) LocalType( &manager, &UpdateManager::UploadTexture, &texture, pixelData, params );
 }
 
-inline void GenerateMipmapsMessage( UpdateManager& manager, Render::NewTexture& texture )
+inline void GenerateMipmapsMessage( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::NewTexture*  > LocalType;
+  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1265,9 +1259,9 @@ inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& fram
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer );
 }
 
-inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  typedef MessageValue4< UpdateManager, Render::FrameBuffer*, Render::NewTexture*, unsigned int, unsigned int  > LocalType;
+  typedef MessageValue4< UpdateManager, Render::FrameBuffer*, Render::Texture*, unsigned int, unsigned int  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );

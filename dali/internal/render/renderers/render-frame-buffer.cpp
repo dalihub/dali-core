@@ -78,7 +78,7 @@ void FrameBuffer::Initialize(Context& context)
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-void FrameBuffer::AttachColorTexture( Context& context, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+void FrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 

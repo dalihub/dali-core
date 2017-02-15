@@ -28,7 +28,6 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/resource-types.h>
-#include <dali/integration-api/resource-cache.h>
 
 
 namespace
@@ -189,7 +188,7 @@ NinePatchImage::NinePatchImage( const std::string& filename )
 
     mWidth = mBitmap->GetImageWidth();
     mHeight = mBitmap->GetImageHeight();
-    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, mBitmap->GetPixelFormat(), mWidth, mHeight );
+    mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, mBitmap->GetPixelFormat(), mWidth, mHeight );
 
     size_t bufferSize = mBitmap->GetBufferSize();
     unsigned char* buffer = new unsigned char[bufferSize];

@@ -25,8 +25,6 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/event/resources/resource-client-declarations.h>
-#include <dali/internal/event/resources/resource-ticket-observer.h>
 
 namespace Dali
 {
@@ -43,7 +41,7 @@ typedef IntrusivePtr<Image> ImagePtr;
  * When the Image object is created, resource loading will be attempted.
  * Provided this is successful, the resource will exist until the Image is destroyed.
  */
-class Image : public BaseObject, public ResourceTicketObserver
+class Image : public BaseObject
 {
 public:
 
@@ -62,13 +60,6 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
-
-  /**
-   * returns the Id used for lookups
-   * @note if LoadPolicy::OnDemand is used and Image is off Stage, this will return 0.
-   * @return the unique ID of the image data resource. This is actually also the same as Dali Texture id.
-   */
-  ResourceId GetResourceId() const;
 
   /**
    * Get the width of the image.
@@ -97,27 +88,10 @@ public:
   /**
    * Returns a pointer to the internal texture used by the image
    */
-  NewTexture* GetTexture() const
+  Texture* GetTexture() const
   {
     return mTexture.Get();
   }
-
-public: // From ResourceTicketObserver
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingFailed()
-   */
-  virtual void ResourceLoadingFailed(const ResourceTicket& ticket);
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceLoadingSucceeded()
-   */
-  virtual void ResourceLoadingSucceeded(const ResourceTicket& ticket);
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceUploaded()
-   */
-  virtual void ResourceUploaded(const ResourceTicket& ticket);
 
 public:
 
@@ -150,8 +124,7 @@ protected:
 
 protected:
 
-  ResourceTicketPtr mTicket;              ///< smart pointer to the ticket object that gets completed when load finishes
-  NewTexturePtr mTexture;                 ///< smart pointer to the texture used by the image
+  TexturePtr mTexture;  ///< smart pointer to the texture used by the image
 
   unsigned int mWidth;     ///< natural width of the image
   unsigned int mHeight;    ///< natural height of the image

@@ -30,10 +30,9 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderTaskList::RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager )
+RenderTaskList::RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher )
 : mNotificationObject( NULL ),
-  mRenderMessageDispatcher( renderMessageDispatcher ),
-  mResourceManager( resourceManager )
+  mRenderMessageDispatcher( renderMessageDispatcher )
 {
 }
 
@@ -47,7 +46,7 @@ void RenderTaskList::AddTask( RenderTask* newTask )
 
   // mRenderTasks container takes ownership
   mRenderTasks.PushBack( newTask );
-  newTask->Initialize( mRenderMessageDispatcher, mResourceManager );
+  newTask->Initialize( mRenderMessageDispatcher );
 }
 
 void RenderTaskList::RemoveTask( RenderTask* task )
