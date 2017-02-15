@@ -191,6 +191,7 @@ Core::~Core()
   if( tls )
   {
     tls->Remove();
+    delete tls;
   }
 
   // Stop relayout requests being raised on stage destruction
@@ -448,7 +449,7 @@ RelayoutController& Core::GetRelayoutController()
 void Core::CreateThreadLocalStorage()
 {
   // a pointer to the ThreadLocalStorage object will be stored in TLS
-  // and automatically deleted when the thread is killed
+  // The ThreadLocalStorage object should be deleted by the Core destructor
   new ThreadLocalStorage(this);
 }
 
