@@ -44,14 +44,14 @@ struct DALI_IMPORT_API TouchEvent
 
   /**
    * @DEPRECATED_1_1.37
-   * @brief Default constructor
+   * @brief Default constructor.
    * @SINCE_1_0.0
    */
   TouchEvent() DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.37
-   * @brief Constructor
+   * @brief Constructor.
    * @SINCE_1_0.0
    * @param[in] time The time the event occurred
    */
@@ -59,7 +59,7 @@ struct DALI_IMPORT_API TouchEvent
 
   /**
    * @DEPRECATED_1_1.37
-   * @brief Destructor
+   * @brief Destructor.
    * @SINCE_1_0.0
    */
   ~TouchEvent() DALI_DEPRECATED_API;
@@ -88,7 +88,7 @@ struct DALI_IMPORT_API TouchEvent
    * @brief Returns the total number of points in this TouchEvent.
    *
    * @SINCE_1_0.0
-   * @return Total number of Points.
+   * @return Total number of Points
    */
   unsigned int GetPointCount() const DALI_DEPRECATED_API;
 
@@ -99,7 +99,7 @@ struct DALI_IMPORT_API TouchEvent
    * The first point in the set is always the primary
    * touch point (i.e. the first point touched in a multi-touch event).
    * @SINCE_1_0.0
-   * @param[in] point The index of the required Point.
+   * @param[in] point The index of the required Point
    * @return Point requested
    * @note "point" should be less than the value returned by GetPointCount().
    *       If out of range, then program asserts.

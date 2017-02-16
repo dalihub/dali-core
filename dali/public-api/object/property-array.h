@@ -53,7 +53,7 @@ public:
    * @brief Copy Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] other The Array to copy from.
+   * @param[in] other The Array to copy from
    */
   Array( const Array& other );
 
@@ -64,10 +64,10 @@ public:
   ~Array();
 
   /**
-   * @brief Retrieve the number of elements in the array.
+   * @brief Retrieves the number of elements in the array.
    *
    * @SINCE_1_0.0
-   * @return The number of elements in the array.
+   * @return The number of elements in the array
    */
   SizeType Size() const
   {
@@ -75,10 +75,10 @@ public:
   }
 
   /**
-   * @brief Retrieve the number of elements in the array.
+   * @brief Retrieves the number of elements in the array.
    *
    * @SINCE_1_0.0
-   * @return The number of elements in the array.
+   * @return The number of elements in the array
    */
   SizeType Count() const;
 
@@ -86,7 +86,7 @@ public:
    * @brief Returns whether the array is empty.
    *
    * @SINCE_1_0.0
-   * @return true if empty, false otherwise
+   * @return @c true if empty, @c false otherwise
    */
   bool Empty() const
   {
@@ -100,21 +100,21 @@ public:
   void Clear();
 
   /**
-   * @brief Increase the capcity of the array.
+   * @brief Increases the capacity of the array.
    * @SINCE_1_0.0
    * @param[in] size The size to reserve
    */
   void Reserve( SizeType size );
 
   /**
-   * @brief Resize to size.
+   * @brief Resizes to size.
    * @SINCE_1_0.0
    * @param[in] size The size to resize
    */
   void Resize( SizeType size );
 
   /**
-   * @brief Retrieve the capacity of the array.
+   * @brief Retrieves the capacity of the array.
    *
    * @SINCE_1_0.0
    * @return The allocated capacity of the array
@@ -122,7 +122,7 @@ public:
   SizeType Capacity();
 
   /**
-   * @brief Add an element to the array.
+   * @brief Adds an element to the array.
    *
    * @SINCE_1_0.0
    * @param[in] value The value to add to the end of the array
@@ -145,9 +145,8 @@ public:
    * @brief Const access an element.
    *
    * @SINCE_1_0.0
-   * @param[in] index The element index to access. No bounds checking is performed.
-   *
-   * @return The a reference to the element.
+   * @param[in] index The element index to access. No bounds checking is performed
+   * @return The a reference to the element
    */
   const Value& GetElementAt( SizeType index ) const
   {
@@ -155,12 +154,11 @@ public:
   }
 
   /**
-   * @brief Access an element.
+   * @brief Accesses an element.
    *
    * @SINCE_1_0.0
-   * @param[in] index The element index to access. No bounds checking is performed.
-   *
-   * @return The a reference to the element.
+   * @param[in] index The element index to access. No bounds checking is performed
+   * @return The a reference to the element
    */
   Value& GetElementAt( SizeType index )
   {
@@ -171,9 +169,8 @@ public:
    * @brief Const operator to access an element.
    *
    * @SINCE_1_0.0
-   * @param[in] index The element index to access. No bounds checking is performed.
-   *
-   * @return The a reference to the element.
+   * @param[in] index The element index to access. No bounds checking is performed
+   * @return The a reference to the element
    *
    */
   const Value& operator[]( SizeType index ) const;
@@ -182,25 +179,24 @@ public:
    * @brief Operator to access an element.
    *
    * @SINCE_1_0.0
-   * @param[in] index The element index to access. No bounds checking is performed.
-   *
-   * @return The a reference to the element.
+   * @param[in] index The element index to access. No bounds checking is performed
+   * @return The a reference to the element
    *
    */
   Value& operator[]( SizeType index );
 
   /**
-   * @brief Assignment Operator
+   * @brief Assignment Operator.
    *
    * @SINCE_1_0.0
-   * @param[in] other The array to copy from.
+   * @param[in] other The array to copy from
    *
    * @return The copied array.
    */
   Array& operator=( const Array& other );
 
   /**
-   * @brief output to stream
+   * @brief Output to stream.
    * @SINCE_1_1.28
    */
   friend std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
@@ -211,12 +207,12 @@ private:
 };
 
 /**
- * @brief Convert the values of the property array into a string and append to an output stream.
+ * @brief Converts the values of the property array into a string and append to an output stream.
  *
  * @SINCE_1_1.28
- * @param [in] stream The output stream operator.
- * @param [in] array The array to insert
- * @return The output stream operator.
+ * @param[in] stream The output stream operator
+ * @param[in] array The array to insert
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
 

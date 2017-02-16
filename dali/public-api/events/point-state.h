@@ -33,7 +33,7 @@ namespace PointState
 {
 
 /**
- * @brief Point state type
+ * @brief Enumeration for point state type.
  * @SINCE_1_1.37
  */
 enum Type
@@ -44,7 +44,7 @@ enum Type
   UP = FINISHED,  /**< Touch stopped */
   MOTION,         /**< Finger dragged or hovered */
   LEAVE,          /**< Leave the boundary of an actor */
-  STATIONARY,     /**< No change from last event.  Useful when a multi-point event occurs where
+  STATIONARY,     /**< No change from last event. Useful when a multi-point event occurs where
                        all points are sent but indicates that this particular point has not changed
                        since the last time */
   INTERRUPTED,    /**< A system event has occurred which has interrupted the touch or hover event sequence. */

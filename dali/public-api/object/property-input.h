@@ -52,96 +52,96 @@ public:
   virtual ~PropertyInput() = 0;
 
   /**
-   * @brief Query the type of property input.
+   * @brief Queries the type of property input.
    *
    * @SINCE_1_0.0
-   * @return The property type.
+   * @return The property type
    */
   virtual Property::Type GetType() const = 0;
 
   /**
-   * @brief Retrieve a boolean value.
+   * @brief Retrieves a boolean value.
    *
    * @SINCE_1_0.0
-   * @return The boolean value.
+   * @return The boolean value
    * @pre GetType() returns Property::BOOLEAN.
    */
   virtual const bool& GetBoolean() const = 0;
 
   /**
-   * @brief Retrieve a float value.
+   * @brief Retrieves a float value.
    *
    * @SINCE_1_0.0
-   * @return The float value.
+   * @return The float value
    * @pre GetType() returns Property::FLOAT.
    */
   virtual const float& GetFloat() const = 0;
 
   /**
-   * @brief Retrieve an integer value.
+   * @brief Retrieves an integer value.
    *
    * @SINCE_1_0.0
-   * @return The integer value.
+   * @return The integer value
    * @pre GetType() returns Property::INTEGER.
    */
   virtual const int& GetInteger() const = 0;
 
   /**
-   * @brief Retrieve a Vector2 value.
+   * @brief Retrieves a Vector2 value.
    *
    * @SINCE_1_0.0
-   * @return The Vector2 value.
+   * @return The Vector2 value
    * @pre GetType() returns Property::VECTOR2.
    */
   virtual const Vector2& GetVector2() const = 0;
 
   /**
-   * @brief Retrieve a Vector3 value.
+   * @brief Retrieves a Vector3 value.
    *
    * @SINCE_1_0.0
-   * @return The Vector3 value.
+   * @return The Vector3 value
    * @pre GetType() returns Property::VECTOR3.
    */
   virtual const Vector3& GetVector3() const = 0;
 
   /**
-   * @brief Retrieve a Vector4 value.
+   * @brief Retrieves a Vector4 value.
    *
    * @SINCE_1_0.0
-   * @return The Vector4 value.
+   * @return The Vector4 value
    * @pre GetType() returns Property::VECTOR4.
    */
   virtual const Vector4& GetVector4() const = 0;
 
   /**
-   * @brief Retrieve a Matrix (3x3) value.
+   * @brief Retrieves a Matrix (3x3) value.
    *
    * @SINCE_1_0.0
-   * @return The Matrix value.
+   * @return The Matrix value
    * @pre GetType() returns Property::Matrix3.
    */
   virtual const Matrix3& GetMatrix3() const = 0;
 
   /**
-   * @brief Retrieve a Matrix (4x4) value.
+   * @brief Retrieves a Matrix (4x4) value.
    *
    * @SINCE_1_0.0
-   * @return The Matrix value.
+   * @return The Matrix value
    * @pre GetType() returns Property::Matrix4.
    */
   virtual const Matrix& GetMatrix() const = 0;
 
   /**
-   * @brief Retrieve a Quaternion value.
+   * @brief Retrieves a Quaternion value.
    *
    * @SINCE_1_0.0
-   * @return The Quaternion value.
+   * @return The Quaternion value
    * @pre GetType() returns Property::Quaternion.
    */
   virtual const Quaternion& GetQuaternion() const = 0;
 
   /**
-   * @brief Retrieve the extension for the PropertyInput
+   * @brief Retrieves the extension for the PropertyInput
    *
    * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise

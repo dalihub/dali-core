@@ -47,7 +47,7 @@ class DALI_IMPORT_API PropertyNotification : public BaseHandle
 {
 public:
   /**
-   * @brief Enumeration to describe how to check condition
+   * @brief Enumeration for description of how to check condition.
    * @SINCE_1_0.0
    */
   enum NotifyMode
@@ -61,7 +61,7 @@ public:
 public:
 
   /**
-   * @brief Create an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New().
+   * @brief Creates an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
@@ -69,10 +69,10 @@ public:
   PropertyNotification();
 
   /**
-   * @brief Downcast a handle to PropertyNotification handle.
+   * @brief Downcasts a handle to PropertyNotification handle.
    *
-   * If handle points to an PropertyNotification object the downcast
-   * produces valid handle. If not the returned handle is left
+   * If handle points to a PropertyNotification object, the downcast
+   * produces valid handle. If not, the returned handle is left
    * uninitialized.
    *
    * @SINCE_1_0.0
@@ -82,7 +82,7 @@ public:
   static PropertyNotification DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -93,7 +93,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   PropertyNotification(const PropertyNotification& handle);
 
@@ -101,13 +101,13 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PropertyNotification& operator=(const PropertyNotification& rhs);
 
   /**
-   * @brief Get the condition of this notification
+   * @brief Gets the condition of this notification.
    *
    * @SINCE_1_0.0
    * @return The condition is returned
@@ -115,7 +115,7 @@ public:
   PropertyCondition GetCondition();
 
   /**
-   * @brief Get the condition of this notification
+   * @brief Gets the condition of this notification.
    *
    * @SINCE_1_0.0
    * @return The condition is returned
@@ -123,18 +123,18 @@ public:
   const PropertyCondition& GetCondition() const;
 
   /**
-   * @brief Get the target handle that this notification is observing.
+   * @brief Gets the target handle that this notification is observing.
    * @SINCE_1_0.0
    * @return The target handle
    */
   Dali::Handle GetTarget() const;
 
   /**
-   * @brief Get the target handle's property index that this notification
+   * @brief Gets the target handle's property index that this notification
    * is observing.
    *
    * @SINCE_1_0.0
-   * @return The target property.
+   * @return The target property
    */
   Property::Index GetTargetProperty() const;
 
@@ -153,7 +153,7 @@ public:
    * @brief Retrieves the current Notification mode.
    *
    * @SINCE_1_0.0
-   * @return Notification mode.
+   * @return Notification mode
    */
   NotifyMode GetNotifyMode();
 
@@ -167,10 +167,10 @@ public:
   bool GetNotifyResult() const;
 
   /**
-   * @brief Connect to this signal to be notified when the notification has occurred.
+   * @brief Connects to this signal to be notified when the notification has occurred.
    *
    * @SINCE_1_0.0
-   * @return A signal object to Connect() with.
+   * @return A signal object to Connect() with
    */
   PropertyNotifySignalType& NotifySignal();
 
@@ -181,7 +181,7 @@ public: // Not intended for use by Application developers
    * @brief This constructor is used by Dali New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in] propertyNotification A pointer to a newly allocated Dali resource
+   * @param[in] propertyNotification A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);
   /// @endcond

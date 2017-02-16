@@ -35,7 +35,7 @@ class SlotObserver;
 class SlotConnection;
 
 /**
- * @brief Connection tracker concrete implementation
+ * @brief Connection tracker concrete implementation.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ConnectionTracker : public ConnectionTrackerInterface
@@ -55,7 +55,7 @@ public:
   virtual ~ConnectionTracker();
 
   /**
-   * @brief Disconnect all signals from this object.
+   * @brief Disconnects all signals from this object.
    * @SINCE_1_0.0
    */
   void DisconnectAll();
@@ -71,9 +71,9 @@ public:
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
 
   /**
-   * @brief returns the connection count
+   * @brief Returns the connection count.
    * @SINCE_1_0.0
-   * @return the connection count
+   * @return The connection count
    */
   std::size_t GetConnectionCount() const;
 

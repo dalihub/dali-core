@@ -29,7 +29,7 @@ namespace Dali
  */
 
 /**
- * @brief These are the property index ranges.
+ * @brief Enumeration for the property index ranges.
  *
  * Enumerations are being used here rather than static constants so that switch statements can be
  * used to compare property indices.

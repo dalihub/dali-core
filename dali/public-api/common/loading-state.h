@@ -29,7 +29,7 @@ namespace Dali
  */
 
 /**
- * @brief The status during resource loading operations.
+ * @brief Enumeration for the status during resource loading operations.
  * @SINCE_1_0.0
  */
 enum LoadingState

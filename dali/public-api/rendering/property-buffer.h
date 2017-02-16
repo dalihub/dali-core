@@ -35,7 +35,7 @@ class PropertyBuffer;
 }
 
 /**
- * @brief PropertyBuffer is a handle to an object that contains a buffer of structured properties
+ * @brief PropertyBuffer is a handle to an object that contains a buffer of structured properties.
  *
  * PropertyBuffers can be used to provide data to Geometry objects.
  *
@@ -70,7 +70,7 @@ class DALI_IMPORT_API PropertyBuffer : public BaseHandle
 public:
 
   /**
-   * @brief Create a PropertyBuffer
+   * @brief Creates a PropertyBuffer.
    * Static property buffers use less memory.
    *
    * @SINCE_1_1.43
@@ -80,21 +80,21 @@ public:
   static PropertyBuffer New( Dali::Property::Map& bufferFormat );
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   PropertyBuffer();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~PropertyBuffer();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -102,8 +102,8 @@ public:
   PropertyBuffer( const PropertyBuffer& handle );
 
   /**
-   * @brief Downcast to a property buffer handle.
-   * If not a property buffer the returned property buffer handle is left uninitialized.
+   * @brief Downcasts to a property buffer handle.
+   * If not, a property buffer the returned property buffer handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -112,7 +112,7 @@ public:
   static PropertyBuffer DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -121,7 +121,7 @@ public:
   PropertyBuffer& operator=( const PropertyBuffer& handle );
 
   /**
-   * @brief Update the whole buffer information
+   * @brief Updates the whole buffer information.
    *
    * This function expects a pointer to an array of structures with the same
    * format that was given in the construction, and the number of elements to
@@ -139,13 +139,13 @@ public:
    * </pre>
    *
    * @SINCE_1_1.43
-   * @param[in] data A pointer to the data that will be copied to the buffer.
-   * @param[in] size Number of elements to expand or contract the buffer.
+   * @param[in] data A pointer to the data that will be copied to the buffer
+   * @param[in] size Number of elements to expand or contract the buffer
    */
   void SetData( const void* data, std::size_t size );
 
   /**
-   * @brief Get the number of elements in the buffer
+   * @brief Gets the number of elements in the buffer.
    *
    * @SINCE_1_1.43
    * @return Number of elements to expand or contract the buffer
@@ -155,7 +155,7 @@ public:
 public:
 
   /**
-   * @brief The constructor
+   * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated PropertyBuffer

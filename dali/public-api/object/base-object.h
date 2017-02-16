@@ -45,10 +45,10 @@ public:
    * @brief Connects a void() functor to a specified signal.
    *
    * @SINCE_1_0.0
-   * @param [in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param [in] signalName Name of the signal to connect to.
-   * @param [in] functor The functor to copy.
-   * @return True if the signal was available.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] signalName Name of the signal to connect to
+   * @param[in] functor The functor to copy
+   * @return True if the signal was available
    * @pre The signal must be available in this object.
    */
   template <class T>
@@ -78,10 +78,10 @@ public: // Not intended for application developers
    * @brief Not intended for application developers.
    *
    * @SINCE_1_0.0
-   * @param [in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param [in] signalName Name of the signal to connect to.
-   * @param [in] functorDelegate A newly allocatated functor delegate (takes ownership).
-   * @return True if the signal was available.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] signalName Name of the signal to connect to
+   * @param[in] functorDelegate A newly allocated functor delegate (takes ownership)
+   * @return True if the signal was available
    */
   bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
 
@@ -123,11 +123,11 @@ private:
 // Helpers for public-api forwarding methods
 
 /**
- * @brief Get the implementation of a handle.
+ * @brief Gets the implementation of a handle.
  *
  * @SINCE_1_0.0
  * @param[in] handle The handle
- * @return A reference to the object the handle points at.
+ * @return A reference to the object the handle points at
  */
 inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
 {
@@ -137,11 +137,11 @@ inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
 }
 
 /**
- * @brief Get the implementation of a handle.
+ * @brief Gets the implementation of a handle.
  *
  * @SINCE_1_0.0
  * @param[in] handle The handle
- * @return A reference to the object the handle points at.
+ * @return A reference to the object the handle points at
  */
 inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
 {

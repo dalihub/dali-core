@@ -40,7 +40,7 @@ class ResourceImage;
 }
 
 /**
- * @brief ResourceImage is an image loaded using a URL
+ * @brief ResourceImage is an image loaded using a URL.
  *
  * <i>Customizing load requests</i>
  *
@@ -71,7 +71,7 @@ public:
 public:
 
   /**
-   * @brief Get the size of an image from disk.
+   * @brief Gets the size of an image from disk.
    *
    * This function will read the header info from file on disk and is
    * synchronous, so it should not be used repeatedly or in tight
@@ -79,8 +79,8 @@ public:
    *
    * @SINCE_1_0.0
    * @REMARK_STORAGE
-   * @param [in] url The URL of the image file.
-   * @return The width and height in pixels of the image.
+   * @param[in] url The URL of the image file
+   * @return The width and height in pixels of the image
    */
   static ImageDimensions GetImageSize( const std::string& url );
 
@@ -93,7 +93,7 @@ public:
   ResourceImage();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -104,7 +104,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   ResourceImage( const ResourceImage& handle );
 
@@ -112,19 +112,19 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   ResourceImage& operator=( const ResourceImage& rhs );
 
   /**
    * @name ResourceImageFactoryFunctions
-   * Create ResourceImage object instances using these functions.
+   * Creates ResourceImage object instances using these functions.
    */
   ///@{
 
   /**
-   * @brief Create an initialised ResourceImage object.
+   * @brief Creates an initialized ResourceImage object.
    *
    * Uses defaults for all options.
    *
@@ -132,23 +132,23 @@ public:
    * @SINCE_1_0.0
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param [in] url The URL of the image file to use.
-   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param[in] url The URL of the image file to use
+   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return A handle to a newly allocated object
    */
   static ResourceImage New( const std::string& url, bool orientationCorrection = true );
 
   /**
-   * @brief Create an initialised ResourceImage object.
+   * @brief Creates an initialized ResourceImage object.
    *
    * @SINCE_1_0.0
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param [in] url The URL of the image file to use.
-   * @param [in] size The width and height to fit the loaded image to.
-   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
-   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param[in] url The URL of the image file to use
+   * @param[in] size The width and height to fit the loaded image to
+   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return A handle to a newly allocated object
    */
   static ResourceImage New( const std::string& url,
@@ -160,10 +160,10 @@ public:
   ///@}
 
   /**
-   * @brief Downcast a handle to ResourceImage handle.
+   * @brief Downcasts a handle to ResourceImage handle.
    *
-   * If handle points to a ResourceImage object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a ResourceImage object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a Image object or an uninitialized handle
@@ -171,12 +171,12 @@ public:
   static ResourceImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Query whether the image data has loaded.
+   * @brief Queries whether the image data has loaded.
    *
    * The asynchronous loading begins when the Image object is created.
    * After the Image object is discarded, the image data will be released from memory.
    * @SINCE_1_0.0
-   * @return The loading state, either Loading, Success or Failed.
+   * @return The loading state, either Loading, Success or Failed
    */
   LoadingState GetLoadingState() const;
 
@@ -184,18 +184,17 @@ public:
    * @brief Returns the URL of the image.
    *
    * @SINCE_1_0.0
-   * @return The URL of the image file.
+   * @return The URL of the image file
    */
   std::string GetUrl() const;
 
   /**
-   * @brief Reload image from filesystem.
+   * @brief Reloads image from filesystem.
    *
    * The original set of image loading attributes (requested dimensions, scaling
    * mode and filter mode) are used when requesting the image again.
    * @SINCE_1_0.0
-   * @note If image is offstage and OnDemand policy is set, the reload request is
-   * ignored.
+   * @note If image is offstage and OnDemand policy is set, the reload request is ignored.
    */
   void Reload();
 
@@ -205,7 +204,7 @@ public: // Signals
    * @brief Emitted when the image data loads successfully, or when the loading fails.
    *
    * @SINCE_1_0.0
-   * @return A signal object to Connect() with.
+   * @return A signal object to Connect() with
    */
   ResourceImageSignal& LoadingFinishedSignal();
 

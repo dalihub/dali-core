@@ -36,7 +36,7 @@ namespace TextureType
 {
 
 /**
- * @brief Texture types
+ * @brief Enumeration for texture types.
  * @SINCE_1_1.43
  */
 enum Type
@@ -74,7 +74,7 @@ class DALI_IMPORT_API Texture : public BaseHandle
 public:
 
   /**
-   * @brief Creates a new Texture object
+   * @brief Creates a new Texture object.
    *
    * @SINCE_1_1.43
    * @param[in] type The type of the texture
@@ -86,7 +86,7 @@ public:
   static Texture New( TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
 
   /**
-   * @brief Creates a new Texture object from a native image
+   * @brief Creates a new Texture object from a native image.
    *
    * @SINCE_1_1.43
    * @param[in] nativeImageInterface A native image
@@ -97,21 +97,21 @@ public:
   static Texture New( NativeImageInterface& nativeImageInterface );
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   Texture();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~Texture();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -119,8 +119,8 @@ public:
   Texture( const Texture& handle );
 
   /**
-   * @brief Downcast to a texture.
-   * If not the returned handle is left uninitialized.
+   * @brief Downcasts to a texture.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -129,7 +129,7 @@ public:
   static Texture DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -138,7 +138,7 @@ public:
   Texture& operator=( const Texture& handle );
 
   /**
-   * @brief Upload data to the texture from a PixelData object
+   * @brief Uploads data to the texture from a PixelData object.
    *
    * @SINCE_1_1.43
    * @param[in] pixelData The pixelData object
@@ -147,7 +147,7 @@ public:
   bool Upload( PixelData pixelData );
 
   /**
-   * @brief Upload data to the texture from a PixelData object
+   * @brief Uploads data to the texture from a PixelData object.
    * @note Upload does not upsample or downsample pixel data to fit the specified rectangular area in the texture.
    *
    * @SINCE_1_1.43
@@ -166,15 +166,15 @@ public:
                unsigned int width, unsigned int height );
 
   /**
-   * @brief Generate mipmaps for the texture
-   * This will auto generate all the mipmaps for the texture based on the data in the base level
+   * @brief Generates mipmaps for the texture.
+   * This will auto generate all the mipmaps for the texture based on the data in the base level.
    *
    * @SINCE_1_1.43
    */
   void GenerateMipmaps();
 
   /**
-   * @brief Returns the width of the texture
+   * @brief Returns the width of the texture.
    *
    * @SINCE_1_1.43
    * @return The width, in pixels, of the texture
@@ -182,7 +182,7 @@ public:
   unsigned int GetWidth() const;
 
   /**
-   * @brief Returns the height of the texture
+   * @brief Returns the height of the texture.
    *
    * @SINCE_1_1.43
    * @return The height, in pixels, of the texture
@@ -192,7 +192,7 @@ public:
 public:
 
   /**
-   * @brief The constructor
+   * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Texture

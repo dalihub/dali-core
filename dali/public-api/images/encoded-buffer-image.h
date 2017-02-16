@@ -78,46 +78,46 @@ public:
   EncodedBufferImage();
 
   /**
-   * @brief Create an initialised image object from an encoded image buffer in memory.
+   * @brief Creates an initialized image object from an encoded image buffer in memory.
    *
    * @SINCE_1_0.0
-   * @param [in] encodedImage The encoded bytes of an image, in a supported
+   * @param[in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
    * The caller retains ownership of this buffer and is free to modify or
-   * discard it as soon as the function returns.
-   * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
+   * discard it as soon as the function returns
+   * @param[in] encodedImageByteCount The size in bytes of the buffer pointed to
    * by encodedImage.
-   * @return A handle to a newly allocated object.
+   * @return A handle to a newly allocated object
    */
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount );
 
   /**
-   * @brief Create an initialised image object from an encoded image buffer in memory.
+   * @brief Creates an initialized image object from an encoded image buffer in memory.
    *
    * @SINCE_1_1.4
-   * @param [in] encodedImage The encoded bytes of an image, in a supported
+   * @param[in] encodedImage The encoded bytes of an image, in a supported
    * image format such as PNG, JPEG, GIF, BMP, KTX, ICO, and WBMP, organised
    * exactly as it would be as a file in the filesystem.
    * The caller retains ownership of this buffer and is free to modify or
-   * discard it as soon as the function returns.
-   * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
-   * by encodedImage.
-   * @param [in] size The width and height to fit the loaded image to.
-   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
-   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * discard it as soon as the function returns
+   * @param[in] encodedImageByteCount The size in bytes of the buffer pointed to
+   * by encodedImage
+   * @param[in] size The width and height to fit the loaded image to
+   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * policy is set, a reload will not be possible, so the Image should never be
-   * used once all actors using it have gone off-stage.
-   * @return A handle to a newly allocated object.
+   * used once all actors using it have gone off-stage
+   * @return A handle to a newly allocated object
    */
   static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
 
   /**
-   * @brief Downcast a handle to EncodedBufferImage handle.
+   * @brief Downcasts a handle to EncodedBufferImage handle.
    *
-   * If handle points to a EncodedBufferImage the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a EncodedBufferImage, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a EncodedBufferImage or an uninitialized handle
@@ -125,7 +125,7 @@ public:
   static EncodedBufferImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -136,7 +136,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   EncodedBufferImage(const EncodedBufferImage& handle);
 
@@ -144,7 +144,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   EncodedBufferImage& operator=(const EncodedBufferImage& rhs);

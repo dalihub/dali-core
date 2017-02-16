@@ -41,7 +41,7 @@ struct Radian;
 struct Degree
 {
   /**
-   * @brief default constructor, initialises to 0.
+   * @brief Default constructor, initialises to 0.
    * @SINCE_1_0.0
    */
   Degree()
@@ -49,20 +49,20 @@ struct Degree
   { }
 
   /**
-   * @brief Create an angle in degrees.
+   * @brief Creates an angle in degrees.
    *
    * @SINCE_1_0.0
-   * @param[in] value The initial value in degrees.
+   * @param[in] value The initial value in degrees
    */
   explicit Degree( float value )
   : degree( value )
   { }
 
   /**
-   * @brief Create an angle in degrees from a Radian.
+   * @brief Creates an angle in degrees from a Radian.
    *
    * @SINCE_1_0.0
-   * @param[in] value The initial value in Radians.
+   * @param[in] value The initial value in Radians
    */
   DALI_EXPORT_API Degree( Radian value );
 
@@ -90,12 +90,12 @@ DALI_EXPORT_API extern const Radian ANGLE_30;  ///< 30 degree turn in radians
 DALI_EXPORT_API extern const Radian ANGLE_0;   ///< 0 degree turn in radians
 
 /**
- * @brief Compare equality between two degrees.
+ * @brief Compares equality between two degrees.
  *
  * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Degree to compare to
- * @return true if the values are identical
+ * @return True if the values are identical
  */
 inline bool operator==( const Degree& lhs, const Degree& rhs )
 {
@@ -103,12 +103,12 @@ inline bool operator==( const Degree& lhs, const Degree& rhs )
 }
 
 /**
- * @brief Compare inequality between two degrees.
+ * @brief Compares inequality between two degrees.
  *
  * @SINCE_1_0.0
  * @param[in] lhs Degree to compare
  * @param[in] rhs Degree to compare to
- * @return true if the values are not identical
+ * @return True if the values are not identical
  */
 inline bool operator!=( const Degree& lhs, const Degree& rhs )
 {
@@ -116,12 +116,12 @@ inline bool operator!=( const Degree& lhs, const Degree& rhs )
 }
 
 /**
- * @brief Clamp a radian value
+ * @brief Clamps a radian value.
  * @SINCE_1_0.0
  * @param angle to clamp
  * @param min value
  * @param max value
- * @return the resulting radian
+ * @return The resulting radian
  */
 inline Degree Clamp( Degree angle, float min, float max )
 {

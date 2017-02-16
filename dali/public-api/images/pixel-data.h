@@ -41,7 +41,7 @@ class DALI_IMPORT_API PixelData : public BaseHandle
 public:
 
   /**
-   * @brief Function to release the pixel buffer
+   * @brief Enumeration for Function to release the pixel buffer.
    * @SINCE_1_1.43
    */
   enum ReleaseFunction
@@ -51,15 +51,15 @@ public:
   };
 
   /**
-   * @brief Create a PixelData object.
+   * @brief Creates a PixelData object.
    *
    * @SINCE_1_1.43
-   * @param[in] buffer           The raw pixel data.
-   * @param[in] bufferSize       The size of the buffer in bytes
-   * @param[in] width            Buffer width in pixels
-   * @param[in] height           Buffer height in pixels
-   * @param[in] pixelFormat      The pixel format
-   * @param[in] releaseFunction  The function used to release the memory.
+   * @param[in] buffer          The raw pixel data
+   * @param[in] bufferSize      The size of the buffer in bytes
+   * @param[in] width           Buffer width in pixels
+   * @param[in] height          Buffer height in pixels
+   * @param[in] pixelFormat     The pixel format
+   * @param[in] releaseFunction The function used to release the memory
    * @return A handle to the PixelData
    */
   static PixelData New( unsigned char* buffer,
@@ -70,7 +70,7 @@ public:
                         ReleaseFunction releaseFunction);
 
   /**
-   * @brief Create an empty handle.
+   * @brief Creates an empty handle.
    * Use PixelData::New() to create an initialized object.
    *
    * @SINCE_1_1.43
@@ -102,7 +102,7 @@ public:
   PixelData& operator=(const PixelData& rhs);
 
   /**
-   * @brief Get the width of the buffer in pixels.
+   * @brief Gets the width of the buffer in pixels.
    *
    * @SINCE_1_1.43
    * @return The width of the buffer in pixels
@@ -110,7 +110,7 @@ public:
   unsigned int GetWidth() const;
 
   /**
-   * @brief Get the height of the buffer in pixels.
+   * @brief Gets the height of the buffer in pixels.
    *
    * @SINCE_1_1.43
    * @return The height of the buffer in pixels
@@ -118,7 +118,7 @@ public:
   unsigned int GetHeight() const;
 
   /**
-   * @brief Get the pixel format.
+   * @brief Gets the pixel format.
    *
    * @SINCE_1_1.43
    * @return The pixel format
@@ -128,7 +128,7 @@ public:
 public:
 
   /**
-   * @brief The constructor
+   * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated PixelData
