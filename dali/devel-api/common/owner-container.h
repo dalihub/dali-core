@@ -78,7 +78,7 @@ public:
    */
   Iterator Erase( Iterator position )
   {
-    delete (*position);
+    Delete (*position);
     return Vector< T >::Erase( position );
   }
 
@@ -103,7 +103,7 @@ public:
     ConstIterator end = Vector< T >::End();
     for( Iterator iter = Vector< T >::Begin(); iter != end; ++iter )
     {
-      delete (*iter);
+      Delete (*iter);
     }
     Vector< T >::Clear();
   }
@@ -120,7 +120,7 @@ public:
       ConstIterator end = Vector< T >::End();
       for( Iterator iter = Vector< T >::Begin() + size; iter != end; ++iter )
       {
-        delete (*iter);
+        Delete (*iter);
       }
     }
     Vector< T >::Resize( size );
@@ -165,6 +165,17 @@ private:
   OwnerContainer( const OwnerContainer& );
   // Undefined assignment operator.
   OwnerContainer& operator=( const OwnerContainer& );
+
+  /**
+   * @brief delete the contents of the pointer
+   * Function provided to allow classes to provide a custom destructor through template specialisation
+   * @param pointer to the object
+   */
+  void Delete( T pointer )
+  {
+    delete pointer;
+  }
+
 
 };
 

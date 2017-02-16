@@ -191,7 +191,7 @@ struct UpdateManager::Impl
     for(;iter!=endIter;++iter)
     {
       (*iter)->OnDestroy();
-      delete(*iter);
+      Node::Delete(*iter);
     }
 
     // If there is root, reset it, otherwise do nothing as rendering was never started
@@ -199,7 +199,7 @@ struct UpdateManager::Impl
     {
       root->OnDestroy();
 
-      delete root;
+      Node::Delete( root );
       root = NULL;
     }
 
@@ -207,7 +207,7 @@ struct UpdateManager::Impl
     {
       systemLevelRoot->OnDestroy();
 
-      delete systemLevelRoot;
+      Node::Delete( systemLevelRoot );
       systemLevelRoot = NULL;
     }
 

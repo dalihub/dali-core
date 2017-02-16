@@ -120,13 +120,13 @@ private:
   RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
 
   // Messages are queued here when the update buffer index == 0
-  NodeOwnerContainer           mNodeQueue0;
+  OwnerContainer< Node* >      mNodeQueue0;
   ShaderQueue                  mShaderQueue0;
   RendererQueue                mRendererQueue0;
   CameraQueue                  mCameraQueue0;
 
   // Messages are queued here when the update buffer index == 1
-  NodeOwnerContainer           mNodeQueue1;
+  OwnerContainer< Node* >      mNodeQueue1;
   ShaderQueue                  mShaderQueue1;
   RendererQueue                mRendererQueue1;
   CameraQueue                  mCameraQueue1;
