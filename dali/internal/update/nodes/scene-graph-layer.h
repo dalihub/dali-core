@@ -82,11 +82,6 @@ public:
   static SceneGraph::Layer* New();
 
   /**
-   * Virtual destructor
-   */
-  virtual ~Layer();
-
-  /**
    * From Node, to convert a node to a layer.
    * @return The layer.
    */
@@ -216,6 +211,11 @@ private:
 
   // Undefined
   Layer(const Layer&);
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~Layer();
 
   // Undefined
   Layer& operator=(const Layer& rhs);

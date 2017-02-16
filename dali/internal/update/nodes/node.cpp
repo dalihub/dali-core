@@ -27,7 +27,8 @@
 
 namespace //Unnamed namespace
 {
-//Memory pool used to allocate new nodes. Memory used by this pool will be released when shutting down DALi
+//Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
+// or DALI library is unloaded
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
 }
 
@@ -43,9 +44,28 @@ namespace SceneGraph
 const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
+
 Node* Node::New()
 {
   return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node();
+}
+
+void Node::Delete( Node* node )
+{
+  // check we have a node not a layer
+  if( !node->mIsLayer )
+  {
+    // Manually call the destructor
+    node->~Node();
+
+    // Mark the memory it used as free in the memory pool
+    gNodeMemoryPool.FreeThreadSafe( node );
+  }
+  else
+  {
+    // not in the pool, just delete it.
+    delete node;
+  }
 }
 
 Node::Node()
@@ -75,7 +95,8 @@ Node::Node()
   mDrawMode( DrawMode::NORMAL ),
   mColorMode( DEFAULT_COLOR_MODE ),
   mClippingMode( ClippingMode::DISABLED ),
-  mIsRoot( false )
+  mIsRoot( false ),
+  mIsLayer( false )
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;
@@ -87,11 +108,6 @@ Node::~Node()
   {
     mTransformManager->RemoveTransform(mTransformId);
   }
-}
-
-void Node::operator delete( void* ptr )
-{
-  gNodeMemoryPool.FreeThreadSafe( static_cast<Node*>( ptr ) );
 }
 
 void Node::OnDestroy()
@@ -320,6 +336,22 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 
 } // namespace SceneGraph
 
+template <>
+void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
+{
+  if( mObject != NULL )
+  {
+    Dali::Internal::SceneGraph::Node::Delete( mObject );
+    mObject = NULL;
+  }
+}
+
 } // namespace Internal
+
+template <>
+void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete(Dali::Internal::SceneGraph::Node* pointer)
+{
+  Dali::Internal::SceneGraph::Node::Delete( pointer );
+}
 
 } // namespace Dali

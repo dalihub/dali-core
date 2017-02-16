@@ -107,15 +107,9 @@ public:
   static Node* New();
 
   /**
-   * Virtual destructor
+   * Deletes a Node.
    */
-  virtual ~Node();
-
-  /**
-   * Overriden delete operator
-   * Deletes the node from its global memory pool
-   */
-  void operator delete( void* ptr );
+  static void Delete( Node* node );
 
   /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
@@ -130,7 +124,7 @@ public:
    */
   bool IsLayer()
   {
-    return (GetLayer() != NULL);
+    return mIsLayer;
   }
 
   /**
@@ -333,15 +327,6 @@ public:
    * @return The dirty flags
    */
   int GetDirtyFlags() const;
-
-  /**
-   * Query whether a node is clean.
-   * @return True if the node is clean.
-   */
-  bool IsClean() const
-  {
-    return ( NothingFlag == GetDirtyFlags() );
-  }
 
   /**
    * Retrieve the parent-origin of the node.
@@ -772,6 +757,12 @@ protected:
    */
   Node();
 
+  /**
+   * Protected virtual destructor; See also Node::Delete( Node* )
+   * Kept protected to allow destructor chaining from layer
+   */
+  virtual ~Node();
+
 private: // from NodeDataProvider
 
   /**
@@ -873,7 +864,7 @@ protected:
   ColorMode                          mColorMode:2;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
   ClippingMode::Type                 mClippingMode:2;         ///< The clipping mode of this node
   bool                               mIsRoot:1;               ///< True if the node cannot have a parent
-
+  bool                               mIsLayer:1;              ///< True if the node is a layer
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
@@ -1004,7 +995,15 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
 
 } // namespace SceneGraph
 
+// Template specialisation for OwnerPointer<Node>, because delete is protected
+template <>
+void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset();
+
 } // namespace Internal
+
+// Template specialisations for OwnerContainer<Node*>, because delete is protected
+template <>
+void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete( Dali::Internal::SceneGraph::Node* pointer );
 
 } // namespace Dali
 
