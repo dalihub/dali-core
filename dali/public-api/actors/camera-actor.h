@@ -33,13 +33,13 @@ class CameraActor;
 }
 
 /**
- * @brief Camera enumerations.
+ * @brief Enumeration for camera.
  * @SINCE_1_0.0
  */
 namespace Camera
 {
 /**
- * @brief Type determines how camera operates.
+ * @brief Enumeration for type determination of how camera operates.
  * @SINCE_1_0.0
  */
 enum Type
@@ -49,7 +49,7 @@ enum Type
 };
 
 /**
- * @brief Projection modes.
+ * @brief Enumeration for projection modes.
  * @SINCE_1_0.0
  */
 enum ProjectionMode
@@ -65,13 +65,13 @@ enum ProjectionMode
  *
  * Allows the developer to use actor semantics to control a camera.
  *
- * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default
+ * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default,
  * the camera actor will be FREE_LOOK.
  *
  * A FREE_LOOK camera uses actor's orientation to control where the camera is looking.
  * If no additional rotations are specified, the camera looks in the negative Z direction.
  *
- * For LOOK_AT_TARGET the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
+ * For LOOK_AT_TARGET, the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
  * in world coordinates.
  *
  * @SINCE_1_0.0
@@ -81,7 +81,7 @@ class DALI_IMPORT_API CameraActor : public Actor
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the CameraActor class.
+   * @brief Enumeration for the instance of properties belonging to the CameraActor class.
    *
    * Properties additional to Actor.
    * @SINCE_1_0.0
@@ -89,7 +89,7 @@ public:
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the CameraActor class.
+     * @brief Enumeration for the instance of properties belonging to the CameraActor class.
      *
      * Properties additional to Actor.
      * @SINCE_1_0.0
@@ -114,39 +114,39 @@ public:
   };
 
   /**
-   * @brief Create an uninitialized CameraActor handle.
+   * @brief Creates an uninitialized CameraActor handle.
    *
-   * Initialise it using CameraActor::New().
+   * Initialize it using CameraActor::New().
    * Calling member functions with an uninitialized CameraActor handle is not allowed.
    * @SINCE_1_0.0
    */
   CameraActor();
 
   /**
-   * @brief Create a CameraActor object.
+   * @brief Creates a CameraActor object.
    *
    * Sets the default camera perspective projection for the stage's size. @see SetPerspectiveProjection().
    * @SINCE_1_0.0
-   * @return The newly created camera actor.
+   * @return The newly created camera actor
    */
   static CameraActor New();
 
   /**
-   * @brief Create a CameraActor object.
+   * @brief Creates a CameraActor object.
    *
    * Sets the default camera perspective projection for the given canvas size. @see SetPerspectiveProjection().
    *
    * @SINCE_1_0.0
-   * @param[in] size The canvas size.
-   * @return The newly created camera actor.
+   * @param[in] size The canvas size
+   * @return The newly created camera actor
    */
   static CameraActor New( const Size& size );
 
   /**
-   * @brief Downcast a handle to CameraActor handle.
+   * @brief Downcasts a handle to CameraActor handle.
    *
-   * If handle points to a CameraActor the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a CameraActor, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return Handle to a CameraActor or an uninitialized handle
@@ -154,32 +154,32 @@ public:
   static CameraActor DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * This is non-virtual, since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
   ~CameraActor();
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] copy The actor to copy.
+   * @param[in] copy The actor to copy
    */
   CameraActor(const CameraActor& copy);
 
   /**
-   * @brief Assignment operator
+   * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs The actor to copy.
+   * @param[in] rhs The actor to copy
    * @return A reference to this
    */
   CameraActor& operator=(const CameraActor& rhs);
 
   /**
-   * @brief Set the camera type.
+   * @brief Sets the camera type.
    * The default type is Dali::Camera::FREE_LOOK
    * @SINCE_1_0.0
    * @param[in] type The camera type
@@ -187,7 +187,7 @@ public:
   void SetType( Dali::Camera::Type type );
 
   /**
-   * @brief Get the type of the camera.
+   * @brief Gets the type of the camera.
    *
    * @SINCE_1_0.0
    * @return The type of camera
@@ -195,7 +195,7 @@ public:
   Dali::Camera::Type GetType() const;
 
   /**
-   * @brief Set the projection mode.
+   * @brief Sets the projection mode.
    *
    * @SINCE_1_0.0
    * @param[in] mode One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
@@ -203,7 +203,7 @@ public:
   void SetProjectionMode( Dali::Camera::ProjectionMode mode );
 
   /**
-   * @brief Get the projection mode.
+   * @brief Gets the projection mode.
    *
    * @SINCE_1_0.0
    * @return One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
@@ -211,7 +211,7 @@ public:
   Dali::Camera::ProjectionMode GetProjectionMode() const;
 
   /**
-   * @brief Set the field of view.
+   * @brief Sets the field of view.
    *
    * @SINCE_1_0.0
    * @param[in] fieldOfView The field of view in radians
@@ -219,7 +219,7 @@ public:
   void SetFieldOfView( float fieldOfView );
 
   /**
-   * @brief Get the field of view in Radians.
+   * @brief Gets the field of view in Radians.
    *
    * The default field of view is 45 degrees.
    * @SINCE_1_0.0
@@ -228,7 +228,7 @@ public:
   float GetFieldOfView( );
 
   /**
-   * @brief Set the aspect ratio.
+   * @brief Sets the aspect ratio.
    *
    * @SINCE_1_0.0
    * @param[in] aspectRatio The aspect ratio
@@ -236,7 +236,7 @@ public:
   void SetAspectRatio( float aspectRatio );
 
   /**
-   * @brief Get the aspect ratio of the camera.
+   * @brief Gets the aspect ratio of the camera.
    *
    * The default aspect ratio is 4.0f/3.0f.
    * @SINCE_1_0.0
@@ -253,7 +253,7 @@ public:
   void SetNearClippingPlane( float nearClippingPlane );
 
   /**
-   * @brief Get the near clipping plane distance.
+   * @brief Gets the near clipping plane distance.
    *
    * The default near clipping plane is 800.0f, to match the default screen height.
    * Reduce this value to see objects closer to the camera.
@@ -271,7 +271,7 @@ public:
   void SetFarClippingPlane( float farClippingPlane );
 
   /**
-   * @brief Get the far clipping plane distance.
+   * @brief Gets the far clipping plane distance.
    *
    * The default value is the default near clipping plane + (0xFFFF>>4).
    * @SINCE_1_0.0
@@ -280,7 +280,7 @@ public:
   float GetFarClippingPlane( );
 
   /**
-   * @brief Set the target position of the camera.
+   * @brief Sets the target position of the camera.
    *
    * @SINCE_1_0.0
    * @param[in] targetPosition The position of the target to look at
@@ -289,7 +289,7 @@ public:
   void SetTargetPosition( const Vector3& targetPosition );
 
   /**
-   * @brief Get Camera Target position.
+   * @brief Gets the Camera Target position.
    *
    * The default target position is Vector3::ZERO.
    * @SINCE_1_0.0
@@ -299,7 +299,7 @@ public:
   Vector3 GetTargetPosition() const;
 
   /**
-   * @brief Request for an inversion on the Y axis on the projection calculation.
+   * @brief Requests for an inversion on the Y axis on the projection calculation.
    *
    * The default value is not inverted.
    * @SINCE_1_0.0
@@ -308,17 +308,17 @@ public:
   void SetInvertYAxis(bool invertYAxis);
 
   /**
-   * @brief Get whether the Y axis is inverted.
+   * @brief Gets whether the Y axis is inverted.
    *
    * @SINCE_1_0.0
-   * @return True if the Y axis is inverted, false otherwise
+   * @return @c True if the Y axis is inverted, @c false otherwise
    */
   bool GetInvertYAxis();
 
   /**
    * @brief Sets the default camera perspective projection for the given canvas size.
    *
-   * Sets the near and far clipping planes, the field of view, the aspect ratio
+   * Sets the near and far clipping planes, the field of view, the aspect ratio,
    * and the Z position of the actor based on the canvas size so that 1 unit in
    * XY (z=0) plane is 1 pixel on screen.
    *
@@ -326,7 +326,7 @@ public:
    * projection for the stage's size.
    *
    * @SINCE_1_0.0
-   * @param[in] size The canvas size.
+   * @param[in] size The canvas size
    * @pre If size is non ZERO, \e width and \e height must be greater than zero.
    *
    */
@@ -369,7 +369,7 @@ public: // Not intended for use by Application developers
    * @brief This constructor is used by CameraActor::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in] actor A pointer to a newly allocated Dali resource
+   * @param[in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL CameraActor(Internal::CameraActor* actor);
 };

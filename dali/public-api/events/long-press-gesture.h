@@ -45,7 +45,7 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
   // Construction & Destruction
 
   /**
-   * @brief Constructor
+   * @brief Constructor.
    *
    * @SINCE_1_0.0
    * @param[in] state The state of the gesture
@@ -53,14 +53,14 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
   LongPressGesture(Gesture::State state);
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    */
   LongPressGesture( const LongPressGesture& rhs );
 
   /**
-   * @brief Assignment operator
+   * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
@@ -68,7 +68,7 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
   LongPressGesture& operator=( const LongPressGesture& rhs );
 
   /**
-   * @brief Virtual destructor
+   * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
   virtual ~LongPressGesture();
@@ -92,7 +92,7 @@ struct DALI_IMPORT_API LongPressGesture : public Gesture
    * @brief This is the point, in local actor coordinates, where the long press occurred.
    *
    * If a multi-touch long press, then this is the centroid of all the touch points.
-   * @return The point where tap has occurred (in local actor coordinates).
+   * @return The point where tap has occurred (in local actor coordinates)
    */
   Vector2 localPoint;
 };

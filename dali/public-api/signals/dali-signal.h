@@ -163,10 +163,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -174,10 +174,10 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
@@ -185,10 +185,10 @@ public:
   }
 
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( void (*func)() )
   {
@@ -196,10 +196,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( void (*func)() )
   {
@@ -207,11 +207,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, void (X::*func)() )
@@ -220,11 +220,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, void (X::*func)() )
@@ -233,11 +233,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, void (X::*func)() )
@@ -246,11 +246,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, void (X::*func)() )
@@ -259,11 +259,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -272,11 +272,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -284,7 +284,7 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    * @SINCE_1_0.0
    */
   void Emit()
@@ -329,10 +329,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -340,20 +340,20 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( Ret (*func)() )
   {
@@ -361,10 +361,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( Ret (*func)() )
   {
@@ -372,11 +372,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, Ret (X::*func)() )
@@ -385,11 +385,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, Ret (X::*func)() )
@@ -398,11 +398,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, Ret (X::*func)() )
@@ -411,11 +411,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)() )
@@ -424,11 +424,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -437,11 +437,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -449,10 +449,10 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
+   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
   Ret Emit()
   {
@@ -496,10 +496,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -507,20 +507,20 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( void (*func)( Arg0 arg0 ) )
   {
@@ -528,10 +528,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( void (*func)( Arg0 arg0 ) )
   {
@@ -539,11 +539,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, void (X::*func)( Arg0 arg0 ) )
@@ -552,11 +552,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, void (X::*func)( Arg0 arg0 ) )
@@ -565,11 +565,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
@@ -578,11 +578,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
@@ -591,11 +591,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -604,11 +604,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -616,10 +616,10 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
+   * @param[in] arg0 The first value to pass to callbacks
    */
   void Emit( Arg0 arg0 )
   {
@@ -663,10 +663,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -674,20 +674,20 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( Ret (*func)( Arg0 arg0 ) )
   {
@@ -695,10 +695,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( Ret (*func)( Arg0 arg0 ) )
   {
@@ -706,11 +706,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, Ret (X::*func)( Arg0 arg0 ) )
@@ -719,11 +719,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0 ) )
@@ -732,11 +732,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0 ) )
@@ -745,11 +745,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0 ) )
@@ -758,11 +758,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -771,11 +771,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -783,11 +783,11 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
-   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
+   * @param[in] arg0 The first value to pass to callbacks
+   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
   Ret Emit( Arg0 arg0 )
   {
@@ -834,10 +834,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -845,20 +845,20 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
   {
@@ -866,10 +866,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
   {
@@ -877,11 +877,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -890,11 +890,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -903,11 +903,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -916,11 +916,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -929,11 +929,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -942,11 +942,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -954,11 +954,11 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
-   * @param[in] arg1 The second value to pass to callbacks.
+   * @param[in] arg0 The first value to pass to callbacks
+   * @param[in] arg1 The second value to pass to callbacks
    */
   void Emit( Arg0 arg0, Arg1 arg1 )
   {
@@ -1002,10 +1002,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -1013,19 +1013,19 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
   {
@@ -1033,10 +1033,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
   {
@@ -1044,11 +1044,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -1057,11 +1057,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -1070,11 +1070,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -1083,11 +1083,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -1096,11 +1096,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -1109,11 +1109,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -1121,12 +1121,12 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
-   * @param[in] arg1 The second value to pass to callbacks.
-   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
+   * @param[in] arg0 The first value to pass to callbacks
+   * @param[in] arg1 The second value to pass to callbacks
+   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
   Ret Emit( Arg0 arg0, Arg1 arg1 )
   {
@@ -1170,10 +1170,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -1181,20 +1181,20 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
     return mImpl.GetConnectionCount();
   }
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
   {
@@ -1202,10 +1202,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
   {
@@ -1213,11 +1213,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1226,11 +1226,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1239,11 +1239,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1252,11 +1252,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1265,11 +1265,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -1278,11 +1278,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -1290,12 +1290,12 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
-   * @param[in] arg1 The second value to pass to callbacks.
-   * @param[in] arg2 The third value to pass to callbacks.
+   * @param[in] arg0 The first value to pass to callbacks
+   * @param[in] arg1 The second value to pass to callbacks
+   * @param[in] arg2 The third value to pass to callbacks
    */
   void Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
   {
@@ -1339,10 +1339,10 @@ public:
   }
 
   /**
-   * @brief Query whether there are any connected slots.
+   * @brief Queries whether there are any connected slots.
    *
    * @SINCE_1_0.0
-   * @return True if there are any slots connected to the signal.
+   * @return True if there are any slots connected to the signal
    */
   bool Empty() const
   {
@@ -1350,10 +1350,10 @@ public:
   }
 
   /**
-   * @brief Query the number of slots.
+   * @brief Queries the number of slots.
    *
    * @SINCE_1_0.0
-   * @return The number of slots connected to this signal.
+   * @return The number of slots connected to this signal
    */
   std::size_t GetConnectionCount() const
   {
@@ -1361,10 +1361,10 @@ public:
   }
 
   /**
-   * @brief Connect a function.
+   * @brief Connects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to connect.
+   * @param[in] func The function to connect
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
   {
@@ -1372,10 +1372,10 @@ public:
   }
 
   /**
-   * @brief Disconnect a function.
+   * @brief Disconnects a function.
    *
    * @SINCE_1_0.0
-   * @param[in] func The function to disconnect.
+   * @param[in] func The function to disconnect
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
   {
@@ -1383,11 +1383,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to connect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1396,11 +1396,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] obj An object which must implement the ConnectionTrackerInterface.
-   * @param[in] func The member function to disconnect.
+   * @param[in] obj An object which must implement the ConnectionTrackerInterface
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1409,11 +1409,11 @@ public:
   }
 
   /**
-   * @brief Connect a member function.
+   * @brief Connects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to connect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to connect
    */
   template<class X>
   void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1422,11 +1422,11 @@ public:
   }
 
   /**
-   * @brief Disconnect a member function.
+   * @brief Disconnects a member function.
    *
    * @SINCE_1_0.0
-   * @param[in] delegate A slot delegate.
-   * @param[in] func The member function to disconnect.
+   * @param[in] delegate A slot delegate
+   * @param[in] func The member function to disconnect
    */
   template<class X>
   void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1435,11 +1435,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object.
+   * @brief Connects a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] func The function object to copy.
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] func The function object to copy
    */
   template<class X>
   void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
@@ -1448,11 +1448,11 @@ public:
   }
 
   /**
-   * @brief Connect a function object using FunctorDelegate.
+   * @brief Connects a function object using FunctorDelegate.
    *
    * @SINCE_1_0.0
-   * @param[in] connectionTracker A connection tracker which can be used to disconnect.
-   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
+   * @param[in] connectionTracker A connection tracker which can be used to disconnect
+   * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
   void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
   {
@@ -1460,13 +1460,13 @@ public:
   }
 
   /**
-   * @brief Emit the signal.
+   * @brief Emits the signal.
    *
    * @SINCE_1_0.0
-   * @param[in] arg0 The first value to pass to callbacks.
-   * @param[in] arg1 The second value to pass to callbacks.
-   * @param[in] arg2 The third value to pass to callbacks.
-   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
+   * @param[in] arg0 The first value to pass to callbacks
+   * @param[in] arg1 The second value to pass to callbacks
+   * @param[in] arg2 The third value to pass to callbacks
+   * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
   Ret Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
   {

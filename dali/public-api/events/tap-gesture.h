@@ -41,28 +41,28 @@ struct DALI_IMPORT_API TapGesture : public Gesture
   // Construction & Destruction
 
   /**
-   * @brief Default Constructor
+   * @brief Default Constructor.
    * @SINCE_1_0.0
    */
   TapGesture();
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] rhs A reference to the copied handle
+   * @param rhs A reference to the copied handle
    */
   TapGesture( const TapGesture& rhs );
 
   /**
-   * @brief Assignment operator
+   * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] rhs A reference to the copied handle
+   * @param rhs A reference to the copied handle
    * @return A reference to this
    */
   TapGesture& operator=( const TapGesture& rhs );
 
   /**
-   * @brief Virtual destructor
+   * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
   virtual ~TapGesture();
@@ -91,7 +91,7 @@ struct DALI_IMPORT_API TapGesture : public Gesture
    * @brief This is the point, in local actor coordinates, where the tap occurred.
    *
    * If a multi-touch tap, then this is the centroid of all the touch points.
-   * @return The point where tap has occurred (in local actor coordinates).
+   * @return The point where tap has occurred (in local actor coordinates)
    */
   Vector2 localPoint;
 };

@@ -38,10 +38,10 @@ class FrameBufferImage;
 namespace RenderBuffer
 {
 /**
- * @brief Render Buffer formats
+ * @brief Enumeration for rendering buffer formats.
  *
  * The default format for framebuffer creation is COLOR, so If a depth buffer for 3D rendering is required use
- * COLOR_DEPTH instead
+ * COLOR_DEPTH instead.
  * @SINCE_1_0.0
  */
 enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alpha @SINCE_1_0.0
@@ -66,44 +66,44 @@ public:
   /**
    * @brief Constructor which creates an uninitialized FrameBufferImage object.
    *
-   * Use @ref FrameBufferImage::New to create an initialised object.
+   * Use @ref FrameBufferImage::New to create an initialized object.
    * @SINCE_1_0.0
    */
   FrameBufferImage();
 
   /**
-   * @brief Create a new FrameBufferImage.
+   * @brief Creates a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @SINCE_1_0.0
-   * @param [in] width       The width in pixels. Setting to zero will use the width of the stage.
-   * @param [in] height      The height in pixels. Setting to zero will use the height of the stage.
-   * @param [in] pixelFormat The pixel format (rgba 32 bit by default)
-   * @param [in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
-   * @return A handle to a new instance of a FrameBufferImage.
+   * @param[in] width The width in pixels. Setting to zero will use the width of the stage
+   * @param[in] height The height in pixels. Setting to zero will use the height of the stage
+   * @param[in] pixelFormat The pixel format (rgba 32 bit by default)
+   * @param[in] bufferFormat The format of the buffers that are going to be created for the FBO, (COLOR and DEPTH buffer as default)
+   * @return A handle to a new instance of a FrameBufferImage
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    */
   static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
 
   /**
-   * @brief Create a new FrameBufferImage.
+   * @brief Creates a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @SINCE_1_0.0
-   * @param [in] image       The native image.
+   * @param[in] image The native image
    *
-   * @return A handle to a new instance of a FrameBufferImage.
+   * @return A handle to a new instance of a FrameBufferImage
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    */
   static FrameBufferImage New(NativeImageInterface& image);
 
   /**
-   * @brief Downcast a handle to FrameBufferImage handle.
+   * @brief Downcasts a handle to FrameBufferImage handle.
    *
-   * If handle points to a FrameBufferImage object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a FrameBufferImage object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a FrameBufferImage object or an uninitialized handle
@@ -111,7 +111,7 @@ public:
   static FrameBufferImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -122,7 +122,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   FrameBufferImage(const FrameBufferImage& handle);
 
@@ -130,7 +130,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   FrameBufferImage& operator=(const FrameBufferImage& rhs);

@@ -68,7 +68,7 @@ struct DALI_IMPORT_API Property
   class Array;
 
   /**
-   * @brief The property types supported.
+   * @brief Enumeration for the property types supported.
    * @SINCE_1_0.0
    */
   enum Type
@@ -91,7 +91,7 @@ struct DALI_IMPORT_API Property
   };
 
   /**
-   * @brief The access mode for custom properties
+   * @brief Enumeration for the access mode for custom properties.
    * @SINCE_1_0.0
    */
   enum AccessMode
@@ -104,43 +104,43 @@ struct DALI_IMPORT_API Property
 
 
   /**
-   * @brief Create a Property instance.
+   * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @param [in] object A valid handle to the target object.
-   * @param [in] propertyIndex The index of a property.
+   * @param[in] object A valid handle to the target object
+   * @param[in] propertyIndex The index of a property
    */
   Property( Handle& object, Property::Index propertyIndex );
 
 
   /**
-   * @brief Create a Property instance.
+   * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @param [in] object A valid handle to the target object.
-   * @param [in] propertyIndex The index of a property.
-   * @param [in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
+   * @param[in] object A valid handle to the target object.
+   * @param[in] propertyIndex The index of a property.
+   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
    */
   Property( Handle& object, Property::Index propertyIndex, int componentIndex );
 
   /**
-   * @brief Create a Property instance.
+   * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @param [in] object A valid handle to the target object.
-   * @param [in] propertyName The property name.
+   * @param[in] object A valid handle to the target object
+   * @param[in] propertyName The property name
    * @note This performs a property index query and is therefore slower than
    * constructing a Property directly with the index.
    */
   Property( Handle& object, const std::string& propertyName );
 
   /**
-   * @brief Create a Property instance.
+   * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @param [in] object A valid handle to the target object.
-   * @param [in] propertyName The property name.
-   * @param [in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
+   * @param[in] object A valid handle to the target object
+   * @param[in] propertyName The property name
+   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
    * @note This performs a property index query and is therefore slower than
    * constructing a Property directly with the index.
    */

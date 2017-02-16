@@ -28,7 +28,7 @@ namespace Dali
 /**
  * @brief Basic type traits that every type has by default.
  *
- * This allows specializations to not have to repeat all flags
+ * This allows specializations to not have to repeat all flags.
  * @SINCE_1_0.0
  */
 template <typename Type>

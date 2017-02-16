@@ -54,8 +54,8 @@ public:
   /**
    * @brief Constructor taking separate x and y (width and height) parameters.
    * @SINCE_1_0.0
-   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536,
-   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536,
+   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536
+   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536
    */
   Uint16Pair( uint32_t width, uint32_t height )
   {
@@ -83,7 +83,7 @@ public:
   /**
    * @brief Sets the width.
    * @SINCE_1_1.13
-   * @param[in] width The x dimension to be stored in this 2-tuple.
+   * @param[in] width The x dimension to be stored in this 2-tuple
    */
   void SetWidth( uint16_t width )
   {
@@ -103,7 +103,7 @@ public:
   /**
    * @brief Sets the height.
    * @SINCE_1_1.13
-   * @param[in] height The y dimension to be stored in this 2-tuple.
+   * @param[in] height The y dimension to be stored in this 2-tuple
    */
   void SetHeight( uint16_t height )
   {
@@ -123,7 +123,7 @@ public:
   /**
    * @brief Sets the x dimension (same as width).
    * @SINCE_1_1.14
-   * @param[in] x The x dimension to be stored in this 2-tuple.
+   * @param[in] x The x dimension to be stored in this 2-tuple
    */
   void SetX( uint16_t x )
   {
@@ -143,7 +143,7 @@ public:
   /**
    * @brief Sets the y dimension (same as height).
    * @SINCE_1_1.14
-   * @param[in] y The y dimension to be stored in this 2-tuple.
+   * @param[in] y The y dimension to be stored in this 2-tuple
    */
   void SetY( uint16_t y )
   {
@@ -222,14 +222,14 @@ public:
   }
 
   /**
-   * @brief Create an instance by rounding a floating point vector to closest
+   * @brief Creates an instance by rounding a floating point vector to closest
    * integers.
    *
    * Uses a template for loose coupling, to save a header include, and allow any
    * vector type with .x and .y members to be converted.
    * @SINCE_1_0.0
    * @param[in] from Floating point vector2
-   * @return Closest integer value.
+   * @return Closest integer value
    */
   template<typename FLOAT_VECTOR_N_TYPE>
   static Uint16Pair FromFloatVec2( const FLOAT_VECTOR_N_TYPE& from )
@@ -240,14 +240,14 @@ public:
   }
 
   /**
-   * @brief Create an instance by rounding a floating point array to closest
+   * @brief Creates an instance by rounding a floating point array to closest
    * integers.
    *
    * Uses a template to allow any vector type with operator [] to be converted
    * in addition to plain arrays.
    * @SINCE_1_0.0
    * @param[in] from Floating point array
-   * @return Closest integer value.
+   * @return Closest integer value
    */
   template<typename FLOAT_ARRAY>
   static Uint16Pair FromFloatArray( const FLOAT_ARRAY& from )

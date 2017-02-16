@@ -56,22 +56,22 @@ public:
   /**
    * @brief Constructor which creates an uninitialized BufferImage object.
    *
-   * Use BufferImage::New(...) to create an initialised object.
+   * Use BufferImage::New(...) to create an initialized object.
    * @SINCE_1_0.0
    */
   BufferImage();
 
   /**
-   * @brief Create a new BufferImage.
+   * @brief Creates a new BufferImage.
    *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @SINCE_1_0.0
-   * @param [in] width       Image width in pixels
-   * @param [in] height      Image height in pixels
-   * @param [in] pixelformat The pixel format (rgba 32 bit by default)
+   * @param[in] width  Image width in pixels
+   * @param[in] height Image height in pixels
+   * @param[in] pixelformat The pixel format (rgba 32 bit by default)
    * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
    * @note default resource management policies are Immediate and Never
@@ -82,7 +82,7 @@ public:
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * @brief Create a new BufferImage, which uses an external data source.
+   * @brief Creates a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
    *
@@ -95,11 +95,11 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @SINCE_1_0.0
-   * @param [in] pixelBuffer  Pixel buffer. has to be allocated by application.
-   * @param [in] width        Image width in pixels
-   * @param [in] height       Image height in pixels
-   * @param [in] pixelFormat  The pixel format (rgba 32 bit by default)
-   * @param [in] stride       The internal stride of the pixelbuffer in pixels
+   * @param[in] pixelBuffer  Pixel buffer has to be allocated by application
+   * @param[in] width        Image width in pixels
+   * @param[in] height       Image height in pixels
+   * @param[in] pixelFormat  The pixel format (rgba 32 bit by default)
+   * @param[in] stride       The internal stride of the pixelbuffer in pixels
    * @return A handle to a new instance of BufferImage
    * @pre width & height are greater than zero
    */
@@ -110,10 +110,10 @@ public:
                          unsigned int  stride=0);
 
   /**
-   * @brief Downcast a handle to BufferImage handle.
+   * @brief Downcasts a handle to BufferImage handle.
    *
-   * If handle points to a BufferImage the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If the handle points to a BufferImage, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -122,7 +122,7 @@ public:
   static BufferImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -133,7 +133,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   BufferImage(const BufferImage& handle);
 
@@ -141,7 +141,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   BufferImage& operator=(const BufferImage& rhs);
@@ -215,7 +215,7 @@ public:
 
   /**
    * @copydoc Update()
-   * @param [in] updateArea Area that has changed in buffer
+   * @param[in] updateArea Area that has changed in buffer
    */
   void Update( RectArea updateArea );
 
@@ -229,7 +229,7 @@ public:
    * if it has called Update() and hasn't received a Image::UploadedSignal.
    *
    * @SINCE_1_0.0
-   * @return true if application owns data, false otherwise
+   * @return @c true if application owns data, @c false otherwise
    */
   bool IsDataExternal() const;
 

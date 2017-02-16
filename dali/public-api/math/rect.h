@@ -58,10 +58,10 @@ struct Rect
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] x       x coordinate (or left)
-   * @param [in] y       y coordinate (or right)
-   * @param [in] width   width (or bottom)
-   * @param [in] height  height (or top)
+   * @param[in] x      X coordinate (or left)
+   * @param[in] y      Y coordinate (or right)
+   * @param[in] width  Width (or bottom)
+   * @param[in] height Height (or top)
    */
   Rect(T x, T y, T width, T height)
   : x(x),
@@ -75,7 +75,7 @@ struct Rect
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  The original object
+   * @param[in] rhs The original object
    */
   Rect(const Rect<T>& rhs)
   {
@@ -89,8 +89,8 @@ struct Rect
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  The original object
-   * @return reference to this
+   * @param[in] rhs The original object
+   * @return Reference to this
    */
   Rect<T>& operator= (const Rect<T>& rhs)
   {
@@ -109,10 +109,10 @@ struct Rect
    * @brief Assignment from individual values.
    *
    * @SINCE_1_0.0
-   * @param[in] newX      x coordinate
-   * @param[in] newY      y coordinate
-   * @param[in] newWidth  width
-   * @param[in] newHeight height
+   * @param[in] newX      X coordinate
+   * @param[in] newY      Y coordinate
+   * @param[in] newWidth  Width
+   * @param[in] newHeight Height
    */
   void Set(T newX, T newY, T newWidth, T newHeight)
   {
@@ -126,7 +126,7 @@ struct Rect
    * @brief Determines whether or not this Rectangle is empty.
    *
    * @SINCE_1_0.0
-   * @return true if width or height are zero
+   * @return True if width or height are zero
    */
   bool IsEmpty() const
   {
@@ -135,7 +135,7 @@ struct Rect
   }
 
   /**
-   * @brief Get the left of the rectangle.
+   * @brief Gets the left of the rectangle.
    *
    * @SINCE_1_0.0
    * @return The left edge of the rectangle
@@ -145,7 +145,7 @@ struct Rect
     return x;
   }
   /**
-   * @brief Get the right of the rectangle.
+   * @brief Gets the right of the rectangle.
    *
    * @SINCE_1_0.0
    * @return The right edge of the rectangle
@@ -156,7 +156,7 @@ struct Rect
   }
 
   /**
-   * @brief Get the top of the rectangle.
+   * @brief Gets the top of the rectangle.
    *
    * @SINCE_1_0.0
    * @return The top of the rectangle
@@ -167,7 +167,7 @@ struct Rect
   }
 
   /**
-   * @brief Get the bottom of the rectangle.
+   * @brief Gets the bottom of the rectangle.
    *
    * @SINCE_1_0.0
    * @return The bottom of the rectangle
@@ -178,7 +178,7 @@ struct Rect
   }
 
   /**
-   * @brief Get the area of the rectangle.
+   * @brief Gets the area of the rectangle.
    *
    * @SINCE_1_0.0
    * @return The area of the rectangle
@@ -192,8 +192,8 @@ struct Rect
    * @brief Determines whether or not this rectangle and the specified rectangle intersect.
    *
    * @SINCE_1_0.0
-   * @param[in] other  The other rectangle to test against this rectangle
-   * @return           true if the rectangles intersect
+   * @param[in] other The other rectangle to test against this rectangle
+   * @return True if the rectangles intersect
    */
   bool Intersects(const Rect<T>& other) const
   {
@@ -207,8 +207,8 @@ struct Rect
    * @brief Determines whether or not this Rectangle contains the specified rectangle.
    *
    * @SINCE_1_0.0
-   * @param[in] other  The other rectangle to test against this rectangle
-   * @return           true if the specified rectangle is contained
+   * @param[in] other The other rectangle to test against this rectangle
+   * @return True if the specified rectangle is contained
    */
   bool Contains(const Rect<T>& other) const
   {
@@ -251,7 +251,7 @@ public:   // Data
  * @SINCE_1_0.0
  * @param[in] lhs First operand
  * @param[in] rhs Second operand
- * @return true if boxes are exactly same
+ * @return True if boxes are exactly same
  */
 template< typename T >
 inline bool operator==( const Rect<T>& lhs, const Rect<T>& rhs )
@@ -268,7 +268,7 @@ inline bool operator==( const Rect<T>& lhs, const Rect<T>& rhs )
  * @SINCE_1_0.0
  * @param[in] lhs The first rectangle
  * @param[in] rhs The second rectangle
- * @return true if rectangles are not identical
+ * @return True if rectangles are not identical
  */
 template< typename T >
 inline bool operator!=( const Rect<T>& lhs, const Rect<T>& rhs )
@@ -282,7 +282,7 @@ inline bool operator!=( const Rect<T>& lhs, const Rect<T>& rhs )
  * @SINCE_1_0.0
  * @param[in] lhs The first rectangle
  * @param[in] rhs The second rectangle
- * @return true if rectangles are exactly same
+ * @return True if rectangles are exactly same
  */
 template<>
 inline bool operator==( const Rect<float>& lhs, const Rect<float>& rhs )
@@ -297,7 +297,7 @@ inline bool operator==( const Rect<float>& lhs, const Rect<float>& rhs )
  * @brief IsEmpty specialization for float.
  *
  * @SINCE_1_0.0
- * @return true if the rectangle has zero size.
+ * @return True if the rectangle has zero size
  */
 template<>
 inline bool Rect<float>::IsEmpty() const
@@ -308,12 +308,12 @@ inline bool Rect<float>::IsEmpty() const
 }
 
 /**
- * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ * @brief Converts the value of the rectangle into a string and insert in to an output stream.
  *
  * @SINCE_1_0.0
- * @param [in] stream The output stream operator.
- * @param [in] rectangle the rectangle to output
- * @return The output stream operator.
+ * @param[in] stream The output stream operator
+ * @param[in] rectangle the rectangle to output
+ * @return The output stream operator
  */
 template< typename T >
 inline std::ostream& operator<< (std::ostream& stream, const Rect<T>& rectangle)

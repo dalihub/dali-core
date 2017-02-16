@@ -51,8 +51,8 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] slotObserver The slot observer.
-   * @param[in] callback A callback object (not owned).
+   * @param[in] slotObserver The slot observer
+   * @param[in] callback A callback object (not owned)
    */
   SlotConnection(SlotObserver* slotObserver, CallbackBase* callback);
 
@@ -63,18 +63,18 @@ public:
   ~SlotConnection();
 
   /**
-   * @brief Retrieve the callback.
+   * @brief Retrieves the callback.
    *
    * @SINCE_1_0.0
-   * @return A pointer to the callback.
+   * @return A pointer to the callback
    */
   CallbackBase* GetCallback();
 
   /**
-   * @brief Retrieve the slot observer.
+   * @brief Retrieves the slot observer.
    *
    * @SINCE_1_0.0
-   * @return A pointer to the slot observer.
+   * @return A pointer to the slot observer
    */
   SlotObserver* GetSlotObserver();
 
@@ -111,7 +111,7 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] callback The callback which should be a C function.
+   * @param[in] callback The callback which should be a C function
    */
   SignalConnection( CallbackBase* callback );
 
@@ -119,8 +119,8 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] signalObserver The signal observer.
-   * @param[in] callback Ownership of this callback object is taken.
+   * @param[in] signalObserver The signal observer
+   * @param[in] callback Ownership of this callback object is taken
    */
   SignalConnection( SignalObserver* signalObserver, CallbackBase* callback );
 
@@ -131,18 +131,18 @@ public:
   ~SignalConnection();
 
   /**
-   * @brief Disconnect the signal from the slot.
+   * @brief Disconnects the signal from the slot.
    *
    * @SINCE_1_0.0
-   * @param[in] slotObserver The signal disconnecting from the slot.
+   * @param[in] slotObserver The signal disconnecting from the slot
    */
   void Disconnect( SlotObserver* slotObserver );
 
   /**
-   * @brief Retrieve the callback.
+   * @brief Retrieves the callback.
    *
    * @SINCE_1_0.0
-   * @return A pointer to the callback.
+   * @return A pointer to the callback
    */
   CallbackBase* GetCallback();
 

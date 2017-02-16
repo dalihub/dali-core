@@ -44,26 +44,26 @@ public:
   class Extension; ///< Forward declare future extension interface
 
   /**
-   * @brief Create the GL resource for the NativeImage.
+   * @brief Creates the GL resource for the NativeImage.
    *
-   * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR()
+   * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR().
    * @SINCE_1_0.0
-   * @return false If the initialization fails.
+   * @return false If the initialization fails
    * @pre There is a GL context for the current thread.
    */
   virtual bool GlExtensionCreate() = 0;
 
   /**
-   * @brief Destroy the GL resource for the NativeImage.
+   * @brief Destroys the GL resource for the NativeImage.
    *
-   * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR()
+   * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR().
    * @SINCE_1_0.0
    * @pre There is a GL context for the current thread.
    */
   virtual void GlExtensionDestroy() = 0;
 
   /**
-   * @brief Use the NativeImage as a texture for rendering.
+   * @brief Uses the NativeImage as a texture for rendering.
    *
    * @SINCE_1_0.0
    * @return A GL error code
@@ -97,14 +97,14 @@ public:
   virtual unsigned int GetHeight() const = 0;
 
  /**
-  * @brief Query whether blending is required
+  * @brief Queries whether blending is required.
   * @SINCE_1_0.0
-  * @return true if blending is required
+  * @return True if blending is required
   */
   virtual bool RequiresBlending() const = 0;
 
   /**
-   * @brief Retrieve the extension for the interface.
+   * @brief Retrieves the extension for the interface.
    *
    * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
@@ -129,7 +129,7 @@ protected:
 };
 
 /**
- * @brief Pointer to Dali::NativeImageInterface
+ * @brief Pointer to Dali::NativeImageInterface.
  * @SINCE_1_0.0
  */
 typedef Dali::IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;

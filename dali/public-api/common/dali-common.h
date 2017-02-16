@@ -25,14 +25,14 @@
 #endif
 
 /*
- * Definitions for shared library support
+ * Definitions for shared library support.
  *
  * If a library is configured with --enable-exportall or --enable-debug
  * then HIDE_DALI_INTERNALS is not defined, and nothing is hidden.
  * If it is configured without these options (the default), then HIDE_INTERNALS
  * is defined when building the library, visibility is automatically hidden, and the explicit
  * defines below come into use.
- * When building a library that uses DALI, HIDE_DALI_INTERNALS
+ * When building a library that uses DALI, HIDE_DALI_INTERNALS.
  */
 #if __GNUC__ >= 4
 #  ifndef HIDE_DALI_INTERNALS
@@ -84,15 +84,15 @@
 /**
  * @brief Two macros to provide branch predictor information.
  * DALI_LIKELY should be used when a branch is taken in almost all cases so the
- * branch predictor can avoid pre-fetching the code for else branch
- * DALI_UNLIKELY should be used when a branch is almost never taken
+ * branch predictor can avoid pre-fetching. The code for else branch
+ * DALI_UNLIKELY should be used when a branch is almost never taken.
  * @SINCE_1_0.0
  */
 #define DALI_LIKELY(expression)   __builtin_expect( !!(expression), 1 )
 #define DALI_UNLIKELY(expression) __builtin_expect( !!(expression), 0 )
 
 /**
- * @brief The DALi namespace
+ * @brief The DALi namespace.
  * @SINCE_1_0.0
  */
 namespace Dali
@@ -160,8 +160,8 @@ public:
  */
 
 /**
- * @brief Strip assert location for release builds, assert text is descriptive enough
- * This is to save space for low spec devices
+ * @brief Strip assert location for release builds, assert text is descriptive enough.
+ * This is to save space for low spec devices.
  * @SINCE_1_0.0
  */
 #if defined(DEBUG_ENABLED)
@@ -192,7 +192,7 @@ public:
 /**
  * @brief An invariant concurrent assertion to ensure its argument evaluates TRUE in debug builds.
  *
- * Use this to sanity check algorithms and prevent internal programming errors
+ * Use this to sanity check algorithms and prevent internal programming errors.
  * @SINCE_1_0.0
  */
 #if defined(DEBUG_ENABLED)

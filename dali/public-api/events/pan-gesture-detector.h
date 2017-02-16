@@ -68,13 +68,13 @@ class DALI_IMPORT_API PanGestureDetector : public GestureDetector
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the PanGestureDetector class.
+   * @brief Enumeration for the instance of properties belonging to the PanGestureDetector class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the PanGestureDetector class.
+     * @brief Enumeration for the instance of properties belonging to the PanGestureDetector class.
      * @SINCE_1_0.0
      */
     enum
@@ -107,7 +107,7 @@ public:
 public: // Creation & Destruction
 
   /**
-   * @brief Create an uninitialized PanGestureDetector; this can be initialized with PanGestureDetector::New().
+   * @brief Creates an uninitialized PanGestureDetector; this can be initialized with PanGestureDetector::New().
    *
    * Calling member functions with an uninitialized PanGestureDetector handle is not allowed.
    * @SINCE_1_0.0
@@ -115,18 +115,18 @@ public: // Creation & Destruction
   PanGestureDetector();
 
   /**
-   * @brief Create an initialized PanGestureDetector.
+   * @brief Creates an initialized PanGestureDetector.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static PanGestureDetector New();
 
   /**
-   * @brief Downcast a handle to PanGestureDetector handle.
+   * @brief Downcasts a handle to PanGestureDetector handle.
    *
-   * If handle points to a PanGestureDetector object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a PanGestureDetector object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a PanGestureDetector object or an uninitialized handle
@@ -134,7 +134,7 @@ public: // Creation & Destruction
   static PanGestureDetector DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -145,7 +145,7 @@ public: // Creation & Destruction
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   PanGestureDetector(const PanGestureDetector& handle);
 
@@ -153,7 +153,7 @@ public: // Creation & Destruction
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PanGestureDetector& operator=(const PanGestureDetector& rhs);
@@ -164,7 +164,7 @@ public: // Setters
    * @brief This is the minimum number of touches required for the pan gesture to be detected.
    *
    * @SINCE_1_0.0
-   * @param[in]  minimum  Minimum touches required.
+   * @param[in] minimum Minimum touches required
    * @pre The gesture detector has been initialized.
    * @note The default minimum is '1'.
    */
@@ -174,7 +174,7 @@ public: // Setters
    * @brief This is the maximum number of touches required for the pan gesture to be detected.
    *
    * @SINCE_1_0.0
-   * @param[in]  maximum  Maximum touches required.
+   * @param[in] maximum Maximum touches required
    * @pre The gesture detector has been initialized.
    * @note The default maximum is '1'.
    */
@@ -186,7 +186,7 @@ public: // Getters
    * @brief Retrieves the minimum number of touches required for the pan gesture to be detected.
    *
    * @SINCE_1_0.0
-   * @return The minimum touches required.
+   * @return The minimum touches required
    * @pre The gesture detector has been initialized.
    */
   unsigned int GetMinimumTouchesRequired() const;
@@ -195,7 +195,7 @@ public: // Getters
    * @brief Retrieves the maximum number of touches required for the pan gesture to be detected.
    *
    * @SINCE_1_0.0
-   * @return The maximum touches required.
+   * @return The maximum touches required
    * @pre The gesture detector has been initialized.
    */
   unsigned int GetMaximumTouchesRequired() const;
@@ -221,8 +221,8 @@ public: // Directional Panning
    * direction range is from -45 to 45 degrees.
    *
    * @SINCE_1_0.0
-   * @param[in]  angle      The angle that pan should be allowed.
-   * @param[in]  threshold  The threshold around that angle.
+   * @param[in] angle     The angle that pan should be allowed
+   * @param[in] threshold The threshold around that angle
    *
    * @pre The gesture detector has been initialized.
    * @note The angle added using this API is only checked when the gesture first starts, after that,
@@ -244,8 +244,8 @@ public: // Directional Panning
    * right scrolling.
    *
    * @SINCE_1_0.0
-   * @param[in]  direction  The direction of panning required.
-   * @param[in]  threshold  The threshold.
+   * @param[in] direction The direction of panning required
+   * @param[in] threshold The threshold
    *
    * @pre The gesture detector has been initialized.
    *
@@ -263,7 +263,7 @@ public: // Directional Panning
    * @brief Returns the count of angles that this pan gesture detector emits a signal.
    *
    * @SINCE_1_0.0
-   * @return The count.
+   * @return The count
    * @pre The gesture detector has been initialized.
    */
   size_t GetAngleCount() const;
@@ -273,7 +273,7 @@ public: // Directional Panning
    *
    * @SINCE_1_0.0
    * @param[in] index The angle's index
-   * @return An angle threshold pair, or a zero valued angle pair when index is invalid.
+   * @return An angle threshold pair, or a zero valued angle pair when index is invalid
    * @pre The gesture detector has been initialized.
    * @pre The index is less than GetAngleCount()
    */
@@ -293,7 +293,7 @@ public: // Directional Panning
    * @brief Removes the angle specified from the container.
    *
    * @SINCE_1_0.0
-   * @param[in]  angle  The angle to remove.
+   * @param[in] angle The angle to remove
    * @pre The gesture detector has been initialized.
    * @note This will only remove the first instance of the angle found from the container.
    * @note If an angle outside the range in AddAngle() is given, then the value is wrapped within
@@ -305,7 +305,7 @@ public: // Directional Panning
    * @brief Removes the two angles that make up the direction from the container.
    *
    * @SINCE_1_0.0
-   * @param[in]  direction  The direction to remove.
+   * @param[in] direction The direction to remove
    * @pre The gesture detector has been initialized.
    * @note If a direction outside the range in AddAngle() is given, then the value is wrapped within
    *       the range and that is removed.
@@ -322,7 +322,7 @@ public: // Signals
    *   void YourCallbackName( Actor actor, const PanGesture& gesture );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The gesture detector has been initialized.
    */
   DetectedSignalType& DetectedSignal();
@@ -333,7 +333,7 @@ public: // Pan Properties Setters
    * @brief Allows setting of the pan properties that are returned in constraints.
    *
    * @SINCE_1_0.0
-   * @param[in]  pan  The pan gesture to set.
+   * @param[in] pan The pan gesture to set
    * @note If a normal pan is taking place, then any value set is ignored.
    */
   static void SetPanGestureProperties( const PanGesture& pan );
@@ -345,7 +345,7 @@ public: // Not intended for Application developers
    * @brief This constructor is used by PanGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in] internal A pointer to a newly allocated Dali resource.
+   * @param[in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
 

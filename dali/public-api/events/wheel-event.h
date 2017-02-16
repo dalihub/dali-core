@@ -46,7 +46,7 @@ struct DALI_IMPORT_API WheelEvent
   // Enumerations
 
   /**
-   * @brief Specifies the type of the wheel event.
+   * @brief Enumeration for specifying the type of the wheel event.
    * @SINCE_1_0.0
    */
   enum Type
@@ -65,12 +65,12 @@ struct DALI_IMPORT_API WheelEvent
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  type       The type of the wheel event
-   * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
-   * @param[in]  modifiers  Modifier keys pressed during the event (such as shift, alt and control)
-   * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
-   * @param[in]  z          The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
-   * @param[in]  timeStamp  The time the wheel is being rolled.
+   * @param[in] type      The type of the wheel event
+   * @param[in] direction The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
+   * @param[in] modifiers Modifier keys pressed during the event (such as shift, alt and control)
+   * @param[in] point     The co-ordinates of the cursor relative to the top-left of the screen
+   * @param[in] z         The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
+   * @param[in] timeStamp The time the wheel is being rolled
    */
   WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp );
 
@@ -81,7 +81,7 @@ struct DALI_IMPORT_API WheelEvent
   ~WheelEvent();
 
   /**
-   * @brief Check to see if Shift key modifier has been supplied.
+   * @brief Checks to see if Shift key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if shift modifier
@@ -89,7 +89,7 @@ struct DALI_IMPORT_API WheelEvent
   bool IsShiftModifier() const;
 
   /**
-   * @brief Check to see if Ctrl (control) key modifier has been supplied.
+   * @brief Checks to see if Ctrl (control) key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if ctrl modifier
@@ -97,7 +97,7 @@ struct DALI_IMPORT_API WheelEvent
   bool IsCtrlModifier() const;
 
   /**
-   * @brief Check to see if Alt key modifier has been supplied.
+   * @brief Checks to see if Alt key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if alt modifier
@@ -107,7 +107,7 @@ struct DALI_IMPORT_API WheelEvent
   // Data
 
   /**
-   * @brief Type of the event
+   * @brief Type of the event.
    *
    * @see Type
    */
@@ -116,7 +116,7 @@ struct DALI_IMPORT_API WheelEvent
   /**
    * @brief The direction in which the wheel is being rolled.
    *
-   * 0 means the default vertical wheel, and 1 means horizontal wheel
+   * 0 means the default vertical wheel, and 1 means horizontal wheel.
    */
   int direction;
 

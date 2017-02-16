@@ -67,7 +67,7 @@ public: // Typedefs
 public: // Creation & Destruction
 
   /**
-   * @brief Create an uninitialized LongPressGestureDetector; this can be initialized with LongPressGestureDetector::New().
+   * @brief Creates an uninitialized LongPressGestureDetector; this can be initialized with LongPressGestureDetector::New().
    *
    * Calling member functions with an uninitialized LongPressGestureDetector handle is not allowed.
    * @SINCE_1_0.0
@@ -75,42 +75,42 @@ public: // Creation & Destruction
   LongPressGestureDetector();
 
   /**
-   * @brief Create an initialized LongPressGestureDetector.
+   * @brief Creates an initialized LongPressGestureDetector.
    *
    * By default, this would create a gesture detector that requires only one touch.
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static LongPressGestureDetector New();
 
   /**
-   * @brief Create an initialized LongPressGestureDetector with the number of touches required.
+   * @brief Creates an initialized LongPressGestureDetector with the number of touches required.
    *
    * A long press gesture will be emitted from this detector if the number of fingers touching the
    * screen is equal to the touches required.
    * @SINCE_1_0.0
-   * @param[in]  touchesRequired  The number of touches required.
-   * @return A handle to a newly allocated Dali resource.
+   * @param[in] touchesRequired The number of touches required
+   * @return A handle to a newly allocated Dali resource
    */
   static LongPressGestureDetector New(unsigned int touchesRequired);
 
   /**
-   * @brief Create an initialized LongPressGestureDetector with the minimum and maximum number of touches required.
+   * @brief Creates an initialized LongPressGestureDetector with the minimum and maximum number of touches required.
    *
    * A long press gesture will be emitted from this detector if the number of fingers touching the screen
    * falls between the minimum and maximum touches set.
    * @SINCE_1_0.0
-   * @param[in]  minTouches  The minimum number of touches required.
-   * @param[in]  maxTouches  The maximum number of touches required.
-   * @return A handle to a newly allocated Dali resource.
+   * @param[in] minTouches The minimum number of touches required
+   * @param[in] maxTouches The maximum number of touches required
+   * @return A handle to a newly allocated Dali resource
    */
   static LongPressGestureDetector New(unsigned int minTouches, unsigned int maxTouches);
 
   /**
-   * @brief Downcast a handle to LongPressGestureDetector handle.
+   * @brief Downcasts a handle to LongPressGestureDetector handle.
    *
-   * If handle points to a LongPressGestureDetector object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a LongPressGestureDetector object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a LongPressGestureDetector object or an uninitialized handle
@@ -118,7 +118,7 @@ public: // Creation & Destruction
   static LongPressGestureDetector DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -129,7 +129,7 @@ public: // Creation & Destruction
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   LongPressGestureDetector(const LongPressGestureDetector& handle);
 
@@ -137,7 +137,7 @@ public: // Creation & Destruction
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   LongPressGestureDetector& operator=(const LongPressGestureDetector& rhs);
@@ -145,14 +145,14 @@ public: // Creation & Destruction
 public: // Setters
 
   /**
-   * @brief Set the number of touches required.
+   * @brief Sets the number of touches required.
    *
    * The number of touches corresponds to the number of fingers a user
    * has on the screen.  This sets the minimum and maximum touches to
    * the input parameter.
    *
    * @SINCE_1_0.0
-   * @param[in]  touches  Touches required.
+   * @param[in] touches Touches required
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
@@ -165,8 +165,8 @@ public: // Setters
    * has on the screen.
    *
    * @SINCE_1_0.0
-   * @param[in]  minTouches  Minimum Touches required.
-   * @param[in]  maxTouches  Maximum Touches required.
+   * @param[in] minTouches Minimum Touches required
+   * @param[in] maxTouches Maximum Touches required
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
@@ -178,7 +178,7 @@ public: // Getters
    * @brief Retrieves the minimum number of touches required.
    *
    * @SINCE_1_0.0
-   * @return The minimum number of touches required.
+   * @return The minimum number of touches required
    * @pre The gesture detector has been initialized.
    */
   unsigned int GetMinimumTouchesRequired() const;
@@ -187,7 +187,7 @@ public: // Getters
    * @brief Retrieves the maximum number of touches required.
    *
    * @SINCE_1_0.0
-   * @return The maximum number of touches required.
+   * @return The maximum number of touches required
    * @pre The gesture detector has been initialized.
    */
   unsigned int GetMaximumTouchesRequired() const;
@@ -195,14 +195,14 @@ public: // Getters
 public: // Signals
 
   /**
-   * @brief  This signal is emitted when the specified long press is detected on the attached actor.
+   * @brief This signal is emitted when the specified long press is detected on the attached actor.
    *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( Actor actor, const LongPressGesture& gesture );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The gesture detector has been initialized.
    */
   DetectedSignalType& DetectedSignal();
@@ -214,7 +214,7 @@ public: // Not intended for Application developers
    * @brief This constructor is used by LongPressGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in]  internal  A pointer to a newly allocated Dali resource.
+   * @param[in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL LongPressGestureDetector(Internal::LongPressGestureDetector* internal);
 
