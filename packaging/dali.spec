@@ -12,7 +12,7 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
 
-%if "%{tizen_version_major}" == "3"
+%if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
 %endif
 
