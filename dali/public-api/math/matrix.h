@@ -39,7 +39,7 @@ class Quaternion;
  * @brief The Matrix class represents transformations and projections.
  *
  * It is agnostic w.r.t. row/column major notation - it operates on a flat array.
- * Each axis is contiguous in memory, so the x axis corresponds to elements 0, 1, 2 and 3, the y axis dorresponds to elements 4, 5, 6, 7, etc.
+ * Each axis is contiguous in memory, so the x axis corresponds to elements 0, 1, 2 and 3, the y axis corresponds to elements 4, 5, 6, 7, etc.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Matrix
@@ -51,7 +51,7 @@ public:
   /**
    * @brief Constructor.
    *
-   * Zero initialises the matrix
+   * Zero initializes the matrix.
    * @SINCE_1_0.0
    */
   Matrix();
@@ -65,9 +65,9 @@ public:
   explicit Matrix( bool initialize );
 
   /**
-   * @brief Constructor
+   * @brief Constructor.
    *
-   * The matrix is initialised with the contents of 'array' which must contain 16 floats.
+   * The matrix is initialized with the contents of 'array' which must contain 16 floats.
    * The order of the values for a transform matrix is:
    *
    * @code
@@ -80,7 +80,7 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @param [in] array Pointer of 16 floats data
+   * @param[in] array Pointer of 16 floats data
    */
   explicit Matrix(const float* array);
 
@@ -96,7 +96,7 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] matrix A reference to the copied matrix
+   * @param[in] matrix A reference to the copied matrix
    */
   Matrix( const Matrix& matrix );
 
@@ -104,7 +104,7 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] matrix A reference to the copied matrix
+   * @param[in] matrix A reference to the copied matrix
    * @return A reference to this
    */
   Matrix& operator=( const Matrix& matrix );
@@ -129,12 +129,12 @@ public:
   void SetIdentityAndScale( const Vector3& scale );
 
   /**
-   * @brief Invert a transform Matrix.
+   * @brief Inverts a transform Matrix.
    *
    * Any Matrix representing only a rotation and/or translation
    * can be inverted using this function. It is faster and more accurate then using Invert().
    * @SINCE_1_0.0
-   * @param [out] result The inverse of this matrix
+   * @param[out] result The inverse of this matrix
    */
   void InvertTransform(Matrix& result) const;
 
@@ -144,7 +144,7 @@ public:
    * Using the Matrix invert function for the specific type
    * of matrix you are dealing with is faster, more accurate.
    * @SINCE_1_0.0
-   * @return true if successful
+   * @return True if successful
    */
   bool Invert();
 
@@ -158,7 +158,7 @@ public:
    * @brief Returns the xAxis from a Transform matrix.
    *
    * @SINCE_1_0.0
-   * @return the x axis
+   * @return The x axis
    */
   Vector3 GetXAxis() const;
 
@@ -166,7 +166,7 @@ public:
    * @brief Returns the yAxis from a Transform matrix.
    *
    * @SINCE_1_0.0
-   * @return the y axis
+   * @return The y axis
    */
   Vector3 GetYAxis() const;
 
@@ -174,7 +174,7 @@ public:
    * @brief Returns the zAxis from a Transform matrix.
    *
    * @SINCE_1_0.0
-   * @return the z axis
+   * @return The z axis
    */
   Vector3 GetZAxis() const;
 
@@ -210,7 +210,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @return the translation
+   * @return The translation
    * @note inlined for performance reasons (generates less code than a function call)
    */
   const Vector4& GetTranslation() const { return reinterpret_cast<const Vector4&>(mMatrix[12]); }
@@ -220,7 +220,7 @@ public:
    *
    * This assumes the matrix is a transform matrix.
    * @SINCE_1_0.0
-   * @return the translation
+   * @return The translation
    * @note inlined for performance reasons (generates less code than a function call)
    */
   const Vector3& GetTranslation3() const { return reinterpret_cast<const Vector3&>(mMatrix[12]); }
@@ -268,7 +268,7 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @return the matrix contents as an array of 16 floats.
+   * @return The matrix contents as an array of 16 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
   const float* AsFloat() const {return mMatrix;}
@@ -288,7 +288,7 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @return the matrix contents as an array of 16 floats.
+   * @return The matrix contents as an array of 16 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
   float* AsFloat() {return mMatrix;}
@@ -296,7 +296,7 @@ public:
   /**
    * @brief Function to multiply two matrices and store the result onto third.
    *
-   * Use this method in time critical path as it does not require temporaries
+   * Use this method in time critical path as it does not require temporaries.
    * @SINCE_1_0.0
    * @param[out] result Result of the multiplication
    * @param[in] lhs Matrix, this can be same matrix as result
@@ -307,7 +307,7 @@ public:
   /**
    * @brief Function to multiply a matrix and quaternion and store the result onto third.
    *
-   * Use this method in time critical path as it does not require temporaries
+   * Use this method in time critical path as it does not require temporaries.
    * @SINCE_1_0.0
    * @param[out] result Result of the multiplication
    * @param[in] lhs Matrix, this can be same matrix as result
@@ -327,7 +327,7 @@ public:
   /**
    * @brief The equality operator.
    *
-   * Utilises appropriate machine epsilon values.
+   * Utilizes appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
    * @param[in] rhs The Matrix to compare this to
@@ -338,7 +338,7 @@ public:
   /**
    * @brief The inequality operator.
    *
-   * Utilises appropriate machine epsilon values.
+   * Utilizes appropriate machine epsilon values.
    * @SINCE_1_0.0
    * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are not equal.
@@ -406,13 +406,13 @@ private:
 };
 
 /**
- * @brief Print a matrix.
+ * @brief Prints a matrix.
  *
  * It is printed in memory order, i.e. each printed row is contiguous in memory.
  * @SINCE_1_0.0
- * @param[in] o The output stream operator.
- * @param[in] matrix The matrix to print.
- * @return The output stream operator.
+ * @param[in] o The output stream operator
+ * @param[in] matrix The matrix to print
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
 

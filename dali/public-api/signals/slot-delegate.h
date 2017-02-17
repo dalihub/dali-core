@@ -81,7 +81,7 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] slot The object with a callback.
+   * @param[in] slot The object with a callback
    */
   SlotDelegate( Slot* slot )
   : mSlot( slot )
@@ -98,7 +98,7 @@ public:
   }
 
   /**
-   * @brief Disconnect all signals from this object.
+   * @brief Disconnects all signals from this object.
    *
    * @SINCE_1_0.0
    */
@@ -116,10 +116,10 @@ public:
   }
 
   /**
-   * @brief Retrieve the slot object.
+   * @brief Retrieves the slot object.
    *
    * @SINCE_1_0.0
-   * @return The object with a callback.
+   * @return The object with a callback
    */
   Slot* GetSlot()
   {
@@ -127,10 +127,10 @@ public:
   }
 
   /**
-   * @brief Retrieve the connection tracker component.
+   * @brief Retrieves the connection tracker component.
    *
    * @SINCE_1_0.0
-   * @return The connection tracker component.
+   * @return The connection tracker component
    */
   ConnectionTracker* GetConnectionTracker()
   {

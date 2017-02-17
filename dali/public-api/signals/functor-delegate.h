@@ -29,17 +29,17 @@ namespace Dali
  */
 
 /**
- * @brief Dispatcher to call a functor
+ * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
 template< typename T >
 struct FunctorDispatcher
 {
   /**
-   * @brief Call a function object.
+   * @brief Calls a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] functorPtr The functor to call.
+   * @param[in] functorPtr The functor to call
    */
   static void Dispatch( void* functorPtr )
   {
@@ -50,14 +50,14 @@ struct FunctorDispatcher
 };
 
 /**
- * @brief Dispatcher to delete a functor object
+ * @brief Dispatcher to delete a functor object.
  * @SINCE_1_0.0
  */
 template< typename T >
 struct FunctorDestroyer
 {
   /**
-   * @brief Dispatcher to delete an object
+   * @brief Dispatcher to delete an object.
    * @SINCE_1_0.0
    * @param[in] functorPtr A functor object to delete
    */
@@ -70,7 +70,7 @@ struct FunctorDestroyer
 };
 
 /**
- * @brief Used to connect a void() functor to a signal via BaseObject::SignalConnect()
+ * @brief Used to connect a void() functor to a signal via BaseObject::SignalConnect().
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API FunctorDelegate
@@ -99,7 +99,7 @@ public:
   ~FunctorDelegate();
 
   /**
-   * @brief Function to call the function or member function dispatcher
+   * @brief Function to call the function or member function dispatcher.
    * @SINCE_1_0.0
    */
   void Execute();
@@ -119,13 +119,13 @@ private:
   typedef void(*Destructor)( void* objectPtr );
 
   /**
-   * @brief Not defined
+   * @brief Not defined.
    * @SINCE_1_0.0
    */
   FunctorDelegate( const FunctorDelegate& rhs );
 
   /**
-   * @brief Not defined
+   * @brief Not defined.
    * @SINCE_1_0.0
    */
   const FunctorDelegate& operator=( const FunctorDelegate& rhs );
@@ -135,8 +135,8 @@ private:
    *
    * @SINCE_1_0.0
    * @param[in] functorPtr A newly allocated functor object (takes ownership)
-   * @param dispatcher Used to call the actual function.
-   * @param destructor Used to delete the owned functor object.
+   * @param dispatcher Used to call the actual function
+   * @param destructor Used to delete the owned functor object
    */
   FunctorDelegate( void* functorPtr, Dispatcher dispatcher, Destructor destructor );
 

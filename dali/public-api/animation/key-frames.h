@@ -49,18 +49,18 @@ class DALI_IMPORT_API KeyFrames : public BaseHandle
 {
 public:
   /**
-   * @brief Create an initialized KeyFrames handle.
+   * @brief Creates an initialized KeyFrames handle.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static KeyFrames New();
 
   /**
-   * @brief Downcast a handle to KeyFrames handle.
+   * @brief Downcasts a handle to KeyFrames handle.
    *
-   * If handle points to a KeyFrames object the downcast produces
-   * valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a KeyFrames object, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a KeyFrames object or an uninitialized handle
@@ -68,7 +68,7 @@ public:
   static KeyFrames DownCast( BaseHandle handle );
 
   /**
-   * @brief Create an uninitialized KeyFrame handle.
+   * @brief Creates an uninitialized KeyFrame handle.
    *
    * This can be initialized with KeyFrame::New().
    * Calling member functions with an uninitialized KeyFrames handle is not allowed.
@@ -77,7 +77,7 @@ public:
   KeyFrames();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -88,7 +88,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   KeyFrames(const KeyFrames& handle);
 
@@ -96,7 +96,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   KeyFrames& operator=(const KeyFrames& rhs);
@@ -106,27 +106,27 @@ public:
    *
    * If no key frames have been added, this returns Property::NONE.
    * @SINCE_1_0.0
-   * @return The key frame property type.
+   * @return The key frame property type
    */
   Property::Type GetType() const;
 
   /**
-   * @brief Add a key frame.
+   * @brief Adds a key frame.
    *
    * The key frames should be added in time order.
    * @SINCE_1_0.0
-   * @param[in] progress A progress value between 0.0 and 1.0.
-   * @param[in] value A value.
+   * @param[in] progress A progress value between 0.0 and 1.0
+   * @param[in] value A value
    */
   void Add(float progress, Property::Value value);
 
   /**
-   * @brief Add a key frame.
+   * @brief Adds a key frame.
    *
    * The key frames should be added in time order.
    * @SINCE_1_0.0
-   * @param[in] progress A progress value between 0.0 and 1.0.
-   * @param[in] value A value.
+   * @param[in] progress A progress value between 0.0 and 1.0
+   * @param[in] value A value
    * @param[in] alpha The alpha function used to blend to the next keyframe
    */
   void Add(float progress, Property::Value value, AlphaFunction alpha);

@@ -51,7 +51,7 @@ struct DALI_IMPORT_API KeyEvent
   // Enumerations
 
   /**
-   * @brief Specifies the state of the key event.
+   * @brief Enumeration for specifying the state of the key event.
    * @SINCE_1_0.0
    */
   enum State
@@ -62,7 +62,7 @@ struct DALI_IMPORT_API KeyEvent
   };
 
   /**
-   * @brief Default constructor
+   * @brief Default constructor.
    * @SINCE_1_0.0
    */
   KeyEvent();
@@ -71,12 +71,12 @@ struct DALI_IMPORT_API KeyEvent
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
-   * @param[in]  keyString     A string of input characters or key pressed
-   * @param[in]  keyCode       The unique key code for the key pressed.
-   * @param[in]  keyModifier   The key modifier for special keys like shift and alt
-   * @param[in]  timeStamp The time (in ms) that the key event occurred.
-   * @param[in]  keyState The state of the key event.
+   * @param[in] keyName The name of the key pressed or command from the IMF, if later then the some following parameters will be needed
+   * @param[in] keyString A string of input characters or key pressed
+   * @param[in] keyCode The unique key code for the key pressed
+   * @param[in] keyModifier The key modifier for special keys like shift and alt
+   * @param[in] timeStamp The time (in ms) that the key event occurred
+   * @param[in] keyState The state of the key event
    */
   KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState);
 
@@ -87,7 +87,7 @@ struct DALI_IMPORT_API KeyEvent
   ~KeyEvent();
 
   /**
-   * @brief Check to see if Shift key modifier has been supplied.
+   * @brief Checks to see if Shift key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if shift modifier
@@ -95,7 +95,7 @@ struct DALI_IMPORT_API KeyEvent
   bool IsShiftModifier() const;
 
   /**
-   * @brief Check to see if Ctrl (control) key modifier has been supplied.
+   * @brief Checks to see if Ctrl (control) key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if ctrl modifier
@@ -103,7 +103,7 @@ struct DALI_IMPORT_API KeyEvent
   bool IsCtrlModifier() const;
 
   /**
-   * @brief Check to see if Alt key modifier has been supplied.
+   * @brief Checks to see if Alt key modifier has been supplied.
    *
    * @SINCE_1_0.0
    * @return True if alt modifier
@@ -113,7 +113,7 @@ struct DALI_IMPORT_API KeyEvent
   // Data
 
   /**
-   * @brief name given to the key pressed.
+   * @brief Name given to the key pressed.
    */
   std::string keyPressedName;
 

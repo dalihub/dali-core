@@ -88,8 +88,8 @@ public:
    * should change this value to the desired one. The PropertyInputContainer is a const reference to the property inputs
    * added to the Constraint in the order they were added via AddSource().
    *
-   * @tparam  P  The property type to constrain.
    * @SINCE_1_0.0
+   * @tparam P The property type to constrain
    */
   template< typename P >
   class DALI_INTERNAL Function : public CallbackBase
@@ -105,7 +105,7 @@ public:
      * @endcode
      *
      * @SINCE_1_0.0
-     * @param[in]  function  The function to call.
+     * @param[in] function The function to call
      */
     Function( void( *function )( P&, const PropertyInputContainer& ) )
     : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) ),
@@ -122,9 +122,8 @@ public:
      * @endcode
      *
      * @SINCE_1_0.0
-     * @param[in]  object  The object to copy.
-     *
-     * @tparam  T  The type of the object.
+     * @param[in] object The object to copy
+     * @tparam T The type of the object
      */
     template< class T >
     Function( const T& object )
@@ -145,10 +144,9 @@ public:
      * @endcode
      *
      * @SINCE_1_0.0
-     * @param[in]  object          The object to copy.
-     * @param[in]  memberFunction  The member function to call. This has to be a member of the same class.
-     *
-     * @tparam  T  The type of the object.
+     * @param[in] object The object to copy
+     * @param[in] memberFunction The member function to call. This has to be a member of the same class
+     * @tparam T The type of the object
      */
     template< class T >
     Function( const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
@@ -166,7 +164,7 @@ public:
      * The object, if held by this object, is also copied.
      *
      * @SINCE_1_0.0
-     * @return A pointer to a newly-allocation Function.
+     * @return A pointer to a newly-allocated Function
      */
     CallbackBase* Clone()
     {
@@ -196,7 +194,7 @@ public:
     class UndefinedClass;
 
     /**
-     * @brief Used to call the function to copy the stored object
+     * @brief Used to call the function to copy the stored object.
      * @SINCE_1_0.0
      */
     typedef UndefinedClass* (*CopyConstructorDispatcher) ( UndefinedClass* object );
@@ -204,19 +202,18 @@ public:
     /**
      * @brief Copies the actual object in Constraint::Function.
      *
-     * @tparam  T  The type of the object.
      * @SINCE_1_0.0
+	 * @tparam T The type of the object
      */
     template< class T >
     struct ObjectCopyConstructorDispatcher
     {
       /**
-       * @brief Copy the object stored in Constraint::Function.
+       * @brief Copies the object stored in Constraint::Function.
        *
        * @SINCE_1_0.0
-       * @param[in]  object  The object to copy.
-       *
-       * @return Newly allocated clone of the object.
+       * @param[in] object The object to copy
+       * @return Newly allocated clone of the object
        */
       static UndefinedClass* Copy( const UndefinedClass* object )
       {
@@ -226,13 +223,13 @@ public:
     };
 
     /**
-     * @brief Undefined copy constructor
+     * @brief Undefined copy constructor.
      * @SINCE_1_0.0
      */
     Function( const Function& );
 
     /**
-     * @brief Undefined assignment operator
+     * @brief Undefined assignment operator.
      * @SINCE_1_0.0
      */
     Function& operator=( const Function& );
@@ -242,10 +239,10 @@ public:
      *
      * @SINCE_1_0.0
      * @param[in]  object                     A newly copied object
-     * @param[in]  memberFunction             The member function of the object.
-     * @param[in]  dispatcher                 Used to call the actual object.
-     * @param[in]  destructor                 Used to delete the owned object.
-     * @param[in]  copyConstructorDispatcher  Used to create a copy of the owned object.
+     * @param[in]  memberFunction             The member function of the object
+     * @param[in]  dispatcher                 Used to call the actual object
+     * @param[in]  destructor                 Used to delete the owned object
+     * @param[in]  copyConstructorDispatcher  Used to create a copy of the owned object
      */
     Function( void* object,
               CallbackBase::MemberFunction memberFunction,
@@ -261,7 +258,7 @@ public:
      * @brief Constructor used when copying a simple stored function.
      *
      * @SINCE_1_0.0
-     * @param[in]  function   The function to call.
+     * @param[in] function The function to call
      */
     Function( CallbackBase::Function function )
     : CallbackBase( function ),
@@ -275,7 +272,7 @@ public:
   };
 
   /**
-   * @brief The action that will happen when the constraint is removed.
+   * @brief Enumeration for the action that will happen when the constraint is removed.
    *
    * The final value may be "baked" i.e. saved permanently.
    * Alternatively the constrained value may be discarded when the constraint is removed.
@@ -290,7 +287,7 @@ public:
   static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< Bake
 
   /**
-   * @brief Create an uninitialized Constraint; this can be initialized with Constraint::New().
+   * @brief Creates an uninitialized Constraint; this can be initialized with Constraint::New().
    *
    * Calling member functions with an uninitialized Constraint handle is not allowed.
    * @SINCE_1_0.0
@@ -298,7 +295,7 @@ public:
   Constraint();
 
   /**
-   * @brief Create a constraint which targets a property using a function or a static class member.
+   * @brief Creates a constraint which targets a property using a function or a static class member.
    *
    * The expected signature, for a Vector3 type for example, of the function is:
    * @code
@@ -312,12 +309,12 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @param[in]  handle       The handle to the property-owning object.
-   * @param[in]  targetIndex  The index of the property to constrain.
-   * @param[in]  function     The function to call to set the constrained property value.
-   * @return The new constraint.
+   * @param[in] handle      The handle to the property-owning object
+   * @param[in] targetIndex The index of the property to constrain
+   * @param[in] function    The function to call to set the constrained property value
    *
-   * @tparam P The type of the property to constrain.
+   * @tparam P The type of the property to constrain
+   * @return The new constraint
    */
   template< class P >
   static Constraint New( Handle handle, Property::Index targetIndex, void( *function )( P&, const PropertyInputContainer& ) )
@@ -327,7 +324,7 @@ public:
   }
 
   /**
-   * @brief Create a constraint which targets a property using a functor object.
+   * @brief Creates a constraint which targets a property using a functor object.
    *
    * The expected structure, for a Vector3 type for example, of the functor object is:
    * @code
@@ -344,13 +341,13 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @param[in]  handle       The handle to the property-owning object.
-   * @param[in]  targetIndex  The index of the property to constrain.
-   * @param[in]  object       The functor object whose functor is called to set the constrained property value.
-   * @return The new constraint.
+   * @param[in] handle      The handle to the property-owning object
+   * @param[in] targetIndex The index of the property to constraint
+   * @param[in] object      The functor object whose functor is called to set the constrained property value
    *
-   * @tparam P The type of the property to constrain.
-   * @tparam T The type of the object.
+   * @tparam P The type of the property to constrain
+   * @tparam T The type of the object
+   * @return The new constraint
    */
   template< class P, class T >
   static Constraint New( Handle handle, Property::Index targetIndex, const T& object )
@@ -360,7 +357,7 @@ public:
   }
 
   /**
-   * @brief Create a constraint which targets a property using an object method.
+   * @brief Creates a constraint which targets a property using an object method.
    *
    * The expected structure, for a Vector3 type for example, of the object is:
    * @code
@@ -377,14 +374,14 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @param[in]  handle          The handle to the property-owning object.
-   * @param[in]  targetIndex     The index of the property to constrain.
-   * @param[in]  object          The object whose member function is called to set the constrained property value.
-   * @param[in]  memberFunction  The member function to call to set the constrained property value.
-   * @return The new constraint.
+   * @param[in] handle         The handle to the property-owning object
+   * @param[in] targetIndex    The index of the property to constraint
+   * @param[in] object         The object whose member function is called to set the constrained property value
+   * @param[in] memberFunction The member function to call to set the constrained property value
+   * @return The new constraint
    *
-   * @tparam P The type of the property to constrain.
-   * @tparam T The type of the object.
+   * @tparam P The type of the property to constrain
+   * @tparam T The type of the object
    */
   template< class P, class T >
   static Constraint New( Handle handle, Property::Index targetIndex, const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
@@ -394,17 +391,16 @@ public:
   }
 
   /**
-   * @brief Creates a clones of this constraint for another object.
+   * @brief Creates a clone of this constraint for another object.
    *
    * @SINCE_1_0.0
-   * @param[in]  handle  The handle to the property-owning object this constraint is to be cloned for.
-   *
-   * @return The new constraint.
+   * @param[in] handle The handle to the property-owning object this constraint is to be cloned for
+   * @return The new constraint
    */
   Constraint Clone( Handle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -415,7 +411,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in]  constraint  A reference to the copied handle
+   * @param[in] constraint A reference to the copied handle
    */
   Constraint( const Constraint& constraint );
 
@@ -423,16 +419,16 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   Constraint& operator=( const Constraint& rhs );
 
   /**
-   * @brief Downcast a handle to Constraint handle.
+   * @brief Downcasts a handle to Constraint handle.
    *
-   * If handle points to a Constraint object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a Constraint object, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] baseHandle BaseHandle to an object
    * @return Handle to a Constraint object or an uninitialized handle
@@ -440,7 +436,7 @@ public:
   static Constraint DownCast( BaseHandle baseHandle );
 
   /**
-   * @brief Adds a constraint source to the constraint
+   * @brief Adds a constraint source to the constraint.
    *
    * @SINCE_1_0.0
    * @param[in] source The constraint source input to add
@@ -451,9 +447,9 @@ public:
    * @brief Applies this constraint.
    *
    * @SINCE_1_0.0
-   * @pre The constraint must be initialized
-   * @pre The target object must still be alive
-   * @pre The source inputs should not have been destroyed
+   * @pre The constraint must be initialized.
+   * @pre The target object must still be alive.
+   * @pre The source inputs should not have been destroyed.
    */
   void Apply();
 
@@ -464,41 +460,41 @@ public:
   void Remove();
 
   /**
-   * @brief Retrieve the object which this constraint is targeting.
+   * @brief Retrieves the object which this constraint is targeting.
    *
    * @SINCE_1_0.0
-   * @return The target object.
+   * @return The target object
    */
   Handle GetTargetObject();
 
   /**
-   * @brief Retrieve the property which this constraint is targeting.
+   * @brief Retrieves the property which this constraint is targeting.
    *
    * @SINCE_1_0.0
-   * @return The target property.
+   * @return The target property
    */
   Dali::Property::Index GetTargetProperty();
 
   /**
-   * @brief Set the remove action. Constraint::Bake will "bake" a value when fully-applied.
+   * @brief Sets the remove action. Constraint::Bake will "bake" a value when fully-applied.
    *
    * In case of Constraint::Discard, the constrained value will be discarded, when the constraint is removed.
    * The default value is Constraint::Bake.
    * @SINCE_1_0.0
-   * @param[in] action The remove-action.
+   * @param[in] action The remove-action
    */
   void SetRemoveAction( RemoveAction action );
 
   /**
-   * @brief Retrieve the remove action that will happen when the constraint is removed.
+   * @brief Retrieves the remove action that will happen when the constraint is removed.
    *
    * @SINCE_1_0.0
-   * @return The remove-action.
+   * @return The remove-action
    */
   RemoveAction GetRemoveAction() const;
 
   /**
-   * @brief Set a tag for the constraint so it can be identified later
+   * @brief Sets a tag for the constraint so it can be identified later.
    *
    * @SINCE_1_0.0
    * @param[in] tag An integer to identify the constraint
@@ -506,7 +502,7 @@ public:
   void SetTag( const unsigned int tag );
 
   /**
-   * @brief Get the tag
+   * @brief Gets the tag.
    *
    * @SINCE_1_0.0
    * @return The tag
@@ -517,9 +513,9 @@ public: // Not intended for use by Application developers
 
   /// @cond internal
   /**
-   * @brief This constructor is used by Constraint::New() methods
+   * @brief This constructor is used by Constraint::New() methods.
    * @SINCE_1_0.0
-   * @param [in] constraint A pointer to a newly allocated Dali resource
+   * @param[in] constraint A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Constraint( Internal::ConstraintBase* constraint );
   /// @endcond
@@ -528,14 +524,14 @@ private: // Not intended for use by Application developers
 
   /// @cond internal
   /**
-   * @brief Construct a new constraint which targets a property.
+   * @brief Constructs a new constraint which targets a property.
    *
    * @SINCE_1_0.0
-   * @param[in]  handle       The handle to the property-owning object.
-   * @param[in]  targetIndex  The index of the property to constrain.
-   * @param[in]  targetType   Type The type of the constrained property.
-   * @param[in]  function     The constraint function.
-   * @return The new constraint.
+   * @param[in]  handle       The handle to the property-owning object
+   * @param[in]  targetIndex  The index of the property to constrain
+   * @param[in]  targetType   Type The type of the constrained property
+   * @param[in]  function     The constraint function
+   * @return The new constraint
    */
   static Constraint New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function );
   /// @endcond

@@ -58,7 +58,7 @@ public:
    * @brief Copy Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] other The Map to copy from.
+   * @param[in] other The Map to copy from
    */
   Map( const Map& other );
 
@@ -69,10 +69,10 @@ public:
   ~Map();
 
   /**
-   * @brief Retrieve the number of elements in the map.
+   * @brief Retrieves the number of elements in the map.
    *
    * @SINCE_1_0.0
-   * @return The number of elements in the map.
+   * @return The number of elements in the map
    */
   SizeType Count() const;
 
@@ -80,37 +80,37 @@ public:
    * @brief Returns whether the map is empty.
    *
    * @SINCE_1_0.0
-   * @return true if empty, false otherwise
+   * @return @c true if empty, @c false otherwise
    */
   bool Empty() const;
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as string.
    *
-   * Does not check for duplicates
+   * Does not check for duplicates.
    * @SINCE_1_0.0
-   * @param[in] key to insert
-   * @param[in] value to insert
+   * @param[in] key The key to insert
+   * @param[in] value The value to insert
    */
   void Insert( const char* key, const Value& value );
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as string.
    *
-   * Does not check for duplicates
+   * Does not check for duplicates.
    * @SINCE_1_0.0
-   * @param[in] key to insert
-   * @param[in] value to insert
+   * @param[in] key The key to insert
+   * @param[in] value The value to insert
    */
   void Insert( const std::string& key, const Value& value );
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as index.
    *
-   * Does not check for duplicates
+   * Does not check for duplicates.
    * @SINCE_1_1.39
-   * @param[in] key to insert
-   * @param[in] value to insert
+   * @param[in] key The key to insert
+   * @param[in] value The value to insert
    */
   void Insert( Property::Index key, const Value& value );
 
@@ -162,11 +162,11 @@ public:
   }
 
   /**
-   * @brief Retrieve the value at the specified position.
+   * @brief Retrieves the value at the specified position.
    *
    * @SINCE_1_0.0
    * @param[in] position The specified position
-   * @return A reference to the value at the specified position.
+   * @return A reference to the value at the specified position
    *
    * @note Will assert if position >= Count()
    */
@@ -175,11 +175,11 @@ public:
   /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
    *
-   * @brief Retrieve the key at the specified position.
+   * @brief Retrieves the key at the specified position.
    *
    * @SINCE_1_0.0
    * @param[in] position The specified position
-   * @return A const reference to the key at the specified position.
+   * @return A const reference to the key at the specified position
    *
    * @note Will assert if position >= Count()
    */
@@ -198,11 +198,11 @@ public:
   /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
    *
-   * @brief Retrieve the key & the value at the specified position.
+   * @brief Retrieves the key & the value at the specified position.
    *
    * @SINCE_1_0.0
    * @param[in] position The specified position
-   * @return A reference to the pair of key and value at the specified position.
+   * @return A reference to the pair of key and value at the specified position
    *
    * @note Will assert if position >= Count() or key at position is an index key.
    */
@@ -222,7 +222,7 @@ public:
    * @brief Finds the value for the specified key if it exists.
    *
    * @SINCE_1_0.0
-   * @param[in]  key   The key to find.
+   * @param[in] key The key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
@@ -232,7 +232,7 @@ public:
    * @brief Finds the value for the specified key if it exists.
    *
    * @SINCE_1_0.0
-   * @param[in]  key   The key to find.
+   * @param[in] key The key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
@@ -242,7 +242,7 @@ public:
    * @brief Finds the value for the specified key if it exists.
    *
    * @SINCE_1_1.39
-   * @param[in]  key   The key to find.
+   * @param[in] key The key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
@@ -254,30 +254,30 @@ public:
    * Will search for the index key first.
    *
    * @SINCE_1_1.45
-   * @param[in]  indexKey   The index key to find.
-   * @param[in]  stringKey  The string key to find.
+   * @param[in] indexKey  The index key to find
+   * @param[in] stringKey The string key to find
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
   Value* Find( Property::Index indexKey, const std::string& stringKey ) const;
 
   /**
-   * @brief Finds the value for the specified key if it exists and its type is type
+   * @brief Finds the value for the specified key if it exists and its type is type.
    *
    * @SINCE_1_0.0
-   * @param[in]  key   The key to find.
-   * @param[in]  type  The type to check.
+   * @param[in] key  The key to find
+   * @param[in] type The type to check
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
   Value* Find( const std::string& key, Property::Type type ) const;
 
   /**
-   * @brief Finds the value for the specified key if it exists and its type is type
+   * @brief Finds the value for the specified key if it exists and its type is type.
    *
    * @SINCE_1_1.39
-   * @param[in]  key   The key to find.
-   * @param[in]  type  The type to check.
+   * @param[in] key  The key to find
+   * @param[in] type The type to check
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
@@ -295,7 +295,7 @@ public:
    * Any values in 'from' will overwrite the values in the current map.
    *
    * @SINCE_1_0.0
-   * @param[in]  from  The map to merge from.
+   * @param[in] from The map to merge from
    */
   void Merge( const Map& from );
 
@@ -303,9 +303,9 @@ public:
    * @brief Const operator to access element with the specified string key.
    *
    * @SINCE_1_0.0
-   * @param[in] key The key whose value to access.
+   * @param[in] key The key whose value to access
    *
-   * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned.
+   * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned
    *
    * @note Will assert if invalid-key is given.
    */
@@ -315,9 +315,9 @@ public:
    * @brief Operator to access the element with the specified string key.
    *
    * @SINCE_1_0.0
-   * @param[in] key The key whose value to access.
+   * @param[in] key The key whose value to access
    *
-   * @return A reference to the value for the element with the specified key.
+   * @return A reference to the value for the element with the specified key
    *
    * @note If an element with the key does not exist, then it is created.
    */
@@ -327,9 +327,9 @@ public:
    * @brief Const operator to access element with the specified index key.
    *
    * @SINCE_1_1.39
-   * @param[in] key The key whose value to access.
+   * @param[in] key The key whose value to access
    *
-   * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned.
+   * @return The value for the element with the specified key, if key doesn't exist, then Property::NONE is returned
    *
    * @note Will assert if invalid-key is given.
    */
@@ -339,26 +339,26 @@ public:
    * @brief Operator to access the element with the specified index key.
    *
    * @SINCE_1_1.39
-   * @param[in] key The key whose value to access.
+   * @param[in] key The key whose value to access
    *
-   * @return A reference to the value for the element with the specified key.
+   * @return A reference to the value for the element with the specified key
    *
    * @note If an element with the key does not exist, then it is created.
    */
   Value& operator[]( Property::Index key );
 
   /**
-   * @brief Assignment Operator
+   * @brief Assignment Operator.
    *
    * @SINCE_1_0.0
-   * @param[in] other The map to copy from.
+   * @param[in] other The map to copy from
    *
-   * @return The copied map.
+   * @return The copied map
    */
   Map& operator=( const Map& other );
 
   /**
-   * @brief output to stream
+   * @brief Output to stream.
    * @SINCE_1_1.28
    */
   friend std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
@@ -369,12 +369,12 @@ private:
 };
 
 /**
- * @brief Convert the key/value pairs of the property map into a string and append to an output stream.
+ * @brief Converts the key/value pairs of the property map into a string and append to an output stream.
  *
  * @SINCE_1_1.28
- * @param [in] stream The output stream operator.
- * @param [in] map The map to insert
- * @return The output stream operator.
+ * @param[in] stream The output stream operator
+ * @param[in] map The map to insert
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
 

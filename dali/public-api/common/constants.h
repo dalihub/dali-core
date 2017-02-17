@@ -33,9 +33,9 @@ namespace Dali
  */
 
 /**
- * @brief ParentOrigin constants
+ * @brief ParentOrigin constants.
  *
- * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
+ * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f).
  * @SINCE_1_0.0
  */
 namespace ParentOrigin
@@ -60,9 +60,9 @@ DALI_IMPORT_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
 }
 
 /**
- * @brief AnchorPoint constants
+ * @brief AnchorPoint constants.
  *
- * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
+ * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f).
  * @SINCE_1_0.0
  */
 namespace AnchorPoint
@@ -111,7 +111,7 @@ DALI_IMPORT_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 
 } // namespace Color
 
 /**
- * @brief Math constants
+ * @brief Math constants.
  * @SINCE_1_0.0
  */
 namespace Math

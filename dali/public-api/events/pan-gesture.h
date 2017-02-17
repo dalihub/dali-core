@@ -149,7 +149,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    *
    * This is the pixel movement per millisecond.
    * @SINCE_1_0.0
-   * @return The speed of the pan (in pixels per millisecond).
+   * @return The speed of the pan (in pixels per millisecond)
    */
   float GetSpeed() const;
 
@@ -159,7 +159,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    *
    * This is always a positive value.
    * @SINCE_1_0.0
-   * @return The distance, as a float, a user's finger has panned.
+   * @return The distance, as a float, a user's finger has panned
    */
   float GetDistance() const;
 
@@ -168,7 +168,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    *
    * This is the pixel movement per millisecond.
    * @SINCE_1_0.0
-   * @return The speed of the pan (in pixels per millisecond).
+   * @return The speed of the pan (in pixels per millisecond)
    */
   float GetScreenSpeed() const;
 
@@ -179,7 +179,7 @@ struct DALI_IMPORT_API PanGesture: public Gesture
    *
    * This is always a positive value.
    * @SINCE_1_0.0
-   * @return The distance, as a float, a user's finger has panned.
+   * @return The distance, as a float, a user's finger has panned
    */
   float GetScreenDistance() const;
 };

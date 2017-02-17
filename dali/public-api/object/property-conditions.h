@@ -59,7 +59,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   PropertyCondition( const PropertyCondition& handle );
 
@@ -67,7 +67,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PropertyCondition& operator=( const PropertyCondition& rhs );
@@ -75,7 +75,7 @@ public:
 public:
 
   /**
-   * @brief Retrieve the arguments that this condition uses.
+   * @brief Retrieves the arguments that this condition uses.
    *
    * @SINCE_1_0.0
    * @return The arguments used for this condition
@@ -83,7 +83,7 @@ public:
   std::size_t GetArgumentCount() const;
 
   /**
-   * @brief Retrieve the arguments that this condition uses.
+   * @brief Retrieves the arguments that this condition uses.
    *
    * @SINCE_1_0.0
    * @param[in] index The condition index to get the argument
@@ -157,7 +157,7 @@ DALI_IMPORT_API PropertyCondition InsideCondition( float arg0, float arg1 );
 DALI_IMPORT_API PropertyCondition OutsideCondition( float arg0, float arg1 );
 
 /**
- * @brief Detects when a property changes by stepAmount from initialValue, in both positive and negative directions. This will continue checking for multiples of stepAmount
+ * @brief Detects when a property changes by stepAmount from initialValue, in both positive and negative directions. This will continue checking for multiples of stepAmount.
  *
  * property type:
  * float (float)
@@ -172,7 +172,7 @@ DALI_IMPORT_API PropertyCondition OutsideCondition( float arg0, float arg1 );
 DALI_IMPORT_API PropertyCondition StepCondition( float stepAmount, float initialValue = 0.0f );
 
 /**
- * @brief Receive notifications as a property goes above/below the inputted values. Values must be ordered and can be either ascending or descending
+ * @brief Receives notifications as a property goes above/below the inputted values. Values must be ordered and can be either ascending or descending.
  *
  * property type:
  * float (float)

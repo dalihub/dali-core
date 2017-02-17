@@ -43,7 +43,7 @@ class ObjectRegistry;
  *
  * Care should be taken to not store the handle in the Observer, as this will
  * have adverse effect on the life time of the Internal Object. The Handle
- * should only be used to connect to signals
+ * should only be used to connect to signals.
  *
  * Usage:
  * ObjectRegistry registry = Stage::GetObjectRegistry();
@@ -63,13 +63,13 @@ public:
   // Typedefs
 
   /**
-   * @brief Object created signal
+   * @brief Object created signal.
    * @SINCE_1_0.0
    */
   typedef Signal< void ( BaseHandle ) > ObjectCreatedSignalType;
 
   /**
-   * @brief Object destroyed signal
+   * @brief Object destroyed signal.
    * @SINCE_1_0.0
    */
   typedef Signal< void ( const Dali::RefObject* ) > ObjectDestroyedSignalType;
@@ -84,7 +84,7 @@ public:
   ObjectRegistry();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -95,7 +95,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   ObjectRegistry(const ObjectRegistry& handle);
 
@@ -103,7 +103,7 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   ObjectRegistry& operator=(const ObjectRegistry& rhs);
@@ -118,7 +118,7 @@ public: // Signals
    *   void YourCallbackName(BaseHandle object);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ObjectCreatedSignalType& ObjectCreatedSignal();
@@ -142,7 +142,7 @@ public: // Signals
    *   void YourCallbackName(const Dali::RefObject* objectPointer);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ObjectDestroyedSignalType& ObjectDestroyedSignal();
@@ -154,7 +154,7 @@ public: // Not intended for application developers
    * @brief This constructor is used by Dali Get() method.
    *
    * @SINCE_1_0.0
-   * @param [in] objectRegistry A pointer to a Dali resource
+   * @param[in] objectRegistry A pointer to a Dali resource
    */
   explicit DALI_INTERNAL ObjectRegistry(Internal::ObjectRegistry* objectRegistry);
   /// @endcond

@@ -47,7 +47,7 @@ class DALI_IMPORT_API AlphaFunction
 public:
 
   /**
-   * @brief Built-in alpha functions
+   * @brief Enumeration for built-in alpha functions.
    * @SINCE_1_0.0
    */
   enum BuiltinFunction
@@ -75,7 +75,7 @@ public:
   };
 
   /**
-   * @brief All possible functioning modes for the alpha function
+   * @brief Enumeration for all possible functioning modes for the alpha function.
    * @SINCE_1_0.0
    */
   enum Mode
@@ -87,7 +87,7 @@ public:
 
   /**
    * @brief Default constructor.
-   * Creates an alpha function object with the default built-in alpha function
+   * Creates an alpha function object with the default built-in alpha function.
    * @SINCE_1_0.0
    * @return The alpha function
    */
@@ -96,7 +96,7 @@ public:
   /**
    * @brief Constructor.
    * Creates an alpha function object with the built-in alpha function passed as a parameter
-   * to the constructor
+   * to the constructor.
    * @SINCE_1_0.0
    * @param[in] function One of the built-in alpha functions
    * @return The alpha function
@@ -105,8 +105,8 @@ public:
 
   /**
    * @brief Constructor.
-   * Creates an alpha function object using a pointer to an alpha function passed as a paramter
-   * to the constructor
+   * Creates an alpha function object using a pointer to an alpha function passed as a parameter
+   * to the constructor.
    * @SINCE_1_0.0
    * @param[in] function A pointer to an alpha function
    * @return The alpha function
@@ -128,22 +128,22 @@ public:
   AlphaFunction( const Dali::Vector2& controlPoint0, const Dali::Vector2& controlPoint1 );
 
   /**
-   * @brief Return the control points of the alpha function
+   * @brief Returns the control points of the alpha function.
    * @SINCE_1_0.0
-   * @return Vector4 containing the two control points of the curve.
+   * @return Vector4 containing the two control points of the curve
    * (xy for the first point and zw for the second)
    */
   Vector4 GetBezierControlPoints() const;
 
   /**
-   * @brief Returns the pointer to the custom function
+   * @brief Returns the pointer to the custom function.
    * @SINCE_1_0.0
-   * @return A pointer to a custom alpha function or 0 if not defined
+   * @return A pointer to a custom alpha function, or @c 0 if not defined
    */
   AlphaFunctionPrototype GetCustomFunction() const;
 
   /**
-   * @brief Returns the built-in function used by the alpha function
+   * @brief Returns the built-in function used by the alpha function.
    * @SINCE_1_0.0
    * @return One of the built-in alpha functions. In case no built-in function
    * has been specified, it will return AlphaFunction::DEFAULT

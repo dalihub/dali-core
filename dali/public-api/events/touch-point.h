@@ -40,7 +40,7 @@ struct DALI_IMPORT_API TouchPoint
   // Enumerations
 
   /**
-   * @brief Touch state
+   * @brief Enumeration for Touch state.
    * @SINCE_1_0.0
    */
   enum State
@@ -61,31 +61,31 @@ struct DALI_IMPORT_API TouchPoint
   // Construction & Destruction
 
   /**
-   * @brief Constructor
+   * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  id       The touch device ID.
-   * @param[in]  state    The state.
-   * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
-   * @param[in]  screenY  The Y co-ordinate relative to the screen's origin.
+   * @param[in] id      The touch device ID
+   * @param[in] state   The state
+   * @param[in] screenX The X co-ordinate relative to the screen's origin
+   * @param[in] screenY The Y co-ordinate relative to the screen's origin
    */
   TouchPoint(int id, State state, float screenX, float screenY);
 
   /**
-   * @brief Constructor
+   * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in]  id       The touch device ID.
-   * @param[in]  state    The state.
-   * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
-   * @param[in]  screenY  The Y co-ordinate relative to the screen's origin.
-   * @param[in]  localX   The X co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor.
-   * @param[in]  localY   The Y co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor.
+   * @param[in] id      The touch device ID
+   * @param[in] state   The state
+   * @param[in] screenX The X co-ordinate relative to the screen's origin
+   * @param[in] screenY The Y co-ordinate relative to the screen's origin
+   * @param[in] localX  The X co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
+   * @param[in] localY  The Y co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
    */
   TouchPoint(int id, State state, float screenX, float screenY, float localX, float localY);
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    * @SINCE_1_0.0
    */
   ~TouchPoint();

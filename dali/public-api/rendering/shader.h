@@ -79,7 +79,7 @@ public:
   struct Hint
   {
     /**
-     * @brief Hint value
+     * @brief Enumeration for the hint value.
      * @SINCE_1_1.45
      */
     enum Value
@@ -91,21 +91,21 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the Shader class.
+   * @brief Enumeration for instances of properties belonging to the Shader class.
    * @SINCE_1_1.43
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Shader class.
+     * @brief Enumeration for instances of properties belonging to the Shader class.
      * @SINCE_1_1.43
      */
     enum
     {
       /**
-       * @brief Name: "program", Type: MAP
-       * @note  The default value is empty
-       * @note  Format: {"vertex":"","fragment":"",hints:"","vertexPrefix":"","fragmentPrefix":""}
+       * @brief Name: "program", Type: MAP.
+       * @note The default value is empty.
+       * @note Format: {"vertex":"","fragment":"",hints:"","vertexPrefix":"","fragmentPrefix":""}
        * @SINCE_1_1.43
        */
       PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX
@@ -113,7 +113,7 @@ public:
   };
 
   /**
-   * @brief Create Shader.
+   * @brief Creates Shader.
    *
    * @SINCE_1_1.43
    * @param[in] vertexShader Vertex shader code for the effect.
@@ -126,14 +126,14 @@ public:
                      Hint::Value hints = Hint::NONE );
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   Shader();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    *
    * @SINCE_1_1.43
@@ -141,7 +141,7 @@ public:
   ~Shader();
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    *
    * @SINCE_1_1.43
    * @param[in] handle A handle to a Shader object
@@ -149,8 +149,8 @@ public:
   Shader( const Shader& handle );
 
   /**
-   * @brief Downcast to a shader handle.
-   * If not a shader the returned shader handle is left uninitialized.
+   * @brief Downcasts to a shader handle.
+   * If not, a shader the returned shader handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -159,7 +159,7 @@ public:
   static Shader DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object

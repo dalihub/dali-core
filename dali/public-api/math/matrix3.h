@@ -45,7 +45,7 @@ public:
   friend std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
 
   /**
-   * @brief The identity matrix
+   * @brief The identity matrix.
    */
   static const Matrix3 IDENTITY;
 
@@ -67,7 +67,7 @@ public:
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] m A 4x4 matrix. The translation and shear components are ignored.
+   * @param[in] m A 4x4 matrix. The translation and shear components are ignored
    */
   Matrix3(const Matrix& m);
 
@@ -88,15 +88,15 @@ public:
   Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22);
 
   /**
-   * @brief Assignment Operator
+   * @brief Assignment Operator.
    * @SINCE_1_0.0
-   * @param[in] matrix from which to copy values
-   * @return reference to this object
+   * @param[in] matrix From which to copy values
+   * @return Reference to this object
    */
   Matrix3& operator=( const Matrix3& matrix );
 
   /**
-   * @brief Assignment Operator
+   * @brief Assignment Operator.
    * @SINCE_1_0.0
    * @param[in] matrix A reference to the copied matrix
    * @return A reference to this
@@ -106,18 +106,18 @@ public:
   /**
    * @brief The equality operator.
    *
-   * Utilises appropriate machine epsilon values.
+   * Utilizes appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
    * @param[in] rhs The Matrix to compare this to
-   * @return true if the matrices are equal
+   * @return True if the matrices are equal
    */
   bool operator==(const Matrix3 & rhs) const;
 
   /**
    * @brief The inequality operator.
    *
-   * Utilises appropriate machine epsilon values.
+   * Utilizes appropriate machine epsilon values.
    *
    * @SINCE_1_0.0
    * @param[in] rhs The Matrix to compare this to
@@ -153,7 +153,7 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @return the matrix contents as an array of 9 floats.
+   * @return The matrix contents as an array of 9 floats
    */
   const float* AsFloat() const {return &mElements[0];}
 
@@ -170,7 +170,7 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @return the matrix contents as an array of 9 floats.
+   * @return The matrix contents as an array of 9 floats
    */
   float* AsFloat() {return &mElements[0];}
 
@@ -178,14 +178,14 @@ public:
    * @brief Inverts the matrix.
    *
    * @SINCE_1_0.0
-   * @return true if successful
+   * @return True if successful
    */
   bool Invert();
 
   /**
-   * @brief Swaps the rows to columns
+   * @brief Swaps the rows to columns.
    * @SINCE_1_0.0
-   * @return true if successful
+   * @return True if successful
    */
   bool Transpose();
 
@@ -193,7 +193,7 @@ public:
    * @brief Multiplies all elements of the matrix by the scale value.
    *
    * @SINCE_1_0.0
-   * @param[in] scale The value by which to scale the whole matrix.
+   * @param[in] scale The value by which to scale the whole matrix
    *
    */
   void Scale(float scale);
@@ -204,7 +204,7 @@ public:
    *
    * (The Magnitude of the unit matrix is therefore 1)
    * @SINCE_1_0.0
-   * @return the magnitude - always positive.
+   * @return The magnitude - always positive
    */
   float Magnitude() const;
 
@@ -216,7 +216,7 @@ public:
    * If the matrix is not invertible, then the matrix is left unchanged.
    *
    * @SINCE_1_0.0
-   * @return true if the matrix is invertible, otherwise false
+   * @return @c true if the matrix is invertible, otherwise @c false
    */
   bool ScaledInverseTranspose();
 
@@ -237,12 +237,12 @@ private:
 };
 
 /**
- * @brief Print a 3x3 matrix.
+ * @brief Prints a 3x3 matrix.
  *
  * @SINCE_1_0.0
- * @param[in] o The output stream operator.
- * @param[in] matrix The matrix to print.
- * @return The output stream operator.
+ * @param[in] o The output stream operator
+ * @param[in] matrix The matrix to print
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
 

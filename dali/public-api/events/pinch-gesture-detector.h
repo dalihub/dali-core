@@ -71,7 +71,7 @@ public: // Typedefs
 public: // Creation & Destruction
 
   /**
-   * @brief Create an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
+   * @brief Creates an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
    *
    * Calling member functions with an uninitialized PinchGestureDetector handle is not allowed.
    * @SINCE_1_0.0
@@ -79,18 +79,18 @@ public: // Creation & Destruction
   PinchGestureDetector();
 
   /**
-   * @brief Create an initialized PinchGestureDetector.
+   * @brief Creates an initialized PinchGestureDetector.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static PinchGestureDetector New();
 
   /**
-   * @brief Downcast a handle to PinchGestureDetector handle.
+   * @brief Downcasts a handle to PinchGestureDetector handle.
    *
-   * If handle points to a PinchGestureDetector object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a PinchGestureDetector object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a PinchGestureDetector object or an uninitialized handle
@@ -98,7 +98,7 @@ public: // Creation & Destruction
   static PinchGestureDetector DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -109,7 +109,7 @@ public: // Creation & Destruction
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   PinchGestureDetector(const PinchGestureDetector& handle);
 
@@ -117,7 +117,7 @@ public: // Creation & Destruction
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PinchGestureDetector& operator=(const PinchGestureDetector& rhs);
@@ -132,7 +132,7 @@ public: // Signals
    *   void YourCallbackName( Actor actor, const PinchGesture& gesture );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The gesture detector has been initialized.
    */
   DetectedSignalType& DetectedSignal();
@@ -144,7 +144,7 @@ public: // Not intended for Application developers
    * @brief This constructor is used by PinchGestureDetector::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in]  internal  A pointer to a newly allocated Dali resource.
+   * @param[in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PinchGestureDetector(Internal::PinchGestureDetector* internal);
   /// @endcond

@@ -42,7 +42,7 @@ namespace Random
  * @SINCE_1_0.0
  * @param[in] f0 The lower bound
  * @param[in] f1 The upper bound
- * @return a random value between the lower and upper bound
+ * @return A random value between the lower and upper bound
  */
 inline float Range(float f0, float f1)
 {
@@ -55,7 +55,7 @@ inline float Range(float f0, float f1)
  * @brief Function to return a normalized axis in a random direction.
  *
  * @SINCE_1_0.0
- * @return the axis
+ * @return The axis
  */
 inline Vector4 Axis()
 {
