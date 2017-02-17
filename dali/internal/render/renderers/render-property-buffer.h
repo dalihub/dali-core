@@ -80,12 +80,6 @@ public:
   void SetData( Dali::Vector<char>* data, size_t size );
 
   /**
-   * @brief Sets flag to update data in the buffer when next PropertyBuffer::Update()
-   * is called.
-   */
-  void UpdateData();
-
-  /**
    * @brief Set the number of elements
    * @param[in] size The number of elements
    */

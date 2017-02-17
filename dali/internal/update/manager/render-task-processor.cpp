@@ -200,7 +200,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    RenderTaskList& renderTasks,
                                    Layer& rootNode,
                                    SortedLayerPointers& sortedLayers,
-                                   GeometryBatcher& geometryBatcher,
                                    RenderInstructionContainer& instructions )
 {
   RenderTaskList::RenderTaskContainer& taskContainer = renderTasks.GetTasks();
@@ -277,7 +276,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                   sortedLayers,
                                   renderTask,
                                   renderTask.GetCullMode(),
-                                  geometryBatcher,
                                   hasClippingNodes,
                                   instructions );
     }
@@ -343,7 +341,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                   sortedLayers,
                                   renderTask,
                                   renderTask.GetCullMode(),
-                                  geometryBatcher,
                                   hasClippingNodes,
                                   instructions );
     }

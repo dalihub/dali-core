@@ -65,7 +65,6 @@ DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
-DALI_PROPERTY( "batchingEnabled",                 BOOLEAN,   true, false,  false, Dali::DevelRenderer::Property::BATCHING_ENABLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
 // Property string to enumeration tables:
@@ -348,11 +347,6 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
   return mPremultipledAlphaEnabled;
-}
-
-bool Renderer::IsBatchingEnabled() const
-{
-  return mBatchingEnabled;
 }
 
 SceneGraph::Renderer* Renderer::GetRendererSceneObject()
@@ -652,19 +646,6 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
-    case Dali::DevelRenderer::Property::BATCHING_ENABLED:
-    {
-      bool enabled;
-      if( propertyValue.Get( enabled ) )
-      {
-        if( mBatchingEnabled != enabled )
-        {
-          mBatchingEnabled = enabled;
-          SetBatchingEnabledMessage( GetEventThreadServices(), *mSceneObject, mBatchingEnabled );
-        }
-      }
-      break;
-    }
   }
 }
 
@@ -778,11 +759,6 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mDepthWriteMode;
       break;
     }
-    case Dali::DevelRenderer::Property::BATCHING_ENABLED:
-    {
-      value = mBatchingEnabled;
-      break;
-    }
     case Dali::Renderer::Property::DEPTH_FUNCTION:
     {
       value = mDepthFunction;
@@ -893,8 +869,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
-  mPremultipledAlphaEnabled( false ),
-  mBatchingEnabled( false )
+  mPremultipledAlphaEnabled( false )
 {
 }
 

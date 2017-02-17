@@ -897,3 +897,27 @@ int UtcDaliHandleWeightNew(void)
 
   END_TEST;
 }
+
+int UtcDaliHandleSetTypeInfo(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  Actor actor = Actor::DownCast(typeInfo.CreateInstance());
+  DALI_TEST_CHECK( actor );
+
+  DevelHandle::SetTypeInfo(actor, typeInfo);
+
+  TypeInfo newTypeInfo;
+  bool success = actor.GetTypeInfo( newTypeInfo );
+  DALI_TEST_CHECK( success );
+
+  DALI_TEST_CHECK(typeInfo.GetName() == newTypeInfo.GetName());
+  DALI_TEST_CHECK(typeInfo.GetBaseName() == newTypeInfo.GetBaseName());
+
+  END_TEST;
+}
+

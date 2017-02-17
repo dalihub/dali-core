@@ -2,7 +2,7 @@
 #define __DALI_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ public:
 
   static const unsigned int DEFAULT_RENDER_INTERVAL = 1;
 
+  static const unsigned int RENDER_FRAME_INTERVAL = 16;
+
   TestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
@@ -80,6 +82,7 @@ public:
   bool RenderOnly( );
   void ResetContext();
   bool GetRenderNeedsUpdate();
+  unsigned int Wait( unsigned int durationToWait );
 
 private:
   void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );

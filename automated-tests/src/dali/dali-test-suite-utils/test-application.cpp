@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,5 +221,17 @@ void TestApplication::ResetContext()
   mCore->ContextCreated();
 }
 
+unsigned int TestApplication::Wait( unsigned int durationToWait )
+{
+  int time = 0;
+
+  for(unsigned int i = 0; i <= ( durationToWait / RENDER_FRAME_INTERVAL); i++)
+  {
+    SendNotification();
+    Render(RENDER_FRAME_INTERVAL);
+    time += RENDER_FRAME_INTERVAL;
+  }
+  return time;
+}
 
 } // Namespace dali
