@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+SUBDIRS = graphics
+
 # Parse each file.list
 # These files define <module>_src_files & <module>_header_files,
 # where <module> is the subdirectory from core_src_dir
@@ -54,6 +56,7 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            $(DALI_CFLAGS)
 
 libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
+                         graphics/libdali-graphics.a \
                          -lpthread
 
 # Install headers under the correct subdirectories

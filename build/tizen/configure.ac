@@ -121,6 +121,7 @@ AC_SUBST(devincludepath)
 AC_CONFIG_FILES([
  Makefile
  dali-core/Makefile
+ dali-core/graphics/Makefile
  dali-core.pc
 ])
 
