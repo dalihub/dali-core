@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-test-suite-utils.h>
 
 using std::max;
@@ -9860,6 +9861,7 @@ int UtcDaliAnimationUpdateManagerP(void)
 
   // Apply animation to actor
   animation.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( 100.f, 90.f, 80.f ), AlphaFunction::LINEAR );
+  animation.AnimateTo( Property(actor, DevelActor::Property::OPACITY), 0.3f, AlphaFunction::LINEAR );
 
   animation.Play();
 

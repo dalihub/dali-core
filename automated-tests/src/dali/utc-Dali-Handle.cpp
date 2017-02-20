@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 #include <mesh-builder.h>
@@ -297,6 +298,7 @@ int UtcDaliHandleIsPropertyWritable(void)
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_GREEN ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_BLUE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_ALPHA ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( DevelActor::Property::OPACITY ) );
 
   // World-properties are not writable:
   DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION ) );
@@ -345,6 +347,7 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_GREEN ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_BLUE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_ALPHA ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( DevelActor::Property::OPACITY ) );
 
   // World-properties can not be animated
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION ) );
@@ -392,6 +395,7 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_GREEN ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_BLUE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_ALPHA ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( DevelActor::Property::OPACITY ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_ORIENTATION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_SCALE ) );

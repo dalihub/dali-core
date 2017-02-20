@@ -201,6 +201,7 @@ DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
 DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
+DALI_PROPERTY( "opacity",             FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -2536,8 +2537,13 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
     {
-      SetOpacity( property.Get< float >() );
+      float value;
+      if( property.Get( value ) )
+      {
+        SetOpacity( value );
+      }
       break;
     }
 
@@ -3114,6 +3120,7 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
     {
       value = GetCurrentColor().a;
       break;
@@ -3372,6 +3379,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
         break;
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
         property = &mNode->mColor;
         break;
 
@@ -3540,8 +3548,11 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
         break;
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
+      {
         property = &mNode->mColor;
         break;
+      }
 
       case Dali::Actor::Property::WORLD_COLOR:
         property = &mNode->mWorldColor;
@@ -3613,6 +3624,7 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
       }
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
       {
         componentIndex = 3;
         break;
