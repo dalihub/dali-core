@@ -31,31 +31,31 @@ namespace Dali
 namespace FilterMode
 {
 /**
- * @brief Texture filtering mode.
+ * @brief Enumeration for texture filtering mode.
  * @SINCE_1_0.0
  */
 enum Type
 {
   /**
-   * @brief Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR)
+   * @brief Use GL defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR).
    * @SINCE_1_0.0
    */
   NONE = 0,
 
   /**
-   * @brief Use Dali defaults (minification LINEAR, magnification LINEAR)
-   *  @SINCE_1_0.0
+   * @brief Use Dali defaults (minification LINEAR, magnification LINEAR).
+   * @SINCE_1_0.0
    */
   DEFAULT,
 
   /**
-   * @brief Filter nearest
+   * @brief Filter nearest.
    * @SINCE_1_0.0
    */
   NEAREST,
 
   /**
-   * @brief Filter linear
+   * @brief Filter linear.
    * @SINCE_1_0.0
    */
   LINEAR,

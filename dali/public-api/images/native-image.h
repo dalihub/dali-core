@@ -64,7 +64,7 @@ public:
     * @brief This copy constructor is required for (smart) pointer semantics.
     *
     * @SINCE_1_0.0
-    * @param [in] handle A reference to the copied handle
+    * @param[in] handle A reference to the copied handle
     */
    NativeImage( const NativeImage& handle );
 
@@ -72,13 +72,13 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs A reference to the copied handle.
-   * @return A reference to this.
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
    */
   NativeImage& operator=( const NativeImage& rhs );
 
   /**
-   * @brief Trigger asynchronous creation of backing GL texture immediately.
+   * @brief Triggers asynchronous creation of backing GL texture immediately.
    *
    * The normal policy is for a GL texture to created lazily when needed.
    * This function forces the allocation of a texture to happen at the earliest
@@ -92,35 +92,35 @@ public:
   void CreateGlTexture();
 
   /**
-   * @brief Create a new NativeImage, which used native resources.
+   * @brief Creates a new NativeImage, which used native resources.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @SINCE_1_0.0
-   * @param [in] nativeImageInterface An reference to the object of the interface implementation.
-   * @return A handle to a newly allocated object.
+   * @param[in] nativeImageInterface An reference to the object of the interface implementation
+   * @return A handle to a newly allocated object
    */
   static NativeImage New( NativeImageInterface& nativeImageInterface );
 
   /**
-   * @brief Downcast a handle to NativeImage handle.
+   * @brief Downcasts a handle to NativeImage handle.
    *
    * If handle points to a NativeImage object, the downcast produces valid handle.
-   * If not, the returned handle is left unintialized.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle Handle to an object.
-   * @return handle to a NativeImage or an uninitialized handle.
+   * @param[in] handle Handle to an object
+   * @return handle to a NativeImage or an uninitialized handle
    */
   static NativeImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Get custom fragment prefix for rendering a native image.
+   * @brief Gets custom fragment prefix for rendering a native image.
    *
    * @return String for custom fragment prefix
    */
   const char* GetCustomFragmentPreFix();
 
   /**
-   * @brief Get custom sampler type name for rendering a native image.
+   * @brief Gets custom sampler type name for rendering a native image.
    *
    * @return String for custom sampler type name
    */

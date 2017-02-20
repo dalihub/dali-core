@@ -47,13 +47,13 @@ class DALI_IMPORT_API Quaternion
 public:
 
   /**
-   * @brief Default Constructor
+   * @brief Default Constructor.
    * @SINCE_1_0.0
    */
   Quaternion();
 
   /**
-   * @brief Construct from a quaternion represented by floats.
+   * @brief Constructs from a quaternion represented by floats.
    *
    * @SINCE_1_0.0
    * @param[in] cosThetaBy2
@@ -64,7 +64,7 @@ public:
   Quaternion( float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta );
 
   /**
-   * @brief Construct from a quaternion represented by a vector.
+   * @brief Constructs from a quaternion represented by a vector.
    *
    * @SINCE_1_0.0
    * @param[in] vector x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
@@ -81,7 +81,7 @@ public:
   Quaternion( Radian angle, const Vector3& axis );
 
   /**
-   * @brief Construct from Euler angles.
+   * @brief Constructs from Euler angles.
    *
    * @SINCE_1_0.0
    * @param[in] pitch
@@ -91,7 +91,7 @@ public:
   Quaternion( Radian pitch, Radian yaw, Radian roll );
 
   /**
-   * @brief Construct from a matrix.
+   * @brief Constructs from a matrix.
    *
    * @SINCE_1_0.0
    * @param[in] matrix
@@ -99,7 +99,7 @@ public:
   explicit Quaternion(const Matrix& matrix);
 
   /**
-   * @brief Construct from 3 orthonormal axes.
+   * @brief Constructs from 3 orthonormal axes.
    *
    * @SINCE_1_0.0
    * @param[in] xAxis The X axis
@@ -109,7 +109,7 @@ public:
   explicit Quaternion( const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis );
 
   /**
-   * @brief Construct quaternion which describes minimum rotation to align v0 with v1
+   * @brief Constructs quaternion which describes minimum rotation to align v0 with v1.
    * @SINCE_1_0.0
    * @param[in] v0 First normalized vector
    * @param[in] v1 Second normalized vector
@@ -130,28 +130,28 @@ public:
   static const Quaternion IDENTITY; ///< (0.0f,0.0f,0.0f,1.0f)
 
   /**
-   * @brief Helper to check if this is an identity quaternion
+   * @brief Helper to check if this is an identity quaternion.
    *
    * @SINCE_1_0.0
-   * @return true if this is identity quaternion
+   * @return True if this is identity quaternion
    */
   bool IsIdentity() const;
 
   /**
-   * @brief Convert the quaternion to an axis/angle pair.
+   * @brief Converts the quaternion to an axis/angle pair.
    *
    * @SINCE_1_0.0
    * @param[out] axis
    * @param[out] angle Angle in radians
-   * @return true if converted correctly
+   * @return True if converted correctly
    */
   bool ToAxisAngle( Vector3& axis, Radian& angle ) const;
 
   /**
-   * @brief Return the quaternion as a vector.
+   * @brief Returns the quaternion as a vector.
    *
    * @SINCE_1_0.0
-   * @return the vector representation of the quaternion
+   * @return The vector representation of the quaternion
    */
   const Vector4& AsVector() const;
 
@@ -166,10 +166,10 @@ public:
   void SetEuler( Radian pitch, Radian yaw, Radian roll );
 
   /**
-   * @brief returns the Euler angles from a rotation Quaternion.
+   * @brief Returns the Euler angles from a rotation Quaternion.
    *
    * @SINCE_1_0.0
-   * @return a vector of Euler angles (x == pitch, y == yaw, z == roll)
+   * @return A vector of Euler angles (x == pitch, y == yaw, z == roll)
    */
   Vector4 EulerAngles() const;
 
@@ -293,8 +293,8 @@ public:
    * @brief Equality operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs The quaterion to compare with.
-   * @return True if the quaternions are equal.
+   * @param[in] rhs The quaternion to compare with
+   * @return True if the quaternions are equal
    */
   bool operator==( const Quaternion& rhs ) const;
 
@@ -302,29 +302,29 @@ public:
    * @brief Inequality operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs The quaterion to compare with.
-   * @return True if the quaternions are not equal.
+   * @param[in] rhs The quaternion to compare with
+   * @return True if the quaternions are not equal
    */
   bool operator!=( const Quaternion& rhs ) const;
 
   /**
-   * @brief Return the length of the quaternion.
+   * @brief Returns the length of the quaternion.
    *
    * @SINCE_1_0.0
-   * @return the length of the quaternion
+   * @return The length of the quaternion
    */
   float Length() const;
 
   /**
-   * @brief Return the squared length of the quaternion.
+   * @brief Returns the squared length of the quaternion.
    *
    * @SINCE_1_0.0
-   * @return the squared length of the quaternion
+   * @return The squared length of the quaternion
    */
   float LengthSquared() const;
 
   /**
-   * @brief Normalize this to unit length.
+   * @brief Normalizes this to unit length.
    *
    * @SINCE_1_0.0
    */
@@ -334,19 +334,19 @@ public:
    * @brief Normalized.
    *
    * @SINCE_1_0.0
-   * @return a normalized version of this quaternion
+   * @return A normalized version of this quaternion
    */
   Quaternion Normalized() const;
 
   /**
-   * @brief Conjugate this quaternion.
+   * @brief Conjugates this quaternion.
    *
    * @SINCE_1_0.0
    */
   void Conjugate();
 
   /**
-   * @brief Invert this quaternion.
+   * @brief Inverts this quaternion.
    *
    * @SINCE_1_0.0
    */
@@ -356,7 +356,7 @@ public:
    * @brief Performs the logarithm of a Quaternion = v*a where q = (cos(a),v*sin(a)).
    *
    * @SINCE_1_0.0
-   * @return a quaternion representing the logarithm
+   * @return A quaternion representing the logarithm
    */
   Quaternion Log() const;
 
@@ -364,17 +364,17 @@ public:
    * @brief Performs an exponent e^Quaternion = Exp(v*a) = (cos(a),vsin(a)).
    *
    * @SINCE_1_0.0
-   * @return a quaternion representing the exponent
+   * @return A quaternion representing the exponent
    */
   Quaternion Exp() const;
 
   /**
-   * @brief Return the dot product of two quaternions.
+   * @brief Returns the dot product of two quaternions.
    *
    * @SINCE_1_0.0
    * @param[in] q1 The first quaternion
    * @param[in] q2 The second quaternion
-   * @return the dot product of the two quaternions
+   * @return The dot product of the two quaternions
    */
   static float Dot( const Quaternion &q1, const Quaternion &q2 );
 
@@ -384,8 +384,8 @@ public:
    * @SINCE_1_0.0
    * @param[in] q1 The start quaternion
    * @param[in] q2 The end quaternion
-   * @param[in] t  A progress value between 0 and 1
-   * @return the interpolated quaternion
+   * @param[in] t A progress value between 0 and 1
+   * @return The interpolated quaternion
    */
   static Quaternion Lerp( const Quaternion &q1, const Quaternion &q2, float t );
 
@@ -397,7 +397,7 @@ public:
    * @param[in] q1 The start quaternion
    * @param[in] q2 The end quaternion
    * @param[in] progress A progress value between 0 and 1
-   * @return the interpolated quaternion
+   * @return The interpolated quaternion
    */
   static Quaternion Slerp( const Quaternion &q1, const Quaternion &q2, float progress );
 
@@ -407,8 +407,8 @@ public:
    * @SINCE_1_0.0
    * @param[in] q1 The start quaternion
    * @param[in] q2 The end quaternion
-   * @param[in] t  A progress value between 0 and 1
-   * @return the interpolated quaternion
+   * @param[in] t A progress value between 0 and 1
+   * @return The interpolated quaternion
    */
   static Quaternion SlerpNoInvert( const Quaternion &q1, const Quaternion &q2, float t );
 
@@ -420,8 +420,8 @@ public:
    * @param[in] end The end quaternion
    * @param[in] ctrl1 The control quaternion for q1
    * @param[in] ctrl2 The control quaternion for q2
-   * @param[in] t  A progress value between 0 and 1
-   * @return the interpolated quaternion
+   * @param[in] t A progress value between 0 and 1
+   * @return The interpolated quaternion
    */
   static Quaternion Squad( const Quaternion& start, const Quaternion& end,  const Quaternion& ctrl1,  const Quaternion& ctrl2, float t );
 
@@ -431,25 +431,25 @@ public:
    * @SINCE_1_0.0
    * @param[in] q1 The first quaternion
    * @param[in] q2 The second quaternion
-   * @return The angle between the two quaternions.
+   * @return The angle between the two quaternions
    */
   static float AngleBetween( const Quaternion& q1, const Quaternion& q2 );
 
   /**
-   * @brief Rotate v by this Quaternion (Quaternion must be unit).
+   * @brief Rotates v by this Quaternion (Quaternion must be unit).
    *
    * @SINCE_1_0.0
    * @param[in] vector A vector to rotate
-   * @return the rotated vector
+   * @return The rotated vector
    */
   Vector4 Rotate( const Vector4& vector ) const;
 
   /**
-   * @brief Rotate v by this Quaternion (Quaternion must be unit).
+   * @brief Rotates v by this Quaternion (Quaternion must be unit).
    *
    * @SINCE_1_0.0
    * @param[in] vector A vector to rotate
-   * @return the rotated vector
+   * @return The rotated vector
    */
   Vector3 Rotate( const Vector3& vector ) const;
 
@@ -457,7 +457,7 @@ private:
 
   /**
    * @internal
-   * @brief Set the quaternion from 3 orthonormal axes.
+   * @brief Sets the quaternion from 3 orthonormal axes.
    *
    * @SINCE_1_0.0
    * @param[in] xAxis The X axis
@@ -472,12 +472,12 @@ public:
 };
 
 /**
- * @brief Print a Quaternion.
+ * @brief Prints a Quaternion.
  *
  * @SINCE_1_0.0
- * @param [in] o The output stream operator.
- * @param [in] quaternion The quaternion to print.
- * @return The output stream operator.
+ * @param[in] o The output stream operator
+ * @param[in] quaternion The quaternion to print
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Quaternion& quaternion);
 

@@ -33,12 +33,12 @@ namespace Dali
  */
 
 /**
- * @brief Compile time template to calculate base to the power of N.
+ * @brief Compiles time template to calculate base to the power of N.
  *
  * @SINCE_1_0.0
  * @tparam mantissa to raise to exponent
  * @tparam exponent to use for mantissa
- * @note values need to be compile time constants
+ * @note Values need to be compile time constants.
  * Usage: <code>Power< 10, 2 >::value; // value=100</code>
  */
 template< size_t mantissa, size_t exponent >
@@ -48,9 +48,9 @@ struct Power
 };
 
 /**
- * @brief Compile time template to calculate base to the power of N.
+ * @brief Compiles time template to calculate base to the power of N.
  *
- * Specialisation for power of 1
+ * Specialization for power of 1.
  * @SINCE_1_0.0
  * @tparam mantissa to raise to exponent
  */
@@ -61,9 +61,9 @@ struct Power< mantissa, 1 >
 };
 
 /**
- * @brief Compile time template to calculate base to the power of N.
+ * @brief Compiles time template to calculate base to the power of N.
  *
- * Specialisation for power of 0
+ * Specialization for power of 0.
  * @SINCE_1_0.0
  * @tparam mantissa to raise to exponent
  */
@@ -74,12 +74,12 @@ struct Power< mantissa, 0 >
 };
 
 /**
- * @brief Compile time template to calculate base logarithm of N.
+ * @brief Compiles time template to calculate base logarithm of N.
  *
  * @SINCE_1_0.0
  * @tparam number for which to calculate the logarithm
  * @tparam base logarithm to calculate
- * @note values need to be compile time constants
+ * @note Values need to be compile time constants.
  * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
  */
 template< size_t number, size_t base = 2 >
@@ -89,9 +89,9 @@ struct Log
 };
 
 /**
- * @brief Compile time template to calculate base logarithm of N.
+ * @brief Compiles time template to calculate base logarithm of N.
  *
- * Specialisation for logarithm of 1
+ * Specialization for logarithm of 1.
  * @SINCE_1_0.0
  * @tparam base logarithm to calculate
  */
@@ -102,9 +102,9 @@ struct Log< 1, base >
 };
 
 /**
- * @brief Compile time template to calculate base logarithm of N.
+ * @brief Compiles time template to calculate base logarithm of N.
  *
- * Specialisation for logarithm of 0
+ * Specialization for logarithm of 0.
  * @SINCE_1_0.0
  * @tparam base logarithm to calculate
  */
@@ -116,11 +116,11 @@ struct Log< 0, base >
 
 
 /**
- * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ * @brief Compiles time template to calculate the machine epsilon for a given floating point number.
  *
  * @SINCE_1_0.0
  * @tparam N the number for which to calculate the machine epsilon
- * @note value needs to be compile time constant
+ * @note Value needs to be compile time constant.
  * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
  */
 template< size_t N >
@@ -136,9 +136,9 @@ struct Epsilon
 };
 
 /**
- * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ * @brief Compiles time template to calculate the machine epsilon for a given floating point number.
  *
- * Specialisation for epsilon of 1
+ * Specialization for epsilon of 1.
  * @SINCE_1_0.0
  */
 template<>
@@ -152,9 +152,9 @@ struct Epsilon< 1 >
 };
 
 /**
- * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ * @brief Compiles time template to calculate the machine epsilon for a given floating point number.
  *
- * Specialisation for epsilon of 0
+ * Specialization for epsilon of 0.
  * @SINCE_1_0.0
  */
 template<>

@@ -51,10 +51,10 @@ struct EqualToConstraint
   { }
 
   /**
-   * @brief Override functor for float properties
+   * @brief Overrides functor for float properties.
    *
    * @SINCE_1_0.0
-   * @param[in, out] current The current property value, the constrained value is set
+   * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
   void operator()( float& current, const PropertyInputContainer& inputs )
@@ -63,10 +63,10 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Vector2 properties
+   * @brief Overrides functor for Vector2 properties.
    *
    * @SINCE_1_0.0
-   * @param[in, out] current The current property value, the constrained value is set
+   * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
   void operator()( Vector2& current, const PropertyInputContainer& inputs )
@@ -75,7 +75,7 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Vector3 properties
+   * @brief Overrides functor for Vector3 properties.
    *
    * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
@@ -87,7 +87,7 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Vector4 properties
+   * @brief Overrides functor for Vector4 properties.
    *
    * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
@@ -99,7 +99,7 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Quaternion properties
+   * @brief Overrides functor for Quaternion properties.
    *
    * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
@@ -111,7 +111,7 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Matrix3 properties
+   * @brief Overrides functor for Matrix3 properties.
    *
    * @SINCE_1_0.0
    * @param[in,out] current The current property value
@@ -123,7 +123,7 @@ struct EqualToConstraint
   }
 
   /**
-   * @brief Override functor for Matrix properties
+   * @brief Overrides functor for Matrix properties.
    *
    * @SINCE_1_0.0
    * @param[in,out] current The current property value, the constrained value is set
@@ -141,7 +141,7 @@ struct EqualToConstraint
  * multiplied by scale parameter (for Vector3 properties).
  *
  * @e current = <em>input[0]</em> * @e scale. @e current, <em>input[0]</em>, and @e scale
- * indicate the target property, the first constraint source, and the scale parameter, respectively.
+ * indicates the target property, the first constraint source, and the scale parameter, respectively.
  * * implies element-wise multiplication.
  * @SINCE_1_0.0
  */
@@ -166,7 +166,7 @@ struct RelativeToConstraint
   /**
    * @brief Functor.
    * @SINCE_1_0.0
-   * @param[in,out] current The current property value (vector3 property * scale factor).
+   * @param[in,out] current The current property value (vector3 property * scale factor)
    * @param[in] inputs Property container for current property calculation
    */
   void operator()( Vector3& current, const PropertyInputContainer& inputs )
@@ -182,7 +182,7 @@ struct RelativeToConstraint
  * multiplied by scale parameter (for float properties).
  *
  * @e current = <em>input[0]</em> * @e scale. @e current, <em>input[0]</em>, and @e scale
- * indicate the target property, the first constraint source, and the scale parameter, respectively.
+ * indicates the target property, the first constraint source, and the scale parameter, respectively.
  * @SINCE_1_0.0
  */
 struct RelativeToConstraintFloat
@@ -198,7 +198,7 @@ struct RelativeToConstraintFloat
   /**
    * @brief Functor.
    * @SINCE_1_0.0
-   * @param[in,out] current The current property value (float property * scale factor).
+   * @param[in,out] current The current property value (float property * scale factor)
    * @param[in] inputs Property container for current property calculation
    */
   void operator()( float& current, const PropertyInputContainer& inputs )
@@ -213,12 +213,12 @@ struct RelativeToConstraintFloat
  * @brief Constraint function to aim a camera at a target.
  *
  * Constraint which sets camera's orientation given camera world position
- * and a target world position.  Uses target's up vector to orient the
+ * and a target world position. Uses target's up vector to orient the
  * constrained actor along the vector between camera position and
  * target position.
  *
  * @SINCE_1_0.0
- * @param[in,out] current The current orientation property value, the constrained value is set.
+ * @param[in,out] current The current orientation property value, the constrained value is set
  * @param[in] inputs Contains the world position of the target, the world position of the camera, and the world orientation of the target
  */
 inline void LookAt( Dali::Quaternion& current, const Dali::PropertyInputContainer& inputs )

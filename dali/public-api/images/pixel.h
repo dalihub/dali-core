@@ -35,9 +35,9 @@ namespace Dali
 namespace Pixel
 {
 /**
- * @brief Pixel formats
+ * @brief Enumeration for Pixel formats.
  *
- * Pixel format, default color depth is RGBA 32 bit with alpha
+ * Pixel format, default color depth is RGBA 32 bit with alpha.
  * @SINCE_1_0.0
  * @note BufferImage::Update might not work with BGR/BGRA formats!
  */
@@ -128,8 +128,8 @@ const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
  * @brief Whether specified pixel format contains an alpha value.
  *
  * @SINCE_1_0.0
- * @param [in] pixelformat Pixel format
- * @return true if format has alpha, false otherwise
+ * @param[in] pixelformat Pixel format
+ * @return @c true if format has alpha, @c false otherwise
  */
 DALI_IMPORT_API bool HasAlpha(Format pixelformat);
 
@@ -137,7 +137,7 @@ DALI_IMPORT_API bool HasAlpha(Format pixelformat);
  * @brief Returns The number of bytes per pixel for the specified pixel format.
  *
  * @SINCE_1_0.0
- * @param [in] pixelFormat The pixel format
+ * @param[in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
 DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
@@ -149,7 +149,7 @@ DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
  * For example, in case of Pixel::RGBA4444, byteOffset value is 1 and bitMask value is 0x0f.
  * It means the second byte contains the alpha value and the last 4 bits of the byte is the alpha value.
  *
- * Bitmask is zero if the pixelFormat does not support alpha
+ * Bitmask is zero if the pixelFormat does not support alpha.
  * @SINCE_1_0.0
  * @param[in]  pixelFormat The pixel format
  * @param[out] byteOffset The byte offset of the byte containing the alpha value

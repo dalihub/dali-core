@@ -111,7 +111,7 @@ public:
   /**
    * @brief Called after the actor has been disconnected from Stage.
    *
-   * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
+   * If an actor is disconnected, it either has no parent or is parented to a disconnected actor.
    *
    * @SINCE_1_0.0
    * @note When the parent of a set of actors is disconnected to the stage, then all of the children
@@ -139,7 +139,7 @@ public:
   virtual void OnChildAdd(Actor& child) = 0;
 
   /**
-   * @brief Called after the owning actor has attempted to remove a child( regardless of whether it succeeded or not ).
+   * @brief Called after the owning actor has attempted to remove a child (regardless of whether it succeeded or not).
    *
    * @SINCE_1_0.0
    * @param[in] child The child being removed
@@ -159,7 +159,7 @@ public:
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
    *
    * @SINCE_1_0.0
-   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize.
+   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
    */
   virtual void OnSizeSet(const Vector3& targetSize) = 0;
 
@@ -167,8 +167,8 @@ public:
    * @brief Called when the owning actor's size is animated e.g. using Animation::AnimateTo( Property( actor, Actor::Property::SIZE ), ... ).
    *
    * @SINCE_1_0.0
-   * @param[in] animation The object which is animating the owning actor.
-   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize.
+   * @param[in] animation The object which is animating the owning actor
+   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
 
@@ -179,7 +179,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] event The touch event
-   * @return True if the event should be consumed.
+   * @return True if the event should be consumed
    * @note CustomActorImpl::REQUIRES_TOUCH_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
    */
   virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API = 0;
@@ -189,7 +189,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] event The hover event
-   * @return True if the event should be consumed.
+   * @return True if the event should be consumed
    * @note CustomActorImpl::REQUIRES_HOVER_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
    */
   virtual bool OnHoverEvent(const HoverEvent& event) = 0;
@@ -198,8 +198,8 @@ public:
    * @brief Called after a key-event is received by the actor that has had its focus set.
    *
    * @SINCE_1_0.0
-   * @param[in] event the Key Event
-   * @return True if the event should be consumed.
+   * @param[in] event The Key Event
+   * @return True if the event should be consumed
    */
   virtual bool OnKeyEvent(const KeyEvent& event) = 0;
 
@@ -208,7 +208,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] event The wheel event
-   * @return True if the event should be consumed.
+   * @return True if the event should be consumed
    * @note CustomActorImpl::REQUIRES_WHEEL_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
    */
   virtual bool OnWheelEvent(const WheelEvent& event) = 0;
@@ -223,16 +223,16 @@ public:
    * actors, resize or after changing specific properties.
    *
    * @SINCE_1_0.0
-   * @param[in]      size       The allocated size.
+   * @param[in]      size       The allocated size
    * @param[in,out]  container  The control should add actors to this container that it is not able
-   *                            to allocate a size for.
+   *                            to allocate a size for
    * @note  As this function is called from inside the size negotiation algorithm, you cannot
    * call RequestRelayout (the call would just be ignored).
    */
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) = 0;
 
   /**
-   * @brief Notification for deriving classes
+   * @brief Notification for deriving classes.
    *
    * @SINCE_1_0.0
    * @param[in] policy The policy being set
@@ -241,7 +241,7 @@ public:
   virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) = 0;
 
   /**
-   * @brief Return the natural size of the actor.
+   * @brief Returns the natural size of the actor.
    *
    * @SINCE_1_0.0
    * @return The actor's natural size
@@ -249,12 +249,12 @@ public:
   virtual Vector3 GetNaturalSize() = 0;
 
   /**
-   * @brief Calculate the size for a child.
+   * @brief Calculates the size for a child.
    *
    * @SINCE_1_0.0
    * @param[in] child The child actor to calculate the size for
-   * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
-   * @return Return the calculated size for the given dimension.
+   * @param[in] dimension The dimension to calculate the size for. E.g. width or height
+   * @return Return the calculated size for the given dimension
    */
   virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) = 0;
 
@@ -264,8 +264,8 @@ public:
    * Derived classes should override this if they wish to customize the height returned.
    *
    * @SINCE_1_0.0
-   * @param[in] width Width to use.
-   * @return The height based on the width.
+   * @param[in] width Width to use
+   * @return The height based on the width
    */
   virtual float GetHeightForWidth( float width ) = 0;
 
@@ -275,23 +275,23 @@ public:
    * Derived classes should override this if they wish to customize the width returned.
    *
    * @SINCE_1_0.0
-   * @param[in] height Height to use.
-   * @return The width based on the width.
+   * @param[in] height Height to use
+   * @return The width based on the width
    */
   virtual float GetWidthForHeight( float height ) = 0;
 
   /**
-   * @brief Determine if this actor is dependent on it's children for relayout.
+   * @brief Determines if this actor is dependent on its children for relayout.
    *
    * @SINCE_1_0.0
    * @param[in] dimension The dimension(s) to check for
-   * @return Return if the actor is dependent on it's children.
+   * @return Return if the actor is dependent on it's children
    */
   virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that relayout dependencies have been
-   * met and the size for this object is about to be calculated for the given dimension
+   * met and the size for this object is about to be calculated for the given dimension.
    *
    * @SINCE_1_0.0
    * @param[in] dimension The dimension that is about to be calculated
@@ -300,7 +300,7 @@ public:
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
-   * has just been negotiated
+   * has just been negotiated.
    *
    * @SINCE_1_0.0
    * @param[in] size The new size for the given dimension
@@ -309,7 +309,7 @@ public:
   virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
 
   /**
-   * @brief Retrieve the extension for this control.
+   * @brief Retrieves the extension for this control.
    *
    * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
@@ -322,7 +322,7 @@ public:
 protected: // For derived classes
 
   /**
-   * @brief Flags for the constructor
+   * @brief Enumeration for the constructor flags.
    * @SINCE_1_0.0
    */
   enum ActorFlags
@@ -340,7 +340,7 @@ protected: // For derived classes
   static const int ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
 
   /**
-   * @brief Create a CustomActorImpl.
+   * @brief Creates a CustomActorImpl.
    * @SINCE_1_0.0
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
@@ -349,7 +349,7 @@ protected: // For derived classes
   // Size negotiation helpers
 
   /**
-   * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene).
+   * @brief Requests a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene).
    *
    * This method can also be called from a derived class every time it needs a different size.
    * At the end of event processing, the relayout process starts and
@@ -364,42 +364,42 @@ protected: // For derived classes
   /**
    * @brief Provides the Actor implementation of GetHeightForWidth.
    * @SINCE_1_0.0
-   * @param[in] width Width to use.
-   * @return The height based on the width.
+   * @param[in] width Width to use
+   * @return The height based on the width
    */
   float GetHeightForWidthBase( float width );
 
   /**
    * @brief Provides the Actor implementation of GetWidthForHeight.
    * @SINCE_1_0.0
-   * @param[in] height Height to use.
-   * @return The width based on the height.
+   * @param[in] height Height to use
+   * @return The width based on the height
    */
   float GetWidthForHeightBase( float height );
 
   /**
-   * @brief Calculate the size for a child using the base actor object.
+   * @brief Calculates the size for a child using the base actor object.
    *
    * @SINCE_1_0.0
    * @param[in] child The child actor to calculate the size for
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height
-   * @return Return the calculated size for the given dimension. If more than one dimension is requested, just return the first one found.
+   * @return Return the calculated size for the given dimension. If more than one dimension is requested, just return the first one found
    */
   float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
 
   /**
-   * @brief Determine if this actor is dependent on it's children for relayout from the base class.
+   * @brief Determines if this actor is dependent on its children for relayout from the base class.
    *
    * @SINCE_1_0.0
    * @param[in] dimension The dimension(s) to check for
-   * @return Return if the actor is dependent on it's children.
+   * @return Return if the actor is dependent on it's children
    */
   bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
 public: // Not intended for application developers
 
   /**
-   * @brief Initialize a CustomActor.
+   * @brief Initializes a CustomActor.
    * @SINCE_1_0.0
    * @param[in] owner The owning object
    * @pre The CustomActorImpl is not already owned.
@@ -408,7 +408,7 @@ public: // Not intended for application developers
   void Initialize(Internal::CustomActor& owner);
 
   /**
-   * @brief Get the owner.
+   * @brief Gets the owner.
    *
    * This method is needed when creating additional handle objects to existing objects.
    * Owner is the Dali::Internal::CustomActor that owns the implementation of the custom actor
@@ -421,7 +421,7 @@ public: // Not intended for application developers
   /**
    * @brief Returns whether the OnTouchEvent() callback is required.
    * @SINCE_1_0.0
-   * @return True if the OnTouchEvent() callback is required.
+   * @return True if the OnTouchEvent() callback is required
    * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
    */
   bool RequiresTouchEvents() const;
@@ -429,7 +429,7 @@ public: // Not intended for application developers
   /**
    * @brief Returns whether the OnHoverEvent() callback is required.
    * @SINCE_1_0.0
-   * @return True if the OnHoverEvent() callback is required.
+   * @return True if the OnHoverEvent() callback is required
    * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
    */
   bool RequiresHoverEvents() const;
@@ -437,7 +437,7 @@ public: // Not intended for application developers
   /**
    * @brief Returns whether the OnWheelEvent() callback is required.
    * @SINCE_1_0.0
-   * @return True if the OnWheelEvent() callback is required.
+   * @return True if the OnWheelEvent() callback is required
    * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
    */
   bool RequiresWheelEvents() const;
@@ -445,7 +445,7 @@ public: // Not intended for application developers
   /**
    * @brief Returns whether relayout is enabled.
    * @SINCE_1_0.0
-   * @return Return true if relayout is enabled on the custom actor.
+   * @return Return true if relayout is enabled on the custom actor
    * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
    */
   bool IsRelayoutEnabled() const;

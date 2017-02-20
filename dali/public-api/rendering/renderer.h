@@ -36,7 +36,7 @@ namespace FaceCullingMode
 {
 
 /**
- * @brief Face culling mode.
+ * @brief Enumeration for face culling mode.
  * @SINCE_1_1.43
  */
 enum Type
@@ -53,7 +53,7 @@ namespace BlendMode
 {
 
 /**
- * @brief Blend mode.
+ * @brief Enumeration for blend mode.
  * @SINCE_1_1.43
  */
 enum Type
@@ -69,7 +69,7 @@ namespace BlendEquation
 {
 
 /**
- * @brief Blend Equation.
+ * @brief Enumeration for blend equation.
  * @SINCE_1_1.43
  */
 enum Type
@@ -85,7 +85,7 @@ namespace BlendFactor
 {
 
 /**
- * @brief Blend Factor.
+ * @brief Enumeration for blend factor.
  * @SINCE_1_1.43
  */
 enum Type
@@ -113,7 +113,7 @@ namespace DepthWriteMode
 {
 
 /**
- * @brief Depth buffer write modes.
+ * @brief Enumeration for depth buffer write modes.
  * @SINCE_1_1.43
  */
 enum Type
@@ -129,7 +129,7 @@ namespace DepthTestMode
 {
 
 /**
- * @brief Depth buffer test (read) modes.
+ * @brief Enumeration for depth buffer test (read) modes.
  * @SINCE_1_1.43
  */
 enum Type
@@ -145,7 +145,7 @@ namespace DepthFunction
 {
 
 /**
- * @brief Depth functions.
+ * @brief Enumeration for depth functions.
  * @SINCE_1_1.43
  */
 enum Type
@@ -166,7 +166,7 @@ namespace RenderMode
 {
 
 /**
- * @brief Controls how this renderer uses its stencil properties and writes to the color buffer.
+ * @brief Enumeration for the controls of how this renderer uses its stencil properties and writes to the color buffer.
  * @SINCE_1_2_5
  */
 enum Type
@@ -184,7 +184,7 @@ namespace StencilFunction
 {
 
 /**
- * @brief The comparison function used on the stencil buffer.
+ * @brief Enumeration for the comparison function used on the stencil buffer.
  * @SINCE_1_1.43
  */
 enum Type
@@ -205,7 +205,7 @@ namespace StencilOperation
 {
 
 /**
- * @brief Specifies the action to take when the stencil (or depth) test fails during stencil test.
+ * @brief Enumeration for specifying the action to take when the stencil (or depth) test fails during stencil test.
  * @SINCE_1_1.43
  */
 enum Type
@@ -224,7 +224,7 @@ enum Type
 
 
 /**
- * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader
+ * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader.
  *
  * @SINCE_1_1.43
  */
@@ -233,197 +233,197 @@ class DALI_IMPORT_API Renderer : public Handle
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the Renderer class.
+   * @brief Enumeration for instances of properties belonging to the Renderer class.
    * @SINCE_1_1.43
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Renderer class.
+     * @brief Enumeration for instances of properties belonging to the Renderer class.
      * @SINCE_1_1.43
      */
     enum
     {
       /**
-       * @brief name "depthIndex", type INTEGER
-       * @note The default value is 0
+       * @brief Name "depthIndex", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is 0.
        */
       DEPTH_INDEX = DEFAULT_RENDERER_PROPERTY_START_INDEX,
 
       /**
-       * @brief name "faceCullingMode", type INTEGER
-       * @note The default value is FaceCullingMode::NONE
+       * @brief Name "faceCullingMode", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is FaceCullingMode::NONE.
        */
       FACE_CULLING_MODE,
 
       /**
-       * @brief name "blendMode", type INTEGER
-       * @note The default value is BlendMode::AUTO
+       * @brief Name "blendMode", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendMode::AUTO.
        */
       BLEND_MODE,
 
       /**
-       * @brief name "blendEquationRgb", type INTEGER
-       * @note The default value is BlendEquation::ADD
+       * @brief Name "blendEquationRgb", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendEquation::ADD.
        */
       BLEND_EQUATION_RGB,
 
       /**
-       * @brief name "blendEquationAlpha", type INTEGER
-       * @note The default value is BlendEquation::ADD
+       * @brief Name "blendEquationAlpha", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendEquation::ADD.
        */
       BLEND_EQUATION_ALPHA,
 
       /**
-       * @brief name "blendFactorSrcRgb", type INTEGER
-       * @note The default value is BlendFactor::SRC_ALPHA
+       * @brief Name "blendFactorSrcRgb", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendFactor::SRC_ALPHA.
        */
       BLEND_FACTOR_SRC_RGB,
 
       /**
-       * @brief name "blendFactorDestRgb", type INTEGER
-       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA
+       * @brief Name "blendFactorDestRgb", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA.
        */
       BLEND_FACTOR_DEST_RGB,
 
       /**
-       * @brief name "blendFactorSrcAlpha", type INTEGER
-       * @note The default value is BlendFactor::ONE
+       * @brief Name "blendFactorSrcAlpha", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendFactor::ONE.
        */
       BLEND_FACTOR_SRC_ALPHA,
 
       /**
-       * @brief name "blendFactorDestAlpha", type INTEGER
-       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA
+       * @brief Name "blendFactorDestAlpha", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is BlendFactor::ONE_MINUS_SRC_ALPHA.
        */
       BLEND_FACTOR_DEST_ALPHA,
 
       /**
-       * @brief name "blendColor", type VECTOR4
-       * @note The default value is Color::TRANSPARENT
+       * @brief Name "blendColor", type VECTOR4.
        * @SINCE_1_1.43
+       * @note The default value is Color::TRANSPARENT.
        */
       BLEND_COLOR,
 
       /**
-       * @brief name "blendPreMultipledAlpha", type BOOLEAN
-       * @note The default value is false
+       * @brief Name "blendPreMultipledAlpha", type BOOLEAN.
        * @SINCE_1_1.43
+       * @note The default value is false.
        */
       BLEND_PRE_MULTIPLIED_ALPHA,
 
       /**
-       * @brief name "indexRangeFirst", type INTEGER
-       * @note The default value is 0
+       * @brief Name "indexRangeFirst", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is 0.
        */
       INDEX_RANGE_FIRST,
 
       /**
-       * @brief name "indexRangeCount", type INTEGER
-       * @note The default (0) means that whole range of indices will be used
+       * @brief Name "indexRangeCount", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default (0) means that whole range of indices will be used.
        */
       INDEX_RANGE_COUNT,
 
       /**
-       * @brief name "depthWriteMode", type INTEGER
-       * @see DepthWriteMode
-       * @note The default value is DepthWriteMode::AUTO
+       * @brief Name "depthWriteMode", type INTEGER.
        * @SINCE_1_1.43
+       * @see DepthWriteMode
+       * @note The default value is DepthWriteMode::AUTO.
        */
       DEPTH_WRITE_MODE,
 
       /**
-       * @brief name "depthFunction", type INTEGER
-       * @see DepthFunction
-       * @note The default value is DepthFunction::LESS
+       * @brief Name "depthFunction", type INTEGER.
        * @SINCE_1_1.43
+       * @see DepthFunction
+       * @note The default value is DepthFunction::LESS.
        */
       DEPTH_FUNCTION,
 
       /**
-       * @brief name "depthTestMode", type INTEGER
-       * @see DepthTestMode
-       * @note The default value is DepthTestMode::AUTO
+       * @brief Name "depthTestMode", type INTEGER.
        * @SINCE_1_1.43
+       * @see DepthTestMode
+       * @note The default value is DepthTestMode::AUTO.
        */
       DEPTH_TEST_MODE,
 
       /**
-       * @brief name "renderMode", type INTEGER
-       * @see RenderMode
-       * @note The default value is RenderMode::AUTO
+       * @brief Name "renderMode", type INTEGER.
        * @SINCE_1_2_5
+       * @see RenderMode
+       * @note The default value is RenderMode::AUTO.
        */
       RENDER_MODE,
 
       /**
-       * @brief name "stencilFunction", type INTEGER
-       * @see StencilFunction
-       * @note The default value is StencilFunction::ALWAYS
+       * @brief Name "stencilFunction", type INTEGER.
        * @SINCE_1_1.43
+       * @see StencilFunction
+       * @note The default value is StencilFunction::ALWAYS.
        */
       STENCIL_FUNCTION,
 
       /**
-       * @brief name "stencilFunctionMask", type INTEGER
-       * @note The default value is 0xFF
+       * @brief Name "stencilFunctionMask", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is 0xFF.
        */
       STENCIL_FUNCTION_MASK,
 
       /**
-       * @brief name "stencilFunctionReference", type INTEGER
-       * @note The default value is 0
+       * @brief Name "stencilFunctionReference", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is 0.
        */
       STENCIL_FUNCTION_REFERENCE,
 
       /**
-       * @brief name "stencilMask", type INTEGER
-       * @note The default value is 0xFF
+       * @brief Name "stencilMask", type INTEGER.
        * @SINCE_1_1.43
+       * @note The default value is 0xFF.
        */
       STENCIL_MASK,
 
       /**
-       * @brief name "stencilOperationOnFail", type INTEGER
+       * @brief Name "stencilOperationOnFail", type INTEGER.
+       * @SINCE_1_1.43
        * @see StencilOperation
        * @note The default value is StencilOperation::KEEP
-       * @SINCE_1_1.43
        */
       STENCIL_OPERATION_ON_FAIL,
 
       /**
-       * @brief name "stencilOperationOnZFail", type INTEGER
-       * @see StencilOperation
-       * @note The default value is StencilOperation::KEEP
+       * @brief Name "stencilOperationOnZFail", type INTEGER.
        * @SINCE_1_1.43
+       * @see StencilOperation
+       * @note The default value is StencilOperation::KEEP.
        */
       STENCIL_OPERATION_ON_Z_FAIL,
 
       /**
-       * @brief name "stencilOperationOnZPass", type INTEGER
-       * @see StencilOperation
-       * @note The default value is StencilOperation::KEEP
+       * @brief Name "stencilOperationOnZPass", type INTEGER.
        * @SINCE_1_1.43
+       * @see StencilOperation
+       * @note The default value is StencilOperation::KEEP.
        */
       STENCIL_OPERATION_ON_Z_PASS,
     };
   };
 
   /**
-   * @brief Creates a new Renderer object
+   * @brief Creates a new Renderer object.
    *
    * @SINCE_1_1.43
    * @param[in] geometry Geometry to be used by this renderer
@@ -440,14 +440,14 @@ public:
   Renderer();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~Renderer();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -455,8 +455,8 @@ public:
   Renderer( const Renderer& handle );
 
   /**
-   * @brief Downcast to a renderer handle.
-   * If not a renderer the returned renderer handle is left uninitialized.
+   * @brief Downcasts to a renderer handle.
+   * If not, a renderer the returned renderer handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -465,7 +465,7 @@ public:
   static Renderer DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -474,7 +474,7 @@ public:
   Renderer& operator=( const Renderer& handle );
 
   /**
-   * @brief Sets the geometry to be used by this renderer
+   * @brief Sets the geometry to be used by this renderer.
    *
    * @SINCE_1_1.43
    * @param[in] geometry The geometry to be used by this renderer
@@ -482,7 +482,7 @@ public:
   void SetGeometry( Geometry& geometry );
 
   /**
-   * @brief Gets the geometry used by this renderer
+   * @brief Gets the geometry used by this renderer.
    *
    * @SINCE_1_1.43
    * @return The geometry used by the renderer
@@ -490,7 +490,7 @@ public:
   Geometry GetGeometry() const;
 
   /**
-   * @brief Sets effective range of indices to draw from bound index buffer
+   * @brief Sets effective range of indices to draw from bound index buffer.
    *
    * @SINCE_1_1.43
    * @param[in] firstElement The First element to draw
@@ -503,7 +503,7 @@ public:
   }
 
   /**
-   * @brief Sets the texture set to be used by this renderer
+   * @brief Sets the texture set to be used by this renderer.
    *
    * @SINCE_1_1.43
    * @param[in] textureSet The texture set to be used by this renderer
@@ -511,7 +511,7 @@ public:
   void SetTextures( TextureSet& textureSet );
 
   /**
-   * @brief Gets the texture set used by this renderer
+   * @brief Gets the texture set used by this renderer.
    *
    * @SINCE_1_1.43
    * @return The texture set used by the renderer
@@ -519,7 +519,7 @@ public:
   TextureSet GetTextures() const;
 
   /**
-   * @brief Set the shader used by this renderer
+   * @brief Sets the shader used by this renderer.
    *
    * @SINCE_1_1.43
    * @param[in] shader The shader to be used by this renderer
@@ -527,7 +527,7 @@ public:
   void SetShader( Shader& shader );
 
   /**
-   * @brief Get the shader used by this renderer
+   * @brief Gets the shader used by this renderer.
    *
    * @SINCE_1_1.43
    * @return The shader used by the renderer

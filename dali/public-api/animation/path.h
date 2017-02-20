@@ -35,9 +35,9 @@ class Path;
 }
 
 /**
- * @brief A 3D parametric curve
+ * @brief A 3D parametric curve.
  *
- * Paths can be used to animate position and orientation of actors using Dali::Animate()
+ * Paths can be used to animate position and orientation of actors using Dali::Animate().
  *
  * @SINCE_1_0.0
  */
@@ -46,13 +46,13 @@ class DALI_IMPORT_API Path : public Handle
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the Path class.
+   * @brief Enumeration for the instance of properties belonging to the Path class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Path class.
+     * @brief Enumeration for the instance of properties belonging to the Path class.
      * @SINCE_1_0.0
      */
     enum
@@ -63,18 +63,18 @@ public:
   };
 
   /**
-   * @brief Create an initialized Path handle.
+   * @brief Creates an initialized Path handle.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static Path New();
 
   /**
-   * @brief Downcast a handle to Path handle.
+   * @brief Downcasts a handle to Path handle.
    *
-   * If handle points to a Path object the downcast produces
-   * valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a Path object, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a Path object or an uninitialized handle
@@ -82,7 +82,7 @@ public:
   static Path DownCast( BaseHandle handle );
 
   /**
-   * @brief Create an uninitialized Path handle.
+   * @brief Creates an uninitialized Path handle.
    *
    * This can be initialized with Path::New().
    * Calling member functions with an uninitialized Path handle is not allowed.
@@ -91,7 +91,7 @@ public:
   Path();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -102,7 +102,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   Path(const Path& handle);
 
@@ -110,13 +110,13 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   Path& operator=(const Path& rhs);
 
   /**
-   * @brief Add an interpolation point.
+   * @brief Adds an interpolation point.
    *
    * @SINCE_1_0.0
    * @param[in] point The new interpolation point to be added
@@ -124,7 +124,7 @@ public:
   void AddPoint(const Vector3& point );
 
   /**
-   * @brief Add a control point.
+   * @brief Adds a control point.
    *
    * @SINCE_1_0.0
    * @param[in] point The new control point to be added
@@ -145,19 +145,19 @@ public:
    *                      negative values means the spline contains loops, positive values up to
    *                      0.5 result in a smooth curve, positive values between 0.5 and 1 result
    *                      in looped curves where the loops are not distinct (i.e. the curve appears
-   *                      to be non-continuous), positive values higher than 1 result in looped curves.
+   *                      to be non-continuous), positive values higher than 1 result in looped curves
    * @pre There are at least two points in the path ( one segment ).
    *
    */
   void GenerateControlPoints( float curvature );
 
   /**
-   * @brief Sample path at a given progress. Calculates position and tangent at that point of the curve
+   * @brief Sample path at a given progress. Calculates position and tangent at that point of the curve.
    *
    * @SINCE_1_0.0
-   * @param[in]  progress  A floating point value between 0.0 and 1.0.
-   * @param[out] position The interpolated position at that progress.
-   * @param[out] tangent The interpolated tangent at that progress.
+   * @param[in] progress A floating point value between 0.0 and 1.0
+   * @param[out] position The interpolated position at that progress
+   * @param[out] tangent The interpolated tangent at that progress
    */
   void Sample( float progress, Vector3& position, Vector3& tangent ) const;
 
@@ -165,8 +165,8 @@ public:
    * @brief Accessor for the interpolation points.
    *
    * @SINCE_1_0.0
-   * @param[in] index The index of the interpolation point.
-   * @return A reference to the interpolation point.
+   * @param[in] index The index of the interpolation point
+   * @return A reference to the interpolation point
    */
   Vector3& GetPoint( size_t index );
 
@@ -174,13 +174,13 @@ public:
    * @brief Accessor for the control points.
    *
    * @SINCE_1_0.0
-   * @param[in] index The index of the control point.
-   * @return A reference to the control point.
+   * @param[in] index The index of the control point
+   * @return A reference to the control point
    */
   Vector3& GetControlPoint( size_t index );
 
   /**
-   * @brief Get the number of interpolation points in the path
+   * @brief Gets the number of interpolation points in the path.
    *
    * @SINCE_1_0.0
    * @return The number of interpolation points in the path

@@ -44,7 +44,7 @@ class DALI_IMPORT_API Geometry : public BaseHandle
 public:
 
   /**
-   * @brief Describes the type of geometry, used to determine how the coordinates will be used.
+   * @brief Enumeration for the description of the type of geometry, used to determine how the coordinates will be used.
    * @SINCE_1_1.45
    */
   enum Type
@@ -60,7 +60,7 @@ public:
 
 
   /**
-   * @brief Creates a new Geometry object
+   * @brief Creates a new Geometry object.
    *
    * @SINCE_1_1.43
    * @return A handle to a newly allocated Geometry object
@@ -68,21 +68,21 @@ public:
   static Geometry New();
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   Geometry();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~Geometry();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -90,17 +90,17 @@ public:
   Geometry( const Geometry& handle );
 
   /**
-   * @brief Downcast to a geometry.
-   * If not the returned handle is left uninitialized.
+   * @brief Downcasts to a geometry.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
-   * @return geometry Handle or an uninitialized handle
+   * @return Geometry handle or an uninitialized handle
    */
   static Geometry DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -109,7 +109,7 @@ public:
   Geometry& operator=( const Geometry& handle );
 
   /**
-   * @brief Add a PropertyBuffer to be used as source of geometry vertices
+   * @brief Adds a PropertyBuffer to be used as source of geometry vertices.
    *
    * @SINCE_1_1.43
    * @param[in] vertexBuffer PropertyBuffer to be used as source of geometry vertices
@@ -119,7 +119,7 @@ public:
   std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
 
   /**
-   * @brief Retrieve the number of vertex buffers that have been added to this geometry
+   * @brief Retrieves the number of vertex buffers that have been added to this geometry.
    *
    * @SINCE_1_1.43
    * @return Number of vertex buffers that have been added to this geometry
@@ -127,8 +127,8 @@ public:
   std::size_t GetNumberOfVertexBuffers() const;
 
   /**
-   * @brief Remove a vertex buffer
-   * The index must be between 0 and GetNumberOfVertexBuffers()
+   * @brief Removes a vertex buffer.
+   * The index must be between 0 and GetNumberOfVertexBuffers().
    *
    * @SINCE_1_1.43
    * @param[in] index Index to the vertex buffer to remove
@@ -136,9 +136,9 @@ public:
   void RemoveVertexBuffer( std::size_t index );
 
   /**
-   * @brief Set a the index data to be used as a source of indices for the geometry
+   * @brief Sets a the index data to be used as a source of indices for the geometry
    * Setting this buffer will cause the geometry to be rendered using indices.
-   * To unset call SetIndexBuffer with a null pointer or count 0
+   * To unset call SetIndexBuffer with a null pointer or count 0.
    *
    * @SINCE_1_1.43
    * @param[in] indices Array of indices
@@ -147,7 +147,7 @@ public:
   void SetIndexBuffer( const unsigned short* indices, size_t count );
 
   /**
-   * @brief Set the type of primitives this geometry contains
+   * @brief Sets the type of primitives this geometry contains.
    *
    * @SINCE_1_1.43
    * @param[in] geometryType Type of primitives this geometry contains
@@ -155,8 +155,8 @@ public:
   void SetType( Type geometryType );
 
   /**
-   * @brief Get the type of primitives this geometry contains
-   * Calling this function sets the property GEOMETRY_TYPE
+   * @brief Gets the type of primitives this geometry contains.
+   * Calling this function sets the property GEOMETRY_TYPE.
    *
    * @SINCE_1_1.43
    * @return Type of primitives this geometry contains
@@ -166,7 +166,7 @@ public:
 public:
 
   /**
-   * @brief The constructor
+   * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Geometry
