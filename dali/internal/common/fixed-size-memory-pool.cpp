@@ -42,7 +42,9 @@ struct FixedSizeMemoryPool::Impl
   {
     void* blockMemory;      ///< The allocated memory from which allocations can be made
     Block* nextBlock;       ///< The next block in the linked list
-
+#ifdef DEBUG_ENABLED
+    SizeType mBlockSize; ///< Size of the block in bytes
+#endif
     /**
      * @brief Construct a new block with given size
      *
@@ -50,6 +52,9 @@ struct FixedSizeMemoryPool::Impl
      */
     Block( SizeType size )
     : nextBlock( NULL )
+#ifdef DEBUG_ENABLED
+      ,mBlockSize( size )
+#endif
     {
       blockMemory = ::operator new( size );
       DALI_ASSERT_ALWAYS( blockMemory && "Out of memory" );
@@ -124,6 +129,31 @@ struct FixedSizeMemoryPool::Impl
 
     mCurrentBlockSize = 0;
   }
+#ifdef DEBUG_ENABLED
+
+  /**
+   * @brief check the memory being free'd exists inside the memory pool
+   * @param[in] memory address of object to remove
+   */
+  void CheckMemoryIsInsidePool( const void* const memory )
+  {
+    bool inRange = false;
+    const Block* block = &mMemoryBlocks;
+
+    while( block )
+    {
+      const void* const endOfBlock = reinterpret_cast<char *>( block->blockMemory )+ block->mBlockSize;
+
+      if( ( memory >= block->blockMemory ) && ( memory < (endOfBlock) ) )
+      {
+        inRange = true;
+        break;
+      }
+      block = block->nextBlock;
+    }
+    DALI_ASSERT_DEBUG( inRange && "Freeing memory that does not exist in memory pool" );
+  }
+#endif
 
   Mutex mMutex;                       ///< Mutex for thread-safe allocation and deallocation
 
@@ -175,6 +205,10 @@ void* FixedSizeMemoryPool::Allocate()
 
 void FixedSizeMemoryPool::Free( void* memory )
 {
+#ifdef DEBUG_ENABLED
+  mImpl->CheckMemoryIsInsidePool( memory );
+#endif
+
   // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
   *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
   mImpl->mDeletedObjects = memory;
