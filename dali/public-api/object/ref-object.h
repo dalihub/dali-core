@@ -43,13 +43,13 @@ class DALI_IMPORT_API RefObject
 public:
 
   /**
-   * @brief Increment the object's reference count.
+   * @brief Increments the object's reference count.
    * @SINCE_1_0.0
    */
   void Reference();
 
   /**
-   * @brief Decrement the object's reference count.
+   * @brief Decrements the object's reference count.
    *
    * When the reference count drops to zero, the object will self-destruct.
    * @SINCE_1_0.0
@@ -57,7 +57,7 @@ public:
   void Unreference();
 
   /**
-   * @brief Retrieve the object's reference count.
+   * @brief Retrieves the object's reference count.
    *
    * @SINCE_1_0.0
    * @return The reference count
@@ -95,7 +95,7 @@ protected:
    * The newly copied object will have a reference count of zero.
    * @SINCE_1_0.0
    * @param[in] rhs The object to copy
-   * @return a reference to this
+   * @return A reference to this
    */
   RefObject& operator=(const RefObject& rhs);
 

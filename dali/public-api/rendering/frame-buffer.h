@@ -31,7 +31,7 @@ class FrameBuffer;
 }
 
 /**
- * @brief FrameBuffer is a collection of textures that can be used as the destination for rendering
+ * @brief FrameBuffer is a collection of textures that can be used as the destination for rendering.
  * @SINCE_1_1.43
  */
 class DALI_IMPORT_API FrameBuffer : public BaseHandle
@@ -48,7 +48,7 @@ public:
   struct Attachment
   {
     /**
-     * @brief The bit-mask value
+     * @brief Enumeration for the bit-mask value.
      * @SINCE_1_1.45
      */
     enum Mask
@@ -64,29 +64,29 @@ public:
   };
 
   /**
-   * @brief Creates a new FrameBuffer object
+   * @brief Creates a new FrameBuffer object.
    *
    * @SINCE_1_1.43
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
-   * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd).
+   * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd)
    * @return A handle to a newly allocated FrameBuffer
    */
   static FrameBuffer New( unsigned int width, unsigned int height, unsigned int attachments );
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    */
   FrameBuffer();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    * @SINCE_1_1.43
    */
   ~FrameBuffer();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -94,17 +94,16 @@ public:
   FrameBuffer( const FrameBuffer& handle );
 
   /**
-   * @brief Downcast to a FrameBuffer.
-   *
+   * @brief Downcasts to a FrameBuffer.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_1.43
-   * If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
    * @return FrameBuffer handle or an uninitialized handle
    */
   static FrameBuffer DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -119,7 +118,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
    * @note The texture has to have the same size than the FrameBuffer
-   * otherwise it won't be attached
+   * otherwise it won't be attached.
    */
   void AttachColorTexture( Texture& texture );
 
@@ -132,12 +131,12 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    * @note The specified texture mipmap has to have the same size than the FrameBuffer
-   * otherwise it won't be attached
+   * otherwise it won't be attached.
    */
   void AttachColorTexture( Texture& texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
-   * @brief Get the color texture used as output in the FrameBuffer
+   * @brief Gets the color texture used as output in the FrameBuffer.
    *
    * @SINCE_1_1.43
    * @returns A handle to the texture used as color output, or an uninitialized handle

@@ -50,7 +50,7 @@ typedef Dali::Uint16Pair ImageDimensions;
 namespace FittingMode
 {
   /**
-   * @brief The type of FittingMode
+   * @brief Enumeration for FittingMode type.
    * @SINCE_1_0.0
    */
   enum Type
@@ -89,7 +89,7 @@ namespace FittingMode
 namespace SamplingMode
 {
   /**
-   * @brief The type of SamplingMode
+   * @brief Enumeration for SamplingMode type.
    * @SINCE_1_0.0
    */
   enum Type

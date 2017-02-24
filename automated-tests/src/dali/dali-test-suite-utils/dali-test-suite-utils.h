@@ -20,10 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <cstdarg>
+#include <cstdio>
 #include <iostream>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
+#include <test-compare-types.h>
 
 void tet_infoline(const char*str);
 void tet_printf(const char *format, ...);
@@ -73,176 +76,6 @@ else                                                                            
   throw("TET_FAIL");                                                                      \
 }
 
-template <typename Type>
-inline bool CompareType(Type value1, Type value2, float epsilon);
-
-/**
- * A helper for fuzzy-comparing Vector2 objects
- * @param[in] vector1 the first object
- * @param[in] vector2 the second object
- * @param[in] epsilon difference threshold
- * @returns true if difference is smaller than epsilon threshold, false otherwise
- */
-template <>
-inline bool CompareType<float>(float value1, float value2, float epsilon)
-{
-  return fabsf(value1 - value2) < epsilon;
-}
-
-/**
- * A helper for fuzzy-comparing Vector2 objects
- * @param[in] vector1 the first object
- * @param[in] vector2 the second object
- * @param[in] epsilon difference threshold
- * @returns true if difference is smaller than epsilon threshold, false otherwise
- */
-template <>
-inline bool CompareType<Vector2>(Vector2 vector1, Vector2 vector2, float epsilon)
-{
-  return fabsf(vector1.x - vector2.x)<epsilon && fabsf(vector1.y - vector2.y)<epsilon;
-}
-
-/**
- * A helper for fuzzy-comparing Vector3 objects
- * @param[in] vector1 the first object
- * @param[in] vector2 the second object
- * @param[in] epsilon difference threshold
- * @returns true if difference is smaller than epsilon threshold, false otherwise
- */
-template <>
-inline bool CompareType<Vector3>(Vector3 vector1, Vector3 vector2, float epsilon)
-{
-  return fabsf(vector1.x - vector2.x)<epsilon &&
-         fabsf(vector1.y - vector2.y)<epsilon &&
-         fabsf(vector1.z - vector2.z)<epsilon;
-}
-
-
-/**
- * A helper for fuzzy-comparing Vector4 objects
- * @param[in] vector1 the first object
- * @param[in] vector2 the second object
- * @param[in] epsilon difference threshold
- * @returns true if difference is smaller than epsilon threshold, false otherwise
- */
-template <>
-inline bool CompareType<Vector4>(Vector4 vector1, Vector4 vector2, float epsilon)
-{
-  return fabsf(vector1.x - vector2.x)<epsilon &&
-         fabsf(vector1.y - vector2.y)<epsilon &&
-         fabsf(vector1.z - vector2.z)<epsilon &&
-         fabsf(vector1.w - vector2.w)<epsilon;
-}
-
-template <>
-inline bool CompareType<Quaternion>(Quaternion q1, Quaternion q2, float epsilon)
-{
-  Quaternion q2N = -q2; // These quaternions represent the same rotation
-  return CompareType<Vector4>(q1.mVector, q2.mVector, epsilon) || CompareType<Vector4>(q1.mVector, q2N.mVector, epsilon);
-}
-
-template <>
-inline bool CompareType<Radian>(Radian q1, Radian q2, float epsilon)
-{
-  return CompareType<float>(q1.radian, q2.radian, epsilon);
-}
-
-template <>
-inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
-{
-  return CompareType<float>(q1.degree, q2.degree, epsilon);
-}
-
-template <>
-inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2, float epsilon)
-{
-  Property::Type type = q1.GetType();
-  if( type != q2.GetType() )
-  {
-    return false;
-  }
-
-  bool result = false;
-  switch(type)
-  {
-    case Property::BOOLEAN:
-    {
-      bool a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result =  a == b;
-      break;
-    }
-    case Property::INTEGER:
-    {
-      int a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result =  a == b;
-      break;
-    }
-    case Property::FLOAT:
-    {
-      float a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result =  CompareType<float>(a, b, epsilon);
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      Vector2 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector2>(a, b, epsilon);
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      Vector3 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector3>(a, b, epsilon);
-      break;
-    }
-    case Property::RECTANGLE:
-    case Property::VECTOR4:
-    {
-      Vector4 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector4>(a, b, epsilon);
-      break;
-    }
-    case Property::ROTATION:
-    {
-      Quaternion a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Quaternion>(a, b, epsilon);
-      break;
-    }
-    case Property::MATRIX:
-    case Property::MATRIX3:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      //TODO: Implement this?
-      DALI_ASSERT_ALWAYS( 0 && "Not implemented");
-      result = false;
-      break;
-    }
-    case Property::NONE:
-    {
-      result = false;
-      break;
-    }
-  }
-
-  return result;
-}
-
 
 bool operator==(TimePeriod a, TimePeriod b);
 std::ostream& operator<<( std::ostream& ostream, TimePeriod value );
@@ -258,7 +91,7 @@ std::ostream& operator<<( std::ostream& ostream, Degree angle );
 template<typename Type>
 inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
 {
-  if (!(value1 == value2))
+  if( !CompareType<Type>(value1, value2, 0.01f) )
   {
     std::ostringstream o;
     o << value1 << " == " << value2 << std::endl;
@@ -513,6 +346,7 @@ struct DefaultFunctionCoverage
 // Helper to Create buffer image
 BufferImage CreateBufferImage();
 BufferImage CreateBufferImage(int width, int height, const Vector4& color);
+
 
 // Prepare a resource image to be loaded. Should be called before creating the ResourceImage
 void PrepareResourceImage( TestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat );

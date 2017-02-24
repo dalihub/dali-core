@@ -71,8 +71,8 @@ public:
    * @brief Called when a signal is connected.
    *
    * @SINCE_1_0.0
-   * @param[in] slotObserver The slot observer i.e. a signal. Ownership is not passed.
-   * @param[in] callback The call back. Ownership is not passed.
+   * @param[in] slotObserver The slot observer i.e. a signal. Ownership is not passed
+   * @param[in] callback The call back. Ownership is not passed
    */
   virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
 

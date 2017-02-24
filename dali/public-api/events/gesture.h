@@ -69,7 +69,7 @@ struct DALI_IMPORT_API Gesture
   virtual ~Gesture();
 
   /**
-   * @brief Type of gesture.
+   * @brief Enumeration for type of gesture.
    * @SINCE_1_0.0
    */
   enum Type
@@ -81,7 +81,7 @@ struct DALI_IMPORT_API Gesture
   };
 
   /**
-   * @brief State of the gesture.
+   * @brief Enumeration for state of the gesture.
    * @SINCE_1_0.0
    */
   enum State

@@ -45,7 +45,7 @@ struct Radian;
 struct AngleAxis
 {
   /**
-   * @brief Create an angle-axis pair.
+   * @brief Creates an angle-axis pair.
    * @SINCE_1_0.0
    */
   AngleAxis()
@@ -54,11 +54,11 @@ struct AngleAxis
   { }
 
   /**
-   * @brief Create an angle-axis pair.
+   * @brief Creates an angle-axis pair.
    *
    * @SINCE_1_0.0
-   * @param[in] initialAngle The initial angle in radians.
-   * @param[in] initialAxis The initial axis.
+   * @param[in] initialAngle The initial angle in radians
+   * @param[in] initialAxis The initial axis
    */
   AngleAxis( Radian initialAngle, const Vector3& initialAxis )
   : angle( initialAngle ),
@@ -73,7 +73,7 @@ struct AngleAxis
 // Compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 /**
- * @brief Compare two angle axis for equality
+ * @brief Compares two angle axis for equality.
  *
  * @SINCE_1_0.0
  * @param lhs angle axis
@@ -86,12 +86,12 @@ inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
 }
 
 /**
- * @brief Print an angle axis
+ * @brief Prints an angle axis.
  *
  * @SINCE_1_1.33
- * @param [in] o The output stream operator.
- * @param [in] angleAxis The angle axis to print
- * @return The output stream operator.
+ * @param[in] o The output stream operator
+ * @param[in] angleAxis The angle axis to print
+ * @return The output stream operator
  */
 inline std::ostream& operator<< (std::ostream& o, const Dali::AngleAxis& angleAxis)
 {

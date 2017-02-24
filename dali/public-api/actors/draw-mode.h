@@ -31,7 +31,7 @@ namespace DrawMode
 {
 
 /**
- * @brief How the actor and it's children will be drawn.
+ * @brief Enumeration for the instance of how the actor and it's children will be drawn.
  *
  * @SINCE_1_0.0
  * @see Dali::Actor::SetDrawMode()

@@ -46,20 +46,20 @@ namespace PropertyTypes
 {
 
 /**
- * @brief Retrieve the name of a property type.
+ * @brief Retrieves the name of a property type.
  *
  * @SINCE_1_0.0
- * @param [in] type The property type.
- * @return The name of this type.
+ * @param[in] type The property type
+ * @return The name of this type
  */
 DALI_IMPORT_API const char* GetName(Property::Type type);
 
 /**
- * @brief Retrieve an enumerated property type.
+ * @brief Retrieves an enumerated property type.
  *
  * New versions of this templated function must be defined for future types.
  * @SINCE_1_0.0
- * @return The property type.
+ * @return The property type
  */
 template <typename T>
 inline Property::Type Get()                   { return Property::NONE;  }

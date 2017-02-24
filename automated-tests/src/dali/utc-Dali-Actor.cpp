@@ -1991,6 +1991,14 @@ int UtcDaliActorSetColorIndividual(void)
 
   DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
 
+  actor.SetProperty( DevelActor::Property::OPACITY, 0.2f );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0.2f, actor.GetCurrentColor().a, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -2779,6 +2787,41 @@ int UtcDaliActorConstrainedToOrientation(void)
   END_TEST;
 }
 
+int UtcDaliActorConstrainedToOpacity(void)
+{
+  TestApplication app;
+  tet_infoline(" UtcDaliActorConstrainedToOpacity");
+
+  Actor parent = Actor::New();
+  parent.SetOpacity( 0.7f );
+  Stage::GetCurrent().Add( parent );
+
+  Actor child = Actor::New();
+  Constraint opacityConstraint = Constraint::New<float>( child, DevelActor::Property::OPACITY, EqualToConstraint() );
+  opacityConstraint.AddSource( Source( parent, DevelActor::Property::OPACITY ) );
+  opacityConstraint.Apply();
+
+  Stage::GetCurrent().Add( child );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+
+  parent.SetOpacity( 0.3f );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliActorUnparent(void)
 {
   TestApplication app;
@@ -2935,6 +2978,7 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
+  { "opacity",                  DevelActor::Property::OPACITY,             Property::FLOAT       },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace

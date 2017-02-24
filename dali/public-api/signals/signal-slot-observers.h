@@ -57,8 +57,8 @@ public:
    * @brief This method is called when the signal is disconnecting.
    *
    * @SINCE_1_0.0
-   * @param[in] slotObserver The signal that has disconnected.
-   * @param[in] callback The callback attached to the signal disconnected.
+   * @param[in] slotObserver The signal that has disconnected
+   * @param[in] callback The callback attached to the signal disconnected
    */
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
 };
@@ -89,7 +89,7 @@ public:
    * @brief This method is called when the slot is disconnecting.
    *
    * @SINCE_1_0.0
-   * @param[in] callback The callback attached to the signal disconnected.
+   * @param[in] callback The callback attached to the signal disconnected
    */
   virtual void SlotDisconnected( CallbackBase* callback ) = 0;
 };
