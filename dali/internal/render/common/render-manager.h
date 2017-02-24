@@ -21,8 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 #include <dali/internal/common/shader-saver.h>
-#include <dali/internal/update/resources/resource-manager-declarations.h>
-#include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -52,13 +50,12 @@ class Renderer;
 struct Sampler;
 class RenderTracker;
 class Geometry;
-class NewTexture;
+class Texture;
 }
 
 namespace SceneGraph
 {
 class RenderQueue;
-class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
@@ -68,7 +65,7 @@ class PropertyBufferDataProvider;
  * RenderManager is responsible for rendering the result of the previous "update", which
  * is provided in a RenderCommand during UpdateManager::Update().
  */
-class RenderManager : public TextureUploadedDispatcher
+class RenderManager
 {
 public:
 
@@ -79,8 +76,7 @@ public:
    * @param[out] resourcePostProcessQueue A queue for sending rendered texture ids to the update-thread.*
    */
   static RenderManager* New( Integration::GlAbstraction& glAbstraction,
-                             Integration::GlSyncAbstraction& glSyncAbstraction,
-                             LockedResourceQueue& resourcePostProcessQueue );
+                             Integration::GlSyncAbstraction& glSyncAbstraction );
 
   /**
    * Non-virtual destructor; not intended as a base class
@@ -94,13 +90,6 @@ public:
   RenderQueue& GetRenderQueue();
 
   /**
-   * Retrieve the texture cache. Messages should only be sent to this from the update thread,
-   * accessor methods should only be used from the render thread.
-   * @return The texture cache
-   */
-  TextureCache& GetTextureCache();
-
-  /**
    * @copydoc Dali::Integration::Core::ContextCreated()
    */
   void ContextCreated();
@@ -109,12 +98,6 @@ public:
    * @copydoc Dali::Integration::Core::ContextToBeDestroyed()
    */
   void ContextDestroyed();
-
-  /**
-   * Dispatch requests onto the postProcessResourcesQueue
-   * @param[in] resource The Id of the resource to dispatch
-   */
-  virtual void DispatchTextureUploaded( ResourceId resource );
 
   /**
    * Set the upstream interface for compiled shader binaries to be sent back to for eventual
@@ -269,13 +252,13 @@ public:
    * Adds a texture to the render manager
    * @param[in] texture The texture to add
    */
-  void AddTexture( Render::NewTexture* texture );
+  void AddTexture( Render::Texture* texture );
 
   /**
    * Removes a texture from the render manager
    * @param[in] texture The texture to remove
    */
-  void RemoveTexture( Render::NewTexture* texture );
+  void RemoveTexture( Render::Texture* texture );
 
   /**
    * Uploads data to an existing texture
@@ -283,13 +266,13 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params );
+  void UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params );
 
   /**
    * Generates mipmaps for a given texture
    * @param[in] texture The texture
    */
-  void GenerateMipmaps( Render::NewTexture* texture );
+  void GenerateMipmaps( Render::Texture* texture );
 
   /**
    * Adds a framebuffer to the render manager
@@ -310,7 +293,7 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

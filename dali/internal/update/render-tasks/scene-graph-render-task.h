@@ -34,7 +34,6 @@ namespace Dali
 namespace Internal
 {
 class FrameBufferTexture;
-class ResourceManager;
 
 namespace Render
 {
@@ -76,9 +75,8 @@ public:
   /**
    * Initialize the render task. Called in update thread
    * @param[in] renderMessageDispatcher to send messages to render thread
-   * @param[in] resourceManager to check and update status of FBOs
    */
-  void Initialize( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager );
+  void Initialize( RenderMessageDispatcher& renderMessageDispatcher );
 
   /**
    * Set the nodes to be rendered.
@@ -372,7 +370,6 @@ public: // Animatable Properties
 
 private:
   RenderMessageDispatcher* mRenderMessageDispatcher;
-  ResourceManager* mResourceManager;
   Render::RenderTracker* mRenderSyncTracker;
   Node* mSourceNode;
   Node* mCameraNode;

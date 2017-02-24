@@ -41,13 +41,11 @@ namespace Render
  * Process a render-instruction.
  * @param[in] instruction The render-instruction to process.
  * @param[in] context The GL context.
- * @param[in] textureCache The texture cache used to get textures.
  * @param[in] defaultShader The default shader.
  * @param[in] bufferIndex The current render buffer index (previous update buffer)
  */
 void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                Context& context,
-                               SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex );
 

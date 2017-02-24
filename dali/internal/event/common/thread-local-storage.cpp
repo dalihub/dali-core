@@ -87,11 +87,6 @@ NotificationManager& ThreadLocalStorage::GetNotificationManager()
   return mCore->GetNotificationManager();
 }
 
-ResourceManager& ThreadLocalStorage::GetResourceManager()
-{
-  return mCore->GetResourceManager();
-}
-
 ShaderFactory& ThreadLocalStorage::GetShaderFactory()
 {
   return mCore->GetShaderFactory();

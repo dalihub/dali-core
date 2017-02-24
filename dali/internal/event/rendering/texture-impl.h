@@ -33,13 +33,13 @@ namespace Internal
 {
 namespace Render
 {
-class NewTexture;
+class Texture;
 }
 
-class NewTexture;
-typedef IntrusivePtr<NewTexture> NewTexturePtr;
+class Texture;
+typedef IntrusivePtr<Texture> TexturePtr;
 
-class NewTexture : public BaseObject
+class Texture : public BaseObject
 {
 public:
 
@@ -65,21 +65,21 @@ public:
    * @param[in] height The height of the texture
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static NewTexturePtr New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height);
+  static TexturePtr New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height);
 
   /**
    * @brief Creates a new Texture from a native image
    * @param[in] nativeImageInterface The native image
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static NewTexturePtr New( NativeImageInterface& nativeImageInterface );
+  static TexturePtr New( NativeImageInterface& nativeImageInterface );
 
   /**
    * @brief Get the texture render object
    *
    * @return the texture render object
    */
-  Render::NewTexture* GetRenderObject() const;
+  Render::Texture* GetRenderObject() const;
 
   /**
    * @copydoc Dali::Texture::Upload()
@@ -118,13 +118,13 @@ private: // implementation
    * @param[in] width The width of the texture
    * @param[in] height The height of the texture
    */
-  NewTexture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
+  Texture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
 
   /**
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  NewTexture( NativeImageInterfacePtr nativeImageInterface );
+  Texture( NativeImageInterfacePtr nativeImageInterface );
 
   /**
    * Second stage initialization of the Texture
@@ -136,16 +136,16 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~NewTexture();
+  virtual ~Texture();
 
 private: // unimplemented methods
-  NewTexture( const NewTexture& );
-  NewTexture& operator=( const NewTexture& );
+  Texture( const Texture& );
+  Texture& operator=( const Texture& );
 
 private: // data
 
   Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Internal::Render::NewTexture* mRenderObject;            ///<The Render::Texture associated to this texture
+  Internal::Render::Texture* mRenderObject;            ///<The Render::Texture associated to this texture
 
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   Dali::TextureType::Type mType;      ///< Texture type (cached)
@@ -157,22 +157,22 @@ private: // data
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::NewTexture& GetImplementation(Dali::Texture& handle)
+inline Internal::Texture& GetImplementation(Dali::Texture& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Texture handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::NewTexture&>(object);
+  return static_cast<Internal::Texture&>(object);
 }
 
-inline const Internal::NewTexture& GetImplementation(const Dali::Texture& handle)
+inline const Internal::Texture& GetImplementation(const Dali::Texture& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Texture handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::NewTexture&>(object);
+  return static_cast<const Internal::Texture&>(object);
 }
 
 } // namespace Dali

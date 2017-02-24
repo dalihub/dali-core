@@ -39,18 +39,6 @@ static const char* gTestImageFilename = "icon_wrt.png";
 
 namespace
 {
-void LoadBitmapResource(TestPlatformAbstraction& platform)
-{
-  Integration::ResourceRequest* request = platform.GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-}
 
 }
 
@@ -126,8 +114,6 @@ int UtcDaliImageDiscard01(void)
     std::vector<GLuint> ids;
     ids.push_back( 23 );
     application.GetGlAbstraction().SetNextTextureIds( ids );
-    TestPlatformAbstraction& platform = application.GetPlatform();
-    LoadBitmapResource( platform );
     application.Render(16);
     application.SendNotification();
   } // Drop image handle

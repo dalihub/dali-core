@@ -28,13 +28,13 @@ namespace Dali
 
 Texture Texture::New( TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
 {
-  Internal::NewTexturePtr texture = Internal::NewTexture::New(type, format, width, height );
+  Internal::TexturePtr texture = Internal::Texture::New(type, format, width, height );
   return Texture( texture.Get() );
 }
 
 Texture Texture::New( NativeImageInterface& nativeImageInterface )
 {
-  Internal::NewTexturePtr texture = Internal::NewTexture::New( nativeImageInterface );
+  Internal::TexturePtr texture = Internal::Texture::New( nativeImageInterface );
   return Texture( texture.Get() );
 }
 
@@ -53,7 +53,7 @@ Texture::Texture( const Texture& handle )
 
 Texture Texture::DownCast( BaseHandle handle )
 {
-  return Texture( dynamic_cast<Dali::Internal::NewTexture*>(handle.GetObjectPtr()));
+  return Texture( dynamic_cast<Dali::Internal::Texture*>(handle.GetObjectPtr()));
 }
 
 Texture& Texture::operator=( const Texture& handle )
@@ -92,7 +92,7 @@ unsigned int Texture::GetHeight() const
   return GetImplementation(*this).GetHeight();
 }
 
-Texture::Texture( Internal::NewTexture* pointer )
+Texture::Texture( Internal::Texture* pointer )
 : BaseHandle( pointer )
 {
 }

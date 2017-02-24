@@ -301,7 +301,6 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
 inline void ProcessRenderList(
   const RenderList& renderList,
   Context& context,
-  SceneGraph::TextureCache& textureCache,
   SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
   const Matrix& viewMatrix,
@@ -338,7 +337,6 @@ inline void ProcessRenderList(
 
     // Render the item
     item.mRenderer->Render( context,
-                            textureCache,
                             bufferIndex,
                             *item.mNode,
                             defaultShader,
@@ -353,7 +351,6 @@ inline void ProcessRenderList(
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
-                               SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex )
 {
@@ -379,7 +376,6 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       {
         ProcessRenderList( *renderList,
                            context,
-                           textureCache,
                            defaultShader,
                            bufferIndex,
                            *viewMatrix,

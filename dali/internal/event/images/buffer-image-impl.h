@@ -37,8 +37,6 @@ namespace Internal
 class BufferImage;
 typedef IntrusivePtr<BufferImage> BufferImagePtr;
 
-class ResourceManager;
-
 /**
  * BufferImage represents an image resource that can be added to actors etc.
  * Its pixel buffer data is provided by the application developer.

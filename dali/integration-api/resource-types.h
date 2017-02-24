@@ -45,9 +45,7 @@ namespace Integration
  */
 enum ResourceTypeId
 {
-  ResourceBitmap,
-  ResourceNativeImage,
-  ResourceTargetImage
+  ResourceBitmap
 };
 
 /**
@@ -135,101 +133,6 @@ private:
 
   // Undefined assignment operator.
   BitmapResourceType& operator=(const BitmapResourceType& rhs);
-};
-
-/**
- * NativeImageResourceType describes a native image resource, which can be injected
- * through ResourceManager::AddNativeImage() or requested through ResourceLoader::LoadResource().
- * If the adaptor does not support NativeImages, it can fall back to Bitmap type.
- */
-struct NativeImageResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  NativeImageResourceType()
-  : ResourceType(ResourceNativeImage) {}
-
-  /**
-   * Constructor.
-   * @param[in] dimensions Width and Height to allocate for image.
-   */
-  NativeImageResourceType( ImageDimensions dimensions )
-  : ResourceType(ResourceNativeImage),
-    imageDimensions(dimensions) {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~NativeImageResourceType() {}
-
- /**
-  * @copydoc ResourceType::Clone
-  */
-  virtual ResourceType* Clone() const
-  {
-    return new NativeImageResourceType(imageDimensions);
-  }
-
-  /**
-   * Attributes are copied from the request (if supplied).
-   */
-  ImageDimensions imageDimensions;
-
-private:
-
-  // Undefined copy constructor.
-  NativeImageResourceType(const NativeImageResourceType& typePath);
-
-  // Undefined assignment operator.
-  NativeImageResourceType& operator=(const NativeImageResourceType& rhs);
-};
-
-/**
- * RenderTargetResourceType describes a bitmap resource, which can injected
- * through ResourceManager::AddTargetImage()
- */
-struct RenderTargetResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  RenderTargetResourceType()
-  : ResourceType(ResourceTargetImage) {}
-
-  /**
-   * Constructor.
-   * @param[in] dims Width and Height to allocate for image.
-   */
-  RenderTargetResourceType( ImageDimensions dims )
-  : ResourceType(ResourceTargetImage),
-    imageDimensions(dims) {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~RenderTargetResourceType() {}
-
-  /**
-   * @copydoc ResourceType::Clone
-   */
-  virtual ResourceType* Clone() const
-  {
-    return new RenderTargetResourceType(imageDimensions);
-  }
-
-  /**
-   * Image size is copied from the request.
-   */
-  ImageDimensions imageDimensions;
-
-private:
-
-  // Undefined copy constructor.
-  RenderTargetResourceType(const RenderTargetResourceType& typePath);
-
-  // Undefined assignment operator.
-  RenderTargetResourceType& operator=(const RenderTargetResourceType& rhs);
 };
 
 } // namespace Integration

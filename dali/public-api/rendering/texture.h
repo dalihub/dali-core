@@ -29,7 +29,7 @@ namespace Dali
 
 namespace Internal DALI_INTERNAL
 {
-class NewTexture;
+class Texture;
 }
 
 namespace TextureType
@@ -197,7 +197,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Texture
    */
-  explicit DALI_INTERNAL Texture( Internal::NewTexture* pointer );
+  explicit DALI_INTERNAL Texture( Internal::Texture* pointer );
 };
 
 } //namespace Dali

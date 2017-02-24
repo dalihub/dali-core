@@ -45,7 +45,6 @@ namespace SceneGraph
 {
 class SceneController;
 class Shader;
-class TextureCache;
 class NodeDataProvider;
 }
 
@@ -164,9 +163,8 @@ public:
    * Second-phase construction.
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
-   * @param[in] textureCache The texture cache to use
    */
-  void Initialize( Context& context, SceneGraph::TextureCache& textureCache );
+  void Initialize( Context& context );
 
   /**
    * Destructor
@@ -345,7 +343,6 @@ public:
   /**
    * Called to render during RenderManager::Render().
    * @param[in] context The context used for rendering
-   * @param[in] textureCache The texture cache used to get textures
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using this renderer
    * @param[in] defaultShader in case there is no custom shader
@@ -356,7 +353,6 @@ public:
    * @param[in] blend If true, blending is enabled
    */
   void Render( Context& context,
-               SceneGraph::TextureCache& textureCache,
                BufferIndex bufferIndex,
                const SceneGraph::NodeDataProvider& node,
                SceneGraph::Shader& defaultShader,
@@ -412,18 +408,16 @@ private:
   /**
    * Bind the textures and setup the samplers
    * @param[in] context The GL context
-   * @param[in] textureCache The texture cache
    * @param[in] program The shader program
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures( Context& context, SceneGraph::TextureCache& textureCache, Program& program );
+  bool BindTextures( Context& context, Program& program );
 
 private:
 
   OwnerPointer< SceneGraph::RenderDataProvider > mRenderDataProvider;
 
   Context*                     mContext;
-  SceneGraph::TextureCache*    mTextureCache;
   Render::Geometry*            mGeometry;
 
   struct UniformIndexMap

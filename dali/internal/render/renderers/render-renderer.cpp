@@ -25,8 +25,6 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/gl-resources/gl-texture.h>
 
 namespace Dali
 {
@@ -135,7 +133,6 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     StencilParameters& stencilParameters )
 : mRenderDataProvider( dataProvider ),
   mContext( NULL),
-  mTextureCache( NULL ),
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
@@ -161,10 +158,9 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   }
 }
 
-void Renderer::Initialize( Context& context, SceneGraph::TextureCache& textureCache )
+void Renderer::Initialize( Context& context )
 {
   mContext = &context;
-  mTextureCache = &textureCache;
 }
 
 Renderer::~Renderer()
@@ -177,7 +173,7 @@ void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvid
   mUpdateAttributesLocation = true;
 
   //Check that the number of textures match the number of samplers in the shader
-  size_t textureCount =  dataProvider->GetNewTextures().size();
+  size_t textureCount =  dataProvider->GetTextures().size();
   Program* program = dataProvider->GetShader().GetProgram();
   if( program && program->GetActiveSamplerCount() != textureCount )
   {
@@ -364,19 +360,19 @@ void Renderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program
   }
 }
 
-bool Renderer::BindTextures( Context& context, SceneGraph::TextureCache& textureCache, Program& program )
+bool Renderer::BindTextures( Context& context, Program& program )
 {
   unsigned int textureUnit = 0;
   bool result = true;
 
   GLint uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
-  std::vector<Render::NewTexture*>& newTextures( mRenderDataProvider->GetNewTextures() );
-  for( size_t i(0); i<newTextures.size() && result; ++i )
+  std::vector<Render::Texture*>& textures( mRenderDataProvider->GetTextures() );
+  for( size_t i(0); i<textures.size() && result; ++i )
   {
-    if( newTextures[i] )
+    if( textures[i] )
     {
-      result = newTextures[i]->Bind(context, textureUnit, samplers[i] );
+      result = textures[i]->Bind(context, textureUnit, samplers[i] );
       if( result && program.GetSamplerUniformLocation( i, uniformLocation ) )
       {
         program.SetUniform1i( uniformLocation, textureUnit );
@@ -529,7 +525,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
 }
 
 void Renderer::Render( Context& context,
-                       SceneGraph::TextureCache& textureCache,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
                        SceneGraph::Shader& defaultShader,
@@ -563,7 +558,7 @@ void Renderer::Render( Context& context,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  if( DALI_LIKELY( BindTextures( context, textureCache, *program ) ) )
+  if( DALI_LIKELY( BindTextures( context, *program ) ) )
   {
     // Only set up and draw if we have textures and they are all valid
 
