@@ -30,6 +30,16 @@ namespace //Unnamed namespace
 //Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
 // or DALI library is unloaded
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
+#ifdef DEBUG_ENABLED
+// keep track of nodes created / deleted, to ensure we have 0 when the process exits or DALi library is unloaded
+int gNodeCount =0;
+
+// Called when the process is about to exit, Node count should be zero at this point.
+void __attribute__ ((destructor)) ShutDown(void)
+{
+DALI_ASSERT_DEBUG( (gNodeCount == 0) && "Node memory leak");
+}
+#endif
 }
 
 namespace Dali
@@ -100,6 +110,11 @@ Node::Node()
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;
+
+#ifdef DEBUG_ENABLED
+  gNodeCount++;
+#endif
+
 }
 
 Node::~Node()
@@ -108,6 +123,10 @@ Node::~Node()
   {
     mTransformManager->RemoveTransform(mTransformId);
   }
+
+#ifdef DEBUG_ENABLED
+  gNodeCount--;
+#endif
 }
 
 void Node::OnDestroy()
