@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
 
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
+  DiscardRequest();
 }
 
 void TestPlatformAbstraction::Suspend()
@@ -266,6 +267,7 @@ void TestPlatformAbstraction::SetAllResourceRequestsAsLoaded()
     Integration::ResourcePointer resource(bitmap);
     bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
     SetResourceLoaded( request->GetId(), request->GetType()->id, resource );
+    delete request;
   }
   mResourceRequests.Clear();
 }
@@ -275,13 +277,21 @@ void TestPlatformAbstraction::SetAllResourceRequestsAsFailed( Integration::Resou
   for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
        iter != endIter; ++iter )
   {
+    Integration::ResourceRequest* request = *iter;
     SetResourceLoadFailed( (*iter)->GetId(), failure);
+    delete request;
   }
   mResourceRequests.Clear();
 }
 
 void TestPlatformAbstraction::DiscardRequest()
 {
+  for( ResourceRequestContainer::Iterator iter = mResourceRequests.Begin(), endIter = mResourceRequests.End();
+       iter != endIter; ++iter )
+  {
+    Integration::ResourceRequest* request = *iter;
+    delete request;
+  }
   mResourceRequests.Clear();
 }
 

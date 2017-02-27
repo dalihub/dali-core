@@ -98,6 +98,16 @@ DALI_IMPORT_API Property::Index GetPropertyIndex( const Handle& handle, Property
  */
 DALI_IMPORT_API Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue );
 
+/**
+ * @brief Set the type-info that the object is created by.
+ *
+ * @note This is particularly useful to link C# custom control with its correct type-info in the native side
+ *
+ * @param[in] handle The handle created by this TypeInfo.
+ * @param[in] typeInfo The TypeInfo that creates the handle.
+ */
+DALI_IMPORT_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
+
 } // namespace DevelHandle
 
 } // namespace Dali

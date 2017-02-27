@@ -25,13 +25,15 @@
 #include <map>
 #include <cstdio>
 #include <cstring> // for strcmp
+#include <typeinfo>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
-#include "test-trace-call-stack.h"
+#include <test-trace-call-stack.h>
+#include <test-compare-types.h>
 
 namespace Dali
 {
@@ -2132,7 +2134,7 @@ private:
       T uniformValue;
       if ( GetUniformValue( program, uniform, uniformValue ) )
       {
-        return value == uniformValue;
+        return CompareType<T>(value, uniformValue, Math::MACHINE_EPSILON_10);
       }
 
       return false;
@@ -2175,6 +2177,9 @@ private:
   ProgramUniformValue<Vector4> mProgramUniforms4f;
   ProgramUniformValue<Matrix> mProgramUniformsMat4;
   ProgramUniformValue<Matrix3> mProgramUniformsMat3;
+
+
+
 
   inline const ProgramUniformValue<int>& GetProgramUniformsForType( const int ) const
   {

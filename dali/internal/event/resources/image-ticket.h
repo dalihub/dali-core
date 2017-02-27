@@ -109,12 +109,6 @@ private:
    * If requested width or height was 0, the natural size is used.
    */
   ImageAttributes mAttributes;
-
-  /*
-   * ResourceClient needs to set dimensions and pixelformat.
-   * Image needs to know about them.
-   */
-  friend class ResourceClient;
 };
 
 } // namespace Internal

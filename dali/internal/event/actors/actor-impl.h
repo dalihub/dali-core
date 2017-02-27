@@ -743,7 +743,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetHierarchyDepth()
    */
-  int GetHierarchyDepth() const
+  inline int GetHierarchyDepth() const
   {
     if( mIsOnStage )
     {
@@ -752,6 +752,14 @@ public:
 
     return -1;
   }
+
+  /**
+   * Get the actor's sorting depth (The hierarchy depth combined with
+   * the sibling order)
+   *
+   * @return The depth used for hit-testing and renderer sorting
+   */
+  unsigned int GetSortingDepth();
 
 public:
 
@@ -1841,9 +1849,6 @@ private:
 
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
-
-  bool mIsBatchParent : 1;              ///< Flag indicating that the actor is a batch parent
-
 };
 
 } // namespace Internal

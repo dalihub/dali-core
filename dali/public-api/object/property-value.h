@@ -57,146 +57,146 @@ public:
   Value();
 
   /**
-   * @brief Create a boolean property value.
+   * @brief Creates a boolean property value.
    *
    * @SINCE_1_0.0
-   * @param [in] boolValue A boolean value.
+   * @param[in] boolValue A boolean value
    */
   Value( bool boolValue );
 
   /**
-   * @brief Create an integer property value.
+   * @brief Creates an integer property value.
    *
    * @SINCE_1_0.0
-   * @param [in] integerValue An integer value.
+   * @param[in] integerValue An integer value
    */
   Value( int integerValue );
 
   /**
-   * @brief Create a float property value.
+   * @brief Creates a float property value.
    *
    * @SINCE_1_0.0
-   * @param [in] floatValue A floating-point value.
+   * @param[in] floatValue A floating-point value
    */
   Value( float floatValue );
 
   /**
-   * @brief Create a Vector2 property value.
+   * @brief Creates a Vector2 property value.
    *
    * @SINCE_1_0.0
-   * @param [in] vectorValue A vector of 2 floating-point values.
+   * @param[in] vectorValue A vector of 2 floating-point values
    */
   Value( const Vector2& vectorValue );
 
   /**
-   * @brief Create a Vector3 property value.
+   * @brief Creates a Vector3 property value.
    *
    * @SINCE_1_0.0
-   * @param [in] vectorValue A vector of 3 floating-point values.
+   * @param[in] vectorValue A vector of 3 floating-point values
    */
   Value( const Vector3& vectorValue );
 
   /**
-   * @brief Create a Vector4 property value.
+   * @brief Creates a Vector4 property value.
    *
    * @SINCE_1_0.0
-   * @param [in] vectorValue A vector of 4 floating-point values.
+   * @param[in] vectorValue A vector of 4 floating-point values
    */
   Value( const Vector4& vectorValue );
 
   /**
-   * @brief Create a Matrix3 property value.
+   * @brief Creates a Matrix3 property value.
    *
    * @SINCE_1_0.0
-   * @param [in] matrixValue A matrix of 3x3 floating-point values.
+   * @param[in] matrixValue A matrix of 3x3 floating-point values
    */
   Value( const Matrix3& matrixValue );
 
   /**
-   * @brief Create a Matrix property value.
+   * @brief Creates a Matrix property value.
    *
    * @SINCE_1_0.0
-   * @param [in] matrixValue A matrix of 4x4 floating-point values.
+   * @param[in] matrixValue A matrix of 4x4 floating-point values
    */
   Value( const Matrix& matrixValue );
 
   /**
-   * @brief Create a Vector4 property value.
+   * @brief Creates a Vector4 property value.
    *
    * @SINCE_1_0.0
-   * @param [in] vectorValue A vector of 4 integer values.
+   * @param[in] vectorValue A vector of 4 integer values
    */
   Value( const Rect<int>& vectorValue );
 
   /**
-   * @brief Create an orientation property value.
+   * @brief Creates an orientation property value.
    *
    * @SINCE_1_0.0
-   * @param [in] angleAxis An angle-axis representing the rotation.
+   * @param[in] angleAxis An angle-axis representing the rotation
    */
   Value( const AngleAxis& angleAxis );
 
   /**
-   * @brief Create an orientation property value.
+   * @brief Creates an orientation property value.
    *
    * @SINCE_1_0.0
-   * @param [in] quaternion A quaternion representing the rotation.
+   * @param[in] quaternion A quaternion representing the rotation
    */
   Value( const Quaternion& quaternion );
 
   /**
-   * @brief Create an string property value.
+   * @brief Creates an string property value.
    *
    * @SINCE_1_0.0
-   * @param [in] stringValue A string.
+   * @param[in] stringValue A string
    */
   Value( const std::string& stringValue );
 
   /**
-   * @brief Create an string property value.
+   * @brief Creates a string property value.
    *
    * @SINCE_1_0.0
-   * @param [in] stringValue A string.
+   * @param[in] stringValue A string
    */
   Value( const char* stringValue );
 
   /**
-   * @brief Create an array property value.
+   * @brief Creates an array property value.
    *
    * @SINCE_1_0.0
-   * @param [in] arrayValue An array
+   * @param[in] arrayValue An array
    */
   Value( Property::Array& arrayValue );
 
   /**
-   * @brief Create a map property value.
+   * @brief Creates a map property value.
    *
    * @SINCE_1_0.0
-   * @param [in] mapValue An array
+   * @param[in] mapValue An array
    */
   Value( Property::Map& mapValue );
 
   /**
-   * @brief Explicitly set a type and initialize it.
+   * @brief Explicitly sets a type and initialize it.
    *
    * @SINCE_1_0.0
-   * @param [in] type The property value type.
+   * @param[in] type The property value type
    */
   explicit Value( Type type );
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] value The property value to copy.
+   * @param[in] value The property value to copy
    */
   Value( const Value& value );
 
   /**
-   * @brief Assign a property value.
+   * @brief Assigns a property value.
    *
    * @SINCE_1_0.0
-   * @param [in] value The property value to assign from.
+   * @param[in] value The property value to assign from
    * @return a reference to this
    */
   Value& operator=( const Value& value );
@@ -210,20 +210,20 @@ public:
   ~Value();
 
   /**
-   * @brief Query the type of this property value.
+   * @brief Queries the type of this property value.
    *
    * @SINCE_1_0.0
-   * @return The type ID.
+   * @return The type ID
    */
   Type GetType() const;
 
   /**
-   * @brief Retrieve a specific value.
+   * @brief Retrieves a specific value.
    *
-   * Works on a best-effort approach; if value type is not convertible returns a default value of the type
+   * Works on a best-effort approach; if value type is not convertible returns a default value of the type.
    *
    * @SINCE_1_0.0
-   * @return A value of type T.
+   * @return A value of type T
    */
   template <typename T>
   T DALI_INTERNAL Get() const
@@ -234,163 +234,163 @@ public:
   }
 
   /**
-   * @brief Retrieve a boolean value.
+   * @brief Retrieves a boolean value.
    *
    * @SINCE_1_0.0
-   * @param [out] boolValue On return, a boolean value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] boolValue On return, a boolean value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to bool.
    */
   bool Get( bool& boolValue ) const;
 
   /**
-   * @brief Retrieve a floating-point value.
+   * @brief Retrieves a floating-point value.
    *
    * @SINCE_1_0.0
-   * @param [out] floatValue On return, a floating-point value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] floatValue On return, a floating-point value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to float.
    */
   bool Get( float& floatValue ) const;
 
   /**
-   * @brief Retrieve an integer value.
+   * @brief Retrieves an integer value.
    *
    * @SINCE_1_0.0
-   * @param [out] integerValue On return, an integer value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] integerValue On return, an integer value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to int.
    */
   bool Get( int& integerValue ) const;
 
   /**
-   * @brief Retrieve an integer rectangle.
+   * @brief Retrieves an integer rectangle.
    *
    * @SINCE_1_0.0
-   * @param [out] rect On return, an integer rectangle.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] rect On return, an integer rectangle
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Rect<int>.
    */
   bool Get( Rect<int>& rect ) const;
 
   /**
-   * @brief Retrieve a vector value.
+   * @brief Retrieves a vector value.
    *
    * @SINCE_1_0.0
-   * @param [out] vectorValue On return, a vector value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] vectorValue On return, a vector value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector2.
    */
   bool Get( Vector2& vectorValue ) const;
 
   /**
-   * @brief Retrieve a vector value.
+   * @brief Retrieves a vector value.
    *
    * @SINCE_1_0.0
-   * @param [out] vectorValue On return, a vector value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] vectorValue On return, a vector value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector3.
    */
   bool Get( Vector3& vectorValue ) const;
 
   /**
-   * @brief Retrieve a vector value.
+   * @brief Retrieves a vector value.
    *
    * @SINCE_1_0.0
-   * @param [out] vectorValue On return, a vector value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] vectorValue On return, a vector value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector4.
    */
   bool Get( Vector4& vectorValue ) const;
 
   /**
-   * @brief Retrieve a matrix3 value.
+   * @brief Retrieves a matrix3 value.
    *
    * @SINCE_1_0.0
-   * @param [out] matrixValue On return, a matrix3 value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] matrixValue On return, a matrix3 value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Matrix3.
    */
   bool Get( Matrix3& matrixValue ) const;
 
   /**
-   * @brief Retrieve a matrix value.
+   * @brief Retrieves a matrix value.
    *
    * @SINCE_1_0.0
-   * @param [out] matrixValue On return, a matrix value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] matrixValue On return, a matrix value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Matrix.
    */
   bool Get( Matrix& matrixValue ) const;
 
   /**
-   * @brief Retrieve an angle-axis value.
+   * @brief Retrieves an angle-axis value.
    *
    * @SINCE_1_0.0
-   * @param [out] angleAxisValue On return, a angle-axis value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] angleAxisValue On return, a angle-axis value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to AngleAxis.
    */
   bool Get( AngleAxis& angleAxisValue ) const;
 
   /**
-   * @brief Retrieve a quaternion value.
+   * @brief Retrieves a quaternion value.
    *
    * @SINCE_1_0.0
-   * @param [out] quaternionValue On return, a quaternion value.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] quaternionValue On return, a quaternion value
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Quaternion.
    */
   bool Get( Quaternion& quaternionValue ) const;
 
   /**
-   * @brief Retrieve an string property value.
+   * @brief Retrieves an string property value.
    *
    * @SINCE_1_0.0
-   * @param [out] stringValue A string.
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] stringValue A string
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to string.
    */
   bool Get( std::string& stringValue ) const;
 
   /**
-   * @brief Retrieve an array property value.
+   * @brief Retrieves an array property value.
    *
    * @SINCE_1_0.0
-   * @param [out] arrayValue The array as a vector Property Values
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] arrayValue The array as a vector Property Values
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() returns Property::ARRAY.
    */
   bool Get( Property::Array& arrayValue ) const;
 
   /**
-   * @brief Retrieve an map property value.
+   * @brief Retrieves an map property value.
    *
    * @SINCE_1_0.0
-   * @param [out] mapValue The map as vector of string and Property Value pairs
-   * @return true if the value is successfully retrieved, false if the type is not convertible
+   * @param[out] mapValue The map as vector of string and Property Value pairs
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() returns Property::MAP.
    */
   bool Get( Property::Map& mapValue ) const;
 
   /**
-   * @brief Retrieve the Array API of the Property::Value without copying the contents of the map
+   * @brief Retrieves the Array API of the Property::Value without copying the contents of the map.
    *
    * @SINCE_1_0.0
-   * @return the Array API of the Property::Value or NULL if not a Property::Array
+   * @return The Array API of the Property::Value or NULL if not a Property::Array
    */
   Property::Array* GetArray() const;
 
   /**
-   * @brief Retrieve the Map API of the Property::Value without copying the contents of the map
+   * @brief Retrieves the Map API of the Property::Value without copying the contents of the map.
    *
    * @SINCE_1_0.0
-   * @return  the Map API of the Property::Value or NULL if not a Property::Map
+   * @return The Map API of the Property::Value or NULL if not a Property::Map
    */
   Property::Map* GetMap() const;
 
   /**
-   * @brief output to stream
+   * @brief Output to stream.
    * @SINCE_1_0.0
    */
   friend std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
@@ -403,12 +403,12 @@ private:
 };
 
 /**
- * @brief Convert the value of the property into a string and append to an output stream.
+ * @brief Converts the value of the property into a string and append to an output stream.
  *
  * @SINCE_1_0.0
- * @param [in] ouputStream The output stream operator.
- * @param [in] value The value to insert
- * @return The output stream operator.
+ * @param[in] ouputStream The output stream operator
+ * @param[in] value The value to insert
+ * @return The output stream operator
  */
 DALI_IMPORT_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
 

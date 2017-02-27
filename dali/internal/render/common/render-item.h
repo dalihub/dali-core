@@ -33,7 +33,6 @@ namespace Internal
 namespace Render
 {
 class Renderer;
-class RenderGeometry;
 }
 
 namespace SceneGraph
@@ -67,12 +66,9 @@ struct RenderItem
   Vector3           mSize;
   Render::Renderer* mRenderer;
   Node*             mNode;
-
-  mutable Render::Geometry* mBatchRenderGeometry;
-
+  const void*       mTextureSet;        //< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque:1;
-  bool              mBatched:1;
 
 private:
 

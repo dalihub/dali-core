@@ -31,7 +31,7 @@ class Sampler;
 }
 
 /**
- * @brief Sampler is a handle to an object that can be used to provide the sampling parameters to sample textures
+ * @brief Sampler is a handle to an object that can be used to provide the sampling parameters to sample textures.
  *
  * @SINCE_1_1.43
  */
@@ -40,7 +40,7 @@ class DALI_IMPORT_API Sampler : public BaseHandle
 public:
 
   /**
-   * @brief Creates a new Sampler object
+   * @brief Creates a new Sampler object.
    *
    * @SINCE_1_1.43
    * @return A handle to the Sampler
@@ -48,21 +48,21 @@ public:
   static Sampler New();
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   Sampler();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~Sampler();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -70,8 +70,8 @@ public:
   Sampler( const Sampler& handle );
 
   /**
-   * @brief Downcast to a sampler handle.
-   * If not the returned handle is left uninitialized.
+   * @brief Downcasts to a sampler handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -80,7 +80,7 @@ public:
   static Sampler DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -90,7 +90,7 @@ public:
 
 
   /**
-   * @brief Set the filter modes for this sampler
+   * @brief Sets the filter modes for this sampler.
    * Calling this function sets the properties MINIFICATION_FILTER and MAGNIFICATION_FILTER.
    *
    * @SINCE_1_1.43
@@ -100,7 +100,7 @@ public:
   void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
 
   /**
-   * @brief Set the wrap modes for this sampler
+   * @brief Sets the wrap modes for this sampler.
    *
    * @SINCE_1_1.43
    * @param[in] uWrap Wrap mode for u coordinates
@@ -109,7 +109,7 @@ public:
   void SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap );
 
   /**
-   * @brief Set the wrap modes for this sampler
+   * @brief Sets the wrap modes for this sampler.
    *
    * @SINCE_1_1.43
    * @param[in] rWrap Wrap mode for the z direction
@@ -121,7 +121,7 @@ public:
 public:
 
   /**
-   * @brief The constructor
+   * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Sampler

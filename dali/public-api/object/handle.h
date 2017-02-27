@@ -54,7 +54,7 @@ class DALI_IMPORT_API Handle : public BaseHandle
 public:
 
   /**
-   * @brief An Handle's capabilities can be queried using Handle::Supports()
+   * @brief Enumeration for Handle's capabilities that can be queried using Handle::Supports().
    * @SINCE_1_0.0
    */
   enum Capability
@@ -74,7 +74,7 @@ public:
    * @brief This constructor is used by Dali New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A pointer to a newly allocated Dali resource
+   * @param[in] handle A pointer to a newly allocated Dali resource
    */
   Handle( Dali::Internal::Object* handle );
 
@@ -95,15 +95,15 @@ public:
   Handle();
 
   /**
-   * @brief Create a new object.
+   * @brief Creates a new object.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated object.
+   * @return A handle to a newly allocated object
    */
   static Handle New();
 
   /**
-   * @brief Dali::Handle is intended as a base class
+   * @brief Dali::Handle is intended as a base class.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -114,7 +114,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   Handle( const Handle& handle );
 
@@ -122,15 +122,15 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   Handle& operator=( const Handle& rhs );
 
   /**
-   * @brief Downcast to a handle.
+   * @brief Downcasts to a handle.
    *
-   * If not the returned handle is left uninitialized.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle to An object
    * @return handle or an uninitialized handle
@@ -138,99 +138,99 @@ public:
   static Handle DownCast( BaseHandle handle );
 
   /**
-   * @brief Query whether an handle supports a given capability.
+   * @brief Queries whether an handle supports a given capability.
    *
    * @SINCE_1_0.0
-   * @param[in] capability The queried capability.
-   * @return True if the capability is supported.
+   * @param[in] capability The queried capability
+   * @return True if the capability is supported
    */
   bool Supports( Capability capability ) const;
 
   // Properties
 
   /**
-   * @brief Query how many properties are provided by an handle.
+   * @brief Queries how many properties are provided by an handle.
    *
    * This may vary between instances of a class, if dynamic properties are supported.
    * @SINCE_1_0.0
-   * @return The number of properties.
+   * @return The number of properties
    */
   unsigned int GetPropertyCount() const;
 
   /**
-   * @brief Query the name of a property.
+   * @brief Queries the name of a property.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return The name of the property.
+   * @param[in] index The index of the property
+   * @return The name of the property
    */
   std::string GetPropertyName( Property::Index index ) const;
 
   /**
-   * @brief Query the index of a property.
+   * @brief Queries the index of a property.
    *
    * Returns the first property index that matches the given name exactly.
    *
    * @SINCE_1_0.0
-   * @param [in] name The name of the property.
-   * @return The index of the property, or Property::INVALID_INDEX if no property exists with the given name.
+   * @param[in] name The name of the property
+   * @return The index of the property, or Property::INVALID_INDEX if no property exists with the given name
    */
   Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
-   * @brief Query whether a property can be set using SetProperty().
+   * @brief Queries whether a property can be set using SetProperty().
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return True if the property is writable.
+   * @param[in] index The index of the property
+   * @return True if the property is writable
    * @pre Property::INVALID_INDEX < index.
    */
   bool IsPropertyWritable( Property::Index index ) const;
 
   /**
-   * @brief Query whether a writable property can be the target of an animation or constraint.
+   * @brief Queries whether a writable property can be the target of an animation or constraint.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return True if the property is animatable.
+   * @param[in] index The index of the property
+   * @return True if the property is animatable
    */
   bool IsPropertyAnimatable( Property::Index index ) const;
 
   /**
-   * @brief Query whether a property can be used as in input to a constraint.
+   * @brief Queries whether a property can be used as in input to a constraint.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return True if the property can be used as a constraint input.
+   * @param[in] index The index of the property
+   * @return True if the property can be used as a constraint input
    */
   bool IsPropertyAConstraintInput( Property::Index index ) const;
 
   /**
-   * @brief Query the type of a property.
+   * @brief Queries the type of a property.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return The type of the property.
+   * @param[in] index The index of the property
+   * @return The type of the property
    */
   Property::Type GetPropertyType( Property::Index index ) const;
 
   /**
-   * @brief Set the value of an existing property.
+   * @brief Sets the value of an existing property.
    *
    * Property should be write-able. Setting a read-only property is a no-op.
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The new value of the property.
+   * @param[in] index The index of the property
+   * @param[in] propertyValue The new value of the property
    * @pre The property types match i.e. propertyValue.GetType() is equal to GetPropertyType(index).
    */
   void SetProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
-   * @brief Register a new animatable property.
+   * @brief Registers a new animatable property.
    *
    * @SINCE_1_0.0
-   * @param [in] name The name of the property.
-   * @param [in] propertyValue The new value of the property.
+   * @param[in] name The name of the property
+   * @param[in] propertyValue The new value of the property
    * @return The index of the property or Property::INVALID_INDEX if registration failed
    * @pre The object supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
    * Property names are expected to be unique, but this is not enforced.
@@ -252,13 +252,13 @@ public:
   Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
 
   /**
-   * @brief Register a new property.
+   * @brief Registers a new property.
    *
    * Properties can be set as non animatable using property attributes.
    * @SINCE_1_0.0
-   * @param [in] name The name of the property.
-   * @param [in] propertyValue The new value of the property.
-   * @param [in] accessMode The property access mode (writable, animatable etc).
+   * @param[in] name The name of the property
+   * @param[in] propertyValue The new value of the property
+   * @param[in] accessMode The property access mode (writable, animatable etc)
    * @return The index of the property
    * @pre The handle supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
    * @pre name is unused i.e. GetPropertyIndex(name) returns PropertyIndex::INVALID.
@@ -277,11 +277,11 @@ public:
   Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
-   * @brief Retrieve a property value.
+   * @brief Retrieves a property value.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return The property value.
+   * @param[in] index The index of the property
+   * @return The property value
    */
   Property::Value GetProperty( Property::Index index ) const;
 
@@ -289,8 +289,8 @@ public:
    * @brief Convenience function for obtaining a property of a known type.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @return The property value.
+   * @param[in] index The index of the property
+   * @return The property value
    * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
    */
   template <typename T>
@@ -302,34 +302,32 @@ public:
   }
 
   /**
-   * @brief Retrieve all the property indices for this object (including custom properties).
+   * @brief Retrieves all the property indices for this object (including custom properties).
    *
    * @SINCE_1_0.0
-   * @param[out] indices A container of property indices for this object.
-   * @note the added container is cleared
+   * @param[out] indices A container of property indices for this object
+   * @note The added container is cleared.
    */
   void GetPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
-   * @brief Add a property notification to this object.
+   * @brief Adds a property notification to this object.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @param [in] condition The notification will be triggered when this condition is satisfied.
-   *
+   * @param[in] index The index of the property
+   * @param[in] condition The notification will be triggered when this condition is satisfied
    * @return A handle to the newly created PropertyNotification
    */
   PropertyNotification AddPropertyNotification( Property::Index index,
                                                 const PropertyCondition& condition );
 
   /**
-   * @brief Add a property notification to this object.
+   * @brief Adds a property notification to this object.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of the property.
-   * @param [in] componentIndex Index to the component of a complex property such as a Vector
-   * @param [in] condition The notification will be triggered when this condition is satisfied.
-   *
+   * @param[in] index The index of the property
+   * @param[in] componentIndex Index to the component of a complex property such as a Vector
+   * @param[in] condition The notification will be triggered when this condition is satisfied
    * @return A handle to the newly created PropertyNotification
    */
   PropertyNotification AddPropertyNotification( Property::Index index,
@@ -337,15 +335,15 @@ public:
                                                 const PropertyCondition& condition );
 
   /**
-   * @brief Remove a property notification from this object.
+   * @brief Removes a property notification from this object.
    *
    * @SINCE_1_0.0
-   * @param [in] propertyNotification The propertyNotification to be removed.
+   * @param[in] propertyNotification The propertyNotification to be removed
    */
   void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
 
   /**
-   * @brief Remove all property notifications from this object.
+   * @brief Removes all property notifications from this object.
    * @SINCE_1_0.0
    */
   void RemovePropertyNotifications();
@@ -353,7 +351,7 @@ public:
   // Constraints
 
   /**
-   * @brief Remove all constraints from an Object.
+   * @brief Removes all constraints from an Object.
    *
    * @SINCE_1_0.0
    * @pre The object has been initialized.
@@ -361,7 +359,7 @@ public:
   void RemoveConstraints();
 
   /**
-   * @brief Remove all the constraint from the Object with a matching tag.
+   * @brief Removes all the constraint from the Object with a matching tag.
    *
    * @SINCE_1_0.0
    * @param[in] tag The tag of the constraints which will be removed
@@ -380,7 +378,7 @@ DALI_IMPORT_API extern const Property::Index WEIGHT; ///< name "weight", type FL
  * @brief Convenience function to create an object with a custom "weight" property.
  *
  * @SINCE_1_0.0
- * @return A handle to a newly allocated object.
+ * @return A handle to a newly allocated object
  */
 DALI_IMPORT_API Handle New();
 

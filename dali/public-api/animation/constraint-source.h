@@ -30,7 +30,7 @@ namespace Dali
  */
 
 /**
- * @brief Constraint source types.
+ * @brief Enumeration for constraint source types.
  *
  * This specifies the location of a property, which is used as an input for a constraint function.
  * @SINCE_1_0.0
@@ -50,10 +50,10 @@ enum SourceType
 struct DALI_IMPORT_API LocalSource
 {
   /**
-   * @brief Create a local constraint source.
+   * @brief Creates a local constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of a property provided by the constrained object.
+   * @param[in] index The index of a property provided by the constrained object
    */
   LocalSource( Property::Index index );
 
@@ -67,10 +67,10 @@ struct DALI_IMPORT_API LocalSource
 struct DALI_IMPORT_API ParentSource
 {
   /**
-   * @brief Create a parent constraint source.
+   * @brief Creates a parent constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] index The index of a property, provided by the parent of the constrained object.
+   * @param[in] index The index of a property, provided by the parent of the constrained object
    */
   ParentSource( Property::Index index );
 
@@ -84,11 +84,11 @@ struct DALI_IMPORT_API ParentSource
 struct DALI_IMPORT_API Source
 {
   /**
-   * @brief Create a constraint source.
+   * @brief Creates a constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] object The object providing the property.
-   * @param [in] index The index of a property provided by object.
+   * @param[in] object The object providing the property
+   * @param[in] index The index of a property provided by object
    */
   Source( Handle& object, Property::Index index );
 
@@ -104,26 +104,26 @@ struct DALI_IMPORT_API Source
 struct DALI_IMPORT_API ConstraintSource
 {
   /**
-   * @brief Create a constraint source.
+   * @brief Creates a constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] source A constraint source from an arbitrary object.
+   * @param[in] source A constraint source from an arbitrary object
    */
   ConstraintSource( Source source );
 
   /**
-   * @brief Create a constraint source.
+   * @brief Creates a constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] local A local constraint source.
+   * @param[in] local A local constraint source
    */
   ConstraintSource( LocalSource local );
 
   /**
-   * @brief Create a constraint source.
+   * @brief Creates a constraint source.
    *
    * @SINCE_1_0.0
-   * @param [in] parent A parent constraint source.
+   * @param[in] parent A parent constraint source
    */
   ConstraintSource( ParentSource parent );
 

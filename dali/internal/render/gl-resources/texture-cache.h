@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
@@ -31,7 +32,8 @@
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/event/resources/resource-client.h> // For RectArea
+#include <dali/internal/event/images/pixel-data-impl.h>
+#include <dali/internal/event/resources/resource-client-declarations.h> // For RectArea
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/gl-resources/texture-units.h>

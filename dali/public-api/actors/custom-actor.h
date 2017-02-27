@@ -45,7 +45,7 @@ class DALI_IMPORT_API CustomActor : public Actor
 public:
 
   /**
-   * @brief Create an uninitialized CustomActor handle.
+   * @brief Creates an uninitialized CustomActor handle.
    *
    * Only derived versions can be instantiated.
    * Calling member functions with an uninitialized CustomActor handle is not allowed.
@@ -54,10 +54,10 @@ public:
   CustomActor();
 
   /**
-   * @brief Downcast a handle to CustomActor handle.
+   * @brief Downcasts a handle to CustomActor handle.
    *
-   * If handle points to a CustomActor the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If the handle points to a CustomActor, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -66,7 +66,7 @@ public:
   static CustomActor DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -74,7 +74,7 @@ public:
   ~CustomActor();
 
   /**
-   * @brief Retrieve the custom actor implementation.
+   * @brief Retrieves the custom actor implementation.
    *
    * @SINCE_1_0.0
    * @return The implementation
@@ -82,7 +82,7 @@ public:
   CustomActorImpl& GetImplementation();
 
   /**
-   * @brief Retrieve the custom actor implementation.
+   * @brief Retrieves the custom actor implementation.
    *
    * @SINCE_1_0.0
    * @return The implementation
@@ -90,7 +90,7 @@ public:
   const CustomActorImpl& GetImplementation() const;
 
   /**
-   * @brief Create an initialised CustomActor.
+   * @brief Creates an initialized CustomActor.
    *
    * @SINCE_1_0.0
    * @param[in] implementation The implementation for this custom actor
@@ -99,18 +99,18 @@ public:
   CustomActor(CustomActorImpl& implementation);
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] copy The actor to copy
+   * @param[in] copy The actor to copy
    */
   CustomActor(const CustomActor& copy);
 
   /**
-   * @brief Assignment operator
+   * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs The actor to copy
+   * @param[in] rhs The actor to copy
    * @return A reference to this
    */
   CustomActor& operator=(const CustomActor& rhs);
@@ -121,7 +121,7 @@ public: // Not intended for application developers
    * @brief This constructor is used internally to create additional CustomActor handles.
    *
    * @SINCE_1_0.0
-   * @param [in] actor A pointer to a newly allocated Dali resource
+   * @param[in] actor A pointer to a newly allocated Dali resource
    */
   CustomActor(Internal::CustomActor* actor);
 };

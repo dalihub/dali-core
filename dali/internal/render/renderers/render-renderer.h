@@ -161,15 +161,6 @@ public:
   void SetGeometry( Render::Geometry* geometry );
 
   /**
-   * Retrieves the geometry used by the renderer
-   * @return The geometry used by the renderer
-   */
-  Render::Geometry* GetGeometry() const
-  {
-    return mGeometry;
-  }
-
-  /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
@@ -352,12 +343,6 @@ public:
   StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
-   * Sets batching mode on the renderer
-   * @param[in] batchingEnabled batching state
-   */
-  void SetBatchingEnabled( bool batchingEnabled );
-
-  /**
    * Called to render during RenderManager::Render().
    * @param[in] context The context used for rendering
    * @param[in] textureCache The texture cache used to get textures
@@ -368,7 +353,6 @@ public:
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] size Size of the render item
-   * @param[in] externalGeometry Optional external geometry, if set the original geometry is ignored. If NULL, original geometry will be drawn as normal.
    * @param[in] blend If true, blending is enabled
    */
   void Render( Context& context,
@@ -381,8 +365,7 @@ public:
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
                const Vector3& size,
-               Render::Geometry* externalGeometry,
-               bool blend);
+               bool blend );
 
   /**
    * Write the renderer's sort attributes to the passed in reference
@@ -466,7 +449,6 @@ private:
   DepthTestMode::Type          mDepthTestMode:2;            ///< The depth test mode
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                         mBatchingEnabled:1;          ///< Flag indicating if the renderer is batchable
 
 };
 

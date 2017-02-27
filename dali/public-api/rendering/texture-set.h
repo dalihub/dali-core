@@ -45,7 +45,7 @@ class DALI_IMPORT_API TextureSet : public BaseHandle
 public:
 
   /**
-   * @brief Creates a new TextureSet object
+   * @brief Creates a new TextureSet object.
    *
    * @SINCE_1_1.43
    * @return A handle to a newly allocated TextureSet
@@ -53,21 +53,21 @@ public:
   static TextureSet New();
 
   /**
-   * @brief Default constructor, creates an empty handle
+   * @brief Default constructor, creates an empty handle.
    *
    * @SINCE_1_1.43
    */
   TextureSet();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @SINCE_1_1.43
    */
   ~TextureSet();
 
   /**
-   * @brief Copy constructor, creates a new handle to the same object
+   * @brief Copy constructor, creates a new handle to the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -75,17 +75,16 @@ public:
   TextureSet( const TextureSet& handle );
 
   /**
-   * @brief Downcast to a TextureSet handle.
-   *
-   * @SINCE_1_1.43
+   * @brief Downcasts to a TextureSet handle.
    * If handle is not a TextureSet, the returned handle is left uninitialized.
+   * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    * @return TextureSet handle or an uninitialized handle
    */
   static TextureSet DownCast( BaseHandle handle );
 
   /**
-   * @brief Assignment operator, changes this handle to point at the same object
+   * @brief Assignment operator, changes this handle to point at the same object.
    *
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
@@ -94,7 +93,7 @@ public:
   TextureSet& operator=( const TextureSet& handle );
 
   /**
-   * @brief Set the texture at position "index"
+   * @brief Sets the texture at position "index".
    *
    * @SINCE_1_1.43
    * @param[in] index The position in the texture set of the texture
@@ -103,7 +102,7 @@ public:
   void SetTexture( size_t index, Texture texture );
 
   /**
-   * @brief Get the image at position "index"
+   * @brief Gets the image at position "index".
    *
    * @SINCE_1_1.43
    * @param[in] index The position in the texture set of the image
@@ -112,7 +111,7 @@ public:
   Texture GetTexture( size_t index ) const;
 
   /**
-   * @brief Set the sampler to be used by the image at position "index"
+   * @brief Sets the sampler to be used by the image at position "index".
    *
    * @SINCE_1_1.43
    * @param[in] index The position in the texture set of the sampler
@@ -121,7 +120,7 @@ public:
   void SetSampler( size_t index, Sampler sampler );
 
   /**
-   * @brief Set the sampler to be used by the image at position "index"
+   * @brief Sets the sampler to be used by the image at position "index".
    *
    * @SINCE_1_1.43
    * @param[in] index The position in the texture set of the image
@@ -130,7 +129,7 @@ public:
   Sampler GetSampler( size_t index ) const;
 
   /**
-   * @brief Get the number of textures present in the TextureSet
+   * @brief Gets the number of textures present in the TextureSet.
    *
    * @SINCE_1_1.43
    * @return The number of textures in the TextureSet

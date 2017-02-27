@@ -38,7 +38,7 @@ class Layer;
 }
 
 /**
- * @brief Rectangle describing area on screen that a layer can draw to
+ * @brief Rectangle describing area on screen that a layer can draw to.
  *
  * @SINCE_1_0.0
  * @see Dali::Layer::SetClippingBox()
@@ -82,7 +82,7 @@ class DALI_IMPORT_API Layer : public Actor
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the Layer class.
+   * @brief Enumeration for the instance of properties belonging to the Layer class.
    *
    * Properties additional to Actor.
    * @SINCE_1_0.0
@@ -90,7 +90,7 @@ public:
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Layer class.
+     * @brief Enumeration for the instance of properties belonging to the Layer class.
      *
      * Properties additional to Actor.
      * @SINCE_1_0.0
@@ -113,7 +113,7 @@ public:
   {
     /**
      * @DEPRECATED_1_1.45, use LAYER_UI instead
-     * @brief UI control rendering mode
+     * @brief UI control rendering mode.
      * @SINCE_1_0.0
      * @see LAYER_UI
      */
@@ -149,7 +149,7 @@ public:
     /**
      * @brief Layer will use depth test.
      *
-     * When using this mode depth test will be used. A depth clear will happen for each layer,
+     * When using this mode, depth test will be used. A depth clear will happen for each layer,
      * which means actors in a layer "above" other layers will be rendered in front of actors in
      * those layers regardless of their Z positions (see Layer::Raise() and Layer::Lower()).
      * Opaque renderers are drawn first and write to the depth buffer.
@@ -167,31 +167,34 @@ public:
   };
 
   /**
-   * @brief TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
+   * @DEPRECATED_1_2.26. Not intended for application use.
+   *
+   * @brief Enumeration for TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
    * @SINCE_1_0.0
    */
   enum TreeDepthMultiplier
   {
     TREE_DEPTH_MULTIPLIER = 10000,
   };
+
   /**
-   * @brief The sort function type
+   * @brief The sort function type.
    *
    * @SINCE_1_0.0
-   * @param[in] position This is the actor translation from camera.
+   * @param[in] position This is the actor translation from camera
    */
   typedef float (*SortFunctionType)( const Vector3& position );
 
   /**
-   * @brief Create an empty Layer handle.
+   * @brief Creates an empty Layer handle.
    *
-   * This can be initialised with Layer::New(...).
+   * This can be initialized with Layer::New(...).
    * @SINCE_1_0.0
    */
   Layer();
 
   /**
-   * @brief Create a Layer object.
+   * @brief Creates a Layer object.
    *
    * @SINCE_1_0.0
    * @return A handle to a newly allocated Layer
@@ -199,18 +202,18 @@ public:
   static Layer New();
 
   /**
-   * @brief Downcast a handle to Layer handle.
+   * @brief Downcasts a handle to Layer handle.
    *
-   * If handle points to a Layer the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a Layer, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
-   * @param[in] handle Handle to An object
+   * @param[in] handle Handle to an object
    * @return Handle to a Layer or an uninitialized handle
    */
   static Layer DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -218,26 +221,26 @@ public:
   ~Layer();
 
   /**
-   * @brief Copy constructor
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param [in] copy The actor to copy
+   * @param[in] copy The actor to copy
    */
   Layer(const Layer& copy);
 
   /**
-   * @brief Assignment operator
+   * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs The actor to copy
+   * @param[in] rhs The actor to copy
    * @return A reference to this
    */
   Layer& operator=(const Layer& rhs);
 
   /**
-   * @brief Query the depth of the layer
+   * @brief Queries the depth of the layer.
    *
-   * 0 is bottom most layer, higher number is on top.
+   * 0 is the bottom most layer, higher number is on top.
    * @SINCE_1_0.0
    * @return The current depth of the layer
    * @pre Layer is on the stage.
@@ -246,7 +249,7 @@ public:
   unsigned int GetDepth() const;
 
   /**
-   * @brief Increment the depth of the layer.
+   * @brief Increments the depth of the layer.
    *
    * @SINCE_1_0.0
    * @pre Layer is on the stage.
@@ -254,7 +257,7 @@ public:
   void Raise();
 
   /**
-   * @brief Decrement the depth of the layer.
+   * @brief Decrements the depth of the layer.
    *
    * @SINCE_1_0.0
    * @pre Layer is on the stage.
@@ -264,7 +267,7 @@ public:
   /**
    * @brief Ensures the layers depth is greater than the target layer.
    *
-   * If the layer already is above the target layer its depth is not changed.
+   * If the layer already is above the target layer, its depth is not changed.
    * If the layer was below target, its new depth will be immediately above target.
    * @SINCE_1_0.0
    * @param target Layer to get above of
@@ -277,7 +280,7 @@ public:
   /**
    * @brief Ensures the layers depth is less than the target layer.
    *
-   * If the layer already is below the target layer its depth is not changed.
+   * If the layer already is below the target layer, its depth is not changed.
    * If the layer was above target, its new depth will be immediately below target.
    * @SINCE_1_0.0
    * @param target Layer to get below of
@@ -304,7 +307,7 @@ public:
   /**
    * @brief Moves the layer directly above the given layer.
    *
-   * After the call this layers depth will be immediately above target.
+   * After the call, this layers depth will be immediately above target.
    * @SINCE_1_0.0
    * @param target Layer to get on top of
    * @pre Layer is on the stage.
@@ -316,7 +319,7 @@ public:
   /**
    * @brief Moves the layer directly below the given layer.
    *
-   * After the call this layers depth will be immediately below target.
+   * After the call, this layers depth will be immediately below target.
    * @SINCE_1_0.0
    * @param target Layer to get below of
    * @pre Layer is on the stage.
@@ -326,7 +329,7 @@ public:
   void MoveBelow( Layer target );
 
   /**
-   * @brief Set the behavior of the layer.
+   * @brief Sets the behavior of the layer.
    *
    * @SINCE_1_0.0
    * @param[in] behavior The desired behavior
@@ -334,7 +337,7 @@ public:
   void SetBehavior( Behavior behavior );
 
   /**
-   * @brief Get the behavior of the layer.
+   * @brief Gets the behavior of the layer.
    *
    * @SINCE_1_0.0
    * @return The behavior of the layer
@@ -346,16 +349,16 @@ public:
    *
    * Clipping is initially disabled; see also SetClippingBox().
    * @SINCE_1_0.0
-   * @param [in] enabled True if clipping is enabled.
+   * @param[in] enabled True if clipping is enabled
    *
-   * @note When clipping is enabled, the default clipping box is empty (0,0,0,0) which means everything is clipped.
+   * @note When clipping is enabled, the default clipping box is empty (0,0,0,0), which means everything is clipped.
    */
   void SetClipping(bool enabled);
 
   /**
-   * @brief Query whether clipping is enabled for a layer.
+   * @brief Queries whether clipping is enabled for a layer.
    * @SINCE_1_0.0
-   * @return True if clipping is enabled.
+   * @return True if clipping is enabled
    */
   bool IsClipping() const;
 
@@ -366,25 +369,25 @@ public:
    * enabled. The default clipping box is empty (0,0,0,0) which means everything is clipped.
    * You can only do rectangular clipping using this API in window coordinates.
    * @SINCE_1_0.0
-   * @param [in] x The X-coordinate of the top-left corner of the box
-   * @param [in] y The Y-coordinate of the top-left corner of the box
-   * @param [in] width  The width of the box
-   * @param [in] height The height of the box
+   * @param[in] x The X-coordinate of the top-left corner of the box
+   * @param[in] y The Y-coordinate of the top-left corner of the box
+   * @param[in] width The width of the box
+   * @param[in] height The height of the box
    */
   void SetClippingBox(int x, int y, int width, int height);
 
   /**
-   * @brief Sets the clipping box of a layer, in window coordinates.
+   * @brief Sets the clipping box of a layer in window coordinates.
    *
-   * The contents of the layer will not be visible outside this box, when clipping is
+   * The contents of the layer will not be visible outside this box when clipping is
    * enabled. The default clipping box is empty (0,0,0,0).
    * @SINCE_1_0.0
-   * @param [in] box The clipping box
+   * @param[in] box The clipping box
    */
   void SetClippingBox(ClippingBox box);
 
   /**
-   * @brief Retrieves the clipping box of a layer, in window coordinates.
+   * @brief Retrieves the clipping box of a layer in window coordinates.
    *
    * @SINCE_1_0.0
    * @return The clipping box
@@ -400,7 +403,7 @@ public:
    * However, it's possible to disable the depth test by calling this method.
    *
    * @SINCE_1_0.0
-   * @param[in] disable \e True disables depth test. \e false sets the default behavior.
+   * @param[in] disable \e True disables depth test. \e false sets the default behavior
    */
   void SetDepthTestDisabled( bool disable );
 
@@ -408,7 +411,7 @@ public:
    * @brief Retrieves whether depth test is disabled.
    *
    * @SINCE_1_0.0
-   * @return \e True if depth test is disabled.
+   * @return \e True if depth test is disabled
    */
   bool IsDepthTestDisabled() const;
 
@@ -426,12 +429,12 @@ public:
    * @endcode
    *
    * @SINCE_1_0.0
-   * @param[in]  function  The sort function pointer
+   * @param[in] function The sort function pointer
    * @note If the sort function returns a low number, the actor with the data will be
    * drawn in front of an actor whose data yields a high value from the sort function.
    *
-   * @note All child layers use the same sort function.  If a child layer is added to this
-   * layer then the sort function used by the child layer will also be the same.
+   * @note All child layers use the same sort function. If a child layer is added to this
+   * layer, then the sort function used by the child layer will also be the same.
    *
   */
   void SetSortFunction( SortFunctionType function );
@@ -442,7 +445,7 @@ public:
    * If set, any layers behind this layer will not be hit-test.
    *
    * @SINCE_1_0.0
-   * @param[in]  consume  Whether the layer should consume touch (including gestures).
+   * @param[in] consume Whether the layer should consume touch (including gestures)
    */
   void SetTouchConsumed( bool consume );
 
@@ -450,7 +453,7 @@ public:
    * @brief Retrieves whether the layer consumes touch (including gestures).
    *
    * @SINCE_1_0.0
-   * @return True if consuming touch, false otherwise.
+   * @return @c True if consuming touch, @c false otherwise
    */
   bool IsTouchConsumed() const;
 
@@ -460,7 +463,7 @@ public:
    * If set, any layers behind this layer will not be hit-test.
    *
    * @SINCE_1_0.0
-   * @param[in]  consume  Whether the layer should consume hover.
+   * @param[in] consume Whether the layer should consume hover
    */
   void SetHoverConsumed( bool consume );
 
@@ -468,7 +471,7 @@ public:
    * @brief Retrieves whether the layer consumes hover.
    *
    * @SINCE_1_0.0
-   * @return True if consuming hover, false otherwise.
+   * @return @c True if consuming hover, @c false otherwise
    */
   bool IsHoverConsumed() const;
 
@@ -479,7 +482,7 @@ public: // Not intended for application developers
    * @brief This constructor is used by Layer::New() methods.
    *
    * @SINCE_1_0.0
-   * @param [in] Layer A pointer to a newly allocated Dali resource
+   * @param[in] Layer A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Layer(Internal::Layer* Layer);
   /// @endcond

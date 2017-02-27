@@ -28,7 +28,7 @@ namespace Dali
  */
 
 /**
- * @brief Actor color mode.
+ * @brief Enumeration for Actor color mode.
  *
  * @SINCE_1_0.0
  */
@@ -42,7 +42,7 @@ enum ColorMode
 
 /**
  * @DEPRECATED_1_1.24 Use SetInheritPosition instead
- * @brief Actor position inheritance mode.
+ * @brief Enumeration for Actor position inheritance mode.
  * @SINCE_1_0.0
  */
 enum PositionInheritanceMode
@@ -54,13 +54,13 @@ enum PositionInheritanceMode
 };
 
 /**
- * @brief Dimensions for layout
+ * @brief Enumeration for layout Dimensions.
  * @SINCE_1_0.0
  */
 namespace Dimension
 {
   /**
-   * @brief The type of Dimension
+   * @brief Enumeration for Dimension types.
    * @SINCE_1_0.0
    */
   enum Type
@@ -72,7 +72,7 @@ namespace Dimension
   };
 
   /**
-   * @brief The number of dimensions
+   * @brief Enumeration for Dimension number.
    * @SINCE_1_0.0
    */
   enum Meta
@@ -82,13 +82,13 @@ namespace Dimension
 }
 
 /**
- * @brief Size negotiation resize policies
+ * @brief Enumeration for size negotiation resize policies.
  * @SINCE_1_0.0
  */
 namespace ResizePolicy
 {
   /**
-   * @brief The type of ResizePolicy
+   * @brief Enumeration for ResizePolicy types.
    * @SINCE_1_0.0
    */
   enum Type
@@ -106,13 +106,13 @@ namespace ResizePolicy
 }
 
 /**
- * @brief Policies to determine how an actor should resize itself when having its size set in size negotiation
+ * @brief Enumeration for policies to determine how an actor should resize itself when having its size set in size negotiation.
  * @SINCE_1_0.0
  */
 namespace SizeScalePolicy
 {
   /**
-   * @brief The type of SizeScalePolicy
+   * @brief Enumeration for SizeScalePolicy types.
    * @SINCE_1_0.0
    */
   enum Type
@@ -124,13 +124,13 @@ namespace SizeScalePolicy
 }
 
 /**
- * @brief Horizontal alignment types.
+ * @brief Enumeration for horizontal alignment types.
  * @SINCE_1_0.0
  */
 namespace HorizontalAlignment
 {
   /**
-   * @brief The type of HorizontalAlignment
+   * @brief Enumeration for HorizontalAlignment types.
    * @SINCE_1_0.0
    */
   enum Type
@@ -142,13 +142,13 @@ namespace HorizontalAlignment
 }
 
 /**
- * @brief Vertical alignment types.
+ * @brief Enumeration for vertical alignment types.
  * @SINCE_1_0.0
  */
 namespace VerticalAlignment
 {
   /**
-   * @brief The type of VerticalAlignment
+   * @brief Enumeration for VerticalAlignment types.
    * @SINCE_1_0.0
    */
   enum Type
@@ -160,13 +160,13 @@ namespace VerticalAlignment
 }
 
 /**
- * @brief The ClippingMode describes how this Actors children will be clipped against it.
+ * @brief Enumeration for ClippingMode describing how this Actor's children will be clipped against it.
  * @SINCE_1_2_5
  */
 namespace ClippingMode
 {
   /**
-   * @brief The type of ClippingMode
+   * @brief Enumeration for ClippingMode types.
    * @SINCE_1_2_5
    */
   enum Type

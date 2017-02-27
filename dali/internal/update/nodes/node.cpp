@@ -22,7 +22,6 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 
@@ -65,12 +64,8 @@ Node::Node()
   mWorldOrientation(),                                                            // Initialized to identity by default
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
-  mGeometryBatcher( NULL ),
-  mBatchIndex( BATCH_NULL_HANDLE ),
   mClippingSortModifier( 0u ),
-  mIsBatchParent( false ),
   mParent( NULL ),
-  mBatchParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),
   mClippingDepth( 0u ),
@@ -240,12 +235,6 @@ void Node::AddRenderer( Renderer* renderer )
   }
 
   mRenderer.PushBack( renderer );
-
-  // Tell geometry batcher if should batch the child
-  if( mRenderer.Size() == 1 && mRenderer[0]->mBatchingEnabled )
-  {
-    mGeometryBatcher->AddNode( this );
-  }
 }
 
 void Node::RemoveRenderer( Renderer* renderer )
@@ -300,29 +289,6 @@ void Node::SetParent( Node& parentNode )
   if( mTransformId != INVALID_TRANSFORM_ID )
   {
     mTransformManager->SetParent( mTransformId, parentNode.GetTransformId() );
-  }
-}
-
-void Node::SetBatchParent( Node* batchParentNode )
-{
-  DALI_ASSERT_ALWAYS(!mIsRoot);
-  mBatchParent = batchParentNode;
-}
-
-void Node::SetIsBatchParent( bool enabled )
-{
-  if( mIsBatchParent != enabled )
-  {
-    mIsBatchParent = enabled;
-
-    if( enabled )
-    {
-      mGeometryBatcher->AddBatchParent( this );
-    }
-    else
-    {
-      mGeometryBatcher->RemoveBatchParent( this );
-    }
   }
 }
 

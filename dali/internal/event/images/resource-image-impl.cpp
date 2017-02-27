@@ -29,7 +29,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/resources/resource-client.h>
 
 using namespace Dali::Integration;
 

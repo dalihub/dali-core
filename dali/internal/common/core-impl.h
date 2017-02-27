@@ -53,7 +53,6 @@ class AnimationPlaylist;
 class PropertyNotificationManager;
 class EventProcessor;
 class GestureEventProcessor;
-class ResourceClient;
 class ResourceManager;
 class ShaderFactory;
 class TouchResampler;
@@ -65,7 +64,6 @@ class UpdateManager;
 class RenderManager;
 class DiscardQueue;
 class TextureCacheDispatcher;
-class GeometryBatcher;
 class RenderTaskProcessor;
 }
 
@@ -237,12 +235,6 @@ private:  // for use by ThreadLocalStorage
   ResourceManager& GetResourceManager();
 
   /**
-   * Returns the Resource client.
-   * @return A reference to the Resource Client.
-   */
-  ResourceClient& GetResourceClient();
-
-  /**
    * Returns the Shader factory
    * @return A reference to the Shader binary factory.
    */
@@ -290,10 +282,8 @@ private:
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
-  ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-  SceneGraph::GeometryBatcher*              mGeometryBatcher;             ///< Instance of the geometry batcher
   SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()

@@ -200,8 +200,8 @@ DALI_PROPERTY( "minimumSize",         VECTOR2,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "batchParent",         BOOLEAN,  true,  false, false, Dali::DevelActor::Property::BATCH_PARENT )
 DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
+DALI_PROPERTY( "opacity",             FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -359,7 +359,7 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 
 unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
 {
-  return depth * Dali::DevelLayer::TREE_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+  return depth * Dali::DevelLayer::ACTOR_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
 }
 
 } // unnamed namespace
@@ -1017,6 +1017,11 @@ ClippingMode::Type Actor::GetClippingMode() const
   return mClippingMode;
 }
 
+unsigned int Actor::GetSortingDepth()
+{
+  return GetDepthIndex( mDepth, mSiblingOrder );
+}
+
 const Vector4& Actor::GetCurrentWorldColor() const
 {
   if( NULL != mNode )
@@ -1291,6 +1296,9 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
 {
   EnsureRelayoutData();
 
+  ResizePolicy::Type originalWidthPolicy = GetResizePolicy(Dimension::WIDTH);
+  ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
+
   for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
@@ -1314,6 +1322,34 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
 
   // If calling SetResizePolicy, assume we want relayout enabled
   SetRelayoutEnabled( true );
+
+  // If the resize policy is set to be FIXED, the preferred size
+  // should be overrided by the target size. Otherwise the target
+  // size should be overrided by the preferred size.
+
+  if( dimension & Dimension::WIDTH )
+  {
+    if( originalWidthPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
+    {
+      mRelayoutData->preferredSize.width = mTargetSize.width;
+    }
+    else if( originalWidthPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
+    {
+      mTargetSize.width = mRelayoutData->preferredSize.width;
+    }
+  }
+
+  if( dimension & Dimension::HEIGHT )
+  {
+    if( originalHeightPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
+    {
+      mRelayoutData->preferredSize.height = mTargetSize.height;
+    }
+    else if( originalHeightPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
+    {
+      mTargetSize.height = mRelayoutData->preferredSize.height;
+    }
+  }
 
   OnSetResizePolicy( policy, dimension );
 
@@ -1987,8 +2023,7 @@ Actor::Actor( DerivedType derivedType )
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mClippingMode( ClippingMode::DISABLED ),
-  mIsBatchParent( false )
+  mClippingMode( ClippingMode::DISABLED )
 {
 }
 
@@ -2502,8 +2537,13 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
     {
-      SetOpacity( property.Get< float >() );
+      float value;
+      if( property.Get( value ) )
+      {
+        SetOpacity( value );
+      }
       break;
     }
 
@@ -2648,21 +2688,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       Vector2 size = property.Get< Vector2 >();
       SetMaximumSize( size.x, Dimension::WIDTH );
       SetMaximumSize( size.y, Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::DevelActor::Property::BATCH_PARENT:
-    {
-      bool value;
-
-      if( property.Get( value ) )
-      {
-        if( value != mIsBatchParent )
-        {
-          mIsBatchParent = value;
-          SetIsBatchParentMessage( GetEventThreadServices(), *mNode, mIsBatchParent );
-        }
-      }
       break;
     }
 
@@ -2923,19 +2948,48 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::SIZE:
     {
-      value = GetTargetSize();
+      Vector3 size = GetTargetSize();
+
+      // Should return preferred size if size is fixed as set by SetSize
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        size.width = GetPreferredSize().width;
+      }
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        size.height = GetPreferredSize().height;
+      }
+
+      value = size;
+
       break;
     }
 
     case Dali::Actor::Property::SIZE_WIDTH:
     {
-      value = GetTargetSize().width;
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().width;
+      }
+      else
+      {
+        value = GetTargetSize().width;
+      }
       break;
     }
 
     case Dali::Actor::Property::SIZE_HEIGHT:
     {
-      value = GetTargetSize().height;
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().height;
+      }
+      else
+      {
+        value = GetTargetSize().height;
+      }
       break;
     }
 
@@ -3066,6 +3120,7 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
     {
       value = GetCurrentColor().a;
       break;
@@ -3190,12 +3245,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::MAXIMUM_SIZE:
     {
       value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::DevelActor::Property::BATCH_PARENT:
-    {
-      value = mIsBatchParent;
       break;
     }
 
@@ -3330,6 +3379,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
         break;
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
         property = &mNode->mColor;
         break;
 
@@ -3498,8 +3548,11 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
         break;
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
+      {
         property = &mNode->mColor;
         break;
+      }
 
       case Dali::Actor::Property::WORLD_COLOR:
         property = &mNode->mWorldColor;
@@ -3571,6 +3624,7 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
       }
 
       case Dali::Actor::Property::COLOR_ALPHA:
+      case Dali::DevelActor::Property::OPACITY:
       {
         componentIndex = 3;
         break;

@@ -721,11 +721,44 @@ int UtcDaliActorSetSize01(void)
 
   actor.SetSize(vector.x, vector.y);
 
-  // flush the queue and render once
+  // Immediately retrieve the size after setting
+  Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the size in the new frame
   DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Change the resize policy and check whether the size stays the same
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Set a new size after resize policy is changed and check the new size
+  actor.SetSize( Vector3( 0.1f, 0.2f, 0.0f ) );
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Change the resize policy again and check whether the new size stays the same
+  actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Set another new size after resize policy is changed and check the new size
+  actor.SetSize( Vector3( 50.0f, 60.0f, 0.0f ) );
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, Vector3( 50.0f, 60.0f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -741,11 +774,20 @@ int UtcDaliActorSetSize02(void)
 
   actor.SetSize(vector.x, vector.y, vector.z);
 
+  // Immediately check the size after setting
+  Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the size in the new frame
   DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -761,11 +803,20 @@ int UtcDaliActorSetSize03(void)
 
   actor.SetSize(Vector2(vector.x, vector.y));
 
+  // Immediately check the size after setting
+  Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the size in the new frame
   DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -781,20 +832,34 @@ int UtcDaliActorSetSize04(void)
 
   actor.SetSize(vector);
 
+  // Immediately check the size after setting
+  Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the size in the new frame
   DALI_TEST_CHECK(vector == actor.GetCurrentSize());
 
   Stage::GetCurrent().Add( actor );
   actor.SetSize( Vector3( 0.1f, 0.2f, 0.3f ) );
 
+  // Immediately check the size after setting
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.3f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the size in the new frame
   DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentSize(), TEST_LOCATION );
+
+  currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.3f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   Stage::GetCurrent().Remove( actor );
   END_TEST;
 }
@@ -810,27 +875,75 @@ int UtcDaliActorSetSizeIndividual(void)
 
   actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
 
+  // Immediately check the width after setting
+  float sizeWidth = actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the width in the new frame
   DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
+
+  sizeWidth = actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SIZE_HEIGHT, vector.height );
 
+  // Immediately check the height after setting
+  float sizeHeight = actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >();
+  DALI_TEST_EQUALS( sizeHeight, vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the height in the new frame
   DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+
+  sizeHeight = actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >();
+  DALI_TEST_EQUALS( sizeHeight, vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SIZE_DEPTH, vector.depth );
 
+  // Immediately check the depth after setting
+  float sizeDepth = actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
+  // Check the depth in the new frame
   DALI_TEST_EQUALS( vector.depth, actor.GetCurrentSize().depth, TEST_LOCATION );
+
+  sizeDepth = actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Change the resize policy and check whether the size stays the same
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+
+  sizeWidth = actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  sizeHeight = actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >();
+  DALI_TEST_EQUALS( sizeHeight, vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  sizeDepth = actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Change the resize policy again and check whether the size stays the same
+  actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  sizeWidth = actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  sizeHeight = actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >();
+  DALI_TEST_EQUALS( sizeHeight, vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  sizeDepth = actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >();
+  DALI_TEST_EQUALS( sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1878,6 +1991,14 @@ int UtcDaliActorSetColorIndividual(void)
 
   DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
 
+  actor.SetProperty( DevelActor::Property::OPACITY, 0.2f );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0.2f, actor.GetCurrentColor().a, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -2666,6 +2787,41 @@ int UtcDaliActorConstrainedToOrientation(void)
   END_TEST;
 }
 
+int UtcDaliActorConstrainedToOpacity(void)
+{
+  TestApplication app;
+  tet_infoline(" UtcDaliActorConstrainedToOpacity");
+
+  Actor parent = Actor::New();
+  parent.SetOpacity( 0.7f );
+  Stage::GetCurrent().Add( parent );
+
+  Actor child = Actor::New();
+  Constraint opacityConstraint = Constraint::New<float>( child, DevelActor::Property::OPACITY, EqualToConstraint() );
+  opacityConstraint.AddSource( Source( parent, DevelActor::Property::OPACITY ) );
+  opacityConstraint.Apply();
+
+  Stage::GetCurrent().Add( child );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+
+  parent.SetOpacity( 0.3f );
+
+  app.SendNotification();
+  app.Render(0);
+  app.Render();
+  app.SendNotification();
+
+  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliActorUnparent(void)
 {
   TestApplication app;
@@ -2821,8 +2977,8 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "minimumSize",              Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
-  { "batchParent",              DevelActor::Property::BATCH_PARENT,        Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
+  { "opacity",                  DevelActor::Property::OPACITY,             Property::FLOAT       },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace

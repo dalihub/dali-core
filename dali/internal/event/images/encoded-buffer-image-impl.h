@@ -32,7 +32,6 @@ namespace Internal
 class EncodedBufferImage;
 typedef IntrusivePtr<EncodedBufferImage> EncodedBufferImagePtr;
 
-class ResourceClient;
 class ResourceManager;
 
 namespace SceneGraph

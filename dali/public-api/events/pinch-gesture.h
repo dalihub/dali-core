@@ -34,7 +34,7 @@ namespace Dali
  *
  * This gesture can be in one of three states; when the pinch gesture is first detected, its
  * state is set to Gesture::Started.  After this, if there is change in the gesture, the state will
- * be Gesture::Continuing.  Finally, when the gesture ends, the state of the gesture changes to
+ * be Gesture::Continuing. Finally, when the gesture ends, the state of the gesture changes to
  * Gesture::Finished.
  *
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch

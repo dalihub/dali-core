@@ -36,7 +36,7 @@ namespace Dali
  * If i is zero returns 1.
  * @SINCE_1_0.0
  * @param[in] i Input number
- * @return    The next power of two or i itself in case it's a power of two
+ * @return The next power of two or i itself in case it's a power of two
  */
 inline unsigned int NextPowerOfTwo( unsigned int i )
 {

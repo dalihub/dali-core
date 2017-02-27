@@ -37,7 +37,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
 #include <dali/internal/event/resources/resource-type-path.h>
-#include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 
 namespace Dali
@@ -115,18 +114,7 @@ public:
    */
   virtual ~ResourceManager();
 
-public: // Used by ResourceClient
-
-  /********************************************************************************
-   ************************ ResourceClient direct interface  **********************
-   ********************************************************************************/
-
-  /**
-   * Resource client passes itself for secondary intialisation.
-   * (The resource client requires the ResourceManager to be instantiated first).
-   * @param[in] resourceClient The ResourceClient.
-   */
-  void SetClient( ResourceClient& resourceClient );
+public:
 
   /********************************************************************************
    ************************ UpdateManager direct interface  ***********************
@@ -140,12 +128,6 @@ public: // Used by ResourceClient
    * @return true, if a resource load was completed or failed
    */
   bool UpdateCache( BufferIndex updateBufferIndex );
-
-  /**
-   * Iterate through the post process queue, performing requested updates.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void PostProcessResources( BufferIndex updateBufferIndex );
 
   /********************************************************************************
    *************************** CoreImpl direct interface  *************************
@@ -347,26 +329,6 @@ public:
   /********************************************************************************
    ********************************* Private Methods  *****************************
    ********************************************************************************/
-
-  /**
-   * Sends notification messages for load sucess & failure,
-   * pushes from newComplete / newFailed into oldComplete / oldFailed respectively
-   */
-  void NotifyTickets();
-
-  /**
-   * Triggers message to Event thread to update the ticket's image attributes
-   * @pre An Image resource with the given id should exist in the cache.
-   * @param id ID of the image resource
-   * @param attributes Resource image attributes
-   */
-  void UpdateImageTicket( ResourceId id, ImageAttributes& attributes );
-
-  /**
-   * Send message to ResourceClient in event thread
-   * @param[in] message The message to send
-   */
-  void SendToClient( MessageBase* message );
 
   /**
    * Discard all dead resources.

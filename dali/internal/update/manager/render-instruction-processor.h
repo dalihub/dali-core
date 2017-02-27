@@ -41,7 +41,6 @@ namespace SceneGraph
 class RenderTracker;
 struct RenderItem;
 class Shader;
-class GeometryBatcher;
 struct RenderList;
 class RenderTask;
 class RenderInstructionContainer;
@@ -73,7 +72,7 @@ public:
     SortAttributes()
     : renderItem( NULL ),
       shader( NULL ),
-      textureResourceId( Integration::InvalidResourceId ),
+      textureSet( NULL ),
       geometry( NULL ),
       zValue( 0.0f )
     {
@@ -81,7 +80,7 @@ public:
 
     RenderItem*             renderItem;        ///< The render item that is being sorted (includes depth index)
     const Shader*           shader;            ///< The shader instance
-    Integration::ResourceId textureResourceId; ///< The first texture resource ID of the texture set instance, is InvalidResourceId if the texture set doesn't have any textures
+    const void*             textureSet;        ///< The textureSet instance
     const Render::Geometry* geometry;          ///< The geometry instance
     float                   zValue;            ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
   };
@@ -101,7 +100,6 @@ public:
    * @param[in]  sortedLayers      The layers containing lists of opaque/transparent renderables.
    * @param[in]  renderTask        The rendering task information.
    * @param[in]  cull              Whether frustum culling is enabled or not
-   * @param[in]  geometryBatcher   The instance of the geometry batcher
    * @param[in]  hasClippingNodes  Whether any clipping nodes exist within this layer, to optimize sorting if not
    * @param[out] instructions      The rendering instructions for the next frame.
    */
@@ -109,7 +107,6 @@ public:
                 SortedLayerPointers& sortedLayers,
                 RenderTask& renderTask,
                 bool cull,
-                GeometryBatcher& geometryBatcher,
                 bool hasClippingNodes,
                 RenderInstructionContainer& instructions );
 

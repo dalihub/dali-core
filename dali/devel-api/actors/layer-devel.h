@@ -28,12 +28,12 @@ namespace DevelLayer
 {
 
   /**
-   * @brief TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
+   * @brief ACTOR_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
    * @SINCE_1_0.0
    */
-  enum TreeDepthMultiplier
+  enum ActorDepthMultiplier
   {
-    TREE_DEPTH_MULTIPLIER = 1000000,
+    ACTOR_DEPTH_MULTIPLIER = 1000000,
   };
 
   /**

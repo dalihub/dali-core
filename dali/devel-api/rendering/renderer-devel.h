@@ -56,13 +56,6 @@ namespace Property
     STENCIL_OPERATION_ON_FAIL   = Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL,
     STENCIL_OPERATION_ON_Z_FAIL = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL,
     STENCIL_OPERATION_ON_Z_PASS = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS,
-
-    /**
-     * @brief name "batchingEnabled", type BOOLEAN
-     * @see Batching
-     * @note The default value is 'false'
-     */
-    BATCHING_ENABLED            = STENCIL_OPERATION_ON_Z_PASS + 1
   };
 } // namespace Property
 

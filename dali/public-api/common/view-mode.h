@@ -26,7 +26,7 @@ namespace Dali
  */
 
 /**
- * @brief Stereoscopic view modes
+ * @brief Enumeration for stereoscopic view modes.
  * @SINCE_1_0.0
  */
 enum ViewMode

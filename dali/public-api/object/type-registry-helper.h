@@ -23,7 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 /**
- * @brief These macros are used internally by the property macros.
+ * @brief Definition for macros that are used internally by the property macros.
  * Use the the property macros in the section below this one (without the _INTERNAL postfix) when defining properties.
  * These internal macros exist as to perform the compile-time check on the enumeration order, the __COUNTER__ macro is used twice.
  * Using it twice within the same macro would result in two different values.
@@ -88,7 +88,7 @@
  *   PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000
  * };
  *
- * ///< @brief An enumeration of properties belonging to the Button class.
+ * ///< @brief Enumeration for the instance of properties belonging to the Button class.
  * struct Property
  * {
  *   enum

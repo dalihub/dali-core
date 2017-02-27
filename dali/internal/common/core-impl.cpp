@@ -43,7 +43,6 @@
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/resources/resource-manager.h>
 
@@ -97,7 +96,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mTextureUploadedQueue(),
   mNotificationManager(NULL),
   mShaderFactory(NULL),
-  mGeometryBatcher( NULL ),
   mIsActive(true),
   mProcessingEvent(false)
 {
@@ -115,11 +113,9 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mTextureUploadedQueue = new LockedResourceQueue;
 
-  mGeometryBatcher = new SceneGraph::GeometryBatcher();
-
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mGeometryBatcher, *mTextureUploadedQueue );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mTextureUploadedQueue );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
@@ -151,7 +147,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                       *mRenderManager,
                                        renderQueue,
                                       *mTextureCacheDispatcher,
-                                      *mGeometryBatcher,
                                       *mRenderTaskProcessor );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
@@ -162,8 +157,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
   mStage->Initialize();
-
-  mResourceClient = new ResourceClient( *mResourceManager, *mStage );
 
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
@@ -193,6 +186,7 @@ Core::~Core()
   if( tls )
   {
     tls->Remove();
+    delete tls;
   }
 
   // Stop relayout requests being raised on stage destruction
@@ -208,14 +202,12 @@ Core::~Core()
   delete mGestureEventProcessor;
   delete mNotificationManager;
   delete mShaderFactory;
-  delete mResourceClient;
   delete mResourceManager;
   delete mDiscardQueue;
   delete mTextureCacheDispatcher;
   delete mUpdateManager;
   delete mRenderManager;
   delete mRenderTaskProcessor;
-  delete mGeometryBatcher;
   delete mTextureUploadedQueue;
 }
 
@@ -433,11 +425,6 @@ ResourceManager& Core::GetResourceManager()
   return *(mResourceManager);
 }
 
-ResourceClient& Core::GetResourceClient()
-{
-  return *(mResourceClient);
-}
-
 ShaderFactory& Core::GetShaderFactory()
 {
   return *(mShaderFactory);
@@ -456,7 +443,7 @@ RelayoutController& Core::GetRelayoutController()
 void Core::CreateThreadLocalStorage()
 {
   // a pointer to the ThreadLocalStorage object will be stored in TLS
-  // and automatically deleted when the thread is killed
+  // The ThreadLocalStorage object should be deleted by the Core destructor
   new ThreadLocalStorage(this);
 }
 

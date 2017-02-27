@@ -8,11 +8,9 @@ SET(CAPI_LIB "dali-internal")
 SET(TC_SOURCES
         utc-Dali-Internal-Core.cpp
         utc-Dali-Internal-Handles.cpp
-        utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-FrustumCulling.cpp
-        utc-Dali-Internal-GeometryBatcher.cpp
 )
 
 LIST(APPEND TC_SOURCES

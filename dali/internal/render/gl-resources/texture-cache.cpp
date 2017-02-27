@@ -21,7 +21,6 @@
 // INTERNAL HEADERS
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/bitmap.h>
-#include <dali/internal/event/resources/resource-client.h> // For RectArea
 #include <dali/internal/render/common/texture-uploaded-dispatcher.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/gl-resources/context.h>

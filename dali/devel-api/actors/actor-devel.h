@@ -87,13 +87,14 @@ enum Type
   INHERIT_POSITION     = Dali::Actor::Property::INHERIT_POSITION,
   CLIPPING_MODE        = Dali::Actor::Property::CLIPPING_MODE,
 
-    /**
-     * @brief name "batchParent", type BOOLEAN
-     * @see Batching
-     * @note The default value is 'false'
-     */
-  BATCH_PARENT         = CLIPPING_MODE + 1,
-  SIBLING_ORDER          = CLIPPING_MODE + 2,
+  SIBLING_ORDER        = CLIPPING_MODE + 1,
+
+  /**
+   * @brief The opacity of the actor.
+   * @details Name "opacity", type Property::FLOAT.
+   * @SINCE_1_2.28
+   */
+  OPACITY              = CLIPPING_MODE + 2,
 };
 
 } // namespace Property

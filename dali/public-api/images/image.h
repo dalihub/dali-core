@@ -73,13 +73,13 @@ public:
    * This class has no New method.
    * Use the appropriate New method of its subclasses to create an initialized handle.
    * (Dali::BufferImage::New(), Dali::EncodedBufferImage::New(), Dali::FrameBufferImage::New(),
-   * Dali::NativeImage::New(), Dali::ResourceImage::New())
+   * Dali::NativeImage::New(), Dali::ResourceImage::New()).
    * @SINCE_1_0.0
    */
   Image();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -90,7 +90,7 @@ public:
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] handle A reference to the copied handle
+   * @param[in] handle A reference to the copied handle
    */
   Image(const Image& handle);
 
@@ -98,16 +98,16 @@ public:
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
-   * @param [in] rhs  A reference to the copied handle
+   * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   Image& operator=(const Image& rhs);
 
   /**
-   * @brief Downcast a handle to Image handle.
+   * @brief Downcasts a handle to Image handle.
    *
-   * If handle points to a Image object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a Image object, the
+   * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return Handle to a Image object or an uninitialized handle
@@ -120,7 +120,7 @@ public:
    * Returns either the requested width or the actual loaded width if no specific size was requested.
    *
    * @SINCE_1_0.0
-   * @return Width of the image in pixels.
+   * @return Width of the image in pixels
    */
   unsigned int GetWidth() const;
 
@@ -130,7 +130,7 @@ public:
    * Returns either the requested height or the actual loaded height if no specific size was requested.
    *
    * @SINCE_1_0.0
-   * @return Height of the image in pixels.
+   * @return Height of the image in pixels
    */
   unsigned int GetHeight() const;
 
@@ -143,7 +143,7 @@ public: // Signals
    * the stage, when such a staged image is reloaded, or when a staged
    * BufferImage calls Update().
    * @SINCE_1_0.0
-   * @return A signal object to Connect() with.
+   * @return A signal object to Connect() with
    */
   ImageSignalType& UploadedSignal();
 

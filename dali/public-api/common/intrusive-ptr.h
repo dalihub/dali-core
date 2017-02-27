@@ -29,7 +29,7 @@ namespace Dali
  */
 
 /**
- * @brief Templated intrusive pointer class
+ * @brief Templated intrusive pointer class.
  *
  * Uses the Dali:RefObject type with actual reference counting.
  * The object is responsible for destroying itself.
@@ -51,7 +51,7 @@ public:
    * @brief Constructor to attach existing object.
    *
    * @SINCE_1_0.0
-   * @param[in] p Pointer to object,
+   * @param[in] p Pointer to object
    */
   IntrusivePtr( T* p ) : mPtr( p )
   {
@@ -93,7 +93,7 @@ public:
   /**
    * @brief Destructor.
    *
-   * Object will self-destruct if reference count is zero
+   * Object will self-destruct if reference count is zero.
    * @SINCE_1_0.0
    */
   ~IntrusivePtr()
@@ -105,7 +105,7 @@ public:
   }
 
   /**
-   * @brief Get pointer to reference counted object.
+   * @brief Gets pointer to reference counted object.
    *
    * @SINCE_1_0.0
    * @return Pointer to reference counted object
@@ -204,7 +204,7 @@ public:
   }
 
   /**
-   * @brief Detach pointer from intrusive ptr counting.
+   * @brief Detaches pointer from intrusive ptr counting.
    *
    * Use with care.
    * @SINCE_1_0.0
@@ -226,7 +226,7 @@ private:
   void ThisIsSaferThanReturningVoidStar() const {}
 
   /**
-   * @brief Internal swap function
+   * @brief Internal swap function.
    * @SINCE_1_0.0
    */
   void Swap( IntrusivePtr& rhs )
@@ -268,7 +268,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
 }
 
 /**
- * @brief Comparison overrides of objects wrapped by intrusive pointers
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
  * @param[in] lhs Intrusive pointer to compare with
@@ -296,7 +296,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
 }
 
 /**
- * @brief Comparison overrides of objects wrapped by intrusive pointers
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
  * @param[in] lhs Object to compare with
@@ -310,7 +310,7 @@ inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
 }
 
 /**
- * @brief Comparison overrides of objects wrapped by intrusive pointers
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
  *
  * @SINCE_1_0.0
  * @param[in] lhs Object to compare with

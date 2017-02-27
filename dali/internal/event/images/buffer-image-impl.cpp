@@ -65,7 +65,6 @@ BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format 
 : Image(),
   mInternalBuffer( NULL ),
   mExternalBuffer( NULL ),
-  mResourceClient( NULL ),
   mBufferSize( 0 ),
   mByteStride( 0 ),
   mBytesPerPixel( 0 ),
@@ -87,7 +86,6 @@ BufferImage::BufferImage(PixelBuffer* pixBuf,
 : Image(),
   mInternalBuffer( NULL ),
   mExternalBuffer( pixBuf ),
-  mResourceClient( NULL ),
   mBufferSize( 0 ),
   mByteStride( 0 ),
   mBytesPerPixel( 0 ),
@@ -108,8 +106,6 @@ void BufferImage::SetupBuffer( unsigned int width,
                                Pixel::Format pixelformat,
                                unsigned int byteStride )
 {
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
   mPixelFormat = pixelformat;

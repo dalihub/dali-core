@@ -58,7 +58,6 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/manager/geometry-batcher.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
@@ -131,7 +130,6 @@ struct UpdateManager::Impl
         RenderManager& renderManager,
         RenderQueue& renderQueue,
         SceneGraphBuffers& sceneGraphBuffers,
-        GeometryBatcher& geometryBatcher,
         RenderTaskProcessor& renderTaskProcessor )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
@@ -146,7 +144,6 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
-    geometryBatcher( geometryBatcher ),
     renderTaskProcessor( renderTaskProcessor ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     taskList( renderMessageDispatcher, resourceManager ),
@@ -166,8 +163,6 @@ struct UpdateManager::Impl
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
     renderers.SetSceneController( *sceneController );
-
-    discardQueue.SetGeometryBatcher( &geometryBatcher );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -231,7 +226,6 @@ struct UpdateManager::Impl
   RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
-  GeometryBatcher&                    geometryBatcher;               ///< An instance of the GeometryBatcher
   RenderTaskProcessor&                renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
   Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
@@ -289,7 +283,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
                               TextureCacheDispatcher& textureCacheDispatcher,
-                              GeometryBatcher& geometryBatcher,
                               RenderTaskProcessor& renderTaskProcessor )
   : mImpl(NULL)
 {
@@ -302,11 +295,9 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     renderManager,
                     renderQueue,
                     mSceneGraphBuffers,
-                    geometryBatcher,
                     renderTaskProcessor );
 
   textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
-  mImpl->geometryBatcher.SetUpdateManager( this );
 }
 
 UpdateManager::~UpdateManager()
@@ -348,7 +339,6 @@ void UpdateManager::AddNode( Node* node )
     {
       mImpl->nodes.Insert((iter+1), node);
       node->CreateTransform( &mImpl->transformManager );
-      node->mGeometryBatcher = &mImpl->geometryBatcher;
       break;
     }
   }
@@ -937,9 +927,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   //Process the queued scene messages
   mImpl->messageQueue.ProcessMessages( bufferIndex );
 
-  //Post Process Ids of resources updated by renderer
-  mImpl->resourceManager.PostProcessResources( bufferIndex );
-
   //Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
@@ -982,9 +969,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
-    //Update geometry batcher
-    mImpl->geometryBatcher.Update( bufferIndex );
-
     //Process the RenderTasks; this creates the instructions for rendering the next frame.
     //reset the update buffer index and make sure there is enough room in the instruction container
     mImpl->renderInstructions.ResetAndReserve( bufferIndex,
@@ -996,7 +980,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                                         mImpl->taskList,
                                         *mImpl->root,
                                         mImpl->sortedLayers,
-                                        mImpl->geometryBatcher,
                                         mImpl->renderInstructions );
 
       // Process the system-level RenderTasks last
@@ -1006,7 +989,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                                           mImpl->systemLevelTaskList,
                                           *mImpl->systemLevelRoot,
                                           mImpl->systemLevelSortedLayers,
-                                          mImpl->geometryBatcher,
                                           mImpl->renderInstructions );
       }
     }
