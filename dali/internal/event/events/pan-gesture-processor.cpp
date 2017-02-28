@@ -362,6 +362,46 @@ void PanGestureProcessor::SetSmoothingAmount(float amount)
   mSceneObject->SetSmoothingAmount(amount);
 }
 
+void PanGestureProcessor::SetUseActualTimes( bool value )
+{
+  mSceneObject->SetUseActualTimes( value );
+}
+
+void PanGestureProcessor::SetInterpolationTimeRange( int value )
+{
+  mSceneObject->SetInterpolationTimeRange( value );
+}
+
+void PanGestureProcessor::SetScalarOnlyPredictionEnabled( bool value )
+{
+  mSceneObject->SetScalarOnlyPredictionEnabled( value );
+}
+
+void PanGestureProcessor::SetTwoPointPredictionEnabled( bool value )
+{
+  mSceneObject->SetTwoPointPredictionEnabled( value );
+}
+
+void PanGestureProcessor::SetTwoPointInterpolatePastTime( int value )
+{
+  mSceneObject->SetTwoPointInterpolatePastTime( value );
+}
+
+void PanGestureProcessor::SetTwoPointVelocityBias( float value )
+{
+  mSceneObject->SetTwoPointVelocityBias( value );
+}
+
+void PanGestureProcessor::SetTwoPointAccelerationBias( float value )
+{
+  mSceneObject->SetTwoPointAccelerationBias( value );
+}
+
+void PanGestureProcessor::SetMultitapSmoothingRange( int value )
+{
+  mSceneObject->SetMultitapSmoothingRange( value );
+}
+
 void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
