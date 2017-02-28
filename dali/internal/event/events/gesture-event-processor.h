@@ -181,6 +181,62 @@ public: // Called by Core
    */
   void SetPanGestureSmoothingAmount( float amount );
 
+  /*
+   * @brief Sets whether to use actual times of the real gesture and frames or not.
+   *
+   * @param[in] value True = use actual times, False = use perfect values
+   */
+  void SetPanGestureUseActualTimes( bool value );
+
+  /**
+   * @brief Sets the interpolation time range (ms) of past points to use (with weights) when interpolating.
+   *
+   * @param[in] value Time range in ms
+   */
+  void SetPanGestureInterpolationTimeRange( int value );
+
+  /**
+   * @brief Sets whether to use scalar only prediction, which when enabled, ignores acceleration.
+   *
+   * @param[in] value True = use scalar prediction only
+   */
+  void SetPanGestureScalarOnlyPredictionEnabled( bool value );
+
+  /**
+   * @brief Sets whether to use two point prediction. This combines two interpolated points to get more steady acceleration and velocity values.
+   *
+   * @param[in] value True = use two point prediction
+   */
+  void SetPanGestureTwoPointPredictionEnabled( bool value );
+
+  /**
+   * @brief Sets the time in the past to interpolate the second point when using two point interpolation.
+   *
+   * @param[in] value Time in past in ms
+   */
+  void SetPanGestureTwoPointInterpolatePastTime( int value );
+
+  /**
+   * @brief Sets the two point velocity bias. This is the ratio of first and second points to use for velocity.
+   *
+   * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
+   */
+  void SetPanGestureTwoPointVelocityBias( float value );
+
+  /**
+   * @brief Sets the two point acceleration bias. This is the ratio of first and second points to use for acceleration.
+   *
+   * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
+   */
+  void SetPanGestureTwoPointAccelerationBias( float value );
+
+  /**
+   * @brief Sets the range of time (ms) of points in the history to perform multitap smoothing with (if enabled).
+   *
+   * @param[in] value Time in past in ms
+   */
+  void SetPanGestureMultitapSmoothingRange( int value );
+
 private:
 
   // Undefined

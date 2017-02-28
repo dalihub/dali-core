@@ -265,6 +265,47 @@ void GestureEventProcessor::SetPanGestureSmoothingAmount( float amount )
   mPanGestureProcessor.SetSmoothingAmount(amount);
 }
 
+void GestureEventProcessor::SetPanGestureUseActualTimes( bool value )
+{
+  mPanGestureProcessor.SetUseActualTimes( value );
+}
+
+void GestureEventProcessor::SetPanGestureInterpolationTimeRange( int value )
+{
+  mPanGestureProcessor.SetInterpolationTimeRange( value );
+}
+
+void GestureEventProcessor::SetPanGestureScalarOnlyPredictionEnabled( bool value )
+{
+  mPanGestureProcessor.SetScalarOnlyPredictionEnabled( value );
+}
+
+void GestureEventProcessor::SetPanGestureTwoPointPredictionEnabled( bool value )
+{
+  mPanGestureProcessor.SetTwoPointPredictionEnabled( value );
+}
+
+void GestureEventProcessor::SetPanGestureTwoPointInterpolatePastTime( int value )
+{
+  mPanGestureProcessor.SetTwoPointInterpolatePastTime( value );
+}
+
+void GestureEventProcessor::SetPanGestureTwoPointVelocityBias( float value )
+{
+  mPanGestureProcessor.SetTwoPointVelocityBias( value );
+}
+
+void GestureEventProcessor::SetPanGestureTwoPointAccelerationBias( float value )
+{
+  mPanGestureProcessor.SetTwoPointAccelerationBias( value );
+}
+
+void GestureEventProcessor::SetPanGestureMultitapSmoothingRange( int value )
+{
+  mPanGestureProcessor.SetMultitapSmoothingRange( value );
+}
+
+
 } // namespace Internal
 
 } // namespace Dali
