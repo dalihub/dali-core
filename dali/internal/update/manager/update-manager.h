@@ -654,7 +654,8 @@ private:
 
 inline void InstallRootMessage( UpdateManager& manager, Layer& root, bool systemLevel )
 {
-  typedef MessageValue2< UpdateManager, Layer*, bool > LocalType;
+  // Message has ownership of Layer while in transit from event -> update
+  typedef MessageValue2< UpdateManager, OwnerPointer<Layer>, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -665,6 +666,7 @@ inline void InstallRootMessage( UpdateManager& manager, Layer& root, bool system
 
 inline void AddNodeMessage( UpdateManager& manager, Node& node )
 {
+  // Message has ownership of Node while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer<Node> > LocalType;
 
   // Reserve some memory inside the message queue
