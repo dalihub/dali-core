@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,9 +108,9 @@ enum Type
 } // namespace Property
 
 /**
- * @brief Raise actor above the next highest level of actor(s)
+ * @brief Raise actor above the next highest level of actor(s).
  *
- * @param[in] actor the Actor to lower
+ * @param[in] actor The Actor to raise
  * @note Sibling order of actors within the parent will be updated automatically.
  * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
  * Initially actors added to a parent will have the same sibling order and shown in relation to insertion order.
@@ -121,9 +121,9 @@ enum Type
 DALI_IMPORT_API void Raise( Actor actor );
 
 /**
- * @brief Lower the actor to underneath the level below actor(s)
+ * @brief Lower the actor to underneath the level below actor(s).
  *
- * @param[in] actor the Actor to lower
+ * @param[in] actor The Actor to lower
  * @note Sibling order of actors within the parent will be updated automatically.
  * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
  * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
@@ -132,9 +132,9 @@ DALI_IMPORT_API void Raise( Actor actor );
 DALI_IMPORT_API void Lower( Actor actor );
 
 /**
- * @brief Raise actor above all other actors
+ * @brief Raise actor above all other actors.
  *
- * @param[in] actor the Actor to lower
+ * @param[in] actor The Actor to raise to the top
  * @note Sibling order of actors within the parent will be updated automatically.
  * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
  * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
@@ -142,9 +142,9 @@ DALI_IMPORT_API void Lower( Actor actor );
 DALI_IMPORT_API void RaiseToTop( Actor actor );
 
 /**
- * @brief Lower actor to the bottom of all actors
+ * @brief Lower actor to the bottom of all actors.
  *
- * @param[in] actor the Actor to lower
+ * @param[in] actor The Actor to lower to the bottom
  * @note Sibling order of actors within the parent will be updated automatically.
  * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
  * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
@@ -152,10 +152,10 @@ DALI_IMPORT_API void RaiseToTop( Actor actor );
 DALI_IMPORT_API void LowerToBottom( Actor actor );
 
 /**
- * @brief Raise the actor to above the target actor
+ * @brief Raise the actor to above the target actor.
  *
- * @param[in] actor the Actor to lower
- * @param[in] target the target Actor to raise above
+ * @param[in] actor The actor to raise
+ * @param[in] target Will be raised above this actor
  * @note Sibling order of actors within the parent will be updated automatically.
  * Actors on the level above the target actor will still be shown above this actor.
  * Raising this actor above actors with the same sibling order as each other will raise this actor above them.
@@ -165,10 +165,10 @@ DALI_IMPORT_API void LowerToBottom( Actor actor );
 DALI_IMPORT_API void RaiseAbove( Actor actor, Dali::Actor target );
 
 /**
- * @brief Lower the actor to below the target actor
+ * @brief Lower the actor to below the target actor.
  *
- * @param[in] actor the Actor to lower
- * @param[in] target the target Actor to lower below
+ * @param[in] actor The Actor to lower
+ * @param[in] target Will be lowered below this actor
  * @note Sibling order of actors within the parent will be updated automatically.
  * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
  * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
