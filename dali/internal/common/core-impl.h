@@ -24,7 +24,6 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/resource-policies.h>
 
@@ -53,7 +52,6 @@ class AnimationPlaylist;
 class PropertyNotificationManager;
 class EventProcessor;
 class GestureEventProcessor;
-class ResourceManager;
 class ShaderFactory;
 class TouchResampler;
 class RelayoutController;
@@ -63,7 +61,6 @@ namespace SceneGraph
 class UpdateManager;
 class RenderManager;
 class DiscardQueue;
-class TextureCacheDispatcher;
 class RenderTaskProcessor;
 }
 
@@ -229,12 +226,6 @@ private:  // for use by ThreadLocalStorage
   NotificationManager& GetNotificationManager();
 
   /**
-   * Returns the Resource Manager.
-   * @return A reference to the Resource Manager.
-   */
-  ResourceManager& GetResourceManager();
-
-  /**
    * Returns the Shader factory
    * @return A reference to the Shader binary factory.
    */
@@ -276,13 +267,10 @@ private:
   SceneGraph::UpdateManager*                mUpdateManager;               ///< Update manager
   SceneGraph::RenderManager*                mRenderManager;               ///< Render manager
   SceneGraph::DiscardQueue*                 mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
-  SceneGraph::TextureCacheDispatcher*       mTextureCacheDispatcher;      ///< Used to send messages to TextureCache
-  LockedResourceQueue*                      mTextureUploadedQueue;        ///< Stores resource ids which require post processing after render
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
-  ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
   SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended

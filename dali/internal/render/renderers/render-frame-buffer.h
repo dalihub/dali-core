@@ -30,7 +30,7 @@ namespace Internal
 {
 namespace Render
 {
-class NewTexture;
+class Texture;
 
 class FrameBuffer
 {
@@ -73,7 +73,7 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTexture( Context& context, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTexture( Context& context, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
    * @brief Bind the framebuffer

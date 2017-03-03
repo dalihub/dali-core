@@ -24,7 +24,6 @@
 #include <dali/public-api/rendering/shader.h> // Dali::Shader
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
 #include <dali/internal/common/shader-data.h> // ShaderPtr
 
 namespace Dali

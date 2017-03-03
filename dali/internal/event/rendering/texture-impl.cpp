@@ -27,26 +27,26 @@ namespace Dali
 namespace Internal
 {
 
-NewTexturePtr NewTexture::New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
+TexturePtr Texture::New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
 {
-  NewTexturePtr texture( new NewTexture( type, format, width, height ) );
+  TexturePtr texture( new Texture( type, format, width, height ) );
   texture->Initialize();
   return texture;
 }
 
-NewTexturePtr NewTexture::New( NativeImageInterface& nativeImageInterface )
+TexturePtr Texture::New( NativeImageInterface& nativeImageInterface )
 {
-  NewTexturePtr texture( new NewTexture( &nativeImageInterface ) );
+  TexturePtr texture( new Texture( &nativeImageInterface ) );
   texture->Initialize();
   return texture;
 }
 
-Render::NewTexture* NewTexture::GetRenderObject() const
+Render::Texture* Texture::GetRenderObject() const
 {
   return mRenderObject;
 }
 
-NewTexture::NewTexture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
+Texture::Texture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
   mNativeImage(),
@@ -57,7 +57,7 @@ NewTexture::NewTexture(TextureType::Type type, Pixel::Format format, unsigned in
 {
 }
 
-NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
+Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
   mNativeImage( nativeImageInterface ),
@@ -68,24 +68,24 @@ NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
 {
 }
 
-void NewTexture::Initialize()
+void Texture::Initialize()
 {
   if( EventThreadServices::IsCoreRunning() )
   {
     if( mNativeImage )
     {
-      mRenderObject = new Render::NewTexture( mNativeImage );
+      mRenderObject = new Render::Texture( mNativeImage );
     }
     else
     {
-      mRenderObject = new Render::NewTexture( mType, mFormat, mWidth, mHeight );
+      mRenderObject = new Render::Texture( mType, mFormat, mWidth, mHeight );
     }
 
     AddTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 
-NewTexture::~NewTexture()
+Texture::~Texture()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
@@ -93,12 +93,12 @@ NewTexture::~NewTexture()
   }
 }
 
-bool NewTexture::Upload( PixelDataPtr pixelData )
+bool Texture::Upload( PixelDataPtr pixelData )
 {
   return Upload( pixelData, 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight() );
 }
 
-bool NewTexture::Upload( PixelDataPtr pixelData,
+bool Texture::Upload( PixelDataPtr pixelData,
                          unsigned int layer, unsigned int mipmap,
                          unsigned int xOffset, unsigned int yOffset,
                          unsigned int width, unsigned int height )
@@ -150,7 +150,7 @@ bool NewTexture::Upload( PixelDataPtr pixelData,
   return result;
 }
 
-void NewTexture::GenerateMipmaps()
+void Texture::GenerateMipmaps()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
@@ -158,12 +158,12 @@ void NewTexture::GenerateMipmaps()
   }
 }
 
-unsigned int NewTexture::GetWidth() const
+unsigned int Texture::GetWidth() const
 {
   return mWidth;
 }
 
-unsigned int NewTexture::GetHeight() const
+unsigned int Texture::GetHeight() const
 {
   return mHeight;
 }

@@ -110,7 +110,7 @@ ResourceImage::~ResourceImage()
 bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  DALI_ASSERT_DEBUG( dynamic_cast<ResourceImage*>( object ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
+  DALI_ASSERT_DEBUG( dynamic_cast<ResourceImage*>( object ) && "Failed to downcast from BaseObject to ResourceImage.\n" );
   ResourceImage* image = static_cast<ResourceImage*>(object);
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_LOADING_FINISHED ) )
@@ -156,7 +156,7 @@ void ResourceImage::Reload()
 
     //Create texture
     Pixel::Format format = bitmap->GetPixelFormat();
-    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
+    mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
     size_t bufferSize = bitmap->GetBufferSize();
@@ -181,7 +181,7 @@ void ResourceImage::Reload()
   }
   else
   {
-    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
+    mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 0u, 0u );
     mWidth = mHeight = 0u;
     mLoadingState = Dali::ResourceLoadingFailed;
   }

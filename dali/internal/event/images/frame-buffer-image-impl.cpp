@@ -48,7 +48,7 @@ FrameBufferImagePtr FrameBufferImage::New( unsigned int width,
   FrameBufferImagePtr image = new FrameBufferImage( width, height );
   image->Initialize();
 
-  image->mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height );
+  image->mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height );
   image->mFrameBufferObject = FrameBuffer::New( width, height, RenderBufferFormatToFrameBufferAttachments[bufferformat] );
   image->mFrameBufferObject->AttachColorTexture( image->mTexture, 0u, 0u );
 
@@ -60,7 +60,7 @@ FrameBufferImagePtr FrameBufferImage::New( NativeImageInterface& nativeImage )
   FrameBufferImagePtr image = new FrameBufferImage( nativeImage );
   image->Initialize();
 
-  image->mTexture = NewTexture::New( nativeImage );
+  image->mTexture = Texture::New( nativeImage );
   image->mFrameBufferObject = FrameBuffer::New( image->mTexture->GetWidth(), image->mTexture->GetHeight(), Dali::FrameBuffer::Attachment::NONE );
   image->mFrameBufferObject->AttachColorTexture( image->mTexture, 0u, 0u );
 

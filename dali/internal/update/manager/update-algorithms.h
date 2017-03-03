@@ -27,8 +27,6 @@ namespace Dali
 namespace Internal
 {
 
-class ResourceManager;
-
 namespace SceneGraph
 {
 
@@ -49,13 +47,11 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
  * The inherited properties of each node are recalculated if necessary.
  * @param[in] rootNode The root of a tree of nodes.
  * @param[in] updateBufferIndex The current update buffer index.
- * @param[in] resourceManager The resource manager.
  * @param[in] renderQueue Used to query messages for the next Render.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
 int UpdateNodeTree( Layer& rootNode,
                     BufferIndex updateBufferIndex,
-                    ResourceManager& resourceManager,
                     RenderQueue& renderQueue );
 
 } // namespace SceneGraph

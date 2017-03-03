@@ -26,7 +26,6 @@
 #include <dali/public-api/object/type-registry.h>
 
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 
@@ -54,7 +53,7 @@ Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_UPLOADED, &Image
 bool Image::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  DALI_ASSERT_DEBUG( dynamic_cast<Image*>( object ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
+  DALI_ASSERT_DEBUG( dynamic_cast<Image*>( object ) && "Failed to downcast from BaseObject to Image.\n" );
   Image* image = static_cast<Image*>(object);
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_UPLOADED ) )
@@ -68,28 +67,6 @@ bool Image::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   }
 
   return connected;
-}
-
-ResourceId Image::GetResourceId() const
-{
-  ResourceId ret = mTicket ? mTicket->GetId() : 0;
-
-  return ret;
-}
-
-void Image::ResourceLoadingFailed(const ResourceTicket& ticket)
-{
-  // do nothing
-}
-
-void Image::ResourceLoadingSucceeded(const ResourceTicket& ticket)
-{
-  // do nothing
-}
-
-void Image::ResourceUploaded(const ResourceTicket& ticket)
-{
-  mUploaded.Emit( Dali::Image( this ) );
 }
 
 unsigned int Image::GetWidth() const
@@ -117,12 +94,6 @@ Image::Image()
 
 Image::~Image()
 {
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    mTicket.Reset();
-  }
-
   if( Stage::IsInstalled() )
   {
     UnregisterObject();

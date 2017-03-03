@@ -36,7 +36,6 @@ namespace Internal
 
 class Core;
 class NotificationManager;
-class ResourceManager;
 class ShaderFactory;
 class GestureEventProcessor;
 class RelayoutController;
@@ -107,12 +106,6 @@ public:
    * @return reference to the Notification Manager
    */
   NotificationManager& GetNotificationManager();
-
-  /**
-   * Returns the Resource Manager
-   * @return reference to the Resource Manager
-   */
-  ResourceManager& GetResourceManager();
 
   /**
    * Returns the Shader Factory

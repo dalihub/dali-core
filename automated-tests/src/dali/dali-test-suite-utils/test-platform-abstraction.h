@@ -40,8 +40,6 @@ class DALI_IMPORT_API TestPlatformAbstraction : public Dali::Integration::Platfo
 
 public:
 
-  typedef Vector< Integration::ResourceRequest* > ResourceRequestContainer;
-
   /**
    * Constructor
    */
@@ -51,16 +49,6 @@ public:
    * Destructor
    */
   virtual ~TestPlatformAbstraction();
-
-  /**
-   * @copydoc PlatformAbstraction::Suspend()
-   */
-  virtual void Suspend();
-
-  /**
-   * @copydoc PlatformAbstraction::Resume()
-   */
-  virtual void Resume();
 
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
@@ -81,11 +69,6 @@ public:
                                                bool orientationCorrection );
 
   /**
-   * @copydoc PlatformAbstraction::LoadResource()
-   */
-  virtual void LoadResource(const Integration::ResourceRequest& request);
-
-  /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
    */
   virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
@@ -96,70 +79,24 @@ public:
   virtual Integration::BitmapPtr DecodeBuffer( const Dali::Integration::ResourceType& resourceType, uint8_t * buffer, size_t size );
 
   /**
-   * @copydoc PlatformAbstraction::CancelLoad()
-   */
-  virtual void CancelLoad(Integration::ResourceId id, Integration::ResourceTypeId typeId);
-
-  /**
-   * @copydoc PlatformAbstraction::GetResources()
-   */
-  virtual void GetResources(Integration::ResourceCache& cache);
-
-  /**
-   * @copydoc PlatformAbstraction::IsLoading()
-   */
-  virtual bool IsLoading();
-
-  /**
-   * @copydoc PlatformAbstraction::GetDefaultFontSize()
-   */
-  virtual int GetDefaultFontSize() const;
-
-  /**
-   * @copydoc PlatformAbstraction::SetDpi()
-   */
-  virtual void SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical);
-
-  /**
-   * @copydoc PlatformAbstraction::LoadFile()
-   */
-  virtual bool LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const;
-
-  /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
    */
   virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const;
 
   /**
-   * @copydoc PlatformAbstraction::SaveFile()
+   * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
    */
-  virtual bool SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const;
-
- /**
-  * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
-  */
   virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
 
-  virtual void JoinLoaderThreads();
 
 public: // TEST FUNCTIONS
 
   // Enumeration of Platform Abstraction methods
   typedef enum
   {
-    SuspendFunc,
-    ResumeFunc,
-    LoadResourceFunc,
     LoadResourceSynchronouslyFunc,
-    SaveFileFunc,
-    LoadFileFunc,
     LoadShaderBinaryFileFunc,
-    SaveShaderBinaryFileFunc,
-    CancelLoadFunc,
-    GetResourcesFunc,
-    IsLoadingFunc,
-    SetDpiFunc,
-    JoinLoaderThreadsFunc,
+    SaveShaderBinaryFileFunc
   } TestFuncEnum;
 
   /** Call this every test */
@@ -183,61 +120,9 @@ public: // TEST FUNCTIONS
   void SetIsLoadingResult(bool result);
 
   /**
-   * @brief Sets the value returned by GetDefaultFontSize
-   * @param[in] result The value to return
-   */
-  void SetGetDefaultFontSizeResult(float result);
-
-  /**
    * @brief Clears all resource queues
    */
   void ClearReadyResources();
-
-  /**
-   * @brief Sets a particular resource request as loaded.
-   * @param[in] loadedId The ResourceID of the resource that has been loaded.
-   * @param[in] loadedType The type of resource that has been loaded.
-   * @param[in] loadedResource A pointer to the resource that has been loaded.
-   */
-  void SetResourceLoaded(Integration::ResourceId  loadedId,
-                         Integration::ResourceTypeId  loadedType,
-                         Integration::ResourcePointer loadedResource);
-
-  /**
-   * @brief Sets a particular resource request as load failure.
-   * @param[in] id The ID of the failed resource request.
-   * @param[in] failure The type of failure.
-   */
-  void SetResourceLoadFailed(Integration::ResourceId  id,
-                             Integration::ResourceFailure failure);
-
-  /**
-   * @brief Retrieves the latest resource request
-   * @return A pointer to the latest resource request.
-   */
-  Integration::ResourceRequest* GetRequest();
-
-  /**
-   * @brief Retrieves a reference to a container of all the resource requests.
-   * @return A reference to a container of all the resource requests.
-   */
-  const ResourceRequestContainer& GetAllRequests() const;
-
-  /**
-   * @brief Sets all resource requests as loaded.
-   */
-  void SetAllResourceRequestsAsLoaded();
-
-  /**
-   * @brief Sets all resource requests as loaded.
-   * @param[in] failure The failure type
-   */
-  void SetAllResourceRequestsAsFailed( Integration::ResourceFailure failure );
-
-  /**
-   * @brief Discards all current resource requests.
-   */
-  void DiscardRequest();
 
   /**
    * @brief Sets the value returned by GetClosestImageSize.
@@ -277,19 +162,6 @@ private:
 
 private:
 
-  struct LoadedResource
-  {
-    Integration::ResourceId      id;
-    Integration::ResourceTypeId  type;
-    Integration::ResourcePointer resource;
-  };
-
-  struct FailedLoad
-  {
-    Integration::ResourceId      id;
-    Integration::ResourceFailure failure;
-  };
-
   struct LoadFileResult
   {
     inline LoadFileResult()
@@ -302,15 +174,8 @@ private:
     Dali::Vector< unsigned char> buffer;
   };
 
-  typedef std::vector< LoadedResource > LoadedResourceContainer;
-  typedef std::vector< FailedLoad > FailedLoadContainer;
-
   mutable TraceCallStack        mTrace;
   bool                          mIsLoadingResult;
-  int                           mGetDefaultFontSizeResult;
-  LoadedResourceContainer       mLoadedResourcesQueue;
-  FailedLoadContainer           mFailedLoadQueue;
-  ResourceRequestContainer      mResourceRequests;
   Vector2                       mSize;
   Vector2                       mClosestSize;
 

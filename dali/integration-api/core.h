@@ -56,9 +56,8 @@ enum Reasons
   NOT_REQUESTED           = 0,    ///< Zero means that no further updates are required
   STAGE_KEEP_RENDERING    = 1<<1, ///<  - Stage::KeepRendering() is being used
   ANIMATIONS_RUNNING      = 1<<2, ///< - Animations are ongoing
-  LOADING_RESOURCES       = 1<<3, ///< - Resources are being loaded
-  MONITORING_PERFORMANCE  = 1<<4, ///< - The --enable-performance-monitor option is being used
-  RENDER_TASK_SYNC        = 1<<5  ///< - A render task is waiting for render sync
+  MONITORING_PERFORMANCE  = 1<<3, ///< - The --enable-performance-monitor option is being used
+  RENDER_TASK_SYNC        = 1<<4  ///< - A render task is waiting for render sync
 };
 }
 

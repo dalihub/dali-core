@@ -76,7 +76,11 @@ struct MessageQueue::Impl
   ~Impl()
   {
     // Delete the current buffer
-    delete currentMessageBuffer;
+    if( currentMessageBuffer )
+    {
+      DeleteBufferContents( currentMessageBuffer );
+      delete currentMessageBuffer;
+    }
 
     // Delete the unprocessed buffers
     const MessageBufferIter processQueueEndIter = processQueue.end();

@@ -25,6 +25,13 @@
 
 namespace Dali
 {
+
+template<typename T>
+std::string ToString(const T& x)
+{
+  return "undefined";
+}
+
 std::string ToString(int x);
 std::string ToString(unsigned int x);
 std::string ToString(float x);

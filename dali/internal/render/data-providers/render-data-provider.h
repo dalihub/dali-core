@@ -95,16 +95,16 @@ public:
   Samplers& GetSamplers();
 
   /**
-   * Returns the list of NewTextures
-   * @return The list of NewTextures
+   * Returns the list of Textures
+   * @return The list of Textures
    */
-  std::vector<Render::NewTexture*>& GetNewTextures();
+  std::vector<Render::Texture*>& GetTextures();
 
 private:
 
   const UniformMapDataProvider*       mUniformMapDataProvider;
   Shader*                             mShader;
-  std::vector<Render::NewTexture*>    mNewTextures;
+  std::vector<Render::Texture*>    mTextures;
   Samplers                            mSamplers;
 
   // Give Renderer access to our private data to reduce copying vectors on construction.

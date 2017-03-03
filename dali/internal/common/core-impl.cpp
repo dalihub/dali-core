@@ -41,22 +41,17 @@
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/render-task-processor.h>
-#include <dali/internal/update/resources/resource-manager.h>
 
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderQueue;
-using Dali::Internal::SceneGraph::TextureCache;
-using Dali::Internal::SceneGraph::TextureCacheDispatcher;
 
 namespace
 {
@@ -93,7 +88,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mUpdateManager(NULL),
   mRenderManager(NULL),
   mDiscardQueue(NULL),
-  mTextureUploadedQueue(),
   mNotificationManager(NULL),
   mShaderFactory(NULL),
   mIsActive(true),
@@ -111,42 +105,21 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mPropertyNotificationManager = PropertyNotificationManager::New();
 
-  mTextureUploadedQueue = new LockedResourceQueue;
-
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, *mTextureUploadedQueue );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-  TextureCache& textureCache = mRenderManager->GetTextureCache();
-
-  ResourcePolicy::Discardable discardPolicy = ResourcePolicy::OWNED_DISCARD;
-  if( dataRetentionPolicy == ResourcePolicy::DALI_RETAINS_ALL_DATA )
-  {
-    discardPolicy = ResourcePolicy::OWNED_RETAIN;
-  }
-  textureCache.SetDiscardBitmapsPolicy(discardPolicy);
-
-  mTextureCacheDispatcher = new SceneGraph::TextureCacheDispatcher( renderQueue, textureCache );
 
   mDiscardQueue = new DiscardQueue( renderQueue );
-
-  mResourceManager = new ResourceManager(  mPlatform,
-                                          *mNotificationManager,
-                                          *mTextureCacheDispatcher,
-                                          *mTextureUploadedQueue,
-                                          *mDiscardQueue,
-                                           renderQueue );
 
   mUpdateManager = new UpdateManager( *mNotificationManager,
                                       *mAnimationPlaylist,
                                       *mPropertyNotificationManager,
-                                      *mResourceManager,
                                       *mDiscardQueue,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mTextureCacheDispatcher,
                                       *mRenderTaskProcessor );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
@@ -169,12 +142,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
 Core::~Core()
 {
-  /**
-   * TODO this should be done by Adaptor, Core does not know about threading
-   * First stop the resource loading thread(s)
-   */
-  mPlatform.JoinLoaderThreads();
-
   /*
    * The order of destructing these singletons is important!!!
    */
@@ -202,13 +169,10 @@ Core::~Core()
   delete mGestureEventProcessor;
   delete mNotificationManager;
   delete mShaderFactory;
-  delete mResourceManager;
   delete mDiscardQueue;
-  delete mTextureCacheDispatcher;
   delete mUpdateManager;
   delete mRenderManager;
   delete mRenderTaskProcessor;
-  delete mTextureUploadedQueue;
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
@@ -273,12 +237,6 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
   // No need to keep update running if there are notifications to process.
   // Any message to update will wake it up anyways
-
-  if ( mResourceManager->ResourcesToProcess() )
-  {
-    // If we are still processing resources, then we have to continue the update
-    status.keepUpdating |= Integration::KeepUpdating::LOADING_RESOURCES;
-  }
 }
 
 void Core::Render( RenderStatus& status )
@@ -290,15 +248,11 @@ void Core::Render( RenderStatus& status )
 
 void Core::Suspend()
 {
-  mPlatform.Suspend();
-
   mIsActive = false;
 }
 
 void Core::Resume()
 {
-  mPlatform.Resume();
-
   mIsActive = true;
 
   // trigger processing of events queued up while paused
@@ -418,11 +372,6 @@ RenderManager& Core::GetRenderManager()
 NotificationManager& Core::GetNotificationManager()
 {
   return *(mNotificationManager);
-}
-
-ResourceManager& Core::GetResourceManager()
-{
-  return *(mResourceManager);
 }
 
 ShaderFactory& Core::GetShaderFactory()

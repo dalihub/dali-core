@@ -27,7 +27,7 @@ namespace Dali
 
 void TextureSetImage( TextureSet textureSet, size_t index, Image image )
 {
-  Internal::NewTexture* texture = NULL;
+  Internal::Texture* texture = NULL;
   if( image )
   {
     texture = GetImplementation( image ).GetTexture();

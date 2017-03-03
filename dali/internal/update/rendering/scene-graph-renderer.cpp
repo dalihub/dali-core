@@ -563,12 +563,12 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
 
   if( mTextureSet )
   {
-    size_t textureCount = mTextureSet->GetNewTextureCount();
-    dataProvider->mNewTextures.resize( textureCount );
+    size_t textureCount = mTextureSet->GetTextureCount();
+    dataProvider->mTextures.resize( textureCount );
     dataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )
     {
-      dataProvider->mNewTextures[i] = mTextureSet->GetNewTexture(i);
+      dataProvider->mTextures[i] = mTextureSet->GetTexture(i);
       dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
     }
   }
