@@ -4412,9 +4412,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   END_TEST;
 }
 
-int UtcDaliActorRaiseAboveLowerBelow(void)
+int UtcDaliActorRaiseAbove(void)
 {
-  tet_infoline( "UtcDaliActor RaiseToAbove and LowerBelow test \n" );
+  tet_infoline( "UtcDaliActor RaiseToAbove test \n" );
 
   TestApplication application;
 
@@ -4637,7 +4637,7 @@ int UtcDaliActorLowerBelow(void)
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
   tet_infoline( "Testing B above A and C at bottom\n" );
-  bool BAC = ( indexB > indexA) &&  ( indexA > indexC );
+  bool BAC = ( indexB > indexA) &&  ( indexA > indexC ); // B at TOP, then A then C at bottom
 
   DALI_TEST_EQUALS( BAC, true, TEST_LOCATION );
 
@@ -4667,7 +4667,7 @@ int UtcDaliActorLowerBelow(void)
   indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
-  bool ACB = ( indexA > indexC) &&  ( indexC > indexB );
+  bool ACB = ( indexA > indexC) &&  ( indexC > indexB ); // A on TOP, then C then B at bottom
 
   DALI_TEST_EQUALS( ACB, true, TEST_LOCATION );
 
@@ -4676,6 +4676,30 @@ int UtcDaliActorLowerBelow(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
 
   ResetTouchCallbacks();
+
+  tet_printf( "Lower actor A below Actor C leaving C on top\n" );
+
+  DevelActor::LowerBelow( actorA, actorC );
+
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( event );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.Render();
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  bool CAB = ( indexC > indexA) &&  ( indexA > indexB );
+
+  DALI_TEST_EQUALS( CAB, true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -4735,3 +4759,438 @@ int UtcDaliActorMaxSiblingOrder(void)
 
   END_TEST;
 }
+
+int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
+{
+  tet_infoline( "UtcDaliActor RaiseToAbove test with actor and target actor having different parents \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor parentA = Actor::New();
+  Actor parentB = Actor::New();
+  parentA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  parentA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+  parentB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  parentB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  parentA.SetAnchorPoint( AnchorPoint::CENTER );
+  parentA.SetParentOrigin( ParentOrigin::CENTER );
+
+  parentB.SetAnchorPoint( AnchorPoint::CENTER );
+  parentB.SetParentOrigin( ParentOrigin::CENTER );
+
+  stage.Add( parentA );
+  stage.Add( parentB );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  parentA.Add( actorA );
+  parentA.Add( actorB );
+
+  tet_printf( "Actor C added to different parent from A and B \n" );
+  parentB.Add( actorC );
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  ResetTouchCallbacks();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Raise actor A Above Actor C which have different parents\n" );
+
+  DevelActor::RaiseAbove( actorA, actorC );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
+{
+  tet_infoline( "UtcDaliActor Test  raiseAbove and lowerBelow api when target Actor has no parent \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  ResetTouchCallbacks();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false, TEST_LOCATION );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  tet_printf( "Raise actor A Above Actor C which have no parents\n" );
+
+  DevelActor::RaiseAbove( actorA, actorC );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so RaiseAbove should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  stage.Add ( actorB );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
+  DevelActor::LowerBelow( actorA, actorC );
+  application.ProcessEvent( event );
+
+  tet_printf( "Actor A not parented so LowerBelow should show no effect\n" );
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Adding Actor A to stage, will be on top\n" );
+
+  stage.Add ( actorA );
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
+  DevelActor::RaiseAbove( actorB, actorC );
+  application.ProcessEvent( event );
+
+  tet_printf( "C not parented so RaiseAbove should show no effect\n" );
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
+  DevelActor::LowerBelow( actorA, actorC );
+  application.ProcessEvent( event );
+
+  tet_printf( "C not parented so LowerBelow should show no effect\n" );
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  stage.Add ( actorC );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelActor::RaiseAbove( actorA, actorC );
+  application.ProcessEvent( event );
+
+  tet_printf( "Raise actor A Above Actor C, now both have same parent \n" );
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorTestAllAPIwhenActorNotParented(void)
+{
+  tet_infoline( "UtcDaliActor Test all raise/lower api when actor has no parent \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  ResetTouchCallbacks();
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  stage.Add ( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
+
+  DevelActor::Raise( actorB );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so RaiseAbove should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
+  ResetTouchCallbacks();
+
+  DevelActor::Lower( actorC );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so RaiseAbove should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor C below B but C not parented\n" );
+
+  DevelActor::Lower( actorB );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so Lower should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+  ResetTouchCallbacks();
+
+  tet_printf( "Raise actor B to top\n" );
+
+  DevelActor::RaiseToTop( actorB );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so RaiseToTop should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+  ResetTouchCallbacks();
+
+  tet_printf( "Add ActorB to stage so only Actor C not parented\n" );
+
+  stage.Add ( actorB );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Lower actor C to Bottom, B stays at top\n" );
+
+  DevelActor::LowerToBottom( actorC );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "Not parented so LowerToBottom should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+  ResetTouchCallbacks();
+
+  END_TEST;
+}
+
+
+int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
+{
+  tet_infoline( "UtcDaliActor RaiseToAbove and  test with actor provided as target resulting in a no operation \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorB.SetAnchorPoint( AnchorPoint::CENTER );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+
+  actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
+  actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
+
+  stage.Add( actorA );
+  stage.Add( actorB );
+  stage.Add( actorC );
+
+  // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
+  // Only top actor will get touched.
+  actorA.TouchSignal().Connect( TestTouchCallback );
+  actorB.TouchSignal().Connect( TestTouchCallback2 );
+  actorC.TouchSignal().Connect( TestTouchCallback3 );
+
+  ResetTouchCallbacks();
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.f, 10.f ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, true, TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Raise actor A Above Actor A which is the same actor!!\n" );
+
+  DevelActor::RaiseAbove( actorA, actorA );
+
+  application.ProcessEvent( event );
+
+  tet_printf( "No target is source Actor so RaiseAbove should show no effect\n" );
+
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  DevelActor::RaiseAbove( actorA, actorC );
+  application.ProcessEvent( event );
+
+  tet_printf( "Raise actor A Above Actor C which will now be successful \n" );
+  DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
+
+  END_TEST;
+}
+

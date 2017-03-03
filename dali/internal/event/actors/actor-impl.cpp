@@ -95,6 +95,24 @@ int GetSiblingOrder( ActorPtr actor )
   return order;
 }
 
+bool ValidateActors( const Internal::Actor& actor, const Internal::Actor& target )
+{
+  bool validTarget = true;
+
+  if( &actor == &target )
+  {
+    DALI_LOG_WARNING( "Source actor and target actor can not be the same, Sibling order not changed.\n" );
+    validTarget = false;
+  }
+  else if( actor.GetParent() != target.GetParent() )
+  {
+    DALI_LOG_WARNING( "Source actor and target actor need to have common parent, Sibling order not changed.\n" );
+    validTarget = false;
+  }
+
+  return validTarget;
+}
+
 } // unnamed namespace
 
 /**
@@ -4607,6 +4625,10 @@ void Actor::Raise()
     }
     SetSiblingOrder( mSiblingOrder );
   }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
 }
 
 void Actor::Lower()
@@ -4669,6 +4691,10 @@ void Actor::Lower()
       }
     }
   }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
 }
 
 void Actor::RaiseToTop()
@@ -4717,6 +4743,10 @@ void Actor::RaiseToTop()
     {
       DefragmentSiblingIndexes( *siblings );
     }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
   }
 }
 
@@ -4779,9 +4809,13 @@ void Actor::LowerToBottom()
       }
     }
   }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
 }
 
-void Actor::RaiseAbove( Dali::Actor target )
+void Actor::RaiseAbove( Internal::Actor& target )
 {
   /**
     1 ) a) Find target actor's sibling order
@@ -4796,25 +4830,32 @@ void Actor::RaiseAbove( Dali::Actor target )
         defragmention will stop and new sibling orders will be set to same max value.
    */
 
-  if ( this != target )
+  if ( mParent )
   {
-     // Find target's sibling order
-     // Set actor sibling order to this number +1
-    int targetSiblingOrder = GetSiblingOrder( &GetImplementation( target ) );
-    ActorContainer* siblings = mParent->mChildren;
-    mSiblingOrder = targetSiblingOrder + 1;
-    bool defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
-
-    SetSiblingOrder( mSiblingOrder );
-
-    if ( defragmentationRequired )
+    if ( ValidateActors( *this, target ) )
     {
-      DefragmentSiblingIndexes( *(mParent->mChildren) );
+       // Find target's sibling order
+       // Set actor sibling order to this number +1
+      int targetSiblingOrder = GetSiblingOrder( &target );
+      ActorContainer* siblings = mParent->mChildren;
+      mSiblingOrder = targetSiblingOrder + 1;
+      bool defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+
+      SetSiblingOrder( mSiblingOrder );
+
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *(mParent->mChildren) );
+      }
     }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
   }
 }
 
-void Actor::LowerBelow( Dali::Actor target )
+void Actor::LowerBelow( Internal::Actor& target )
 {
   /**
      1 ) a) Find target actor's sibling order
@@ -4829,44 +4870,51 @@ void Actor::LowerBelow( Dali::Actor target )
          defragmention will stop and new sibling orders will be set to same max value.
    */
 
-  if ( this != target  )
+  if ( mParent )
   {
-    bool defragmentationRequired ( false );
-    // Find target's sibling order
-    // Set actor sibling order to target sibling order - 1
-    int targetSiblingOrder = GetSiblingOrder( &GetImplementation( target ) );
-    ActorContainer* siblings = mParent->mChildren;
-    if ( targetSiblingOrder == 0 )
+    if ( ValidateActors( *this, target )  )
     {
-      //lower to botton
-      ActorIter end = siblings->end();
-      for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+      bool defragmentationRequired ( false );
+      // Find target's sibling order
+      // Set actor sibling order to target sibling order - 1
+      int targetSiblingOrder = GetSiblingOrder( &target);
+      ActorContainer* siblings = mParent->mChildren;
+      if ( targetSiblingOrder == 0 )
       {
-        ActorPtr sibling = (*iter);
-        if ( sibling != this )
+        //lower to botton
+        ActorIter end = siblings->end();
+        for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
         {
-          sibling->mSiblingOrder++;
-          if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+          ActorPtr sibling = (*iter);
+          if ( sibling != this )
           {
-            defragmentationRequired = true;
+            sibling->mSiblingOrder++;
+            if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+            {
+              defragmentationRequired = true;
+            }
+            sibling->SetSiblingOrder( sibling->mSiblingOrder );
           }
-          sibling->SetSiblingOrder( sibling->mSiblingOrder );
         }
+        mSiblingOrder = 0;
       }
-      mSiblingOrder = 0;
-    }
-    else
-    {
-      defragmentationRequired = ShiftSiblingsLevels( *siblings, targetSiblingOrder );
+      else
+      {
+        defragmentationRequired = ShiftSiblingsLevels( *siblings, targetSiblingOrder );
 
-      mSiblingOrder = targetSiblingOrder;
-    }
-    SetSiblingOrder( mSiblingOrder );
+        mSiblingOrder = targetSiblingOrder;
+      }
+      SetSiblingOrder( mSiblingOrder );
 
-    if ( defragmentationRequired )
-    {
-      DefragmentSiblingIndexes( *(mParent->mChildren) );
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *(mParent->mChildren) );
+      }
     }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
   }
 }
 
