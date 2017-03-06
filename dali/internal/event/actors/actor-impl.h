@@ -1675,12 +1675,12 @@ public:
   /**
    * @copydoc Dali::DevelActor::RaiseAbove()
    */
-  void RaiseAbove( Dali::Actor target );
+  void RaiseAbove( Internal::Actor& target );
 
   /**
    * @copydoc Dali::DevelActor::LowerBelow()
    */
-  void LowerBelow( Dali::Actor target );
+  void LowerBelow( Internal::Actor& target );
 
 private:
 
