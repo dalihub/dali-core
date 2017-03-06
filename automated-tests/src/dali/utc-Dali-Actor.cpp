@@ -5169,13 +5169,13 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   ResetTouchCallbacks();
 
-  tet_printf( "Raise actor A Above Actor A which is the same actor!!\n" );
+  tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
   DevelActor::RaiseAbove( actorA, actorA );
 
   application.ProcessEvent( event );
 
-  tet_printf( "No target is source Actor so RaiseAbove should show no effect\n" );
+  tet_infoline( "No target is source Actor so RaiseAbove should show no effect\n" );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -5186,7 +5186,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   DevelActor::RaiseAbove( actorA, actorC );
   application.ProcessEvent( event );
 
-  tet_printf( "Raise actor A Above Actor C which will now be successful \n" );
+  tet_infoline( "Raise actor A Above Actor C which will now be successful \n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
@@ -5194,3 +5194,329 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   END_TEST;
 }
 
+int UtcDaliActorGetScreenPosition(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPosition Get screen coordinates of Actor \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+
+  Vector2 size2( 10.0f, 20.0f );
+  actorA.SetSize( size2 );
+
+  actorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "UtcDaliActorGetScreenPosition Center Anchor Point and 0,0 position \n" );
+
+  stage.Add( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::CENTER \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position %f %f \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  0lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0lu , TEST_LOCATION );
+
+  tet_infoline( "UtcDaliActorGetScreenPosition Top Left Anchor Point and 0,0 position \n" );
+
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position  ( %f %f ) AnchorPoint::TOP_LEFT  \n",  actorWorldPosition.x, actorWorldPosition.y );
+  tet_printf( "Actor Screen Position  ( %f %f ) AnchorPoint::TOP_LEFT \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  0lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0lu , TEST_LOCATION );
+
+  tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 0,0 position \n" );
+
+  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT   \n",  actorWorldPosition.x, actorWorldPosition.y );
+  tet_printf( "Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT  \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  0lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0lu , TEST_LOCATION );
+
+  tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,0 position \n" );
+
+  actorA.SetPosition( 30.0, 0.0 );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0 \n",  actorWorldPosition.x, actorWorldPosition.y );
+  tet_printf( "Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0   \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  30lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0lu , TEST_LOCATION );
+
+  tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,420 position \n" );
+
+  actorA.SetPosition( 30.0, 420.0 );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  30lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  420lu , TEST_LOCATION );
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0\n",  actorWorldPosition.x, actorWorldPosition.y );
+  tet_printf( "Actor Screen Position( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0 \n", actorScreenPosition.x, actorScreenPosition.y );
+
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionAfterScaling(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionAfterScaling Get screen coordinates of Actor \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  Vector2 size2( 10.0f, 20.0f );
+  actorA.SetSize( size2 );
+  actorA.SetScale( 1.5f );
+  actorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "UtcDaliActorGetScreenPositionAfterScaling TopRight Anchor Point, scale 1.5f and 0,0 position \n" );
+
+  stage.Add( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  0lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0lu , TEST_LOCATION );
+
+  tet_infoline( "UtcDaliActorGetScreenPositionAfterScaling BOTTOM_RIGHT Anchor Point, scale 1.5f and 0,0 position \n" );
+
+  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x , 0.0f  , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0.0f , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionWithDifferentParentOrigin Changes parent origin which should not effect result \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  Vector2 size2( 10.0f, 20.0f );
+  actorA.SetSize( size2 );
+  actorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( " TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  stage.Add( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  240.0f , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  400.0f , TEST_LOCATION );
+
+  tet_infoline( " BOTTOM_RIGHT Anchor Point, ParentOrigin::TOP_RIGHT and 0,0 position \n" );
+
+  actorA.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT ParentOrigin::TOP_RIGHT \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x , 480.0f , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  0.0f , TEST_LOCATION );
+
+  END_TEST;
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionWithChildActors(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionWithChildActors Check screen position with a tree of actors \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  Vector2 size1( 10.0f, 20.0f );
+  actorA.SetSize( size1 );
+  actorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  Actor parentActorA = Actor::New();
+  parentActorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  parentActorA.SetParentOrigin( ParentOrigin::CENTER );
+  Vector2 size2( 30.0f, 60.0f );
+  parentActorA.SetSize( size2 );
+  parentActorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "Add child 1 to Parent 1 and check screen position \n" );
+
+  stage.Add( parentActorA );
+  parentActorA.Add ( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  255.0f , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  430.0f , TEST_LOCATION );
+
+  tet_infoline( "Test 2\n");
+
+  tet_infoline( "change parent anchor point and parent origin then check screen position \n" );
+
+  parentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  parentActorA.SetParentOrigin( ParentOrigin::TOP_LEFT );
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_LEFT ParentOrigin::TOP_LEFT  \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  15.0f , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  -30.0f , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionWithChildActors02(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionWithChildActors02 Check screen position with a tree of actors \n" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  Vector2 size1( 10.0f, 20.0f );
+  actorA.SetSize( size1 );
+  actorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  Actor parentActorA = Actor::New();
+  parentActorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  parentActorA.SetParentOrigin( ParentOrigin::CENTER );
+  Vector2 size2( 30.0f, 60.0f );
+  parentActorA.SetSize( size2 );
+  parentActorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "Create Grand Parent Actor 1 TOP_RIGHT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+
+  Actor grandParentActorA = Actor::New();
+  grandParentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  grandParentActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  Vector2 size3( 60.0f, 120.0f );
+  grandParentActorA.SetSize( size3 );
+  grandParentActorA.SetPosition( 0.f, 0.f );
+
+  tet_infoline( "Add Parent 1 to Grand Parent 1 \n" );
+
+  stage.Add( grandParentActorA );
+  grandParentActorA.Add ( parentActorA );
+
+  tet_infoline( "Add child 1 to Parent 1 and check screen position \n" );
+
+  parentActorA.Add ( actorA );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
+  tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  45.0f , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  770.0f , TEST_LOCATION );
+
+  END_TEST;
+}

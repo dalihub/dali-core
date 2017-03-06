@@ -228,6 +228,7 @@ DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor
 DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
 DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY( "opacity",             FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
+DALI_PROPERTY( "screenPosition",      VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -801,6 +802,25 @@ const Vector3& Actor::GetCurrentWorldPosition() const
   }
 
   return Vector3::ZERO;
+}
+
+const Vector2 Actor::GetCurrentScreenPosition() const
+{
+  if( OnStage() && NULL != mNode )
+  {
+    StagePtr stage = Stage::GetCurrent();
+    Vector3 worldPosition =  mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    Vector3 actorSize = GetCurrentSize() * GetCurrentScale();
+    Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
+    Vector3 halfActorSize( actorSize * 0.5f );
+    // Anchor point offset first set to TOP_LEFT (0,0.5) then moved to required anchor point.
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * GetCurrentAnchorPoint();
+
+    return Vector2( halfStageSize.width + worldPosition.x - anchorPointOffSet.x,
+                    halfStageSize.height + worldPosition.y - anchorPointOffSet.y );
+  }
+
+  return Vector2::ZERO;
 }
 
 void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
@@ -3279,6 +3299,12 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       value = mClippingMode;
+      break;
+    }
+
+    case Dali::DevelActor::Property::SCREEN_POSITION:
+    {
+      value = GetCurrentScreenPosition();
       break;
     }
   }

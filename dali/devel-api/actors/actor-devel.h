@@ -103,6 +103,13 @@ enum Type
    * @SINCE_1_2.28
    */
   OPACITY              = CLIPPING_MODE + 2,
+
+  /**
+   * @brief Returns the screen position of the Actor
+   * @details Name "screenPosition", type Property::VECTOR2. Read-only
+   * @note This assumes default camera and default render-task and the Z position is ZERO.
+   */
+  SCREEN_POSITION      = CLIPPING_MODE + 3,
 };
 
 } // namespace Property

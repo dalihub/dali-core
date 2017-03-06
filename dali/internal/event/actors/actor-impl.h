@@ -1847,6 +1847,13 @@ private:
   bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
 
 
+  /**
+   * @brief Get the current position of the actor in screen coordinates.
+   *
+   * @return Returns the screen position of actor
+   */
+  const Vector2 GetCurrentScreenPosition() const;
+
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
