@@ -93,7 +93,7 @@ Property::Value& Property::Map::GetValue( SizeType position ) const
 
 const std::string& Property::Map::GetKey( SizeType position ) const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n" );
+  DALI_LOG_WARNING( "DEPRECATION WARNING: GetKey() is due to be deprecated in the next release.\n" );
 
   DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
 
@@ -102,7 +102,7 @@ const std::string& Property::Map::GetKey( SizeType position ) const
 
 StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPair() is deprecated and will be removed from next release.\n" );
+  DALI_LOG_WARNING( "DEPRECATION WARNING: GetPair() is due to be deprecated in the next release.\n" );
 
   DALI_ASSERT_ALWAYS( position < mImpl->mStringValueContainer.size() && "position out-of-bounds" );
 
