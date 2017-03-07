@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,8 @@ Node::Node()
   mColorMode( DEFAULT_COLOR_MODE ),
   mClippingMode( ClippingMode::DISABLED ),
   mIsRoot( false ),
-  mIsLayer( false )
+  mIsLayer( false ),
+  mPositionUsesAnchorPoint( true )
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;
@@ -154,6 +155,9 @@ void Node::CreateTransform( SceneGraph::TransformManager* transformManager )
   mWorldScale.Initialize( transformManager, mTransformId );
   mWorldOrientation.Initialize( transformManager, mTransformId );
   mWorldMatrix.Initialize( transformManager, mTransformId );
+
+  //Set whether the position should use the anchor point
+  transformManager->SetPositionUsesAnchorPoint( mTransformId, mPositionUsesAnchorPoint );
 }
 
 void Node::SetRoot(bool isRoot)

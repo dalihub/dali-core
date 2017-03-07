@@ -5520,3 +5520,178 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   END_TEST;
 }
+
+int utcDaliActorPositionUsesAnchorPoint(void)
+{
+  TestApplication application;
+  tet_infoline( "Check default behaviour\n" );
+
+  Actor actor = Actor::New();
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetSize( 100.0f, 100.0f );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check that the world position is in the center\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Set the position uses anchor point property to false\n" );
+  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check that the world position has changed appropriately\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorPositionUsesAnchorPointCheckScale(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the scale is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
+
+  Actor actor = Actor::New();
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetScale( 2.0f );
+  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check the world position is the same as it would be without a scale\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 100.0f, 100.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
+
+  Actor actor = Actor::New();
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
+  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check the world position is the same as it would be without a rotation\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( -50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 150.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the scale and rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
+
+  Actor actor = Actor::New();
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
+  actor.SetScale( 2.0f );
+  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check the world position is the same as it would be without a scale and rotation\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( -100.0f, 100.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
+  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 200.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that if not inheriting scale and position, then the position is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
+
+  Actor parent = Actor::New();
+
+  Stage::GetCurrent().Add( parent );
+  Vector2 stageSize( Stage::GetCurrent().GetSize() );
+
+  Actor actor = Actor::New();
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetInheritScale( false );
+  actor.SetInheritOrientation( false );
+  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  parent.Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector3 expectedWorldPosition( -stageSize.width * 0.5f + 50.0f, -stageSize.height * 0.5f + 50.0f, 0.0f );
+
+  tet_infoline( "Check the world position is in the right place\n" );
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure world position hasn't changed" );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+
+  tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure world position hasn't changed" );
+  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+
+  END_TEST;
+}
+

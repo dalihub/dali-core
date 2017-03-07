@@ -88,28 +88,35 @@ enum Type
   CLIPPING_MODE        = Dali::Actor::Property::CLIPPING_MODE,
 
   /**
-   * @brief name "siblingOrder", type INTEGER
-   *
-   * @details Sets the sibling order of the actor so depth position can be defined within the same parent.
-   *
+   * @brief Sets the sibling order of the actor so depth position can be defined within the same parent.
+   * @details Name "siblingOrder", type Property::INTEGER.
+   * @note The initial value is 0.
    * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
-   * sibling order. The values set by this Property will likey change.
+   * sibling order. The values set by this Property will likely change.
    */
-  SIBLING_ORDER        = CLIPPING_MODE + 1,
+  SIBLING_ORDER = CLIPPING_MODE + 1,
 
   /**
    * @brief The opacity of the actor.
    * @details Name "opacity", type Property::FLOAT.
-   * @SINCE_1_2.28
    */
-  OPACITY              = CLIPPING_MODE + 2,
+  OPACITY = CLIPPING_MODE + 2,
 
   /**
    * @brief Returns the screen position of the Actor
    * @details Name "screenPosition", type Property::VECTOR2. Read-only
    * @note This assumes default camera and default render-task and the Z position is ZERO.
    */
-  SCREEN_POSITION      = CLIPPING_MODE + 3,
+  SCREEN_POSITION = CLIPPING_MODE + 3,
+
+  /**
+   * @brief Determines whether the anchor point should be used to determine the position of the actor.
+   * @details Name "positionUsesAnchorPoint", type Property::BOOLEAN.
+   * @note This is true by default.
+   * @note If false, then the top-left of the actor is used for the position.
+   * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
+   */
+  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4
 };
 
 } // namespace Property

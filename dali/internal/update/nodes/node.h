@@ -716,6 +716,19 @@ public:
    */
   unsigned int GetDepthIndex(){ return mDepthIndex; }
 
+  /**
+   * @brief Sets the boolean which states whether the position should use the anchor-point.
+   * @param[in] positionUsesAnchorPoint True if the position should use the anchor-point
+   */
+  void SetPositionUsesAnchorPoint( bool positionUsesAnchorPoint )
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint )
+    {
+      mPositionUsesAnchorPoint = positionUsesAnchorPoint;
+      mTransformManager->SetPositionUsesAnchorPoint( mTransformId, mPositionUsesAnchorPoint );
+    }
+  }
+
 public:
   /**
    * @copydoc UniformMap::Add
@@ -865,6 +878,7 @@ protected:
   ClippingMode::Type                 mClippingMode:2;         ///< The clipping mode of this node
   bool                               mIsRoot:1;               ///< True if the node cannot have a parent
   bool                               mIsLayer:1;              ///< True if the node is a layer
+  bool                               mPositionUsesAnchorPoint:1; ///< True if the node should use the anchor-point when calculating the position
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
@@ -992,6 +1006,16 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
   new (slot) LocalType( &node, &Node::SetClippingMode, clippingMode );
 }
 
+inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint )
+{
+  typedef MessageValue1< Node, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint );
+}
 
 } // namespace SceneGraph
 
