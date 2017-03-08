@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/common/message.h>
 
 namespace Dali
@@ -45,7 +46,8 @@ RenderMessageDispatcher::~RenderMessageDispatcher()
 
 void RenderMessageDispatcher::AddRenderer( Render::Renderer& renderer )
 {
-  typedef MessageValue1< RenderManager, Render::Renderer* > DerivedType;
+  // Message has ownership of renderer while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Renderer > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

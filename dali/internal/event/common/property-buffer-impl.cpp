@@ -132,21 +132,22 @@ PropertyBufferPtr PropertyBuffer::New( Dali::Property::Map& format )
 
 void PropertyBuffer::SetData( const void* data, std::size_t size )
 {
-  DALI_ASSERT_DEBUG( mFormat.Count() && "Format must be set before setting the data." );
+  mSize = size; // size is the number of elements
 
-  mSize = size;
+  unsigned int bufferSize = mBufferFormatSize * mSize;
 
-  // Check if format and size have been set yet
-  if( mBufferFormat != NULL )
-  {
-    unsigned int bufferSize = mBufferFormat->size * mSize;
-    mBuffer.Resize( bufferSize );
-  }
+  // create a new DALi vector to store the buffer data
+  // the heap allocated vector will end up being owned by Render::PropertyBuffer
+  Dali::Vector<char>* bufferCopy = new Dali::Vector<char>();
+  bufferCopy->Resize( bufferSize );
 
+  // copy the data
   const char* source = static_cast<const char*>( data );
-  std::copy( source, source + mBuffer.Size(), &mBuffer[0] );
+  char *destination = &((*bufferCopy)[0]);
+  std::copy( source, source + bufferSize, destination );
 
-  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, new Dali::Vector<char>( mBuffer ), mSize );
+  // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
+  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
 }
 
 std::size_t PropertyBuffer::GetSize() const
@@ -170,7 +171,7 @@ PropertyBuffer::~PropertyBuffer()
 PropertyBuffer::PropertyBuffer()
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
-  mBufferFormat( NULL ),
+  mBufferFormatSize( 0 ),
   mSize( 0 )
 {
 }
@@ -180,12 +181,9 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
   mRenderObject = new Render::PropertyBuffer();
   SceneGraph::AddPropertyBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject );
 
-  mFormat = formatMap;
-
-  size_t numComponents = mFormat.Count();
+  size_t numComponents = formatMap.Count();
 
   // Create the format
-  DALI_ASSERT_DEBUG( mBufferFormat == NULL && "PropertyFormat should not be set yet" );
   Render::PropertyBuffer::Format* format = new Render::PropertyBuffer::Format();
   format->components.resize( numComponents );
 
@@ -194,7 +192,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 
   for( size_t i = 0u; i < numComponents; ++i )
   {
-    KeyValuePair component = mFormat.GetKeyValue( i );
+    KeyValuePair component = formatMap.GetKeyValue( i );
 
     // Get the name
     if(component.first.type == Property::Key::INDEX)
@@ -253,7 +251,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
   // Set the format size
   format->size = currentAlignment;
 
-  mBufferFormat = format;
+  mBufferFormatSize = format->size;
 
   SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
 }

@@ -35,6 +35,8 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -71,14 +73,12 @@ namespace SceneGraph
 
 class Animation;
 class DiscardQueue;
-class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
 class RenderQueue;
 class PropertyBuffer;
 class TextureSet;
-class Camera;
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
@@ -721,7 +721,8 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
 
 inline void AddCameraMessage( UpdateManager& manager, const Camera* constCamera )
 {
-  typedef MessageValue1< UpdateManager, Camera* > LocalType;
+  // Message has ownership of Camera while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Camera > > LocalType;
 
   Camera* camera = const_cast<Camera*>( constCamera );
   // Reserve some memory inside the message queue
@@ -744,6 +745,7 @@ inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
 
 inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )
 {
+  // Message has ownership of object while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer<PropertyOwner> > LocalType;
 
   // Reserve some memory inside the message queue
@@ -805,7 +807,8 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
 
 inline void AddPropertyNotificationMessage( UpdateManager& manager, PropertyNotification* propertyNotification )
 {
-  typedef MessageValue1< UpdateManager, PropertyNotification* > LocalType;
+  // Message has ownership of PropertyNotification while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< PropertyNotification > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -934,7 +937,8 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
 
 inline void AddGestureMessage( UpdateManager& manager, PanGesture* gesture )
 {
-  typedef MessageValue1< UpdateManager, PanGesture* > LocalType;
+  // Message has ownership of PanGesture while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< PanGesture > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1002,7 +1006,8 @@ inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& texture
 
 inline void AddSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )
 {
-  typedef MessageValue1< UpdateManager, Render::Sampler* > LocalType;
+  // Message has ownership of Sampler while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Sampler > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1046,7 +1051,8 @@ inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler
 
 inline void AddPropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::PropertyBuffer*  > LocalType;
+  // Message has ownership of propertyBuffer while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::PropertyBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1068,7 +1074,8 @@ inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer
 
 inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Render::PropertyBuffer::Format* format )
 {
-  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, Render::PropertyBuffer::Format*  > LocalType;
+  // Message has ownership of PropertyBuffer::Format while in transit from event -> update
+  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format> > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1079,7 +1086,8 @@ inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuf
 
 inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Vector<char>* data, size_t size )
 {
-  typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, Vector<char>*, size_t  > LocalType;
+  // Message has ownership of PropertyBuffer data while in transit from event -> update
+  typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Vector<char> >, size_t  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1090,7 +1098,8 @@ inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffe
 
 inline void AddGeometry( UpdateManager& manager, Render::Geometry& geometry )
 {
-  typedef MessageValue1< UpdateManager, Render::Geometry*  > LocalType;
+  // Message has ownership of Geometry while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Geometry > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1196,7 +1205,8 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
 
 inline void AddTexture( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
+  // Message has ownership of Texture while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Texture > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
