@@ -1,9 +1,8 @@
-
-#ifndef TRANSFORM_MANAGER_H_
-#define TRANSFORM_MANAGER_H_
+#ifndef DALI_INTERNAL_TRANSFORM_MANAGER_H
+#define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +23,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/common/constants.h>
 #include <dali/internal/update/manager/free-list.h>
 
 namespace Dali
@@ -41,10 +41,11 @@ namespace SceneGraph
 struct TransformComponentAnimatable
 {
   TransformComponentAnimatable()
-  :mScale(1.0f,1.0f,1.0f),
-   mOrientation(1.0f,0.0f,0.0f,0.0f),
-   mPosition(0.0f,0.0f,0.0f)
-  {}
+  : mScale( Vector3::ONE ),
+    mOrientation( Quaternion::IDENTITY ),
+    mPosition( Vector3::ZERO )
+  {
+  }
 
   Vector3 mScale;
   Quaternion mOrientation;
@@ -57,12 +58,15 @@ struct TransformComponentAnimatable
 struct TransformComponentStatic
 {
   TransformComponentStatic()
-  :mAnchorPoint(0.5f,0.5f,0.5f),
-   mParentOrigin(0.0f,0.0f,0.5f)
-  {}
+  : mAnchorPoint( AnchorPoint::DEFAULT ),
+    mParentOrigin( ParentOrigin::DEFAULT ),
+    mPositionUsesAnchorPoint( true )
+  {
+  }
 
   Vector3 mAnchorPoint;
   Vector3 mParentOrigin;
+  bool mPositionUsesAnchorPoint;
 };
 
 enum InheritanceMode
@@ -339,6 +343,13 @@ public:
    */
   void GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const;
 
+  /**
+   * @brief Sets the boolean which states whether the position should use the anchor-point on the given transform component.
+   * @param[in] id Id of the transform component
+   * @param[in] value True if the position should use the anchor-point
+   */
+  void SetPositionUsesAnchorPoint( TransformId id, bool value );
+
 private:
 
   //Helper struct to order components
@@ -363,23 +374,23 @@ private:
    */
   void ReorderComponents();
 
-  unsigned int mComponentCount;                                ///< Total number of components
-  FreeList mIds;                                               ///< FreeList of Ids
-  Vector<TransformComponentAnimatable> mTxComponentAnimatable; ///< Animatable part of the components
-  Vector<TransformComponentStatic> mTxComponentStatic;         ///< Static part of the components
-  Vector<unsigned int> mInheritanceMode;                       ///< Inheritance mode of the components
-  Vector<TransformId> mComponentId;                            ///< Ids of the components
-  Vector<Vector3> mSize;                                       ///< Size of the components
-  Vector<TransformId> mParent;                                 ///< Parent of the components
-  Vector<Matrix> mWorld;                                       ///< Local to world transform of the components
-  Vector<Matrix> mLocal;                                       ///< Local to parent space transform of the components
-  Vector<Vector4> mBoundingSpheres;                            ///< Bounding spheres. xyz is the center and w is the radius
-  Vector<TransformComponentAnimatable> mTxComponentAnimatableBaseValue;  ///< Base values for the animatable part of the components
-  Vector<Vector3> mSizeBase;                                             ///< Base value for the size of the components
-  Vector<bool> mComponentDirty;    ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
-  Vector<bool> mLocalMatrixDirty;  ///< 1u if the local matrix has been updated in this frame, 0 otherwise
-  Vector<SOrderItem> mOrderedComponents;   ///< Used to reorder components when hierarchy changes
-  bool mReorder;                           ///< Flag to determine if the components have to reordered in the next Update
+  unsigned int mComponentCount;                                            ///< Total number of components
+  FreeList mIds;                                                           ///< FreeList of Ids
+  Vector< TransformComponentAnimatable > mTxComponentAnimatable;           ///< Animatable part of the components
+  Vector< TransformComponentStatic > mTxComponentStatic;                   ///< Static part of the components
+  Vector< unsigned int > mInheritanceMode;                                 ///< Inheritance mode of the components
+  Vector< TransformId > mComponentId;                                      ///< Ids of the components
+  Vector< Vector3 > mSize;                                                 ///< Size of the components
+  Vector< TransformId > mParent;                                           ///< Parent of the components
+  Vector< Matrix > mWorld;                                                 ///< Local to world transform of the components
+  Vector< Matrix > mLocal;                                                 ///< Local to parent space transform of the components
+  Vector< Vector4 > mBoundingSpheres;                                      ///< Bounding spheres. xyz is the center and w is the radius
+  Vector< TransformComponentAnimatable > mTxComponentAnimatableBaseValue;  ///< Base values for the animatable part of the components
+  Vector< Vector3 > mSizeBase;                                             ///< Base value for the size of the components
+  Vector< bool > mComponentDirty;                                          ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
+  Vector< bool > mLocalMatrixDirty;                                        ///< 1u if the local matrix has been updated in this frame, 0 otherwise
+  Vector< SOrderItem > mOrderedComponents;                                 ///< Used to reorder components when hierarchy changes
+  bool mReorder;                                                           ///< Flag to determine if the components have to reordered in the next Update
 };
 
 } //namespace SceneGraph
@@ -390,4 +401,4 @@ private:
 } //namespace Dali
 
 
-#endif /* TRANSFORM_MANAGER_H_ */
+#endif // DALI_INTERNAL_TRANSFORM_MANAGER_H

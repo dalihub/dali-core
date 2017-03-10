@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,40 @@ namespace
 static const float gDefaultTransformComponentAnimatableData[] = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 
 //Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
-static const float gDefaultTransformComponentStaticData[] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f };
+static const float gDefaultTransformComponentStaticData[] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, true };
 
 DALI_COMPILE_TIME_ASSERT( sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable) );
 DALI_COMPILE_TIME_ASSERT( sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic) );
+
+/**
+ * @brief Calculates the center position for the transform component
+ * @param[out] centerPosition The calculated center-position of the transform component
+ * @param[in] transformComponentStatic A const reference to the static component transform struct
+ * @param[in] transformComponentAnimatable A const reference to the animatable component transform struct
+ * @param[in] size The size of the current transform component
+ * @param[in] half Halfway point of the transform
+ * @param[in] topLeft The top-left coords of the transform
+ */
+inline void CalculateCenterPosition(
+  Vector3& centerPosition,
+  const TransformComponentStatic& transformComponentStatic,
+  const TransformComponentAnimatable& transformComponentAnimatable,
+  const Vector3& size,
+  const Vector3& half,
+  const Vector3& topLeft )
+{
+  // Calculate the center-point by applying the scale and rotation on the anchor point.
+  centerPosition = ( half - transformComponentStatic.mAnchorPoint ) * size * transformComponentAnimatable.mScale;
+  centerPosition *= transformComponentAnimatable.mOrientation;
+
+  // If the position is ignoring the anchor-point, then remove the anchor-point shift from the position.
+  if( ! transformComponentStatic.mPositionUsesAnchorPoint )
+  {
+    centerPosition -= ( topLeft - transformComponentStatic.mAnchorPoint ) * size;
+  }
 }
+
+} // unnamed namespace
 
 TransformManager::TransformManager()
 :mComponentCount(0),
@@ -211,9 +240,10 @@ void TransformManager::Update()
   }
 
   //Iterate through all components to compute its world matrix
-  Vector3 anchorPosition;
+  Vector3 centerPosition;
   Vector3 localPosition;
-  Vector3 half( 0.5f,0.5f,0.5f );
+  const Vector3 half( 0.5f,0.5f,0.5f );
+  const Vector3 topLeft( 0.0f, 0.0f, 0.5f );
   for( unsigned int i(0); i<mComponentCount; ++i )
   {
     if( DALI_LIKELY( mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID ) )
@@ -225,11 +255,9 @@ void TransformManager::Update()
         {
           //Full transform inherited
           mLocalMatrixDirty[i] = true;
-
-          anchorPosition = ( half - mTxComponentStatic[i].mAnchorPoint ) * mSize[i] * mTxComponentAnimatable[i].mScale;
-          anchorPosition *= mTxComponentAnimatable[i].mOrientation;
-          localPosition = mTxComponentAnimatable[i].mPosition + anchorPosition + ( mTxComponentStatic[i].mParentOrigin - half ) *  mSize[parentIndex];
-          mLocal[i].SetTransformComponents( mTxComponentAnimatable[i].mScale,mTxComponentAnimatable[i].mOrientation, localPosition );
+          CalculateCenterPosition( centerPosition, mTxComponentStatic[ i ], mTxComponentAnimatable[ i ], mSize[ i ], half, topLeft );
+          localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + ( mTxComponentStatic[i].mParentOrigin - half ) *  mSize[parentIndex];
+          mLocal[i].SetTransformComponents( mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition );
         }
 
         //Update the world matrix
@@ -267,9 +295,8 @@ void TransformManager::Update()
         }
         else
         {
-          anchorPosition = ( half - mTxComponentStatic[i].mAnchorPoint ) * mSize[i] * mTxComponentAnimatable[i].mScale;
-          anchorPosition *= mTxComponentAnimatable[i].mOrientation;
-          localPosition = mTxComponentAnimatable[i].mPosition + anchorPosition + ( mTxComponentStatic[i].mParentOrigin - half ) *  mSize[parentIndex];
+          CalculateCenterPosition( centerPosition, mTxComponentStatic[ i ], mTxComponentAnimatable[ i ], mSize[ i ], half, topLeft );
+          localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + ( mTxComponentStatic[i].mParentOrigin - half ) *  mSize[parentIndex];
           mLocal[i].SetTransformComponents( localScale, localOrientation, localPosition );
           Matrix::Multiply( mWorld[i], mLocal[i], parentMatrix );
         }
@@ -279,9 +306,8 @@ void TransformManager::Update()
     }
     else  //Component has no parent or doesn't inherit transform
     {
-      anchorPosition = ( half - mTxComponentStatic[i].mAnchorPoint ) * mSize[i] * mTxComponentAnimatable[i].mScale;
-      anchorPosition *= mTxComponentAnimatable[i].mOrientation;
-      localPosition = mTxComponentAnimatable[i].mPosition + anchorPosition;
+      CalculateCenterPosition( centerPosition, mTxComponentStatic[ i ], mTxComponentAnimatable[ i ], mSize[ i ], half, topLeft );
+      localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
       mLocal[i].SetTransformComponents( mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition );
       mWorld[i] = mLocal[i];
       mLocalMatrixDirty[i] = true;
@@ -848,6 +874,13 @@ void TransformManager::GetWorldMatrixAndSize( TransformId id, Matrix& worldMatri
   unsigned int index = mIds[id];
   worldMatrix = mWorld[index];
   size = mSize[index];
+}
+
+void TransformManager::SetPositionUsesAnchorPoint( TransformId id, bool value )
+{
+  unsigned int index( mIds[ id ] );
+  mComponentDirty[ index ] = true;
+  mTxComponentStatic[ index ].mPositionUsesAnchorPoint = value;
 }
 
 } //namespace SceneGraph

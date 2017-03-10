@@ -45,14 +45,14 @@ void LowerToBottom( Actor actor )
   GetImplementation( actor ).LowerToBottom();
 }
 
-void RaiseAbove( Actor actor, Dali::Actor target )
+void RaiseAbove( Actor actor, Actor target )
 {
-  GetImplementation( actor ).RaiseAbove( target );
+  GetImplementation( actor ).RaiseAbove( GetImplementation( target ) );
 }
 
 void LowerBelow( Actor actor, Actor target )
 {
-  GetImplementation( actor ).LowerBelow( target);
+  GetImplementation( actor ).LowerBelow( GetImplementation( target ) );
 }
 
 } // namespace DevelActor
