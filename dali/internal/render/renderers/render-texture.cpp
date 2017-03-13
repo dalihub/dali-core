@@ -589,7 +589,7 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 } //Unnamed namespace
 
 
-NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
+Texture::Texture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
 :mId( 0 ),
  mTarget( (type == TextureType::TEXTURE_2D)? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
  mType( type ),
@@ -605,7 +605,7 @@ NewTexture::NewTexture( Type type, Pixel::Format format, unsigned int width, uns
   PixelFormatToGl( format, mPixelDataType, mInternalFormat );
 }
 
-NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
+Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 :mId( 0 ),
  mTarget( GL_TEXTURE_2D ),
  mType( TextureType::TEXTURE_2D ),
@@ -620,10 +620,10 @@ NewTexture::NewTexture( NativeImageInterfacePtr nativeImageInterface )
 {
 }
 
-NewTexture::~NewTexture()
+Texture::~Texture()
 {}
 
-void NewTexture::Destroy( Context& context )
+void Texture::Destroy( Context& context )
 {
   if( mId )
   {
@@ -636,12 +636,12 @@ void NewTexture::Destroy( Context& context )
   }
 }
 
-void NewTexture::GlContextDestroyed()
+void Texture::GlContextDestroyed()
 {
   mId = 0u;
 }
 
-void NewTexture::Initialize(Context& context)
+void Texture::Initialize(Context& context)
 {
   if( mNativeImage )
   {
@@ -717,7 +717,7 @@ void NewTexture::Initialize(Context& context)
   }
 }
 
-void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Internal::NewTexture::UploadParams& params  )
+void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params  )
 {
   DALI_ASSERT_ALWAYS( mNativeImage == NULL );
 
@@ -797,7 +797,7 @@ void NewTexture::Upload( Context& context, PixelDataPtr pixelData, const Interna
   delete[] tempBuffer;
 }
 
-bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
+bool Texture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
 {
   if( mNativeImage && mId == 0 )
   {
@@ -821,12 +821,12 @@ bool NewTexture::Bind( Context& context, unsigned int textureUnit, Render::Sampl
   return false;
 }
 
-void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
+void Texture::ApplySampler( Context& context, Render::Sampler* sampler )
 {
   Render::Sampler oldSampler = mSampler;
   mSampler = sampler ? *sampler : Sampler();
 
-  if( mSampler.mBitfield != oldSampler.mBitfield )
+  if( mSampler != oldSampler )
   {
     GLint mode = FilterModeToGL( mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT );
     if( mode != FilterModeToGL( oldSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT ) )
@@ -863,12 +863,12 @@ void NewTexture::ApplySampler( Context& context, Render::Sampler* sampler )
   }
 }
 
-bool NewTexture::HasAlphaChannel()
+bool Texture::HasAlphaChannel()
 {
   return mHasAlpha;
 }
 
-void NewTexture::GenerateMipmaps( Context& context )
+void Texture::GenerateMipmaps( Context& context )
 {
   context.BindTexture( mTarget, mId );
   context.GenerateMipmap( mTarget );

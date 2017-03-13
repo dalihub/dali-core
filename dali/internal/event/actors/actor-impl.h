@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1652,6 +1652,36 @@ public:
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
+  /**
+   * @copydoc Dali::DevelActor::Raise()
+   */
+  void Raise();
+
+  /**
+   * @copydoc Dali::DevelActor::Lower()
+   */
+  void Lower();
+
+  /**
+   * @copydoc Dali::DevelActor::RaiseToTop()
+   */
+  void RaiseToTop();
+
+  /**
+   * @copydoc Dali::DevelActor::LowerToBottom()
+   */
+  void LowerToBottom();
+
+  /**
+   * @copydoc Dali::DevelActor::RaiseAbove()
+   */
+  void RaiseAbove( Internal::Actor& target );
+
+  /**
+   * @copydoc Dali::DevelActor::LowerBelow()
+   */
+  void LowerBelow( Internal::Actor& target );
+
 private:
 
   // Undefined
@@ -1793,6 +1823,37 @@ private:
    */
   virtual Object* GetParentObject() const;
 
+  /**
+   * Set Sibling order
+   * @param[in] order The sibling order this Actor should be
+   */
+  void SetSiblingOrder( unsigned int order);
+
+  /**
+   * @brief Re-orders the sibling order when any actor raised to the max level
+   * @param[in] siblings the container of sibling actors
+   */
+  void DefragmentSiblingIndexes( ActorContainer& siblings );
+
+  /**
+   * @brief Shifts all siblings levels from the target level up by 1 to make space for a newly insert sibling
+   * at an exclusive level.
+   *
+   * @note Used with Raise and Lower API
+   *
+   * @param[in] siblings the actor container of the siblings
+   * @param[in] targetLevelToShiftFrom the sibling level to start shifting from
+   */
+  bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
+
+
+  /**
+   * @brief Get the current position of the actor in screen coordinates.
+   *
+   * @return Returns the screen position of actor
+   */
+  const Vector2 GetCurrentScreenPosition() const;
+
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
@@ -1840,6 +1901,7 @@ protected:
   bool mInheritPosition                            : 1; ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
+  bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited

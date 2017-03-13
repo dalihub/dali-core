@@ -33,6 +33,8 @@ namespace SceneGraph
 
 SceneGraph::Layer* Layer::New()
 {
+  // Layers are currently heap allocated, unlike Nodes which are in a memory pool
+  // However Node::Delete( layer ) will correctly delete a layer / node depending on type
   return new Layer();
 }
 
@@ -45,6 +47,9 @@ Layer::Layer()
   mDepthTestDisabled( true ),
   mIsDefaultSortFunction( true )
 {
+  // set a flag the node to say this is a layer
+  mIsLayer = true;
+
   // layer starts off dirty
   mAllChildTransformsClean[ 0 ] = false;
   mAllChildTransformsClean[ 1 ] = false;
@@ -108,6 +113,15 @@ void Layer::ClearRenderables()
 
 } // namespace SceneGraph
 
+template <>
+void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
+{
+  if( mObject != NULL )
+  {
+    Dali::Internal::SceneGraph::Node::Delete( mObject );
+    mObject = NULL;
+  }
+}
 } // namespace Internal
 
 } // namespace Dali

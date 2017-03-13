@@ -91,7 +91,7 @@ public:
    * Whilst iterating through each layer, update the RenderItems ModelView matrices
    *
    * The opaque and transparent render lists are sorted first by depth
-   * index, then by Z (for transparent only), then by shader, texture
+   * index, then by Z (for transparent only), then by shader
    * and geometry. The render algorithm should then work through both
    * lists simultaneously, working through opaque then transparent
    * items at each depth index, resetting the flags appropriately.

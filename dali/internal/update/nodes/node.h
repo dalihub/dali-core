@@ -107,15 +107,9 @@ public:
   static Node* New();
 
   /**
-   * Virtual destructor
+   * Deletes a Node.
    */
-  virtual ~Node();
-
-  /**
-   * Overriden delete operator
-   * Deletes the node from its global memory pool
-   */
-  void operator delete( void* ptr );
+  static void Delete( Node* node );
 
   /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
@@ -130,7 +124,7 @@ public:
    */
   bool IsLayer()
   {
-    return (GetLayer() != NULL);
+    return mIsLayer;
   }
 
   /**
@@ -333,15 +327,6 @@ public:
    * @return The dirty flags
    */
   int GetDirtyFlags() const;
-
-  /**
-   * Query whether a node is clean.
-   * @return True if the node is clean.
-   */
-  bool IsClean() const
-  {
-    return ( NothingFlag == GetDirtyFlags() );
-  }
 
   /**
    * Retrieve the parent-origin of the node.
@@ -731,6 +716,19 @@ public:
    */
   unsigned int GetDepthIndex(){ return mDepthIndex; }
 
+  /**
+   * @brief Sets the boolean which states whether the position should use the anchor-point.
+   * @param[in] positionUsesAnchorPoint True if the position should use the anchor-point
+   */
+  void SetPositionUsesAnchorPoint( bool positionUsesAnchorPoint )
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint )
+    {
+      mPositionUsesAnchorPoint = positionUsesAnchorPoint;
+      mTransformManager->SetPositionUsesAnchorPoint( mTransformId, mPositionUsesAnchorPoint );
+    }
+  }
+
 public:
   /**
    * @copydoc UniformMap::Add
@@ -771,6 +769,12 @@ protected:
    * Protected constructor; See also Node::New()
    */
   Node();
+
+  /**
+   * Protected virtual destructor; See also Node::Delete( Node* )
+   * Kept protected to allow destructor chaining from layer
+   */
+  virtual ~Node();
 
 private: // from NodeDataProvider
 
@@ -873,7 +877,8 @@ protected:
   ColorMode                          mColorMode:2;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
   ClippingMode::Type                 mClippingMode:2;         ///< The clipping mode of this node
   bool                               mIsRoot:1;               ///< True if the node cannot have a parent
-
+  bool                               mIsLayer:1;              ///< True if the node is a layer
+  bool                               mPositionUsesAnchorPoint:1; ///< True if the node should use the anchor-point when calculating the position
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
@@ -1001,10 +1006,28 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
   new (slot) LocalType( &node, &Node::SetClippingMode, clippingMode );
 }
 
+inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint )
+{
+  typedef MessageValue1< Node, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint );
+}
 
 } // namespace SceneGraph
 
+// Template specialisation for OwnerPointer<Node>, because delete is protected
+template <>
+void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset();
+
 } // namespace Internal
+
+// Template specialisations for OwnerContainer<Node*>, because delete is protected
+template <>
+void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete( Dali::Internal::SceneGraph::Node* pointer );
 
 } // namespace Dali
 

@@ -41,7 +41,6 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/common/texture-cache-dispatcher.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -57,13 +56,11 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
 // Un-comment to enable node tree debug logging
@@ -124,7 +121,6 @@ struct UpdateManager::Impl
   Impl( NotificationManager& notificationManager,
         CompleteNotificationInterface& animationFinishedNotifier,
         PropertyNotifier& propertyNotifier,
-        ResourceManager& resourceManager,
         DiscardQueue& discardQueue,
         RenderController& renderController,
         RenderManager& renderManager,
@@ -137,7 +133,6 @@ struct UpdateManager::Impl
     animationFinishedNotifier( animationFinishedNotifier ),
     propertyNotifier( propertyNotifier ),
     shaderSaver( NULL ),
-    resourceManager( resourceManager ),
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
@@ -146,8 +141,8 @@ struct UpdateManager::Impl
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
     renderTaskProcessor( renderTaskProcessor ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    taskList( renderMessageDispatcher, resourceManager ),
-    systemLevelTaskList( renderMessageDispatcher, resourceManager ),
+    taskList( renderMessageDispatcher ),
+    systemLevelTaskList( renderMessageDispatcher ),
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers( sceneGraphBuffers, discardQueue ),
@@ -189,7 +184,7 @@ struct UpdateManager::Impl
     for(;iter!=endIter;++iter)
     {
       (*iter)->OnDestroy();
-      delete(*iter);
+      Node::Delete(*iter);
     }
 
     // If there is root, reset it, otherwise do nothing as rendering was never started
@@ -197,7 +192,7 @@ struct UpdateManager::Impl
     {
       root->OnDestroy();
 
-      delete root;
+      Node::Delete( root );
       root = NULL;
     }
 
@@ -205,7 +200,7 @@ struct UpdateManager::Impl
     {
       systemLevelRoot->OnDestroy();
 
-      delete systemLevelRoot;
+      Node::Delete( systemLevelRoot );
       systemLevelRoot = NULL;
     }
 
@@ -219,7 +214,6 @@ struct UpdateManager::Impl
   CompleteNotificationInterface&      animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
   PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
   ShaderSaver*                        shaderSaver;                   ///< Saves shader binaries.
-  ResourceManager&                    resourceManager;               ///< resource manager
   DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&                   renderController;              ///< render controller
   SceneControllerImpl*                sceneController;               ///< scene controller
@@ -277,19 +271,16 @@ private:
 UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               CompleteNotificationInterface& animationFinishedNotifier,
                               PropertyNotifier& propertyNotifier,
-                              ResourceManager& resourceManager,
                               DiscardQueue& discardQueue,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              TextureCacheDispatcher& textureCacheDispatcher,
                               RenderTaskProcessor& renderTaskProcessor )
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
                     animationFinishedNotifier,
                     propertyNotifier,
-                    resourceManager,
                     discardQueue,
                     controller,
                     renderManager,
@@ -297,7 +288,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     mSceneGraphBuffers,
                     renderTaskProcessor );
 
-  textureCacheDispatcher.SetBufferIndices( &mSceneGraphBuffers );
 }
 
 UpdateManager::~UpdateManager()
@@ -880,14 +870,12 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
   // And add the renderers to the sorted layers. Start from root, which is also a layer
   mImpl->nodeDirtyFlags = UpdateNodeTree( *( mImpl->root ),
                                           bufferIndex,
-                                          mImpl->resourceManager,
                                           mImpl->renderQueue );
 
   if ( mImpl->systemLevelRoot )
   {
     mImpl->nodeDirtyFlags |= UpdateNodeTree( *( mImpl->systemLevelRoot ),
                                              bufferIndex,
-                                             mImpl->resourceManager,
                                              mImpl->renderQueue );
   }
 }
@@ -901,9 +889,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   //Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear( bufferIndex );
 
-  //Grab any loaded resources
-  bool resourceChanged = mImpl->resourceManager.UpdateCache( bufferIndex );
-
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
@@ -911,7 +896,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
       IsAnimationRunning()                            ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
-      resourceChanged                                 ||    // ..one or more resources were updated/changed OR
       gestureUpdated;                                       // ..a gesture property was updated
 
 
@@ -1123,7 +1107,8 @@ void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
 
 void UpdateManager::AddSampler( Render::Sampler* sampler )
 {
-  typedef MessageValue1< RenderManager, Render::Sampler* > DerivedType;
+  // Message has ownership of Sampler while in transit from update to render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Sampler > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1167,7 +1152,8 @@ void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMod
 
 void UpdateManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::PropertyBuffer* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::PropertyBuffer > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1189,7 +1175,8 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
 
 void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
 {
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, Render::PropertyBuffer::Format* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1200,7 +1187,8 @@ void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuff
 
 void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
 {
-  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, Dali::Vector<char>*, size_t > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, OwnerPointer< Dali::Vector<char> >, size_t > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1211,7 +1199,8 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
 
 void UpdateManager::AddGeometry( Render::Geometry* geometry )
 {
-  typedef MessageValue1< RenderManager, Render::Geometry* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1275,9 +1264,10 @@ void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::Propert
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddVertexBuffer, geometry, propertyBuffer );
 }
 
-void UpdateManager::AddTexture( Render::NewTexture* texture )
+void UpdateManager::AddTexture( Render::Texture* texture )
 {
-  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+  // Message has ownership of Texture while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Texture > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1286,9 +1276,9 @@ void UpdateManager::AddTexture( Render::NewTexture* texture )
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddTexture, texture );
 }
 
-void UpdateManager::RemoveTexture( Render::NewTexture* texture)
+void UpdateManager::RemoveTexture( Render::Texture* texture)
 {
-  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::Texture* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1297,9 +1287,9 @@ void UpdateManager::RemoveTexture( Render::NewTexture* texture)
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveTexture, texture );
 }
 
-void UpdateManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
+void UpdateManager::UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
 {
-  typedef MessageValue3< RenderManager, Render::NewTexture*, PixelDataPtr, NewTexture::UploadParams > DerivedType;
+  typedef MessageValue3< RenderManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > DerivedType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1308,9 +1298,9 @@ void UpdateManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pix
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::UploadTexture, texture, pixelData, params );
 }
 
-void UpdateManager::GenerateMipmaps( Render::NewTexture* texture )
+void UpdateManager::GenerateMipmaps( Render::Texture* texture )
 {
-  typedef MessageValue1< RenderManager, Render::NewTexture* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::Texture* > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1341,9 +1331,9 @@ void UpdateManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer)
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveFrameBuffer, frameBuffer );
 }
 
-void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  typedef MessageValue4< RenderManager, Render::FrameBuffer*, Render::NewTexture*, unsigned int, unsigned int > DerivedType;
+  typedef MessageValue4< RenderManager, Render::FrameBuffer*, Render::Texture*, unsigned int, unsigned int > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

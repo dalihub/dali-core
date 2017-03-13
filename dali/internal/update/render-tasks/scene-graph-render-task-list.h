@@ -28,7 +28,7 @@ namespace Dali
 
 namespace Internal
 {
-class ResourceManager;
+
 class CompleteNotificationInterface;
 
 namespace SceneGraph
@@ -48,9 +48,8 @@ public:
   /**
    * Constructor
    * @param renderMessageDispatcher to send messages
-   * @param resourceManager to pass to render tasks
    */
-  RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager );
+  RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher );
 
   /**
    * Destructor
@@ -104,7 +103,6 @@ private:
 
   CompleteNotificationInterface* mNotificationObject; ///< object to pass in to the complete notification
   RenderMessageDispatcher& mRenderMessageDispatcher; ///< for sending messages to render thread
-  ResourceManager& mResourceManager; ///< The resource manager (render tasks need this)
   RenderTaskContainer mRenderTasks; ///< A container of owned RenderTasks
 
 };
@@ -113,7 +111,8 @@ private:
 
 inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, RenderTask& task )
 {
-  typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
+  // Message has ownership of the RenderTask while in transit from event -> update
+  typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

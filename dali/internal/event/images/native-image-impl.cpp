@@ -57,7 +57,7 @@ NativeImagePtr NativeImage::New( NativeImageInterface& resourceData )
   image->mWidth  = resourceData.GetWidth();
   image->mHeight = resourceData.GetHeight();
 
-  image->mTexture = NewTexture::New( resourceData );
+  image->mTexture = Texture::New( resourceData );
   return image;
 }
 

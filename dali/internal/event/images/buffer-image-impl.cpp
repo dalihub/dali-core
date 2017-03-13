@@ -127,7 +127,7 @@ void BufferImage::Update( const RectArea& updateArea )
 {
   if ( !mTexture )
   {
-    mTexture = NewTexture::New( Dali::TextureType::TEXTURE_2D, mPixelFormat, mWidth, mHeight );
+    mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, mPixelFormat, mWidth, mHeight );
   }
   DALI_ASSERT_DEBUG( updateArea.x + updateArea.width <= mWidth && updateArea.y + updateArea.height <= mHeight );
   UploadArea( updateArea );

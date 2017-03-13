@@ -87,6 +87,32 @@ inline const Vector2& GetDefaultDimensionPadding()
 
 const SizeScalePolicy::Type DEFAULT_SIZE_SCALE_POLICY = SizeScalePolicy::USE_SIZE_SET;
 
+int GetSiblingOrder( ActorPtr actor )
+{
+  Property::Value value  = actor->GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
+  int order;
+  value.Get( order );
+  return order;
+}
+
+bool ValidateActors( const Internal::Actor& actor, const Internal::Actor& target )
+{
+  bool validTarget = true;
+
+  if( &actor == &target )
+  {
+    DALI_LOG_WARNING( "Source actor and target actor can not be the same, Sibling order not changed.\n" );
+    validTarget = false;
+  }
+  else if( actor.GetParent() != target.GetParent() )
+  {
+    DALI_LOG_WARNING( "Source actor and target actor need to have common parent, Sibling order not changed.\n" );
+    validTarget = false;
+  }
+
+  return validTarget;
+}
+
 } // unnamed namespace
 
 /**
@@ -146,62 +172,64 @@ namespace // unnamed namespace
  *              Name                  Type   writable animatable constraint-input  enum for index-checking
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "parentOrigin",        VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN )
-DALI_PROPERTY( "parentOriginX",       FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_X )
-DALI_PROPERTY( "parentOriginY",       FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Y )
-DALI_PROPERTY( "parentOriginZ",       FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Z )
-DALI_PROPERTY( "anchorPoint",         VECTOR3,  true,  false, true,  Dali::Actor::Property::ANCHOR_POINT )
-DALI_PROPERTY( "anchorPointX",        FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_X )
-DALI_PROPERTY( "anchorPointY",        FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Y )
-DALI_PROPERTY( "anchorPointZ",        FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Z )
-DALI_PROPERTY( "size",                VECTOR3,  true,  true,  true,  Dali::Actor::Property::SIZE )
-DALI_PROPERTY( "sizeWidth",           FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_WIDTH )
-DALI_PROPERTY( "sizeHeight",          FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_HEIGHT )
-DALI_PROPERTY( "sizeDepth",           FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_DEPTH )
-DALI_PROPERTY( "position",            VECTOR3,  true,  true,  true,  Dali::Actor::Property::POSITION )
-DALI_PROPERTY( "positionX",           FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_X )
-DALI_PROPERTY( "positionY",           FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Y )
-DALI_PROPERTY( "positionZ",           FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Z )
-DALI_PROPERTY( "worldPosition",       VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_POSITION )
-DALI_PROPERTY( "worldPositionX",      FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_X )
-DALI_PROPERTY( "worldPositionY",      FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Y )
-DALI_PROPERTY( "worldPositionZ",      FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Z )
-DALI_PROPERTY( "orientation",         ROTATION, true,  true,  true,  Dali::Actor::Property::ORIENTATION )
-DALI_PROPERTY( "worldOrientation",    ROTATION, false, false, true,  Dali::Actor::Property::WORLD_ORIENTATION )
-DALI_PROPERTY( "scale",               VECTOR3,  true,  true,  true,  Dali::Actor::Property::SCALE )
-DALI_PROPERTY( "scaleX",              FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_X )
-DALI_PROPERTY( "scaleY",              FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Y )
-DALI_PROPERTY( "scaleZ",              FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Z )
-DALI_PROPERTY( "worldScale",          VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_SCALE )
-DALI_PROPERTY( "visible",             BOOLEAN,  true,  true,  true,  Dali::Actor::Property::VISIBLE )
-DALI_PROPERTY( "color",               VECTOR4,  true,  true,  true,  Dali::Actor::Property::COLOR )
-DALI_PROPERTY( "colorRed",            FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_RED )
-DALI_PROPERTY( "colorGreen",          FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_GREEN )
-DALI_PROPERTY( "colorBlue",           FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_BLUE )
-DALI_PROPERTY( "colorAlpha",          FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_ALPHA )
-DALI_PROPERTY( "worldColor",          VECTOR4,  false, false, true,  Dali::Actor::Property::WORLD_COLOR )
-DALI_PROPERTY( "worldMatrix",         MATRIX,   false, false, true,  Dali::Actor::Property::WORLD_MATRIX )
-DALI_PROPERTY( "name",                STRING,   true,  false, false, Dali::Actor::Property::NAME )
-DALI_PROPERTY( "sensitive",           BOOLEAN,  true,  false, false, Dali::Actor::Property::SENSITIVE )
-DALI_PROPERTY( "leaveRequired",       BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED )
-DALI_PROPERTY( "inheritOrientation",  BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
-DALI_PROPERTY( "inheritScale",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
-DALI_PROPERTY( "colorMode",           STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "positionInheritance", STRING,   true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE )
-DALI_PROPERTY( "drawMode",            STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
-DALI_PROPERTY( "sizeModeFactor",      VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
-DALI_PROPERTY( "widthResizePolicy",   STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
-DALI_PROPERTY( "heightResizePolicy",  STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
-DALI_PROPERTY( "sizeScalePolicy",     STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
-DALI_PROPERTY( "widthForHeight",      BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
-DALI_PROPERTY( "heightForWidth",      BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
-DALI_PROPERTY( "padding",             VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING )
-DALI_PROPERTY( "minimumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE )
-DALI_PROPERTY( "maximumSize",         VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
-DALI_PROPERTY( "inheritPosition",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
-DALI_PROPERTY( "clippingMode",        STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "siblingOrder",        INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
-DALI_PROPERTY( "opacity",             FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
+DALI_PROPERTY( "parentOrigin",              VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN )
+DALI_PROPERTY( "parentOriginX",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_X )
+DALI_PROPERTY( "parentOriginY",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Y )
+DALI_PROPERTY( "parentOriginZ",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Z )
+DALI_PROPERTY( "anchorPoint",               VECTOR3,  true,  false, true,  Dali::Actor::Property::ANCHOR_POINT )
+DALI_PROPERTY( "anchorPointX",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_X )
+DALI_PROPERTY( "anchorPointY",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Y )
+DALI_PROPERTY( "anchorPointZ",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Z )
+DALI_PROPERTY( "size",                      VECTOR3,  true,  true,  true,  Dali::Actor::Property::SIZE )
+DALI_PROPERTY( "sizeWidth",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_WIDTH )
+DALI_PROPERTY( "sizeHeight",                FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_HEIGHT )
+DALI_PROPERTY( "sizeDepth",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_DEPTH )
+DALI_PROPERTY( "position",                  VECTOR3,  true,  true,  true,  Dali::Actor::Property::POSITION )
+DALI_PROPERTY( "positionX",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_X )
+DALI_PROPERTY( "positionY",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Y )
+DALI_PROPERTY( "positionZ",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Z )
+DALI_PROPERTY( "worldPosition",             VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_POSITION )
+DALI_PROPERTY( "worldPositionX",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_X )
+DALI_PROPERTY( "worldPositionY",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Y )
+DALI_PROPERTY( "worldPositionZ",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Z )
+DALI_PROPERTY( "orientation",               ROTATION, true,  true,  true,  Dali::Actor::Property::ORIENTATION )
+DALI_PROPERTY( "worldOrientation",          ROTATION, false, false, true,  Dali::Actor::Property::WORLD_ORIENTATION )
+DALI_PROPERTY( "scale",                     VECTOR3,  true,  true,  true,  Dali::Actor::Property::SCALE )
+DALI_PROPERTY( "scaleX",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_X )
+DALI_PROPERTY( "scaleY",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Y )
+DALI_PROPERTY( "scaleZ",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Z )
+DALI_PROPERTY( "worldScale",                VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_SCALE )
+DALI_PROPERTY( "visible",                   BOOLEAN,  true,  true,  true,  Dali::Actor::Property::VISIBLE )
+DALI_PROPERTY( "color",                     VECTOR4,  true,  true,  true,  Dali::Actor::Property::COLOR )
+DALI_PROPERTY( "colorRed",                  FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_RED )
+DALI_PROPERTY( "colorGreen",                FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_GREEN )
+DALI_PROPERTY( "colorBlue",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_BLUE )
+DALI_PROPERTY( "colorAlpha",                FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_ALPHA )
+DALI_PROPERTY( "worldColor",                VECTOR4,  false, false, true,  Dali::Actor::Property::WORLD_COLOR )
+DALI_PROPERTY( "worldMatrix",               MATRIX,   false, false, true,  Dali::Actor::Property::WORLD_MATRIX )
+DALI_PROPERTY( "name",                      STRING,   true,  false, false, Dali::Actor::Property::NAME )
+DALI_PROPERTY( "sensitive",                 BOOLEAN,  true,  false, false, Dali::Actor::Property::SENSITIVE )
+DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED )
+DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
+DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
+DALI_PROPERTY( "colorMode",                 STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
+DALI_PROPERTY( "positionInheritance",       STRING,   true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE )
+DALI_PROPERTY( "drawMode",                  STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
+DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
+DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
+DALI_PROPERTY( "heightResizePolicy",        STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
+DALI_PROPERTY( "sizeScalePolicy",           STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
+DALI_PROPERTY( "widthForHeight",            BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
+DALI_PROPERTY( "heightForWidth",            BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
+DALI_PROPERTY( "padding",                   VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING )
+DALI_PROPERTY( "minimumSize",               VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE )
+DALI_PROPERTY( "maximumSize",               VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
+DALI_PROPERTY( "inheritPosition",           BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
+DALI_PROPERTY( "clippingMode",              STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
+DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
+DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
+DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
+DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -775,6 +803,25 @@ const Vector3& Actor::GetCurrentWorldPosition() const
   }
 
   return Vector3::ZERO;
+}
+
+const Vector2 Actor::GetCurrentScreenPosition() const
+{
+  if( OnStage() && NULL != mNode )
+  {
+    StagePtr stage = Stage::GetCurrent();
+    Vector3 worldPosition =  mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    Vector3 actorSize = GetCurrentSize() * GetCurrentScale();
+    Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
+    Vector3 halfActorSize( actorSize * 0.5f );
+    // Anchor point offset first set to TOP_LEFT (0,0.5) then moved to required anchor point.
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * GetCurrentAnchorPoint();
+
+    return Vector2( halfStageSize.width + worldPosition.x - anchorPointOffSet.x,
+                    halfStageSize.height + worldPosition.y - anchorPointOffSet.y );
+  }
+
+  return Vector2::ZERO;
 }
 
 void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
@@ -2020,6 +2067,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritPosition( true ),
   mInheritOrientation( true ),
   mInheritScale( true ),
+  mPositionUsesAnchorPoint( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
@@ -2699,11 +2747,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       {
         if( static_cast<unsigned int>(value) != mSiblingOrder )
         {
-          mSiblingOrder = value;
-          if( mIsOnStage )
-          {
-            SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
-          }
+          SetSiblingOrder( value );
         }
       }
       break;
@@ -2718,6 +2762,20 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
         if( NULL != mNode )
         {
           SetClippingModeMessage( GetEventThreadServices(), *mNode, mClippingMode );
+        }
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
+    {
+      bool value = false;
+      if( property.Get( value ) && value != mPositionUsesAnchorPoint )
+      {
+        mPositionUsesAnchorPoint = value;
+        if( NULL != mNode )
+        {
+          SetPositionUsesAnchorPointMessage( GetEventThreadServices(), *mNode, mPositionUsesAnchorPoint );
         }
       }
       break;
@@ -3257,6 +3315,18 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       value = mClippingMode;
+      break;
+    }
+
+    case Dali::DevelActor::Property::SCREEN_POSITION:
+    {
+      value = GetCurrentScreenPosition();
+      break;
+    }
+
+    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
+    {
+      value = mPositionUsesAnchorPoint;
       break;
     }
   }
@@ -4417,6 +4487,483 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
 Object* Actor::GetParentObject() const
 {
   return mParent;
+}
+
+void Actor::SetSiblingOrder( unsigned int order )
+{
+  mSiblingOrder = std::min( order, static_cast<unsigned int>( DevelLayer::SIBLING_ORDER_MULTIPLIER ) );
+  if( mIsOnStage )
+  {
+    SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+  }
+}
+
+void Actor::DefragmentSiblingIndexes( ActorContainer& siblings )
+{
+  // Sibling index may not be in consecutive order as the sibling range is limited ( DevelLayer::SIBLING_ORDER_MULTIPLIER )
+  // we need to remove the gaps and ensure the number start from 0 and consecutive hence have a full range.
+
+  // Start at index 0, while index <= highest order
+  // Find next index higher than 0
+  //   if nextHigher > index+1
+  //      set all nextHigher orders to index+1
+
+  // Limitation: May reach the ceiling of DevelLayer::SIBLING_ORDER_MULTIPLIER with highest sibling.
+
+  ActorIter end = siblings.end();
+  int highestOrder = 0;
+  for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+  {
+    ActorPtr sibling = (*iter);
+    int siblingOrder = sibling->mSiblingOrder;
+    highestOrder = std::max( highestOrder, siblingOrder );
+  }
+
+  for ( int index = 0; index <= highestOrder; index++ )
+  {
+    int nextHighest = -1;
+
+    // Find Next highest
+    for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      int siblingOrder = sibling->mSiblingOrder;
+
+      if ( siblingOrder > index )
+      {
+        if ( nextHighest == -1 )
+        {
+          nextHighest = siblingOrder;
+        }
+        nextHighest = std::min( nextHighest, siblingOrder );
+      }
+    }
+
+    // Check if a gap exists between indexes, if so set next index to consecutive number
+    if ( ( nextHighest - index ) > 1 )
+    {
+      for( ActorIter iter = siblings.begin(); iter != end; ++iter )
+      {
+        ActorPtr sibling = (*iter);
+        int siblingOrder = sibling->mSiblingOrder;
+        if ( siblingOrder == nextHighest )
+        {
+          sibling->mSiblingOrder =  index + 1;
+          if ( sibling->mSiblingOrder >= Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER )
+          {
+            DALI_LOG_WARNING( "Reached max sibling order level for raising / lowering actors\n" );
+            sibling->mSiblingOrder = Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
+          }
+          sibling->SetSiblingOrder( sibling->mSiblingOrder );
+        }
+      }
+    }
+  }
+}
+
+bool Actor::ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom )
+{
+  // Allows exclusive levels for an actor by shifting all sibling levels at the target and above by 1
+  bool defragmentationRequired( false );
+  ActorIter end = siblings.end();
+  for( ActorIter iter = siblings.begin(); ( iter != end ) ; ++iter )
+  {
+    // Move actors at nearest order and above up by 1
+    ActorPtr sibling = (*iter);
+    if ( sibling != this )
+    {
+      // Iterate through container of actors, any actor with a sibling order of the target or greater should
+      // be incremented by 1.
+      if ( sibling->mSiblingOrder >= targetLevelToShiftFrom )
+      {
+        sibling->mSiblingOrder++;
+        if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+        {
+          // If a sibling order raises so that it is only 1 from the maximum allowed then set flag so
+          // can re-order all sibling orders.
+          defragmentationRequired = true;
+        }
+        sibling->SetSiblingOrder( sibling->mSiblingOrder );
+      }
+    }
+  }
+  return defragmentationRequired;
+}
+
+void Actor::Raise()
+{
+  /*
+     1) Check if already at top and nothing to be done.
+        This Actor can have highest sibling order but if not exclusive then another actor at same sibling
+        order can be positioned above it due to insertion order of actors.
+     2) Find nearest sibling level above, these are the siblings this actor needs to be above
+     3) a) There may be other levels above this target level
+        b) Increment all sibling levels at the level above nearest(target)
+        c) Now have a vacant sibling level
+     4) Set this actor's sibling level to nearest +1 as now vacated.
+
+     Note May not just be sibling level + 1 as could be empty levels in-between
+
+     Example:
+
+     1 ) Initial order
+        ActorC ( sibling level 4 )
+        ActorB ( sibling level 3 )
+        ActorA ( sibling level 1 )
+
+     2 )  ACTION: Raise A above B
+        a) Find nearest level above A = Level 3
+        b) Increment levels above Level 3
+
+           ActorC ( sibling level 5 )
+           ActorB ( sibling level 3 )  NEAREST
+           ActorA ( sibling level 1 )
+
+     3 ) Set Actor A sibling level to nearest +1 as vacant
+
+         ActorC ( sibling level 5 )
+         ActorA ( sibling level 4 )
+         ActorB ( sibling level 3 )
+
+     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+         remove any empty sibling order gaps and start from sibling level 0 again.
+         If the number of actors reaches this maximum and all using exclusive sibling order values then
+         defragmention will stop and new sibling orders will be set to same max value.
+  */
+  if ( mParent )
+  {
+    int nearestLevel = mSiblingOrder;
+    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
+    bool defragmentationRequired( false );
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    // Find Nearest sibling level above this actor
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int order = GetSiblingOrder( sibling );
+
+        if ( ( order >= mSiblingOrder ) )
+        {
+          int distanceToNextLevel =  order - mSiblingOrder;
+          if ( distanceToNextLevel < shortestDistanceToNextLevel )
+          {
+            nearestLevel = order;
+            shortestDistanceToNextLevel = distanceToNextLevel;
+          }
+        }
+      }
+    }
+
+    if ( nearestLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at top
+    {
+      mSiblingOrder = nearestLevel + 1; // Set sibling level to that above the nearest level
+      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+      // Move current actor to newly vacated order level
+      SetSiblingOrder( mSiblingOrder );
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+    SetSiblingOrder( mSiblingOrder );
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::Lower()
+{
+  /**
+    1) Check if actor already at bottom and if nothing needs to be done
+       This Actor can have lowest sibling order but if not exclusive then another actor at same sibling
+       order can be positioned above it due to insertion order of actors so need to move this actor below it.
+    2) Find nearest sibling level below, this Actor needs to be below it
+    3) a) Need to vacate a sibling level below nearest for this actor to occupy
+       b) Shift up all sibling order values of actor at the nearest level and levels above it to vacate a level.
+       c) Set this actor's sibling level to this newly vacated level.
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+       If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+       remove any empty sibling order gaps and start from sibling level 0 again.
+       If the number of actors reaches this maximum and all using exclusive sibling order values then
+       defragmention will stop and new sibling orders will be set to same max value.
+  */
+
+  if ( mParent )
+  {
+    // 1) Find nearest level below
+    int nearestLevel = mSiblingOrder;
+    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int order = GetSiblingOrder( sibling );
+
+        if ( order <= mSiblingOrder )
+        {
+          int distanceToNextLevel =  mSiblingOrder - order;
+          if ( distanceToNextLevel < shortestDistanceToNextLevel )
+          {
+            nearestLevel = order;
+            shortestDistanceToNextLevel = distanceToNextLevel;
+          }
+        }
+      }
+    }
+
+    bool defragmentationRequired ( false );
+
+    // 2) If actor already not at bottom, raise all actors at required level and above
+    if ( shortestDistanceToNextLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at bottom
+    {
+      mSiblingOrder = nearestLevel;
+      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+      // Move current actor to newly vacated order
+      SetSiblingOrder( mSiblingOrder );
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::RaiseToTop()
+{
+  /**
+    1 ) Find highest sibling order actor
+    2 ) If highest sibling level not itself then set sibling order to that + 1
+    3 ) highest sibling order can be same as itself so need to increment over that
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    int maxOrder = 0;
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        maxOrder = std::max( GetSiblingOrder( sibling ), maxOrder );
+      }
+    }
+
+    bool defragmentationRequired( false );
+
+    if ( maxOrder >= mSiblingOrder )
+    {
+      mSiblingOrder = maxOrder + 1;
+      if ( mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+      {
+        defragmentationRequired = true;
+      }
+    }
+
+    SetSiblingOrder( mSiblingOrder );
+
+    if ( defragmentationRequired )
+    {
+      DefragmentSiblingIndexes( *siblings );
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::LowerToBottom()
+{
+  /**
+    See Actor::LowerToBottom()
+
+    1 ) Check if this actor already at exclusively at the bottom, if so then no more to be done.
+    2 ) a ) Check if the bottom position 0 is vacant.
+        b ) If 0 position is not vacant then shift up all sibling order values from 0 and above
+        c ) 0 sibling position is vacant.
+    3 ) Set this actor to vacant sibling order 0;
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    bool defragmentationRequired( false );
+    bool orderZeroFree ( true );
+
+    ActorContainer* siblings = mParent->mChildren;
+
+    bool actorAtLowestOrder = true;
+    ActorIter end = siblings->end();
+    for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+    {
+      ActorPtr sibling = (*iter);
+      if ( sibling != this )
+      {
+        int siblingOrder = GetSiblingOrder( sibling );
+        if ( siblingOrder <= mSiblingOrder )
+        {
+          actorAtLowestOrder = false;
+        }
+
+        if ( siblingOrder == 0 )
+        {
+          orderZeroFree = false;
+        }
+      }
+    }
+
+    if ( ! actorAtLowestOrder  )
+    {
+      if ( ! orderZeroFree )
+      {
+        defragmentationRequired = ShiftSiblingsLevels( *siblings, 0 );
+      }
+      mSiblingOrder = 0;
+      SetSiblingOrder( mSiblingOrder );
+
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *siblings );
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::RaiseAbove( Internal::Actor& target )
+{
+  /**
+    1 ) a) Find target actor's sibling order
+        b) If sibling order of target is the same as this actor then need to this Actor's sibling order
+           needs to be above it or the insertion order will determine which is drawn on top.
+    2 ) Shift up by 1 all sibling order greater than target sibling order
+    3 ) Set this actor to the sibling order to target +1 as will be a newly vacated gap above
+    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+        remove any empty sibling order gaps and start from sibling level 0 again.
+        If the number of actors reaches this maximum and all using exclusive sibling order values then
+        defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    if ( ValidateActors( *this, target ) )
+    {
+       // Find target's sibling order
+       // Set actor sibling order to this number +1
+      int targetSiblingOrder = GetSiblingOrder( &target );
+      ActorContainer* siblings = mParent->mChildren;
+      mSiblingOrder = targetSiblingOrder + 1;
+      bool defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+
+      SetSiblingOrder( mSiblingOrder );
+
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *(mParent->mChildren) );
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::LowerBelow( Internal::Actor& target )
+{
+  /**
+     1 ) a) Find target actor's sibling order
+         b) If sibling order of target is the same as this actor then need to this Actor's sibling order
+            needs to be below it or the insertion order will determine which is drawn on top.
+     2 ) Shift the target sibling order and all sibling orders at that level or above by 1
+     3 ) Set this actor to the sibling order of the target before it changed.
+     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
+         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
+         remove any empty sibling order gaps and start from sibling level 0 again.
+         If the number of actors reaches this maximum and all using exclusive sibling order values then
+         defragmention will stop and new sibling orders will be set to same max value.
+   */
+
+  if ( mParent )
+  {
+    if ( ValidateActors( *this, target )  )
+    {
+      bool defragmentationRequired ( false );
+      // Find target's sibling order
+      // Set actor sibling order to target sibling order - 1
+      int targetSiblingOrder = GetSiblingOrder( &target);
+      ActorContainer* siblings = mParent->mChildren;
+      if ( targetSiblingOrder == 0 )
+      {
+        //lower to botton
+        ActorIter end = siblings->end();
+        for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+        {
+          ActorPtr sibling = (*iter);
+          if ( sibling != this )
+          {
+            sibling->mSiblingOrder++;
+            if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
+            {
+              defragmentationRequired = true;
+            }
+            sibling->SetSiblingOrder( sibling->mSiblingOrder );
+          }
+        }
+        mSiblingOrder = 0;
+      }
+      else
+      {
+        defragmentationRequired = ShiftSiblingsLevels( *siblings, targetSiblingOrder );
+
+        mSiblingOrder = targetSiblingOrder;
+      }
+      SetSiblingOrder( mSiblingOrder );
+
+      if ( defragmentationRequired )
+      {
+        DefragmentSiblingIndexes( *(mParent->mChildren) );
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
 }
 
 } // namespace Internal

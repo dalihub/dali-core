@@ -59,12 +59,12 @@ public:
   /**
    * @copydoc Dali::TextureSet::SetTexture()
    */
-  void SetTexture( size_t index, NewTexturePtr texture );
+  void SetTexture( size_t index, TexturePtr texture );
 
   /**
    * @copydoc Dali::TextureSet::GetTexture()
    */
-  NewTexture* GetTexture( size_t index ) const;
+  Texture* GetTexture( size_t index ) const;
 
   /**
    * @copydoc Dali::TextureSet::SetSampler()
@@ -111,7 +111,7 @@ private: // Data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the update thread
   SceneGraph::TextureSet* mSceneObject;
   std::vector<SamplerPtr> mSamplers;
-  std::vector<NewTexturePtr> mNewTextures;
+  std::vector<TexturePtr> mTextures;
 };
 
 } // namespace Internal

@@ -59,9 +59,9 @@ RenderDataProvider::Samplers& RenderDataProvider::GetSamplers()
   return mSamplers;
 }
 
-std::vector<Render::NewTexture*>& RenderDataProvider::GetNewTextures()
+std::vector<Render::Texture*>& RenderDataProvider::GetTextures()
 {
-  return mNewTextures;
+  return mTextures;
 }
 
 } // SceneGraph

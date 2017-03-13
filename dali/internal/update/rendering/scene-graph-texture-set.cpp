@@ -74,7 +74,7 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   NotifyChangeToRenderers();
 }
 
-void TextureSet::SetTexture( size_t index, Render::NewTexture* texture )
+void TextureSet::SetTexture( size_t index, Render::Texture* texture )
 {
   const size_t textureCount( mTextures.Size() );
   if( textureCount < index + 1 )

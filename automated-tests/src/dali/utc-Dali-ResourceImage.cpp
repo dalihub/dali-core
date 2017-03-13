@@ -213,15 +213,6 @@ int UtcDaliResourceImageSignalLoadingFinished(void)
   application.SendNotification();
   application.Render(16);
 
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
-  }
-
-  application.Render(16);
-  application.SendNotification();
-
   DALI_TEST_CHECK( SignalLoadFlag == true );
   END_TEST;
 }

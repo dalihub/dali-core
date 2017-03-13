@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,17 +87,108 @@ enum Type
   INHERIT_POSITION     = Dali::Actor::Property::INHERIT_POSITION,
   CLIPPING_MODE        = Dali::Actor::Property::CLIPPING_MODE,
 
-  SIBLING_ORDER        = CLIPPING_MODE + 1,
+  /**
+   * @brief Sets the sibling order of the actor so depth position can be defined within the same parent.
+   * @details Name "siblingOrder", type Property::INTEGER.
+   * @note The initial value is 0.
+   * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
+   * sibling order. The values set by this Property will likely change.
+   */
+  SIBLING_ORDER = CLIPPING_MODE + 1,
 
   /**
    * @brief The opacity of the actor.
    * @details Name "opacity", type Property::FLOAT.
-   * @SINCE_1_2.28
    */
-  OPACITY              = CLIPPING_MODE + 2,
+  OPACITY = CLIPPING_MODE + 2,
+
+  /**
+   * @brief Returns the screen position of the Actor
+   * @details Name "screenPosition", type Property::VECTOR2. Read-only
+   * @note This assumes default camera and default render-task and the Z position is ZERO.
+   */
+  SCREEN_POSITION = CLIPPING_MODE + 3,
+
+  /**
+   * @brief Determines whether the anchor point should be used to determine the position of the actor.
+   * @details Name "positionUsesAnchorPoint", type Property::BOOLEAN.
+   * @note This is true by default.
+   * @note If false, then the top-left of the actor is used for the position.
+   * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
+   */
+  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4
 };
 
 } // namespace Property
+
+/**
+ * @brief Raise actor above the next highest level of actor(s).
+ *
+ * @param[in] actor The Actor to raise
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Initially actors added to a parent will have the same sibling order and shown in relation to insertion order.
+ * Raising this actor above actors with the same sibling order as each other will raise this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ *
+ */
+DALI_IMPORT_API void Raise( Actor actor );
+
+/**
+ * @brief Lower the actor to underneath the level below actor(s).
+ *
+ * @param[in] actor The Actor to lower
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void Lower( Actor actor );
+
+/**
+ * @brief Raise actor above all other actors.
+ *
+ * @param[in] actor The Actor to raise to the top
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void RaiseToTop( Actor actor );
+
+/**
+ * @brief Lower actor to the bottom of all actors.
+ *
+ * @param[in] actor The Actor to lower to the bottom
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void LowerToBottom( Actor actor );
+
+/**
+ * @brief Raise the actor to above the target actor.
+ *
+ * @param[in] actor The actor to raise
+ * @param[in] target Will be raised above this actor
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Actors on the level above the target actor will still be shown above this actor.
+ * Raising this actor above actors with the same sibling order as each other will raise this actor above them.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void RaiseAbove( Actor actor, Dali::Actor target );
+
+/**
+ * @brief Lower the actor to below the target actor.
+ *
+ * @param[in] actor The Actor to lower
+ * @param[in] target Will be lowered below this actor
+ * @note Sibling order of actors within the parent will be updated automatically.
+ * Using this API means a limit of DevelLayer::SIBLING_ORDER_MULTIPLIER Actors.
+ * Lowering this actor below actors with the same sibling order as each other will lower this actor above them.
+ * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
+ */
+DALI_IMPORT_API void LowerBelow( Actor actor, Dali::Actor target );
 
 } // namespace DevelActor
 

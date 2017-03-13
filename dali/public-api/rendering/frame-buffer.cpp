@@ -69,14 +69,14 @@ void FrameBuffer::AttachColorTexture( Texture& texture, unsigned int mipmapLevel
 {
   if( texture )
   {
-    Internal::NewTexturePtr texturePtr( &GetImplementation( texture ) );
+    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
     GetImplementation(*this).AttachColorTexture( texturePtr, mipmapLevel, layer );
   }
 }
 
 Texture FrameBuffer::GetColorTexture()
 {
-  Internal::NewTexture* texturePtr = GetImplementation(*this).GetColorTexture();
+  Internal::Texture* texturePtr = GetImplementation(*this).GetColorTexture();
   return Dali::Texture( texturePtr );
 }
 

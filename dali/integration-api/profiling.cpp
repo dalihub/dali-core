@@ -38,16 +38,11 @@
 
 #include <dali/internal/event/images/image-impl.h>
 
-#include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/event/resources/image-ticket.h>
-
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
-#include <dali/internal/update/resources/texture-metadata.h>
 
-#include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
@@ -104,10 +99,7 @@ const int LAYER_MEMORY_SIZE(
   sizeof( Internal::SceneGraph::Layer ) );
 const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::Image ) +
-  sizeof( Integration::Bitmap ) +
-  sizeof( Internal::TextureMetadata ) +
-  sizeof( Internal::BitmapTexture ) +
-  sizeof( Internal::ImageTicket ) );
+  sizeof( Integration::Bitmap ) );
 const int RENDERER_MEMORY_SIZE(
   sizeof( Internal::Renderer ) +
   sizeof( Internal::SceneGraph::Renderer ) +

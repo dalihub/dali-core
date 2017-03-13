@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
@@ -57,10 +56,9 @@ RenderTask::~RenderTask()
   }
 }
 
-void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher, ResourceManager& resourceManager )
+void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher )
 {
   mRenderMessageDispatcher = &renderMessageDispatcher;
-  mResourceManager = &resourceManager;
 }
 
 void RenderTask::SetSourceNode( Node* node )
@@ -481,7 +479,6 @@ RenderTask::RenderTask()
   mViewportSize( Vector2::ZERO),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
   mRenderMessageDispatcher( NULL ),
-  mResourceManager( NULL ),
   mRenderSyncTracker( NULL ),
   mSourceNode( NULL ),
   mCameraNode( NULL ),

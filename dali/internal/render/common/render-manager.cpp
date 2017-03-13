@@ -32,8 +32,6 @@
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/gl-resources/frame-buffer-texture.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
@@ -59,7 +57,7 @@ typedef GeometryOwnerContainer::Iterator       GeometryOwnerIter;
 typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
 typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
 
-typedef OwnerContainer< Render::NewTexture* >   TextureOwnerContainer;
+typedef OwnerContainer< Render::Texture* >   TextureOwnerContainer;
 typedef TextureOwnerContainer::Iterator         TextureOwnerIter;
 
 typedef OwnerContainer< Render::FrameBuffer* >  FrameBufferOwnerContainer;
@@ -78,14 +76,10 @@ typedef RenderTrackerContainer::ConstIterator    RenderTrackerConstIter;
 struct RenderManager::Impl
 {
   Impl( Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction,
-        LockedResourceQueue& textureUploadedQ,
-        TextureUploadedDispatcher& postProcessDispatcher )
+        Integration::GlSyncAbstraction& glSyncAbstraction )
   : context( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
-    textureCache( renderQueue, postProcessDispatcher, context ),
-    textureUploadedQueue( textureUploadedQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     frameCount( 0 ),
@@ -138,8 +132,6 @@ struct RenderManager::Impl
   Context                       context;                  ///< holds the GL state
   Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
   RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
-  TextureCache                  textureCache;             ///< Cache for all GL textures
-  LockedResourceQueue&          textureUploadedQueue;     ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
@@ -170,14 +162,11 @@ struct RenderManager::Impl
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
-                                   Integration::GlSyncAbstraction& glSyncAbstraction,
-                                   LockedResourceQueue& textureUploadedQ )
+                                   Integration::GlSyncAbstraction& glSyncAbstraction )
 {
   RenderManager* manager = new RenderManager;
   manager->mImpl = new Impl( glAbstraction,
-                             glSyncAbstraction,
-                             textureUploadedQ,
-                             *manager );
+                             glSyncAbstraction );
   return manager;
 }
 
@@ -196,11 +185,6 @@ RenderQueue& RenderManager::GetRenderQueue()
   return mImpl->renderQueue;
 }
 
-TextureCache& RenderManager::GetTextureCache()
-{
-  return mImpl->textureCache;
-}
-
 void RenderManager::ContextCreated()
 {
   mImpl->context.GlContextCreated();
@@ -214,9 +198,6 @@ void RenderManager::ContextDestroyed()
 {
   mImpl->context.GlContextDestroyed();
   mImpl->programController.GlContextDestroyed();
-
-  // inform texture cache
-  mImpl->textureCache.GlContextDestroyed(); // Clears gl texture ids
 
   //Inform textures
   for( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
@@ -238,11 +219,6 @@ void RenderManager::ContextDestroyed()
     GlResourceOwner* renderer = *iter;
     renderer->GlContextDestroyed(); // Clear up vertex buffers
   }
-}
-
-void RenderManager::DispatchTextureUploaded(ResourceId request)
-{
-  mImpl->textureUploadedQueue.PushBack( request );
 }
 
 void RenderManager::SetShaderSaver( ShaderSaver& upstream )
@@ -268,7 +244,7 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 void RenderManager::AddRenderer( Render::Renderer* renderer )
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize( mImpl->context, mImpl->textureCache );
+  renderer->Initialize( mImpl->context );
 
   mImpl->rendererContainer.PushBack( renderer );
 
@@ -317,13 +293,13 @@ void RenderManager::RemoveSampler( Render::Sampler* sampler )
   }
 }
 
-void RenderManager::AddTexture( Render::NewTexture* texture )
+void RenderManager::AddTexture( Render::Texture* texture )
 {
   mImpl->textureContainer.PushBack( texture );
   texture->Initialize(mImpl->context);
 }
 
-void RenderManager::RemoveTexture( Render::NewTexture* texture )
+void RenderManager::RemoveTexture( Render::Texture* texture )
 {
   DALI_ASSERT_DEBUG( NULL != texture );
 
@@ -341,12 +317,12 @@ void RenderManager::RemoveTexture( Render::NewTexture* texture )
   }
 }
 
-void RenderManager::UploadTexture( Render::NewTexture* texture, PixelDataPtr pixelData, const NewTexture::UploadParams& params )
+void RenderManager::UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
 {
   texture->Upload( mImpl->context, pixelData, params );
 }
 
-void RenderManager::GenerateMipmaps( Render::NewTexture* texture )
+void RenderManager::GenerateMipmaps( Render::Texture* texture )
 {
   texture->GenerateMipmaps( mImpl->context );
 }
@@ -388,7 +364,7 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
   }
 }
 
-void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::NewTexture* texture, unsigned int mipmapLevel, unsigned int layer )
+void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
   frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
@@ -590,8 +566,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   DALI_PRINT_RENDER_END();
 
-  // check if anything has been posted to the update thread, if IsEmpty then no update required.
-  return !mImpl->textureUploadedQueue.IsEmpty();
+  return false;
 }
 
 void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
@@ -607,8 +582,6 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
   {
     clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
   }
-
-  FrameBufferTexture* offscreen = NULL;
 
   if( instruction.mFrameBuffer != 0 )
   {
@@ -661,11 +634,10 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
-                                    mImpl->textureCache,
                                     defaultShader,
                                     mImpl->renderBufferIndex );
 
-  if( instruction.mRenderTracker && ( offscreen != NULL || instruction.mFrameBuffer != NULL ) )
+  if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {
     // This will create a sync object every frame this render tracker
     // is alive (though it should be now be created only for

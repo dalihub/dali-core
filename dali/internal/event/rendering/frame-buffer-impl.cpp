@@ -57,7 +57,7 @@ void FrameBuffer::Initialize()
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
-void FrameBuffer::AttachColorTexture( NewTexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
+void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
 {
   if( (unsigned int)( texture->GetWidth() / ( 1 << mipmapLevel ) ) == mWidth &&
       (unsigned int)( texture->GetHeight() / ( 1 << mipmapLevel ) ) == mHeight )
@@ -71,7 +71,7 @@ void FrameBuffer::AttachColorTexture( NewTexturePtr texture, unsigned int mipmap
   }
 }
 
-NewTexture* FrameBuffer::GetColorTexture()
+Texture* FrameBuffer::GetColorTexture()
 {
   return mColor.Get();
 }

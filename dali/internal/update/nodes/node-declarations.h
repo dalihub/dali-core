@@ -34,8 +34,6 @@ namespace SceneGraph
 
 class Node;
 
-typedef OwnerContainer< Node* > NodeOwnerContainer;
-
 typedef Dali::Vector< Node* > NodeContainer;
 typedef NodeContainer::Iterator NodeIter;
 typedef NodeContainer::ConstIterator NodeConstIter;

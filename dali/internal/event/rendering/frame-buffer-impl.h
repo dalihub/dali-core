@@ -62,12 +62,12 @@ public:
   /**
    * @copydoc Dali::FrameBuffer::AttachColorTexture()
    */
-  void AttachColorTexture( NewTexturePtr texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer );
 
   /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
    */
-  NewTexture* GetColorTexture();
+  Texture* GetColorTexture();
 
 private: // implementation
 
@@ -100,7 +100,7 @@ private: // data
   Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
   Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
-  NewTexturePtr mColor;
+  TexturePtr mColor;
   unsigned int mWidth;
   unsigned int mHeight;
   unsigned int mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask

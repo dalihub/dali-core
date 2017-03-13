@@ -60,7 +60,7 @@ void TextureSet::SetTexture( size_t index, Texture texture )
 {
   if( texture )
   {
-    Internal::NewTexturePtr texturePtr( &GetImplementation( texture ) );
+    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
     GetImplementation(*this).SetTexture( index, texturePtr );
   }
   else
@@ -71,7 +71,7 @@ void TextureSet::SetTexture( size_t index, Texture texture )
 
 Texture TextureSet::GetTexture( size_t index ) const
 {
-  Internal::NewTexture* texturePtr = GetImplementation(*this).GetTexture( index );
+  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture( index );
   return Dali::Texture( texturePtr );
 }
 
