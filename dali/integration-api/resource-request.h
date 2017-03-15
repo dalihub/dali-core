@@ -123,6 +123,10 @@ public:
     if( this != &rhs )
     {
       id = rhs.id;
+      if( type )
+      {
+        delete type;
+      }
       type = rhs.type->Clone();
       path = rhs.path;
       resource = rhs.resource;
