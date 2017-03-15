@@ -19,13 +19,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/animation/animator-connector-base.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
-#include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -37,14 +35,11 @@ namespace Internal
 /**
  * AnimatorConnector is used to connect SceneGraph::Animators for newly created scene-graph objects.
  *
- * The scene-graph objects are created by a Object e.g. Actor is a proxy for SceneGraph::Node.
- * AnimatorConnector observes the proxy object, in order to detect when a scene-graph object is created.
- *
  * SceneGraph::Animators weakly reference scene objects, and are automatically deleted when orphaned.
  * Therefore the AnimatorConnector is NOT responsible for disconnecting animators.
  */
 template < typename PropertyType >
-class AnimatorConnector : public AnimatorConnectorBase, public Object::Observer
+class AnimatorConnector : public AnimatorConnectorBase
 {
 public:
 
@@ -121,14 +116,10 @@ private:
                      Internal::AnimatorFunctionBase* animatorFunction,
                      AlphaFunction alpha,
                      const TimePeriod& period )
-  : AnimatorConnectorBase( alpha, period ),
-    mObject( &object ),
+  : AnimatorConnectorBase( object, propertyIndex, componentIndex, alpha, period ),
     mAnimator(0),
-    mPropertyIndex( propertyIndex ),
-    mComponentIndex( componentIndex ),
     mAnimatorFunction( animatorFunction )
   {
-    object.AddObserver( *this );
   }
 
   // Undefined
@@ -143,25 +134,10 @@ private:
   virtual void SceneObjectAdded( Object& object )
   {
     //If the animator has not been created yet, create it now.
-    if( !mAnimator )
+    if( !mAnimator && mObject )
     {
       CreateAnimator();
     }
-  }
-
-  /**
-   * From Object::Observer
-   */
-  virtual void SceneObjectRemoved( Object& object )
-  {
-  }
-
-  /**
-   * From Object::Observer
-   */
-  virtual void ObjectDestroyed( Object& object )
-  {
-    mObject = NULL;
   }
 
    /**
@@ -390,11 +366,7 @@ private:
 
 protected:
 
-  Object* mObject; ///< Not owned by the animator connector. Valid until ObjectDestroyed() is called.
   SceneGraph::AnimatorBase* mAnimator;
-
-  Property::Index mPropertyIndex;
-  int mComponentIndex;
 
   Internal::AnimatorFunctionBase* mAnimatorFunction;  ///< Owned by the animator connector until an Scenegraph::Animator is created
 };
