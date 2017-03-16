@@ -1,6 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
-
+#ifndef DALI_GRAPHICS_API_BASE_FACTORY_H
+#define DALI_GRAPHICS_API_BASE_FACTORY_H
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
@@ -18,6 +17,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+#include <tuple>
+#include <utility>
+
 namespace Dali
 {
 namespace Graphics
@@ -25,32 +29,33 @@ namespace Graphics
 namespace API
 {
 
-/**
- * @brief Interface class for Texture types in the graphics API.
- */
-class Texture
+template< typename T, typename... Params >
+class BaseFactory
 {
 public:
+  using Type        = T;
+  using PointerType = std::unique_ptr< T >;
 
-  // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  BaseFactory(Params&&... params) : mParams(std::forward< Params >(params)...)
+  {
+  }
+  virtual ~BaseFactory() = default;
 
-  virtual ~Texture() = default;
+  virtual PointerType Create(const Params&...) const = 0;
 
 protected:
-  // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  BaseFactory(const BaseFactory&) = delete;
+  BaseFactory& operator=(const BaseFactory&) = delete;
 
-  /**
-   * Objects of this type should not directly.
-   */
-  Texture() = default;
+  BaseFactory(BaseFactory&&) = default;
+  BaseFactory& operator=(BaseFactory&&) = default;
+
+private:
+  std::tuple< Params... > mParams;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_BASE_FACTORY_H

@@ -7,6 +7,11 @@ SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
   utc-Dali-Graphics-API.cpp
+  utc-Dali-Graphics-object-owner.cpp
+)
+
+LIST(APPEND TC_SOURCES
+  graphics-test-implementation/graphics-test-implementation.cpp
 )
 
 LIST(APPEND TC_SOURCES

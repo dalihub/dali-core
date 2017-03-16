@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_TEXTURE_SET_H
+#define DALI_GRAPHICS_API_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-texture.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -26,31 +28,32 @@ namespace API
 {
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * @brief Interface class for TextureSet types in the graphics API.
  */
-class Texture
+class TextureSet
 {
 public:
+  virtual void AddTexture(const Accessor< Texture >& texture) = 0;
 
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  TextureSet(const TextureSet&) = delete;
+  TextureSet& operator=(const TextureSet&) = delete;
 
-  virtual ~Texture() = default;
+  virtual ~TextureSet() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  TextureSet(TextureSet&&) = default;
+  TextureSet& operator=(TextureSet&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  TextureSet() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_TEXTURE_SET_H

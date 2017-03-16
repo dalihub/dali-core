@@ -28,6 +28,14 @@ namespace Graphics
 namespace API
 {
 
+/**
+ * Structure that represents a rectangular size
+ */
+struct RectSize {
+  size_t width = 0;
+  size_t height = 0;
+};
+
 } // namespace API
 } // namespace Graphics
 } // namespace Dali

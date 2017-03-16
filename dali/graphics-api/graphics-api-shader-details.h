@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_MANAGER_H
-#define DALI_GRAPHICS_MANAGER_H
+#ifndef DALI_GRAPHICS_API_TEXTURE_DETAILS_H
+#define DALI_GRAPHICS_API_TEXTURE_DETAILS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,39 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-manager.h>
+#include <string>
 
 namespace Dali
 {
 namespace Graphics
 {
-
-/**
- * @brief Manager implementation of the graphics API
- */
-class Manager final : public API::Manager
+namespace API
 {
-public:
-  Manager() = default;
+namespace ShaderDetails
+{
 
-  Manager(const Manager&) = delete;
-  Manager& operator=(const Manager&) = delete;
+using ShaderSource = std::string;
 
-  Manager(Manager&&) = default;
-  Manager& operator=(Manager&&) = default;
-
-  virtual ~Manager() = default;
-
-  /**
-   * Dummy method
-   */
-  int GetNumber() const;
+enum class Language {
+  GLSL_1,
+  GLSL_3_1,
+  GLSL_3_2,
+  SPIRV_1_0,
+  SPIRV_1_1,
 };
 
+enum class PipelineStage {
+  VERTEX,
+  GEOMETRY,
+  FRAGMENT,
+  COMPUTE,
+  TESSELATION_CONTROL,
+  TESSELATION_EVALUATION,
+};
+
+} // namespace TextureDetails
+} // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_MANAGER_H
+#endif // DALI_GRAPHICS_API_TEXTURE_DETAILS_H

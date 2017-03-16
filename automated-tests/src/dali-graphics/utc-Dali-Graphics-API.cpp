@@ -16,41 +16,104 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/graphics-api/graphics-api-manager.h>
 
-using Dali::Graphics::API::Manager;
+#include "graphics-test-implementation/graphics-test-implementation.h"
 
-void utc_dali_internal_memorypoolobjectallocator_startup(void)
+using namespace Dali::Graphics::Test;
+
+void utc_dali_graphics_api_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_internal_memorypoolobjectallocator_cleanup(void)
+void utc_dali_graphics_api_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
 
-namespace
-{
-
-class TestManager : public Manager
-{
-public:
-  virtual int GetNumber() const override
-  {
-    return 42;
-  }
-};
-
-} // namespace
-
 int UtcDaliGraphicsAPI(void)
 {
-  TestManager testManager;
+  auto controller = Controller{};
 
-  auto n = testManager.GetNumber();
+  // Just test construction of controller
+  DALI_TEST_CHECK(true);
 
-  DALI_TEST_EQUALS(n, 42, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateShader(void)
+{
+  auto controller = Controller {};
+
+  auto factory = ShaderFactory {};
+  auto accessor = controller.CreateShader(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateTexture(void)
+{
+  auto controller = Controller {};
+
+  auto factory = TextureFactory {};
+  auto accessor = controller.CreateTexture(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateTextureSet(void)
+{
+  auto controller = Controller {};
+
+  auto factory = TextureSetFactory {};
+  auto accessor = controller.CreateTextureSet(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateDynamicBuffer(void)
+{
+  auto controller = Controller {};
+
+  auto factory = DynamicBufferFactory {};
+  auto accessor = controller.CreateDynamicBuffer(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateStaticBuffer(void)
+{
+  auto controller = Controller {};
+
+  auto factory = StaticBufferFactory {};
+  auto accessor = controller.CreateStaticBuffer(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateSampler(void)
+{
+  auto controller = Controller {};
+
+  auto factory = SamplerFactory {};
+  auto accessor = controller.CreateSampler(factory);
+  DALI_TEST_CHECK(accessor.Exists());
+
+  END_TEST;
+}
+
+int UtcDaliGraphicsAPICreateFramebuffer(void)
+{
+  auto controller = Controller {};
+
+  auto factory = FramebufferFactory {};
+  auto accessor = controller.CreateFramebuffer(factory);
+  DALI_TEST_CHECK(accessor.Exists());
 
   END_TEST;
 }

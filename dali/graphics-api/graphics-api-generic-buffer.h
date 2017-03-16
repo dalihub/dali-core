@@ -1,6 +1,5 @@
-#ifndef DALI_GRAPHICS_API_HANDLE_H
-#define DALI_GRAPHICS_API_HANDLE_H
-
+#ifndef DALI_GRAPHICS_API_GENERIC_BUFFER_H
+#define DALI_GRAPHICS_API_GENERIC_BUFFER_H
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
@@ -18,8 +17,7 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <memory>
+#include <vector>
 
 namespace Dali
 {
@@ -28,48 +26,33 @@ namespace Graphics
 namespace API
 {
 
-template< typename T >
-class Handle
+/**
+ * @brief Interface class for GenericBuffer types in the graphics API.
+ */
+template< typename Base, typename Structure >
+class GenericBuffer final : public Base
 {
 public:
-  constexpr Handle(T& reference) : mObject(reference)
-  {
-  }
+  GenericBuffer(size_t size) = default;
 
-  Handle(const Handle&) = default;
-  Handle& operator=(const Handle&) = default;
+  // not copyable
+  GenericBuffer(const GenericBuffer&) = delete;
+  GenericBuffer& operator=(const GenericBuffer&) = delete;
 
-  Handle(Handle&&) = default;
-  Handle& operator=(Handle&&) = default;
+  virtual ~GenericBuffer() = default;
 
-  ~Handle() = default;
-
-  T* operator->()
-  {
-    return &mObject;
-  }
-
-  constexpr const T* operator->() const
-  {
-    return &mObject;
-  }
-
-  T& operator()()
-  {
-    return mObject;
-  }
-
-  constexpr const T& operator()() const
-  {
-    return mObject;
-  }
+protected:
+  // derived types should not be moved direcly to prevent slicing
+  GenericBuffer(GenericBuffer&&) = default;
+  GenericBuffer& operator=(GenericBuffer&&) = default;
 
 private:
-  T& mObject;
+
+  std::vector< Structure > mData;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_HANDLE_H
+#endif // DALI_GRAPHICS_API_GENERIC_BUFFER_H
