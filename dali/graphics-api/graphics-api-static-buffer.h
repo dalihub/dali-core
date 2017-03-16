@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_STATIC_BUFFER_H
+#define DALI_GRAPHICS_API_STATIC_BUFFER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,31 +28,28 @@ namespace API
 /**
  * @brief Interface class for Texture types in the graphics API.
  */
-class Texture
+class StaticBuffer
 {
 public:
-
-  void SetData(void* data, size_t size);
-
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  StaticBuffer(const StaticBuffer&) = delete;
+  StaticBuffer& operator=(const StaticBuffer&) = delete;
 
-  virtual ~Texture() = default;
+  virtual ~StaticBuffer() = default;
 
 protected:
-  // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  // derived types should not be moved directly to prevent slicing
+  StaticBuffer(StaticBuffer&&) = default;
+  StaticBuffer& operator=(StaticBuffer&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  StaticBuffer() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_STATIC_BUFFER_H

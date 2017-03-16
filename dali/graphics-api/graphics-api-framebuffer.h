@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_API_MANAGER_H
-#define DALI_GRAPHICS_API_MANAGER_H
+#ifndef DALI_GRAPHICS_API_FRAMEBUFFER_H
+#define DALI_GRAPHICS_API_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-texture.h>
-
 namespace Dali
 {
 namespace Graphics
@@ -28,35 +26,30 @@ namespace API
 {
 
 /**
- * @brief Interface class for Manager types in the graphics API.
+ * @brief Interface class for Framebuffer types in the graphics API.
  */
-class Manager
+class Framebuffer
 {
 public:
-  /**
-   * Dummy method
-   */
-  virtual int GetNumber() const = 0;
-
   // not copyable
-  Manager(const Manager&) = delete;
-  Manager& operator=(const Manager&) = delete;
+  Framebuffer(const Framebuffer&) = delete;
+  Framebuffer& operator=(const Framebuffer&) = delete;
 
-  virtual ~Manager() = default;
+  virtual ~Framebuffer() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Manager(Manager&&) = default;
-  Manager& operator=(Manager&&) = default;
+  Framebuffer(Framebuffer&&) = default;
+  Framebuffer& operator=(Framebuffer&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Manager() = default;
+  Framebuffer() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_MANAGER_H
+#endif // DALI_GRAPHICS_API_FRAMEBUFFER_H

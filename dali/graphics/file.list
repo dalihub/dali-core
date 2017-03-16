@@ -1,4 +1,4 @@
 # Add graphics source files here
 
 graphics_src_files = \
-  $(graphics_src_dir)/graphics-manager.cpp
+  $(graphics_src_dir)/graphics-controller.cpp

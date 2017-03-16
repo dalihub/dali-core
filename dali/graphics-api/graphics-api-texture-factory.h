@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_TEXTURE_FACTORY_H
+#define DALI_GRAPHICS_API_TEXTURE_FACTORY_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,6 +18,10 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-base-factory.h>
+#include <dali/graphics-api/graphics-api-texture-details.h>
+#include <dali/graphics-api/graphics-api-texture.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -26,33 +30,33 @@ namespace API
 {
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * @brief Interface class for TextureFactory types in the graphics API.
  */
-class Texture
+class TextureFactory : BaseFactory< Texture >
 {
 public:
-
-  void SetData(void* data, size_t size);
+  virtual void SetSize(TextureDetails::RectSize)        = 0;
+  virtual void SetFormat(TextureDetails::Format format) = 0;
 
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  TextureFactory(const TextureFactory&) = delete;
+  TextureFactory& operator=(const TextureFactory&) = delete;
 
-  virtual ~Texture() = default;
+  virtual ~TextureFactory() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  TextureFactory(TextureFactory&&) = default;
+  TextureFactory& operator=(TextureFactory&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  TextureFactory() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_TEXTURE_FACTORY_H

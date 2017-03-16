@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_TEXTURE_DETAILS_H
+#define DALI_GRAPHICS_API_TEXTURE_DETAILS_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -24,35 +24,45 @@ namespace Graphics
 {
 namespace API
 {
+namespace TextureDetails
+{
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * Structure that represents a rectangular size
  */
-class Texture
-{
-public:
-
-  void SetData(void* data, size_t size);
-
-  // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
-
-  virtual ~Texture() = default;
-
-protected:
-  // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
-
-  /**
-   * Objects of this type should not directly.
-   */
-  Texture() = default;
+struct RectSize {
+  size_t width = 0;
+  size_t height = 0;
 };
 
+enum class Format {
+
+  // texture color formats
+  RGBA8,
+  ETC2_RGBA8,
+
+  // compressed color formats
+  ETC2,
+  ASTC_4x4,
+  ASTC_5x5,
+  ASTC_6x6,
+  ASTC_8x8,
+  ASTC_10x10,
+  ASTC_12x12,
+
+  // depth /stencil formats
+  D16_UNORM,
+  D16_UNORM_S8_UINT,
+  D32_SFLOAT,
+  D32_SFLOAT_S8_UINT,
+  D24_UNORM_S8_UINT,
+
+  // TODO: copy
+};
+
+} // namespace TextureDetails
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_TEXTURE_DETAILS_H
