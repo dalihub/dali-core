@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_MANAGER_H
-#define DALI_GRAPHICS_MANAGER_H
+#ifndef DALI_GRAPHICS_API_SHADER_H
+#define DALI_GRAPHICS_API_SHADER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,38 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-manager.h>
-
 namespace Dali
 {
 namespace Graphics
 {
+namespace API
+{
 
 /**
- * @brief Manager implementation of the graphics API
+ * @brief Interface class for Shader types in the graphics API.
  */
-class Manager final : public API::Manager
+class Shader
 {
 public:
-  Manager() = default;
+  // not copyable
+  Shader(const Shader&) = delete;
+  Shader& operator=(const Shader&) = delete;
 
-  Manager(const Manager&) = delete;
-  Manager& operator=(const Manager&) = delete;
+  virtual ~Shader() = default;
 
-  Manager(Manager&&) = default;
-  Manager& operator=(Manager&&) = default;
-
-  virtual ~Manager() = default;
+protected:
+  // derived types should not be moved direcly to prevent slicing
+  Shader(Shader&&) = default;
+  Shader& operator=(Shader&&) = default;
 
   /**
-   * Dummy method
+   * Objects of this type should not directly.
    */
-  int GetNumber() const;
+  Shader() = default;
 };
 
+} // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_MANAGER_H
+#endif // DALI_GRAPHICS_API_SHADER_H
