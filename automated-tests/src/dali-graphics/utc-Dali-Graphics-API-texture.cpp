@@ -20,12 +20,12 @@
 
 using Dali::Graphics::API::Texture;
 
-void utc_dali_internal_memorypoolobjectallocator_startup(void)
+void utc_dali_graphics_api_textures_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_internal_memorypoolobjectallocator_cleanup(void)
+void utc_dali_graphics_api_textures_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -46,7 +46,7 @@ public:
 
 } // namespace
 
-int UtcDaliGraphicsAPI(void)
+int UtcDaliGraphicsAPITextures(void)
 {
   TestTexture testTexture;
 

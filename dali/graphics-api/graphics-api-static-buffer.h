@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_HANDLE_H
-#define DALI_GRAPHICS_API_HANDLE_H
+#ifndef DALI_GRAPHICS_API_STATIC_BUFFER_H
+#define DALI_GRAPHICS_API_STATIC_BUFFER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <memory>
-
 namespace Dali
 {
 namespace Graphics
@@ -28,48 +25,31 @@ namespace Graphics
 namespace API
 {
 
-template< typename T >
-class Handle
+/**
+ * @brief Interface class for Texture types in the graphics API.
+ */
+class StaticBuffer
 {
 public:
-  constexpr Handle(T& reference) : mObject(reference)
-  {
-  }
+  // not copyable
+  StaticBuffer(const StaticBuffer&) = delete;
+  StaticBuffer& operator=(const StaticBuffer&) = delete;
 
-  Handle(const Handle&) = default;
-  Handle& operator=(const Handle&) = default;
+  virtual ~StaticBuffer() = default;
 
-  Handle(Handle&&) = default;
-  Handle& operator=(Handle&&) = default;
+protected:
+  // derived types should not be moved directly to prevent slicing
+  StaticBuffer(StaticBuffer&&) = default;
+  StaticBuffer& operator=(StaticBuffer&&) = default;
 
-  ~Handle() = default;
-
-  T* operator->()
-  {
-    return &mObject;
-  }
-
-  constexpr const T* operator->() const
-  {
-    return &mObject;
-  }
-
-  T& operator()()
-  {
-    return mObject;
-  }
-
-  constexpr const T& operator()() const
-  {
-    return mObject;
-  }
-
-private:
-  T& mObject;
+  /**
+   * Objects of this type should not directly.
+   */
+  StaticBuffer() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_HANDLE_H
+#endif // DALI_GRAPHICS_API_STATIC_BUFFER_H
