@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_DYNAMIC_BUFFER_H
+#define DALI_GRAPHICS_API_DYNAMIC_BUFFER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -26,32 +26,30 @@ namespace API
 {
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * @brief Interface class for DynamicBuffer types in the graphics API.
  */
-class Texture
+class DynamicBuffer
 {
 public:
-  using Handle = size_t;
-
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  DynamicBuffer(const DynamicBuffer&) = delete;
+  DynamicBuffer& operator=(const DynamicBuffer&) = delete;
 
-  virtual ~Texture() = default;
+  virtual ~DynamicBuffer() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  DynamicBuffer(DynamicBuffer&&) = default;
+  DynamicBuffer& operator=(DynamicBuffer&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  DynamicBuffer() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_DYNAMIC_BUFFER_H

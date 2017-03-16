@@ -63,7 +63,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
-#include <dali/graphics/graphics-manager.h>
+#include <dali-core/dali/graphics/graphics-controller.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1

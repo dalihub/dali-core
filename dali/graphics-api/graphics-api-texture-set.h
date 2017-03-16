@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_HANDLE_H
-#define DALI_GRAPHICS_API_HANDLE_H
+#ifndef DALI_GRAPHICS_API_TEXTURE_SET_H
+#define DALI_GRAPHICS_API_TEXTURE_SET_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,8 +18,7 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <memory>
+#include <dali/graphics-api/graphics-api-texture.h>
 
 namespace Dali
 {
@@ -28,48 +27,35 @@ namespace Graphics
 namespace API
 {
 
-template< typename T >
-class Handle
+/**
+ * @brief Interface class for TextureSet types in the graphics API.
+ */
+class TextureSet
 {
 public:
-  constexpr Handle(T& reference) : mObject(reference)
-  {
-  }
+  using Handle = size_t;
 
-  Handle(const Handle&) = default;
-  Handle& operator=(const Handle&) = default;
+  virtual void AddTexture(Texture::Handle texture) = 0;
 
-  Handle(Handle&&) = default;
-  Handle& operator=(Handle&&) = default;
+  // not copyable
+  TextureSet(const TextureSet&) = delete;
+  TextureSet& operator=(const TextureSet&) = delete;
 
-  ~Handle() = default;
+  virtual ~TextureSet() = default;
 
-  T* operator->()
-  {
-    return &mObject;
-  }
+protected:
+  // derived types should not be moved direcly to prevent slicing
+  TextureSet(TextureSet&&) = default;
+  TextureSet& operator=(TextureSet&&) = default;
 
-  constexpr const T* operator->() const
-  {
-    return &mObject;
-  }
-
-  T& operator()()
-  {
-    return mObject;
-  }
-
-  constexpr const T& operator()() const
-  {
-    return mObject;
-  }
-
-private:
-  T& mObject;
+  /**
+   * Objects of this type should not directly.
+   */
+  TextureSet() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_HANDLE_H
+#endif // DALI_GRAPHICS_API_TEXTURE_SET_H

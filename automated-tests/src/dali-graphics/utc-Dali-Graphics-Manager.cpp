@@ -16,16 +16,16 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/graphics/graphics-manager.h>
+#include "../../../dali/graphics/graphics-controller.h"
 
 using Dali::Graphics::Manager;
 
-void utc_dali_internal_memorypoolobjectallocator_startup(void)
+void utc_dali_graphics_manager_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_internal_memorypoolobjectallocator_cleanup(void)
+void utc_dali_graphics_manager_cleanup(void)
 {
   test_return_value = TET_PASS;
 }

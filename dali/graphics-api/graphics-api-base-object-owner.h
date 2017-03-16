@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_BASE_OBJECT_OWNER_H
+#define DALI_GRAPHICS_API_BASE_OBJECT_OWNER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,40 +18,39 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cassert>
+#include <memory>
+#include <unordered_map>
+#include <utility>
+
+#include <dali/graphics-api/graphics-api-base-factory.h>
+
 namespace Dali
 {
 namespace Graphics
 {
 namespace API
 {
-
-/**
- * @brief Interface class for Texture types in the graphics API.
- */
-class Texture
+template< typename T >
+class ObjectOwnerBase
 {
 public:
   using Handle = size_t;
 
-  // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
-
-  virtual ~Texture() = default;
-
-protected:
-  // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
-
   /**
-   * Objects of this type should not directly.
+   * @brief Create an new object using the provided factory and store it.
+   *
+   * @param[in] factory Factory that will be used to create the object\
+   * @return Handle that identifies the object
    */
-  Texture() = default;
-};
+  Handle virtual CreateObject(const BaseFactory< T >& factory) = 0;
 
+  // virtual destructor
+  virtual ~ObjectOwnerBase() = default;
+};
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_BASE_OBJECT_OWNER_H

@@ -1,5 +1,8 @@
+#ifndef DALI_GRAPHICS_API_SHADER_H
+#define DALI_GRAPHICS_API_SHADER_H
+
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +18,38 @@
  *
  */
 
-#include <dali/graphics/graphics-manager.h>
-
-
 namespace Dali
 {
 namespace Graphics
 {
-
-int Manager::GetNumber() const
+namespace API
 {
-  return 42;
-}
 
+/**
+ * @brief Interface class for Shader types in the graphics API.
+ */
+class Shader
+{
+public:
+  // not copyable
+  Shader(const Shader&) = delete;
+  Shader& operator=(const Shader&) = delete;
 
+  virtual ~Shader() = default;
+
+protected:
+  // derived types should not be moved direcly to prevent slicing
+  Shader(Shader&&) = default;
+  Shader& operator=(Shader&&) = default;
+
+  /**
+   * Objects of this type should not directly.
+   */
+  Shader() = default;
+};
+
+} // namespace API
 } // namespace Graphics
 } // namespace Dali
 
+#endif // DALI_GRAPHICS_API_SHADER_H

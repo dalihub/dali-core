@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_RENDER_LIST_H
+#define DALI_GRAPHICS_API_RENDER_LIST_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -26,32 +26,34 @@ namespace API
 {
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * @brief Interface class for RenderList types in the graphics API.
  */
-class Texture
+class RenderList
 {
 public:
   using Handle = size_t;
 
-  // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  virtual void SetRenderItemData(size_t index) = 0;
 
-  virtual ~Texture() = default;
+  // not copyable
+  RenderList(const RenderList&) = delete;
+  RenderList& operator=(const RenderList&) = delete;
+
+  virtual ~RenderList() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  RenderList(RenderList&&) = default;
+  RenderList& operator=(RenderList&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  RenderList() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_RENDER_LIST_H

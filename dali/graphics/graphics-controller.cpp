@@ -1,8 +1,5 @@
-#ifndef DALI_GRAPHICS_MANAGER_H
-#define DALI_GRAPHICS_MANAGER_H
-
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +15,35 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-manager.h>
+#include "graphics-controller.h"
 
 namespace Dali
 {
 namespace Graphics
 {
-
-/**
- * @brief Manager implementation of the graphics API
- */
-class Manager final : public API::Manager
+API::Accessor< API::Texture > Controller::CreateTexture()
 {
-public:
-  Manager() = default;
+}
 
-  Manager(const Manager&) = delete;
-  Manager& operator=(const Manager&) = delete;
+API::Accessor< API::TextureSet > Controller::CreateTextureSet()
+{
+}
 
-  Manager(Manager&&) = default;
-  Manager& operator=(Manager&&) = default;
+API::Accessor< API::DynamicBuffer > Controller::CreateDynamicBuffer()
+{
+}
 
-  virtual ~Manager() = default;
+API::Accessor< API::StaticBuffer > Controller::CreateStaticBuffer()
+{
+}
 
-  /**
-   * Dummy method
-   */
-  int GetNumber() const;
-};
+API::Accessor< API::Sampler > Controller::CreateSampler()
+{
+}
+
+API::Accessor< API::Framebuffer > Controller::CreateFramebuffer()
+{
+}
 
 } // namespace Graphics
 } // namespace Dali
-
-#endif // DALI_GRAPHICS_MANAGER_H

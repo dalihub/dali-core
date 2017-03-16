@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_H
-#define DALI_GRAPHICS_API_TEXTURE_H
+#ifndef DALI_GRAPHICS_API_SAMPLER_H
+#define DALI_GRAPHICS_API_SAMPLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,32 +26,30 @@ namespace API
 {
 
 /**
- * @brief Interface class for Texture types in the graphics API.
+ * @brief Interface class for Sampler types in the graphics API.
  */
-class Texture
+class Sampler
 {
 public:
-  using Handle = size_t;
-
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  Sampler(const Sampler&) = delete;
+  Sampler& operator=(const Sampler&) = delete;
 
-  virtual ~Texture() = default;
+  virtual ~Sampler() = default;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  Sampler(Sampler&&) = default;
+  Sampler& operator=(Sampler&&) = default;
 
   /**
    * Objects of this type should not directly.
    */
-  Texture() = default;
+  Sampler() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_H
+#endif // DALI_GRAPHICS_API_SAMPLER_H
