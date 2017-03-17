@@ -115,6 +115,13 @@ Image::Image()
 {
 }
 
+Image::Image( unsigned int width, unsigned int height )
+: mWidth( width ),
+  mHeight( height ),
+  mConnectionCount( 0 )
+{
+}
+
 Image::~Image()
 {
   if( mTicket )

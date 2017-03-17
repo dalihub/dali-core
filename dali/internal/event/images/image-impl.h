@@ -135,6 +135,14 @@ protected:
   Image();
 
   /**
+   * Constructor, with width and height
+   *
+   * @param[in] width The width.
+   * @param[in] height The height.
+   */
+  Image( unsigned int width, unsigned int height );
+
+  /**
    * Second stage initialization
    */
   void Initialize();

@@ -368,7 +368,7 @@ bool RenderTask::IsWaitingToRender()
 bool RenderTask::HasRendered()
 {
   bool notify = false;
-  if( mNotifyTrigger == true )
+  if( mNotifyTrigger )
   {
     ++mRenderedOnceCounter;
     mState = RENDERED_ONCE_AND_NOTIFIED;

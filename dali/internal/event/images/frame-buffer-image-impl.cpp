@@ -56,32 +56,28 @@ FrameBufferImage::FrameBufferImage( unsigned int width,
                                     unsigned int height,
                                     Pixel::Format pixelFormat,
                                     RenderBuffer::Format bufferformat )
-: Image(),
+: Image( width, height ),
   mNativeImage(0),
   mPixelFormat( pixelFormat ),
   mBufferFormat( bufferformat ),
-  mIsNativeFbo( false )
+  mIsNativeFbo( false ),
+  mIsConnected( false )
 {
-  mWidth  = width;
-  mHeight = height;
 }
 
 FrameBufferImage::FrameBufferImage( NativeImageInterface& nativeImage )
-: Image(),
+: Image( nativeImage.GetWidth(), nativeImage.GetHeight() ),
   mNativeImage( &nativeImage ),
   mPixelFormat( Pixel::FIRST_VALID_PIXEL_FORMAT ),
   mBufferFormat( RenderBuffer::COLOR ),
-  mIsNativeFbo( true )
+  mIsNativeFbo( true ),
+  mIsConnected( false )
 {
-  mWidth = nativeImage.GetWidth();
-  mHeight = nativeImage.GetHeight();
 }
 
 void FrameBufferImage::Connect()
 {
-  ++mConnectionCount;
-
-  if (mConnectionCount == 1)
+  if( !mIsConnected )
   {
     // ticket was thrown away when related actors went offstage
     if (!mTicket)
@@ -98,24 +94,13 @@ void FrameBufferImage::Connect()
         mTicket->AddObserver(*this);
       }
     }
+    mIsConnected = true;
   }
 }
 
 void FrameBufferImage::Disconnect()
 {
-  if(!mTicket)
-  {
-    return;
-  }
-
-  DALI_ASSERT_DEBUG(mConnectionCount > 0);
-  --mConnectionCount;
-  if (mConnectionCount == 0)
-  {
-    // release image memory when it's not visible anymore (decrease ref. count of texture)
-    mTicket->RemoveObserver(*this);
-    mTicket.Reset();
-  }
+  // Nothing to do.
 }
 
 bool FrameBufferImage::IsNativeFbo() const

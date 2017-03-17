@@ -468,7 +468,7 @@ bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, floa
   CameraActor* cam = GetCameraActor();
 
   Vector4 pos(position);
-  pos.w = 1.0;
+  pos.w = 1.f;
 
   Vector4 viewportPosition;
 

@@ -85,7 +85,8 @@ private:
   NativeImageInterfacePtr mNativeImage;
   Pixel::Format mPixelFormat;
   RenderBuffer::Format mBufferFormat;
-  bool mIsNativeFbo;
+  bool mIsNativeFbo : 1;
+  bool mIsConnected : 1;
 }; // class FrameBufferImage
 
 } // namespace Internal
