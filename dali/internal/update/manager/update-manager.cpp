@@ -1113,7 +1113,8 @@ void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
 
 void UpdateManager::AddSampler( Render::Sampler* sampler )
 {
-  typedef MessageValue1< RenderManager, Render::Sampler* > DerivedType;
+  // Message has ownership of Sampler while in transit from update to render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Sampler > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1157,7 +1158,8 @@ void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMod
 
 void UpdateManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::PropertyBuffer* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::PropertyBuffer > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1179,7 +1181,8 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
 
 void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
 {
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, Render::PropertyBuffer::Format* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1190,7 +1193,8 @@ void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuff
 
 void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
 {
-  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, Dali::Vector<char>*, size_t > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, OwnerPointer< Dali::Vector<char> >, size_t > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1201,7 +1205,8 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
 
 void UpdateManager::AddGeometry( Render::Geometry* geometry )
 {
-  typedef MessageValue1< RenderManager, Render::Geometry* > DerivedType;
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -1267,7 +1272,8 @@ void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::Propert
 
 void UpdateManager::AddTexture( Render::Texture* texture )
 {
-  typedef MessageValue1< RenderManager, Render::Texture* > DerivedType;
+  // Message has ownership of Texture while in transit from update -> render
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::Texture > > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
