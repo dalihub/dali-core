@@ -826,7 +826,7 @@ void Texture::ApplySampler( Context& context, Render::Sampler* sampler )
   Render::Sampler oldSampler = mSampler;
   mSampler = sampler ? *sampler : Sampler();
 
-  if( mSampler.mBitfield != oldSampler.mBitfield )
+  if( mSampler != oldSampler )
   {
     GLint mode = FilterModeToGL( mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT );
     if( mode != FilterModeToGL( oldSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT ) )

@@ -111,7 +111,8 @@ private:
 
 inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, RenderTask& task )
 {
-  typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
+  // Message has ownership of the RenderTask while in transit from event -> update
+  typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

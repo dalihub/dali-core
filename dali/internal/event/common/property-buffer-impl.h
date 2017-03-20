@@ -89,12 +89,9 @@ private: // unimplemented methods
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Render::PropertyBuffer* mRenderObject; ///<Render side object
-
-  Property::Map mFormat;  ///< Format of the property buffer
-  const Render::PropertyBuffer::Format* mBufferFormat;  ///< Metadata for the format of the property buffer
+  Render::PropertyBuffer* mRenderObject;        ///<Render side object
+  unsigned int mBufferFormatSize;
   unsigned int mSize; ///< Number of elements in the buffer
-  Dali::Vector< char > mBuffer; // Data of the property-buffer
 };
 
 /**

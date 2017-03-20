@@ -50,21 +50,25 @@ struct Sampler
   ~Sampler()
   {}
 
-
-  union
+  bool operator==(const Sampler& rhs) const
   {
-    unsigned int mBitfield;
+    return ( ( mMinificationFilter == rhs.mMinificationFilter ) &&
+             ( mMagnificationFilter == rhs.mMagnificationFilter ) &&
+             ( mSWrapMode == rhs.mSWrapMode ) &&
+             ( mTWrapMode == rhs.mTWrapMode ) &&
+             ( mRWrapMode == rhs.mRWrapMode ) );
+  }
 
-    struct
-    {
-      FilterMode  mMinificationFilter   : 4;    ///< The minify filter
-      FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
-      WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
-      WrapMode    mTWrapMode            : 4;    ///< The vertical wrap mode
-      WrapMode    mRWrapMode            : 4;    ///< The vertical wrap mode
-    };
+  bool operator!=(const Sampler& rhs) const
+  {
+    return !(*this == rhs);
+  }
 
-  };
+  FilterMode  mMinificationFilter   : 4;    ///< The minify filter
+  FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
+  WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
+  WrapMode    mTWrapMode            : 4;    ///< The vertical wrap mode
+  WrapMode    mRWrapMode            : 4;    ///< The vertical wrap mode
 };
 
 } // namespace Render
