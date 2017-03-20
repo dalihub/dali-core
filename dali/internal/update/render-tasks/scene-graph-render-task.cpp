@@ -476,7 +476,6 @@ RenderTask::RenderTask()
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
   mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mRenderTarget( NULL ),
   mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
           ? RENDER_CONTINUOUSLY
           : RENDER_ONCE_WAITING_FOR_RESOURCES ),
