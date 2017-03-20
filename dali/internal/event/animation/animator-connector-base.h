@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/public-api/animation/alpha-function.h>
@@ -43,19 +44,31 @@ typedef AnimatorConnectorContainer::ConstIterator AnimatorConnectorConstIter;
 
 /**
  * An abstract base class for animator connectors.
+ *
+ * The scene-graph objects are created by a Object e.g. Actor is a proxy for SceneGraph::Node.
+ * AnimatorConnectorBase observes the proxy object, in order to detect when a scene-graph object is created.
  */
-class AnimatorConnectorBase
+class AnimatorConnectorBase: public Object::Observer
 {
 public:
 
   /**
    * Constructor.
    */
-  AnimatorConnectorBase(AlphaFunction alpha, const TimePeriod& period)
-  : mParent(NULL),
+  AnimatorConnectorBase(
+      Object& object,
+      Property::Index propertyIndex,
+      int componentIndex,
+      AlphaFunction alpha,
+      const TimePeriod& period)
+  : mParent( NULL ),
+    mObject( &object ),
     mAlphaFunction(alpha),
-    mTimePeriod(period)
+    mTimePeriod(period),
+    mPropertyIndex( propertyIndex ),
+    mComponentIndex( componentIndex )
   {
+    object.AddObserver( *this );
   }
 
   /**
@@ -81,12 +94,56 @@ public:
     return mParent;
   }
 
+  Object* GetObject() const
+  {
+    return mObject;
+  }
+
+  Property::Index GetPropertyIndex() const
+  {
+    return mPropertyIndex;
+  }
+
+  int GetComponentIndex() const
+  {
+    return mComponentIndex;
+  }
+
+private:
+
+  /**
+   * From Object::Observer
+   */
+  virtual void SceneObjectAdded( Object& object )
+  {
+  }
+
+  /**
+   * From Object::Observer
+   */
+  virtual void SceneObjectRemoved( Object& object )
+  {
+  }
+
+  /**
+   * From Object::Observer
+   */
+  virtual void ObjectDestroyed( Object& object )
+  {
+    mObject = NULL;
+  }
+
 protected:
 
   Animation* mParent; ///< The parent owns the connector.
+  Object* mObject; ///< Not owned by the animator connector. Valid until ObjectDestroyed() is called.
 
   AlphaFunction mAlphaFunction;
   TimePeriod mTimePeriod;
+
+  Property::Index mPropertyIndex;
+  int mComponentIndex;
+
 };
 
 } // namespace Internal
