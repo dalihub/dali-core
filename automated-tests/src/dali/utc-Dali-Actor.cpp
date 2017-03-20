@@ -979,6 +979,37 @@ int UtcDaliActorSetSizeIndividual(void)
   END_TEST;
 }
 
+int UtcDaliActorSetSizeIndividual02(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  Stage::GetCurrent().Add( actor );
+
+  Vector3 vector( 100.0f, 200.0f, 400.0f );
+  DALI_TEST_CHECK( vector != actor.GetCurrentSize() );
+
+  actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >(), vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_HEIGHT, vector.height );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >(), vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_DEPTH, vector.depth );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >(), vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the width in the new frame
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliActorGetCurrentSize(void)
 {
