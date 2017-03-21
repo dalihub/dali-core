@@ -1071,7 +1071,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   const Vector3 targetValue( 10.0f, 20.0f, 30.0f );
   animation.AnimateTo( Property( actor, Actor::Property::SIZE ), targetValue );
 
-  DALI_TEST_CHECK( actor.GetTargetSize() == targetValue );
+  DALI_TEST_CHECK( actor.GetTargetSize() == vector );
 
   // Start the animation
   animation.Play();

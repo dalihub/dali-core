@@ -448,6 +448,13 @@ private:
   Animation& operator=(const Animation& rhs);
 
 private:
+
+  struct ConnectorTargetValues
+  {
+    unsigned int connectorIndex;
+    Property::Value targetValue;
+  };
+
   EventThreadServices& mEventThreadServices;
   AnimationPlaylist& mPlaylist;
 
@@ -461,6 +468,8 @@ private:
   Object* mFinishedCallbackObject;
 
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
+
+  std::vector< ConnectorTargetValues > mConnectorActorTargetValues; //< Store Actor target values and matchinf connector index that need to set value on Animation::Play
 
   // Cached for public getters
   float mDurationSeconds;
