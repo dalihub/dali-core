@@ -112,8 +112,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 %endif
       --infodir=%{_infodir}
 
-#make %{?jobs:-j%jobs}
-make
+make %{?jobs:-j%jobs}
 
 ##############################
 # Installation
