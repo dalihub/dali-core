@@ -89,7 +89,7 @@ public:
    * Retrieve the parent of the AnimatorConnector.
    * @return The parent object, or NULL.
    */
-  Animation* GetParent()
+  Animation* GetParent() const
   {
     return mParent;
   }
