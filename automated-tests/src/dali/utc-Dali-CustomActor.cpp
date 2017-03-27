@@ -876,12 +876,49 @@ int UtcDaliCustomActorOnSizeAnimation(void)
 
   Animation anim = Animation::New( 1.0f );
   anim.AnimateTo( Property( custom, Actor::Property::SIZE ), Vector3( 8.0f, 9.0f, 10.0f ) );
+  anim.Play();
+
+  application.SendNotification();
+  application.Render( static_cast<unsigned int>( 1000.0f ) );
+
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( 8.0f, custom.GetTargetSize().width, TEST_LOCATION );
   DALI_TEST_EQUALS( 9.0f, custom.GetTargetSize().height, TEST_LOCATION );
   DALI_TEST_EQUALS( 10.0f, custom.GetTargetSize().depth, TEST_LOCATION );
   END_TEST;
+}
+
+int UtcDaliCustomActorSizeComponentAnimation(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Size component animation");
+
+  Test::TestCustomActor custom = Test::TestCustomActor::New();
+  float intialWidth( 10.0f );
+
+  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  custom.SetSize( intialWidth, 10.0f); // First method
+
+  Animation anim = Animation::New( 1.0f );
+
+  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+
+  anim.AnimateTo( Property( custom, Actor::Property::SIZE_WIDTH ), 20.0f );
+
+  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+
+  anim.Play();   // Triggers second method ( OnSizeAnimation )
+
+  application.SendNotification();
+  application.Render( static_cast<unsigned int>( 1000.0f ) );
+
+  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+
+  END_TEST;
+
 }
 
 int UtcDaliCustomActorOnTouchEvent(void)

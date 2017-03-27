@@ -10141,3 +10141,251 @@ int UtcDaliAnimationAnimateBetweenNonAnimateableTypeN(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationSetAndGetTargetBeforePlayP(void)
+{
+  tet_infoline("Setting up an animation should not effect it's position property until the animation plays");
+
+  TestApplication application;
+
+  tet_infoline("Set initial position and set up animation to re-position actor");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+  actor.SetProperty( Actor::Property::POSITION, initialPosition );
+
+  // Build the animation
+  Animation animation = Animation::New(2.0f);
+
+  //Test GetCurrentProgress return 0.0 as the duration is 0.0
+  DALI_TEST_EQUALS( 0.0f, animation.GetCurrentProgress(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.0f, 0.0f, 0.0f ), actor.GetCurrentPosition(), TEST_LOCATION );
+
+  tet_infoline("Set target position in animation without intiating play");
+
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Ensure position of actor is still at intial value");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), initialPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), initialPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), initialPosition.z, TEST_LOCATION );
+
+  tet_infoline("Play animation and ensure actor position is now target");
+
+  animation.Play();
+  application.SendNotification();
+  application.Render(1000u);
+
+  tet_infoline("Ensure position of actor is at target value when aninmation half way");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetPosition.z, TEST_LOCATION );
+
+  tet_printf( "x position at half way point(%f)\n", actor.GetCurrentPosition().x );
+
+  application.Render(2000u);
+
+  tet_infoline("Ensure position of actor is still at target value when aninmation complete");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetPosition.z, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsPositionP(void)
+{
+  tet_infoline("Setting up an animation should not effect it's position property until the animation plays even with mulitple animators");
+
+  TestApplication application;
+
+  std::vector<Vector3> targetPositions;
+
+  targetPositions.push_back( Vector3( 100.0f, 100.0f, 100.0f ) );
+  targetPositions.push_back( Vector3( 200.0f, 1.0f, 100.0f ) );
+  targetPositions.push_back( Vector3( 50.0f, 10.0f, 100.0f ) );
+
+  tet_infoline("Set initial position and set up animation to re-position actor");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+  actor.SetProperty( Actor::Property::POSITION, initialPosition );
+
+  // Build the animation
+  Animation animation = Animation::New(2.0f);
+
+  //Test GetCurrentProgress return 0.0 as the duration is 0.0
+  DALI_TEST_EQUALS( 0.0f, animation.GetCurrentProgress(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.0f, 0.0f, 0.0f ), actor.GetCurrentPosition(), TEST_LOCATION );
+
+  tet_infoline("Set target position in animation without intiating play");
+
+  for ( unsigned int i = 0; i < targetPositions.size(); i++ )
+  {
+    animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPositions[i], AlphaFunction::LINEAR);
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Ensure position of actor is still at intial value");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), initialPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), initialPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), initialPosition.z, TEST_LOCATION );
+
+  tet_infoline("Play animation and ensure actor position is now target");
+
+  animation.Play();
+  application.SendNotification();
+  application.Render(1000u);
+
+  tet_infoline("Ensure position of actor is at target value when aninmation half way");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetPositions[2].x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetPositions[2].y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetPositions[2].z, TEST_LOCATION );
+
+  tet_printf( "x position at half way point(%f)\n", actor.GetCurrentPosition().x );
+
+  application.Render(2000u);
+
+  tet_infoline("Ensure position of actor is still at target value when aninmation complete");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetPositions[2].x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetPositions[2].y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetPositions[2].z, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionP(void)
+{
+  tet_infoline("Setting up an animation should not effect it's size property until the animation plays even with mulitple animators of different Property Indexes");
+
+  TestApplication application;
+
+  std::vector<Vector3> targetSizes;
+  std::vector<Vector3> targetPositions;
+
+  targetSizes.push_back( Vector3( 100.0f, 100.0f, 100.0f ) );
+  targetSizes.push_back( Vector3( 50.0f, 10.0f, 100.0f ) );
+
+  targetPositions.push_back( Vector3( 200.0f, 1.0f, 100.0f ) );
+
+  tet_infoline("Set initial position and set up animation to re-position actor");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  Vector3 initialSize( 10.0f, 10.0f, 10.0f);
+  Vector3 initialPosition(10.0f, 10.0f, 10.0f);
+
+  actor.SetProperty( Actor::Property::SIZE, initialSize );
+  actor.SetProperty( Actor::Property::POSITION, initialPosition );
+
+  // Build the animation
+  Animation animation = Animation::New(2.0f);
+
+  tet_infoline("Set target size in animation without intiating play");
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetSizes[0], AlphaFunction::LINEAR);
+  tet_infoline("Set target position in animation without intiating play");
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPositions[0], AlphaFunction::LINEAR);
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetSizes[1], AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Ensure position of actor is still at intial size and position");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), initialSize.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), initialSize.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), initialSize.z, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), initialPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), initialPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), initialPosition.z, TEST_LOCATION );
+
+  tet_infoline("Play animation and ensure actor position and size is now matches targets");
+
+  animation.Play();
+  application.SendNotification();
+  application.Render(2000u);
+
+  tet_infoline("Ensure position and size of actor is at target value when aninmation playing");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), targetSizes[1].x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), targetSizes[1].y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), targetSizes[1].z, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetPositions[0].x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetPositions[0].y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetPositions[0].z, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionColourP(void)
+{
+  tet_infoline("Setting up an animation should not effect it's size property until the animation plays even if other Properties animated");
+
+  TestApplication application;
+
+  std::vector<Vector3> targetSizes;
+  std::vector<float> targetColors;
+
+  targetSizes.push_back( Vector3( 100.0f, 100.0f, 100.0f ) );
+  targetSizes.push_back( Vector3( 50.0f, 10.0f, 150.0f ) );
+
+  targetColors.push_back( 1.0f );
+
+  tet_infoline("Set initial position and set up animation to re-position actor");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  Vector3 initialSize( 10.0f, 5.0f, 10.0f);
+
+  actor.SetProperty( Actor::Property::SIZE, initialSize );
+
+  // Build the animation
+  Animation animation = Animation::New(2.0f);
+
+  tet_infoline("Set target size in animation without intiating play");
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetSizes[0], AlphaFunction::LINEAR);
+  tet_infoline("Set target position in animation without intiating play");
+  animation.AnimateTo(Property(actor, Actor::Property::COLOR_RED), targetColors[0], AlphaFunction::LINEAR);
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetSizes[1], AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Ensure position of actor is still at intial size and position");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), initialSize.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), initialSize.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), initialSize.z, TEST_LOCATION );
+
+  tet_infoline("Play animation and ensure actor position and size is now matches targets");
+
+  animation.Play();
+  application.SendNotification();
+  application.Render(2000u);
+
+  tet_infoline("Ensure position and size of actor is at target value when aninmation playing");
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), targetSizes[1].x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), targetSizes[1].y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), targetSizes[1].z, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED), targetColors[0], TEST_LOCATION );
+
+  END_TEST;
+}

@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -265,6 +266,77 @@ void Animation::Play()
   mPlaylist.OnPlay( *this );
 
   mState = Dali::Animation::PLAYING;
+
+  unsigned int connectorTargetValuesIndex( 0 );
+  unsigned int numberOfConnectorTargetValues = mConnectorActorTargetValues.size();
+
+  /*
+   * Loop through all Animator connectors, if connector index matches the current index stored in mConnectorActorTargetValues container then
+   * should apply target values for this index to the Actor.
+   * Confirm object is an actor and it is a POSITION or SIZE Property Index before sending Notify message to Actor.
+   */
+  for ( unsigned int connectorIndex = 0; connectorIndex < mConnectors.Count(); connectorIndex ++)
+  {
+    // Use index to check if the current connector is next in the mConnectorActorTargetValues container, meaning targetValues have been pushed in AnimateXXFunction
+    if ( connectorTargetValuesIndex < numberOfConnectorTargetValues )
+    {
+      ConnectorTargetValues& connectorPair = mConnectorActorTargetValues[ connectorTargetValuesIndex ];
+
+      if ( connectorPair.connectorIndex == connectorIndex )
+      {
+        // Current connector index matches next in the stored connectors with target values so apply target value.
+        connectorTargetValuesIndex++; // Found a match for connector so increment index to next one
+
+        AnimatorConnectorBase* connector = mConnectors[ connectorIndex ];
+
+        Actor* maybeActor = static_cast<Actor*>( connector->GetObject() ); // Only Actors would be in mConnectorActorTargetValues container
+
+        if ( maybeActor )
+        {
+          // Get Stored Target Value and corresponding connector index
+          const Property::Type valueType = connectorPair.targetValue.GetType();
+          Property::Index propertyIndex = connector->GetPropertyIndex();
+
+          if ( valueType == Property::VECTOR3 )
+          {
+            Vector3 targetVector3 = connectorPair.targetValue.Get<Vector3>();
+
+            if ( propertyIndex == Dali::Actor::Property::POSITION )
+            {
+              maybeActor->NotifyPositionAnimation( *this, targetVector3 );
+            }
+            else if ( propertyIndex == Dali::Actor::Property::SIZE )
+            {
+              maybeActor->NotifySizeAnimation( *this, targetVector3 );
+            }
+          }
+          else if ( valueType == Property::FLOAT )
+          {
+            float targetFloat = connectorPair.targetValue.Get<float>();
+
+            if ( ( Dali::Actor::Property::POSITION_X == propertyIndex ) ||
+                 ( Dali::Actor::Property::POSITION_Y == propertyIndex ) ||
+                 ( Dali::Actor::Property::POSITION_Z == propertyIndex ) )
+            {
+              maybeActor->NotifyPositionAnimation( *this, targetFloat, propertyIndex );
+            }
+            else if ( ( Dali::Actor::Property::SIZE_WIDTH == propertyIndex ) ||
+                    ( Dali::Actor::Property::SIZE_HEIGHT == propertyIndex ) ||
+                    ( Dali::Actor::Property::SIZE_DEPTH == propertyIndex ) )
+
+            {
+              maybeActor->NotifySizeAnimation( *this, targetFloat, propertyIndex );
+            }
+          }
+          else
+          {
+            // Currently only FLOAT and VECTOR3 is supported for Target values in AnimateXXFunctions
+            DALI_LOG_WARNING("Animation::Play Unsupported Value Type provided as TargetValue\n");
+          }
+        }
+      }
+    }
+  }
 
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
@@ -502,26 +574,21 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
     {
       if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex ) ||
            ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) ||
-           ( Dali::Actor::Property::SIZE_DEPTH == targetPropertyIndex ) )
+           ( Dali::Actor::Property::SIZE_DEPTH == targetPropertyIndex )  ||
+           ( Dali::Actor::Property::POSITION_X == targetPropertyIndex ) ||
+           ( Dali::Actor::Property::POSITION_Y == targetPropertyIndex ) ||
+           ( Dali::Actor::Property::POSITION_Z == targetPropertyIndex ) )
       {
-        // Test whether this is actually an Actor
+
         Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
         if ( maybeActor )
         {
-          // Notify the actor that its size is being animated
-          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
-        }
-      }
-      else if ( ( Dali::Actor::Property::POSITION_X == targetPropertyIndex ) ||
-                 ( Dali::Actor::Property::POSITION_Y == targetPropertyIndex ) ||
-                 ( Dali::Actor::Property::POSITION_Z == targetPropertyIndex ) )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its position is being animated
-          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
+          // Store data to later notify the actor that its size or position is being animated
+          ConnectorTargetValues connectorPair;
+          connectorPair.targetValue = destinationValue;
+          connectorPair.connectorIndex = mConnectors.Count();
+
+          mConnectorActorTargetValues.push_back( connectorPair );
         }
       }
 
@@ -547,24 +614,18 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR3:
     {
-      if ( Dali::Actor::Property::SIZE == targetPropertyIndex )
+      if ( Dali::Actor::Property::SIZE == targetPropertyIndex || Dali::Actor::Property::POSITION == targetPropertyIndex )
       {
         // Test whether this is actually an Actor
         Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
         if ( maybeActor )
         {
-          // Notify the actor that its size is being animated
-          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<Vector3>() );
-        }
-      }
-      else if ( Dali::Actor::Property::POSITION == targetPropertyIndex )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its position is being animated
-          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<Vector3>() );
+          // Store data to later notify the actor that its size or position is being animated
+          ConnectorTargetValues connectorPair;
+          connectorPair.targetValue = destinationValue;
+          connectorPair.connectorIndex = mConnectors.Count();
+
+          mConnectorActorTargetValues.push_back( connectorPair );
         }
       }
 

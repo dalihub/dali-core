@@ -1286,24 +1286,44 @@ void Actor::NotifyPositionAnimation( Animation& animation, float targetPosition,
 
 void Actor::SetWidth( float width )
 {
-  mTargetSize.width = width;
-
-  if( NULL != mNode )
+  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
   {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, &mNode->mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width );
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
+    mRelayoutData->preferredSize.width = width;
   }
+  else
+  {
+    mTargetSize.width = width;
+
+    if( NULL != mNode )
+    {
+      // mNode is being used in a separate thread; queue a message to set the value & base value
+      SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, &mNode->mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width );
+    }
+  }
+
+  RelayoutRequest();
 }
 
 void Actor::SetHeight( float height )
 {
-  mTargetSize.height = height;
-
-  if( NULL != mNode )
+  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
   {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, &mNode->mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height );
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
+    mRelayoutData->preferredSize.height = height;
   }
+  else
+  {
+    mTargetSize.height = height;
+
+    if( NULL != mNode )
+    {
+      // mNode is being used in a separate thread; queue a message to set the value & base value
+      SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, &mNode->mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height );
+    }
+  }
+
+  RelayoutRequest();
 }
 
 void Actor::SetDepth( float depth )
