@@ -656,6 +656,12 @@ void Renderer::TextureSetChanged()
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
+void Renderer::TextureSetDeleted()
+{
+  mTextureSet = NULL;
+
+  mResendFlag |= RESEND_DATA_PROVIDER;
+}
 void Renderer::ConnectionsChanged( PropertyOwner& object )
 {
   // One of our child objects has changed it's connections. Ensure the uniform
@@ -679,11 +685,7 @@ void Renderer::UniformMappingsChanged( const UniformMap& mappings )
 
 void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 {
-  if( reinterpret_cast<PropertyOwner*>(mTextureSet) == &owner )
-  {
-    mTextureSet = NULL;
-  }
-  else if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
+  if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
   {
     mShader = NULL;
   }
