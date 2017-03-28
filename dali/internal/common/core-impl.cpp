@@ -83,13 +83,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
             GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
 : mRenderController( renderController ),
   mPlatform(platform),
-  mGestureEventProcessor(NULL),
-  mEventProcessor(NULL),
-  mUpdateManager(NULL),
-  mRenderManager(NULL),
-  mDiscardQueue(NULL),
-  mNotificationManager(NULL),
-  mShaderFactory(NULL),
   mIsActive(true),
   mProcessingEvent(false)
 {
@@ -165,14 +158,6 @@ Core::~Core()
   // remove (last?) reference to stage
   mStage.Reset();
 
-  delete mEventProcessor;
-  delete mGestureEventProcessor;
-  delete mNotificationManager;
-  delete mShaderFactory;
-  delete mDiscardQueue;
-  delete mUpdateManager;
-  delete mRenderManager;
-  delete mRenderTaskProcessor;
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
