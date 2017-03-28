@@ -269,6 +269,11 @@ public:
    */
   void TextureSetChanged();
 
+  /**
+   * Called by the TextureSet to notify to the renderer that it is about to be deleted
+   */
+  void TextureSetDeleted();
+
 public: // Implementation of ObjectOwnerContainer template methods
   /**
    * Connect the object to the scene graph
