@@ -38,8 +38,8 @@ public:
    * Default constructor. Creates an OwnerPointer that does not own any object.
    */
   OwnerPointer()
+  : mObject(NULL)
   {
-    mObject = NULL;
   }
 
   /**
@@ -47,8 +47,8 @@ public:
    * @param[in] object A pointer to a heap allocated object.
    */
   OwnerPointer( T* object )
+  : mObject(object)
   {
-    mObject = object;
   }
 
   /**
@@ -56,8 +56,9 @@ public:
    * @param[in] other The pointer that gives away the ownership.
    */
   OwnerPointer( OwnerPointer& other )
+  : mObject(NULL)
   {
-    Init( other );
+    Swap( other );
   }
 
   /**
@@ -68,8 +69,8 @@ public:
   {
     if( this != &other )    // no self-assignment
     {
-      Reset();
-      Init( other );
+      // Creation of temportaty object to prevent premature deletion of object
+      OwnerPointer(other).Swap(*this);
     }
 
     // return self
@@ -183,6 +184,16 @@ public:
     return mObject;
   }
 
+  /**
+   * Swap owned objects
+   */
+  void Swap( OwnerPointer& other )
+  {
+    T* tmp = mObject;
+    mObject = other.mObject;
+    other.mObject = tmp;
+  }
+
   // Handle comparisons - This is a variation of the safe bool idiom
 
   /**
@@ -205,19 +216,6 @@ private:
    * Used by the safe bool idiom.
    */
   void ThisIsSaferThanReturningVoidStar() const {}
-
-private:
-
-  /**
-   * Initialise this pointer from another one.
-   * ownerPointer parameter looses ownership.
-   * @param ownerPointer owner pointer
-   */
-  void Init( OwnerPointer& ownerPointer )
-  {
-    mObject = ownerPointer.mObject;
-    ownerPointer.mObject = NULL;
-  }
 
   // data
   T* mObject; ///< Raw pointer to the object

@@ -369,6 +369,10 @@ public:
 
 };
 
+/**
+ * @brief This namespace provides a convenient function to create an object with a custom "weight" property.
+ * @SINCE_1_0.0
+ */
 namespace WeightObject
 {
 

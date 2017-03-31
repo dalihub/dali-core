@@ -631,6 +631,9 @@ void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
     if( textureSet == mImpl->textureSets[i] )
     {
       mImpl->textureSets.Remove( mImpl->textureSets.Begin() + i );
+
+      // Update manager has ownership of the TextureSet
+      delete textureSet;
       return;
     }
   }

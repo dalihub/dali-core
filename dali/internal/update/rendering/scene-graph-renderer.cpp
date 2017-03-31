@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,9 +258,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     if( mResendFlag & RESEND_BLEND_COLOR )
     {
-      typedef MessageValue1< Render::Renderer, const Vector4* > DerivedType;
+      typedef MessageValue1< Render::Renderer, Vector4 > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, mBlendColor );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, GetBlendColor() );
     }
 
     if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
@@ -433,13 +433,20 @@ void Renderer::SetBlendingOptions( unsigned int options )
 
 void Renderer::SetBlendColor( const Vector4& blendColor )
 {
-  if( !mBlendColor )
+  if( blendColor == Color::TRANSPARENT )
   {
-    mBlendColor = new Vector4( blendColor );
+    mBlendColor = NULL;
   }
   else
   {
-    *mBlendColor = blendColor;
+    if( !mBlendColor )
+    {
+      mBlendColor = new Vector4( blendColor );
+    }
+    else
+    {
+      *mBlendColor = blendColor;
+    }
   }
 
   mResendFlag |= RESEND_BLEND_COLOR;
@@ -536,7 +543,7 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
   mSceneController = &sceneController;
   RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-  mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, mBlendColor, static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
+  mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                          mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
 
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
@@ -574,6 +581,15 @@ RenderDataProvider* Renderer::NewRenderDataProvider()
   }
 
   return dataProvider;
+}
+
+const Vector4& Renderer::GetBlendColor() const
+{
+  if( mBlendColor )
+  {
+    return *mBlendColor;
+  }
+  return Color::TRANSPARENT;
 }
 
 Render::Renderer& Renderer::GetRenderer()
@@ -640,6 +656,12 @@ void Renderer::TextureSetChanged()
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
+void Renderer::TextureSetDeleted()
+{
+  mTextureSet = NULL;
+
+  mResendFlag |= RESEND_DATA_PROVIDER;
+}
 void Renderer::ConnectionsChanged( PropertyOwner& object )
 {
   // One of our child objects has changed it's connections. Ensure the uniform
@@ -663,11 +685,7 @@ void Renderer::UniformMappingsChanged( const UniformMap& mappings )
 
 void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 {
-  if( reinterpret_cast<PropertyOwner*>(mTextureSet) == &owner )
-  {
-    mTextureSet = NULL;
-  }
-  else if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
+  if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
   {
     mShader = NULL;
   }
