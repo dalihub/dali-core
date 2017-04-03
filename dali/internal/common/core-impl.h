@@ -262,19 +262,20 @@ private:
   Integration::PlatformAbstraction&         mPlatform;                    ///< The interface providing platform specific services.
 
   IntrusivePtr<Stage>                       mStage;                       ///< The current stage
-  GestureEventProcessor*                    mGestureEventProcessor;       ///< The gesture event processor
-  EventProcessor*                           mEventProcessor;              ///< The event processor
-  SceneGraph::UpdateManager*                mUpdateManager;               ///< Update manager
-  SceneGraph::RenderManager*                mRenderManager;               ///< Render manager
-  SceneGraph::DiscardQueue*                 mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
-  NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-  SceneGraph::RenderTaskProcessor*          mRenderTaskProcessor;         ///< Handles the processing of render tasks
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
+
+  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
+  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;               ///< Render manager
+  OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;               ///< Update manager
+  OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
+  OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory
+  OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
+  OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
+  OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
 
   friend class ThreadLocalStorage;
 

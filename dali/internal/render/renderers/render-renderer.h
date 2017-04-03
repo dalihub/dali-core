@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ public:
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
                         Render::Geometry* geometry,
                         unsigned int blendingBitmask,
-                        const Vector4* blendColor,
+                        const Vector4& blendColor,
                         FaceCullingMode::Type faceCullingMode,
                         bool preMultipliedAlphaEnabled,
                         DepthWriteMode::Type depthWriteMode,
@@ -139,7 +139,7 @@ public:
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
             Render::Geometry* geometry,
             unsigned int blendingBitmask,
-            const Vector4* blendColor,
+            const Vector4& blendColor,
             FaceCullingMode::Type faceCullingMode,
             bool preMultipliedAlphaEnabled,
             DepthWriteMode::Type depthWriteMode,
@@ -187,7 +187,7 @@ public:
    * Set the blend color for blending options
    * @param[in] blendColor The blend color to pass to GL
    */
-  void SetBlendColor( const Vector4* color );
+  void SetBlendColor( const Vector4& color );
 
   /**
    * Set the first element index to draw by the indexed draw

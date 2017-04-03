@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,6 +277,11 @@ public:
    */
   void TextureSetChanged();
 
+  /**
+   * Called by the TextureSet to notify to the renderer that it is about to be deleted
+   */
+  void TextureSetDeleted();
+
 public: // Implementation of ObjectOwnerContainer template methods
   /**
    * Connect the object to the scene graph
@@ -361,6 +366,12 @@ private:
    */
   RenderDataProvider* NewRenderDataProvider();
 
+  /**
+   * Helper function to retrieve the blend color.
+   * @return The blend color.
+   */
+  const Vector4& GetBlendColor() const;
+
 private:
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
@@ -369,7 +380,7 @@ private:
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   Render::Geometry*            mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
-  Vector4*                     mBlendColor;                       ///< The blend color for blending operation
+  OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
 

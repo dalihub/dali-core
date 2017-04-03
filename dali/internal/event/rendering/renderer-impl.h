@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,16 +137,6 @@ public:
    void GetBlendEquation( BlendEquation::Type& equationRgb, BlendEquation::Type& equationAlpha ) const;
 
    /**
-    * @copydoc Dali::Renderer::SetBlendColor()
-    */
-   void SetBlendColor( const Vector4& color );
-
-   /**
-    * @copydoc Dali::Renderer::GetBlendColor()
-    */
-   Vector4 GetBlendColor() const;
-
-   /**
     * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
     */
    void SetIndexedDrawFirstElement( size_t firstElement );
@@ -260,9 +250,28 @@ public: // Default property extensions from Object
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
 private: // implementation
+
+  /**
+   * @brief Default constructor.
+   */
   Renderer();
 
+  /**
+   * @brief Initializes the Renderer.
+   */
   void Initialize();
+
+  /**
+   * @brief Sets the blend color.
+   * @param[in] blendColor The blend color to set.
+   */
+  void SetBlendColor( const Vector4& blendColor );
+
+  /**
+   * @brief Retrieves the blend-color.
+   * @return A const reference to the blend-color
+   */
+  const Vector4& GetBlendColor() const;
 
 protected:
   /**
@@ -275,26 +284,25 @@ private: // unimplemented methods
   Renderer& operator=( const Renderer& );
 
 private: // data
-  SceneGraph::Renderer* mSceneObject;
-  Vector4* mBlendColor;               ///< Local copy of blend color, pointer only as its rarely used
-  GeometryPtr mGeometry;              ///< Connector that holds the geometry used by this renderer
-  TextureSetPtr mTextureSet;          ///< Connector that holds the texture set used by this renderer
-  ShaderPtr mShader;                  ///< Connector that holds the shader used by this renderer
+  SceneGraph::Renderer*               mSceneObject;
+  GeometryPtr                         mGeometry;                     ///< Connector that holds the geometry used by this renderer
+  TextureSetPtr                       mTextureSet;                   ///< Connector that holds the texture set used by this renderer
+  ShaderPtr                           mShader;                       ///< Connector that holds the shader used by this renderer
 
-  int mDepthIndex;
+  int                                 mDepthIndex;
 
-  size_t mIndexedDrawFirstElement;                            ///< Offset of first element to draw from bound index buffer
-  size_t mIndexedDrawElementCount;                            ///< Number of elements to draw
+  size_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
+  size_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
 
-  Render::Renderer::StencilParameters mStencilParameters;     ///< Struct containing all stencil related options
-  BlendingOptions              mBlendingOptions;              ///< Local copy of blending options bitmask
+  Render::Renderer::StencilParameters mStencilParameters;            ///< Struct containing all stencil related options
+  BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask
 
-  DepthFunction::Type          mDepthFunction:3;              ///< Local copy of the depth function
-  FaceCullingMode::Type        mFaceCullingMode:2;            ///< Local copy of the mode of face culling
-  BlendMode::Type              mBlendMode:2;                  ///< Local copy of the mode of blending
-  DepthWriteMode::Type         mDepthWriteMode:2;             ///< Local copy of the depth write mode
-  DepthTestMode::Type          mDepthTestMode:2;              ///< Local copy of the depth test mode
-  bool                         mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  DepthFunction::Type                 mDepthFunction:3;              ///< Local copy of the depth function
+  FaceCullingMode::Type               mFaceCullingMode:2;            ///< Local copy of the mode of face culling
+  BlendMode::Type                     mBlendMode:2;                  ///< Local copy of the mode of blending
+  DepthWriteMode::Type                mDepthWriteMode:2;             ///< Local copy of the depth write mode
+  DepthTestMode::Type                 mDepthTestMode:2;              ///< Local copy of the depth test mode
+  bool                                mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace Internal
