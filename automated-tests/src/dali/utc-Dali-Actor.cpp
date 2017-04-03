@@ -5519,7 +5519,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   parentActorA.SetSize( size2 );
   parentActorA.SetPosition( 0.f, 0.f );
 
-  tet_infoline( "Create Grand Parent Actor 1 TOP_RIGHT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+  tet_infoline( "Create Grand Parent Actor 1 BOTTOM_LEFT Anchor Point, ParentOrigin::BOTTOM_LEFT and 0,0 position \n" );
 
   Actor grandParentActorA = Actor::New();
   grandParentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
@@ -5548,6 +5548,70 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   DALI_TEST_EQUALS( actorScreenPosition.x,  45.0f , TEST_LOCATION );
   DALI_TEST_EQUALS( actorScreenPosition.y,  770.0f , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse Check screen position where the position does not use the anchor point" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  tet_infoline( "Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actorA.SetSize( 10.0f, 20.0f );
+  stage.Add( actorA );
+
+  tet_infoline( "Create an Actor with AnchorPoint::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorB = Actor::New();
+  actorB.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Vector2 actorBSize( 30.0f, 60.0f );
+  actorB.SetSize( actorBSize );
+  stage.Add( actorB );
+
+  tet_infoline( "Create an actor with AnchorPoint::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorC = Actor::New();
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Vector2 actorCSize( 60.0f, 120.0f );
+  actorC.SetSize( actorCSize );
+  stage.Add( actorC );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Despite differing sizes and anchor-points, the screen position for all actors is the same");
+
+  Vector2 center( stage.GetSize() * 0.5f );
+
+  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+
+  tet_infoline( "Add scale to all actors" );
+
+  actorA.SetScale( 2.0f );
+  actorB.SetScale( 2.0f );
+  actorC.SetScale( 2.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center /* TOP_LEFT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorBSize /* BOTTOM_RIGHT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorCSize * 0.5f /* CENTER Anchor*/, TEST_LOCATION );
 
   END_TEST;
 }
