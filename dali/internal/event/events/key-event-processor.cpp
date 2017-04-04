@@ -41,10 +41,16 @@ KeyEventProcessor::~KeyEventProcessor()
 
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
+  bool consumed = false;
   KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<KeyEvent::State>(event.state));
 
   // Emit the key event signal from stage.
-  mStage.EmitKeyEventSignal(keyEvent);
+  consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );
+
+  if( !consumed )
+  {
+    mStage.EmitKeyEventSignal(keyEvent);
+  }
 }
 
 } // namespace Internal
