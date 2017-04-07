@@ -271,10 +271,19 @@ void BaseSignal::DeleteConnection( std::size_t connectionIndex )
   SignalConnection* connection( mSignalConnections[ connectionIndex ] );
   delete connection;
 
-  // IMPORTANT - do not remove from items from mSignalConnections, set to NULL instead.
-  // Signal Emit() methods require that connection count is not reduced while iterating
-  // i.e. DeleteConnection can be called from within callbacks, while iterating through mSignalConnections.
-  mSignalConnections[ connectionIndex ] = NULL;
+  if( mEmittingFlag )
+  {
+    // IMPORTANT - do not remove from items from mSignalConnections, set to NULL instead.
+    // Signal Emit() methods require that connection count is not reduced while iterating
+    // i.e. DeleteConnection can be called from within callbacks, while iterating through mSignalConnections.
+    mSignalConnections[ connectionIndex ] = NULL;
+  }
+  else
+  {
+    // If application connects and disconnects without the signal never emitting,
+    // the mSignalConnections vector keeps growing and growing as CleanupConnections() is done from Emit.
+    mSignalConnections.Erase( mSignalConnections.Begin() + connectionIndex );
+  }
 }
 
 void BaseSignal::CleanupConnections()
