@@ -814,8 +814,7 @@ const Vector2 Actor::GetCurrentScreenPosition() const
     Vector3 actorSize = GetCurrentSize() * GetCurrentScale();
     Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
     Vector3 halfActorSize( actorSize * 0.5f );
-    // Anchor point offset first set to TOP_LEFT (0,0.5) then moved to required anchor point.
-    Vector3 anchorPointOffSet = halfActorSize - actorSize * GetCurrentAnchorPoint();
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
 
     return Vector2( halfStageSize.width + worldPosition.x - anchorPointOffSet.x,
                     halfStageSize.height + worldPosition.y - anchorPointOffSet.y );
