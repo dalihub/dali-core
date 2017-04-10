@@ -285,6 +285,9 @@ void Core::ProcessEvents()
     // Run the size negotiation after event processing finished signal
     mRelayoutController->Relayout();
 
+    // Rebuild depth tree after event processing has finished
+    mStage->RebuildDepthTree();
+
     // Flush any queued messages for the update-thread
     const bool messagesToProcess = mUpdateManager->FlushQueue();
 

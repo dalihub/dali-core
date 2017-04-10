@@ -80,6 +80,32 @@ class RenderQueue;
 class PropertyBuffer;
 class TextureSet;
 
+struct NodeDepthPair
+{
+  SceneGraph::Node* node;
+  uint32_t sortedDepth;
+  NodeDepthPair( SceneGraph::Node* node, uint32_t sortedDepth )
+  : node(node),
+    sortedDepth(sortedDepth)
+  {
+  }
+};
+
+struct NodeDepths
+{
+  std::vector<NodeDepthPair> nodeDepths;
+  NodeDepths( int reserveSize )
+  {
+    nodeDepths.reserve(reserveSize);
+  }
+
+  void Add( SceneGraph::Node* node, uint32_t sortedDepth )
+  {
+    nodeDepths.push_back( NodeDepthPair( node, sortedDepth ) );
+  }
+};
+
+
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
  * other scene graph property owning objects.
@@ -556,6 +582,12 @@ public:
    * @param[in] systemLevel True if using the system-level overlay.
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
+
+  /**
+   * Set the depth indices of all nodes (in LayerUI's)
+   * @param[in] nodeDepths A vector of nodes and associated depth indices
+   */
+  void SetDepthIndices( NodeDepths* nodeDepths );
 
 private:
 
@@ -1280,6 +1312,17 @@ inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::Fra
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
+}
+
+inline void SetDepthIndicesMessage( UpdateManager& manager, NodeDepths* nodeDepths )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< NodeDepths > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetDepthIndices, nodeDepths );
 }
 
 

@@ -1092,6 +1092,21 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
+void UpdateManager::SetDepthIndices( NodeDepths* nodeDepths )
+{
+  if( nodeDepths )
+  {
+    // note,this vector is already in depth order. It could be used as-is to
+    // remove sorting in update algorithm. However, it lacks layer boundary markers.
+    for( std::vector<NodeDepthPair>::iterator iter = nodeDepths->nodeDepths.begin(),
+           end = nodeDepths->nodeDepths.end() ;
+         iter != end ; ++iter )
+    {
+      iter->node->SetDepthIndex( iter->sortedDepth );
+    }
+  }
+}
+
 void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
 {
   mImpl->shaderSaver = &upstream;

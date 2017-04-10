@@ -33,6 +33,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/weak-handle.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -56,6 +57,11 @@
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
+Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER" );
+#endif
 
 namespace Dali
 {
@@ -383,11 +389,6 @@ float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
 float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 {
   return GetDimensionValue( values.GetVectorXY(), dimension );
-}
-
-unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
-{
-  return depth * Dali::DevelLayer::ACTOR_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
 }
 
 /**
@@ -1108,7 +1109,7 @@ ClippingMode::Type Actor::GetClippingMode() const
 
 unsigned int Actor::GetSortingDepth()
 {
-  return GetDepthIndex( mDepth, mSiblingOrder );
+  return mSortedDepth;
 }
 
 const Vector4& Actor::GetCurrentWorldColor() const
@@ -2139,6 +2140,7 @@ Actor::Actor( DerivedType derivedType )
   mTargetScale( Vector3::ONE ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
+  mSortedDepth( 0u ),
   mDepth( 0u ),
   mSiblingOrder(0u),
   mIsRoot( ROOT_LAYER == derivedType ),
@@ -2224,6 +2226,12 @@ void Actor::ConnectToStage( unsigned int parentDepth )
   // It protects us when the Actor hierarchy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
+  StagePtr stage = Stage::GetCurrent();
+  if( stage )
+  {
+    stage->RequestRebuildDepthTree();
+  }
+
   // This stage is atomic i.e. not interrupted by user callbacks.
   RecursiveConnectToStage( connectionList, parentDepth + 1 );
 
@@ -2243,7 +2251,6 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned in
 
   mIsOnStage = true;
   mDepth = depth;
-  SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
 
   ConnectToSceneGraph();
 
@@ -2315,6 +2322,12 @@ void Actor::DisconnectFromStage()
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageDisconnectionExternal callbacks.
   ActorContainer disconnectionList;
+
+  StagePtr stage = Stage::GetCurrent();
+  if( stage )
+  {
+    stage->RequestRebuildDepthTree();
+  }
 
   // This stage is atomic i.e. not interrupted by user callbacks
   RecursiveDisconnectFromStage( disconnectionList );
@@ -2399,6 +2412,205 @@ bool Actor::IsNodeConnected() const
   }
 
   return connected;
+}
+
+// This method generates the depth tree using the recursive function below,
+// then walks the tree and sets a depth index based on traversal order. It
+// sends a single message to update manager to update all the actor's nodes in this
+// tree with the depth index. The sceneGraphNodeDepths vector's elements are ordered
+// by depth, and could be used to reduce sorting in the update thread.
+void Actor::RebuildDepthTree()
+{
+  DALI_LOG_TIMER_START(depthTimer);
+
+  DepthNodeMemoryPool nodeMemoryPool;
+  ActorDepthTreeNode* rootNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( this, mSiblingOrder );
+
+  int actorCount = BuildDepthTree( nodeMemoryPool, rootNode );
+
+  // Vector of scene-graph nodes and their depths to send to UpdateManager
+  // in a single message
+  SceneGraph::NodeDepths* sceneGraphNodeDepths = new SceneGraph::NodeDepths(actorCount);
+
+  // Traverse depth tree and set mSortedDepth on each actor and scenegraph node
+  uint32_t sortOrder = 1u; // Don't start at zero, as visual depth can be negative
+  ActorDepthTreeNode* currentNode = rootNode;
+  bool firstVisit = true;
+  while( currentNode != rootNode || firstVisit)
+  {
+    firstVisit = false;
+
+    // Visit node, performing action
+    for( std::vector<Actor*>::iterator iter = currentNode->mActors.begin(); iter != currentNode->mActors.end(); ++iter )
+    {
+      (*iter)->mSortedDepth = sortOrder * DevelLayer::SIBLING_ORDER_MULTIPLIER;
+      sceneGraphNodeDepths->Add( const_cast<SceneGraph::Node*>((*iter)->mNode), (*iter)->mSortedDepth );
+    }
+    ++sortOrder;
+
+    // Descend tree
+    if( currentNode->mFirstChildNode )
+    {
+      currentNode = currentNode->mFirstChildNode;
+    }
+    else // leaf node, goto next sibling, or return up tree.
+    {
+      bool breakout=false;
+      while( ! currentNode->mNextSiblingNode )
+      {
+        if( currentNode == rootNode ) // If we get to root of tree, stop
+        {
+          breakout = true;
+          break;
+        }
+        currentNode = currentNode->mParentNode;
+      }
+
+      if( breakout )
+      {
+        break;
+      }
+      currentNode = currentNode->mNextSiblingNode;
+    }
+  }
+
+  SetDepthIndicesMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths );
+  DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree create time: ");
+}
+
+/**
+ * Structure to store the actor's associated node in the depth tree for child
+ * traversal
+ */
+struct ActorNodePair
+{
+  Actor* actor;
+  ActorDepthTreeNode* node;
+  ActorNodePair( Actor* actor, ActorDepthTreeNode* node )
+  : actor(actor),
+    node(node)
+  {
+  }
+};
+
+/*
+ * Descend actor tree, building a depth tree based on actor's sibling order.
+ * Actors with the same sibling order share the same depth tree. Siblings
+ * in the depth tree are ordered by actor's sibling order.
+ *
+ * An actor tree like this:
+ *
+ *                  Root (SO:0)
+ *                 _/    |   \_
+ *               _/      |     \_
+ *             _/        |       \_
+ *            /          |         \
+ *        A(SO:1)     B(SO:2)    C(SO:1)
+ *         _/\_          |         _/ \_
+ *        /    \         |       /       \
+ *     D(SO:0) E(SO:0) F(SO:0) G(SO:1)  H(SO:0)
+ *
+ * will end up as a depth tree like this:
+ *
+ *     RootNode [ Root ] -> NULL
+ *       |(mFC)
+ *       V                (mNS)
+ *     Node [ A, C ] ------------------------>  Node [ B ] -> NULL
+ *       |                                        |
+ *       V                                        V
+ *     Node [ D, E, H ] -> Node [ G ] -> NULL   Node [ F ] -> NULL
+ *       |                   |                    |
+ *       V                   V                    V
+ *     NULL                NULL                 NULL
+ *
+ * (All nodes also point to their parents to enable storage free traversal)
+ */
+int Actor::BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* node )
+{
+  int treeCount=1; // Count self and children
+
+  // Create/add to children of this node
+  if( mChildren )
+  {
+    std::vector<ActorNodePair> storedChildren;
+    storedChildren.reserve( mChildren->size() );
+
+    for( ActorContainer::iterator it = mChildren->begin(); it != mChildren->end(); ++it )
+    {
+      Actor* childActor = (*it).Get();
+      if( childActor->IsLayer() )
+      {
+        Layer* layer = static_cast<Layer*>(childActor);
+        if( layer->GetBehavior() == Dali::Layer::LAYER_3D )
+        {
+          // Ignore this actor and children.
+          continue;
+        }
+      }
+
+      // If no existing depth node children
+      if( node->mFirstChildNode == NULL )
+      {
+        node->mFirstChildNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( childActor, childActor->mSiblingOrder );
+        node->mFirstChildNode->mParentNode = node;
+        storedChildren.push_back(ActorNodePair( childActor, node->mFirstChildNode ));
+      }
+      else // find child node with matching sibling order (insertion sort)
+      {
+        bool addedChildActor = false;
+
+        // depth tree child nodes ordered by sibling order
+        ActorDepthTreeNode* lastNode = NULL;
+        for( ActorDepthTreeNode* childNode = node->mFirstChildNode; childNode != NULL; childNode = childNode->mNextSiblingNode )
+        {
+          uint16_t actorSiblingOrder = childActor->mSiblingOrder;
+          uint16_t currentSiblingOrder = childNode->GetSiblingOrder();
+
+          if( actorSiblingOrder == currentSiblingOrder )
+          {
+            // Don't need a new depth node, add to existing node
+            childNode->AddActor( childActor );
+            storedChildren.push_back(ActorNodePair( childActor, childNode ));
+            addedChildActor = true;
+            break;
+          }
+          else if( actorSiblingOrder < currentSiblingOrder )
+          {
+            break;
+          }
+          lastNode = childNode;
+        }
+
+        // No matching sibling order - create new node and insert into sibling list
+        if( !addedChildActor )
+        {
+          ActorDepthTreeNode* newNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( childActor, childActor->mSiblingOrder );
+
+          newNode->mParentNode = node;
+          storedChildren.push_back(ActorNodePair( childActor, newNode ));
+
+          if( lastNode == NULL ) // Insert at start of siblings
+          {
+            ActorDepthTreeNode* nextNode = node->mFirstChildNode;
+            node->mFirstChildNode = newNode;
+            newNode->mNextSiblingNode = nextNode;
+          }
+          else // insert into siblings after last node
+          {
+            newNode->mNextSiblingNode = lastNode->mNextSiblingNode;
+            lastNode->mNextSiblingNode = newNode;
+          }
+        }
+      }
+    }
+
+    // Order of descent doesn't matter; we're using insertion to sort.
+    for( std::vector<ActorNodePair>::iterator iter = storedChildren.begin(); iter != storedChildren.end(); ++iter )
+    {
+      treeCount += iter->actor->BuildDepthTree( nodeMemoryPool, iter->node );
+    }
+  }
+  return treeCount;
 }
 
 unsigned int Actor::GetDefaultPropertyCount() const
@@ -4575,6 +4787,8 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   // relayout container afterwards, the dirty flags would still be clear...
   // causing a relayout to be skipped. Here we force any actors added to the
   // container to be relayed out.
+  DALI_LOG_TIMER_START( NegSizeTimer1 );
+
   if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
   {
     SetLayoutNegotiated(false, Dimension::WIDTH);
@@ -4616,6 +4830,7 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
       container.Add( Dali::Actor( child.Get() ), newBounds );
     }
   }
+  DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
 }
 
 void Actor::RelayoutRequest( Dimension::Type dimension )
@@ -4735,9 +4950,14 @@ Object* Actor::GetParentObject() const
 void Actor::SetSiblingOrder( unsigned int order )
 {
   mSiblingOrder = std::min( order, static_cast<unsigned int>( DevelLayer::SIBLING_ORDER_MULTIPLIER ) );
+
   if( mIsOnStage )
   {
-    SetDepthIndexMessage( GetEventThreadServices(), *mNode, GetDepthIndex( mDepth, mSiblingOrder ) );
+    StagePtr stage = Stage::GetCurrent();
+    if( stage )
+    {
+      stage->RequestRebuildDepthTree();
+    }
   }
 }
 
