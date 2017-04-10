@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
+#include <dali/public-api/events/key-event.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -67,6 +68,12 @@ struct KeyEvent : public Event
            int keyModifier,
            unsigned long timeStamp,
            const State& keyState);
+
+  /*
+   * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
+   * @param[in] event Dali::KeyEvent to convert from
+   */
+  explicit KeyEvent( const Dali::KeyEvent& event );
 
   /**
    * Virtual destructor

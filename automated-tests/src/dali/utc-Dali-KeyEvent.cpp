@@ -269,3 +269,22 @@ int UtcDaliIntegrationKeyEvent(void)
   }
   END_TEST;
 }
+
+int UtcDaliIntegrationKeyEventConvertor(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);  // set name to test, key string to i and modifier to shift
+
+  Integration::KeyEvent keyEvent( event );
+
+  DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
+  DALI_TEST_CHECK( keyEvent.keyName == TEST_STRING_1 );
+  DALI_TEST_CHECK( keyEvent.keyString == "i" );
+  DALI_TEST_EQUALS( keyEvent.keyCode, 99, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.keyModifier, SHIFT_MODIFIER, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
+
+  END_TEST;
+}
