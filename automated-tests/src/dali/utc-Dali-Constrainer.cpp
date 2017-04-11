@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/animation/path-constrainer.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -203,21 +204,21 @@ int UtcPathConstrainerApplyRange(void)
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  actor.GetProperty(index).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  actor.GetProperty(index).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  actor.GetProperty(index).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );

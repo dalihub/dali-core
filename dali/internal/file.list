@@ -32,6 +32,7 @@ internal_src_files = \
   $(internal_src_dir)/event/common/projection.cpp \
   $(internal_src_dir)/event/common/property-buffer-impl.cpp  \
   $(internal_src_dir)/event/common/property-conditions-impl.cpp  \
+  $(internal_src_dir)/event/common/property-metadata.cpp  \
   $(internal_src_dir)/event/common/property-notification-impl.cpp  \
   $(internal_src_dir)/event/common/property-notification-manager.cpp \
   $(internal_src_dir)/event/common/property-helper.cpp \
