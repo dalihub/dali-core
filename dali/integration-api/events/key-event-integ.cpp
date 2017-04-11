@@ -46,6 +46,17 @@ KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int
 {
 }
 
+KeyEvent::KeyEvent( const Dali::KeyEvent& event )
+: Event(Key),
+  keyName( event.keyPressedName ),
+  keyString( event.keyPressed ),
+  keyCode( event.keyCode ),
+  keyModifier( event.keyModifier ),
+  time( event.time ),
+  state( static_cast< Integration::KeyEvent::State >( event.state ) )
+{
+}
+
 KeyEvent::~KeyEvent()
 {
 }
