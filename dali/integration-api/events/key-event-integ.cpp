@@ -31,18 +31,21 @@ KeyEvent::KeyEvent()
   keyCode(-1),
   keyModifier(0),
   time(0),
-  state(KeyEvent::Down)
+  state(KeyEvent::Down),
+  deviceName("")
 {
 }
 
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState)
+KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
+                    unsigned long timeStamp, const State& keyState, const std::string deviceName )
 : Event(Key),
   keyName(keyName),
   keyString(keyString),
   keyCode(keyCode),
   keyModifier(keyModifier),
   time(timeStamp),
-  state(keyState)
+  state(keyState),
+  deviceName(deviceName)
 {
 }
 
@@ -53,7 +56,8 @@ KeyEvent::KeyEvent( const Dali::KeyEvent& event )
   keyCode( event.keyCode ),
   keyModifier( event.keyModifier ),
   time( event.time ),
-  state( static_cast< Integration::KeyEvent::State >( event.state ) )
+  state( static_cast< Integration::KeyEvent::State >( event.state ) ),
+  deviceName("")
 {
 }
 
