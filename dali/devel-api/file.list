@@ -4,6 +4,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/animation/animation-data.cpp \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
   $(devel_api_src_dir)/common/hash.cpp \
+  $(devel_api_src_dir)/common/stage-devel.cpp \
   $(devel_api_src_dir)/events/hit-test-algorithm.cpp \
   $(devel_api_src_dir)/images/distance-field.cpp \
   $(devel_api_src_dir)/images/texture-set-image.cpp \
@@ -32,7 +33,8 @@ devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/map-wrapper.h \
   $(devel_api_src_dir)/common/owner-container.h \
   $(devel_api_src_dir)/common/ref-counted-dali-vector.h \
-  $(devel_api_src_dir)/common/set-wrapper.h
+  $(devel_api_src_dir)/common/set-wrapper.h \
+  $(devel_api_src_dir)/common/stage-devel.h
 
 devel_api_core_events_header_files = \
   $(devel_api_src_dir)/events/hit-test-algorithm.h

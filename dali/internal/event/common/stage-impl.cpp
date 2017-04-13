@@ -56,8 +56,10 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 // Signals
 
 const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
+const char* const SIGNAL_KEY_EVENT_GENERATED =       "keyEventGenerated";
 const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
 const char* const SIGNAL_TOUCHED =                   "touched";
+const char* const SIGNAL_TOUCH =                     "touch";
 const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
 const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
 const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
@@ -72,6 +74,8 @@ SignalConnectorType signalConnector4( mType, SIGNAL_WHEEL_EVENT,               &
 SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
 SignalConnectorType signalConnector7( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
+SignalConnectorType signalConnector8( mType, SIGNAL_KEY_EVENT_GENERATED,       &Stage::DoConnectSignal );
+SignalConnectorType signalConnector9( mType, SIGNAL_TOUCH,                     &Stage::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -526,6 +530,10 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     stage->KeyEventSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT_GENERATED ) )
+  {
+    stage->KeyEventGeneratedSignal().Connect( tracker, functor );
+  }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_EVENT_PROCESSING_FINISHED ) )
   {
     stage->EventProcessingFinishedSignal().Connect( tracker, functor );
@@ -533,6 +541,10 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
   {
     stage->TouchedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCH ) )
+  {
+    stage->TouchSignal().Connect( tracker, functor );
   }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
   {
@@ -566,6 +578,13 @@ void Stage::EmitKeyEventSignal(const KeyEvent& event)
   mKeyEventSignal.Emit( event );
 }
 
+bool Stage::EmitKeyEventGeneratedSignal(const KeyEvent& event)
+{
+  // Emit the KeyEventGenerated signal when KeyEvent is generated
+
+  return mKeyEventGeneratedSignal.Emit( event );
+}
+
 void Stage::EmitEventProcessingFinishedSignal()
 {
    mEventProcessingFinishedSignal.Emit();
@@ -592,6 +611,11 @@ void Stage::EmitSceneCreatedSignal()
 Dali::Stage::KeyEventSignalType& Stage::KeyEventSignal()
 {
   return mKeyEventSignal;
+}
+
+Dali::DevelStage::KeyEventGeneratedSignalType& Stage::KeyEventGeneratedSignal()
+{
+  return mKeyEventGeneratedSignal;
 }
 
 Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()

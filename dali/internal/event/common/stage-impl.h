@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage-devel.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/internal/common/owner-pointer.h>
@@ -307,6 +308,13 @@ public:
   void EmitKeyEventSignal(const KeyEvent& event);
 
   /**
+   * Used by the KeyEventProcessor to emit KeyEventGenerated signals.
+   * @param[in] event The key event.
+   * @return The return is true if KeyEvent is consumed, otherwise false.
+   */
+  bool EmitKeyEventGeneratedSignal(const KeyEvent& event);
+
+  /**
    * Emits the event processing finished signal.
    *
    * @see Dali::Stage::SignalEventProcessingFinished()
@@ -370,6 +378,11 @@ public:
    * @copydoc Dali::Stage::SceneCreatedSignal()
    */
   Dali::Stage::SceneCreatedSignalType& SceneCreatedSignal();
+
+  /**
+   * @copydoc Dali::DevelStage::KeyEventGeneratedSignal()
+   */
+  Dali::DevelStage::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -482,6 +495,7 @@ private:
 
   // The key event signal
   Dali::Stage::KeyEventSignalType                 mKeyEventSignal;
+  Dali::DevelStage::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
 
   // The event processing finished signal
   Dali::Stage::EventProcessingFinishedSignalType  mEventProcessingFinishedSignal;

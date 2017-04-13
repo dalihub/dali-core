@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <dali/public-api/events/key-event.h>
 
+// INTERNAL INCLUDES
+#include <dali/devel-api/events/key-event-devel.h>
+#include <dali/devel-api/common/map-wrapper.h>
+
 namespace Dali
 {
 
@@ -27,6 +31,17 @@ const unsigned int MODIFIER_SHIFT = 0x1;
 const unsigned int MODIFIER_CTRL  = 0x2;
 const unsigned int MODIFIER_ALT   = 0x4;
 const int KEY_INVALID_CODE = -1;
+
+struct KeyEventImpl
+{
+  std::string deviceName;
+};
+
+typedef std::map< KeyEvent*, KeyEventImpl*> KeyEventMap;
+typedef KeyEventMap::const_iterator KeyEventMapIter;
+
+
+KeyEventMap keyEventImplMap;
 
 }
 
@@ -38,6 +53,8 @@ KeyEvent::KeyEvent()
   time(0),
   state(KeyEvent::Down)
 {
+  KeyEventImpl* impl = new KeyEventImpl;
+  keyEventImplMap[this] = impl;
 }
 
 KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,unsigned long timeStamp, const State& keyState)
@@ -48,10 +65,14 @@ KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int
   time(timeStamp),
   state(keyState)
 {
+  KeyEventImpl* impl = new KeyEventImpl;
+  keyEventImplMap[this] = impl;
 }
 
 KeyEvent::~KeyEvent()
 {
+  delete keyEventImplMap[this];
+  keyEventImplMap.erase( this );
 }
 
 bool KeyEvent::IsShiftModifier() const
@@ -83,5 +104,32 @@ bool KeyEvent::IsAltModifier() const
 
   return false;
 }
+
+std::string DevelKeyEvent::GetDeviceName( KeyEvent& keyEvent )
+{
+  KeyEventMapIter search;
+
+  search = keyEventImplMap.find( &keyEvent );
+
+  std::string result = "";
+
+  if( search != keyEventImplMap.end())
+  {
+    result = search->second->deviceName;
+  }
+
+  return result;
+}
+
+void DevelKeyEvent::SetDeviceName( KeyEvent& keyEvent, std::string deviceName )
+{
+  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
+
+  if( search != keyEventImplMap.end())
+  {
+    search->second->deviceName = deviceName;
+  }
+}
+
 
 } // namespace Dali
