@@ -917,7 +917,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
-  const bool updateScene =                                  // The scene-graph requires an update if..
+  bool updateScene = // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
       IsAnimationRunning()                            ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
@@ -934,8 +934,10 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     mImpl->transformManager.ResetToBaseValue();
   }
 
-  //Process the queued scene messages
-  mImpl->messageQueue.ProcessMessages( bufferIndex );
+  // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
+  // between calling IsSceneUpdateRequired() above and here, so updateScene should
+  // be set again
+  updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
 
   //Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );

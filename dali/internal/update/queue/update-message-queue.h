@@ -87,8 +87,9 @@ public:
   /**
    * Called once per update; process the previously flushed messages.
    * @param updateBufferIndex to use
+   * @return true if the scene graph node tree is updated
    */
-  void ProcessMessages( BufferIndex updateBufferIndex );
+  bool ProcessMessages( BufferIndex updateBufferIndex );
 
   /**
    * Query whether the queue was empty this frame.

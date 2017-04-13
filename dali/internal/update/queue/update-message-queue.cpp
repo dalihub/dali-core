@@ -149,9 +149,10 @@ MessageQueue::~MessageQueue()
 
 void MessageQueue::EventProcessingStarted()
 {
-  mImpl->processingEvents = true;
+  mImpl->processingEvents = true; // called from event thread
 }
 
+// Called from event thread
 unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool updateScene )
 {
   DALI_ASSERT_DEBUG( 0 != requestedSize );
@@ -198,6 +199,7 @@ unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool
   return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );
 }
 
+// Called from event thread
 bool MessageQueue::FlushQueue()
 {
   const bool messagesToProcess = ( NULL != mImpl->currentMessageBuffer );
@@ -241,7 +243,7 @@ bool MessageQueue::FlushQueue()
   return messagesToProcess;
 }
 
-void MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
+bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
 {
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
@@ -275,6 +277,8 @@ void MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
   mImpl->processQueue.clear();
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
+
+  return ( mImpl->sceneUpdate & 0x01 ); // if it was previously 2, scene graph was updated.
 }
 
 bool MessageQueue::WasEmpty() const
