@@ -25,39 +25,42 @@ namespace Integration
 {
 
 KeyEvent::KeyEvent()
-: Event(Key),
+: Event( Key ),
   keyName(),
   keyString(),
-  keyCode(-1),
-  keyModifier(0),
-  time(0),
-  state(KeyEvent::Down),
-  deviceName("")
+  keyCode( -1 ),
+  keyModifier( 0 ),
+  time( 0 ),
+  state( KeyEvent::Down ),
+  deviceName( "" ),
+  deviceClass( DevelKeyEvent::DeviceClass::NONE )
 {
 }
 
 KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
-                    unsigned long timeStamp, const State& keyState, const std::string deviceName )
-: Event(Key),
-  keyName(keyName),
-  keyString(keyString),
-  keyCode(keyCode),
-  keyModifier(keyModifier),
-  time(timeStamp),
-  state(keyState),
-  deviceName(deviceName)
+                    unsigned long timeStamp, const State& keyState, const std::string deviceName, const DevelKeyEvent::DeviceClass::Type deviceClass )
+: Event( Key ),
+  keyName( keyName ),
+  keyString( keyString ),
+  keyCode( keyCode ),
+  keyModifier( keyModifier ),
+  time( timeStamp ),
+  state( keyState ),
+  deviceName( deviceName ),
+  deviceClass( deviceClass )
 {
 }
 
 KeyEvent::KeyEvent( const Dali::KeyEvent& event )
-: Event(Key),
+: Event( Key ),
   keyName( event.keyPressedName ),
   keyString( event.keyPressed ),
   keyCode( event.keyCode ),
   keyModifier( event.keyModifier ),
   time( event.time ),
   state( static_cast< Integration::KeyEvent::State >( event.state ) ),
-  deviceName("")
+  deviceName( "" ),
+  deviceClass( DevelKeyEvent::DeviceClass::NONE )
 {
 }
 

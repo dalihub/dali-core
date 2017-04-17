@@ -19,8 +19,8 @@
 #include <dali/internal/event/events/key-event-processor.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/events/key-event-devel.h>
 #include <dali/public-api/events/key-event.h>
+#include <dali/internal/event/events/key-event-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -43,8 +43,11 @@ KeyEventProcessor::~KeyEventProcessor()
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
   bool consumed = false;
-  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<KeyEvent::State>(event.state));
-  DevelKeyEvent::SetDeviceName( keyEvent, event.deviceName );
+  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
+
+  GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
+  GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
+
   // Emit the key event signal from stage.
   consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );
 
