@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/devel-api/events/key-event-devel.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -102,6 +103,58 @@ int UtcDaliKeyEventConstructor(void)
   DALI_TEST_EQUALS(99, event.keyCode, TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.keyModifier, TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(KeyEvent::Down, event.state, TEST_LOCATION); // check state
+  END_TEST;
+}
+
+int UtcDaliKeyEventAssignment(void)
+{
+  // Test Assignment operator
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0, KeyEvent::Down);  // set name to test, key string to i and modifier to shift
+
+  DALI_TEST_EQUALS(TEST_STRING_1, event.keyPressedName, TEST_LOCATION); // check key name
+  DALI_TEST_EQUALS("i", event.keyPressed, TEST_LOCATION); // check key string
+  DALI_TEST_EQUALS(99, event.keyCode, TEST_LOCATION); // check keyCode
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.keyModifier, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(KeyEvent::Down, event.state, TEST_LOCATION); // check state
+
+  KeyEvent event2(TEST_STRING_1,"j", 88, CTRL_MODIFIER, 0, KeyEvent::Up);  // set name to test, key string to i and modifier to shift
+
+  DALI_TEST_EQUALS(TEST_STRING_1, event2.keyPressedName, TEST_LOCATION); // check key name
+  DALI_TEST_EQUALS("j", event2.keyPressed, TEST_LOCATION); // check key string
+  DALI_TEST_EQUALS(88, event2.keyCode, TEST_LOCATION); // check keyCode
+  DALI_TEST_EQUALS(CTRL_MODIFIER, event2.keyModifier, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(KeyEvent::Up, event2.state, TEST_LOCATION); // check state
+
+  event = event2;
+
+  DALI_TEST_EQUALS(TEST_STRING_1, event.keyPressedName, TEST_LOCATION); // check key name
+  DALI_TEST_EQUALS("j", event.keyPressed, TEST_LOCATION); // check key string
+  DALI_TEST_EQUALS(88, event.keyCode, TEST_LOCATION); // check keyCode
+  DALI_TEST_EQUALS(CTRL_MODIFIER, event.keyModifier, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(KeyEvent::Up, event.state, TEST_LOCATION); // check state
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventCopy(void)
+{
+  // Test Assignment operator
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0, KeyEvent::Down);  // set name to test, key string to i and modifier to shift
+
+  DALI_TEST_EQUALS(TEST_STRING_1, event.keyPressedName, TEST_LOCATION); // check key name
+  DALI_TEST_EQUALS("i", event.keyPressed, TEST_LOCATION); // check key string
+  DALI_TEST_EQUALS(99, event.keyCode, TEST_LOCATION); // check keyCode
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.keyModifier, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(KeyEvent::Down, event.state, TEST_LOCATION); // check state
+
+  KeyEvent event2( event );
+
+  DALI_TEST_EQUALS(TEST_STRING_1, event2.keyPressedName, TEST_LOCATION); // check key name
+  DALI_TEST_EQUALS("i", event2.keyPressed, TEST_LOCATION); // check key string
+  DALI_TEST_EQUALS(99, event2.keyCode, TEST_LOCATION); // check keyCode
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event2.keyModifier, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(KeyEvent::Down, event2.state, TEST_LOCATION); // check state
+
   END_TEST;
 }
 
@@ -257,8 +310,9 @@ int UtcDaliIntegrationKeyEvent(void)
     const int keyModifier(312);
     const unsigned long timeStamp(132);
     const Integration::KeyEvent::State keyState(Integration::KeyEvent::Up);
+    const std::string deviceName("hwKeyboard");
 
-    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState);
+    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState, deviceName );
     DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
     DALI_TEST_CHECK( keyEvent.keyName == keyName );
     DALI_TEST_CHECK( keyEvent.keyString == keyString );
@@ -266,6 +320,45 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_EQUALS( keyEvent.keyModifier, keyModifier, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.time, timeStamp, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.state, keyState, TEST_LOCATION);
+    DALI_TEST_EQUALS( keyEvent.deviceName, deviceName, TEST_LOCATION);
   }
+  END_TEST;
+}
+
+int UtcDaliIntegrationKeyEventConvertor(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);  // set name to test, key string to i and modifier to shift
+
+  Integration::KeyEvent keyEvent( event );
+
+  DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
+  DALI_TEST_CHECK( keyEvent.keyName == TEST_STRING_1 );
+  DALI_TEST_CHECK( keyEvent.keyString == "i" );
+  DALI_TEST_EQUALS( keyEvent.keyCode, 99, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.keyModifier, SHIFT_MODIFIER, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
+  DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
+  DALI_TEST_EQUALS( keyEvent.deviceName, "", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventSetDeviceName(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
+
+  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceName( event ), "", TEST_LOCATION);
+
+  DevelKeyEvent::SetDeviceName( event, "finger" );
+
+  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceName( event ), "finger", TEST_LOCATION);
+
+  KeyEvent event2;
+  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceName( event2 ), "", TEST_LOCATION);
+
   END_TEST;
 }
