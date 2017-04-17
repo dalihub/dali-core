@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/public-api/events/key-event.h>
+#include <dali/devel-api/events/key-event-devel.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -62,6 +63,7 @@ struct KeyEvent : public Event
    * @param[in]  timeStamp     The time (in ms) that the key event occurred.
    * @param[in]  keyState      The state of the key event.
    * @param[in]  deviceName    Name of device KeyEvent originated from
+   * @param[in]  deviceClass   Class of device KeyEvent originated from
    */
   KeyEvent(const std::string& keyName,
            const std::string& keyString,
@@ -69,7 +71,8 @@ struct KeyEvent : public Event
            int keyModifier,
            unsigned long timeStamp,
            const State& keyState,
-           const std::string deviceName );
+           const std::string deviceName,
+           const DevelKeyEvent::DeviceClass::Type deviceClass );
 
   /*
    * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
@@ -120,6 +123,10 @@ struct KeyEvent : public Event
    */
   std::string deviceName;
 
+  /**
+   * Class of device KeyEvent originated from
+   */
+  DevelKeyEvent::DeviceClass::Type deviceClass;
 };
 
 } // namespace Integration

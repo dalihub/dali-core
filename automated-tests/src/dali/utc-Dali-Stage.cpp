@@ -45,6 +45,7 @@ namespace
 {
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+const DevelKeyEvent::DeviceClass::Type DEFAULT_DEVICE_CLASS( DevelKeyEvent::DeviceClass::TOUCH );
 
 // Functor for EventProcessingFinished signal
 struct EventProcessingFinishedFunctor
@@ -883,7 +884,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   KeyEventGeneratedReceivedFunctor functor2( data2 );
   GetImplementation( stage ).ConnectSignal( &application, "keyEventGenerated", functor2 );
 
-  Integration::KeyEvent event( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -894,7 +895,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -905,7 +906,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -916,7 +917,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -936,7 +937,7 @@ int UtcDaliStageSignalKeyEventP(void)
   KeyEventReceivedFunctor functor( data );
   stage.KeyEventSignal().Connect( &application, functor );
 
-  Integration::KeyEvent event( "i", "i", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event( "i", "i", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -947,7 +948,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -958,7 +959,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -969,7 +970,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DEFAULT_DEVICE_CLASS );
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
