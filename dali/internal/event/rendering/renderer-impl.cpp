@@ -784,6 +784,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
   return value;
 }
 
+Property::Value Renderer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index ); // Event-side only properties
+}
+
 const SceneGraph::PropertyOwner* Renderer::GetPropertyOwner() const
 {
   return mSceneObject;

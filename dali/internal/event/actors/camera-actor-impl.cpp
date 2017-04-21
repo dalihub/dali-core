@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -802,12 +802,12 @@ Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::CameraActor::Property::PROJECTION_MATRIX:
       {
-        ret = GetProjectionMatrix();
+        ret = GetProjectionMatrix(); // Only on scene-graph
         break;
       }
       case Dali::CameraActor::Property::VIEW_MATRIX:
       {
-        ret = GetViewMatrix();
+        ret = GetViewMatrix(); // Only on scene-graph
         break;
       }
       case Dali::CameraActor::Property::INVERT_Y_AXIS:
@@ -816,6 +816,21 @@ Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
         break;
       }
     } // switch(index)
+  }
+
+  return ret;
+}
+
+Property::Value CameraActor::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  Property::Value ret;
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    ret = Actor::GetDefaultPropertyCurrentValue(index);
+  }
+  else
+  {
+    ret = GetDefaultProperty( index ); // Most are event-side properties, the scene-graph properties are only on the scene-graph
   }
 
   return ret;

@@ -588,7 +588,7 @@ Property::Value Object::GetCurrentProperty( Property::Index index ) const
 
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    value = GetDefaultProperty( index );
+    value = GetDefaultPropertyCurrentValue( index );
   }
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {

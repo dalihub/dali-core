@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,11 @@ void CustomObject::SetDefaultProperty( Property::Index index, const Property::Va
 }
 
 Property::Value CustomObject::GetDefaultProperty(Property::Index index) const
+{
+  return Property::Value();
+}
+
+Property::Value CustomObject::GetDefaultPropertyCurrentValue( Property::Index index ) const
 {
   return Property::Value();
 }

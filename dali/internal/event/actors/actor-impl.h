@@ -1642,6 +1642,11 @@ public:
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
   virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
@@ -1819,6 +1824,22 @@ private:
   }
 
   /**
+   * @brief Retrieves the cached event side value of a default property.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the cached value of the property if found.
+   * @return True if value set, false otherwise.
+   */
+  bool GetCachedPropertyValue( Property::Index index, Property::Value& value ) const;
+
+  /**
+   * @brief Retrieves the current value of a default property from the scene-graph.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the current scene-graph value of the property
+   * @return True if value set, false otherwise.
+   */
+  bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
+
+  /**
    * @brief Ensure the relayout data is allocated
    */
   void EnsureRelayoutData();
@@ -1893,8 +1914,11 @@ protected:
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
 
-  Vector3         mTargetSize;       ///< Event-side storage for size (not a pointer as most actors will have a size)
-  Vector3         mTargetPosition;   ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Quaternion      mTargetOrientation; ///< Event-side storage for orientation
+  Vector4         mTargetColor;       ///< Event-side storage for color
+  Vector3         mTargetSize;        ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Vector3         mTargetScale;       ///< Event-side storage for scale
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
