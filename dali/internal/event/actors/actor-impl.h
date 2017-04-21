@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
@@ -210,6 +211,7 @@ public:
    * Retrieve a reference to Actor's children.
    * @note Not for public use.
    * @return A reference to the container of children.
+   * @note The internal container is lazily initialized so ensure you check the child count before using the value returned by this method.
    */
   ActorContainer& GetChildrenInternal()
   {
@@ -1388,6 +1390,13 @@ public:
   bool EmitWheelEventSignal( const WheelEvent& event );
 
   /**
+   * @brief Emits the visibility change signal for this actor and all its children.
+   * @param[in] visible Whether the actor has become visible or not.
+   * @param[in] type Whether the actor's visible property has changed or a parent's.
+   */
+  void EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1421,6 +1430,11 @@ public:
    * @copydoc Dali::Actor::OnRelayoutSignal()
    */
   Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal();
+
+  /**
+   * @copydoc DevelActor::VisibilityChangedSignal
+   */
+  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1857,7 +1871,7 @@ private:
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
-  ActorContainer* mChildren;      ///< Container of referenced actors
+  ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized
   RendererContainer* mRenderers;   ///< Renderer container
 
   const SceneGraph::Node* mNode;  ///< Not owned
@@ -1877,6 +1891,7 @@ protected:
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
+  DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
 
   Vector3         mTargetSize;       ///< Event-side storage for size (not a pointer as most actors will have a size)
   Vector3         mTargetPosition;   ///< Event-side storage for position (not a pointer as most actors will have a position)
@@ -1902,6 +1917,7 @@ protected:
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
+  bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited

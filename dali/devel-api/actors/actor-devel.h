@@ -121,6 +121,19 @@ enum Type
 
 } // namespace Property
 
+namespace VisibilityChange
+{
+
+enum Type
+{
+  SELF,   ///< The visibility of the actor itself has changed.
+  PARENT  ///< The visibility of a parent has changed.
+};
+
+} // namespace VisibilityChange
+
+typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChangedSignalType; ///< Signal type of VisibilityChangedSignal
+
 /**
  * @brief Raise actor above the next highest level of actor(s).
  *
@@ -189,6 +202,22 @@ DALI_IMPORT_API void RaiseAbove( Actor actor, Dali::Actor target );
  * Once a raise or lower API is used that actor will then have an exclusive sibling order independent of insertion.
  */
 DALI_IMPORT_API void LowerBelow( Actor actor, Dali::Actor target );
+
+/**
+ * @brief This signal is emitted when the visible property of this or a parent actor is changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( Actor actor, bool visible, VisibilityChange::Type& type );
+ * @endcode
+ * actor: The actor, or child of actor, whose visibility has changed
+ * visible: Whether the actor is now visible or not
+ * type: Whether the actor's visible property has changed or a parent's.
+ * @return The signal to connect to
+ * @pre The Actor has been initialized.
+ * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
+ */
+DALI_IMPORT_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
 
 } // namespace DevelActor
 
