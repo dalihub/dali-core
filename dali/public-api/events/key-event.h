@@ -81,6 +81,21 @@ struct DALI_IMPORT_API KeyEvent
   KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState);
 
   /**
+   * @brief Copy constructor.
+   * @SINCE_1_2.36
+   * @param[in] rhs A reference to the copied handle
+   */
+  KeyEvent( const KeyEvent& rhs );
+
+  /**
+   * @brief Assignment operator.
+   * @SINCE_1_2.36
+   * @param[in] rhs A reference to the copied handle
+   * @return A reference to this
+   */
+  KeyEvent& operator=( const KeyEvent& rhs );
+
+  /**
    * @brief Destructor.
    * @SINCE_1_0.0
    */

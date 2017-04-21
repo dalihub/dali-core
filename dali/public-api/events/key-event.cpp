@@ -34,10 +34,30 @@ const int KEY_INVALID_CODE = -1;
 
 struct KeyEventImpl
 {
+  KeyEventImpl()
+    :deviceName("")
+  {
+  };
+
+  KeyEventImpl& operator=( const KeyEventImpl& rhs )
+  {
+    if( this != &rhs )
+    {
+      deviceName = rhs.deviceName;
+    }
+
+    return *this;
+  }
+
+  KeyEventImpl( const KeyEventImpl& rhs )
+  {
+    deviceName =  rhs.deviceName;
+  }
+
   std::string deviceName;
 };
 
-typedef std::map< KeyEvent*, KeyEventImpl*> KeyEventMap;
+typedef std::map< const KeyEvent*, KeyEventImpl*> KeyEventMap;
 typedef KeyEventMap::const_iterator KeyEventMapIter;
 
 
@@ -65,8 +85,35 @@ KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int
   time(timeStamp),
   state(keyState)
 {
-  KeyEventImpl* impl = new KeyEventImpl;
-  keyEventImplMap[this] = impl;
+  keyEventImplMap[this] = new KeyEventImpl;
+}
+
+KeyEvent::KeyEvent( const KeyEvent& rhs )
+: keyPressedName( rhs.keyPressedName ),
+  keyPressed( rhs.keyPressed ),
+  keyCode( rhs.keyCode ),
+  keyModifier( rhs.keyModifier ),
+  time( rhs.time ),
+  state( rhs.state )
+{
+  keyEventImplMap[this] = new KeyEventImpl( *keyEventImplMap[ &rhs ] );
+}
+
+KeyEvent& KeyEvent::operator=( const KeyEvent& rhs )
+{
+  if( this != &rhs )
+  {
+    keyPressedName = rhs.keyPressedName;
+    keyPressed = rhs.keyPressed;
+    keyCode = rhs.keyCode;
+    keyModifier = rhs.keyModifier;
+    time = rhs.time;
+    state = rhs.state;
+
+    *keyEventImplMap[ this ] = *keyEventImplMap[ &rhs ];
+  }
+
+  return *this;
 }
 
 KeyEvent::~KeyEvent()
@@ -105,23 +152,19 @@ bool KeyEvent::IsAltModifier() const
   return false;
 }
 
-std::string DevelKeyEvent::GetDeviceName( KeyEvent& keyEvent )
+std::string DevelKeyEvent::GetDeviceName( const KeyEvent& keyEvent )
 {
-  KeyEventMapIter search;
-
-  search = keyEventImplMap.find( &keyEvent );
-
-  std::string result = "";
+  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
 
   if( search != keyEventImplMap.end())
   {
-    result = search->second->deviceName;
+    return search->second->deviceName;
   }
 
-  return result;
+  return std::string("");
 }
 
-void DevelKeyEvent::SetDeviceName( KeyEvent& keyEvent, std::string deviceName )
+void DevelKeyEvent::SetDeviceName( KeyEvent& keyEvent, const std::string& deviceName )
 {
   KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
 

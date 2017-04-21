@@ -26,9 +26,21 @@ namespace Dali
 
 namespace DevelKeyEvent
 {
-  std::string GetDeviceName( KeyEvent& keyEvent );
+  /**
+   * @brief Get the device name the key event originated from
+   *
+   * @param[in] keyEvent the KeyEvent to retrieve the device name from
+   * @return the device name
+   */
+  std::string GetDeviceName( const KeyEvent& keyEvent );
 
-  void SetDeviceName( KeyEvent& keyEvent, std::string deviceName );
+  /**
+   * @brief Set the device name to the KeyEvent
+   *
+   * @param[in] keyEvent the KeyEvent to set the device name on
+   * @param[in] deviceName device name string to set
+   */
+  void SetDeviceName( KeyEvent& keyEvent, const std::string& deviceName );
 
 }
 
