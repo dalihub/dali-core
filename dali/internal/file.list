@@ -45,6 +45,7 @@ internal_src_files = \
   $(internal_src_dir)/event/events/actor-gesture-data.cpp \
   $(internal_src_dir)/event/events/actor-observer.cpp \
   $(internal_src_dir)/event/events/event-processor.cpp \
+  $(internal_src_dir)/event/events/key-event-impl.cpp \
   $(internal_src_dir)/event/events/key-event-processor.cpp \
   $(internal_src_dir)/event/events/gesture-detector-impl.cpp \
   $(internal_src_dir)/event/events/gesture-event-processor.cpp \
