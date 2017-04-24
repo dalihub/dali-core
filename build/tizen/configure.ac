@@ -29,6 +29,8 @@ DALI_VERSION=dali_version
 AC_SUBST(DALI_VERSION)
 
 DALI_CFLAGS=-DPLATFORM_TIZEN
+graphics_includes=
+graphics_libs=
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],
@@ -65,6 +67,18 @@ AC_ARG_ENABLE([gles],
                               [Specify the OpenGL ES version for backwards compatibility])],
               [enable_gles=$enableval],
               [enable_gles=20])
+
+AC_ARG_ENABLE([vulkan],
+              [AC_HELP_STRING([--enable-vulkan],
+                              [Turns on Vulkan support])],
+              [enable_vulkan=$enableval],
+              [enable_vulkan=no])
+
+AC_ARG_WITH([vulkansdk],
+              [AC_HELP_STRING([--with-vulkansdk],
+                              [path to LunarG VulkanSDK])],
+              [with_vulkansdk=$withval],
+              [with_vulkansdk=/opt/vulkan/current])
 
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
@@ -106,6 +120,12 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
+if test "x$enable_vulkan" = "xyes"; then
+  graphics_includes="-I${with_vulkansdk}/x86_64/include"
+  graphics_libs="-L${with_vulkansdk}/x86_64/lib -lvulkan"
+  DALI_CFLAGS="$DALI_CFLAGS -DVK_USE_PLATFORM_XLIB_KHR -DVK_USE_PLATFORM_XCB_KHR -DVULKAN_HPP_NO_EXCEPTIONS"
+fi
+
 DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
 DALI_LDFLAGS="-L${libdir}"
 
@@ -113,6 +133,11 @@ AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_CFLAGS)
 AC_SUBST(DALI_LDFLAGS)
+
+# Graphics specific settings
+AC_SUBST(graphics_includes)
+AC_SUBST(graphics_libs)
+
 
 # Specify the include directory for development headers
 devincludepath=${includedir}
@@ -137,4 +162,7 @@ Configuration
   Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
+  Vulkan Support:                   $enable_vulkan
+  VulkanSDK Path:                   $with_vulkansdk
+  Inc:                              $graphics_includes
 "

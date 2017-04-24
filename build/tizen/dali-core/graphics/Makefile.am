@@ -32,34 +32,22 @@ libdali_graphics_a_SOURCES = $(graphics_api_src_files) \
 
 #libdali_graphics_a_LDFLAGS = -fPIC
 
-
 dali_core_includes = \
-                     -I../../../..
-
+                     -I../../../.. \
+                     $(graphics_includes)
 
 gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override \
             -Wstack-usage=128 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
 
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
                     -Wfloat-equal -Wshadow \
-                    -Wlarger-than=128 -Wframe-larger-than=128 \
                     -Wcast-qual -Wcast-align \
                     -Wconversion -Wsign-conversion \
                     -W
 
-# the following warnings should not be enforced
-cxx_warnings_to_remove = \
-                         -Wno-c++98-compat
+cxx_flags = -fPIC -std=c++14 -Werror -Wall
 
-#the following warnings should be added back when possible
-cxx_warnings_to_preserve = \
-                           -Wno-weak-vtables
-
-cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Weffc++ -Wpedantic \
-            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
-
-libdali_graphics_a_CXXFLAGS = $(cxx_flags) \
+libdali_graphics_a_CXXFLAGS = $(cxx_flags) \                              
                               $(dali_core_includes) \
+                              $(graphics_libs) \
                               $(DALI_CFLAGS)
-
-
