@@ -45,8 +45,6 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   bool consumed = false;
   KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<KeyEvent::State>(event.state));
   DevelKeyEvent::SetDeviceName( keyEvent, event.deviceName );
-  DevelKeyEvent::SetDeviceClass( keyEvent, event.deviceClass );
-
   // Emit the key event signal from stage.
   consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );
 

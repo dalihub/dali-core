@@ -35,17 +35,15 @@ const int KEY_INVALID_CODE = -1;
 struct KeyEventImpl
 {
   KeyEventImpl()
-  : deviceName( "" ),
-    deviceClass( DevelKeyEvent::DeviceClass::NONE )
+    :deviceName("")
   {
-  }
+  };
 
   KeyEventImpl& operator=( const KeyEventImpl& rhs )
   {
     if( this != &rhs )
     {
       deviceName = rhs.deviceName;
-      deviceClass = rhs.deviceClass;
     }
 
     return *this;
@@ -54,11 +52,9 @@ struct KeyEventImpl
   KeyEventImpl( const KeyEventImpl& rhs )
   {
     deviceName =  rhs.deviceName;
-    deviceClass = rhs.deviceClass;
   }
 
   std::string deviceName;
-  DevelKeyEvent::DeviceClass::Type deviceClass;
 };
 
 typedef std::map< const KeyEvent*, KeyEventImpl*> KeyEventMap;
@@ -178,28 +174,5 @@ void DevelKeyEvent::SetDeviceName( KeyEvent& keyEvent, const std::string& device
   }
 }
 
-DevelKeyEvent::DeviceClass::Type DevelKeyEvent::GetDeviceClass( const KeyEvent& keyEvent )
-{
-  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
-
-  DevelKeyEvent::DeviceClass::Type result = DevelKeyEvent::DeviceClass::NONE;
-
-  if( search != keyEventImplMap.end() )
-  {
-    result = search->second->deviceClass;
-  }
-
-  return result;
-}
-
-void DevelKeyEvent::SetDeviceClass( KeyEvent& keyEvent, const DeviceClass::Type& deviceClass )
-{
-  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
-
-  if( search != keyEventImplMap.end() )
-  {
-    search->second->deviceClass = deviceClass;
-  }
-}
 
 } // namespace Dali

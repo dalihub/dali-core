@@ -26,61 +26,24 @@ namespace Dali
 
 namespace DevelKeyEvent
 {
+  /**
+   * @brief Get the device name the key event originated from
+   *
+   * @param[in] keyEvent the KeyEvent to retrieve the device name from
+   * @return the device name
+   */
+  std::string GetDeviceName( const KeyEvent& keyEvent );
 
-namespace DeviceClass
-{
+  /**
+   * @brief Set the device name to the KeyEvent
+   *
+   * @param[in] keyEvent the KeyEvent to set the device name on
+   * @param[in] deviceName device name string to set
+   */
+  void SetDeviceName( KeyEvent& keyEvent, const std::string& deviceName );
 
-/**
- * @brief An enum of Device Classe types.
- */
-enum Type
-{
-  NONE,      ///< Not a device
-  SEAT,      ///< The user/seat (the user themselves)
-  KEYBOARD,  ///< A regular keyboard, numberpad or attached buttons
-  MOUSE,     ///< A mouse, trackball or touchpad relative motion device
-  TOUCH,     ///< A touchscreen with fingers or stylus
-  PEN,       ///< A special pen device
-  POINTER,   ///< A laser pointer, wii-style or 7"minority report" pointing device
-  GAMEPAD    ///< A gamepad controller or joystick
-};
+}
 
-} // namespace DeviceClass
-
-/**
- * @brief Get the device name the key event originated from
- *
- * @param[in] keyEvent The KeyEvent to retrieve the device name from
- * @return The device name
- */
-DALI_IMPORT_API std::string GetDeviceName( const KeyEvent& keyEvent );
-
-/**
- * @brief Set the device name to the KeyEvent
- *
- * @param[in] keyEvent The KeyEvent to set the device name on
- * @param[in] deviceName Device name string to set
- */
-DALI_IMPORT_API void SetDeviceName( KeyEvent& keyEvent, const std::string& deviceName );
-
-/**
- * @brief Get the device class the key event originated from
- *
- * @param[in] keyEvent The KeyEvent to retrieve the device class from
- * @return The device class
- */
-DALI_IMPORT_API DeviceClass::Type GetDeviceClass( const KeyEvent& keyEvent );
-
-/**
- * @brief Set the device class to the KeyEvent
- *
- * @param[in] keyEvent The KeyEvent to set the device class on
- * @param[in] deviceClass Device class to set
- */
-DALI_IMPORT_API void SetDeviceClass( KeyEvent& keyEvent, const DeviceClass::Type& deviceClass );
-
-} // namespace DevelKeyEvent
-
-} // namespace Dali
+}
 
 #endif  //DALI_KEY_EVENT_DEVEL_H
