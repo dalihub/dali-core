@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
  *
  */
 
-#include <dali/graphics/graphics-manager.h>
-
-#include <vulkan/vulkan.hpp>
-
+#include <dali/graphics/graphics-logical-device.h>
 namespace Dali
 {
 namespace Graphics
 {
 
-int Manager::GetNumber() const
-{  
-  auto mInstance = vk::Instance{};
-  mInstance = nullptr;
-  return 42;
+GraphicsSwapchain GraphicsLogicalDevice::CreateSwapchain(const GraphicsSurface& surface,
+                                  uint32_t               bufferCount,
+                                  DepthStencil           depthStencil,
+                                  bool                   enforceVSync)
+{
+  return GetObject()->CreateSwapchain( surface, bufferCount, depthStencil, enforceVSync );
 }
 
 
-} // namespace Graphics
-} // namespace Dali
+}
+}
 

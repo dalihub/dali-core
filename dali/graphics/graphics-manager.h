@@ -45,6 +45,8 @@ public:
    * Dummy method
    */
   int GetNumber() const;
+
+
 };
 
 } // namespace Graphics

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,37 @@
  *
  */
 
-#include <dali/graphics/graphics-manager.h>
-
-#include <vulkan/vulkan.hpp>
+#include <dali/graphics/graphics-surface.h>
+#include <dali/graphics/integration/graphics-surface-base.h>
 
 namespace Dali
 {
 namespace Graphics
 {
-
-int Manager::GetNumber() const
-{  
-  auto mInstance = vk::Instance{};
-  mInstance = nullptr;
-  return 42;
+bool GraphicsSurface::Initialise()
+{
+  return GetObject()->Initialise();
 }
 
+bool GraphicsSurface::Replace()
+{
+  return GetObject()->Replace();
+}
 
-} // namespace Graphics
-} // namespace Dali
+bool GraphicsSurface::Destroy()
+{
+  return GetObject()->Destroy();
+}
 
+int GraphicsSurface::GetWidth()
+{
+  return GetObject()->GetWidth();
+}
+
+int GraphicsSurface::GetHeight()
+{
+  return GetObject()->GetHeight();
+}
+
+}
+}

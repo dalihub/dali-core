@@ -1,5 +1,8 @@
+#ifndef DALI_CORE_GRAPHICS_SWAPCHAIN_BASE_H
+#define DALI_CORE_GRAPHICS_SWAPCHAIN_BASE_H
+
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +18,33 @@
  *
  */
 
-#include <dali/graphics/graphics-manager.h>
-
-#include <vulkan/vulkan.hpp>
+#include <dali/graphics/vulkan/common.h>
 
 namespace Dali
 {
 namespace Graphics
 {
+namespace Integration
+{
 
-int Manager::GetNumber() const
-{  
-  auto mInstance = vk::Instance{};
-  mInstance = nullptr;
-  return 42;
-}
+class GraphicsSwapchainBase : public VkObject
+{
+public:
+  GraphicsSwapchainBase() = default;
+  virtual ~GraphicsSwapchainBase() = default;
+
+  virtual bool Initialise() = 0;
+
+  virtual bool AcquireFrame() = 0;
+  virtual bool PresentFrame() = 0;
+
+  // deprecated
+  virtual void SwapBuffers( bool vsync ) = 0;
+};
+
+} // Integration
+} // Graphics
+} // Dali
 
 
-} // namespace Graphics
-} // namespace Dali
-
+#endif // DALI_CORE_GRAPHICS_SWAPCHAIN_BASE_H
