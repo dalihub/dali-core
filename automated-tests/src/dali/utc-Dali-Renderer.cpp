@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <cstdio>
 #include <string>
 
@@ -993,15 +994,15 @@ int UtcDaliRendererConstraint01(void)
   application.Render(0);
 
   // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::YELLOW, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::YELLOW, TEST_LOCATION );
 
   renderer.RemoveConstraints();
   renderer.SetProperty(colorIndex, Color::WHITE );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::WHITE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1092,11 +1093,11 @@ int UtcDaliRendererAnimatedProperty01(void)
   application.SendNotification();
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::WHITE * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
 
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }

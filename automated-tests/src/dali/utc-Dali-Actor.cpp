@@ -177,6 +177,58 @@ void OnRelayoutCallback( Actor actor )
   gActorNamesRelayout.push_back( actor.GetName() );
 }
 
+struct VisibilityChangedFunctorData
+{
+  VisibilityChangedFunctorData()
+  : actor(),
+    visible( false ),
+    type( DevelActor::VisibilityChange::SELF ),
+    called( false )
+  {
+  }
+
+  void Reset()
+  {
+    actor.Reset();
+    visible = false;
+    type = DevelActor::VisibilityChange::SELF;
+    called = false;
+  }
+
+  void Check( bool compareCalled, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char * location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( actor, compareActor, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( visible, compareVisible, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( (int)type, (int)compareType, TEST_INNER_LOCATION( location ) );
+  }
+
+  void Check( bool compareCalled, const std::string& location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+  }
+
+  Actor actor;
+  bool visible;
+  DevelActor::VisibilityChange::Type type;
+  bool called;
+};
+
+struct VisibilityChangedFunctor
+{
+  VisibilityChangedFunctor( VisibilityChangedFunctorData& dataVar ) : data( dataVar ) { }
+
+  void operator()( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
+  {
+    data.actor = actor;
+    data.visible = visible;
+    data.type = type;
+    data.called = true;
+  }
+
+  VisibilityChangedFunctorData& data;
+};
+
 } // anonymous namespace
 
 
@@ -5790,3 +5842,86 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   END_TEST;
 }
 
+int utcDaliActorVisibilityChangeSignalSelf(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called when the visibility changes for the actor itself" );
+
+  Actor actor = Actor::New();
+
+  VisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
+
+  actor.SetVisible( false );
+
+  data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
+  data.Reset();
+
+  actor.SetVisible( false );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  tet_infoline( "Change the visibility using properties, ensure called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( true /* called */, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Set the visibility to current using properties, ensure not called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalChildren(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called for the children when the visibility changes for the parent" );
+
+  Actor parent = Actor::New();
+  Actor child = Actor::New();
+  parent.Add( child );
+
+  Actor grandChild = Actor::New();
+  child.Add( grandChild );
+
+  VisibilityChangedFunctorData parentData;
+  VisibilityChangedFunctorData childData;
+  VisibilityChangedFunctorData grandChildData;
+
+  tet_infoline( "Only connect the child and grandchild, ensure they are called and not the parent" );
+  DevelActor::VisibilityChangedSignal( child ).Connect( &application, VisibilityChangedFunctor( childData ) );
+  DevelActor::VisibilityChangedSignal( grandChild ).Connect( &application, VisibilityChangedFunctor( grandChildData ) );
+
+  parent.SetVisible( false );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( true /* called */, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Connect to the parent's signal as well and ensure all three are called" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  DevelActor::VisibilityChangedSignal( parent ).Connect( &application, VisibilityChangedFunctor( parentData ) );
+
+  parent.SetVisible( true );
+  parentData.Check( true /* called */, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+  childData.Check( true /* called */, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Ensure none of the functors are called if we attempt to change the visibility to what it already is at" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  parent.SetVisible( true );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( false /* not called */, TEST_LOCATION );
+  grandChildData.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;}

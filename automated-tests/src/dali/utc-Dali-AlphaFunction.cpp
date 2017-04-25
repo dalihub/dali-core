@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -225,27 +226,27 @@ int UtcDaliAlphaFunctionBezier(void)
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
   application.SendNotification();
   float epsilon(0.01f);
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), 0.271964f, epsilon, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 0.271964f, epsilon, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*40% progress*/);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), 0.432387f, epsilon, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 0.432387f, epsilon, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*60% progress*/);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), 0.567613f, epsilon, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 0.567613f, epsilon, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*80% progress*/);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), 0.728037f, epsilon, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 0.728037f, epsilon, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), targetValue, TEST_LOCATION );
 
   END_TEST;
 }

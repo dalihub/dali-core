@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/events/key-event-devel.h>
-#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/internal/event/events/key-event-impl.h>
 
 namespace Dali
 {
@@ -31,38 +31,6 @@ const unsigned int MODIFIER_SHIFT = 0x1;
 const unsigned int MODIFIER_CTRL  = 0x2;
 const unsigned int MODIFIER_ALT   = 0x4;
 const int KEY_INVALID_CODE = -1;
-
-struct KeyEventImpl
-{
-  KeyEventImpl()
-    :deviceName("")
-  {
-  };
-
-  KeyEventImpl& operator=( const KeyEventImpl& rhs )
-  {
-    if( this != &rhs )
-    {
-      deviceName = rhs.deviceName;
-    }
-
-    return *this;
-  }
-
-  KeyEventImpl( const KeyEventImpl& rhs )
-  {
-    deviceName =  rhs.deviceName;
-  }
-
-  std::string deviceName;
-};
-
-typedef std::map< const KeyEvent*, KeyEventImpl*> KeyEventMap;
-typedef KeyEventMap::const_iterator KeyEventMapIter;
-
-
-KeyEventMap keyEventImplMap;
-
 }
 
 KeyEvent::KeyEvent()
@@ -73,8 +41,7 @@ KeyEvent::KeyEvent()
   time(0),
   state(KeyEvent::Down)
 {
-  KeyEventImpl* impl = new KeyEventImpl;
-  keyEventImplMap[this] = impl;
+  new Internal::KeyEventImpl( this );
 }
 
 KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,unsigned long timeStamp, const State& keyState)
@@ -85,7 +52,7 @@ KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int
   time(timeStamp),
   state(keyState)
 {
-  keyEventImplMap[this] = new KeyEventImpl;
+  new Internal::KeyEventImpl( this );
 }
 
 KeyEvent::KeyEvent( const KeyEvent& rhs )
@@ -96,7 +63,8 @@ KeyEvent::KeyEvent( const KeyEvent& rhs )
   time( rhs.time ),
   state( rhs.state )
 {
-  keyEventImplMap[this] = new KeyEventImpl( *keyEventImplMap[ &rhs ] );
+  Internal::KeyEventImpl* impl = new Internal::KeyEventImpl( this );
+  *impl = *GetImplementation( &rhs );
 }
 
 KeyEvent& KeyEvent::operator=( const KeyEvent& rhs )
@@ -110,7 +78,7 @@ KeyEvent& KeyEvent::operator=( const KeyEvent& rhs )
     time = rhs.time;
     state = rhs.state;
 
-    *keyEventImplMap[ this ] = *keyEventImplMap[ &rhs ];
+    *GetImplementation( this ) = *GetImplementation( &rhs );
   }
 
   return *this;
@@ -118,8 +86,7 @@ KeyEvent& KeyEvent::operator=( const KeyEvent& rhs )
 
 KeyEvent::~KeyEvent()
 {
-  delete keyEventImplMap[this];
-  keyEventImplMap.erase( this );
+  delete GetImplementation( this );
 }
 
 bool KeyEvent::IsShiftModifier() const
@@ -154,25 +121,12 @@ bool KeyEvent::IsAltModifier() const
 
 std::string DevelKeyEvent::GetDeviceName( const KeyEvent& keyEvent )
 {
-  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
-
-  if( search != keyEventImplMap.end())
-  {
-    return search->second->deviceName;
-  }
-
-  return std::string("");
+  return GetImplementation( &keyEvent )->GetDeviceName();
 }
 
-void DevelKeyEvent::SetDeviceName( KeyEvent& keyEvent, const std::string& deviceName )
+DevelKeyEvent::DeviceClass::Type DevelKeyEvent::GetDeviceClass( const KeyEvent& keyEvent )
 {
-  KeyEventMapIter search = keyEventImplMap.find( &keyEvent );
-
-  if( search != keyEventImplMap.end())
-  {
-    search->second->deviceName = deviceName;
-  }
+  return GetImplementation( &keyEvent )->GetDeviceClass();
 }
-
 
 } // namespace Dali

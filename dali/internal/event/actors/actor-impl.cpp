@@ -390,6 +390,29 @@ unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
   return depth * Dali::DevelLayer::ACTOR_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
 }
 
+/**
+ * @brief Recursively emits the visibility-changed-signal on the actor tree.
+ * @param[in] actor The actor to emit the signal on
+ * @param[in] visible The new visibility of the actor
+ * @param[in] type Whether the actor's visible property has changed or a parent's
+ */
+void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, DevelActor::VisibilityChange::Type type )
+{
+  if( actor )
+  {
+    actor->EmitVisibilityChangedSignal( visible, type );
+
+    if( actor->GetChildCount() > 0 )
+    {
+      ActorContainer& children = actor->GetChildrenInternal();
+      for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
+      {
+        EmitVisibilityChangedSignalRecursively( *iter, visible, DevelActor::VisibilityChange::PARENT );
+      }
+    }
+  }
+}
+
 } // unnamed namespace
 
 ActorPtr Actor::New()
@@ -1020,10 +1043,18 @@ Matrix Actor::GetCurrentWorldMatrix() const
 
 void Actor::SetVisible( bool visible )
 {
-  if( NULL != mNode )
+  if( mVisible != visible )
   {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
+    if( NULL != mNode )
+    {
+      // mNode is being used in a separate thread; queue a message to set the value & base value
+      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
+    }
+
+    mVisible = visible;
+
+    // Emit the signal on this actor and all its children
+    EmitVisibilityChangedSignalRecursively( this, visible, DevelActor::VisibilityChange::SELF );
   }
 }
 
@@ -1981,6 +2012,15 @@ bool Actor::EmitWheelEventSignal( const WheelEvent& event )
   return consumed;
 }
 
+void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type )
+{
+  if( ! mVisibilityChangedSignal.Empty() )
+  {
+    Dali::Actor handle( this );
+    mVisibilityChangedSignal.Emit( handle, visible, type );
+  }
+}
+
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return mTouchedSignal;
@@ -2014,6 +2054,11 @@ Dali::Actor::OffStageSignalType& Actor::OffStageSignal()
 Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
   return mOnRelayoutSignal;
+}
+
+DevelActor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
+{
+  return mVisibilityChangedSignal;
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2087,6 +2132,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritOrientation( true ),
   mInheritScale( true ),
   mPositionUsesAnchorPoint( true ),
+  mVisible( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
