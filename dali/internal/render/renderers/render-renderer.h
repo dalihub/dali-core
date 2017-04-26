@@ -345,7 +345,6 @@ public:
    * @param[in] context The context used for rendering
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using this renderer
-   * @param[in] defaultShader in case there is no custom shader
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
@@ -355,7 +354,6 @@ public:
   void Render( Context& context,
                BufferIndex bufferIndex,
                const SceneGraph::NodeDataProvider& node,
-               SceneGraph::Shader& defaultShader,
                const Matrix& modelMatrix,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
