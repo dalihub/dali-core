@@ -472,6 +472,13 @@ private: // Default property extensions for derived classes
   virtual Property::Value GetDefaultProperty( Property::Index index ) const = 0;
 
   /**
+   * Retrieve the latest scene-graph value of a default property.
+   * @param[in] index The index of the property.
+   * @return The latest scene-graph value of a default property.
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+
+  /**
    * @todo this is virtual so that for now actor can override it,
    * it needs to be removed and only have GetSceneObject but that requires changing actor and constraint logic
    * Retrieve the scene-graph object added by this object.

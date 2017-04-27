@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,6 +203,8 @@ Actor* RenderTask::GetScreenToFrameBufferMappingActor() const
 
 void RenderTask::SetViewportPosition(const Vector2& value)
 {
+  mViewportPosition = value;
+
   BakeViewportPositionMessage( GetEventThreadServices(), *mSceneObject, value );
 }
 
@@ -213,6 +215,8 @@ Vector2 RenderTask::GetCurrentViewportPosition() const
 
 void RenderTask::SetViewportSize(const Vector2& value)
 {
+  mViewportSize = value;
+
   BakeViewportSizeMessage( GetEventThreadServices(), *mSceneObject, value );
 }
 
@@ -618,6 +622,44 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
 
     case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
+      value = mViewportPosition;
+      break;
+    }
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
+    {
+      value = mViewportSize;
+      break;
+    }
+    case Dali::RenderTask::Property::CLEAR_COLOR:
+    {
+      value = mClearColor;
+      break;
+    }
+    case Dali::RenderTask::Property::REQUIRES_SYNC:
+    {
+      value = IsSyncRequired();
+      break;
+    }
+
+    default:
+    {
+      DALI_ASSERT_ALWAYS(false && "RenderTask property index out of range"); // should not come here
+      break;
+    }
+  }
+
+  return value;
+}
+
+Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  Property::Value value;
+
+  switch ( index )
+  {
+
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
+    {
       value = GetCurrentViewportPosition();
       break;
     }
@@ -766,6 +808,8 @@ RenderTask::RenderTask( bool isSystemLevel )
   mCameraConnector( Connector::CAMERA_CONNECTOR, *this ),
   mMappingConnector( Connector::MAPPING_CONNECTOR, *this  ),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
+  mViewportPosition( Vector2::ZERO ),
+  mViewportSize( Vector2::ZERO ),
   mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
   mRefreshOnceCounter( 0u ),
   mScreenToFrameBufferFunction( Dali::RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION ),

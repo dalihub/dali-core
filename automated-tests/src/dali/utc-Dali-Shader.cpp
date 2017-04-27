@@ -331,6 +331,18 @@ int UtcDaliShaderProgramProperty(void)
   DALI_TEST_CHECK( f == FragmentSource );
   DALI_TEST_CHECK( h == hintSet );
 
+  value = DevelHandle::GetCurrentProperty( shader, Shader::Property::PROGRAM );
+  DALI_TEST_CHECK( value.GetType() == Property::MAP);
+  outMap = value.GetMap();
+
+  v = (*outMap)["vertex"].Get<std::string>();
+  f = (*outMap)["fragment"].Get<std::string>();
+  h = (*outMap)["hints"].Get<std::string>();
+
+  DALI_TEST_CHECK( v == VertexSource );
+  DALI_TEST_CHECK( f == FragmentSource );
+  DALI_TEST_CHECK( h == hintSet );
+
   std::string hintGot;
 
   hintSet = "OUTPUT_IS_TRANSPARENT,MODIFIES_GEOMETRY";

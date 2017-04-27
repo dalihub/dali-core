@@ -225,6 +225,11 @@ public: // Default property extensions from Object
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
   virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
