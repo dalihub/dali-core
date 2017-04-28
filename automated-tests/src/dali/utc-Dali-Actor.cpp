@@ -20,6 +20,7 @@
 #include <string>
 #include <cfloat>   // For FLT_MAX
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali-test-suite-utils.h>
@@ -176,6 +177,58 @@ void OnRelayoutCallback( Actor actor )
   gOnRelayoutCallBackCalled = true;
   gActorNamesRelayout.push_back( actor.GetName() );
 }
+
+struct VisibilityChangedFunctorData
+{
+  VisibilityChangedFunctorData()
+  : actor(),
+    visible( false ),
+    type( DevelActor::VisibilityChange::SELF ),
+    called( false )
+  {
+  }
+
+  void Reset()
+  {
+    actor.Reset();
+    visible = false;
+    type = DevelActor::VisibilityChange::SELF;
+    called = false;
+  }
+
+  void Check( bool compareCalled, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char * location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( actor, compareActor, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( visible, compareVisible, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( (int)type, (int)compareType, TEST_INNER_LOCATION( location ) );
+  }
+
+  void Check( bool compareCalled, const std::string& location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+  }
+
+  Actor actor;
+  bool visible;
+  DevelActor::VisibilityChange::Type type;
+  bool called;
+};
+
+struct VisibilityChangedFunctor
+{
+  VisibilityChangedFunctor( VisibilityChangedFunctorData& dataVar ) : data( dataVar ) { }
+
+  void operator()( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
+  {
+    data.actor = actor;
+    data.visible = visible;
+    data.type = type;
+    data.called = true;
+  }
+
+  VisibilityChangedFunctorData& data;
+};
 
 } // anonymous namespace
 
@@ -755,6 +808,9 @@ int UtcDaliActorSetSize01(void)
   // Immediately retrieve the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
   // Flush the queue and render once
   application.SendNotification();
@@ -765,6 +821,16 @@ int UtcDaliActorSetSize01(void)
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  // Check async behaviour
+  currentSize = DevelHandle::GetCurrentProperty( actor, Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
   // Change the resize policy and check whether the size stays the same
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
@@ -1247,28 +1313,46 @@ int UtcDaliActorSetPositionProperties(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
 
   actor.SetProperty( Actor::Property::POSITION_X, vector.x );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentPosition().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::POSITION_Y, vector.y );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentPosition().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_Y ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::POSITION_Z, vector.z );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentPosition().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_Z ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -1521,12 +1605,15 @@ int UtcDaliActorSetOrientationProperty(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::ORIENTATION, rotation );
+  DALI_TEST_EQUALS(rotation, actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, DevelHandle::GetCurrentProperty< Quaternion >( actor, Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1722,28 +1809,40 @@ int UtcDaliActorSetScaleIndividual(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentScale());
 
   actor.SetProperty( Actor::Property::SCALE_X, vector.x );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentScale().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SCALE_X ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SCALE_Y, vector.y );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentScale().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SCALE_Y ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SCALE_Z, vector.z );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentScale().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::SCALE_Z ), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( vector, actor.GetProperty< Vector3 >( Actor::Property::SCALE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector, DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::SCALE ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -2022,38 +2121,55 @@ int UtcDaliActorSetColorIndividual(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentColor());
 
   actor.SetProperty( Actor::Property::COLOR_RED, vector.r );
+  DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.r, actor.GetCurrentColor().r, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.r, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::COLOR_RED ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_GREEN, vector.g );
+  DALI_TEST_EQUALS( vector.g, actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.g, actor.GetCurrentColor().g, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.g, actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.g, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::COLOR_GREEN ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_BLUE, vector.b );
+  DALI_TEST_EQUALS( vector.b, actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.b, actor.GetCurrentColor().b, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.b, actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.b, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::COLOR_BLUE ), TEST_LOCATION );
+
 
   actor.SetProperty( Actor::Property::COLOR_ALPHA, vector.a );
+  DALI_TEST_EQUALS( vector.a, actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.a, actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.a, DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( vector, actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector, DevelHandle::GetCurrentProperty< Vector4 >( actor, Actor::Property::COLOR ), TEST_LOCATION );
 
   actor.SetProperty( DevelActor::Property::OPACITY, 0.2f );
+
 
   // flush the queue and render once
   application.SendNotification();
@@ -5790,3 +5906,86 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   END_TEST;
 }
 
+int utcDaliActorVisibilityChangeSignalSelf(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called when the visibility changes for the actor itself" );
+
+  Actor actor = Actor::New();
+
+  VisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
+
+  actor.SetVisible( false );
+
+  data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
+  data.Reset();
+
+  actor.SetVisible( false );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  tet_infoline( "Change the visibility using properties, ensure called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( true /* called */, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Set the visibility to current using properties, ensure not called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalChildren(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called for the children when the visibility changes for the parent" );
+
+  Actor parent = Actor::New();
+  Actor child = Actor::New();
+  parent.Add( child );
+
+  Actor grandChild = Actor::New();
+  child.Add( grandChild );
+
+  VisibilityChangedFunctorData parentData;
+  VisibilityChangedFunctorData childData;
+  VisibilityChangedFunctorData grandChildData;
+
+  tet_infoline( "Only connect the child and grandchild, ensure they are called and not the parent" );
+  DevelActor::VisibilityChangedSignal( child ).Connect( &application, VisibilityChangedFunctor( childData ) );
+  DevelActor::VisibilityChangedSignal( grandChild ).Connect( &application, VisibilityChangedFunctor( grandChildData ) );
+
+  parent.SetVisible( false );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( true /* called */, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Connect to the parent's signal as well and ensure all three are called" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  DevelActor::VisibilityChangedSignal( parent ).Connect( &application, VisibilityChangedFunctor( parentData ) );
+
+  parent.SetVisible( true );
+  parentData.Check( true /* called */, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+  childData.Check( true /* called */, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Ensure none of the functors are called if we attempt to change the visibility to what it already is at" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  parent.SetVisible( true );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( false /* not called */, TEST_LOCATION );
+  grandChildData.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;}

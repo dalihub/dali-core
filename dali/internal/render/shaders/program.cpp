@@ -272,14 +272,15 @@ void Program::GetActiveSamplerUniforms()
 
   //Determine declaration order of each sampler
   char* fragShader = strdup( mProgramData->GetFragmentShader() );
-  const char* token = strtok( fragShader, " ;\n");
+  char* nextPtr = NULL;
+  const char* token = strtok_r( fragShader, " ;\n", &nextPtr );
   int samplerPosition = 0;
   while( token )
   {
     if( ( strncmp( token, "sampler2D", 9u ) == 0 ) || ( strncmp( token, "samplerCube", 11u ) == 0 ) )
     {
       bool found( false );
-      token = strtok( NULL, " ;\n");
+      token = strtok_r( NULL, " ;\n", &nextPtr );
       for( size_t i=0; i<samplerUniformLocations.size(); ++i )
       {
         if( samplerUniformLocations[i].position == -1 &&
@@ -297,7 +298,7 @@ void Program::GetActiveSamplerUniforms()
     }
     else
     {
-      token = strtok( NULL, " ;\n");
+      token = strtok_r( NULL, " ;\n", &nextPtr );
     }
   }
 

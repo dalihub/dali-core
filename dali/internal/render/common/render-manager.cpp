@@ -90,8 +90,6 @@ struct RenderManager::Impl
     textureContainer(),
     frameBufferContainer(),
     renderersAdded( false ),
-    firstRenderCompleted( false ),
-    defaultShader( NULL ),
     programController( glAbstraction )
   {
   }
@@ -155,8 +153,6 @@ struct RenderManager::Impl
 
   RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
 
-  bool                          firstRenderCompleted;     ///< False until the first render is done
-  Shader*                       defaultShader;            ///< Default shader to use
   ProgramController             programController;        ///< Owner of the GL programs
 
 };
@@ -477,11 +473,6 @@ void RenderManager::RemoveRenderTracker( Render::RenderTracker* renderTracker )
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-void RenderManager::SetDefaultShader( Shader* shader )
-{
-  mImpl->defaultShader = shader;
-}
-
 ProgramCache* RenderManager::GetProgramCache()
 {
   return &(mImpl->programController);
@@ -500,56 +491,46 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  // No need to make any gl calls if we've done 1st glClear & don't have any renderers to render during startup.
-  if( !mImpl->firstRenderCompleted || mImpl->renderersAdded )
+  // switch rendering to adaptor provided (default) buffer
+  mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+  mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                           mImpl->defaultSurfaceRect.y,
+                           mImpl->defaultSurfaceRect.width,
+                           mImpl->defaultSurfaceRect.height );
+
+  mImpl->context.ClearColor( mImpl->backgroundColor.r,
+                             mImpl->backgroundColor.g,
+                             mImpl->backgroundColor.b,
+                             mImpl->backgroundColor.a );
+
+  mImpl->context.ClearStencil( 0 );
+
+  // Clear the entire color, depth and stencil buffers for the default framebuffer.
+  // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+  mImpl->context.SetScissorTest( false );
+  mImpl->context.ColorMask( true );
+  mImpl->context.DepthMask( true );
+  mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+  mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
+
+  // reset the program matrices for all programs once per frame
+  // this ensures we will set view and projection matrix once per program per camera
+  mImpl->programController.ResetProgramMatrices();
+
+  size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  for ( size_t i = 0; i < count; ++i )
   {
-    // switch rendering to adaptor provided (default) buffer
-    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+    RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
-    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
-                             mImpl->defaultSurfaceRect.y,
-                             mImpl->defaultSurfaceRect.width,
-                             mImpl->defaultSurfaceRect.height );
-
-    mImpl->context.ClearColor( mImpl->backgroundColor.r,
-                               mImpl->backgroundColor.g,
-                               mImpl->backgroundColor.b,
-                               mImpl->backgroundColor.a );
-
-    mImpl->context.ClearStencil( 0 );
-
-    // Clear the entire color, depth and stencil buffers for the default framebuffer.
-    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
-    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-    mImpl->context.SetScissorTest( false );
-    mImpl->context.ColorMask( true );
-    mImpl->context.DepthMask( true );
-    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
-
-    // reset the program matrices for all programs once per frame
-    // this ensures we will set view and projection matrix once per program per camera
-    mImpl->programController.ResetProgramMatrices();
-
-    // if we don't have default shader, no point doing the render calls
-    if( mImpl->defaultShader )
-    {
-      size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
-      for ( size_t i = 0; i < count; ++i )
-      {
-        RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
-
-        DoRender( instruction, *mImpl->defaultShader );
-      }
-      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-
-      mImpl->UpdateTrackers();
-
-      mImpl->firstRenderCompleted = true;
-    }
+    DoRender( instruction );
   }
+  GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+  mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+  mImpl->UpdateTrackers();
 
   //Notify RenderGeometries that rendering has finished
   for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
@@ -569,7 +550,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   return false;
 }
 
-void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
+void RenderManager::DoRender( RenderInstruction& instruction )
 {
   Rect<int> viewportRect;
   Vector4   clearColor;
@@ -634,7 +615,6 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
-                                    defaultShader,
                                     mImpl->renderBufferIndex );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )

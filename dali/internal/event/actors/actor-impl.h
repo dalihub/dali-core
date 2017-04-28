@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
@@ -210,6 +211,7 @@ public:
    * Retrieve a reference to Actor's children.
    * @note Not for public use.
    * @return A reference to the container of children.
+   * @note The internal container is lazily initialized so ensure you check the child count before using the value returned by this method.
    */
   ActorContainer& GetChildrenInternal()
   {
@@ -1388,6 +1390,13 @@ public:
   bool EmitWheelEventSignal( const WheelEvent& event );
 
   /**
+   * @brief Emits the visibility change signal for this actor and all its children.
+   * @param[in] visible Whether the actor has become visible or not.
+   * @param[in] type Whether the actor's visible property has changed or a parent's.
+   */
+  void EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1421,6 +1430,11 @@ public:
    * @copydoc Dali::Actor::OnRelayoutSignal()
    */
   Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal();
+
+  /**
+   * @copydoc DevelActor::VisibilityChangedSignal
+   */
+  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1628,6 +1642,11 @@ public:
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
   virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
@@ -1805,6 +1824,22 @@ private:
   }
 
   /**
+   * @brief Retrieves the cached event side value of a default property.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the cached value of the property if found.
+   * @return True if value set, false otherwise.
+   */
+  bool GetCachedPropertyValue( Property::Index index, Property::Value& value ) const;
+
+  /**
+   * @brief Retrieves the current value of a default property from the scene-graph.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the current scene-graph value of the property
+   * @return True if value set, false otherwise.
+   */
+  bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
+
+  /**
    * @brief Ensure the relayout data is allocated
    */
   void EnsureRelayoutData();
@@ -1857,7 +1892,7 @@ private:
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
-  ActorContainer* mChildren;      ///< Container of referenced actors
+  ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized
   RendererContainer* mRenderers;   ///< Renderer container
 
   const SceneGraph::Node* mNode;  ///< Not owned
@@ -1877,9 +1912,13 @@ protected:
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
+  DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
 
-  Vector3         mTargetSize;       ///< Event-side storage for size (not a pointer as most actors will have a size)
-  Vector3         mTargetPosition;   ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Quaternion      mTargetOrientation; ///< Event-side storage for orientation
+  Vector4         mTargetColor;       ///< Event-side storage for color
+  Vector3         mTargetSize;        ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Vector3         mTargetScale;       ///< Event-side storage for scale
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
@@ -1902,6 +1941,7 @@ protected:
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
+  bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited

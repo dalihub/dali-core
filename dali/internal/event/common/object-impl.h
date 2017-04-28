@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,6 +189,13 @@ public:
    * @copydoc Dali::Handle::GetProperty()
    */
   virtual Property::Value GetProperty( Property::Index index ) const;
+
+  /**
+   * @brief Retrieves the latest value of the property on the scene-graph.
+   * @param[in]  index  The index of the property required.
+   * @return The latest value of the property on the scene-graph.
+   */
+  virtual Property::Value GetCurrentProperty( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndices()
@@ -465,6 +472,13 @@ private: // Default property extensions for derived classes
   virtual Property::Value GetDefaultProperty( Property::Index index ) const = 0;
 
   /**
+   * Retrieve the latest scene-graph value of a default property.
+   * @param[in] index The index of the property.
+   * @return The latest scene-graph value of a default property.
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+
+  /**
    * @todo this is virtual so that for now actor can override it,
    * it needs to be removed and only have GetSceneObject but that requires changing actor and constraint logic
    * Retrieve the scene-graph object added by this object.
@@ -504,11 +518,11 @@ private:
   void DisablePropertyNotifications();
 
   /**
-   * Get the value of the property.
-   * @param [in] entry An entry from the property lookup container.
-   * @return The new value of the property.
+   * Get the latest value of the property on the scene-graph.
+   * @param[in] entry An entry from the property lookup container.
+   * @return The latest value of the property.
    */
-  Property::Value GetPropertyValue( const PropertyMetadata* entry ) const;
+  Property::Value GetCurrentPropertyValue( const PropertyMetadata* entry ) const;
 
   /**
    * Set the value of scene graph property.

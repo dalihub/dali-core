@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -391,6 +392,84 @@ int UtcDaliPathAssignment(void)
   DALI_TEST_EQUALS(position.y, 100.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(tangent.x,  0.8f, 0.1f, TEST_LOCATION);
   DALI_TEST_EQUALS(tangent.y,  -0.4f, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPathPropertyPoints(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+
+  Dali::Property::Array points;
+  points.Add( Vector3( 100.0f, 100.0f, 100.0f ) )
+        .Add( Vector3( 200.0f, 200.0f, 200.0f ) )
+        .Add( Vector3( 300.0f, 300.0f, 300.0f ) );
+  path.SetProperty( Dali::Path::Property::POINTS, points );
+
+  {
+    Property::Value value = path.GetProperty( Dali::Path::Property::POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( path, Dali::Path::Property::POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPathPropertyControlPoints(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+
+  Dali::Property::Array points;
+  points.Add( Vector3( 0.1f, 0.1f, 0.1f ) )
+        .Add( Vector3( 0.2f, 0.2f, 0.2f ) )
+        .Add( Vector3( 0.3f, 0.3f, 0.3f ) );
+  path.SetProperty( Dali::Path::Property::CONTROL_POINTS, points );
+
+  {
+    Property::Value value = path.GetProperty( Dali::Path::Property::CONTROL_POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( path, Dali::Path::Property::CONTROL_POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
 
   END_TEST;
 }

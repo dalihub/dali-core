@@ -524,7 +524,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
 void Renderer::Render( Context& context,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
-                       SceneGraph::Shader& defaultShader,
                        const Matrix& modelMatrix,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -536,14 +535,8 @@ void Renderer::Render( Context& context,
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
   {
-    // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
-    program = defaultShader.GetProgram();
-    DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
-    if( !program )
-    {
-      DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
-      return;
-    }
+    DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
+    return;
   }
 
   //Set cull face  mode

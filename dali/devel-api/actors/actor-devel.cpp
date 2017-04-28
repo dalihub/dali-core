@@ -55,6 +55,11 @@ void LowerBelow( Actor actor, Actor target )
   GetImplementation( actor ).LowerBelow( GetImplementation( target ) );
 }
 
+VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor )
+{
+  return GetImplementation( actor ).VisibilityChangedSignal();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
 #include <test-native-image.h>
@@ -1414,12 +1415,16 @@ int UtcDaliRenderTaskSetViewportPosition(void)
   // Set by Property test
   Vector2 newPosition2(32.0f, 32.0f);
   task.SetProperty( RenderTask::Property::VIEWPORT_POSITION, newPosition2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector2 >( task, RenderTask::Property::VIEWPORT_POSITION ), newPosition, TEST_LOCATION ); // still the old position
 
   // Update
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition2, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector2 >( task, RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
 
   Vector2 newPosition3(64.0f, 0.0f);
   Animation animation = Animation::New(1.0f);
@@ -1462,12 +1467,16 @@ int UtcDaliRenderTaskSetViewportSize(void)
   // Set by Property test
   Vector2 newSize2(50.0f, 50.0f);
   task.SetProperty( RenderTask::Property::VIEWPORT_SIZE, newSize2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector2 >( task, RenderTask::Property::VIEWPORT_SIZE ), newSize, TEST_LOCATION ); // still the old position
 
   // Update
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( task.GetCurrentViewportSize(), newSize2, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector2 >( task, RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
 
   Vector2 newSize3(10.0f, 10.0f);
   Animation animation = Animation::New(1.0f);
@@ -1503,11 +1512,15 @@ int UtcDaliRenderTaskSetClearColorP(void)
   DALI_TEST_EQUALS( task.GetClearColor(), testColor, TEST_LOCATION );
 
   task.SetProperty( RenderTask::Property::CLEAR_COLOR, testColor2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( task, RenderTask::Property::CLEAR_COLOR ), testColor, TEST_LOCATION ); // still the old color
 
   // Wait a frame.
   Wait(application);
 
   DALI_TEST_EQUALS( task.GetClearColor(), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( task, RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2706,4 +2719,23 @@ int UtcDaliRenderTaskViewportToLocal(void)
 
   END_TEST;
 
+}
+
+int UtcDaliRenderTaskRequiresSync(void)
+{
+  TestApplication application;
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, false );
+
+  DALI_TEST_EQUALS( newTask.GetProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( newTask, RenderTask::Property::REQUIRES_SYNC ), false, TEST_LOCATION );
+
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
+
+  DALI_TEST_EQUALS( newTask.GetProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( newTask, RenderTask::Property::REQUIRES_SYNC ), true, TEST_LOCATION );
+
+  END_TEST;
 }

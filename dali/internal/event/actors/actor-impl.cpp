@@ -390,6 +390,29 @@ unsigned int GetDepthIndex( uint16_t depth, uint16_t siblingOrder )
   return depth * Dali::DevelLayer::ACTOR_DEPTH_MULTIPLIER + siblingOrder * Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
 }
 
+/**
+ * @brief Recursively emits the visibility-changed-signal on the actor tree.
+ * @param[in] actor The actor to emit the signal on
+ * @param[in] visible The new visibility of the actor
+ * @param[in] type Whether the actor's visible property has changed or a parent's
+ */
+void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, DevelActor::VisibilityChange::Type type )
+{
+  if( actor )
+  {
+    actor->EmitVisibilityChangedSignal( visible, type );
+
+    if( actor->GetChildCount() > 0 )
+    {
+      ActorContainer& children = actor->GetChildrenInternal();
+      for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
+      {
+        EmitVisibilityChangedSignalRecursively( *iter, visible, DevelActor::VisibilityChange::PARENT );
+      }
+    }
+  }
+}
+
 } // unnamed namespace
 
 ActorPtr Actor::New()
@@ -867,6 +890,8 @@ void Actor::SetOrientation( const Radian& angle, const Vector3& axis )
 
 void Actor::SetOrientation( const Quaternion& orientation )
 {
+  mTargetOrientation = orientation;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -876,15 +901,13 @@ void Actor::SetOrientation( const Quaternion& orientation )
 
 void Actor::RotateBy( const Radian& angle, const Vector3& axis )
 {
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send( GetEventThreadServices(), mNode, &mNode->mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::BakeRelative, Quaternion(angle, axis) );
-  }
+  RotateBy( Quaternion(angle, axis) );
 }
 
 void Actor::RotateBy( const Quaternion& relativeRotation )
 {
+  mTargetOrientation *= Quaternion( relativeRotation );
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -926,6 +949,8 @@ void Actor::SetScale( float x, float y, float z )
 
 void Actor::SetScale( const Vector3& scale )
 {
+  mTargetScale = scale;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -935,6 +960,8 @@ void Actor::SetScale( const Vector3& scale )
 
 void Actor::SetScaleX( float x )
 {
+  mTargetScale.x = x;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -944,6 +971,8 @@ void Actor::SetScaleX( float x )
 
 void Actor::SetScaleY( float y )
 {
+  mTargetScale.y = y;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -953,6 +982,8 @@ void Actor::SetScaleY( float y )
 
 void Actor::SetScaleZ( float z )
 {
+  mTargetScale.z = z;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -962,6 +993,8 @@ void Actor::SetScaleZ( float z )
 
 void Actor::ScaleBy(const Vector3& relativeScale)
 {
+  mTargetScale *= relativeScale;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1020,10 +1053,18 @@ Matrix Actor::GetCurrentWorldMatrix() const
 
 void Actor::SetVisible( bool visible )
 {
-  if( NULL != mNode )
+  if( mVisible != visible )
   {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
+    if( NULL != mNode )
+    {
+      // mNode is being used in a separate thread; queue a message to set the value & base value
+      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
+    }
+
+    mVisible = visible;
+
+    // Emit the signal on this actor and all its children
+    EmitVisibilityChangedSignalRecursively( this, visible, DevelActor::VisibilityChange::SELF );
   }
 }
 
@@ -1040,6 +1081,8 @@ bool Actor::IsVisible() const
 
 void Actor::SetOpacity( float opacity )
 {
+  mTargetColor.a = opacity;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1080,6 +1123,8 @@ const Vector4& Actor::GetCurrentWorldColor() const
 
 void Actor::SetColor( const Vector4& color )
 {
+  mTargetColor = color;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1089,6 +1134,8 @@ void Actor::SetColor( const Vector4& color )
 
 void Actor::SetColorRed( float red )
 {
+  mTargetColor.r = red;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1098,6 +1145,8 @@ void Actor::SetColorRed( float red )
 
 void Actor::SetColorGreen( float green )
 {
+  mTargetColor.g = green;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1107,6 +1156,8 @@ void Actor::SetColorGreen( float green )
 
 void Actor::SetColorBlue( float blue )
 {
+  mTargetColor.b = blue;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -1981,6 +2032,15 @@ bool Actor::EmitWheelEventSignal( const WheelEvent& event )
   return consumed;
 }
 
+void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type )
+{
+  if( ! mVisibilityChangedSignal.Empty() )
+  {
+    Dali::Actor handle( this );
+    mVisibilityChangedSignal.Emit( handle, visible, type );
+  }
+}
+
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return mTouchedSignal;
@@ -2014,6 +2074,11 @@ Dali::Actor::OffStageSignalType& Actor::OffStageSignal()
 Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
   return mOnRelayoutSignal;
+}
+
+DevelActor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
+{
+  return mVisibilityChangedSignal;
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2067,7 +2132,11 @@ Actor::Actor( DerivedType derivedType )
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
   mGestureData( NULL ),
-  mTargetSize( 0.0f, 0.0f, 0.0f ),
+  mTargetOrientation( Quaternion::IDENTITY ),
+  mTargetColor( Color::WHITE ),
+  mTargetSize( Vector3::ZERO ),
+  mTargetPosition( Vector3::ZERO ),
+  mTargetScale( Vector3::ONE ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mDepth( 0u ),
@@ -2087,6 +2156,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritOrientation( true ),
   mInheritScale( true ),
   mPositionUsesAnchorPoint( true ),
+  mVisible( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
@@ -2968,386 +3038,23 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
 
-  if( index >= DEFAULT_PROPERTY_COUNT )
+  if( ! GetCachedPropertyValue( index, value ) )
   {
-    return value;
+    // If property value is not stored in the event-side, then it must be a scene-graph only property
+    GetCurrentPropertyValue( index, value );
   }
 
-  switch( index )
+  return value;
+}
+
+Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  Property::Value value;
+
+  if( ! GetCurrentPropertyValue( index, value ) )
   {
-    case Dali::Actor::Property::PARENT_ORIGIN:
-    {
-      value = GetCurrentParentOrigin();
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_X:
-    {
-      value = GetCurrentParentOrigin().x;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    {
-      value = GetCurrentParentOrigin().y;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    {
-      value = GetCurrentParentOrigin().z;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT:
-    {
-      value = GetCurrentAnchorPoint();
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_X:
-    {
-      value = GetCurrentAnchorPoint().x;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
-    {
-      value = GetCurrentAnchorPoint().y;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    {
-      value = GetCurrentAnchorPoint().z;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE:
-    {
-      Vector3 size = GetTargetSize();
-
-      // Should return preferred size if size is fixed as set by SetSize
-      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-      {
-        size.width = GetPreferredSize().width;
-      }
-      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-      {
-        size.height = GetPreferredSize().height;
-      }
-
-      value = size;
-
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_WIDTH:
-    {
-      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-      {
-        // Should return preferred size if size is fixed as set by SetSize
-        value = GetPreferredSize().width;
-      }
-      else
-      {
-        value = GetTargetSize().width;
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    {
-      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-      {
-        // Should return preferred size if size is fixed as set by SetSize
-        value = GetPreferredSize().height;
-      }
-      else
-      {
-        value = GetTargetSize().height;
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_DEPTH:
-    {
-      value = GetTargetSize().depth;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION:
-    {
-      value = GetTargetPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_X:
-    {
-      value = GetTargetPosition().x;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Y:
-    {
-      value = GetTargetPosition().y;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Z:
-    {
-      value = GetTargetPosition().z;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION:
-    {
-      value = GetCurrentWorldPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_X:
-    {
-      value = GetCurrentWorldPosition().x;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_Y:
-    {
-      value = GetCurrentWorldPosition().y;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_Z:
-    {
-      value = GetCurrentWorldPosition().z;
-      break;
-    }
-
-    case Dali::Actor::Property::ORIENTATION:
-    {
-      value = GetCurrentOrientation();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_ORIENTATION:
-    {
-      value = GetCurrentWorldOrientation();
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE:
-    {
-      value = GetCurrentScale();
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_X:
-    {
-      value = GetCurrentScale().x;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Y:
-    {
-      value = GetCurrentScale().y;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Z:
-    {
-      value = GetCurrentScale().z;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_SCALE:
-    {
-      value = GetCurrentWorldScale();
-      break;
-    }
-
-    case Dali::Actor::Property::VISIBLE:
-    {
-      value = IsVisible();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR:
-    {
-      value = GetCurrentColor();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_RED:
-    {
-      value = GetCurrentColor().r;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_GREEN:
-    {
-      value = GetCurrentColor().g;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      value = GetCurrentColor().b;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::DevelActor::Property::OPACITY:
-    {
-      value = GetCurrentColor().a;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_COLOR:
-    {
-      value = GetCurrentWorldColor();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_MATRIX:
-    {
-      value = GetCurrentWorldMatrix();
-      break;
-    }
-
-    case Dali::Actor::Property::NAME:
-    {
-      value = GetName();
-      break;
-    }
-
-    case Dali::Actor::Property::SENSITIVE:
-    {
-      value = IsSensitive();
-      break;
-    }
-
-    case Dali::Actor::Property::LEAVE_REQUIRED:
-    {
-      value = GetLeaveRequired();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_POSITION:
-    {
-      value = IsPositionInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_ORIENTATION:
-    {
-      value = IsOrientationInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_SCALE:
-    {
-      value = IsScaleInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_MODE:
-    {
-      value = Scripting::GetLinearEnumerationName< ColorMode >( GetColorMode(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_INHERITANCE:
-    {
-      value = Scripting::GetLinearEnumerationName< PositionInheritanceMode >( GetPositionInheritanceMode(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::DRAW_MODE:
-    {
-      value = Scripting::GetEnumerationName< DrawMode::Type >( GetDrawMode(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_MODE_FACTOR:
-    {
-      value = GetSizeModeFactor();
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
-    {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
-    {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_SCALE_POLICY:
-    {
-      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
-    {
-      value = ( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::WIDTH ) == Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
-    {
-      value = ( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::HEIGHT ) == Dimension::WIDTH );
-      break;
-    }
-
-    case Dali::Actor::Property::PADDING:
-    {
-      Vector2 widthPadding = GetPadding( Dimension::WIDTH );
-      Vector2 heightPadding = GetPadding( Dimension::HEIGHT );
-      value = Vector4( widthPadding.x, widthPadding.y, heightPadding.x, heightPadding.y );
-      break;
-    }
-
-    case Dali::Actor::Property::MINIMUM_SIZE:
-    {
-      value = Vector2( GetMinimumSize( Dimension::WIDTH ), GetMinimumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::Actor::Property::MAXIMUM_SIZE:
-    {
-      value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::DevelActor::Property::SIBLING_ORDER:
-    {
-      value = static_cast<int>(mSiblingOrder);
-      break;
-    }
-
-    case Dali::Actor::Property::CLIPPING_MODE:
-    {
-      value = mClippingMode;
-      break;
-    }
-
-    case Dali::DevelActor::Property::SCREEN_POSITION:
-    {
-      value = GetCurrentScreenPosition();
-      break;
-    }
-
-    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
-    {
-      value = mPositionUsesAnchorPoint;
-      break;
-    }
+    // If unable to retrieve scene-graph property value, then it must be an event-side only property
+    GetCachedPropertyValue( index, value );
   }
 
   return value;
@@ -3796,6 +3503,523 @@ bool Actor::DoAction( BaseObject* object, const std::string& actionName, const P
   }
 
   return done;
+}
+
+bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& value ) const
+{
+  bool valueSet = true;
+
+  switch( index )
+  {
+    case Dali::Actor::Property::PARENT_ORIGIN:
+    {
+      value = GetCurrentParentOrigin();
+      break;
+    }
+
+    case Dali::Actor::Property::PARENT_ORIGIN_X:
+    {
+      value = GetCurrentParentOrigin().x;
+      break;
+    }
+
+    case Dali::Actor::Property::PARENT_ORIGIN_Y:
+    {
+      value = GetCurrentParentOrigin().y;
+      break;
+    }
+
+    case Dali::Actor::Property::PARENT_ORIGIN_Z:
+    {
+      value = GetCurrentParentOrigin().z;
+      break;
+    }
+
+    case Dali::Actor::Property::ANCHOR_POINT:
+    {
+      value = GetCurrentAnchorPoint();
+      break;
+    }
+
+    case Dali::Actor::Property::ANCHOR_POINT_X:
+    {
+      value = GetCurrentAnchorPoint().x;
+      break;
+    }
+
+    case Dali::Actor::Property::ANCHOR_POINT_Y:
+    {
+      value = GetCurrentAnchorPoint().y;
+      break;
+    }
+
+    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    {
+      value = GetCurrentAnchorPoint().z;
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE:
+    {
+      Vector3 size = GetTargetSize();
+
+      // Should return preferred size if size is fixed as set by SetSize
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        size.width = GetPreferredSize().width;
+      }
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        size.height = GetPreferredSize().height;
+      }
+
+      value = size;
+
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_WIDTH:
+    {
+      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().width;
+      }
+      else
+      {
+        value = GetTargetSize().width;
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    {
+      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+      {
+        // Should return preferred size if size is fixed as set by SetSize
+        value = GetPreferredSize().height;
+      }
+      else
+      {
+        value = GetTargetSize().height;
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_DEPTH:
+    {
+      value = GetTargetSize().depth;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION:
+    {
+      value = GetTargetPosition();
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_X:
+    {
+      value = GetTargetPosition().x;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Y:
+    {
+      value = GetTargetPosition().y;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Z:
+    {
+      value = GetTargetPosition().z;
+      break;
+    }
+
+    case Dali::Actor::Property::ORIENTATION:
+    {
+      value = mTargetOrientation;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE:
+    {
+      value = mTargetScale;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_X:
+    {
+      value = mTargetScale.x;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Y:
+    {
+      value = mTargetScale.y;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Z:
+    {
+      value = mTargetScale.z;
+      break;
+    }
+
+    case Dali::Actor::Property::VISIBLE:
+    {
+      value = mVisible;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR:
+    {
+      value = mTargetColor;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_RED:
+    {
+      value = mTargetColor.r;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_GREEN:
+    {
+      value = mTargetColor.g;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_BLUE:
+    {
+      value = mTargetColor.b;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
+    {
+      value = mTargetColor.a;
+      break;
+    }
+
+    case Dali::Actor::Property::NAME:
+    {
+      value = GetName();
+      break;
+    }
+
+    case Dali::Actor::Property::SENSITIVE:
+    {
+      value = IsSensitive();
+      break;
+    }
+
+    case Dali::Actor::Property::LEAVE_REQUIRED:
+    {
+      value = GetLeaveRequired();
+      break;
+    }
+
+    case Dali::Actor::Property::INHERIT_POSITION:
+    {
+      value = IsPositionInherited();
+      break;
+    }
+
+    case Dali::Actor::Property::INHERIT_ORIENTATION:
+    {
+      value = IsOrientationInherited();
+      break;
+    }
+
+    case Dali::Actor::Property::INHERIT_SCALE:
+    {
+      value = IsScaleInherited();
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_MODE:
+    {
+      value = Scripting::GetLinearEnumerationName< ColorMode >( GetColorMode(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_INHERITANCE:
+    {
+      value = Scripting::GetLinearEnumerationName< PositionInheritanceMode >( GetPositionInheritanceMode(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::DRAW_MODE:
+    {
+      value = Scripting::GetEnumerationName< DrawMode::Type >( GetDrawMode(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_MODE_FACTOR:
+    {
+      value = GetSizeModeFactor();
+      break;
+    }
+
+    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
+    {
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
+    {
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_SCALE_POLICY:
+    {
+      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
+    {
+      value = ( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::WIDTH ) == Dimension::HEIGHT );
+      break;
+    }
+
+    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
+    {
+      value = ( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::HEIGHT ) == Dimension::WIDTH );
+      break;
+    }
+
+    case Dali::Actor::Property::PADDING:
+    {
+      Vector2 widthPadding = GetPadding( Dimension::WIDTH );
+      Vector2 heightPadding = GetPadding( Dimension::HEIGHT );
+      value = Vector4( widthPadding.x, widthPadding.y, heightPadding.x, heightPadding.y );
+      break;
+    }
+
+    case Dali::Actor::Property::MINIMUM_SIZE:
+    {
+      value = Vector2( GetMinimumSize( Dimension::WIDTH ), GetMinimumSize( Dimension::HEIGHT ) );
+      break;
+    }
+
+    case Dali::Actor::Property::MAXIMUM_SIZE:
+    {
+      value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
+      break;
+    }
+
+    case Dali::Actor::Property::CLIPPING_MODE:
+    {
+      value = mClippingMode;
+      break;
+    }
+
+    case Dali::DevelActor::Property::SIBLING_ORDER:
+    {
+      value = static_cast<int>(mSiblingOrder);
+      break;
+    }
+
+    case Dali::DevelActor::Property::SCREEN_POSITION:
+    {
+      value = GetCurrentScreenPosition();
+      break;
+    }
+
+    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
+    {
+      value = mPositionUsesAnchorPoint;
+      break;
+    }
+
+    default:
+    {
+      // Must be a scene-graph only property
+      valueSet = false;
+      break;
+    }
+  }
+
+  return valueSet;
+}
+
+bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const
+{
+  bool valueSet = true;
+
+  switch( index )
+  {
+    case Dali::Actor::Property::SIZE:
+    {
+      value = GetCurrentSize();
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_WIDTH:
+    {
+      value = GetCurrentSize().width;
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    {
+      value = GetCurrentSize().height;
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_DEPTH:
+    {
+      value = GetCurrentSize().depth;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION:
+    {
+      value = GetCurrentPosition();
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_X:
+    {
+      value = GetCurrentPosition().x;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Y:
+    {
+      value = GetCurrentPosition().y;
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Z:
+    {
+      value = GetCurrentPosition().z;
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_POSITION:
+    {
+      value = GetCurrentWorldPosition();
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_POSITION_X:
+    {
+      value = GetCurrentWorldPosition().x;
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_POSITION_Y:
+    {
+      value = GetCurrentWorldPosition().y;
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_POSITION_Z:
+    {
+      value = GetCurrentWorldPosition().z;
+      break;
+    }
+
+    case Dali::Actor::Property::ORIENTATION:
+    {
+      value = GetCurrentOrientation();
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_ORIENTATION:
+    {
+      value = GetCurrentWorldOrientation();
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE:
+    {
+      value = GetCurrentScale();
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_X:
+    {
+      value = GetCurrentScale().x;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Y:
+    {
+      value = GetCurrentScale().y;
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Z:
+    {
+      value = GetCurrentScale().z;
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_SCALE:
+    {
+      value = GetCurrentWorldScale();
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR:
+    {
+      value = GetCurrentColor();
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_RED:
+    {
+      value = GetCurrentColor().r;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_GREEN:
+    {
+      value = GetCurrentColor().g;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_BLUE:
+    {
+      value = GetCurrentColor().b;
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
+    {
+      value = GetCurrentColor().a;
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_COLOR:
+    {
+      value = GetCurrentWorldColor();
+      break;
+    }
+
+    case Dali::Actor::Property::WORLD_MATRIX:
+    {
+      value = GetCurrentWorldMatrix();
+      break;
+    }
+
+    default:
+    {
+      // Must be an event-side only property
+      valueSet = false;
+      break;
+    }
+  }
+
+  return valueSet;
 }
 
 void Actor::EnsureRelayoutData()

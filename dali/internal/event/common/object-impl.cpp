@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -457,6 +457,9 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
     }
     else
     {
+      // update the cached property value
+      animatableProperty->SetPropertyValue( propertyValue );
+
       // set the scene graph property value
       SetSceneGraphProperty( index, *animatableProperty, propertyValue );
     }
@@ -492,12 +495,16 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
     {
       if( custom->IsAnimatable() )
       {
+        // update the cached property value
+        custom->SetPropertyValue( propertyValue );
+
         // set the scene graph property value
         SetSceneGraphProperty( index, *custom, propertyValue );
       }
       else if( custom->IsWritable() )
       {
-        custom->value = propertyValue;
+        // update the cached property value
+        custom->SetPropertyValue( propertyValue );
       }
       else
       {
@@ -552,8 +559,61 @@ Property::Value Object::GetProperty(Property::Index index) const
     }
     else
     {
+      // get the cached animatable property value
+      value = animatableProperty->GetPropertyValue();
+    }
+  }
+  else if(mCustomProperties.Count() > 0)
+  {
+    CustomPropertyMetadata* custom = FindCustomProperty( index );
+    if(custom)
+    {
+      // get the cached custom property value
+      value = custom->GetPropertyValue();
+    }
+    else
+    {
+      DALI_LOG_ERROR("Invalid property index\n");
+    }
+  } // if custom
+
+  return value;
+}
+
+Property::Value Object::GetCurrentProperty( Property::Index index ) const
+{
+  DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index is out of bounds" );
+
+  Property::Value value;
+
+  if ( index < DEFAULT_PROPERTY_MAX_COUNT )
+  {
+    value = GetDefaultPropertyCurrentValue( index );
+  }
+  else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    const TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      value = typeInfo->GetProperty( this, index );
+    }
+    else
+    {
+      DALI_LOG_ERROR("Cannot find property index\n");
+    }
+  }
+  else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    // check whether the animatable property is registered already, if not then register one.
+    AnimatablePropertyMetadata* animatableProperty = RegisterAnimatableProperty( index );
+    if(!animatableProperty)
+    {
+      DALI_LOG_ERROR("Cannot find property index\n");
+    }
+    else
+    {
       // get the animatable property value
-      value = GetPropertyValue( animatableProperty );
+      value = GetCurrentPropertyValue( animatableProperty );
     }
   }
   else if(mCustomProperties.Count() > 0)
@@ -562,7 +622,7 @@ Property::Value Object::GetProperty(Property::Index index) const
     if(custom)
     {
       // get the custom property value
-      value = GetPropertyValue( custom );
+      value = GetCurrentPropertyValue( custom );
     }
     else
     {
@@ -694,11 +754,11 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     {
       DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
 
-      mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue.GetType(), property ) );
+      mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue, property ) );
     }
     else
     {
-      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, Property::INVALID_COMPONENT_INDEX, propertyValue.GetType(), property ) ); // base property
+      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue, property ) );
     }
 
     // queue a message to add the property
@@ -939,7 +999,7 @@ void Object::RemoveUniformMapping( const std::string& uniformName )
   RemoveUniformMapMessage( GetEventThreadServices(), *sceneObject, uniformName);
 }
 
-Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
+Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata* entry ) const
 {
   Property::Value value;
 
@@ -947,7 +1007,7 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 
   if( !entry->IsAnimatable() )
   {
-    value = entry->value;
+    value = entry->GetPropertyValue();
   }
   else
   {
@@ -1413,7 +1473,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
           // If the base property is not registered yet, register the base property first.
           const  std::string& basePropertyName = typeInfo->GetPropertyName(basePropertyIndex);
 
-          if( Property::INVALID_INDEX != RegisterSceneGraphProperty( basePropertyName, Property::INVALID_KEY, basePropertyIndex, Property::Value(typeInfo->GetPropertyType( basePropertyIndex ) ) ) )
+          if( Property::INVALID_INDEX != RegisterSceneGraphProperty( basePropertyName, Property::INVALID_KEY, basePropertyIndex, typeInfo->GetPropertyDefaultValue( basePropertyIndex ) ) )
           {
             animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size()-1]);
             AddUniformMapping( basePropertyIndex, basePropertyName );
@@ -1423,7 +1483,7 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
         if(animatableProperty)
         {
           // Create the metadata for the property component.
-          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->GetType(), animatableProperty->GetSceneGraphProperty() ) );
+          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->value, animatableProperty->GetSceneGraphProperty() ) );
         }
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,11 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
   }
 
   return Property::Value();
+}
+
+Property::Value PathConstrainer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index ); // Event-side only properties
 }
 
 void PathConstrainer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
