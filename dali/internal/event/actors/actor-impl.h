@@ -305,7 +305,7 @@ public:
    * This size will be the size set or if animating then the target size.
    * @return The Actor's size.
    */
-  const Vector3& GetTargetSize() const;
+  Vector3 GetTargetSize() const;
 
   /**
    * Retrieve the Actor's size from update side.
