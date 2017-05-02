@@ -642,8 +642,7 @@ void PanGesture::ResetDefaultProperties( BufferIndex updateBufferIndex )
 }
 
 PanGesture::PanGesture()
-: mPanning(),
-  mGestures(),
+: mGestures(),
   mWritePosition( 0 ),
   mReadPosition( 0 ),
   mNotAtTarget( false ),
