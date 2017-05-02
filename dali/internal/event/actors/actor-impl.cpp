@@ -1388,9 +1388,21 @@ void Actor::SetDepth( float depth )
   }
 }
 
-const Vector3& Actor::GetTargetSize() const
+Vector3 Actor::GetTargetSize() const
 {
-  return mTargetSize;
+  Vector3 size = mTargetSize;
+
+  // Should return preferred size if size is fixed as set by SetSize
+  if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+  {
+    size.width = GetPreferredSize().width;
+  }
+  if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+  {
+    size.height = GetPreferredSize().height;
+  }
+
+  return size;
 }
 
 const Vector3& Actor::GetCurrentSize() const
@@ -3773,48 +3785,19 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
 
     case Dali::Actor::Property::SIZE:
     {
-      Vector3 size = GetTargetSize();
-
-      // Should return preferred size if size is fixed as set by SetSize
-      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-      {
-        size.width = GetPreferredSize().width;
-      }
-      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-      {
-        size.height = GetPreferredSize().height;
-      }
-
-      value = size;
-
+      value = GetTargetSize();
       break;
     }
 
     case Dali::Actor::Property::SIZE_WIDTH:
     {
-      if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-      {
-        // Should return preferred size if size is fixed as set by SetSize
-        value = GetPreferredSize().width;
-      }
-      else
-      {
-        value = GetTargetSize().width;
-      }
+      value = GetTargetSize().width;
       break;
     }
 
     case Dali::Actor::Property::SIZE_HEIGHT:
     {
-      if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-      {
-        // Should return preferred size if size is fixed as set by SetSize
-        value = GetPreferredSize().height;
-      }
-      else
-      {
-        value = GetTargetSize().height;
-      }
+      value = GetTargetSize().height;
       break;
     }
 
@@ -4517,7 +4500,7 @@ float Actor::NegotiateFromChildren( Dimension::Type dimension )
 
 float Actor::GetSize( Dimension::Type dimension ) const
 {
-  return GetDimensionValue( GetTargetSize(), dimension );
+  return GetDimensionValue( mTargetSize, dimension );
 }
 
 float Actor::GetNaturalSize( Dimension::Type dimension ) const
@@ -4805,7 +4788,7 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   SetNegotiatedSize( container );
 
   // Negotiate down to children
-  const Vector2 newBounds = GetTargetSize().GetVectorXY();
+  const Vector2 newBounds = mTargetSize.GetVectorXY();
 
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
   {
