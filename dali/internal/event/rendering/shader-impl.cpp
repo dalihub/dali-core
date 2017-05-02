@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,11 @@ Property::Value Shader::GetDefaultProperty( Property::Index index ) const
   }
 
   return value;
+}
+
+Property::Value Shader::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index ); // Event-side only properties
 }
 
 const SceneGraph::PropertyOwner* Shader::GetPropertyOwner() const

@@ -2234,10 +2234,13 @@ template< typename T >
 void CheckEnumerationProperty( Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
 {
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( initialValue ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( initialValue ) );
   renderer.SetProperty( propertyIndex, firstCheckEnumeration );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
   renderer.SetProperty( propertyIndex, secondCheckString );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
 }
 
 int UtcDaliRendererEnumProperties(void)

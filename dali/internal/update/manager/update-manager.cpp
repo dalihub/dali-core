@@ -509,19 +509,6 @@ void UpdateManager::AddShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
 
-  if( mImpl->shaders.Count() == 0 )
-  {
-    // the first added shader becomes our default shader
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    typedef MessageValue1< RenderManager, Shader* > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetDefaultShader, shader );
-  }
-
   mImpl->shaders.PushBack( shader );
 }
 

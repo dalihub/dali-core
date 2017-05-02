@@ -293,7 +293,6 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
  * @brief Process a render-list.
  * @param[in] renderList       The render-list to process.
  * @param[in] context          The GL context.
- * @param[in] defaultShader    The default shader to use.
  * @param[in] buffer           The current render buffer index (previous update buffer)
  * @param[in] viewMatrix       The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
@@ -301,7 +300,6 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
 inline void ProcessRenderList(
   const RenderList& renderList,
   Context& context,
-  SceneGraph::Shader& defaultShader,
   BufferIndex bufferIndex,
   const Matrix& viewMatrix,
   const Matrix& projectionMatrix )
@@ -339,7 +337,6 @@ inline void ProcessRenderList(
     item.mRenderer->Render( context,
                             bufferIndex,
                             *item.mNode,
-                            defaultShader,
                             item.mModelMatrix,
                             item.mModelViewMatrix,
                             viewMatrix,
@@ -351,7 +348,6 @@ inline void ProcessRenderList(
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
-                               SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
@@ -376,7 +372,6 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       {
         ProcessRenderList( *renderList,
                            context,
-                           defaultShader,
                            bufferIndex,
                            *viewMatrix,
                            *projectionMatrix );

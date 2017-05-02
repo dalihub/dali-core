@@ -30,7 +30,6 @@ class Context;
 namespace SceneGraph
 {
 class RenderInstruction;
-class Shader;
 class TextureCache;
 }
 
@@ -41,12 +40,10 @@ namespace Render
  * Process a render-instruction.
  * @param[in] instruction The render-instruction to process.
  * @param[in] context The GL context.
- * @param[in] defaultShader The default shader.
  * @param[in] bufferIndex The current render buffer index (previous update buffer)
  */
 void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                Context& context,
-                               SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex );
 
 } // namespace Render

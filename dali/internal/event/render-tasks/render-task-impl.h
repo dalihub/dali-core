@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -318,6 +318,11 @@ public: // Implementation of Object
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
@@ -456,6 +461,9 @@ private:
   Connector mMappingConnector; /// Responsible for connecting/disconnecting actor node, which used to mapping screen to frame buffer coordinate
 
   Vector4 mClearColor;       ///< Optional clear color
+
+  Vector2 mViewportPosition; ///< The cached viewport position
+  Vector2 mViewportSize;     ///< The cached viewport size
 
   unsigned int mRefreshRate; ///< Determines how often the task is processed.
 

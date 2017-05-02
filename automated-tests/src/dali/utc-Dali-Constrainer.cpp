@@ -312,6 +312,80 @@ int UtcPathConstrainerRemove(void)
   END_TEST;
 }
 
+int UtcPathConstrainerProperties(void)
+{
+  TestApplication application;
+  Dali::PathConstrainer pathConstrainer = Dali::PathConstrainer::New();
+
+  pathConstrainer.SetProperty( Dali::PathConstrainer::Property::FORWARD, Vector3( 1.0f,0.0f,0.0f ) );
+  DALI_TEST_EQUALS( pathConstrainer.GetProperty< Vector3 >( Dali::PathConstrainer::Property::FORWARD ), Vector3( 1.0f, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( pathConstrainer, Dali::PathConstrainer::Property::FORWARD ), Vector3( 1.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  Dali::Property::Array points;
+  points.Resize(3);
+  points[0] = Vector3( 30.0,  80.0, 0.0);
+  points[1] = Vector3( 70.0, 120.0, 0.0);
+  points[2] = Vector3(100.0, 100.0, 0.0);
+  pathConstrainer.SetProperty( Dali::PathConstrainer::Property::POINTS, points );
+
+  {
+    Property::Value value = pathConstrainer.GetProperty( Dali::PathConstrainer::Property::POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( pathConstrainer, Dali::PathConstrainer::Property::POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  points.Resize(4);
+  points[0] = Vector3( 39.0,  90.0, 0.0);
+  points[1] = Vector3( 56.0, 119.0, 0.0);
+  points[2] = Vector3( 78.0, 120.0, 0.0);
+  points[3] = Vector3( 93.0, 104.0, 0.0);
+  pathConstrainer.SetProperty( Dali::PathConstrainer::Property::CONTROL_POINTS, points );
+
+  {
+    Property::Value value = pathConstrainer.GetProperty( Dali::PathConstrainer::Property::CONTROL_POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( pathConstrainer, Dali::PathConstrainer::Property::CONTROL_POINTS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  END_TEST;
+}
+
 //LinearConstrainer test cases
 int UtcLinearConstrainerDownCast(void)
 {
@@ -542,6 +616,75 @@ int UtcLinearConstrainerRemove(void)
   application.Render(static_cast<unsigned int>(1.0f));
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcLinearConstrainerProperties(void)
+{
+  TestApplication application;
+
+  Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();
+
+  Dali::Property::Array points;
+  points.Resize(3);
+  points[0] = 0.0f;
+  points[1] = 1.0f;
+  points[2] = 0.0f;
+  linearConstrainer.SetProperty( Dali::LinearConstrainer::Property::VALUE, points );
+
+  {
+    Property::Value value = linearConstrainer.GetProperty( Dali::LinearConstrainer::Property::VALUE );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< float >(), points[i].Get< float >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( linearConstrainer, Dali::LinearConstrainer::Property::VALUE );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< Vector3 >(), points[i].Get< Vector3 >(), TEST_LOCATION );
+    }
+  }
+
+  points[0] = 0.0f;
+  points[1] = 0.25f;
+  points[2] = 1.0f;
+  linearConstrainer.SetProperty( Dali::LinearConstrainer::Property::PROGRESS, points );
+
+  {
+    Property::Value value = linearConstrainer.GetProperty( Dali::LinearConstrainer::Property::PROGRESS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< float >(), points[i].Get< float >(), TEST_LOCATION );
+    }
+  }
+
+  {
+    Property::Value value = DevelHandle::GetCurrentProperty( linearConstrainer, Dali::LinearConstrainer::Property::PROGRESS );
+    Property::Array* array = value.GetArray();
+    DALI_TEST_CHECK( array );
+
+    const unsigned int noOfPoints = points.Size();
+    for( unsigned int i = 0; i < noOfPoints; ++i )
+    {
+      DALI_TEST_EQUALS( ( *array )[i].Get< float >(), points[i].Get< float >(), TEST_LOCATION );
+    }
+  }
 
   END_TEST;
 }
