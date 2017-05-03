@@ -226,9 +226,7 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
 void Core::Render( RenderStatus& status )
 {
-  bool updateRequired = mRenderManager->Render( status );
-
-  status.SetNeedsUpdate( updateRequired );
+  mRenderManager->Render( status );
 }
 
 void Core::Suspend()

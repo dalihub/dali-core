@@ -320,9 +320,8 @@ public:
   /**
    * Renders the results of the previous "update" traversal.
    * @param[out] status contains the flag that indicates if render instructions exist
-   * @return true if a further update is required
    */
-  bool Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status );
 
 private:
 
