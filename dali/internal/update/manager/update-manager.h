@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/manager/object-owner-container.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>  // for OwnerPointer< Renderer >
+#include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>   // for OwnerPointer< Shader >
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
@@ -78,7 +78,6 @@ class RenderTaskList;
 class RenderTaskProcessor;
 class RenderQueue;
 class PropertyBuffer;
-class TextureSet;
 
 struct NodeDepthPair
 {
@@ -144,13 +143,6 @@ public:
   virtual ~UpdateManager();
 
   // Node connection methods
-
-  /**
-   * Get the scene graph side list of RenderTasks.
-   * @param[in] systemLevel True if using the system-level overlay.
-   * @return The list of render tasks
-   */
-  RenderTaskList* GetRenderTaskList( bool systemLevel );
 
   /**
    * Installs a new layer as the root node.
@@ -269,21 +261,6 @@ public:
    */
   void PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode );
 
-  /**
-   * @brief Get the renderer owner
-   *
-   * @return The renderer owner
-   */
-  ObjectOwnerContainer< Renderer >& GetRendererOwner();
-
-  /**
-   * @brief Get the property buffer owner
-   *
-   * @return The property buffer owner
-   */
-  ObjectOwnerContainer< PropertyBuffer >& GetPropertyBufferOwner();
-
-
   // Shaders
 
   /**
@@ -300,21 +277,6 @@ public:
    * @post The shader is destroyed.
    */
   void RemoveShader(Shader* shader);
-
-  /**
-   * Add a newly created TextureSet.
-   * @param[in] textureSet The texture set to add.
-   * @post The TextureSet is owned by the UpdateManager.
-   */
-  void AddTextureSet(TextureSet* textureSet);
-
-  /**
-   * Remove a TextureSet.
-   * @pre The TextureSet has been added to the UpdateManager.
-   * @param[in] textureSet The TextureSet to remove.
-   * @post The TextureSet is destroyed.
-   */
-  void RemoveTextureSet(TextureSet* textureSet);
 
   /**
    * Set the shader program for a Shader object
@@ -337,6 +299,20 @@ public:
    */
   void SetShaderSaver( ShaderSaver& upstream );
 
+  // Renderers
+
+  /**
+   * Add a new renderer to scene
+   * @param renderer to add
+   */
+  void AddRenderer( Renderer* renderer );
+
+  /**
+   * Add a renderer from scene
+   * @param renderer to remove
+   */
+  void RemoveRenderer( Renderer* renderer );
+
   // Gestures
 
   /**
@@ -353,6 +329,32 @@ public:
    * @post The gesture is destroyed.
    */
   void RemoveGesture( PanGesture* gesture );
+
+  // Textures
+
+  /**
+   * Add a newly created TextureSet.
+   * @param[in] textureSet The texture set to add.
+   * @post The TextureSet is owned by the UpdateManager.
+   */
+  void AddTextureSet( TextureSet* textureSet );
+
+  /**
+   * Remove a TextureSet.
+   * @pre The TextureSet has been added to the UpdateManager.
+   * @param[in] textureSet The TextureSet to remove.
+   * @post The TextureSet is destroyed.
+   */
+  void RemoveTextureSet( TextureSet* textureSet );
+
+  // Render tasks
+
+  /**
+   * Get the scene graph side list of RenderTasks.
+   * @param[in] systemLevel True if using the system-level overlay.
+   * @return The list of render tasks
+   */
+  RenderTaskList* GetRenderTaskList( bool systemLevel );
 
 // Message queue handling
 
@@ -603,11 +605,6 @@ private:
    * @return True if the update-thread should keep going.
    */
   unsigned int KeepUpdatingCheck( float elapsedSeconds ) const;
-
-  /**
-   * Post process resources that have been updated by renderer
-   */
-  void PostProcessResources();
 
   /**
    * Helper to reset all Node properties
@@ -990,26 +987,24 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
   new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
 
-template< typename T >
-inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+inline void AddRendererMessage( UpdateManager& manager, Renderer& object )
 {
-  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< Renderer > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Add, &object );
+  new (slot) LocalType( &manager, &UpdateManager::AddRenderer, &object );
 }
 
-template< typename T >
-inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
 {
-  typedef MessageValue1< ObjectOwnerContainer<T>, T* > LocalType;
+  typedef MessageValue1< UpdateManager, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Remove, &object );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderer, &object );
 }
 
 // The render thread can safely change the Shader

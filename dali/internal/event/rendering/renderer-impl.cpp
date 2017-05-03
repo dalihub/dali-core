@@ -854,7 +854,7 @@ void Renderer::Initialize()
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
   mSceneObject = SceneGraph::Renderer::New();
-  AddMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
+  AddRendererMessage( updateManager, *mSceneObject );
 
   eventThreadServices.RegisterObject( this );
 }
@@ -881,7 +881,7 @@ Renderer::~Renderer()
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
+    RemoveRendererMessage( updateManager, *mSceneObject );
 
     eventThreadServices.UnregisterObject( this );
   }
