@@ -126,6 +126,8 @@ inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex update
 template < class T >
 inline void EraseUsingDiscardQueue( OwnerContainer<T*>& container, T* object, DiscardQueue& discardQueue, BufferIndex updateBufferIndex )
 {
+  DALI_ASSERT_DEBUG( object && "NULL object not allowed" );
+
   typename OwnerContainer<T*>::Iterator iter = container.Begin();
   const typename OwnerContainer<T*>::ConstIterator endIter = container.End();
   for ( ; iter != endIter; ++iter )
@@ -434,23 +436,7 @@ void UpdateManager::AddObject( PropertyOwner* object )
 
 void UpdateManager::RemoveObject( PropertyOwner* object )
 {
-  DALI_ASSERT_DEBUG( NULL != object );
-
-  OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
-
-  // Find the object and destroy it
-  for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); iter != customObjects.End(); ++iter )
-  {
-    PropertyOwner* current = *iter;
-    if ( current == object )
-    {
-      customObjects.Erase( iter );
-      return;
-    }
-  }
-
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
+  mImpl->customObjects.EraseObject( object );
 }
 
 void UpdateManager::AddAnimation( Animation* animation )
@@ -505,18 +491,7 @@ void UpdateManager::AddPropertyNotification( PropertyNotification* propertyNotif
 
 void UpdateManager::RemovePropertyNotification( PropertyNotification* propertyNotification )
 {
-  PropertyNotificationContainer &propertyNotifications = mImpl->propertyNotifications;
-  PropertyNotificationIter iter = propertyNotifications.Begin();
-
-  while ( iter != propertyNotifications.End() )
-  {
-    if( *iter == propertyNotification )
-    {
-      propertyNotifications.Erase(iter);
-      break;
-    }
-    ++iter;
-  }
+  mImpl->propertyNotifications.EraseObject( propertyNotification );
 }
 
 void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode )
@@ -534,8 +509,6 @@ void UpdateManager::AddShader( Shader* shader )
 
 void UpdateManager::RemoveShader( Shader* shader )
 {
-  DALI_ASSERT_DEBUG(shader != NULL);
-
   // Find the shader and destroy it
   EraseUsingDiscardQueue( mImpl->shaders, shader, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
@@ -583,12 +556,10 @@ void UpdateManager::AddRenderer( Renderer* renderer )
 
 void UpdateManager::RemoveRenderer( Renderer* renderer )
 {
-  DALI_ASSERT_DEBUG( renderer != NULL );
-
-  renderer->DisconnectFromSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
-
   // Find the renderer and destroy it
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  // Need to remove the render object as well
+  renderer->DisconnectFromSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
@@ -601,23 +572,13 @@ void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
 void UpdateManager::AddTextureSet( TextureSet* textureSet )
 {
   DALI_ASSERT_DEBUG( NULL != textureSet );
+
   mImpl->textureSets.PushBack( textureSet );
 }
 
 void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
 {
-  DALI_ASSERT_DEBUG( textureSet != NULL );
-
-  // Find the texture and destroy it
-  TextureSetOwner& textures = mImpl->textureSets;
-  for ( TextureSetIter iter = textures.Begin(), endIter = textures.End(); iter != endIter; ++iter )
-  {
-    if ( *iter == textureSet )
-    {
-      textures.Erase( iter );
-      return;
-    }
-  }
+  mImpl->textureSets.EraseObject( textureSet );
 }
 
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )

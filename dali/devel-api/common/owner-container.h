@@ -2,7 +2,7 @@
 #define __DALI_OWNER_CONTAINER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,26 @@ public:
   {
     Delete (*position);
     return Vector< T >::Erase( position );
+  }
+
+  /**
+   * Erase an object from OwnerContainer
+   * @param object to remove
+   */
+  inline void EraseObject( T object )
+  {
+    DALI_ASSERT_DEBUG( object && "NULL object not allowed" );
+
+    Iterator iter = Vector< T >::Begin();
+    const ConstIterator endIter = Vector< T >::End();
+    for ( ; iter != endIter; ++iter )
+    {
+      if ( *iter == object )
+      {
+        Erase( iter );
+        return;
+      }
+    }
   }
 
   /**
