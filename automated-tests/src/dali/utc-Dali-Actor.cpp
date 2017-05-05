@@ -3859,17 +3859,33 @@ int UtcDaliActorRemoveRendererP1(void)
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
+  {
+    Geometry geometry = CreateQuadGeometry();
+    Shader shader = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
 
-  actor.AddRenderer( renderer );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+    actor.AddRenderer( renderer );
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
 
-  actor.RemoveRenderer(renderer);
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+    application.SendNotification();
+    application.Render();
+  }
 
+  {
+    Renderer renderer = actor.GetRendererAt(0);
+    actor.RemoveRenderer(renderer);
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  // Call one final time to ensure that the renderer is actually removed after
+  // the handle goes out of scope, and excercises the deletion code path in
+  // scene graph and render.
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -3888,13 +3904,19 @@ int UtcDaliActorRemoveRendererP2(void)
   Renderer renderer = Renderer::New(geometry, shader);
 
   actor.AddRenderer( renderer );
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
 
   actor.RemoveRenderer(0);
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-
+  // Shut down whilst holding onto the renderer handle.
   END_TEST;
 }
 
