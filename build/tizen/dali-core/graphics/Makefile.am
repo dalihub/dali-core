@@ -40,12 +40,13 @@ dali_core_includes = \
 gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override \
             -Wstack-usage=128 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
 
+# -Wfloat-equal causes issues with vulkan.hpp, removed for now
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
-                    -Wfloat-equal -Wshadow \
-                    -Wlarger-than=128 -Wframe-larger-than=128 \
+                    -Wshadow \
+                    -Wlarger-than=2048 -Wframe-larger-than=2048 \
                     -Wcast-qual -Wcast-align \
                     -Wconversion -Wsign-conversion \
-                    -W
+                    -Wno-unused-parameter
 
 # the following warnings should not be enforced
 cxx_warnings_to_remove = \
@@ -55,11 +56,20 @@ cxx_warnings_to_remove = \
 cxx_warnings_to_preserve = \
                            -Wno-weak-vtables
 
-cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Weffc++ -Wpedantic \
-            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
+#cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Weffc++ -Wpedantic \
+#            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
+# vulkan.hpp doesn't pass all c++ checks
+cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Wpedantic \
+            $(cxx_more_warnings)
+
+# todo: for Tizen platform it will be necessary to override VULKAN_SDK such as it doesn't point at x86_64
+if VULKAN_SDK_SET
+    vulkan_flags = -I$(VULKAN_SDK)/x86_64/include -DVULKAN_HPP_NO_EXCEPTIONS
+endif
 
 libdali_graphics_a_CXXFLAGS = $(cxx_flags) \
                               $(dali_core_includes) \
-                              $(DALI_CFLAGS)
+                              $(DALI_CFLAGS) \
+                              $(vulkan_flags)
 
 

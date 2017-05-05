@@ -66,6 +66,12 @@ AC_ARG_ENABLE([gles],
               [enable_gles=$enableval],
               [enable_gles=20])
 
+AC_ARG_ENABLE([vulkan],
+              [AC_HELP_STRING([--enable-vulkan],
+                              [Enables Vulkan support])],
+              [enable_vulkan=$enableval],
+              [enable_vulkan=no])
+
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
 if test "x$enable_debug" = "xyes"; then
@@ -108,6 +114,16 @@ fi
 
 DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
 DALI_LDFLAGS="-L${libdir}"
+
+# forward VULKAN_SDK path to the graphics library if set correct
+if test x"$enable_vulkan" = x"yes"; then
+  if test x"$VULKAN_SDK" = x"" ; then
+    AC_ERROR([VulkanSDK not found! Install VulkanSDK and set VULKAN_SDK environmental variable.])
+  fi
+  AM_CONDITIONAL([VULKAN_SDK_SET], [test x$VULKAN_SDK])
+  DALI_LDFLAGS="${DALI_LDFLAGS} -L${VULKAN_SDK}/x86_64/lib -lvulkan"
+  AC_SUBST(VULKAN_SDK)
+fi
 
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
