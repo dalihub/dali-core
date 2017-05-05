@@ -282,7 +282,6 @@ public:
    */
   void TextureSetDeleted();
 
-public: // Implementation of ObjectOwnerContainer template methods
   /**
    * Connect the object to the scene graph
    *
@@ -308,9 +307,6 @@ public: // Implementation of ConnectionChangePropagator
    * @copydoc ConnectionChangePropagator::RemoveObserver
    */
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer){};
-
-public:
-
 
 public: // UniformMap::Observer
   /**

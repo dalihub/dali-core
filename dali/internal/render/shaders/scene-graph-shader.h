@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public:
   virtual ~Shader();
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // The following methods are called during UpdateManager::Update()
+  // The following methods are called during Update
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -95,7 +95,7 @@ public:
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // The following methods are called in Render thread
+  // The following methods are called during Render
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -115,23 +115,6 @@ public:
    */
   Program* GetProgram();
 
-public: // Implementation of ObjectOwnerContainer template methods
-
-  /**
-   * Connect the object to the scene graph
-   *
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
-
-  /**
-   * Disconnect the object from the scene graph
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
-
 public: // Implementation of ConnectionChangePropagator
 
   /**
@@ -143,8 +126,6 @@ public: // Implementation of ConnectionChangePropagator
    * @copydoc ConnectionChangePropagator::RemoveObserver
    */
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
-
-public:
 
 public: // UniformMap::Observer
   /**

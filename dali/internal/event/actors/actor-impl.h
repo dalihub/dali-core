@@ -30,6 +30,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -59,6 +60,9 @@ typedef ActorContainer::const_iterator ActorConstIter;
 
 typedef std::vector< RendererPtr > RendererContainer;
 typedef RendererContainer::iterator RendererIter;
+
+class ActorDepthTreeNode;
+typedef Dali::Internal::MemoryPoolObjectAllocator< ActorDepthTreeNode > DepthNodeMemoryPool;
 
 /**
  * Actor is the primary object which Dali applications interact with.
@@ -305,7 +309,7 @@ public:
    * This size will be the size set or if animating then the target size.
    * @return The Actor's size.
    */
-  const Vector3& GetTargetSize() const;
+  Vector3 GetTargetSize() const;
 
   /**
    * Retrieve the Actor's size from update side.
@@ -756,8 +760,7 @@ public:
   }
 
   /**
-   * Get the actor's sorting depth (The hierarchy depth combined with
-   * the sibling order)
+   * Get the actor's sorting depth
    *
    * @return The depth used for hit-testing and renderer sorting
    */
@@ -1583,6 +1586,26 @@ protected:
   bool IsNodeConnected() const;
 
 public:
+  /**
+   * Trigger a rebuild of the actor depth tree from this root
+   * If a Layer3D is encountered, then this doesn't descend any further.
+   * The mSortedDepth of each actor is set appropriately.
+   */
+  void RebuildDepthTree();
+
+protected:
+
+  /**
+   * Traverse the actor tree, inserting actors into the depth tree in sibling order.
+   * For all actors that share a sibling order, they also share a depth tree, for
+   * optimal render performance.
+   * @param[in] nodeMemoryPool The memory pool used to allocate depth nodes
+   * @param[in,out] depthTreeNode The depth tree node to which to add this actor's children
+   * @return The count of actors in this depth tree
+   */
+  int BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* depthTreeNode );
+
+public:
 
   // Default property extensions from Object
 
@@ -1923,6 +1946,7 @@ protected:
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
+  uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
   uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   uint16_t mSiblingOrder;     ///< The sibling order of the actor
 
@@ -1952,6 +1976,67 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 };
+
+/**
+ * Helper class to create sorted depth index
+ */
+class ActorDepthTreeNode
+{
+public:
+  ActorDepthTreeNode()
+  : mParentNode(NULL),
+    mNextSiblingNode(NULL),
+    mFirstChildNode(NULL),
+    mSiblingOrder( 0 )
+  {
+  }
+
+  ActorDepthTreeNode( Actor* actor, uint16_t siblingOrder )
+  : mParentNode(NULL),
+    mNextSiblingNode(NULL),
+    mFirstChildNode(NULL),
+    mSiblingOrder( siblingOrder )
+  {
+    mActors.push_back( actor );
+  }
+
+  ~ActorDepthTreeNode()
+  {
+    if( mFirstChildNode )
+    {
+      delete mFirstChildNode;
+      mFirstChildNode = NULL;
+    }
+    if( mNextSiblingNode )
+    {
+      delete mNextSiblingNode;
+      mNextSiblingNode = NULL;
+    }
+    mParentNode = NULL;
+  }
+
+  uint16_t GetSiblingOrder()
+  {
+    return mSiblingOrder;
+  }
+
+  void AddActor( Actor* actor )
+  {
+    mActors.push_back( actor );
+  }
+
+public:
+  std::vector<Actor*> mActors; // Array of actors with the same sibling order and same ancestor sibling orders
+  ActorDepthTreeNode* mParentNode;
+  ActorDepthTreeNode* mNextSiblingNode;
+  ActorDepthTreeNode* mFirstChildNode;
+  uint16_t mSiblingOrder;
+
+private:
+  ActorDepthTreeNode( ActorDepthTreeNode& );
+  ActorDepthTreeNode& operator=(const ActorDepthTreeNode& );
+};
+
 
 } // namespace Internal
 

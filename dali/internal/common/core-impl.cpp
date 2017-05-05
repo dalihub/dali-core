@@ -226,9 +226,7 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
 void Core::Render( RenderStatus& status )
 {
-  bool updateRequired = mRenderManager->Render( status );
-
-  status.SetNeedsUpdate( updateRequired );
+  mRenderManager->Render( status );
 }
 
 void Core::Suspend()
@@ -284,6 +282,9 @@ void Core::ProcessEvents()
 
     // Run the size negotiation after event processing finished signal
     mRelayoutController->Relayout();
+
+    // Rebuild depth tree after event processing has finished
+    mStage->RebuildDepthTree();
 
     // Flush any queued messages for the update-thread
     const bool messagesToProcess = mUpdateManager->FlushQueue();
