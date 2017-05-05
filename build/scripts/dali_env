@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+use warnings;
 use Config;
 use Cwd;
 use Cwd 'abs_path';
@@ -21,6 +22,7 @@ use File::Basename;
 use File::Path;
 use File::Copy;
 use File::Copy::Recursive qw(dircopy);
+use File::Copy::Recursive qw(pathmk);
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -89,9 +91,9 @@ if( exists $ENV{http_proxy} )
   # string  split into 3 items  http, //ip, port
   my @http_proxy_info =  split( /:/,$ENV{http_proxy}, );
 
-  $http_proxy_ip =  @http_proxy_info[1];
+  $http_proxy_ip =  $http_proxy_info[1];
   $http_proxy_ip =~ s/[\/]//g;;  # remove forward slashes
-  $http_proxy_port =  @http_proxy_info[2];
+  $http_proxy_port =  $http_proxy_info[2];
 }
 
 # Make best guess as to where this program was run from (note, it is
@@ -148,18 +150,25 @@ my $src_path         = "$root_path/src-packages";
 my $sbs_path         = "$root_path/target";
 my $install_path     = "$root_path/opt";
 my $emscripten_path  = "$root_path/emsdk_portable";
+my $vulkan_path      = "$root_path/vulkan";
 
 my $opt_create=0;
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
 my $opt_emscripten=0;
+my $opt_vulkan=0;
+my $opt_vulkanVersion="";
+my $opt_vulkanList=0;
 
-GetOptions("create"     => \$opt_create,
-           "setenv"     => \$opt_setenv,
-           "emscripten" => \$opt_emscripten,
-           "help"       => \$opt_help,
-           "man"        => \$opt_man) or pod2usage(2);
+GetOptions("create"                 => \$opt_create,
+           "setenv"                 => \$opt_setenv,
+           "emscripten"             => \$opt_emscripten,
+           "vulkan"                 => \$opt_vulkan,
+           "vulkan-version=s"       => \$opt_vulkanVersion,
+           "vulkan-version-list"    => \$opt_vulkanList,
+           "help"                   => \$opt_help,
+           "man"                    => \$opt_man) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
@@ -232,6 +241,13 @@ export DALI_WINDOW_WIDTH=480
 export DALI_WINDOW_HEIGHT=800
 
 EOF
+
+    # add Vulkan related settings
+    if( -e "$vulkan_path/vulkan-setenv" )
+    {
+        system( 'cat', "$vulkan_path/vulkan-setenv")
+    }
+
 }
 
 ################################################################################
@@ -631,13 +647,122 @@ sub install_emscripten
     chdir($current_dir);
 }
 
+################################################################################
+#
+# install Vulkan SDK
+#
+################################################################################
+sub install_vulkan {
+    if($opt_vulkan || $opt_vulkanList)
+    {
+        my $requestedVersion = "$opt_vulkanVersion";
+        my $vulkanInstallDir = $vulkan_path;
+        # Get Download page
+        my $vulkan_sdk_url = "https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/";
+        my $vulkan_download_page = `curl --silent $vulkan_sdk_url`;
+
+        # Find available VulkanSDK versions
+        my (@linuxVersion) = $vulkan_download_page =~ /linux: .*$/mg;
+
+        my (@version) = $linuxVersion[0] =~ /\"[0-9.]*\"/g;
+        my @allVersions = ();
+
+        if($opt_vulkanList)
+        {
+            print("\nVulkanSDK Versions available:\n");
+        }
+        foreach my $ver (@version)
+        {
+            $ver =~ s/\"//g;
+            push @allVersions, $ver;
+            if($opt_vulkanList)
+            {
+                print(" * $ver\n");
+            }
+        }
+        if($opt_vulkanList)
+        {
+            return;
+        }
+
+        # if no particular version requested, pick latest one
+        if ($requestedVersion eq "")
+        {
+            $requestedVersion = $allVersions[0];
+        }
+        else # or check availability
+        {
+            my $found = 0;
+            foreach my $ver (@allVersions)
+            {
+                if ($ver eq $requestedVersion)
+                {
+                    $found = 1;
+                    last;
+                }
+            }
+            if ($found eq 0)
+            {
+                print("Requested version [$requestedVersion] not found! Available versions:\n\n");
+                foreach my $ver (@allVersions)
+                {
+                    print(" * $ver\n");
+                }
+                die;
+            }
+        }
+
+        # Download SDK
+        my $vulkan_download_url =
+            "https://vulkan.lunarg.com/sdk/download/$requestedVersion/linux/vulkansdk-linux-x86_64-$requestedVersion.run?Human=true";
+        print("* Downloading Vulkan SDK Version $requestedVersion...\n");
+        print("  -> URL: $vulkan_download_url\n");
+        system( 'curl', '--silent', '-o', '/tmp/vulkan_installer.sh', "$vulkan_download_url");
+
+        if ($? == - 1)
+        {
+            die "Failed to download Vulkan SDK, exiting!\n";
+        }
+
+        # Run installer
+        print("  -> Installing VulkanSDK...\n");
+        system( 'chmod', 'a+x', "/tmp/vulkan_installer.sh");
+        system( "/tmp/vulkan_installer.sh --target /tmp/vulkan-$requestedVersion");
+        pathmk( "$vulkanInstallDir/$requestedVersion" );
+        dircopy( "/tmp/vulkan-$requestedVersion/$requestedVersion", "$vulkanInstallDir/$requestedVersion" );
+
+        # create symling to the recently installed as 'latest'
+        symlink( "$requestedVersion", "$vulkanInstallDir/latest" );
+
+        # configure
+        my $vulkanAbsDir = "$vulkanInstallDir/latest";
+
+        my $envsetup = <<EOF
+# VulkanSDK env variables
+
+export VULKAN_SDK="$vulkanAbsDir"
+export PATH="\$VULKAN_SDK/bin:\$PATH"
+export LD_LIBRARY_PATH="\$VULKAN_SDK/lib:\${LD_LIBRARY_PATH:-}"
+export VK_LAYER_PATH="\$VULKAN_SDK/etc/explicit_layer.d"
+
+EOF
+        ;
+
+        open(my $file, '>', "$vulkanInstallDir/vulkan-setenv") or die;
+        print $file $envsetup;
+        close( $file );
+    }
+}
 
 ################################################################################
 #                                       MAIN
 ################################################################################
 
-
-if($opt_create)
+if($opt_vulkanList)
+{
+    install_vulkan();
+}
+elsif($opt_create)
 {
     my $new_root = getcwd() . "/dali-env";
 
@@ -663,6 +788,8 @@ if($opt_create)
 
     # do this after source directory structure created in create_env
     check_source_packages();
+
+    install_vulkan();
 
     create_setenv();
 }
@@ -691,7 +818,7 @@ dali_env - Create the DALi environment for Ubuntu
 
 =head1 SYNOPSIS
 
-dali_env [-c] [-s] [-h|-m]
+dali_env [-c] [-s] [-h|-m] [--vulkan]
 
 =head1 OPTIONS
 
@@ -716,6 +843,22 @@ Display this help
 =item B<-m|--man>
 
 Display the manual page
+
+=head2 Vulkan Support
+
+Use following option to download and install VulkanSDK:
+
+=item B<--vulkan>
+
+Include Vulkan support (use with -c to install with Vulkan support or -s to setup env vars with Vulkan environment).
+
+=item B<--vulkan-version=VERSION>
+
+Forces installing requested VulkanSDK version (use with -c to install with Vulkan support and --vulkan ). If not specified, the latest version is installed.
+
+=item B<--vulkan-version-list>
+
+Lists available VulkanSDK versions.
 
 =back
 

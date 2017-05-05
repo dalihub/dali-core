@@ -146,4 +146,5 @@ linker_test_CXXFLAGS = \
 
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
-  libdali-core.la
+  libdali-core.la \
+  $(DALI_LDFLAGS)
