@@ -2483,9 +2483,9 @@ int UtcDaliActorTouchedSignal(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_CHECK( gTouchCallBackCalled == true );
   END_TEST;
@@ -2513,9 +2513,9 @@ int UtcDaliActorHoveredSignal(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::MOTION );
   point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
-  Dali::Integration::HoverEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
+  Dali::Integration::HoverEvent hoverEvent;
+  hoverEvent.AddPoint( point );
+  application.ProcessEvent( hoverEvent );
 
   DALI_TEST_CHECK( gHoverCallBackCalled == true );
   END_TEST;
@@ -4297,10 +4297,10 @@ int UtcDaliActorRaiseLower(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4317,13 +4317,15 @@ int UtcDaliActorRaiseLower(void)
   value.Get( preActorOrder );
 
   DevelActor::Raise( actorB );
+  // Ensure sort order is calculated before next touch event
+  application.SendNotification();
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( postActorOrder );
 
   tet_printf( "Raised ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  true , TEST_LOCATION );
@@ -4337,13 +4339,14 @@ int UtcDaliActorRaiseLower(void)
   value.Get( preActorOrder );
 
   DevelActor::Lower( actorB );
+  application.SendNotification(); // ensure sort order calculated before next touch event
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( postActorOrder );
 
   tet_printf( "Lowered ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false , TEST_LOCATION );
@@ -4449,10 +4452,10 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4463,8 +4466,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf( "RaiseToTop ActorA\n" );
 
   DevelActor::RaiseToTop( actorA );
+  application.SendNotification(); // ensure sorting order is calculated before next touch event
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4493,8 +4497,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf( "RaiseToTop ActorB\n" );
 
   DevelActor::RaiseToTop( actorB );
+  application.SendNotification(); // Ensure sort order is calculated before next touch event
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4530,7 +4535,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4612,10 +4617,10 @@ int UtcDaliActorRaiseAbove(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4626,8 +4631,10 @@ int UtcDaliActorRaiseAbove(void)
   tet_printf( "Raise actor B Above Actor C\n" );
 
   DevelActor::RaiseAbove( actorB, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
@@ -4639,7 +4646,10 @@ int UtcDaliActorRaiseAbove(void)
 
   DevelActor::RaiseAbove( actorA, actorB );
 
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent ); // process a touch event on ordered actors.
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4748,12 +4758,12 @@ int UtcDaliActorLowerBelow(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   tet_infoline( "UtcDaliActor Test Set up completed \n" );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -4764,11 +4774,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
 
   DevelActor::LowerBelow( actorC, actorB );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent ); // touch event
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4797,11 +4807,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor B below Actor C leaving A on top\n" );
 
   DevelActor::LowerBelow( actorB, actorC );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4827,11 +4837,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor A below Actor C leaving C on top\n" );
 
   DevelActor::LowerBelow( actorA, actorC );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4888,6 +4898,7 @@ int UtcDaliActorMaxSiblingOrder(void)
   Actor sibling = parent.GetChildAt( 5 );
   DevelActor::RaiseToTop( sibling );
 
+  // Ensure sorting happens at end of Core::ProcessEvents()
   application.SendNotification();
   application.Render();
 
@@ -4978,10 +4989,10 @@ int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -4992,8 +5003,10 @@ int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
   tet_printf( "Raise actor A Above Actor C which have different parents\n" );
 
   DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent ); // touch event
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -5053,14 +5066,16 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   tet_printf( "Raise actor A Above Actor C which have no parents\n" );
 
   DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -5071,13 +5086,14 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorB );
+  tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
+  DevelActor::LowerBelow( actorA, actorC );
 
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
-  DevelActor::LowerBelow( actorA, actorC );
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Actor A not parented so LowerBelow should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
@@ -5094,7 +5110,10 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
   DevelActor::RaiseAbove( actorB, actorC );
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "C not parented so RaiseAbove should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5105,7 +5124,10 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
   DevelActor::LowerBelow( actorA, actorC );
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "C not parented so LowerBelow should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5115,12 +5137,12 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorC );
-
+  DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  DevelActor::RaiseAbove( actorA, actorC );
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Raise actor A Above Actor C, now both have same parent \n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5172,19 +5194,17 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   stage.Add ( actorA );
+  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
+  DevelActor::Raise( actorB );
 
   application.SendNotification();
   application.Render();
 
-  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
-
-  DevelActor::Raise( actorB );
-
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -5196,8 +5216,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   ResetTouchCallbacks();
 
   DevelActor::Lower( actorC );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -5209,8 +5232,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Lower actor C below B but C not parented\n" );
 
   DevelActor::Lower( actorB );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so Lower should show no effect\n" );
 
@@ -5222,8 +5248,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Raise actor B to top\n" );
 
   DevelActor::RaiseToTop( actorB );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseToTop should show no effect\n" );
 
@@ -5236,14 +5265,13 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   stage.Add ( actorB );
 
-  application.SendNotification();
-  application.Render();
-
   tet_printf( "Lower actor C to Bottom, B stays at top\n" );
 
   DevelActor::LowerToBottom( actorC );
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so LowerToBottom should show no effect\n" );
 
@@ -5305,10 +5333,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -5319,8 +5347,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
   DevelActor::RaiseAbove( actorA, actorA );
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_infoline( "No target is source Actor so RaiseAbove should show no effect\n" );
 
@@ -5331,7 +5361,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   ResetTouchCallbacks();
 
   DevelActor::RaiseAbove( actorA, actorC );
-  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( touchEvent );
 
   tet_infoline( "Raise actor A Above Actor C which will now be successful \n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5905,7 +5938,6 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
 
   END_TEST;
 }
-
 int utcDaliActorVisibilityChangeSignalSelf(void)
 {
   TestApplication application;

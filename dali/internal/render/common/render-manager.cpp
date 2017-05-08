@@ -478,7 +478,7 @@ ProgramCache* RenderManager::GetProgramCache()
   return &(mImpl->programController);
 }
 
-bool RenderManager::Render( Integration::RenderStatus& status )
+void RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -546,8 +546,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
-
-  return false;
 }
 
 void RenderManager::DoRender( RenderInstruction& instruction )

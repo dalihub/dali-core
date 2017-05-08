@@ -434,6 +434,17 @@ public: // Implementation of EventThreadServices
    */
   virtual BufferIndex GetEventBufferIndex() const;
 
+  /**
+   * Request that the depth tree is rebuilt
+   */
+  void RequestRebuildDepthTree();
+
+  /**
+   * Rebuilds the depth tree at the end of the event frame if
+   * it was requested this frame.
+   */
+  void RebuildDepthTree();
+
 private:
 
   /**
@@ -503,6 +514,7 @@ private:
   // The touched signals
   Dali::Stage::TouchedSignalType                  mTouchedSignal;
   Dali::Stage::TouchSignalType                    mTouchSignal;
+  bool mDepthTreeDirty; ///< True if the depth tree needs recalculating
 
   // The wheel event signal
   Dali::Stage::WheelEventSignalType               mWheelEventSignal;

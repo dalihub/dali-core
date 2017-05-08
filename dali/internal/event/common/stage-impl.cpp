@@ -42,6 +42,13 @@
 
 using Dali::Internal::SceneGraph::Node;
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
+#endif
+}
+
 namespace Dali
 {
 
@@ -663,6 +670,27 @@ void Stage::NotifyContextRegained()
 {
   mContextRegainedSignal.Emit();
 }
+
+
+void Stage::RequestRebuildDepthTree()
+{
+  DALI_LOG_INFO(gLogFilter, Debug::General, "RequestRebuildDepthTree()\n");
+  mDepthTreeDirty = true;
+}
+
+void Stage::RebuildDepthTree()
+{
+  // If the depth tree needs rebuilding, do it in this frame only.
+  if( mDepthTreeDirty )
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "RebuildDepthTree() dirty:T\n");
+
+    ActorPtr actor( mRootLayer.Get() );
+    actor->RebuildDepthTree();
+    mDepthTreeDirty = false;
+  }
+}
+
 
 Stage::Stage( AnimationPlaylist& playlist,
               PropertyNotificationManager& propertyNotificationManager,

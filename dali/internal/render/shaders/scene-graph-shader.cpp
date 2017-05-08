@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,14 +66,6 @@ void Shader::SetProgram( Internal::ShaderDataPtr shaderData,
 Program* Shader::GetProgram()
 {
   return mProgram;
-}
-
-void Shader::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
-{
-}
-
-void Shader::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
-{
 }
 
 void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )

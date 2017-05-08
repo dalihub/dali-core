@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
+#include <ctime>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
@@ -40,6 +41,8 @@ namespace Dali
 
 namespace // unnamed namespace
 {
+
+const uint64_t NANOSECONDS_PER_SECOND = 1e+9;
 
 /**
  * Generic function to print out any 2-Dimensional array
@@ -323,6 +326,15 @@ std::string Matrix3ToString(const Matrix3& m, size_t precision, size_t indent)
 std::string MatrixToString(const Matrix& m, size_t precision, size_t indent)
 {
   return Array2DToString(m.AsFloat(), 4, 4, precision, indent);
+}
+
+void GetNanoseconds( uint64_t& timeInNanoseconds )
+{
+  timespec timeSpec;
+  clock_gettime( CLOCK_MONOTONIC, &timeSpec );
+
+  // Convert all values to uint64_t to match our return type
+  timeInNanoseconds = ( static_cast< uint64_t >( timeSpec.tv_sec ) * NANOSECONDS_PER_SECOND ) + static_cast< uint64_t >( timeSpec.tv_nsec );
 }
 
 } // namespace Log
