@@ -235,7 +235,7 @@ public:
    * @param[in]  nextRenderTime  The estimated time of the next render (in milliseconds).
    * @return true, if properties were updated.
    */
-  virtual bool UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
+  bool UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
 
   /**
    * Retrieves a reference to the panning flag property.
@@ -333,6 +333,12 @@ public:
    */
   void EnableProfiling();
 
+  /**
+   * Reset default properties, custom ones not supported due to this being the only object in scene side
+   * @param updateBufferIndex index to use
+   */
+  void ResetDefaultProperties( BufferIndex updateBufferIndex );
+
 private:
 
   /**
@@ -345,9 +351,6 @@ private:
 
   // Undefined
   PanGesture& operator=(const PanGesture&);
-
-  // PropertyOwner
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
   // Defines information to be gathered by the gesture reading code.
   struct FrameGestureInfo

@@ -151,9 +151,6 @@ typedef TextureSetOwner::Iterator              TextureSetIter;
 typedef OwnerContainer<Renderer*>              RendererOwner;
 typedef RendererOwner::Iterator                RendererIter;
 
-typedef OwnerContainer<PanGesture*>            GestureOwner;
-typedef GestureOwner::Iterator                 GestureIter;
-
 typedef OwnerContainer< Camera* >              CameraOwner;
 typedef OwnerContainer< PropertyOwner* >       CustomObjectOwner;
 
@@ -192,7 +189,7 @@ struct UpdateManager::Impl
     renderers(),
     textureSets(),
     shaders(),
-    gestures(),
+    panGestureProcessor( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
@@ -288,7 +285,7 @@ struct UpdateManager::Impl
   RendererOwner                       renderers;                     ///< A container of owned renderers
   TextureSetOwner                     textureSets;                   ///< A container of owned texture sets
   ShaderOwner                         shaders;                       ///< A container of owned shaders
-  GestureOwner                        gestures;                      ///< A container of owned gesture detectors
+  OwnerPointer<PanGesture>            panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
   ShaderDataBinaryQueue               renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
@@ -594,27 +591,11 @@ void UpdateManager::RemoveRenderer( Renderer* renderer )
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
-void UpdateManager::AddGesture( PanGesture* gesture )
+void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
 {
-  DALI_ASSERT_DEBUG( NULL != gesture );
+  DALI_ASSERT_DEBUG( NULL != panGestureProcessor );
 
-  mImpl->gestures.PushBack( gesture );
-}
-
-void UpdateManager::RemoveGesture( PanGesture* gesture )
-{
-  DALI_ASSERT_DEBUG( gesture != NULL );
-
-  // Find the gesture and destroy it
-  GestureOwner& gestures = mImpl->gestures;
-  for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
-  {
-    if ( *iter == gesture )
-    {
-      gestures.Erase( iter );
-      return;
-    }
-  }
+  mImpl->panGestureProcessor = panGestureProcessor;
 }
 
 void UpdateManager::AddTextureSet( TextureSet* textureSet )
@@ -713,14 +694,11 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastV
 {
   bool gestureUpdated( false );
 
-  // constrain gestures... (in construction order)
-  GestureOwner& gestures = mImpl->gestures;
-
-  for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
+  if( mImpl->panGestureProcessor )
   {
-    PanGesture& gesture = **iter;
-    gesture.ResetToBaseValues( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
-    gestureUpdated |= gesture.UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+    // gesture processor only supports default properties
+    mImpl->panGestureProcessor->ResetDefaultProperties( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
+    gestureUpdated |= mImpl->panGestureProcessor->UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
   }
 
   return gestureUpdated;
