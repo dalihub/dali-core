@@ -5781,10 +5781,11 @@ int UtcDaliAnimationAnimateToVector2AlphaFunctionTimePeriodP(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
 
-  // We didn't expect the animation to finish yet
+  // We didn't expect the animation to finish yet, but cached value should be the final one
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<Vector2>(index), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty<Vector2>( actor, index ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
@@ -5801,6 +5802,7 @@ int UtcDaliAnimationAnimateToVector2AlphaFunctionTimePeriodP(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector2 >( actor, index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), targetValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -6518,8 +6520,20 @@ int UtcDaliAnimationAnimateToActorSizeP(void)
 
   Vector3 ninetyNinePercentProgress(targetSize * 0.99f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), 0.0f, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), targetSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), targetSize.width, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), targetSize.height, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), targetSize.depth, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6628,8 +6642,16 @@ int UtcDaliAnimationAnimateToActorSizeWidthP(void)
 
   float fiftyPercentProgress(startValue + (targetWidth - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3( targetWidth, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), targetWidth, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6672,8 +6694,16 @@ int UtcDaliAnimationAnimateToActorSizeHeightP(void)
 
   float fiftyPercentProgress(startValue + (targetHeight - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3( 0.0f, targetHeight, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), targetHeight, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6716,8 +6746,16 @@ int UtcDaliAnimationAnimateToActorSizeDepthP(void)
 
   float fiftyPercentProgress(startValue + (targetDepth - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3( 0.0f, 0.0f, targetDepth ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), targetDepth, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6868,8 +6906,20 @@ int UtcDaliAnimationAnimateToActorPositionP(void)
 
   Vector3 seventyFivePercentProgress(targetPosition * 0.75f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Y ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Z ), 0.0f, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), targetPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Y ), targetPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Z ), targetPosition.z, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6913,8 +6963,16 @@ int UtcDaliAnimationAnimateToActorPositionXP(void)
 
   float fiftyPercentProgress(startValue + (targetX - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( targetX, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), targetX, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -6961,8 +7019,16 @@ int UtcDaliAnimationAnimateToActorPositionYP(void)
 
   float fiftyPercentProgress(startValue + (targetY - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Y ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 0.0f, targetY, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Y ), targetY, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -7009,8 +7075,16 @@ int UtcDaliAnimationAnimateToActorPositionZP(void)
 
   float fiftyPercentProgress(startValue + (targetZ - startValue)*0.5f);
 
+  // Should return the initial properties before play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Z ), startValue, TEST_LOCATION );
+
   // Start the animation
   animation.Play();
+
+  // Should return the target property after play
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, targetZ ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Z ), targetZ, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -7209,6 +7283,9 @@ int UtcDaliAnimationAnimateToActorOrientationAngleAxisP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -7504,6 +7581,12 @@ int UtcDaliAnimationAnimateToActorScaleP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), targetScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_X ), targetScale.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Y ), targetScale.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Z ), targetScale.z, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -7619,6 +7702,10 @@ int UtcDaliAnimationAnimateToActorScaleXP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), Vector3( targetX, startValue, startValue ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_X ), targetX, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -7672,6 +7759,10 @@ int UtcDaliAnimationAnimateToActorScaleYP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), Vector3( startValue, targetY, startValue ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Y ), targetY, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -7727,6 +7818,10 @@ int UtcDaliAnimationAnimateToActorScaleZP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), Vector3( startValue, startValue, targetZ ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Z ), targetZ, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -7774,6 +7869,14 @@ int UtcDaliAnimationAnimateToActorColorP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), targetColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_RED ), targetColor.r, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), targetColor.g, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), targetColor.b, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetColor.a, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( DevelActor::Property::OPACITY ), targetColor.a, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -7900,6 +8003,10 @@ int UtcDaliAnimationAnimateToActorColorRedP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Vector4( targetRed, startValue, startValue, startValue ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_RED ), targetRed, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -7957,6 +8064,10 @@ int UtcDaliAnimationAnimateToActorColorGreenP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Vector4( startValue, targetGreen, startValue, startValue ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), targetGreen, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -8016,6 +8127,10 @@ int UtcDaliAnimationAnimateToActorColorBlueP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Vector4( startValue, startValue, targetBlue, startValue ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), targetBlue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -8073,6 +8188,11 @@ int UtcDaliAnimationAnimateToActorColorAlphaP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Vector4( startValue, startValue, startValue, targetAlpha ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetAlpha, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( DevelActor::Property::OPACITY ), targetAlpha, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -10085,10 +10205,11 @@ int UtcDaliAnimationExtendDurationP(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(extendedDurationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
 
-  // We didn't expect the animation to finish yet
+  // We didn't expect the animation to finish yet, but cached value should be the final one
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(extendedDurationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
@@ -10105,6 +10226,7 @@ int UtcDaliAnimationExtendDurationP(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), targetValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -10475,7 +10597,7 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionCol
   // Build the animation
   Animation animation = Animation::New(2.0f);
 
-  tet_infoline("Set target size in animation without intiating play");
+  tet_infoline("Set target size in animation without initiating play");
   animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetSizes[0], AlphaFunction::LINEAR);
   tet_infoline("Set target position in animation without intiating play");
   animation.AnimateTo(Property(actor, Actor::Property::COLOR_RED), targetColors[0], AlphaFunction::LINEAR);
@@ -10484,7 +10606,7 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionCol
   application.SendNotification();
   application.Render();
 
-  tet_infoline("Ensure position of actor is still at intial size and position");
+  tet_infoline("Ensure position of actor is still at initial size and position");
 
   DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), initialSize.x, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), initialSize.y, TEST_LOCATION );
@@ -10496,7 +10618,7 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionCol
   application.SendNotification();
   application.Render(2000u);
 
-  tet_infoline("Ensure position and size of actor is at target value when aninmation playing");
+  tet_infoline("Ensure position and size of actor is at target value when animation playing");
 
   DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), targetSizes[1].x, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), targetSizes[1].y, TEST_LOCATION );
