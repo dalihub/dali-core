@@ -469,7 +469,7 @@ private:
 
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
 
-  std::vector< ConnectorTargetValues > mConnectorActorTargetValues; //< Store Actor target values and matchinf connector index that need to set value on Animation::Play
+  std::vector< ConnectorTargetValues > mConnectorTargetValues; //< Used to store animating property target value information
 
   // Cached for public getters
   float mDurationSeconds;

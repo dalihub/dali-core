@@ -41,6 +41,7 @@ class PropertyNotification;
 
 namespace Internal
 {
+class Animation;
 class ConstraintBase;
 class EventThreadServices;
 class Handle;
@@ -238,6 +239,14 @@ public:
    * @copydoc Dali::Handle::RemovePropertyNotifications()
    */
   virtual void RemovePropertyNotifications();
+
+  /**
+   * Notifies that a property is being animated.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   */
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -477,6 +486,15 @@ private: // Default property extensions for derived classes
    * @return The latest scene-graph value of a default property.
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+
+  /**
+   * Notifies that a default property is being animated so the deriving class should update the cached value.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   */
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+  { }
 
   /**
    * @todo this is virtual so that for now actor can override it,
