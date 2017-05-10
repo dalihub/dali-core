@@ -266,7 +266,7 @@ void Program::GetActiveSamplerUniforms()
       mGlAbstraction.GetActiveUniform( mProgramId, (GLuint)i, uniformMaxNameLength,
                                        &nameLength, &number, &type, name );
 
-      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE ) /// Is there a native sampler type?
+      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_EXTERNAL_OES )
       {
         GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
         samplerNames.push_back(name);

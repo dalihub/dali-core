@@ -203,6 +203,15 @@ public:
     return mType;
   }
 
+  /**
+   * Check if the texture is a native image
+   * @return if the texture is a native image
+   */
+  bool IsNativeImage() const
+  {
+    return mNativeImage;
+  }
+
 private:
 
   /**
@@ -219,7 +228,7 @@ private:
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   GLenum mInternalFormat;               ///< The format of the pixel data
   GLenum mPixelDataType;                ///< The data type of the pixel data
-  unsigned int mWidth;                  ///< Widht of the texture
+  unsigned int mWidth;                  ///< Width of the texture
   unsigned int mHeight;                 ///< Height of the texture
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
