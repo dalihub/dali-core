@@ -10506,3 +10506,88 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsSizeAndPositionCol
 
   END_TEST;
 }
+
+int UtcDaliAnimationTimePeriodOrder(void)
+{
+  tet_infoline("Animate the same property with different time periods and ensure it runs correctly and ends up in the right place" );
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+
+  tet_infoline( "With two AnimateTo calls" );
+
+  Animation animation = Animation::New( 0.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 100.0f, TimePeriod( 3.0f, 1.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 1.0f, 1.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(5000); // After the animation is complete
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Same animation again but in a different order - should yield the same result" );
+
+  actor.SetX( 0.0f );
+  application.SendNotification();
+  application.Render();
+
+  animation = Animation::New( 0.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 1.0f, 1.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 100.0f, TimePeriod( 3.0f, 1.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(5000); // After the animation is complete
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Now with several AnimateTo calls" );
+
+  actor.SetX( 0.0f );
+  application.SendNotification();
+  application.Render();
+
+  animation = Animation::New( 0.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 1000.0f, TimePeriod( 4.0f, 2.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 145.0f, TimePeriod( 3.0f, 10.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 109.0f, TimePeriod( 1.0f, 1.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 1.0f, TimePeriod( 3.0f, 4.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 200.0f, TimePeriod( 2.0f, 5.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 10.0f, 2.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(14000); // After the animation is complete
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  tet_infoline( "Same animation again but in a different order - should end up at the same point" );
+
+  actor.SetX( 0.0f );
+  application.SendNotification();
+  application.Render();
+
+  animation = Animation::New( 0.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 200.0f, TimePeriod( 2.0f, 5.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 10.0f, 2.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 145.0f, TimePeriod( 3.0f, 10.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 1000.0f, TimePeriod( 4.0f, 2.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 1.0f, TimePeriod( 3.0f, 4.0f ) );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 109.0f, TimePeriod( 1.0f, 1.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(14000); // After the animation is complete
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
