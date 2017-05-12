@@ -294,7 +294,7 @@ int UtcDaliPanGestureDetectorCopyConstructorP(void)
 {
   TestApplication application;
 
-  PanGestureDetector detector = PanGestureDetector::New();;
+  PanGestureDetector detector = PanGestureDetector::New();
 
   PanGestureDetector copy( detector );
   DALI_TEST_CHECK( detector );
@@ -305,7 +305,7 @@ int UtcDaliPanGestureDetectorAssignmentOperatorP(void)
 {
   TestApplication application;
 
-  PanGestureDetector detector = PanGestureDetector::New();;
+  PanGestureDetector detector = PanGestureDetector::New();
 
   PanGestureDetector assign;
   assign = detector;
