@@ -101,6 +101,7 @@ struct Actor::RelayoutData
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       resizePolicies[ i ] = ResizePolicy::DEFAULT;
+      useAssignedSize[ i ] = false;
       negotiatedDimensions[ i ] = 0.0f;
       dimensionNegotiated[ i ] = false;
       dimensionDirty[ i ] = false;
@@ -112,6 +113,7 @@ struct Actor::RelayoutData
   }
 
   ResizePolicy::Type resizePolicies[ Dimension::DIMENSION_COUNT ];      ///< Resize policies
+  bool useAssignedSize[ Dimension::DIMENSION_COUNT ];                   ///< The flag to specify whether the size should be assigned to the actor
 
   Dimension::Type dimensionDependencies[ Dimension::DIMENSION_COUNT ];  ///< A list of dimension dependencies
 
@@ -1293,7 +1295,15 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
   {
     if( dimension & ( 1 << i ) )
     {
-      mRelayoutData->resizePolicies[ i ] = policy;
+      if ( policy == ResizePolicy::USE_ASSIGNED_SIZE )
+      {
+        mRelayoutData->useAssignedSize[ i ] = true;
+      }
+      else
+      {
+        mRelayoutData->resizePolicies[ i ] = policy;
+        mRelayoutData->useAssignedSize[ i ] = false;
+      }
     }
   }
 
@@ -1328,7 +1338,14 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
     {
       if( ( dimension & ( 1 << i ) ) )
       {
-        return mRelayoutData->resizePolicies[ i ];
+        if( mRelayoutData->useAssignedSize[ i ] )
+        {
+          return ResizePolicy::USE_ASSIGNED_SIZE;
+        }
+        else
+        {
+          return mRelayoutData->resizePolicies[ i ];
+        }
       }
     }
   }
@@ -4202,13 +4219,13 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   // relayout container afterwards, the dirty flags would still be clear...
   // causing a relayout to be skipped. Here we force any actors added to the
   // container to be relayed out.
-  if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+  if( GetUseAssignedSize(Dimension::WIDTH ) )
   {
-    SetLayoutNegotiated(false, Dimension::WIDTH);
+    SetLayoutNegotiated( false, Dimension::WIDTH );
   }
-  if(GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+  if( GetUseAssignedSize( Dimension::HEIGHT ) )
   {
-    SetLayoutNegotiated(false, Dimension::HEIGHT);
+    SetLayoutNegotiated( false, Dimension::HEIGHT );
   }
 
   // Do the negotiation
@@ -4226,12 +4243,13 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
 
     // Forces children that have already been laid out to be relayed out
     // if they have assigned size during relayout.
-    if(child->GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+    if( child->GetUseAssignedSize(Dimension::WIDTH) )
     {
       child->SetLayoutNegotiated(false, Dimension::WIDTH);
       child->SetLayoutDirty(true, Dimension::WIDTH);
     }
-    if(child->GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+
+    if( child->GetUseAssignedSize(Dimension::HEIGHT) )
     {
       child->SetLayoutNegotiated(false, Dimension::HEIGHT);
       child->SetLayoutDirty(true, Dimension::HEIGHT);
@@ -4243,6 +4261,37 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
       container.Add( Dali::Actor( child.Get() ), newBounds );
     }
   }
+}
+
+void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
+{
+  if( mRelayoutData )
+  {
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    {
+      if( dimension & ( 1 << i ) )
+      {
+        mRelayoutData->useAssignedSize[ i ] = use;
+      }
+    }
+  }
+}
+
+bool Actor::GetUseAssignedSize( Dimension::Type dimension ) const
+{
+  if ( mRelayoutData )
+  {
+    // If more than one dimension is requested, just return the first one found
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    {
+      if( dimension & ( 1 << i ) )
+      {
+        return mRelayoutData->useAssignedSize[ i ];
+      }
+    }
+  }
+
+  return false;
 }
 
 void Actor::RelayoutRequest( Dimension::Type dimension )
