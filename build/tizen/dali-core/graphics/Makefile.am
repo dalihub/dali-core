@@ -38,11 +38,11 @@ dali_core_includes = \
 
 
 gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override \
-            -Wstack-usage=128 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
+            -Wstack-usage=256 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
 
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
                     -Wfloat-equal -Wshadow \
-                    -Wlarger-than=128 -Wframe-larger-than=128 \
+                    -Wlarger-than=256 -Wframe-larger-than=128 \
                     -Wcast-qual -Wcast-align \
                     -Wconversion -Wsign-conversion \
                     -W

@@ -7,7 +7,8 @@ SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
   utc-Dali-Graphics-API.cpp
-  utc-Dali-Graphics-object-owner.cpp
+  utc-Dali-Graphics-Object-Owner.cpp
+  utc-Dali-Graphics-Utility-Queue.cpp
 )
 
 LIST(APPEND TC_SOURCES
@@ -33,7 +34,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali-core
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${${CAPI_LIB}_CFLAGS_OTHER} -O0 -ggdb --coverage -Wall -Werror -std=c++14 ")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${${CAPI_LIB}_CFLAGS_OTHER} -O0 -ggdb --coverage -Wall -Werror -std=c++11 ")
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")

@@ -38,7 +38,7 @@ namespace
 struct TestType final
 {
   /**
-   * @brief default conmstructor
+   * @brief default constructor
    */
   TestType() = default;
 
