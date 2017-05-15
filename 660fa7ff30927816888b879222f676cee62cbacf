@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "97b5a784_ea0ba4cc",
+        "filename": "build/scripts/dali_env",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "This should go to the existing setenv file, not a new one.\n\nWhen the setenv is created we should check if the vulkan folder exists in the environment and if it does add these paths as well\n\nAnd we should generate the .pc file as well, the LD_LIBRARY_PATH probably doesn\u0027t need to be set here",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a4fc586d_1c5cf65a",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "we probably should not set the GLES version if we\u0027re using Vulkan, but it\u0027s not important for now",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d0e1d4c_4618e6ce",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "correctly",
+      "range": {
+        "startLine": 118,
+        "startChar": 57,
+        "endLine": 118,
+        "endChar": 64
+      },
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d41a3c4_358c1b8f",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "we should use versions instead of \"yes\" like we do in GLES to be able to have different builds for future versions of Vulkan.",
+      "range": {
+        "startLine": 119,
+        "startChar": 30,
+        "endLine": 119,
+        "endChar": 33
+      },
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a457d720_ce163bd2",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "we should generate and use a .pc file",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd39f8a1_2ff967a5",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "maybe add Vulkan value here as well",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3611dac2_0eed0b18",
+        "filename": "build/tizen/dali-core/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T10:32:23Z",
+      "side": 1,
+      "message": "this is the wrong thing to do, we should use package config",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
