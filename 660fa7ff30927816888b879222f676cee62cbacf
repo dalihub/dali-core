@@ -130,6 +130,40 @@
       "revId": "660fa7ff30927816888b879222f676cee62cbacf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5221fa7a_34441ae2",
+        "filename": "build/tizen/dali-core/graphics/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T11:44:20Z",
+      "side": 1,
+      "message": "did you try 256 or 512 first?",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "13152241_87ec4899",
+        "filename": "build/tizen/dali-core/graphics/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-15T11:44:20Z",
+      "side": 1,
+      "message": "this should be in the \"warnings to remove\" list",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
