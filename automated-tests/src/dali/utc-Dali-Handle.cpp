@@ -896,8 +896,35 @@ int UtcDaliHandleWeightNew(void)
 {
   TestApplication application;
 
-  Handle handle = WeightObject::New();;
+  Handle handle = WeightObject::New();
   DALI_TEST_CHECK( handle.GetProperty<float>(WeightObject::WEIGHT) == 0.0f );
+
+  // process the message so scene object is added to update manager
+  application.SendNotification();
+  application.Render(0);
+
+  // no message to release scene object in this scenario
+
+  END_TEST;
+}
+
+int UtcDaliHandleWeightNew2(void)
+{
+  TestApplication application;
+
+  // scope for the weight object
+  {
+    Handle handle = WeightObject::New();
+    DALI_TEST_CHECK( handle.GetProperty<float>(WeightObject::WEIGHT) == 0.0f );
+
+    // process the message so scene object is added to update manager
+    application.SendNotification();
+    application.Render(0);
+  }
+  // handle out of scope so object gets destroyed
+  // process the message so update manager destroys the scene object
+  application.SendNotification();
+  application.Render(0);
 
   END_TEST;
 }
