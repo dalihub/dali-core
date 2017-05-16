@@ -705,8 +705,7 @@ Stage::Stage( AnimationPlaylist& playlist,
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
   mTopMargin( 0 ),
-  mSystemOverlay(NULL),
-  mDepthTreeDirty( false )
+  mSystemOverlay(NULL)
 {
 }
 
