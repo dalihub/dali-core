@@ -881,6 +881,24 @@ public:
   void NegotiateSize( const Vector2& size, RelayoutContainer& container );
 
   /**
+   * @brief Set whether size negotiation should use the assigned size of the actor
+   * during relayout for the given dimension(s)
+   *
+   * @param[in] use Whether the assigned size of the actor should be used
+   * @param[in] dimension The dimension(s) to set. Can be a bitfield of multiple dimensions
+   */
+  void SetUseAssignedSize( bool use, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+
+  /**
+   * @brief Returns whether size negotiation should use the assigned size of the actor
+   * during relayout for a single dimension
+   *
+   * @param[in] dimension The dimension to get
+   * @return Return whether the assigned size of the actor should be used. If more than one dimension is requested, just return the first one found
+   */
+  bool GetUseAssignedSize( Dimension::Type dimension ) const;
+
+  /**
    * @copydoc Dali::Actor::SetResizePolicy()
    */
   void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );

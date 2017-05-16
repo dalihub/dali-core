@@ -106,15 +106,7 @@ struct RenderManager::Impl
 
   void RemoveRenderTracker( Render::RenderTracker* renderTracker )
   {
-    DALI_ASSERT_DEBUG( renderTracker != NULL );
-    for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
-    {
-      if( *iter == renderTracker )
-      {
-        mRenderTrackers.Erase( iter );
-        break;
-      }
-    }
+    mRenderTrackers.EraseObject( renderTracker );
   }
 
   void UpdateTrackers()
@@ -252,19 +244,7 @@ void RenderManager::AddRenderer( Render::Renderer* renderer )
 
 void RenderManager::RemoveRenderer( Render::Renderer* renderer )
 {
-  DALI_ASSERT_DEBUG( NULL != renderer );
-
-  RendererOwnerContainer& renderers = mImpl->rendererContainer;
-
-  // Find the renderer
-  for ( RendererOwnerIter iter = renderers.Begin(); iter != renderers.End(); ++iter )
-  {
-    if ( *iter == renderer )
-    {
-      renderers.Erase( iter ); // Renderer found; now destroy it
-      break;
-    }
-  }
+  mImpl->rendererContainer.EraseObject( renderer );
 }
 
 void RenderManager::AddSampler( Render::Sampler* sampler )
@@ -274,19 +254,7 @@ void RenderManager::AddSampler( Render::Sampler* sampler )
 
 void RenderManager::RemoveSampler( Render::Sampler* sampler )
 {
-  DALI_ASSERT_DEBUG( NULL != sampler );
-
-  SamplerOwnerContainer& samplers = mImpl->samplerContainer;
-
-  // Find the sampler
-  for ( SamplerOwnerIter iter = samplers.Begin(); iter != samplers.End(); ++iter )
-  {
-    if ( *iter == sampler )
-    {
-      samplers.Erase( iter ); // Sampler found; now destroy it
-      break;
-    }
-  }
+  mImpl->samplerContainer.EraseObject( sampler );
 }
 
 void RenderManager::AddTexture( Render::Texture* texture )
@@ -372,19 +340,7 @@ void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 
 void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
-
-  PropertyBufferOwnerContainer& propertyBuffers = mImpl->propertyBufferContainer;
-
-  // Find the sampler
-  for ( PropertyBufferOwnerIter iter = propertyBuffers.Begin(); iter != propertyBuffers.End(); ++iter )
-  {
-    if ( *iter == propertyBuffer )
-    {
-      propertyBuffers.Erase( iter ); // Property buffer found; now destroy it
-      break;
-    }
-  }
+  mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
 void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
@@ -409,19 +365,7 @@ void RenderManager::AddGeometry( Render::Geometry* geometry )
 
 void RenderManager::RemoveGeometry( Render::Geometry* geometry )
 {
-  DALI_ASSERT_DEBUG( NULL != geometry );
-
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the geometry
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
-  {
-    if ( *iter == geometry )
-    {
-      geometries.Erase( iter ); // Geometry found; now destroy it
-      break;
-    }
-  }
+  mImpl->geometryContainer.EraseObject( geometry );
 }
 
 void RenderManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )

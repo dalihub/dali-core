@@ -316,19 +316,12 @@ public:
   // Gestures
 
   /**
-   * Add a newly created gesture.
-   * @param[in] gesture The gesture to add.
-   * @post The gesture is owned by the UpdateManager.
+   * Set the pan gesture processor.
+   * Pan Gesture processor lives for the lifetime of UpdateManager
+   * @param[in] gesture The gesture processor.
+   * @post The gestureProcessor is owned by the UpdateManager.
    */
-  void AddGesture( PanGesture* gesture );
-
-  /**
-   * Remove a gesture.
-   * @pre The gesture has been added to the UpdateManager.
-   * @param[in] gesture The gesture to remove.
-   * @post The gesture is destroyed.
-   */
-  void RemoveGesture( PanGesture* gesture );
+  void SetPanGestureProcessor( PanGesture* gestureProcessor );
 
   // Textures
 
@@ -962,29 +955,6 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
-}
-
-inline void AddGestureMessage( UpdateManager& manager, PanGesture* gesture )
-{
-  // Message has ownership of PanGesture while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< PanGesture > > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddGesture, gesture );
-}
-
-inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
-{
-  typedef MessageValue1< UpdateManager, PanGesture* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
 
 inline void AddRendererMessage( UpdateManager& manager, Renderer& object )

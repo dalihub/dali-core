@@ -124,8 +124,8 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mStage->Initialize();
 
-  mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
-  mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
+  mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
+  mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
 
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
