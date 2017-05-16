@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a060261f_5c4517d5",
+        "filename": "build/scripts/dali_env",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "this can be done",
+      "parentUuid": "97b5a784_ea0ba4cc",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a4fc586d_1c5cf65a",
         "filename": "build/tizen/configure.ac",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "8a899acf_b01f44ea",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "for now going to leave it that way but when we get Vulkan actually working it should be made \"either-or\".",
+      "parentUuid": "a4fc586d_1c5cf65a",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d0e1d4c_4618e6ce",
         "filename": "build/tizen/configure.ac",
         "patchSetId": 3
@@ -47,6 +83,30 @@
       "writtenOn": "2017-05-15T10:32:23Z",
       "side": 1,
       "message": "correctly",
+      "range": {
+        "startLine": 118,
+        "startChar": 57,
+        "endLine": 118,
+        "endChar": 64
+      },
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ec2d69a_b44ee4f7",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "corrected",
+      "parentUuid": "2d0e1d4c_4618e6ce",
       "range": {
         "startLine": 118,
         "startChar": 57,
@@ -82,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "03f0b13c_2057d47e",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "added version, only supported is 1.0.",
+      "parentUuid": "2d41a3c4_358c1b8f",
+      "range": {
+        "startLine": 119,
+        "startChar": 30,
+        "endLine": 119,
+        "endChar": 33
+      },
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a457d720_ce163bd2",
         "filename": "build/tizen/configure.ac",
         "patchSetId": 3
@@ -93,6 +177,24 @@
       "writtenOn": "2017-05-15T10:32:23Z",
       "side": 1,
       "message": "we should generate and use a .pc file",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e7ab6106_9d1a74db",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": ".pc file is being generated now, libs and cflags are pulled via pkgconfig",
+      "parentUuid": "a457d720_ce163bd2",
       "revId": "660fa7ff30927816888b879222f676cee62cbacf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -116,6 +218,24 @@
     },
     {
       "key": {
+        "uuid": "3e4e1f06_e0ac7e70",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "added",
+      "parentUuid": "cd39f8a1_2ff967a5",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3611dac2_0eed0b18",
         "filename": "build/tizen/dali-core/Makefile.am",
         "patchSetId": 3
@@ -127,6 +247,24 @@
       "writtenOn": "2017-05-15T10:32:23Z",
       "side": 1,
       "message": "this is the wrong thing to do, we should use package config",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69d569f7_4e360d01",
+        "filename": "build/tizen/dali-core/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "3611dac2_0eed0b18",
       "revId": "660fa7ff30927816888b879222f676cee62cbacf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -150,6 +288,24 @@
     },
     {
       "key": {
+        "uuid": "29d72883_afb8ee81",
+        "filename": "build/tizen/dali-core/graphics/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "yes, the largest object for now thrown by the Vulkan header is 840 bytes. At the moment the largest object is allocated by the physical device wrapper and reaches 2320 bytes. I propose to go safe and increase it to 4096 bytes.",
+      "parentUuid": "5221fa7a_34441ae2",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "13152241_87ec4899",
         "filename": "build/tizen/dali-core/graphics/Makefile.am",
         "patchSetId": 3
@@ -161,6 +317,24 @@
       "writtenOn": "2017-05-15T11:44:20Z",
       "side": 1,
       "message": "this should be in the \"warnings to remove\" list",
+      "revId": "660fa7ff30927816888b879222f676cee62cbacf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca28b65_93870197",
+        "filename": "build/tizen/dali-core/graphics/Makefile.am",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-16T15:11:08Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "13152241_87ec4899",
       "revId": "660fa7ff30927816888b879222f676cee62cbacf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
