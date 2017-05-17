@@ -189,14 +189,14 @@ int UtcPathConstrainerApplyRange(void)
 
   Vector3 position, tangent;
   float tValue;
-  actor.GetProperty(index).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get(tValue);
   float currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  actor.GetProperty(index).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get(tValue);
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   path.Sample(0.5, position, tangent );
@@ -219,6 +219,12 @@ int UtcPathConstrainerApplyRange(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
   DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
+  currentCursor =  ( tValue - range.x ) / (range.y-range.x);
+  path.Sample(currentCursor, position, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+
+  // Ensure GetProperty also returns the final result
+  actor.GetProperty( index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
