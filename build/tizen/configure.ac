@@ -31,7 +31,7 @@ AC_SUBST(DALI_VERSION)
 DALI_CFLAGS=-DPLATFORM_TIZEN
 
 # Use C++ 11
-DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor"
+DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor -Woverloaded-virtual"
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],
