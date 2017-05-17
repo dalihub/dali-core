@@ -601,6 +601,10 @@ bool HitTestForEachRenderTask( Stage& stage,
 
 } // unnamed namespace
 
+HitTestInterface::~HitTestInterface()
+{
+}
+
 bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
   bool wasHit( false );
