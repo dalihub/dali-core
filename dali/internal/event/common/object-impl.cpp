@@ -1448,7 +1448,7 @@ CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) cons
     int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
     if( arrayIndex >= 0 )
     {
-      if( arrayIndex < (int)mCustomProperties.Count() ) // we can only access the first 2 billion custom properties
+      if( arrayIndex < static_cast<int>( mCustomProperties.Count() ) ) // we can only access the first 2 billion custom properties
       {
         property = static_cast<CustomPropertyMetadata*>(mCustomProperties[ arrayIndex ]);
       }
@@ -1459,7 +1459,8 @@ CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) cons
 
 AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index index ) const
 {
-  for ( int arrayIndex = 0; arrayIndex < (int)mAnimatableProperties.Count(); arrayIndex++ )
+  const PropertyMetadataLookup::SizeType count = mAnimatableProperties.Count();
+  for ( PropertyMetadataLookup::SizeType arrayIndex = 0; arrayIndex < count; ++arrayIndex )
   {
     AnimatablePropertyMetadata* property = static_cast<AnimatablePropertyMetadata*>( mAnimatableProperties[ arrayIndex ] );
     if( property->index == index )
@@ -1531,7 +1532,8 @@ void Object::ResolveChildProperties()
     if( parentTypeInfo )
     {
       // Go through each custom property
-      for ( int arrayIndex = 0; arrayIndex < (int)mCustomProperties.Count(); arrayIndex++ )
+      const PropertyMetadataLookup::SizeType count = mCustomProperties.Count();
+      for ( PropertyMetadataLookup::SizeType arrayIndex = 0; arrayIndex < count; ++arrayIndex )
       {
         CustomPropertyMetadata* customProperty = static_cast<CustomPropertyMetadata*>( mCustomProperties[ arrayIndex ] );
 

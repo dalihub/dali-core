@@ -348,7 +348,7 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   {
     segment = t * numSegs;
     float segLength = 1.0f / numSegs;
-    float segStart  = (float)segment * segLength;
+    float segStart  = static_cast<float>( segment ) * segLength;
     tLocal = (t - segStart) * numSegs;
   }
 }

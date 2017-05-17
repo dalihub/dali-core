@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,7 @@ void Program::GetActiveSamplerUniforms()
 
     for( int i=0; i<numberOfActiveUniforms; ++i )
     {
-      mGlAbstraction.GetActiveUniform( mProgramId, (GLuint)i, uniformMaxNameLength,
+      mGlAbstraction.GetActiveUniform( mProgramId, static_cast< GLuint >( i ), uniformMaxNameLength,
                                        &nameLength, &number, &type, name );
 
       if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_EXTERNAL_OES )

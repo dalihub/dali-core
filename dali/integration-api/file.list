@@ -31,7 +31,6 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/bitmap.h \
    $(platform_abstraction_src_dir)/resource-policies.h \
    $(platform_abstraction_src_dir)/resource-types.h \
-   $(platform_abstraction_src_dir)/resource-declarations.h \
    $(platform_abstraction_src_dir)/gl-abstraction.h \
    $(platform_abstraction_src_dir)/gl-defines.h \
    $(platform_abstraction_src_dir)/gl-sync-abstraction.h \

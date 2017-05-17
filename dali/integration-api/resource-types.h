@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_RESOURCE_TYPES_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
