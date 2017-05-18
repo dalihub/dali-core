@@ -743,6 +743,7 @@ struct AnimateByInteger : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float alpha, const int& property)
   {
     return int(property + mRelative * alpha + 0.5f );
@@ -758,6 +759,7 @@ struct AnimateToInteger : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float alpha, const int& property)
   {
     return int(property + ((mTarget - property) * alpha) + 0.5f);
@@ -773,6 +775,7 @@ struct AnimateByFloat : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float alpha, const float& property)
   {
     return float(property + mRelative * alpha);
@@ -788,6 +791,7 @@ struct AnimateToFloat : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float alpha, const float& property)
   {
     return float(property + ((mTarget - property) * alpha));
@@ -803,6 +807,7 @@ struct AnimateByVector2 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector2 operator()(float alpha, const Vector2& property)
   {
     return Vector2(property + mRelative * alpha);
@@ -818,6 +823,7 @@ struct AnimateToVector2 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector2 operator()(float alpha, const Vector2& property)
   {
     return Vector2(property + ((mTarget - property) * alpha));
@@ -833,6 +839,7 @@ struct AnimateByVector3 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector3 operator()(float alpha, const Vector3& property)
   {
     return Vector3(property + mRelative * alpha);
@@ -848,6 +855,7 @@ struct AnimateToVector3 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector3 operator()(float alpha, const Vector3& property)
   {
     return Vector3(property + ((mTarget - property) * alpha));
@@ -863,6 +871,7 @@ struct AnimateByVector4 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector4 operator()(float alpha, const Vector4& property)
   {
     return Vector4(property + mRelative * alpha);
@@ -878,6 +887,7 @@ struct AnimateToVector4 : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector4 operator()(float alpha, const Vector4& property)
   {
     return Vector4(property + ((mTarget - property) * alpha));
@@ -893,6 +903,7 @@ struct AnimateByOpacity : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector4 operator()(float alpha, const Vector4& property)
   {
     Vector4 result(property);
@@ -911,6 +922,7 @@ struct AnimateToOpacity : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector4 operator()(float alpha, const Vector4& property)
   {
     Vector4 result(property);
@@ -929,6 +941,7 @@ struct AnimateByBoolean : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   bool operator()(float alpha, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
@@ -945,6 +958,7 @@ struct AnimateToBoolean : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   bool operator()(float alpha, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
@@ -962,6 +976,7 @@ struct RotateByAngleAxis : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Quaternion operator()(float alpha, const Quaternion& rotation)
   {
     if (alpha > 0.0f)
@@ -983,6 +998,7 @@ struct RotateToQuaternion : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Quaternion operator()(float alpha, const Quaternion& rotation)
   {
     return Quaternion::Slerp(rotation, mTarget, alpha);
@@ -999,6 +1015,7 @@ struct KeyFrameBooleanFunctor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   bool operator()(float progress, const bool& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1018,6 +1035,7 @@ struct KeyFrameIntegerFunctor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float progress, const int& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1038,6 +1056,7 @@ struct KeyFrameNumberFunctor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   float operator()(float progress, const float& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1058,6 +1077,7 @@ struct KeyFrameVector2Functor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector2 operator()(float progress, const Vector2& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1079,6 +1099,7 @@ struct KeyFrameVector3Functor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector3 operator()(float progress, const Vector3& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1099,6 +1120,7 @@ struct KeyFrameVector4Functor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector4 operator()(float progress, const Vector4& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1119,6 +1141,7 @@ struct KeyFrameQuaternionFunctor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Quaternion operator()(float progress, const Quaternion& property)
   {
     if(mKeyFrames->IsActive(progress))
@@ -1138,6 +1161,7 @@ struct PathPositionFunctor : public AnimatorFunctionBase
   {
   }
 
+  using AnimatorFunctionBase::operator();
   Vector3 operator()(float progress, const Vector3& property)
   {
     Vector3 position(property);
@@ -1157,6 +1181,7 @@ struct PathRotationFunctor : public AnimatorFunctionBase
     mForward.Normalize();
   }
 
+  using AnimatorFunctionBase::operator();
   Quaternion operator()(float progress, const Quaternion& property)
   {
     Vector3 tangent;
