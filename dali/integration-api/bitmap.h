@@ -267,6 +267,13 @@ public:
      * This property can then be tested for with IsFullyOpaque().
      */
     virtual void TestForTransparency() = 0;
+
+  protected:
+
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~PackedPixelsProfile() {}
   };
 
   /**
@@ -304,6 +311,12 @@ public:
                                        const unsigned width,
                                        const unsigned height,
                                        const size_t numBytes ) = 0;
+  protected:
+
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~CompressedProfile() {}
   };
 
   virtual const CompressedProfile* GetCompressedProfile() const { return 0; }
@@ -330,6 +343,8 @@ public:
    * Delete the pixel buffer data
    */
   void DeletePixelBuffer();
+
+protected:
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

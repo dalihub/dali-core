@@ -57,6 +57,13 @@ public:
    */
   virtual void Update(const GestureRequest& request) = 0;
 
+protected:
+
+  /**
+   * Virtual destructor, no deletion through this interface
+   */
+  virtual ~GestureManager() {}
+
 }; // class GestureManager
 
 } // namespace Integration
