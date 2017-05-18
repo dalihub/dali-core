@@ -147,7 +147,7 @@ void ResourceImage::Reload()
                                                 mAttributes.GetOrientationCorrection() );
 
   // Note, bitmap is only destroyed when the image is destroyed.
-  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, mUrl );
+  Integration::ResourcePointer resource = platformAbstraction.LoadImageSynchronously( resourceType, mUrl );
   if( resource )
   {
     Integration::Bitmap* bitmap = static_cast<Integration::Bitmap*>( resource.Get() );
