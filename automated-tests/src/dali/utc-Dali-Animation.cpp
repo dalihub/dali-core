@@ -2806,6 +2806,9 @@ int UtcDaliAnimationAnimateByBooleanP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( index ), finalValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3099,6 +3102,9 @@ int UtcDaliAnimationAnimateByFloatP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3332,6 +3338,9 @@ int UtcDaliAnimationAnimateByIntegerP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), targetValue, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -3567,6 +3576,9 @@ int UtcDaliAnimationAnimateByVector2P(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3801,6 +3813,9 @@ int UtcDaliAnimationAnimateByVector3P(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index ), targetValue, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -4038,6 +4053,9 @@ int UtcDaliAnimationAnimateByVector4P(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -4274,6 +4292,9 @@ int UtcDaliAnimationAnimateByActorPositionP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -4488,6 +4509,9 @@ int UtcDaliAnimationAnimateByActorOrientationP1(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion(relativeRotationRadians, Vector3::YAXIS), TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -4790,6 +4814,9 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), targetScale, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);

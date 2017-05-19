@@ -281,7 +281,7 @@ void Animation::Play()
       Object* object = connector->GetObject();
       if( object )
       {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue );
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->propertyChangeType );
       }
     }
   }
@@ -369,6 +369,14 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
   DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
   ExtendDuration( period );
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = relativeValue;
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.propertyChangeType = Object::PropertyChange::ADJUST_VALUE_BY;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch ( targetType )
   {
@@ -502,6 +510,7 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   connectorPair.targetValue = destinationValue;
   connectorPair.connectorIndex = mConnectors.Count();
   connectorPair.timePeriod = period;
+  connectorPair.propertyChangeType = Object::PropertyChange::SET;
   mConnectorTargetValues.push_back( connectorPair );
 
   switch ( destinationType )

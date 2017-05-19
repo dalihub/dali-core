@@ -69,6 +69,17 @@ TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), 
 
 SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal );
 
+/// Helper to adjust the current value of a variable from the given property-value
+template< typename PropertyType >
+inline void AdjustValue( PropertyType& currentValue, const Property::Value& value )
+{
+  PropertyType relativeValue;
+  if( value.Get( relativeValue ) )
+  {
+    currentValue += relativeValue;
+  }
+}
+
 } // Unnamed namespace
 
 RenderTask* RenderTask::New( bool isSystemLevel )
@@ -689,30 +700,60 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index inde
   return value;
 }
 
-void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType )
 {
-  switch ( index )
+  if( propertyChangeType == Object::PropertyChange::SET )
   {
-    case Dali::RenderTask::Property::VIEWPORT_POSITION:
+    switch ( index )
     {
-      value.Get( mViewportPosition );
-      break;
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
+      {
+        value.Get( mViewportPosition );
+        break;
+      }
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
+      {
+        value.Get( mViewportSize );
+        break;
+      }
+      case Dali::RenderTask::Property::CLEAR_COLOR:
+      {
+        value.Get( mClearColor );
+        break;
+      }
+      case Dali::RenderTask::Property::REQUIRES_SYNC:
+      default:
+      {
+        // Nothing to do as not animatable
+        break;
+      }
     }
-    case Dali::RenderTask::Property::VIEWPORT_SIZE:
+  }
+  else
+  {
+    switch ( index )
     {
-      value.Get( mViewportSize );
-      break;
-    }
-    case Dali::RenderTask::Property::CLEAR_COLOR:
-    {
-      value.Get( mClearColor );
-      break;
-    }
-    case Dali::RenderTask::Property::REQUIRES_SYNC:
-    default:
-    {
-      // Nothing to do as not animatable
-      break;
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
+      {
+        AdjustValue< Vector2 >( mViewportPosition, value );
+        break;
+      }
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
+      {
+        AdjustValue< Vector2 >( mViewportSize, value );
+        break;
+      }
+      case Dali::RenderTask::Property::CLEAR_COLOR:
+      {
+        AdjustValue< Vector4 >( mClearColor, value );
+        break;
+      }
+      case Dali::RenderTask::Property::REQUIRES_SYNC:
+      default:
+      {
+        // Nothing to do as not animatable
+        break;
+      }
     }
   }
 }

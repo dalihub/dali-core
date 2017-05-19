@@ -325,7 +325,7 @@ public: // Implementation of Object
   /**
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType );
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObject()

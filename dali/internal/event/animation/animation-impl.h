@@ -26,6 +26,7 @@
 #include <dali/internal/event/animation/animator-connector-base.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
+#include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
 {
@@ -445,13 +446,15 @@ private:
     ConnectorTargetValues()
     : targetValue(),
       timePeriod( 0.0f ),
-      connectorIndex( 0 )
+      connectorIndex( 0 ),
+      propertyChangeType( Object::PropertyChange::SET )
     {
     }
 
     Property::Value targetValue;
     TimePeriod timePeriod;
     unsigned int connectorIndex;
+    Object::PropertyChange::Type propertyChangeType;
   };
 
 private:
