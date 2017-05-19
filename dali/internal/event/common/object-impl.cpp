@@ -924,28 +924,46 @@ void Object::RemovePropertyNotifications()
   }
 }
 
-void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
 {
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    OnNotifyDefaultPropertyAnimation( animation, index, value );
-  }
-  else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
-  {
-    AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
-    if( animatableProperty )
-    {
-      // update the cached property value
-      animatableProperty->SetPropertyValue( value );
-    }
+    OnNotifyDefaultPropertyAnimation( animation, index, value, animationType );
   }
   else
   {
-    CustomPropertyMetadata* custom = FindCustomProperty( index );
-    if( custom && custom->IsAnimatable() )
+    PropertyMetadata* propertyMetadata = NULL;
+    if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
     {
-      // update the cached property value
-      custom->SetPropertyValue( value );
+      propertyMetadata = FindAnimatableProperty( index );
+    }
+    else
+    {
+      CustomPropertyMetadata* custom = FindCustomProperty( index );
+      if( custom && custom->IsAnimatable() )
+      {
+        propertyMetadata = custom;
+      }
+    }
+
+    if( propertyMetadata )
+    {
+      switch( animationType )
+      {
+        case Animation::TO:
+        case Animation::BETWEEN:
+        {
+          // Update the cached property value
+          propertyMetadata->SetPropertyValue( value );
+          break;
+        }
+        case Animation::BY:
+        {
+          // Adjust the cached property value
+          propertyMetadata->AdjustPropertyValueBy( value );
+          break;
+        }
+      }
     }
   }
 }

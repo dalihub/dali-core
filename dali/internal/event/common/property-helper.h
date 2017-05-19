@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,25 @@ struct PropertyDetails
  * @return true if strings are the same
  */
 bool CompareTokens( const char * first, const char * second, size_t& size );
+
+
+/**
+ * @brief Helper to adjust the current value of a variable from the given property-value
+ * @param[in] currentValue The current value of the property
+ * @param[in] value The relative value as a Property::Value
+ * @return true if value adjusted, false otherwise
+ */
+template< typename PropertyType >
+bool AdjustValue( PropertyType& currentValue, const Property::Value& value )
+{
+  PropertyType relativeValue;
+  if( value.Get( relativeValue ) )
+  {
+    currentValue += relativeValue;
+    return true;
+  }
+  return false;
+}
 
 } // namespace Internal
 

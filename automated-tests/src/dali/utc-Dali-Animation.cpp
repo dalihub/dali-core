@@ -2805,6 +2805,9 @@ int UtcDaliAnimationAnimateByBooleanP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( index ), finalValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3098,6 +3101,9 @@ int UtcDaliAnimationAnimateByFloatP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3332,6 +3338,9 @@ int UtcDaliAnimationAnimateByIntegerP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -3541,6 +3550,44 @@ int UtcDaliAnimationAnimateByIntegerAlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationAnimateByQuaternionP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register a quaternion property
+  const Quaternion startValue( Degree( 90 ), Vector3::XAXIS );
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_CHECK( actor.GetProperty< Quaternion >(index) == startValue );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Quaternion >( index ) == startValue );
+
+  // Build the animation
+  float durationSeconds(2.0f);
+  Animation animation = Animation::New(durationSeconds);
+  const Quaternion relativeValue( Degree( 90 ), Vector3::ZAXIS );
+  const Quaternion finalValue( startValue * relativeValue );
+  animation.AnimateBy(Property(actor, index), relativeValue);
+
+  DALI_TEST_CHECK( actor.GetProperty< Quaternion >(index) == startValue );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Quaternion >( index ) == startValue );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_CHECK( actor.GetProperty< Quaternion >(index) == finalValue );
+
+  application.SendNotification();
+  application.Render( 2000 ); // animation complete
+
+  DALI_TEST_CHECK( actor.GetProperty< Quaternion >(index) == finalValue );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Quaternion >( index ) == finalValue );
+
+  END_TEST;
+}
+
 int UtcDaliAnimationAnimateByVector2P(void)
 {
   TestApplication application;
@@ -3565,6 +3612,9 @@ int UtcDaliAnimationAnimateByVector2P(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), targetValue, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -3800,6 +3850,9 @@ int UtcDaliAnimationAnimateByVector3P(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( index ), targetValue, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -4037,6 +4090,9 @@ int UtcDaliAnimationAnimateByVector4P(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( index ), targetValue, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -4273,6 +4329,9 @@ int UtcDaliAnimationAnimateByActorPositionP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -4298,6 +4357,45 @@ int UtcDaliAnimationAnimateByActorPositionP(void)
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorPositionComponentsP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(200.0f, 300.0f, 400.0f);
+  Vector3 relativePosition(targetPosition - Vector3::ZERO);
+  animation.AnimateBy( Property( actor, Actor::Property::POSITION_X ), relativePosition.x );
+  animation.AnimateBy( Property( actor, Actor::Property::POSITION_Y ), relativePosition.y );
+  animation.AnimateBy( Property( actor, Actor::Property::POSITION_Z ), relativePosition.z );
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), targetPosition.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Y ), targetPosition.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_Z ), targetPosition.z, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -4487,6 +4585,9 @@ int UtcDaliAnimationAnimateByActorOrientationP1(void)
 
   // Start the animation
   animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion(relativeRotationRadians, Vector3::YAXIS), TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -4790,6 +4891,9 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
   // Start the animation
   animation.Play();
 
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), targetScale, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -4876,6 +4980,239 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale(), targetScale, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorScaleComponentsP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentScale(), Vector3::ONE, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetScale(2.0f, 3.0f, 4.0f);
+  Vector3 relativeScale(targetScale - Vector3::ONE);
+  animation.AnimateBy( Property( actor, Actor::Property::SCALE_X ), relativeScale.x );
+  animation.AnimateBy( Property( actor, Actor::Property::SCALE_Y ), relativeScale.y );
+  animation.AnimateBy( Property( actor, Actor::Property::SCALE_Z ), relativeScale.z );
+
+  DALI_TEST_EQUALS( actor.GetCurrentScale(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SCALE ), targetScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_X ), targetScale.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Y ), targetScale.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SCALE_Z ), targetScale.z, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentScale(), Vector3::ONE, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentScale(), targetScale, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorColorP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector4 targetColor( 0.5f, 0.75f, 0.8f, 0.1f );
+  Vector4 relativeColor( targetColor - Color::WHITE );
+  animation.AnimateBy( Property( actor, Actor::Property::COLOR ), relativeColor );
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), targetColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_RED ), targetColor.r, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), targetColor.g, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), targetColor.b, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetColor.a, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), targetColor, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorColorComponentsP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector4 targetColor( 0.5f, 0.75f, 0.8f, 0.1f );
+  Vector4 relativeColor( targetColor - Color::WHITE );
+  animation.AnimateBy( Property( actor, Actor::Property::COLOR_RED ), relativeColor.r );
+  animation.AnimateBy( Property( actor, Actor::Property::COLOR_GREEN ), relativeColor.g );
+  animation.AnimateBy( Property( actor, Actor::Property::COLOR_BLUE ), relativeColor.b );
+  animation.AnimateBy( Property( actor, Actor::Property::COLOR_ALPHA ), relativeColor.a );
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), targetColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_RED ), targetColor.r, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), targetColor.g, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), targetColor.b, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetColor.a, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), targetColor, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorSizeP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetSize( 100.0f, 200.0f, 300.0f );
+  Vector3 relativeSize( targetSize - Vector3::ZERO );
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE ), relativeSize );
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), targetSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), targetSize.width, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), targetSize.height, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), targetSize.depth, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), targetSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorSizeComponentsP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetSize( 100.0f, 200.0f, 300.0f );
+  Vector3 relativeSize( targetSize - Vector3::ZERO );
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE_WIDTH ), relativeSize.width );
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE_HEIGHT ), relativeSize.height );
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE_DEPTH ), relativeSize.depth );
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE ), targetSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), targetSize.width, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), targetSize.height, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), targetSize.depth, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.GetCurrentSize(), targetSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByActorVisibilityP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.IsVisible(), true, TEST_LOCATION );
+
+  actor.SetVisible( false );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.IsVisible(), false, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  bool targetVisibility( true );
+  bool relativeVisibility( targetVisibility );
+  animation.AnimateBy( Property( actor, Actor::Property::VISIBLE ), relativeVisibility );
+
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), targetVisibility, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsVisible(), false, TEST_LOCATION ); // Not changed yet
+
+  application.SendNotification();
+  application.Render( 1000 ); // 1 second progress
+
+  DALI_TEST_EQUALS( actor.IsVisible(), true, TEST_LOCATION );
+
   END_TEST;
 }
 
