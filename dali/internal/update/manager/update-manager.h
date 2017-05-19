@@ -22,8 +22,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
-#include <dali/integration-api/resource-declarations.h>
-
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/common/shader-saver.h>

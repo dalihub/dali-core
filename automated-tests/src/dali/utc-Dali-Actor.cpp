@@ -5960,6 +5960,7 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
 
   END_TEST;
 }
+
 int utcDaliActorVisibilityChangeSignalSelf(void)
 {
   TestApplication application;
@@ -6042,4 +6043,43 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
   childData.Check( false /* not called */, TEST_LOCATION );
   grandChildData.Check( false /* not called */, TEST_LOCATION );
 
-  END_TEST;}
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is emitted when the visibility changes when an animation starts" );
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  VisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::VISIBLE ), false );
+
+  data.Check( false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( actor, Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
+  tet_infoline( "Play the animation and check the property value" );
+  animation.Play();
+
+  data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  tet_infoline( "Animation not currently finished, so the current visibility should still be true" );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( actor, Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( actor, Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  END_TEST;
+}

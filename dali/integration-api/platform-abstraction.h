@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Integration
 {
-
+typedef unsigned int ResourceId;
 typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
 
 /**

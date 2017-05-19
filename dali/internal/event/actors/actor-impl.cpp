@@ -133,6 +133,7 @@ struct Actor::RelayoutData
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       resizePolicies[ i ] = ResizePolicy::DEFAULT;
+      useAssignedSize[ i ] = false;
       negotiatedDimensions[ i ] = 0.0f;
       dimensionNegotiated[ i ] = false;
       dimensionDirty[ i ] = false;
@@ -144,6 +145,7 @@ struct Actor::RelayoutData
   }
 
   ResizePolicy::Type resizePolicies[ Dimension::DIMENSION_COUNT ];      ///< Resize policies
+  bool useAssignedSize[ Dimension::DIMENSION_COUNT ];                   ///< The flag to specify whether the size should be assigned to the actor
 
   Dimension::Type dimensionDependencies[ Dimension::DIMENSION_COUNT ];  ///< A list of dimension dependencies
 
@@ -1054,19 +1056,7 @@ Matrix Actor::GetCurrentWorldMatrix() const
 
 void Actor::SetVisible( bool visible )
 {
-  if( mVisible != visible )
-  {
-    if( NULL != mNode )
-    {
-      // mNode is being used in a separate thread; queue a message to set the value & base value
-      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
-    }
-
-    mVisible = visible;
-
-    // Emit the signal on this actor and all its children
-    EmitVisibilityChangedSignalRecursively( this, visible, DevelActor::VisibilityChange::SELF );
-  }
+  SetVisibleInternal( visible, SendMessage::TRUE );
 }
 
 bool Actor::IsVisible() const
@@ -1288,53 +1278,6 @@ void Actor::SetSizeInternal( const Vector3& size )
   }
 }
 
-void Actor::NotifySizeAnimation( Animation& animation, const Vector3& targetSize )
-{
-  mTargetSize = targetSize;
-
-  // Notify deriving classes
-  OnSizeAnimation( animation, mTargetSize );
-}
-
-void Actor::NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property )
-{
-  if ( Dali::Actor::Property::SIZE_WIDTH == property )
-  {
-    mTargetSize.width = targetSize;
-  }
-  else if ( Dali::Actor::Property::SIZE_HEIGHT == property )
-  {
-    mTargetSize.height = targetSize;
-  }
-  else if ( Dali::Actor::Property::SIZE_DEPTH == property )
-  {
-    mTargetSize.depth = targetSize;
-  }
-  // Notify deriving classes
-  OnSizeAnimation( animation, mTargetSize );
-}
-
-void Actor::NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition )
-{
-  mTargetPosition = targetPosition;
-}
-
-void Actor::NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property )
-{
-  if ( Dali::Actor::Property::POSITION_X == property )
-  {
-    mTargetPosition.x = targetPosition;
-  }
-  else if ( Dali::Actor::Property::POSITION_Y == property )
-  {
-    mTargetPosition.y = targetPosition;
-  }
-  else if ( Dali::Actor::Property::POSITION_Z == property )
-  {
-    mTargetPosition.z = targetPosition;
-  }
-}
-
 void Actor::SetWidth( float width )
 {
   if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
@@ -1433,7 +1376,15 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
   {
     if( dimension & ( 1 << i ) )
     {
-      mRelayoutData->resizePolicies[ i ] = policy;
+      if ( policy == ResizePolicy::USE_ASSIGNED_SIZE )
+      {
+        mRelayoutData->useAssignedSize[ i ] = true;
+      }
+      else
+      {
+        mRelayoutData->resizePolicies[ i ] = policy;
+        mRelayoutData->useAssignedSize[ i ] = false;
+      }
     }
   }
 
@@ -1496,7 +1447,14 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
     {
       if( ( dimension & ( 1 << i ) ) )
       {
-        return mRelayoutData->resizePolicies[ i ];
+        if( mRelayoutData->useAssignedSize[ i ] )
+        {
+          return ResizePolicy::USE_ASSIGNED_SIZE;
+        }
+        else
+        {
+          return mRelayoutData->resizePolicies[ i ];
+        }
       }
     }
   }
@@ -3284,6 +3242,149 @@ Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) c
   return value;
 }
 
+void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Dali::Actor::Property::SIZE:
+    {
+      if( value.Get( mTargetSize ) )
+      {
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_WIDTH:
+    {
+      if( value.Get( mTargetSize.width ) )
+      {
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    {
+      if( value.Get( mTargetSize.height ) )
+      {
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::SIZE_DEPTH:
+    {
+      if( value.Get( mTargetSize.depth ) )
+      {
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION:
+    {
+      value.Get( mTargetPosition );
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_X:
+    {
+      value.Get( mTargetPosition.x );
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Y:
+    {
+      value.Get( mTargetPosition.y );
+      break;
+    }
+
+    case Dali::Actor::Property::POSITION_Z:
+    {
+      value.Get( mTargetPosition.z );
+      break;
+    }
+
+    case Dali::Actor::Property::ORIENTATION:
+    {
+      value.Get( mTargetOrientation );
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE:
+    {
+      value.Get( mTargetScale );
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_X:
+    {
+      value.Get( mTargetScale.x );
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Y:
+    {
+      value.Get( mTargetScale.y );
+      break;
+    }
+
+    case Dali::Actor::Property::SCALE_Z:
+    {
+      value.Get( mTargetScale.z );
+      break;
+    }
+
+    case Dali::Actor::Property::VISIBLE:
+    {
+      SetVisibleInternal( value.Get< bool >(), SendMessage::FALSE );
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR:
+    {
+      value.Get( mTargetColor );
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_RED:
+    {
+      value.Get( mTargetColor.r );
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_GREEN:
+    {
+      value.Get( mTargetColor.g );
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_BLUE:
+    {
+      value.Get( mTargetColor.b );
+      break;
+    }
+
+    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
+    {
+      value.Get( mTargetColor.a );
+      break;
+    }
+
+    default:
+    {
+      // Not an animatable property. Do nothing.
+      break;
+    }
+  }
+}
+
 const SceneGraph::PropertyOwner* Actor::GetPropertyOwner() const
 {
   return mNode;
@@ -4206,6 +4307,12 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
       break;
     }
 
+    case Dali::Actor::Property::VISIBLE:
+    {
+      value = IsVisible();
+      break;
+    }
+
     default:
     {
       // Must be an event-side only property
@@ -4772,13 +4879,13 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   // container to be relayed out.
   DALI_LOG_TIMER_START( NegSizeTimer1 );
 
-  if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+  if( GetUseAssignedSize(Dimension::WIDTH ) )
   {
-    SetLayoutNegotiated(false, Dimension::WIDTH);
+    SetLayoutNegotiated( false, Dimension::WIDTH );
   }
-  if(GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+  if( GetUseAssignedSize( Dimension::HEIGHT ) )
   {
-    SetLayoutNegotiated(false, Dimension::HEIGHT);
+    SetLayoutNegotiated( false, Dimension::HEIGHT );
   }
 
   // Do the negotiation
@@ -4796,12 +4903,13 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
 
     // Forces children that have already been laid out to be relayed out
     // if they have assigned size during relayout.
-    if(child->GetResizePolicy(Dimension::WIDTH) == ResizePolicy::USE_ASSIGNED_SIZE)
+    if( child->GetUseAssignedSize(Dimension::WIDTH) )
     {
       child->SetLayoutNegotiated(false, Dimension::WIDTH);
       child->SetLayoutDirty(true, Dimension::WIDTH);
     }
-    if(child->GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::USE_ASSIGNED_SIZE)
+
+    if( child->GetUseAssignedSize(Dimension::HEIGHT) )
     {
       child->SetLayoutNegotiated(false, Dimension::HEIGHT);
       child->SetLayoutDirty(true, Dimension::HEIGHT);
@@ -4814,6 +4922,37 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
     }
   }
   DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+}
+
+void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
+{
+  if( mRelayoutData )
+  {
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    {
+      if( dimension & ( 1 << i ) )
+      {
+        mRelayoutData->useAssignedSize[ i ] = use;
+      }
+    }
+  }
+}
+
+bool Actor::GetUseAssignedSize( Dimension::Type dimension ) const
+{
+  if ( mRelayoutData )
+  {
+    // If more than one dimension is requested, just return the first one found
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    {
+      if( dimension & ( 1 << i ) )
+      {
+        return mRelayoutData->useAssignedSize[ i ];
+      }
+    }
+  }
+
+  return false;
 }
 
 void Actor::RelayoutRequest( Dimension::Type dimension )
@@ -4928,6 +5067,23 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
 Object* Actor::GetParentObject() const
 {
   return mParent;
+}
+
+void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
+{
+  if( mVisible != visible )
+  {
+    if( sendMessage == SendMessage::TRUE && NULL != mNode )
+    {
+      // mNode is being used in a separate thread; queue a message to set the value & base value
+      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), mNode, &mNode->mVisible, &AnimatableProperty<bool>::Bake, visible );
+    }
+
+    mVisible = visible;
+
+    // Emit the signal on this actor and all its children
+    EmitVisibilityChangedSignalRecursively( this, visible, DevelActor::VisibilityChange::SELF );
+  }
 }
 
 void Actor::SetSiblingOrder( unsigned int order )

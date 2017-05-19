@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,8 +196,8 @@ void GenerateDistanceFieldMap(const unsigned char* const imagePixels, const Size
   {
     for ( int x = 0; x < paddedWidth; ++x)
     {
-      if( y < (int)fieldBorder || y >= (paddedHeight - (int)fieldBorder) ||
-          x < (int)fieldBorder || x >= (paddedWidth - (int)fieldBorder) )
+      if( y < static_cast< int >( fieldBorder ) || y >= ( paddedHeight - static_cast< int >( fieldBorder ) ) ||
+          x < static_cast< int >( fieldBorder ) || x >= ( paddedWidth - static_cast< int >( fieldBorder ) ) )
       {
         outside[ y * paddedWidth + x ] = MAX_DISTANCE;
         inside[ y * paddedWidth + x ] = 0.0f;

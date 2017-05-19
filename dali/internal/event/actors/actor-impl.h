@@ -619,7 +619,7 @@ public:
 
   /**
    * Sets the visibility flag of an actor.
-   * @param [in] visible The new visibility flag.
+   * @param[in] visible The new visibility flag.
    */
   void SetVisible( bool visible );
 
@@ -879,6 +879,24 @@ public:
    *                            RelayoutController algorithm.
    */
   void NegotiateSize( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @brief Set whether size negotiation should use the assigned size of the actor
+   * during relayout for the given dimension(s)
+   *
+   * @param[in] use Whether the assigned size of the actor should be used
+   * @param[in] dimension The dimension(s) to set. Can be a bitfield of multiple dimensions
+   */
+  void SetUseAssignedSize( bool use, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+
+  /**
+   * @brief Returns whether size negotiation should use the assigned size of the actor
+   * during relayout for a single dimension
+   *
+   * @param[in] dimension The dimension to get
+   * @return Return whether the assigned size of the actor should be used. If more than one dimension is requested, just return the first one found
+   */
+  bool GetUseAssignedSize( Dimension::Type dimension ) const;
 
   /**
    * @copydoc Dali::Actor::SetResizePolicy()
@@ -1468,46 +1486,12 @@ public:
   // For Animation
 
   /**
-   * This should only be called by Animation, when the actors SIZE property is animated.
-   *
-   * @param[in] animation The animation that resized the actor
-   * @param[in] targetSize The new target size of the actor
-   */
-  void NotifySizeAnimation( Animation& animation, const Vector3& targetSize );
-
-  /**
-   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT or SIZE_DEPTH property is animated.
-   *
-   * @param[in] animation The animation that resized the actor
-   * @param[in] targetSize The new target size of the actor
-   * @param[in] property The index of the property being animated
-   */
-  void NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property );
-
-  /**
    * For use in derived classes.
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
    */
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize )
   {
   }
-
-  /**
-   * This should only be called by Animation, when the actors POSITION property is animated.
-   *
-   * @param[in] animation The animation that repositioned the actor
-   * @param[in] targetPosition The new target position of the actor
-   */
-  void NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition );
-
-  /**
-   * This should only be called by Animation, when the actors POSITION_X or POSITION_Y or POSITION_Z property is animated.
-   *
-   * @param[in] animation The animation that repositioned the actor
-   * @param[in] targetPosition The new target position of the actor
-   * @param[in] property The index of the property being animated
-   */
-  void NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property );
 
 protected:
 
@@ -1670,6 +1654,11 @@ public:
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
   virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
@@ -1725,6 +1714,15 @@ public:
   void LowerBelow( Internal::Actor& target );
 
 private:
+
+  struct SendMessage
+  {
+    enum Type
+    {
+      FALSE = 0,
+      TRUE  = 1,
+    };
+  };
 
   // Undefined
   Actor();
@@ -1904,13 +1902,19 @@ private:
    */
   bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
 
-
   /**
    * @brief Get the current position of the actor in screen coordinates.
    *
    * @return Returns the screen position of actor
    */
   const Vector2 GetCurrentScreenPosition() const;
+
+  /**
+   * Sets the visibility flag of an actor.
+   * @param[in] visible The new visibility flag.
+   * @param[in] sendMessage Whether to send a message to the update thread or not.
+   */
+  void SetVisibleInternal( bool visible, SendMessage::Type sendMessage );
 
 protected:
 

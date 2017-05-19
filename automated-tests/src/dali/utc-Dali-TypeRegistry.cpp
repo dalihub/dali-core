@@ -1179,11 +1179,16 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   Animation animation = Animation::New(0.2f);
   animation.AnimateTo( Property( customActor, animatablePropertyIndex ), 15.f, AlphaFunction::LINEAR );
   animation.Play();
+
+  // Target value should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 15.0f, TEST_LOCATION );
+
   // Render and notify, animation play for 0.05 seconds
   application.SendNotification();
   application.Render(50);
   DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( customActor, animatablePropertyIndex ), 22.5f, TEST_LOCATION );
+
   // Render and notify, animation play for another 0.1 seconds
   application.SendNotification();
   application.Render(100);
@@ -1280,11 +1285,16 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   Animation animation = Animation::New(0.2f);
   animation.AnimateTo( Property( customActor, animatablePropertyIndex ), 20.f, AlphaFunction::LINEAR );
   animation.Play();
+
+  // Target value should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 20.0f, TEST_LOCATION );
+
   // Render and notify, animation play for 0.05 seconds
   application.SendNotification();
   application.Render(50);
   DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( customActor, animatablePropertyIndex ), 12.5f, TEST_LOCATION );
+
   // Render and notify, animation play for another 0.1 seconds
   application.SendNotification();
   application.Render(100);

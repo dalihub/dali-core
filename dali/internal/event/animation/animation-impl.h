@@ -62,8 +62,6 @@ public:
   typedef Dali::Animation::EndAction EndAction;
   typedef Dali::Animation::Interpolation Interpolation;
 
-  typedef void (*FinishedCallback)(Object* object);
-
   /**
    * Create a new Animation object.
    * @param[in] durationSeconds The duration of the animation.
@@ -208,13 +206,6 @@ public:
    * @return true if action was done
    */
   static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
-
-  /**
-   * This callback is intended for internal use only, to avoid the overhead of using a signal.
-   * @param[in] callback The callback function to connect.
-   * @param[in] object The internal object requesting the callback, or NULL.
-   */
-  void SetFinishedCallback( FinishedCallback callback, Object* object );
 
   /**
    * @copydoc Dali::Animation::AnimateBy(Property target, Property::Value relativeValue)
@@ -451,37 +442,53 @@ private:
 
   struct ConnectorTargetValues
   {
-    unsigned int connectorIndex;
+    ConnectorTargetValues()
+    : targetValue(),
+      timePeriod( 0.0f ),
+      connectorIndex( 0 )
+    {
+    }
+
     Property::Value targetValue;
+    TimePeriod timePeriod;
+    unsigned int connectorIndex;
   };
+
+private:
+
+  /**
+   * Compares the end times of the animators returning true if lhs end time is less than rhs end time.
+   * @param[in] lhs The first comparator
+   * @param[in] rhs The second comparator
+   * @return True if end time of lhs is less, false otherwise.
+   */
+  static bool CompareConnectorEndTimes( const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs );
+
+private:
+
+  const SceneGraph::Animation* mAnimation;
 
   EventThreadServices& mEventThreadServices;
   AnimationPlaylist& mPlaylist;
 
-  const SceneGraph::Animation* mAnimation;
-
-  int mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
-
   Dali::Animation::AnimationSignalType mFinishedSignal;
-
-  FinishedCallback mFinishedCallback;
-  Object* mFinishedCallbackObject;
 
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
 
-  std::vector< ConnectorTargetValues > mConnectorActorTargetValues; //< Store Actor target values and matchinf connector index that need to set value on Animation::Play
+  typedef std::vector< ConnectorTargetValues > ConnectorTargetValuesContainer;
+  ConnectorTargetValuesContainer mConnectorTargetValues; //< Used to store animating property target value information
 
-  // Cached for public getters
+  Vector2 mPlayRange;
+
   float mDurationSeconds;
   float mSpeedFactor;
+  int mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
   int mLoopCount;
   int mCurrentLoop;
-  Vector2 mPlayRange;
   EndAction mEndAction;
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
   Dali::Animation::State mState;
-
 };
 
 } // namespace Internal

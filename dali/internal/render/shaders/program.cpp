@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,10 +258,10 @@ void Program::GetActiveSamplerUniforms()
 
     for( int i=0; i<numberOfActiveUniforms; ++i )
     {
-      mGlAbstraction.GetActiveUniform( mProgramId, (GLuint)i, uniformMaxNameLength,
+      mGlAbstraction.GetActiveUniform( mProgramId, static_cast< GLuint >( i ), uniformMaxNameLength,
                                        &nameLength, &number, &type, name );
 
-      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE ) /// Is there a native sampler type?
+      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_EXTERNAL_OES )
       {
         GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
         samplerNames.push_back(name);
@@ -277,7 +277,9 @@ void Program::GetActiveSamplerUniforms()
   int samplerPosition = 0;
   while( token )
   {
-    if( ( strncmp( token, "sampler2D", 9u ) == 0 ) || ( strncmp( token, "samplerCube", 11u ) == 0 ) )
+    if( ( strncmp( token, "sampler2D", 9u )    == 0 ) ||
+        ( strncmp( token, "samplerCube", 11u ) == 0 ) ||
+        ( strncmp( token, "samplerExternalOES", 18u ) == 0 ) )
     {
       bool found( false );
       token = strtok_r( NULL, " ;\n", &nextPtr );

@@ -859,5 +859,9 @@
 #define GL_TEXTURE_EXTERNAL_OES                                 0x8D65
 #endif
 
+/* GL_SAMPLER_EXTERNAL_OES  */
+#ifndef GL_SAMPLER_EXTERNAL_OES
+#define GL_SAMPLER_EXTERNAL_OES                                 0x8D66
+#endif
 
 #endif // __DALI_INTERNAL_GL_DEFINES_H__

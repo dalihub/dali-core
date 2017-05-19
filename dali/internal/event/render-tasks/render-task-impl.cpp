@@ -689,6 +689,34 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index inde
   return value;
 }
 
+void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+{
+  switch ( index )
+  {
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
+    {
+      value.Get( mViewportPosition );
+      break;
+    }
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
+    {
+      value.Get( mViewportSize );
+      break;
+    }
+    case Dali::RenderTask::Property::CLEAR_COLOR:
+    {
+      value.Get( mClearColor );
+      break;
+    }
+    case Dali::RenderTask::Property::REQUIRES_SYNC:
+    default:
+    {
+      // Nothing to do as not animatable
+      break;
+    }
+  }
+}
+
 const SceneGraph::PropertyOwner* RenderTask::GetSceneObject() const
 {
   return mSceneObject;
