@@ -8791,6 +8791,9 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaP(void)
   // Start the animation
   animation.Play();
 
+  // Final key frame value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), 0.9f, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -9141,6 +9144,9 @@ int UtcDaliAnimationAnimateBetweenActorVisibleP(void)
   // Start the animation
   animation.Play();
 
+  // Final key frame value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
@@ -9227,6 +9233,9 @@ int UtcDaliAnimationAnimateBetweenActorOrientation01P(void)
 
   // Start the animation
   animation.Play();
+
+  // Final key frame value should be retrievable straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Degree( 60 ), Vector3::ZAXIS ), TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -11119,6 +11128,80 @@ int UtcDaliAnimationTimePeriodOrderSeveralAnimateToCalls(void)
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( Actor::Property::POSITION_X ), 145.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenIntegerP(void)
+{
+  TestApplication application;
+
+  int startValue(1);
+  Actor actor = Actor::New();
+  const Property::Index index = actor.RegisterProperty("customProperty", startValue );
+  Stage::GetCurrent().Add(actor);
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, 10);
+  keyFrames.Add(0.2f, 20);
+  keyFrames.Add(0.4f, 30);
+  keyFrames.Add(0.6f, 40);
+  keyFrames.Add(0.8f, 50);
+  keyFrames.Add(1.0f, 60);
+
+  animation.AnimateBetween( Property(actor, index ), keyFrames );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should change to the last key-frame's value straight away
+  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), 60, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenVector2P(void)
+{
+  TestApplication application;
+
+  Vector2 startValue( 10.0f, 20.0f );
+  Actor actor = Actor::New();
+  const Property::Index index = actor.RegisterProperty("customProperty", startValue );
+  Stage::GetCurrent().Add(actor);
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add( 0.0f, Vector2( 0.0f, 5.0f ) );
+  keyFrames.Add( 0.2f, Vector2( 30.0f, 25.0f ) );
+  keyFrames.Add( 0.4f, Vector2( 40.0f, 35.0f ) );
+  keyFrames.Add( 0.6f, Vector2( 50.0f, 45.0f ) );
+  keyFrames.Add( 0.8f, Vector2( 60.0f, 55.0f ) );
+  keyFrames.Add( 1.0f, Vector2( 70.0f, 65.0f ) );
+
+  animation.AnimateBetween( Property(actor, index ), keyFrames );
+
+  // Start the animation
+  animation.Play();
+
+  // Target value should change to the last key-frame's value straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector2 >( index ), Vector2( 70.0f, 65.0f ), TEST_LOCATION );
 
   END_TEST;
 }
