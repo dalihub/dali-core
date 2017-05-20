@@ -640,6 +640,14 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
   ExtendDuration( period );
 
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = keyFrames.GetLastKeyFrameValue();
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.propertyChangeType = Object::PropertyChange::SET;
+  mConnectorTargetValues.push_back( connectorPair );
+
   switch(keyFrames.GetType())
   {
     case Dali::Property::BOOLEAN:

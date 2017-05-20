@@ -23,6 +23,22 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+
+/// Helper to retrieve the value of the final key frame
+template< typename PropertyType, typename KeyFrameType >
+inline void GetLastKeyFrameValueInternal( const IntrusivePtr< KeyFrameSpec >& keyFrames, Property::Value& value )
+{
+  KeyFrameType* kf = static_cast< KeyFrameType* >( keyFrames.Get() );
+  float time = 0;
+  PropertyType actualValue;
+  kf->GetKeyFrame( kf->GetNumberOfKeyFrames() - 1, time, actualValue );
+  value = actualValue;
+}
+
+} // unnamed namespace
+
 KeyFrames* KeyFrames::New()
 {
   return new KeyFrames();
@@ -158,6 +174,55 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
 KeyFrameSpec* KeyFrames::GetKeyFramesBase() const
 {
   return mKeyFrames.Get();
+}
+
+Property::Value KeyFrames::GetLastKeyFrameValue() const
+{
+  Property::Value value;
+
+  switch(mType)
+  {
+    case Property::BOOLEAN:
+    {
+      GetLastKeyFrameValueInternal< bool, KeyFrameBoolean >( mKeyFrames, value );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      GetLastKeyFrameValueInternal< int, KeyFrameInteger >( mKeyFrames, value );
+      break;
+    }
+    case Property::FLOAT:
+    {
+      GetLastKeyFrameValueInternal< float, KeyFrameNumber >( mKeyFrames, value );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      GetLastKeyFrameValueInternal< Vector2, KeyFrameVector2 >( mKeyFrames, value );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      GetLastKeyFrameValueInternal< Vector3, KeyFrameVector3 >( mKeyFrames, value );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      GetLastKeyFrameValueInternal< Vector4, KeyFrameVector4 >( mKeyFrames, value );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      GetLastKeyFrameValueInternal< Quaternion, KeyFrameQuaternion >( mKeyFrames, value );
+      break;
+    }
+    default:
+      DALI_ASSERT_DEBUG(!"Type not supported");
+      break;
+  }
+
+  return value;
 }
 
 } // Internal

@@ -95,6 +95,11 @@ public:
    */
   KeyFrameSpec* GetKeyFramesBase() const;
 
+  /**
+   * Return the value of the last key frame.
+   */
+  Dali::Property::Value GetLastKeyFrameValue() const;
+
 private:
   Dali::Property::Type mType; // Type of the specialization
   IntrusivePtr<KeyFrameSpec> mKeyFrames;   // Pointer to the specialized key frame object
