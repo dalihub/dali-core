@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
 
@@ -146,15 +145,15 @@ int UtcDaliShaderConstraint01(void)
   application.Render(0);
 
   // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( shader, colorIndex ), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( shader, colorIndex ), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
 
   shader.RemoveConstraints();
   shader.SetProperty(colorIndex, Color::WHITE );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( shader, colorIndex ), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -245,11 +244,11 @@ int UtcDaliShaderAnimatedProperty01(void)
   application.SendNotification();
   application.Render(500);
 
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( shader, colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
 
   application.Render(500);
 
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( shader, colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -331,7 +330,7 @@ int UtcDaliShaderProgramProperty(void)
   DALI_TEST_CHECK( f == FragmentSource );
   DALI_TEST_CHECK( h == hintSet );
 
-  value = DevelHandle::GetCurrentProperty( shader, Shader::Property::PROGRAM );
+  value = shader.GetCurrentProperty( Shader::Property::PROGRAM );
   DALI_TEST_CHECK( value.GetType() == Property::MAP);
   outMap = value.GetMap();
 
