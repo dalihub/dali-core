@@ -16,6 +16,24 @@
       "revId": "480ac87277903177279f686a0c053f0f8b83ab27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0c60732d_849f6f0b",
+        "filename": "build/tizen/dali-core/graphics/Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-05-22T10:39:11Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "5ed4cff1_0858e901",
+      "revId": "480ac87277903177279f686a0c053f0f8b83ab27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
