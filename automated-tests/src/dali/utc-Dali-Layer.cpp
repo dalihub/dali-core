@@ -20,7 +20,6 @@
 #include <stdlib.h>
 
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/object/handle-devel.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -470,7 +469,7 @@ int UtcDaliLayerDefaultProperties(void)
   Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
   DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 
-  v = DevelHandle::GetCurrentProperty( actor, Layer::Property::CLIPPING_BOX );
+  v = actor.GetCurrentProperty( Layer::Property::CLIPPING_BOX );
   DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 
   // set the same boundaries, but through a clipping box object
@@ -481,7 +480,7 @@ int UtcDaliLayerDefaultProperties(void)
   Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
   DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_2D", TEST_LOCATION );
 
-  behavior = DevelHandle::GetCurrentProperty( actor, Layer::Property::BEHAVIOR );
+  behavior = actor.GetCurrentProperty( Layer::Property::BEHAVIOR );
   DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_2D", TEST_LOCATION );
 
   END_TEST;
