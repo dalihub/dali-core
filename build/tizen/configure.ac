@@ -66,6 +66,12 @@ AC_ARG_ENABLE([gles],
               [enable_gles=$enableval],
               [enable_gles=20])
 
+AC_ARG_ENABLE([vulkan],
+              [AC_HELP_STRING([--enable-vulkan],
+                              [Enables Vulkan support])],
+              [enable_vulkan=$enableval],
+              [enable_vulkan=no])
+
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
 if test "x$enable_debug" = "xyes"; then
@@ -109,10 +115,24 @@ fi
 DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
 DALI_LDFLAGS="-L${libdir}"
 
+# forward VULKAN_SDK path to the graphics library if set correctly
+if test x"$enable_vulkan" != x"no"; then
+  PKG_CHECK_MODULES(VULKAN, vulkan-${enable_vulkan}, AC_DEFINE(ENABLE_VULKAN, 1, [Vulkan available as package]),
+                    [ AC_MSG_ERROR([Vulkan not available as a package!]) ]
+                    )
+  DALI_LDFLAGS+=" ${VULKAN_LIBS}"
+  DALI_CFLAGS+=" ${VULKAN_CFLAGS}"
+  AC_SUBST(VULKAN_SDK)
+  AC_SUBST(VULKAN_LIBS)
+  AC_SUBST(VULKAN_CFLAGS)
+fi
+AM_CONDITIONAL([VULKAN_SDK_SET], [test x"$enable_vulkan" != x"no"])
+
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_CFLAGS)
 AC_SUBST(DALI_LDFLAGS)
+
 
 # Specify the include directory for development headers
 devincludepath=${includedir}
@@ -137,4 +157,5 @@ Configuration
   Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
+  Vulkan Support:                   $enable_vulkan
 "

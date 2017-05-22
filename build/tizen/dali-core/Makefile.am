@@ -141,8 +141,7 @@ linker_test_SOURCES = linker-test.cpp  \
 linker_test_CXXFLAGS = \
   $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
-  $(dali_core_includes) \
-  $(DALI_CFLAGS)
+  $(dali_core_includes)
 
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
