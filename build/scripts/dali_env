@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+use warnings;
 use Config;
 use Cwd;
 use Cwd 'abs_path';
@@ -21,6 +22,7 @@ use File::Basename;
 use File::Path;
 use File::Copy;
 use File::Copy::Recursive qw(dircopy);
+use File::Copy::Recursive qw(pathmk);
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -66,17 +68,17 @@ my @emscripten_system_packages = (
 my @source_pkgs = (
 
     {"name" => "disabled-v8",
-     "force-rebuild" => 0,
-     "use_depot_tools" => 1,
-     "repo" => "https://chromium.googlesource.com/v8/v8.git",
-     "depot_tools_repo" => "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+        "force-rebuild" => 0,
+        "use_depot_tools" => 1,
+        "repo" => "https://chromium.googlesource.com/v8/v8.git",
+        "depot_tools_repo" => "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
 
-     # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
-     # upgrading DALi to use  c++0x or c++11
-     "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
+        # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
+        # upgrading DALi to use  c++0x or c++11
+        "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
 
     {"name" => "emscripten",
-     "portable" => "https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz"
+        "portable" => "https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz"
     }
 );
 
@@ -86,12 +88,12 @@ my $http_proxy_ip;
 
 if( exists $ENV{http_proxy} )
 {
-  # string  split into 3 items  http, //ip, port
-  my @http_proxy_info =  split( /:/,$ENV{http_proxy}, );
+    # string  split into 3 items  http, //ip, port
+    my @http_proxy_info =  split( /:/,$ENV{http_proxy}, );
 
-  $http_proxy_ip =  @http_proxy_info[1];
-  $http_proxy_ip =~ s/[\/]//g;;  # remove forward slashes
-  $http_proxy_port =  @http_proxy_info[2];
+    $http_proxy_ip =  $http_proxy_info[1];
+    $http_proxy_ip =~ s/[\/]//g;;  # remove forward slashes
+    $http_proxy_port =  $http_proxy_info[2];
 }
 
 # Make best guess as to where this program was run from (note, it is
@@ -138,9 +140,9 @@ else
 
     if(! -e $root_path)
     {
-      # Creating a new dali-env
+        # Creating a new dali-env
 
-      $new_env = 1;
+        $new_env = 1;
     }
 }
 
@@ -148,18 +150,25 @@ my $src_path         = "$root_path/src-packages";
 my $sbs_path         = "$root_path/target";
 my $install_path     = "$root_path/opt";
 my $emscripten_path  = "$root_path/emsdk_portable";
+my $vulkan_path      = "$root_path/vulkan";
 
 my $opt_create=0;
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
 my $opt_emscripten=0;
+my $opt_vulkan=0;
+my $opt_vulkanVersion="";
+my $opt_vulkanList=0;
 
-GetOptions("create"     => \$opt_create,
-           "setenv"     => \$opt_setenv,
-           "emscripten" => \$opt_emscripten,
-           "help"       => \$opt_help,
-           "man"        => \$opt_man) or pod2usage(2);
+GetOptions("create"                 => \$opt_create,
+    "setenv"                 => \$opt_setenv,
+    "emscripten"             => \$opt_emscripten,
+    "vulkan"                 => \$opt_vulkan,
+    "vulkan-version=s"       => \$opt_vulkanVersion,
+    "vulkan-version-list"    => \$opt_vulkanList,
+    "help"                   => \$opt_help,
+    "man"                    => \$opt_man) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
@@ -210,6 +219,18 @@ EOF
         print @emsdk_env;
     }
 
+    my $vulkan_library_path = "";
+    my $vulkan_sdk_path = "";
+    if( ( -d $vulkan_path ) )
+    {
+        my $vulkan_version = readlink( "$vulkan_path/latest" );
+        $vulkan_library_path = "\${VULKAN_SDK}/lib:";
+        $vulkan_sdk_path =
+            "export VULKAN_VERSION=$vulkan_version\n" .
+            "export VULKAN_SDK=$vulkan_path/\${VULKAN_VERSION}/x86_64\n" .
+            "export VK_LAYER_PATH=\"\${VULKAN_SDK}/etc/explicit_layer.d\""
+    }
+
     print <<"EOF";
 #
 # To use the desktop libraries, please add the following lines to your .bashrc or
@@ -223,8 +244,9 @@ EOF
 # \$ CXXFLAGS="-g -O0" ./configure --prefix=\$DESKTOP_PREFIX
 
 export DESKTOP_PREFIX=$install_path
+$vulkan_sdk_path
 export PATH=$install_path/bin:\$PATH
-export LD_LIBRARY_PATH=$install_path/lib:\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$vulkan_library_path$install_path/lib:\${LD_LIBRARY_PATH:-}
 export INCLUDEDIR=$install_path/include
 export PKG_CONFIG_PATH=$install_path/lib/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
@@ -232,6 +254,7 @@ export DALI_WINDOW_WIDTH=480
 export DALI_WINDOW_HEIGHT=800
 
 EOF
+
 }
 
 ################################################################################
@@ -270,10 +293,10 @@ sub check_system_packages
     my @gpp_v = (`g++ --version  | head -1` =~ /(\d+)\.(\d+)\.(\d+)/);
 
     if(! (($gpp_v[0] > 4)
-          ||
-          ($gpp_v[0] == 4 && $gpp_v[1] > 4)
-          ||
-          ($gpp_v[0] == 4 && $gpp_v[1] == 4 && $gpp_v[2] >= 5)))
+        ||
+        ($gpp_v[0] == 4 && $gpp_v[1] > 4)
+        ||
+        ($gpp_v[0] == 4 && $gpp_v[1] == 4 && $gpp_v[2] >= 5)))
     {
         die "You need g++ 4.5.1 or greater to build dali\n";
     }
@@ -308,8 +331,8 @@ sub create_link
 
     unless (-e $link)
     {
-       print "Creating libjpegturbo symbolic link\n";
-       system("sudo ln -s $link.0 $link");
+        print "Creating libjpegturbo symbolic link\n";
+        system("sudo ln -s $link.0 $link");
     }
 }
 
@@ -318,11 +341,11 @@ sub create_link
 #
 sub run_command
 {
-  my $command = $_[0];
-  my $ret;
-  print("Running: $command\n");
-  $ret = system("$command");
-  if($ret >> 8) { die "$command failed \n"; }
+    my $command = $_[0];
+    my $ret;
+    print("Running: $command\n");
+    $ret = system("$command");
+    if($ret >> 8) { die "$command failed \n"; }
 }
 
 ################################################################################
@@ -331,9 +354,9 @@ sub run_command
 sub install_google_depot_tools
 {
 
-####
-# clone the depo_tools into the source directory and set the path up
-####
+    ####
+    # clone the depo_tools into the source directory and set the path up
+    ####
     my $v8 = $_[0];
 
     my $depot_tools_directory = $src_path . "/depot_tools";
@@ -374,8 +397,8 @@ sub create_boto_config_file
 
     print("Configuring boto with http proxy IP = ". $http_proxy_ip . ", Port = " . $http_proxy_port . "\n");
 
-# Create the proxy info for the boto file
-my $fileContents = <<"END";
+    # Create the proxy info for the boto file
+    my $fileContents = <<"END";
 [Boto]
 debug = 0
 num_retries = 2
@@ -383,7 +406,7 @@ num_retries = 2
 proxy = $http_proxy_ip
 proxy_port = $http_proxy_port
 END
-      # Place the config file in the depot tools folder
+    # Place the config file in the depot tools folder
     my $filename = $depot_tools_directory . "/" . ".boto";
     print("Creating Boto config file with proxy settings to file ". $filename . "\n");
     my $fh;
@@ -415,11 +438,11 @@ sub install_v8
     my $v8Version = $v8->{"version"};
     print( "Checking if V8 ". $v8Version. " is installed \n");
 
-####
-# Check currently installed version
-# We create a text file with v8 and gcc version in the filename to compare with
-# Version file is stored as "v8_2.3.4_installed_built_with_gcc_4_8_3.txt"
-####
+    ####
+    # Check currently installed version
+    # We create a text file with v8 and gcc version in the filename to compare with
+    # Version file is stored as "v8_2.3.4_installed_built_with_gcc_4_8_3.txt"
+    ####
     # get the gcc version, so if the compiler is updated v8 is re-built
     # note: v8 requires gcc version GCC >= 4.6
     my $gccVersion = `gcc --version | grep ^gcc | sed 's/^.* //g'`;
@@ -430,19 +453,19 @@ sub install_v8
     my @install_stats = stat $versionTextFile;
     if( (scalar(@install_stats)) && $v8->{"force-rebuild"} != 1 )
     {
-      print("Correct V8 version installed\n");
-      return;
+        print("Correct V8 version installed\n");
+        return;
     }
     else
     {
-      # delete older versions of the version file first ( otherwise when downgrading it thinks version is still installed)
-      system( "rm " . $src_path . "/v8_*.txt  >/dev/null 2>&1");
+        # delete older versions of the version file first ( otherwise when downgrading it thinks version is still installed)
+        system( "rm " . $src_path . "/v8_*.txt  >/dev/null 2>&1");
     }
 
 
-####
-# Clone the v8 source repository and checkout the version we want
-####
+    ####
+    # Clone the v8 source repository and checkout the version we want
+    ####
     # Need to clone it from repo
     my $v8_source_directory;
 
@@ -451,20 +474,20 @@ sub install_v8
     # newer version of v8 use depot_tools with gclient, git cloned builds do not work
     if( $v8->{"use_depot_tools"} == 1)
     {
-      install_google_depot_tools( $v8 );
+        install_google_depot_tools( $v8 );
 
-      # v8 is checkout out under depot_tools path
-      $v8_source_directory = $src_path . "/depot_tools/v8";
+        # v8 is checkout out under depot_tools path
+        $v8_source_directory = $src_path . "/depot_tools/v8";
     }
     else
     {
-      $v8_source_directory = $src_path . "/v8";
+        $v8_source_directory = $src_path . "/v8";
 
-      # delete the old v8 source directpry if exists
-      rmtree( $v8_source_directory );
+        # delete the old v8 source directpry if exists
+        rmtree( $v8_source_directory );
 
-      # clone the repository
-      run_command( "git clone " . $v8->{"repo"} . " " . $v8_source_directory );
+        # clone the repository
+        run_command( "git clone " . $v8->{"repo"} . " " . $v8_source_directory );
     }
 
     # change to the source directoy for the checkout
@@ -473,16 +496,16 @@ sub install_v8
     # checkout the version DALi is compatible with
     run_command( "git checkout ". $v8Version );
 
-####
-# Run make dependencies then make for the specific target
-####
+    ####
+    # Run make dependencies then make for the specific target
+    ####
     if( $v8->{"use_depot_tools"} == 1)
     {
-      run_command("gclient sync");
+        run_command("gclient sync");
     }
     else
     {
-      run_command("make dependencies");
+        run_command("make dependencies");
     }
 
     # assemble the make command
@@ -491,20 +514,20 @@ sub install_v8
     # need to append architecture and build mode, e.g. x64.debug
     my $buildTarget;
     if( $Config{use64bitint} ) {
-       print("Building 64 bit version of V8\n");
-       $buildTarget= "x64." . $v8->{"build-mode"}
+        print("Building 64 bit version of V8\n");
+        $buildTarget= "x64." . $v8->{"build-mode"}
     }
     else{
-      print("Building 32 bit version of V8\n");
-       $buildTarget= "ia32." . $v8->{"build-mode"}
+        print("Building 32 bit version of V8\n");
+        $buildTarget= "ia32." . $v8->{"build-mode"}
     }
     $makeCommand .= " " . $buildTarget;
     print("Running: $makeCommand\n");
     run_command( $makeCommand );
 
-####
-# Manually install the library / header files
-####
+    ####
+    # Manually install the library / header files
+    ####
 
     # Need to manually install (make install not available on v8 )
     my $libSourceDir = "$v8_source_directory/out/$buildTarget/lib.target/";
@@ -533,11 +556,11 @@ sub install_v8
     print( "source dir = " . $libSourceDir . " dest dir ". $libDestinationDir . " \n" );
 
 
-####
-# Create the package file in,
-# we keep the library files and header files in v8 sub-directories
-####
-my $fileContents = <<"END";
+    ####
+    # Create the package file in,
+    # we keep the library files and header files in v8 sub-directories
+    ####
+    my $fileContents = <<"END";
 prefix=$install_path
 exec_prefix=\${prefix}
 apiversion=$v8Version
@@ -551,28 +574,28 @@ Libs: -L\${libdir} -lv8 -licuuc -licui18n
 Cflags: -I\${includedir}
 END
 
-  my $filename = $install_path . "/lib/pkgconfig/" . "v8.pc";
-  print("writing to file ". $filename . "\n");
-  my $fh;
-  if( open( $fh, '>',  $filename ) )
-  {
-    print { $fh } $fileContents;
-    close( $fh );
-  }
-  else
-  {
-    die "failed to create " . $filename ."\n";
-  }
+    my $filename = $install_path . "/lib/pkgconfig/" . "v8.pc";
+    print("writing to file ". $filename . "\n");
+    my $fh;
+    if( open( $fh, '>',  $filename ) )
+    {
+        print { $fh } $fileContents;
+        close( $fh );
+    }
+    else
+    {
+        die "failed to create " . $filename ."\n";
+    }
 
-  print("Installed V8 " .$v8Version . " OK\n");
+    print("Installed V8 " .$v8Version . " OK\n");
 
-#####
-#
-####
-      my $versionFile;
-      open( $versionFile, '>',  $versionTextFile );
-      close( $versionFile );
-      print("Installing V8 version $v8Version\n");
+    #####
+    #
+    ####
+    my $versionFile;
+    open( $versionFile, '>',  $versionTextFile );
+    close( $versionFile );
+    print("Installing V8 version $v8Version\n");
 
 }
 
@@ -631,13 +654,149 @@ sub install_emscripten
     chdir($current_dir);
 }
 
+################################################################################
+#
+# install Vulkan SDK
+#
+################################################################################
+sub install_vulkan {
+    if($opt_vulkan || $opt_vulkanList)
+    {
+        my $requestedVersion = "$opt_vulkanVersion";
+        my $vulkanInstallDir = $vulkan_path;
+        # Get Download page
+        my $vulkan_sdk_url = "https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/";
+        my $vulkan_download_page = `curl --silent $vulkan_sdk_url`;
+
+        # Find available VulkanSDK versions
+        my (@linuxVersion) = $vulkan_download_page =~ /linux: .*$/mg;
+
+        my (@version) = $linuxVersion[0] =~ /\"[0-9.]*\"/g;
+        my @allVersions = ();
+
+        if($opt_vulkanList)
+        {
+            print("\nVulkanSDK Versions available:\n");
+        }
+        foreach my $ver (@version)
+        {
+            $ver =~ s/\"//g;
+            push @allVersions, $ver;
+            if($opt_vulkanList)
+            {
+                print(" * $ver\n");
+            }
+        }
+        if($opt_vulkanList)
+        {
+            return;
+        }
+
+        # get args
+        my ($dev_env_root) = @_;
+
+        # if no particular version requested, pick latest one
+        if ($requestedVersion eq "")
+        {
+            $requestedVersion = $allVersions[0];
+        }
+        else # or check availability
+        {
+            my $found = 0;
+            foreach my $ver (@allVersions)
+            {
+                if ($ver eq $requestedVersion)
+                {
+                    $found = 1;
+                    last;
+                }
+            }
+            if ($found eq 0)
+            {
+                print("Requested version [$requestedVersion] not found! Available versions:\n\n");
+                foreach my $ver (@allVersions)
+                {
+                    print(" * $ver\n");
+                }
+                die;
+            }
+        }
+
+        # Download SDK
+        my $vulkan_download_url =
+            "https://vulkan.lunarg.com/sdk/download/$requestedVersion/linux/vulkansdk-linux-x86_64-$requestedVersion.run?Human=true";
+        print("* Downloading Vulkan SDK Version $requestedVersion...\n");
+        print("  -> URL: $vulkan_download_url\n");
+        system( 'curl', '--silent', '-o', '/tmp/vulkan_installer.sh', "$vulkan_download_url");
+
+        if ($? == - 1)
+        {
+            die "Failed to download Vulkan SDK, exiting!\n";
+        }
+
+        # Run installer
+        print("  -> Installing VulkanSDK...\n");
+        system( 'chmod', 'a+x', "/tmp/vulkan_installer.sh");
+        system( "/tmp/vulkan_installer.sh --target /tmp/vulkan-$requestedVersion");
+        pathmk( "$vulkanInstallDir/$requestedVersion" );
+        dircopy( "/tmp/vulkan-$requestedVersion/$requestedVersion", "$vulkanInstallDir/$requestedVersion" );
+
+        # create symling to the recently installed as 'latest'
+        symlink( "$requestedVersion", "$vulkanInstallDir/latest" );
+
+        # configure
+        my $vulkanAbsDir = "$vulkanInstallDir/latest";
+
+        my $envsetup = <<EOF
+# VulkanSDK env variables
+
+export VULKAN_SDK="$vulkanAbsDir/x86_64"
+export PATH="\$VULKAN_SDK/bin:\$PATH"
+export LD_LIBRARY_PATH="\$VULKAN_SDK/lib:\${LD_LIBRARY_PATH:-}"
+export VK_LAYER_PATH="\$VULKAN_SDK/etc/explicit_layer.d"
+
+EOF
+        ;
+
+        open(my $file, '>', "$vulkanInstallDir/vulkan-setenv") or die;
+        print $file $envsetup;
+        close( $file );
+
+        # write pkg-config file
+
+        my $pkg_config_body = <<EOF
+prefix=$vulkanInstallDir/$requestedVersion/x86_64
+exec_prefix=\${prefix}
+apiversion=$requestedVersion
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: LunarG VulkanSDK
+Description: LunarG VulkanSDK
+Version: \${apiversion}
+Requires:
+Libs: -L\${libdir} -lvulkan
+Cflags: -I\${includedir}
+
+EOF
+        ;
+
+        # write additional pkg-config file for local Vulkan
+        open(my $file2, '>', "$dev_env_root/opt/lib/pkgconfig/vulkan-1.0.pc") or die;
+        print $file2 $pkg_config_body;
+        close( $file2 );
+    }
+}
 
 ################################################################################
 #                                       MAIN
 ################################################################################
 
-
-if($opt_create)
+if($opt_vulkanList)
+{
+    install_vulkan();
+}
+elsif($opt_create)
 {
     my $new_root = getcwd() . "/dali-env";
 
@@ -663,6 +822,8 @@ if($opt_create)
 
     # do this after source directory structure created in create_env
     check_source_packages();
+
+    install_vulkan( $new_root );
 
     create_setenv();
 }
@@ -691,7 +852,7 @@ dali_env - Create the DALi environment for Ubuntu
 
 =head1 SYNOPSIS
 
-dali_env [-c] [-s] [-h|-m]
+dali_env [-c] [-s] [-h|-m] [--vulkan]
 
 =head1 OPTIONS
 
@@ -716,6 +877,22 @@ Display this help
 =item B<-m|--man>
 
 Display the manual page
+
+=head2 Vulkan Support
+
+Use following option to download and install VulkanSDK:
+
+=item B<--vulkan>
+
+Include Vulkan support (use with -c to install with Vulkan support or -s to setup env vars with Vulkan environment).
+
+=item B<--vulkan-version=VERSION>
+
+Forces installing requested VulkanSDK version (use with -c to install with Vulkan support and --vulkan ). If not specified, the latest version is installed.
+
+=item B<--vulkan-version-list>
+
+Lists available VulkanSDK versions.
 
 =back
 
