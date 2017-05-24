@@ -189,6 +189,7 @@ public:
    * @brief Retrieve the key at the specified position.
    *
    * @SINCE_1_2.7
+   * @param[in] position The specified position
    * @return A copy of the key at the specified position.
    *
    * @note Will assert if position >= Count()
@@ -212,6 +213,7 @@ public:
    * @brief Retrieve the key & the value at the specified position.
    *
    * @SINCE_1_2.7
+   * @param[in] position The specified position
    * @return A copy of the pair of key and value at the specified position.
    *
    * @note Will assert if position >= Count()

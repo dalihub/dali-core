@@ -134,6 +134,7 @@ public:
    *
    * @SINCE_1_2.11
    * @param[in] value The value to add to the end of the array
+   * @return A reference to this object
    */
   inline Property::Array& Add( const Value& value )
   {
