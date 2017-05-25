@@ -2,7 +2,7 @@
 #define __DALI_ENCODED_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ typedef Uint16Pair ImageDimensions;
 
 
 /**
+ * @DEPRECATED_1_2.41
+ *
  * @brief EncodedBufferImage represents an image resource as a buffer of encoded pixel data.
  *
  * A memory buffer of encoded image data is provided by the application and
@@ -69,15 +71,20 @@ typedef Uint16Pair ImageDimensions;
 class DALI_IMPORT_API EncodedBufferImage : public Image
 {
 public:
+
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Constructor which creates an uninitialized EncodedBufferImage object.
    *
    * Use @ref EncodedBufferImage::New to create an initialised object.
    * @SINCE_1_0.0
    */
-  EncodedBufferImage();
+  EncodedBufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates an initialized image object from an encoded image buffer in memory.
    *
    * @SINCE_1_0.0
@@ -90,9 +97,11 @@ public:
    * by encodedImage.
    * @return A handle to a newly allocated object
    */
-  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount );
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates an initialized image object from an encoded image buffer in memory.
    *
    * @SINCE_1_1.4
@@ -111,9 +120,11 @@ public:
    * used once all actors using it have gone off-stage
    * @return A handle to a newly allocated object
    */
-  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true );
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection = true ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Downcasts a handle to EncodedBufferImage handle.
    *
    * If handle points to a EncodedBufferImage, the
@@ -122,32 +133,38 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a EncodedBufferImage or an uninitialized handle
    */
-  static EncodedBufferImage DownCast( BaseHandle handle );
+  static EncodedBufferImage DownCast( BaseHandle handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
-  ~EncodedBufferImage();
+  ~EncodedBufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
-  EncodedBufferImage(const EncodedBufferImage& handle);
+  EncodedBufferImage(const EncodedBufferImage& handle) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  EncodedBufferImage& operator=(const EncodedBufferImage& rhs);
+  EncodedBufferImage& operator=(const EncodedBufferImage& rhs) DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 

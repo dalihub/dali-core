@@ -2,7 +2,7 @@
 #define __DALI_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SIN
 
 
 /**
+ * @DEPRECATED_1_2.41
+ *
  * @brief BufferImage represents an image resource as a pixel data buffer.
  *
  * Its pixel buffer data is provided by the application developer.
@@ -53,15 +55,20 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SIN
 class DALI_IMPORT_API BufferImage : public Image
 {
 public:
+
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Constructor which creates an uninitialized BufferImage object.
    *
    * Use BufferImage::New(...) to create an initialized object.
    * @SINCE_1_0.0
    */
-  BufferImage();
+  BufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates a new BufferImage.
    *
    * Also a pixel buffer for image data is allocated.
@@ -79,9 +86,11 @@ public:
    */
   static BufferImage New(unsigned int width,
                          unsigned int height,
-                         Pixel::Format pixelformat=Pixel::RGBA8888);
+                         Pixel::Format pixelformat=Pixel::RGBA8888) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
@@ -107,9 +116,11 @@ public:
                          unsigned int  width,
                          unsigned int  height,
                          Pixel::Format pixelFormat=Pixel::RGBA8888,
-                         unsigned int  stride=0);
+                         unsigned int  stride=0) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Downcasts a handle to BufferImage handle.
    *
    * If the handle points to a BufferImage, the downcast produces valid handle.
@@ -119,44 +130,55 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a BufferImage or an uninitialized handle
    */
-  static BufferImage DownCast( BaseHandle handle );
+  static BufferImage DownCast( BaseHandle handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
-  ~BufferImage();
+  ~BufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
-  BufferImage(const BufferImage& handle);
+  BufferImage(const BufferImage& handle) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  BufferImage& operator=(const BufferImage& rhs);
+  BufferImage& operator=(const BufferImage& rhs) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief White pixel as image data.
    *
    * Can be used to create solid color actors.
    * @SINCE_1_0.0
    * @return 1 white pixel with 32 bit colordepth
    */
-  static const BufferImage WHITE();
+  static const BufferImage WHITE() DALI_DEPRECATED_API;
 
 public:
+
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns the pixel buffer of the Image.
    *
    * The application can write to the buffer to modify its contents.
@@ -168,33 +190,41 @@ public:
    * @SINCE_1_0.0
    * @return The pixel buffer
    */
-  PixelBuffer* GetBuffer();
+  PixelBuffer* GetBuffer() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns buffer size in bytes.
    *
    * @SINCE_1_0.0
    * @return The buffer size in bytes
    */
-  unsigned int GetBufferSize() const;
+  unsigned int GetBufferSize() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns buffer stride (in bytes).
    *
    * @SINCE_1_0.0
    * @return The buffer stride
    */
-  unsigned int GetBufferStride() const;
+  unsigned int GetBufferStride() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns the pixel format of the contained buffer
    *
    * @SINCE_1_0.0
    * @return The pixel format
    */
-  Pixel::Format GetPixelFormat() const;
+  Pixel::Format GetPixelFormat() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Inform Dali that the contents of the buffer have changed.
    *
    * Image::UploadedSignal will be sent in response if the image is on stage
@@ -211,15 +241,19 @@ public:
    * @note Some GPUs may not support Non power of two buffer updates (for
    * example C110/SGX540)
    */
-  void Update();
+  void Update() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @copydoc Update()
    * @param[in] updateArea Area that has changed in buffer
    */
-  void Update( RectArea updateArea );
+  void Update( RectArea updateArea ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns whether BufferImage uses external data source or not.
    *
    * If not, dali holds ownership of the PixelBuffer, otherwise the application
@@ -231,7 +265,7 @@ public:
    * @SINCE_1_0.0
    * @return @c true if application owns data, @c false otherwise
    */
-  bool IsDataExternal() const;
+  bool IsDataExternal() const DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 
