@@ -475,6 +475,11 @@ private:
    */
   static bool CompareConnectorEndTimes( const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs );
 
+  /**
+   * Notifies all the objects whose properties are being animated.
+   */
+  void NotifyObjects();
+
 private:
 
   const SceneGraph::Animation* mAnimation;
