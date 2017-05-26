@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
