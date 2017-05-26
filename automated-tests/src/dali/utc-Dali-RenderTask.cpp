@@ -1438,6 +1438,23 @@ int UtcDaliRenderTaskSetViewportPosition(void)
   DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
   DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
   DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  // Create another animation which animates by a certain value
+  const Vector2 newPosition4( 75.0f, 45.0f );
+  const Vector2 relativePosition( newPosition4 - newPosition3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::VIEWPORT_POSITION ), relativePosition );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1496,6 +1513,22 @@ int UtcDaliRenderTaskSetViewportSize(void)
   DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
   DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE  ), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
+  // Create another animation which animates by a certain value
+  const Vector2 newSize4( 75.0f, 45.0f );
+  const Vector2 relativeSize( newSize4 - newSize3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::VIEWPORT_SIZE ), relativeSize );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize3, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentViewportSize(), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1543,6 +1576,21 @@ int UtcDaliRenderTaskSetClearColorP(void)
   Wait(application, 1000);
   DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
   DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR  ), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  // Create another animation which animates by a certain value
+  const Vector4 newColor4( 0.45f, 0.35f, 0.25f, 0.1f );
+  const Vector4 relativeColor( newColor4 - newColor3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::CLEAR_COLOR ), relativeColor );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor3, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
 
   END_TEST;
 }

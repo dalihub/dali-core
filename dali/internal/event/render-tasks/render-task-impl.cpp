@@ -689,29 +689,66 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index inde
   return value;
 }
 
-void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
 {
-  switch ( index )
+  switch( animationType )
   {
-    case Dali::RenderTask::Property::VIEWPORT_POSITION:
+    case Animation::TO:
+    case Animation::BETWEEN:
     {
-      value.Get( mViewportPosition );
+      switch ( index )
+      {
+        case Dali::RenderTask::Property::VIEWPORT_POSITION:
+        {
+          value.Get( mViewportPosition );
+          break;
+        }
+        case Dali::RenderTask::Property::VIEWPORT_SIZE:
+        {
+          value.Get( mViewportSize );
+          break;
+        }
+        case Dali::RenderTask::Property::CLEAR_COLOR:
+        {
+          value.Get( mClearColor );
+          break;
+        }
+        case Dali::RenderTask::Property::REQUIRES_SYNC:
+        default:
+        {
+          // Nothing to do as not animatable
+          break;
+        }
+      }
       break;
     }
-    case Dali::RenderTask::Property::VIEWPORT_SIZE:
+
+    case Animation::BY:
     {
-      value.Get( mViewportSize );
-      break;
-    }
-    case Dali::RenderTask::Property::CLEAR_COLOR:
-    {
-      value.Get( mClearColor );
-      break;
-    }
-    case Dali::RenderTask::Property::REQUIRES_SYNC:
-    default:
-    {
-      // Nothing to do as not animatable
+      switch ( index )
+      {
+        case Dali::RenderTask::Property::VIEWPORT_POSITION:
+        {
+          AdjustValue< Vector2 >( mViewportPosition, value );
+          break;
+        }
+        case Dali::RenderTask::Property::VIEWPORT_SIZE:
+        {
+          AdjustValue< Vector2 >( mViewportSize, value );
+          break;
+        }
+        case Dali::RenderTask::Property::CLEAR_COLOR:
+        {
+          AdjustValue< Vector4 >( mClearColor, value );
+          break;
+        }
+        case Dali::RenderTask::Property::REQUIRES_SYNC:
+        default:
+        {
+          // Nothing to do as not animatable
+          break;
+        }
+      }
       break;
     }
   }

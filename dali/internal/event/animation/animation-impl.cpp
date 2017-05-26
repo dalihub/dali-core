@@ -30,6 +30,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
+#include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -281,7 +282,7 @@ void Animation::Play()
       Object* object = connector->GetObject();
       if( object )
       {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue );
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
       }
     }
   }
@@ -363,12 +364,28 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Time
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = GetImplementation( target.object );
-  const Property::Type targetType = object.GetPropertyType( target.propertyIndex );
+  Object& object = GetImplementation(target.object);
+  const Property::Type targetType = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = relativeValue.GetType();
-  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
-  ExtendDuration( period );
+  if ( object.GetPropertyComponentIndex( target.propertyIndex ) != Property::INVALID_COMPONENT_INDEX )
+  {
+    DALI_ASSERT_ALWAYS(Property::FLOAT == destinationType && "Animated value and Property type don't match");
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS(targetType == destinationType && "Animated value and Property type don't match");
+  }
+
+  ExtendDuration(period);
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = relativeValue;
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::BY;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch ( targetType )
   {
@@ -502,6 +519,7 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   connectorPair.targetValue = destinationValue;
   connectorPair.connectorIndex = mConnectors.Count();
   connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::TO;
   mConnectorTargetValues.push_back( connectorPair );
 
   switch ( destinationType )
