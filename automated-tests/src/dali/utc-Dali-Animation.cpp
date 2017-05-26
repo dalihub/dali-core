@@ -2362,6 +2362,8 @@ int UtcDaliAnimationPlayFromP(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
+
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
@@ -2370,6 +2372,9 @@ int UtcDaliAnimationPlayFromP(void)
 
   // Start the animation from 40% progress
   animation.PlayFrom( 0.4f );
+
+  // Target value should be updated straight away
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);

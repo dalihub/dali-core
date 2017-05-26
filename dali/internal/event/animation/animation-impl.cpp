@@ -267,25 +267,7 @@ void Animation::Play()
 
   mState = Dali::Animation::PLAYING;
 
-  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
-  {
-    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
-    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
-
-    // Loop through all connector target values sorted by increasing end time
-    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
-    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
-    for( ; iter != endIter; ++iter )
-    {
-      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
-
-      Object* object = connector->GetObject();
-      if( object )
-      {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
-      }
-    }
-  }
+  NotifyObjects();
 
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
@@ -299,6 +281,8 @@ void Animation::PlayFrom( float progress )
     mPlaylist.OnPlay( *this );
 
     mState = Dali::Animation::PLAYING;
+
+    NotifyObjects();
 
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
@@ -995,6 +979,29 @@ Vector2 Animation::GetPlayRange() const
 bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
 {
   return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
+}
+
+void Animation::NotifyObjects()
+{
+  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
+  {
+    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
+    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+
+    // Loop through all connector target values sorted by increasing end time
+    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
+    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
+    for( ; iter != endIter; ++iter )
+    {
+      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
+
+      Object* object = connector->GetObject();
+      if( object )
+      {
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
+      }
+    }
+  }
 }
 
 } // namespace Internal
