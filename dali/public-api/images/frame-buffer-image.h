@@ -2,7 +2,7 @@
 #define __DALI_FRAME_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
 }
 
 /**
+ * @DEPRECATED_1_2.41
+ *
  * @brief FrameBufferImage represents an Open GL ES Frame Buffer Object and contains the result
  * of an 'off screen' render pass of a RenderTask.
  *
@@ -63,15 +65,20 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
 class DALI_IMPORT_API FrameBufferImage : public Image
 {
 public:
+
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Constructor which creates an uninitialized FrameBufferImage object.
    *
    * Use @ref FrameBufferImage::New to create an initialized object.
    * @SINCE_1_0.0
    */
-  FrameBufferImage();
+  FrameBufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
@@ -85,9 +92,11 @@ public:
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    */
   static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
-                              RenderBuffer::Format bufferFormat = RenderBuffer::COLOR);
+                              RenderBuffer::Format bufferFormat = RenderBuffer::COLOR) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates a new FrameBufferImage.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
@@ -97,9 +106,11 @@ public:
    * @return A handle to a new instance of a FrameBufferImage
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    */
-  static FrameBufferImage New(NativeImageInterface& image);
+  static FrameBufferImage New(NativeImageInterface& image) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Downcasts a handle to FrameBufferImage handle.
    *
    * If handle points to a FrameBufferImage object, the
@@ -108,32 +119,38 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a FrameBufferImage object or an uninitialized handle
    */
-  static FrameBufferImage DownCast( BaseHandle handle );
+  static FrameBufferImage DownCast( BaseHandle handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
-  ~FrameBufferImage();
+  ~FrameBufferImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
-  FrameBufferImage(const FrameBufferImage& handle);
+  FrameBufferImage(const FrameBufferImage& handle) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  FrameBufferImage& operator=(const FrameBufferImage& rhs);
+  FrameBufferImage& operator=(const FrameBufferImage& rhs) DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 
