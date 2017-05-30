@@ -102,8 +102,6 @@ class Animation;
  *
  * Using AnimateTo and AnimateBy for the same property of the same Actor will yield undefined behaviour especially if the TimePeriod overlaps.
  *
- * After calling Animation::Play(), Handle::GetProperty will return the target value of the animated property.
- *
  * Signals
  * | %Signal Name | Method                   |
  * |--------------|--------------------------|

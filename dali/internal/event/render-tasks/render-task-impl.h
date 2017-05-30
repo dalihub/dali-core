@@ -323,11 +323,6 @@ public: // Implementation of Object
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
-   */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
-
-  /**
    * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
