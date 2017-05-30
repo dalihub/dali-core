@@ -45,24 +45,18 @@ CallbackBase::CallbackBase( void* object, MemberFunction function, Dispatcher di
 : mMemberFunction( function )
 {
   mImpl = new CallbackBase::Impl;
-  if( mImpl )
-  {
-    mImpl->mObjectPointer = object;
-    mImpl->mMemberFunctionDispatcher = dispatcher;
-    mImpl->mDestructorDispatcher = NULL; // object is not owned
-  }
+  mImpl->mObjectPointer = object;
+  mImpl->mMemberFunctionDispatcher = dispatcher;
+  mImpl->mDestructorDispatcher = NULL; // object is not owned
 }
 
 CallbackBase::CallbackBase( void* object, MemberFunction function, Dispatcher dispatcher, Destructor destructor )
 : mMemberFunction( function )
 {
   mImpl = new CallbackBase::Impl;
-  if( mImpl )
-  {
-    mImpl->mObjectPointer = object;
-    mImpl->mMemberFunctionDispatcher = dispatcher;
-    mImpl->mDestructorDispatcher = destructor; // object is owned
-  }
+  mImpl->mObjectPointer = object;
+  mImpl->mMemberFunctionDispatcher = dispatcher;
+  mImpl->mDestructorDispatcher = destructor; // object is owned
 }
 
 void CallbackBase::Reset()
