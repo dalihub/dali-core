@@ -20,6 +20,7 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <cstdio>
 #include <string>
 
@@ -993,15 +994,15 @@ int UtcDaliRendererConstraint01(void)
   application.Render(0);
 
   // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::YELLOW, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::YELLOW, TEST_LOCATION );
 
   renderer.RemoveConstraints();
   renderer.SetProperty(colorIndex, Color::WHITE );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::WHITE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1092,11 +1093,11 @@ int UtcDaliRendererAnimatedProperty01(void)
   application.SendNotification();
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
 
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector4 >( renderer, colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2037,13 +2038,13 @@ template< typename T >
 void CheckEnumerationProperty( Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
 {
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( initialValue ) );
-  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( initialValue ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( initialValue ) );
   renderer.SetProperty( propertyIndex, firstCheckEnumeration );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
-  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
   renderer.SetProperty( propertyIndex, secondCheckString );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
-  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
+  DALI_TEST_CHECK( DevelHandle::GetCurrentProperty< int >( renderer, propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
 }
 
 int UtcDaliRendererEnumProperties(void)

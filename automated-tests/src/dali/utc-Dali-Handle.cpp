@@ -969,14 +969,14 @@ int UtcDaliHandleCustomPropertySynchronousGetSet(void)
   tet_infoline( "Set the value, retrieve it and ensure both the synchronous and the async version work" );
   actor.SetProperty( index, 5.0f );
   DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 5.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), startValue, TEST_LOCATION );
 
   tet_infoline( "Render and retrieve values again" );
   application.SendNotification();
   application.Render(0);
 
   DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 5.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 5.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1020,19 +1020,19 @@ int UtcDaliHandleGetCurrentProperty(void)
 {
   TestApplication application;
 
-  tet_infoline( "Get a default and non-animatable custom property using the GetCurrentProperty API" );
+  tet_infoline( "Get a default and non-animatable custom property using the DevelHandle::GetCurrentProperty API" );
 
   Actor actor = Actor::New();
   Stage::GetCurrent().Add( actor );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< bool >( actor, Actor::Property::VISIBLE ), true, TEST_LOCATION );
 
   Property::Index index = actor.RegisterProperty( "testProperty3", 1.0f, Property::READ_WRITE );
   DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 1.0f, TEST_LOCATION );
 
   actor.SetProperty( index, 2.0f );
   DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 2.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, index ), 2.0f, TEST_LOCATION );
 
   END_TEST;
 }

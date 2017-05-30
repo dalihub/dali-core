@@ -108,6 +108,31 @@ DALI_IMPORT_API Property::Index RegisterProperty( Handle handle, Property::Index
  */
 DALI_IMPORT_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
 
+/**
+ * @brief Retrieves the latest value of the property from the scene-graph.
+ *
+ * @param[in] handle The handle whose current property value is required
+ * @param[in] index The index of the property
+ * @return The property value
+ */
+DALI_IMPORT_API Property::Value GetCurrentProperty( Handle handle, Property::Index index );
+
+/**
+ * @brief Convenience function for obtaining the current value of a property of a known type.
+ *
+ * @param[in] handle The handle whose current property value is required
+ * @param[in] index The index of the property
+ * @return The property value
+ * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+ */
+template <typename T>
+T GetCurrentProperty( Handle handle, Property::Index index )
+{
+  Property::Value value = GetCurrentProperty( handle, index );
+
+  return T( value.Get<T>() );
+}
+
 } // namespace DevelHandle
 
 } // namespace Dali

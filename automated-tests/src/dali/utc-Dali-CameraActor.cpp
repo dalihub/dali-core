@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/object/handle-devel.h>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
@@ -224,7 +225,7 @@ int UtcDaliCameraActorSetGetTypeP(void)
   DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
 
   DALI_TEST_EQUALS( "LOOK_AT_TARGET", actor.GetProperty< std::string >( CameraActor::Property::TYPE ), TEST_LOCATION );
-  DALI_TEST_EQUALS( "LOOK_AT_TARGET", actor.GetCurrentProperty< std::string >( CameraActor::Property::TYPE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( "LOOK_AT_TARGET", DevelHandle::GetCurrentProperty< std::string >( actor, CameraActor::Property::TYPE ), TEST_LOCATION );
   END_TEST;
 }
 

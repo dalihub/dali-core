@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/animation/path-constrainer.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -188,14 +189,14 @@ int UtcPathConstrainerApplyRange(void)
 
   Vector3 position, tangent;
   float tValue;
-  actor.GetCurrentProperty( index ).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get(tValue);
   float currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  actor.GetCurrentProperty( index ).Get(tValue);
+  DevelHandle::GetCurrentProperty( actor, index ).Get(tValue);
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   path.Sample(0.5, position, tangent );
@@ -203,21 +204,21 @@ int UtcPathConstrainerApplyRange(void)
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  actor.GetCurrentProperty( index ).Get( tValue );
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  actor.GetCurrentProperty( index ).Get( tValue );
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  actor.GetCurrentProperty( index ).Get( tValue );
+  DevelHandle::GetCurrentProperty( actor, index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
@@ -324,7 +325,7 @@ int UtcPathConstrainerProperties(void)
 
   pathConstrainer.SetProperty( Dali::PathConstrainer::Property::FORWARD, Vector3( 1.0f,0.0f,0.0f ) );
   DALI_TEST_EQUALS( pathConstrainer.GetProperty< Vector3 >( Dali::PathConstrainer::Property::FORWARD ), Vector3( 1.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( pathConstrainer.GetCurrentProperty< Vector3 >( Dali::PathConstrainer::Property::FORWARD ), Vector3( 1.0f, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( pathConstrainer, Dali::PathConstrainer::Property::FORWARD ), Vector3( 1.0f, 0.0f, 0.0f ), TEST_LOCATION );
 
   Dali::Property::Array points;
   points.Resize(3);
@@ -346,7 +347,7 @@ int UtcPathConstrainerProperties(void)
   }
 
   {
-    Property::Value value = pathConstrainer.GetCurrentProperty( Dali::PathConstrainer::Property::POINTS );
+    Property::Value value = DevelHandle::GetCurrentProperty( pathConstrainer, Dali::PathConstrainer::Property::POINTS );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 
@@ -377,7 +378,7 @@ int UtcPathConstrainerProperties(void)
   }
 
   {
-    Property::Value value = pathConstrainer.GetCurrentProperty( Dali::PathConstrainer::Property::CONTROL_POINTS );
+    Property::Value value = DevelHandle::GetCurrentProperty( pathConstrainer, Dali::PathConstrainer::Property::CONTROL_POINTS );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 
@@ -651,7 +652,7 @@ int UtcLinearConstrainerProperties(void)
   }
 
   {
-    Property::Value value = linearConstrainer.GetCurrentProperty( Dali::LinearConstrainer::Property::VALUE );
+    Property::Value value = DevelHandle::GetCurrentProperty( linearConstrainer, Dali::LinearConstrainer::Property::VALUE );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 
@@ -680,7 +681,7 @@ int UtcLinearConstrainerProperties(void)
   }
 
   {
-    Property::Value value = linearConstrainer.GetCurrentProperty( Dali::LinearConstrainer::Property::PROGRESS );
+    Property::Value value = DevelHandle::GetCurrentProperty( linearConstrainer, Dali::LinearConstrainer::Property::PROGRESS );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 

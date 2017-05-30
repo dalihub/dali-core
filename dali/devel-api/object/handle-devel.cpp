@@ -49,6 +49,11 @@ void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )
   GetImplementation( handle ).SetTypeInfo( &GetImplementation( typeInfo ) );
 }
 
+Property::Value GetCurrentProperty( Handle handle, Property::Index index )
+{
+  return GetImplementation( handle ).GetCurrentProperty( index );
+}
+
 } // namespace DevelHandle
 
 } // namespace Dali
