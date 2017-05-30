@@ -112,18 +112,17 @@ AnimationPtr Animation::New(float durationSeconds)
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
-: mAnimation( NULL ),
-  mEventThreadServices( eventThreadServices ),
+: mEventThreadServices( eventThreadServices ),
   mPlaylist( playlist ),
-  mFinishedSignal(),
-  mConnectors(),
-  mConnectorTargetValues(),
-  mPlayRange( Vector2(0.0f,1.0f)),
+  mAnimation( NULL ),
+  mNotificationCount( 0 ),
+  mFinishedCallback( NULL ),
+  mFinishedCallbackObject( NULL ),
   mDurationSeconds( durationSeconds ),
   mSpeedFactor(1.0f),
-  mNotificationCount( 0 ),
   mLoopCount(1),
   mCurrentLoop(0),
+  mPlayRange( Vector2(0.0f,1.0f)),
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
   mDefaultAlpha( defaultAlpha ),
@@ -783,6 +782,12 @@ void Animation::EmitSignalFinish()
     Dali::Animation handle( this );
     mFinishedSignal.Emit( handle );
   }
+
+  // This callback is used internally, to avoid the overhead of using a signal.
+  if ( mFinishedCallback )
+  {
+    mFinishedCallback( mFinishedCallbackObject );
+  }
 }
 
 bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -801,6 +806,12 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   }
 
   return connected;
+}
+
+void Animation::SetFinishedCallback( FinishedCallback callback, Object* object )
+{
+  mFinishedCallback = callback;
+  mFinishedCallbackObject = object;
 }
 
 void Animation::AddAnimatorConnector( AnimatorConnectorBase* connector )
