@@ -442,29 +442,9 @@ private:
 
   struct ConnectorTargetValues
   {
-    ConnectorTargetValues()
-    : targetValue(),
-      timePeriod( 0.0f ),
-      connectorIndex( 0 )
-    {
-    }
-
-    Property::Value targetValue;
-    TimePeriod timePeriod;
     unsigned int connectorIndex;
+    Property::Value targetValue;
   };
-
-private:
-
-  /**
-   * Compares the end times of the animators returning true if lhs end time is less than rhs end time.
-   * @param[in] lhs The first comparator
-   * @param[in] rhs The second comparator
-   * @return True if end time of lhs is less, false otherwise.
-   */
-  static bool CompareConnectorEndTimes( const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs );
-
-private:
 
   const SceneGraph::Animation* mAnimation;
 
@@ -475,8 +455,7 @@ private:
 
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
 
-  typedef std::vector< ConnectorTargetValues > ConnectorTargetValuesContainer;
-  ConnectorTargetValuesContainer mConnectorTargetValues; //< Used to store animating property target value information
+  std::vector< ConnectorTargetValues > mConnectorTargetValues; //< Used to store animating property target value information
 
   Vector2 mPlayRange;
 

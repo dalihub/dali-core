@@ -10240,7 +10240,6 @@ int UtcDaliAnimationCustomIntProperty(void)
 
   Property::Index index = actor.RegisterProperty("anIndex",  startValue);
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< int >( actor, index ), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -10249,9 +10248,6 @@ int UtcDaliAnimationCustomIntProperty(void)
 
   // Start the animation
   animation.Play();
-
-  // Target value should be retrievable straight away
-  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), 20, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -10272,7 +10268,6 @@ int UtcDaliAnimationCustomIntProperty(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< int >( actor, index ), 20, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< int >( index ), 20, TEST_LOCATION );
   END_TEST;
 }
 
@@ -10647,12 +10642,6 @@ int UtcDaliAnimationTimePeriodOrder(void)
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-
-  //////////////////////////////////////////////////////////////////////////////////
 
   tet_infoline( "With two AnimateTo calls" );
 
@@ -10661,74 +10650,34 @@ int UtcDaliAnimationTimePeriodOrder(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 1.0f, 1.0f ) );
   animation.Play();
 
-  tet_infoline( "The target position should change instantly" );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 100.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render(5000); // After the animation is complete
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 100.0f, TEST_LOCATION );
-
-  //////////////////////////////////////////////////////////////////////////////////
 
   tet_infoline( "Same animation again but in a different order - should yield the same result" );
 
   actor.SetX( 0.0f );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render();
-
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
 
   animation = Animation::New( 0.0f );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 1.0f, 1.0f ) );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 100.0f, TimePeriod( 3.0f, 1.0f ) );
   animation.Play();
 
-  tet_infoline( "The target position should change instantly" );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 100.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render(5000); // After the animation is complete
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 100.0f, TEST_LOCATION );
 
-  END_TEST;
-}
+  tet_infoline( "Now with several AnimateTo calls" );
 
-int UtcDaliAnimationTimePeriodOrderSeveralAnimateToCalls(void)
-{
-  tet_infoline("Animate the same property with different time periods and ensure it runs correctly and ends up in the right place with several AnimateTo calls" );
-
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
-
+  actor.SetX( 0.0f );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-
-  //////////////////////////////////////////////////////////////////////////////////
-
-  tet_infoline( "" );
-
-  Animation animation = Animation::New( 0.0f );
+  animation = Animation::New( 0.0f );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 1000.0f, TimePeriod( 4.0f, 2.0f ) );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 145.0f, TimePeriod( 3.0f, 10.0f ) );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 109.0f, TimePeriod( 1.0f, 1.0f ) );
@@ -10737,32 +10686,16 @@ int UtcDaliAnimationTimePeriodOrderSeveralAnimateToCalls(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 10.0f, TimePeriod( 10.0f, 2.0f ) );
   animation.Play();
 
-  tet_infoline( "The target position should change instantly" );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 145.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render(14000); // After the animation is complete
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 145.0f, TEST_LOCATION );
-
-  //////////////////////////////////////////////////////////////////////////////////
 
   tet_infoline( "Same animation again but in a different order - should end up at the same point" );
 
   actor.SetX( 0.0f );
-
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render();
-
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
 
   animation = Animation::New( 0.0f );
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 200.0f, TimePeriod( 2.0f, 5.0f ) );
@@ -10773,16 +10706,10 @@ int UtcDaliAnimationTimePeriodOrderSeveralAnimateToCalls(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 109.0f, TimePeriod( 1.0f, 1.0f ) );
   animation.Play();
 
-  tet_infoline( "The target position should change instantly" );
-  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 145.0f, TEST_LOCATION );
-
   application.SendNotification();
   application.Render(14000); // After the animation is complete
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< Vector3 >( actor, Actor::Property::POSITION ), Vector3( 145.0f, 0.0f, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelHandle::GetCurrentProperty< float >( actor, Actor::Property::POSITION_X ), 145.0f, TEST_LOCATION );
 
   END_TEST;
 }

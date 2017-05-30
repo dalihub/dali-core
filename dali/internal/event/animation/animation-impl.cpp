@@ -268,20 +268,33 @@ void Animation::Play()
 
   if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
   {
-    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
-    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+    unsigned int connectorTargetValuesIndex( 0 );
+    unsigned int numberOfConnectorTargetValues = mConnectorTargetValues.size();
 
-    // Loop through all connector target values sorted by increasing end time
-    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
-    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
-    for( ; iter != endIter; ++iter )
+    /*
+     * Loop through all Animator connectors, if connector index matches the current index stored in mConnectorTargetValues container then
+     * should apply target values for this index to the object.
+     */
+    for ( unsigned int connectorIndex = 0; connectorIndex < mConnectors.Count(); connectorIndex ++)
     {
-      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
-
-      Object* object = connector->GetObject();
-      if( object )
+      // Use index to check if the current connector is next in the mConnectorTargetValues container, meaning targetValues have been pushed in AnimateXXFunction
+      if ( connectorTargetValuesIndex < numberOfConnectorTargetValues )
       {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue );
+        ConnectorTargetValues& connectorPair = mConnectorTargetValues[ connectorTargetValuesIndex ];
+
+        if ( connectorPair.connectorIndex == connectorIndex )
+        {
+          // Current connector index matches next in the stored connectors with target values so apply target value.
+          connectorTargetValuesIndex++; // Found a match for connector so increment index to next one
+
+          AnimatorConnectorBase* connector = mConnectors[ connectorIndex ];
+
+          Object* object = connector->GetObject();
+          if( object )
+          {
+            object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), connectorPair.targetValue );
+          }
+        }
       }
     }
   }
@@ -501,7 +514,6 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   ConnectorTargetValues connectorPair;
   connectorPair.targetValue = destinationValue;
   connectorPair.connectorIndex = mConnectors.Count();
-  connectorPair.timePeriod = period;
   mConnectorTargetValues.push_back( connectorPair );
 
   switch ( destinationType )
@@ -966,10 +978,6 @@ Vector2 Animation::GetPlayRange() const
   return mPlayRange;
 }
 
-bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
-{
-  return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
-}
 
 } // namespace Internal
 
