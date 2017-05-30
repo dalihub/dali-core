@@ -8482,9 +8482,6 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaP(void)
   // Start the animation
   animation.Play();
 
-  // Final key frame value should be retrievable straight away
-  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), 0.9f, TEST_LOCATION );
-
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
