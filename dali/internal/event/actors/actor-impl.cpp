@@ -416,20 +416,6 @@ void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, Devel
   }
 }
 
-/// Helper to adjust the current value of a variable from the given property-value
-/// Returns true if value adjusted, false otherwise
-template< typename PropertyType >
-inline bool AdjustValue( PropertyType& currentValue, const Property::Value& value )
-{
-  PropertyType relativeValue;
-  if( value.Get( relativeValue ) )
-  {
-    currentValue += relativeValue;
-    return true;
-  }
-  return false;
-}
-
 } // unnamed namespace
 
 ActorPtr Actor::New()
@@ -3256,299 +3242,145 @@ Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) c
   return value;
 }
 
-void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType )
+void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
 {
-  if( propertyChangeType == Object::PropertyChange::SET )
+  switch( index )
   {
-    switch( index )
+    case Dali::Actor::Property::SIZE:
     {
-      case Dali::Actor::Property::SIZE:
+      if( value.Get( mTargetSize ) )
       {
-        if( value.Get( mTargetSize ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
       }
-
-      case Dali::Actor::Property::SIZE_WIDTH:
-      {
-        if( value.Get( mTargetSize.width ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
-      }
-
-      case Dali::Actor::Property::SIZE_HEIGHT:
-      {
-        if( value.Get( mTargetSize.height ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
-      }
-
-      case Dali::Actor::Property::SIZE_DEPTH:
-      {
-        if( value.Get( mTargetSize.depth ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
-      }
-
-      case Dali::Actor::Property::POSITION:
-      {
-        value.Get( mTargetPosition );
-        break;
-      }
-
-      case Dali::Actor::Property::POSITION_X:
-      {
-        value.Get( mTargetPosition.x );
-        break;
-      }
-
-      case Dali::Actor::Property::POSITION_Y:
-      {
-        value.Get( mTargetPosition.y );
-        break;
-      }
-
-      case Dali::Actor::Property::POSITION_Z:
-      {
-        value.Get( mTargetPosition.z );
-        break;
-      }
-
-      case Dali::Actor::Property::ORIENTATION:
-      {
-        value.Get( mTargetOrientation );
-        break;
-      }
-
-      case Dali::Actor::Property::SCALE:
-      {
-        value.Get( mTargetScale );
-        break;
-      }
-
-      case Dali::Actor::Property::SCALE_X:
-      {
-        value.Get( mTargetScale.x );
-        break;
-      }
-
-      case Dali::Actor::Property::SCALE_Y:
-      {
-        value.Get( mTargetScale.y );
-        break;
-      }
-
-      case Dali::Actor::Property::SCALE_Z:
-      {
-        value.Get( mTargetScale.z );
-        break;
-      }
-
-      case Dali::Actor::Property::VISIBLE:
-      {
-        SetVisibleInternal( value.Get< bool >(), SendMessage::FALSE );
-        break;
-      }
-
-      case Dali::Actor::Property::COLOR:
-      {
-        value.Get( mTargetColor );
-        break;
-      }
-
-      case Dali::Actor::Property::COLOR_RED:
-      {
-        value.Get( mTargetColor.r );
-        break;
-      }
-
-      case Dali::Actor::Property::COLOR_GREEN:
-      {
-        value.Get( mTargetColor.g );
-        break;
-      }
-
-      case Dali::Actor::Property::COLOR_BLUE:
-      {
-        value.Get( mTargetColor.b );
-        break;
-      }
-
-      case Dali::Actor::Property::COLOR_ALPHA:
-      case Dali::DevelActor::Property::OPACITY:
-      {
-        value.Get( mTargetColor.a );
-        break;
-      }
-
-      default:
-      {
-        // Not an animatable property. Do nothing.
-        break;
-      }
+      break;
     }
-  }
-  else
-  {
-    switch( index )
+
+    case Dali::Actor::Property::SIZE_WIDTH:
     {
-      case Dali::Actor::Property::SIZE:
+      if( value.Get( mTargetSize.width ) )
       {
-        if( AdjustValue< Vector3 >( mTargetSize, value ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
       }
+      break;
+    }
 
-      case Dali::Actor::Property::SIZE_WIDTH:
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    {
+      if( value.Get( mTargetSize.height ) )
       {
-        if( AdjustValue< float >( mTargetSize.width, value ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
       }
+      break;
+    }
 
-      case Dali::Actor::Property::SIZE_HEIGHT:
+    case Dali::Actor::Property::SIZE_DEPTH:
+    {
+      if( value.Get( mTargetSize.depth ) )
       {
-        if( AdjustValue< float >( mTargetSize.height, value ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
+        // Notify deriving classes
+        OnSizeAnimation( animation, mTargetSize );
       }
+      break;
+    }
 
-      case Dali::Actor::Property::SIZE_DEPTH:
-      {
-        if( AdjustValue< float >( mTargetSize.depth, value ) )
-        {
-          // Notify deriving classes
-          OnSizeAnimation( animation, mTargetSize );
-        }
-        break;
-      }
+    case Dali::Actor::Property::POSITION:
+    {
+      value.Get( mTargetPosition );
+      break;
+    }
 
-      case Dali::Actor::Property::POSITION:
-      {
-        AdjustValue< Vector3 >( mTargetPosition, value );
-        break;
-      }
+    case Dali::Actor::Property::POSITION_X:
+    {
+      value.Get( mTargetPosition.x );
+      break;
+    }
 
-      case Dali::Actor::Property::POSITION_X:
-      {
-        AdjustValue< float >( mTargetPosition.x, value );
-        break;
-      }
+    case Dali::Actor::Property::POSITION_Y:
+    {
+      value.Get( mTargetPosition.y );
+      break;
+    }
 
-      case Dali::Actor::Property::POSITION_Y:
-      {
-        AdjustValue< float >( mTargetPosition.y, value );
-        break;
-      }
+    case Dali::Actor::Property::POSITION_Z:
+    {
+      value.Get( mTargetPosition.z );
+      break;
+    }
 
-      case Dali::Actor::Property::POSITION_Z:
-      {
-        AdjustValue< float >( mTargetPosition.z, value );
-        break;
-      }
+    case Dali::Actor::Property::ORIENTATION:
+    {
+      value.Get( mTargetOrientation );
+      break;
+    }
 
-      case Dali::Actor::Property::ORIENTATION:
-      {
-        Quaternion relativeValue;
-        if( value.Get( relativeValue ) )
-        {
-          mTargetOrientation *= relativeValue;
-        }
-        break;
-      }
+    case Dali::Actor::Property::SCALE:
+    {
+      value.Get( mTargetScale );
+      break;
+    }
 
-      case Dali::Actor::Property::SCALE:
-      {
-        AdjustValue< Vector3 >( mTargetScale, value );
-        break;
-      }
+    case Dali::Actor::Property::SCALE_X:
+    {
+      value.Get( mTargetScale.x );
+      break;
+    }
 
-      case Dali::Actor::Property::SCALE_X:
-      {
-        AdjustValue< float >( mTargetScale.x, value );
-        break;
-      }
+    case Dali::Actor::Property::SCALE_Y:
+    {
+      value.Get( mTargetScale.y );
+      break;
+    }
 
-      case Dali::Actor::Property::SCALE_Y:
-      {
-        AdjustValue< float >( mTargetScale.y, value );
-        break;
-      }
+    case Dali::Actor::Property::SCALE_Z:
+    {
+      value.Get( mTargetScale.z );
+      break;
+    }
 
-      case Dali::Actor::Property::SCALE_Z:
-      {
-        AdjustValue< float >( mTargetScale.z, value );
-        break;
-      }
+    case Dali::Actor::Property::VISIBLE:
+    {
+      SetVisibleInternal( value.Get< bool >(), SendMessage::FALSE );
+      break;
+    }
 
-      case Dali::Actor::Property::VISIBLE:
-      {
-        bool relativeValue = false;
-        if( value.Get( relativeValue ) )
-        {
-          bool visible = mVisible || relativeValue;
-          SetVisibleInternal( visible, SendMessage::FALSE );
-        }
-        break;
-      }
+    case Dali::Actor::Property::COLOR:
+    {
+      value.Get( mTargetColor );
+      break;
+    }
 
-      case Dali::Actor::Property::COLOR:
-      {
-        AdjustValue< Vector4 >( mTargetColor, value );
-        break;
-      }
+    case Dali::Actor::Property::COLOR_RED:
+    {
+      value.Get( mTargetColor.r );
+      break;
+    }
 
-      case Dali::Actor::Property::COLOR_RED:
-      {
-        AdjustValue< float >( mTargetColor.r, value );
-        break;
-      }
+    case Dali::Actor::Property::COLOR_GREEN:
+    {
+      value.Get( mTargetColor.g );
+      break;
+    }
 
-      case Dali::Actor::Property::COLOR_GREEN:
-      {
-        AdjustValue< float >( mTargetColor.g, value );
-        break;
-      }
+    case Dali::Actor::Property::COLOR_BLUE:
+    {
+      value.Get( mTargetColor.b );
+      break;
+    }
 
-      case Dali::Actor::Property::COLOR_BLUE:
-      {
-        AdjustValue< float >( mTargetColor.b, value );
-        break;
-      }
+    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::DevelActor::Property::OPACITY:
+    {
+      value.Get( mTargetColor.a );
+      break;
+    }
 
-      case Dali::Actor::Property::COLOR_ALPHA:
-      case Dali::DevelActor::Property::OPACITY:
-      {
-        AdjustValue< float >( mTargetColor.a, value );
-        break;
-      }
-
-      default:
-      {
-        // Not an animatable property. Do nothing.
-        break;
-      }
+    default:
+    {
+      // Not an animatable property. Do nothing.
+      break;
     }
   }
 }

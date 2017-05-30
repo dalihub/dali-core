@@ -924,32 +924,19 @@ void Object::RemovePropertyNotifications()
   }
 }
 
-void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType )
+void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
 {
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    OnNotifyDefaultPropertyAnimation( animation, index, value, propertyChangeType );
+    OnNotifyDefaultPropertyAnimation( animation, index, value );
   }
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
     if( animatableProperty )
     {
-      switch( propertyChangeType )
-      {
-        case PropertyChange::SET:
-        {
-          // update the cached property value
-          animatableProperty->SetPropertyValue( value );
-          break;
-        }
-        case PropertyChange::ADJUST_VALUE_BY:
-        {
-          // adjust the cached property value
-          animatableProperty->AdjustPropertyValueBy( value );
-          break;
-        }
-      }
+      // update the cached property value
+      animatableProperty->SetPropertyValue( value );
     }
   }
   else
@@ -957,21 +944,8 @@ void Object::NotifyPropertyAnimation( Animation& animation, Property::Index inde
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     if( custom && custom->IsAnimatable() )
     {
-      switch( propertyChangeType )
-      {
-        case PropertyChange::SET:
-        {
-          // update the cached property value
-          custom->SetPropertyValue( value );
-          break;
-        }
-        case PropertyChange::ADJUST_VALUE_BY:
-        {
-          // adjust the cached property value
-          custom->AdjustPropertyValueBy( value );
-          break;
-        }
-      }
+      // update the cached property value
+      custom->SetPropertyValue( value );
     }
   }
 }

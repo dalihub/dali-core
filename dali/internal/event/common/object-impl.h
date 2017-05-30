@@ -81,18 +81,6 @@ class Object : public Dali::BaseObject
 {
 public:
 
-  /**
-   * Used by NotifyPropertyAnimation to differentiate between an AnimateTo and AnimateBy call.
-   */
-  struct PropertyChange
-  {
-    enum Type
-    {
-      SET,      ///< Animating to the given value.
-      ADJUST_VALUE_BY  ///< Animating by the given value.
-    };
-  };
-
   typedef Dali::Handle::Capability Capability;
 
   class Observer
@@ -257,9 +245,8 @@ public:
    * @param[in] animation The animation animating the property.
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
-   * @param[in] propertyChangeType Whether the property value given should be set or changed by.
    */
-  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType );
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -505,9 +492,8 @@ private: // Default property extensions for derived classes
    * @param[in] animation The animation animating the property.
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
-   * @param[in] propertyChangeType Whether the property value given should be set or changed by.
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, PropertyChange::Type propertyChangeType )
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
   { }
 
   /**

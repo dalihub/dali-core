@@ -116,12 +116,6 @@ public:
    */
   Property::Value GetPropertyValue() const;
 
-  /**
-   * Modifies the stored value by the relativeValue.
-   * @param[in] relativeValue The value to change by.
-   */
-  void AdjustPropertyValueBy( const Property::Value& relativeValue );
-
 protected:
 
   /**
