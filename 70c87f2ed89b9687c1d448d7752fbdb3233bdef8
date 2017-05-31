@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9bd55b17_bde48ac7",
+        "filename": "dali/graphics/graphics-swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "separate external includes from internal includes",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98aa33be_f7a02082",
+        "filename": "dali/graphics/graphics-swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "wrong include style",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "15a78d4a_18c1d3c1",
+        "filename": "dali/graphics/vulkan/swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "what\u0027s the responsibility of this class, add a comment",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9667b1e2_beee161c",
+        "filename": "dali/graphics/vulkan/swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "we shouldn\u0027t use raw pointers",
+      "range": {
+        "startLine": 38,
+        "startChar": 25,
+        "endLine": 38,
+        "endChar": 46
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c51ac236_76865e51",
+        "filename": "dali/graphics/vulkan/swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "no single letter variables",
+      "range": {
+        "startLine": 38,
+        "startChar": 48,
+        "endLine": 38,
+        "endChar": 49
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0015fb13_74042368",
+        "filename": "dali/graphics/vulkan/swapchain.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-05-31T17:34:53Z",
+      "side": 1,
+      "message": "strange formatting",
+      "range": {
+        "startLine": 39,
+        "startChar": 50,
+        "endLine": 39,
+        "endChar": 52
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
