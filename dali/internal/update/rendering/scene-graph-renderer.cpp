@@ -142,8 +142,6 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
-  mResourcesReady( false ),
-  mFinishedResourceAcquisition( false ),
   mPremultipledAlphaEnabled( false ),
   mDepthIndex( 0 )
 {
@@ -176,21 +174,8 @@ void Renderer::operator delete( void* ptr )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  mResourcesReady = false;
-  mFinishedResourceAcquisition = false;
-
-  // Can only be considered ready when all the scene graph objects are connected to the renderer
-  if( mGeometry && mShader )
-  {
-    mResourcesReady = true;
-    mFinishedResourceAcquisition = true;
-  }
-
   if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
-    DALI_ASSERT_DEBUG( mGeometry != NULL && "No geometry available in PrepareRender()" );
-    DALI_ASSERT_DEBUG( mShader != NULL && "No shader available in PrepareRender()" );
-
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
@@ -238,7 +223,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     {
       typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
     }
 
@@ -600,12 +584,6 @@ Render::Renderer& Renderer::GetRenderer()
 const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) const
 {
   return mCollectedUniformMap[bufferIndex];
-}
-
-void Renderer::GetReadyAndComplete( bool& ready, bool& complete ) const
-{
-  ready = mResourcesReady;
-  complete = mFinishedResourceAcquisition;
 }
 
 Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const

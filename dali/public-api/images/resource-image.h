@@ -2,7 +2,7 @@
 #define __DALI_RESOURCE_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ class ResourceImage;
 }
 
 /**
+ * @DEPRECATED_1_2.41
+ *
  * @brief ResourceImage is an image loaded using a URL.
  *
  * <i>Customizing load requests</i>
@@ -63,6 +65,8 @@ class DALI_IMPORT_API ResourceImage : public Image
 public:
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Type of signal for LoadingFinished and Uploaded.
    * @SINCE_1_0.0
    */
@@ -71,6 +75,8 @@ public:
 public:
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Gets the size of an image from disk.
    *
    * This function will read the header info from file on disk and is
@@ -82,40 +88,48 @@ public:
    * @param[in] url The URL of the image file
    * @return The width and height in pixels of the image
    */
-  static ImageDimensions GetImageSize( const std::string& url );
+  static ImageDimensions GetImageSize( const std::string& url ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Constructor which creates an empty ResourceImage object.
    *
    * Use ResourceImage::New(...) to create an initialised object.
    * @SINCE_1_0.0
    */
-  ResourceImage();
+  ResourceImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
-  ~ResourceImage();
+  ~ResourceImage() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
-  ResourceImage( const ResourceImage& handle );
+  ResourceImage( const ResourceImage& handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  ResourceImage& operator=( const ResourceImage& rhs );
+  ResourceImage& operator=( const ResourceImage& rhs ) DALI_DEPRECATED_API;
 
   /**
    * @name ResourceImageFactoryFunctions
@@ -124,6 +138,8 @@ public:
   ///@{
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates an initialized ResourceImage object.
    *
    * Uses defaults for all options.
@@ -136,9 +152,11 @@ public:
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return A handle to a newly allocated object
    */
-  static ResourceImage New( const std::string& url, bool orientationCorrection = true );
+  static ResourceImage New( const std::string& url, bool orientationCorrection = true ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Creates an initialized ResourceImage object.
    *
    * @SINCE_1_0.0
@@ -155,11 +173,13 @@ public:
                             ImageDimensions size,
                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
                             SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
-                            bool orientationCorrection = true );
+                            bool orientationCorrection = true ) DALI_DEPRECATED_API;
 
   ///@}
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Downcasts a handle to ResourceImage handle.
    *
    * If handle points to a ResourceImage object, the
@@ -168,9 +188,11 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a Image object or an uninitialized handle
    */
-  static ResourceImage DownCast( BaseHandle handle );
+  static ResourceImage DownCast( BaseHandle handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Queries whether the image data has loaded.
    *
    * The asynchronous loading begins when the Image object is created.
@@ -178,17 +200,21 @@ public:
    * @SINCE_1_0.0
    * @return The loading state, either Loading, Success or Failed
    */
-  LoadingState GetLoadingState() const;
+  LoadingState GetLoadingState() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns the URL of the image.
    *
    * @SINCE_1_0.0
    * @return The URL of the image file
    */
-  std::string GetUrl() const;
+  std::string GetUrl() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Reloads image from filesystem.
    *
    * The original set of image loading attributes (requested dimensions, scaling
@@ -196,17 +222,19 @@ public:
    * @SINCE_1_0.0
    * @note If image is offstage and OnDemand policy is set, the reload request is ignored.
    */
-  void Reload();
+  void Reload() DALI_DEPRECATED_API;
 
 public: // Signals
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Emitted when the image data loads successfully, or when the loading fails.
    *
    * @SINCE_1_0.0
    * @return A signal object to Connect() with
    */
-  ResourceImageSignal& LoadingFinishedSignal();
+  ResourceImageSignal& LoadingFinishedSignal() DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 

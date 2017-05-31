@@ -25,7 +25,6 @@ namespace Dali
 TestPlatformAbstraction::TestPlatformAbstraction()
 : mTrace(),
   mIsLoadingResult( false ),
-  mSize(),
   mClosestSize(),
   mLoadFileResult(),
   mSaveFileResult( false ),
@@ -60,13 +59,13 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
   return closestSize;
 }
 
-Integration::ResourcePointer TestPlatformAbstraction::LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath )
+Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath )
 {
   mTrace.PushCall("LoadResourceSynchronously", "");
   return mSynchronouslyLoadedResource;
 }
 
-Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::ResourceType& resourceType, uint8_t * buffer, size_t size )
+Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size )
 {
   mTrace.PushCall("DecodeBuffer", "");
   return mDecodedBitmap;

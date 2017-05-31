@@ -255,17 +255,6 @@ public:
   Render::Renderer& GetRenderer();
 
   /**
-   * Check whether the renderer has been marked as ready to render
-   * ready means that renderer has all resources and should produce correct result
-   * complete means all resources have finished loading
-   * It's possible that renderer is complete but not ready,
-   * for example in case of resource load failed
-   * @param[out] ready TRUE if the renderer has resources to render
-   * @param[out] complete TRUE if the renderer resources are complete
-   */
-  void GetReadyAndComplete( bool& ready, bool& complete ) const;
-
-  /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
@@ -393,13 +382,12 @@ private:
   DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
-  bool                         mResourcesReady;                   ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
-  bool                         mFinishedResourceAcquisition;      ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 public:
 
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
+
 };
 
 

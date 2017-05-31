@@ -535,7 +535,7 @@ void Renderer::Render( Context& context,
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
   {
-    DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
+    DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", reinterpret_cast< void* >( &mRenderDataProvider->GetShader() ) );
     return;
   }
 

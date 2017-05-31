@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
@@ -238,6 +239,15 @@ public:
    * @copydoc Dali::Handle::RemovePropertyNotifications()
    */
   virtual void RemovePropertyNotifications();
+
+  /**
+   * Notifies that a property is being animated.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
+   */
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -477,6 +487,16 @@ private: // Default property extensions for derived classes
    * @return The latest scene-graph value of a default property.
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+
+  /**
+   * Notifies that a default property is being animated so the deriving class should update the cached value.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
+   */
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType )
+  { }
 
   /**
    * @todo this is virtual so that for now actor can override it,

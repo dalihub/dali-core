@@ -76,6 +76,14 @@ public:
      * may not be called (i.e. when shutting down).
      */
     virtual void PropertyOwnerDestroyed( PropertyOwner& owner ) = 0;
+
+  protected:
+
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~Observer() {}
+
   };
 
   /**

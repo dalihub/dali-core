@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -421,7 +420,7 @@ int UtcDaliPathPropertyPoints(void)
   }
 
   {
-    Property::Value value = DevelHandle::GetCurrentProperty( path, Dali::Path::Property::POINTS );
+    Property::Value value = path.GetCurrentProperty( Dali::Path::Property::POINTS );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 
@@ -460,7 +459,7 @@ int UtcDaliPathPropertyControlPoints(void)
   }
 
   {
-    Property::Value value = DevelHandle::GetCurrentProperty( path, Dali::Path::Property::CONTROL_POINTS );
+    Property::Value value = path.GetCurrentProperty( Dali::Path::Property::CONTROL_POINTS );
     Property::Array* array = value.GetArray();
     DALI_TEST_CHECK( array );
 

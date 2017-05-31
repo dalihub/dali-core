@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/platform-abstraction.h>
+#include <dali/public-api/math/vector2.h>
 
 #include "test-trace-call-stack.h"
 
@@ -71,12 +72,12 @@ public:
   /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
    */
-  virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
+  virtual Integration::ResourcePointer LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath );
 
   /**
    * @copydoc PlatformAbstraction::DecodeBuffer()
    */
-  virtual Integration::BitmapPtr DecodeBuffer( const Dali::Integration::ResourceType& resourceType, uint8_t * buffer, size_t size );
+  virtual Integration::BitmapPtr DecodeBuffer( const Dali::Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size );
 
   /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
@@ -176,7 +177,6 @@ private:
 
   mutable TraceCallStack        mTrace;
   bool                          mIsLoadingResult;
-  Vector2                       mSize;
   Vector2                       mClosestSize;
 
   LoadFileResult                mLoadFileResult;
@@ -188,4 +188,4 @@ private:
 
 } // Dali
 
-#endif /* __DALI_TET_PLATFORM_ABSTRACTION_H__ */
+#endif /* __DALI_TEST_PLATFORM_ABSTRACTION_H__ */

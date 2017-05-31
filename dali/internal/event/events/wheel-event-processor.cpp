@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,15 +142,15 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "  Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    event.point.x, event.point.y,
-                   ( hitTestResults.actor ? (void*)&hitTestResults.actor.GetBaseObject() : NULL ),
+                   ( hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL ),
                    ( hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" ),
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );
 
     // Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
     Dali::Actor consumedActor = EmitWheelSignals( hitTestResults.actor, wheelEvent );
 
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? (void*)&hitTestResults.actor.GetBaseObject() : NULL, hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" );
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? (void*)&consumedActor.GetBaseObject() : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL, hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
   }
   else
   {
