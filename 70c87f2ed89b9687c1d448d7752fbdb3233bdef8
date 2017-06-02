@@ -196,6 +196,23 @@
     },
     {
       "key": {
+        "uuid": "2d02b11e_4957d134",
+        "filename": "dali/graphics/vulkan/buffer.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:37:50Z",
+      "side": 1,
+      "message": "if requires {}",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "15a78d4a_18c1d3c1",
         "filename": "dali/graphics/vulkan/swapchain.h",
         "patchSetId": 4
