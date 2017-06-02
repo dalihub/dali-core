@@ -213,6 +213,23 @@
     },
     {
       "key": {
+        "uuid": "b4270a13_a7f92c5c",
+        "filename": "dali/graphics/vulkan/command-buffer.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:38:51Z",
+      "side": 1,
+      "message": "the c++11 eleven suggest you should prefer auto\u0026\u0026 in for loops",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "15a78d4a_18c1d3c1",
         "filename": "dali/graphics/vulkan/swapchain.h",
         "patchSetId": 4
