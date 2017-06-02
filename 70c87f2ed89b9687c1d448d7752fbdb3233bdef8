@@ -2,6 +2,166 @@
   "comments": [
     {
       "key": {
+        "uuid": "3c7f37a1_8740dbf0",
+        "filename": "dali/graphics/graphics-logical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "prefer {} when calling constructors",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e89abf3d_98da3743",
+        "filename": "dali/graphics/graphics-logical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a567d51c_b60c4531",
+        "filename": "dali/graphics/graphics-logical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "should receive structures by const reference",
+      "range": {
+        "startLine": 44,
+        "startChar": 63,
+        "endLine": 44,
+        "endChar": 75
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64b77702_58ea82d8",
+        "filename": "dali/graphics/graphics-logical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "avoid using booleans, prefer enums instead",
+      "range": {
+        "startLine": 45,
+        "startChar": 63,
+        "endLine": 45,
+        "endChar": 67
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "586115ca_037da77f",
+        "filename": "dali/graphics/graphics-physical-device.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "const",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86a99023_fa2938ac",
+        "filename": "dali/graphics/graphics-physical-device.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "const",
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4f823d9_be5d3d7a",
+        "filename": "dali/graphics/graphics-physical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "raw pointer",
+      "range": {
+        "startLine": 34,
+        "startChar": 38,
+        "endLine": 34,
+        "endChar": 64
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "939728be_b594662b",
+        "filename": "dali/graphics/graphics-physical-device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-06-02T10:35:19Z",
+      "side": 1,
+      "message": "prefer {} when calling constructors",
+      "range": {
+        "startLine": 35,
+        "startChar": 4,
+        "endLine": 35,
+        "endChar": 16
+      },
+      "revId": "70c87f2ed89b9687c1d448d7752fbdb3233bdef8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9bd55b17_bde48ac7",
         "filename": "dali/graphics/graphics-swapchain.h",
         "patchSetId": 4
