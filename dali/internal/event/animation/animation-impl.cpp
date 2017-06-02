@@ -30,6 +30,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
+#include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -266,25 +267,7 @@ void Animation::Play()
 
   mState = Dali::Animation::PLAYING;
 
-  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
-  {
-    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
-    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
-
-    // Loop through all connector target values sorted by increasing end time
-    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
-    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
-    for( ; iter != endIter; ++iter )
-    {
-      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
-
-      Object* object = connector->GetObject();
-      if( object )
-      {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue );
-      }
-    }
-  }
+  NotifyObjects();
 
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
@@ -298,6 +281,8 @@ void Animation::PlayFrom( float progress )
     mPlaylist.OnPlay( *this );
 
     mState = Dali::Animation::PLAYING;
+
+    NotifyObjects();
 
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
@@ -363,12 +348,28 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Time
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = GetImplementation( target.object );
-  const Property::Type targetType = object.GetPropertyType( target.propertyIndex );
+  Object& object = GetImplementation(target.object);
+  const Property::Type targetType = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = relativeValue.GetType();
-  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
-  ExtendDuration( period );
+  if ( object.GetPropertyComponentIndex( target.propertyIndex ) != Property::INVALID_COMPONENT_INDEX )
+  {
+    DALI_ASSERT_ALWAYS(Property::FLOAT == destinationType && "Animated value and Property type don't match");
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS(targetType == destinationType && "Animated value and Property type don't match");
+  }
+
+  ExtendDuration(period);
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = relativeValue;
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::BY;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch ( targetType )
   {
@@ -502,6 +503,7 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   connectorPair.targetValue = destinationValue;
   connectorPair.connectorIndex = mConnectors.Count();
   connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::TO;
   mConnectorTargetValues.push_back( connectorPair );
 
   switch ( destinationType )
@@ -630,6 +632,14 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
   Object& object = GetImplementation( target.object );
 
   ExtendDuration( period );
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = keyFrames.GetLastKeyFrameValue();
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = BETWEEN;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch(keyFrames.GetType())
   {
@@ -969,6 +979,29 @@ Vector2 Animation::GetPlayRange() const
 bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
 {
   return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
+}
+
+void Animation::NotifyObjects()
+{
+  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
+  {
+    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
+    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+
+    // Loop through all connector target values sorted by increasing end time
+    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
+    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
+    for( ; iter != endIter; ++iter )
+    {
+      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
+
+      Object* object = connector->GetObject();
+      if( object )
+      {
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
+      }
+    }
+  }
 }
 
 } // namespace Internal

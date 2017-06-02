@@ -23,9 +23,9 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/internal/event/animation/animator-connector-base.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
-#include <dali/internal/event/animation/path-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -42,7 +42,9 @@ class UpdateManager;
 class Actor;
 class Animation;
 class AnimationPlaylist;
+class AnimatorConnectorBase;
 class Object;
+class Path;
 
 typedef IntrusivePtr<Animation> AnimationPtr;
 typedef std::vector<AnimationPtr> AnimationContainer;
@@ -58,6 +60,13 @@ typedef AnimationContainer::const_iterator AnimationConstIter;
 class Animation : public BaseObject
 {
 public:
+
+  enum Type
+  {
+    TO,      ///< Animating TO the given value
+    BY,      ///< Animating BY the given value
+    BETWEEN  ///< Animating BETWEEN key-frames
+  };
 
   typedef Dali::Animation::EndAction EndAction;
   typedef Dali::Animation::Interpolation Interpolation;
@@ -445,13 +454,15 @@ private:
     ConnectorTargetValues()
     : targetValue(),
       timePeriod( 0.0f ),
-      connectorIndex( 0 )
+      connectorIndex( 0 ),
+      animatorType( TO )
     {
     }
 
     Property::Value targetValue;
     TimePeriod timePeriod;
     unsigned int connectorIndex;
+    Animation::Type animatorType;
   };
 
 private:
@@ -464,6 +475,11 @@ private:
    */
   static bool CompareConnectorEndTimes( const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs );
 
+  /**
+   * Notifies all the objects whose properties are being animated.
+   */
+  void NotifyObjects();
+
 private:
 
   const SceneGraph::Animation* mAnimation;
@@ -473,6 +489,7 @@ private:
 
   Dali::Animation::AnimationSignalType mFinishedSignal;
 
+  typedef OwnerContainer< AnimatorConnectorBase* > AnimatorConnectorContainer;
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
 
   typedef std::vector< ConnectorTargetValues > ConnectorTargetValuesContainer;

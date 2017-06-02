@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
@@ -41,7 +42,6 @@ class PropertyNotification;
 
 namespace Internal
 {
-class Animation;
 class ConstraintBase;
 class EventThreadServices;
 class Handle;
@@ -245,8 +245,9 @@ public:
    * @param[in] animation The animation animating the property.
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
    */
-  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value );
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -492,8 +493,9 @@ private: // Default property extensions for derived classes
    * @param[in] animation The animation animating the property.
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value )
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType )
   { }
 
   /**

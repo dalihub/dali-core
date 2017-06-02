@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,6 @@ Layer* FindLayer( Node& node )
 /**
  * Rebuild the Layer::colorRenderables and overlayRenderables members,
  * including only renderers which are included in the current render-task.
- * Returns true if all renderers have finished acquiring resources.
  *
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] node The current node of the scene-graph.
@@ -98,7 +97,7 @@ Layer* FindLayer( Node& node )
  *              Note: ClippingId is passed by reference, so it is permanently modified when traversing back up the tree for uniqueness.
  * @param[in] clippingDepth The current clipping depth
  */
-bool AddRenderablesForTask( BufferIndex updateBufferIndex,
+void AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,
                             Layer& currentLayer,
                             RenderTask& renderTask,
@@ -106,19 +105,17 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
                             uint32_t& currentClippingId,
                             uint32_t clippingDepth )
 {
-  bool resourcesFinished = true;
-
   // Short-circuit for invisible nodes
   if( !node.IsVisible( updateBufferIndex ) )
   {
-    return resourcesFinished;
+    return;
   }
 
   // Check whether node is exclusive to a different render-task
   const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
   if( exclusiveTo && ( exclusiveTo != &renderTask ) )
   {
-    return resourcesFinished;
+    return;
   }
 
   // Assume all children go to this layer (if this node is a layer).
@@ -150,25 +147,15 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   for( unsigned int i = 0; i < count; ++i )
   {
     SceneGraph::Renderer* renderer = node.GetRendererAt( i );
-    bool ready = false;
-    bool complete = false;
-    renderer->GetReadyAndComplete( ready, complete );
 
-    DALI_LOG_INFO( gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderer, ready ? "T" : "F", complete ? "T" : "F" );
-
-    resourcesFinished &= complete;
-
-    if( ready ) // IE. should be rendered (all resources are available)
+    // Normal is the more-likely draw mode to occur.
+    if( DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) )
     {
-      // Normal is the more-likely draw mode to occur.
-      if( DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) )
-      {
-        layer->colorRenderables.PushBack( Renderable( &node, renderer ) );
-      }
-      else
-      {
-        layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
-      }
+      layer->colorRenderables.PushBack( Renderable( &node, renderer ) );
+    }
+    else
+    {
+      layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
     }
   }
 
@@ -178,11 +165,8 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   for( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    bool childResourcesComplete = AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth );
-    resourcesFinished &= childResourcesComplete;
+    AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth );
   }
-
-  return resourcesFinished;
 }
 
 } // Anonymous namespace.
@@ -250,7 +234,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
       continue;
     }
 
-    bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
       size_t layerCount( sortedLayers.size() );
@@ -259,15 +242,13 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
         sortedLayers[i]->ClearRenderables();
       }
 
-      resourcesFinished = AddRenderablesForTask( updateBufferIndex,
-                                                 *sourceNode,
-                                                 *layer,
-                                                 renderTask,
-                                                 sourceNode->GetDrawMode(),
-                                                 clippingId,
-                                                 0u );
-
-      renderTask.SetResourcesFinished( resourcesFinished );
+      AddRenderablesForTask( updateBufferIndex,
+                             *sourceNode,
+                             *layer,
+                             renderTask,
+                             sourceNode->GetDrawMode(),
+                             clippingId,
+                             0u );
 
       // If the clipping Id is still 0 after adding all Renderables, there is no clipping required for this RenderTaskList.
       hasClippingNodes = clippingId != 0u;
@@ -278,10 +259,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                   renderTask.GetCullMode(),
                                   hasClippingNodes,
                                   instructions );
-    }
-    else
-    {
-      renderTask.SetResourcesFinished( resourcesFinished );
     }
   }
 
@@ -317,7 +294,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
       continue;
     }
 
-    bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
       size_t layerCount( sortedLayers.size() );
@@ -326,13 +302,13 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
         sortedLayers[i]->ClearRenderables();
       }
 
-      resourcesFinished = AddRenderablesForTask( updateBufferIndex,
-                                                 *sourceNode,
-                                                 *layer,
-                                                 renderTask,
-                                                 sourceNode->GetDrawMode(),
-                                                 clippingId,
-                                                 0u );
+      AddRenderablesForTask( updateBufferIndex,
+                             *sourceNode,
+                             *layer,
+                             renderTask,
+                             sourceNode->GetDrawMode(),
+                             clippingId,
+                             0u );
 
       // If the clipping Id is still 0 after adding all Renderables, there is no clipping required for this RenderTaskList.
       hasClippingNodes = clippingId != 0;
@@ -344,8 +320,6 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                   hasClippingNodes,
                                   instructions );
     }
-
-    renderTask.SetResourcesFinished( resourcesFinished );
   }
 }
 
