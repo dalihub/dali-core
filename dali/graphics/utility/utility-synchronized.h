@@ -85,6 +85,16 @@ public:
       return mObjectRef;
     }
 
+    T* operator&()
+    {
+      return &mObjectRef;
+    }
+
+    const T* operator&() const
+    {
+      return &mObjectRef;
+    }
+
   private:
     friend Synchronized; //< Allow Synchronized to create a handle
     Handle( std::mutex& mutex, T& object )
