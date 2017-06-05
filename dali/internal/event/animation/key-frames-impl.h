@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_KEY_FRAMES_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,11 @@ public:
    */
   KeyFrameSpec* GetKeyFramesBase() const;
 
+  /**
+   * Return the value of the last key frame.
+   */
+  Dali::Property::Value GetLastKeyFrameValue() const;
+
 private:
   Dali::Property::Type mType; // Type of the specialization
   IntrusivePtr<KeyFrameSpec> mKeyFrames;   // Pointer to the specialized key frame object
@@ -115,6 +120,13 @@ public:
   KeyFrameSpec() {}
 
   virtual unsigned int GetNumberOfKeyFrames() const = 0;
+
+  /**
+   * Get the key frame value as a Property::Value.
+   * @param[in] index The index of the key frame to fetch
+   * @param[out] value The value of the given key frame
+   */
+  virtual void GetKeyFrameAsValue( unsigned int index, Property::Value& value ) = 0;
 
 protected:
 
@@ -223,6 +235,14 @@ public:
   {
     DALI_ASSERT_ALWAYS( index < mPVs.size() && "KeyFrame index is out of bounds" );
     time  = mPVs[index].mProgress;
+    value = mPVs[index].mValue;
+  }
+
+  /**
+   * @copydoc KeyFrameSpec::GetKeyFrameAsValue()
+   */
+  virtual void GetKeyFrameAsValue( unsigned int index, Property::Value& value )
+  {
     value = mPVs[index].mValue;
   }
 

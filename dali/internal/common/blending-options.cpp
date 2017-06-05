@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,7 +251,6 @@ BlendingOptions::BlendingOptions()
 
 BlendingOptions::~BlendingOptions()
 {
-  delete mBlendColor;
 }
 
 void BlendingOptions::SetBitmask( unsigned int bitmask )
@@ -315,31 +314,27 @@ BlendEquation::Type BlendingOptions::GetBlendEquationAlpha() const
 
 void BlendingOptions::SetBlendColor( const Vector4& color )
 {
-  if( Vector4::ZERO == color )
+  if( Color::TRANSPARENT == color )
   {
-    if( mBlendColor )
-    {
-      // Discard unnecessary vector
-      delete mBlendColor;
-      mBlendColor = NULL;
-    }
-    return;
-  }
-
-  if( mBlendColor )
-  {
-    *mBlendColor = color;
+    mBlendColor = NULL;
   }
   else
   {
-    // Lazy allocation when non-default is set
-    mBlendColor = new Vector4( color );
+    if( mBlendColor )
+    {
+      *mBlendColor = color;
+    }
+    else
+    {
+      // Lazy allocation when non-default is set
+      mBlendColor = new Vector4( color );
+    }
   }
 }
 
 const Vector4* BlendingOptions::GetBlendColor() const
 {
-  return mBlendColor;
+  return mBlendColor.Get();
 }
 
 } // namespace Internal

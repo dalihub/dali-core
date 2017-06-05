@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,10 +258,10 @@ void Program::GetActiveSamplerUniforms()
 
     for( int i=0; i<numberOfActiveUniforms; ++i )
     {
-      mGlAbstraction.GetActiveUniform( mProgramId, (GLuint)i, uniformMaxNameLength,
+      mGlAbstraction.GetActiveUniform( mProgramId, static_cast< GLuint >( i ), uniformMaxNameLength,
                                        &nameLength, &number, &type, name );
 
-      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE ) /// Is there a native sampler type?
+      if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_EXTERNAL_OES )
       {
         GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
         samplerNames.push_back(name);
@@ -272,14 +272,17 @@ void Program::GetActiveSamplerUniforms()
 
   //Determine declaration order of each sampler
   char* fragShader = strdup( mProgramData->GetFragmentShader() );
-  const char* token = strtok( fragShader, " ;\n");
+  char* nextPtr = NULL;
+  const char* token = strtok_r( fragShader, " ;\n", &nextPtr );
   int samplerPosition = 0;
   while( token )
   {
-    if( ( strncmp( token, "sampler2D", 9u ) == 0 ) || ( strncmp( token, "samplerCube", 11u ) == 0 ) )
+    if( ( strncmp( token, "sampler2D", 9u )    == 0 ) ||
+        ( strncmp( token, "samplerCube", 11u ) == 0 ) ||
+        ( strncmp( token, "samplerExternalOES", 18u ) == 0 ) )
     {
       bool found( false );
-      token = strtok( NULL, " ;\n");
+      token = strtok_r( NULL, " ;\n", &nextPtr );
       for( size_t i=0; i<samplerUniformLocations.size(); ++i )
       {
         if( samplerUniformLocations[i].position == -1 &&
@@ -297,7 +300,7 @@ void Program::GetActiveSamplerUniforms()
     }
     else
     {
-      token = strtok( NULL, " ;\n");
+      token = strtok_r( NULL, " ;\n", &nextPtr );
     }
   }
 

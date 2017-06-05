@@ -310,12 +310,6 @@ public:
   void RemoveRenderTracker( Render::RenderTracker* renderTracker );
 
   /**
-   * Set the default shader that is to be used in absence of custom shader
-   * @param[in] shader that is the default one
-   */
-  void SetDefaultShader( Shader* shader );
-
-  /**
    * returns the Program controller for sending program messages
    * @return the ProgramController
    */
@@ -326,18 +320,16 @@ public:
   /**
    * Renders the results of the previous "update" traversal.
    * @param[out] status contains the flag that indicates if render instructions exist
-   * @return true if a further update is required
    */
-  bool Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status );
 
 private:
 
   /**
    * Helper to process a single RenderInstruction.
    * @param[in] instruction A description of the rendering operation.
-   * @param[in] defaultShader default shader to use.
    */
-  void DoRender( RenderInstruction& instruction, Shader& defaultShader );
+  void DoRender( RenderInstruction& instruction );
 
 private:
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -993,15 +993,15 @@ int UtcDaliRendererConstraint01(void)
   application.Render(0);
 
   // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
 
   renderer.RemoveConstraints();
   renderer.SetProperty(colorIndex, Color::WHITE );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1092,11 +1092,11 @@ int UtcDaliRendererAnimatedProperty01(void)
   application.SendNotification();
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::WHITE * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
 
   application.Render(500);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(colorIndex), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >( colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1402,6 +1402,33 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   END_TEST;
 }
 
+
+Renderer CreateRenderer( Actor actor, Geometry geometry, Shader shader, int depthIndex )
+{
+  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
+  TextureSet textureSet0 = CreateTextureSet( image0 );
+  Renderer renderer0 = Renderer::New( geometry, shader );
+  renderer0.SetTextures( textureSet0 );
+  renderer0.SetProperty( Renderer::Property::DEPTH_INDEX, depthIndex );
+  actor.AddRenderer(renderer0);
+  return renderer0;
+}
+
+
+Actor CreateActor( Actor parent, int siblingOrder, const char* location )
+{
+  Actor actor0 = Actor::New();
+  actor0.SetAnchorPoint(AnchorPoint::CENTER);
+  actor0.SetParentOrigin(AnchorPoint::CENTER);
+  actor0.SetPosition(0.0f,0.0f);
+  actor0.SetSize(100, 100);
+  actor0.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder );
+  DALI_TEST_EQUALS( actor0.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location) );
+  parent.Add(actor0);
+
+  return actor0;
+}
+
 int UtcDaliRendererRenderOrder2DLayer(void)
 {
   TestApplication application;
@@ -1410,59 +1437,20 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
 
-  Actor actor0 = Actor::New();
-  actor0.SetAnchorPoint(AnchorPoint::CENTER);
-  actor0.SetParentOrigin(AnchorPoint::CENTER);
-  actor0.SetPosition(0.0f,0.0f);
-  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet0 = CreateTextureSet( image0 );
-  Renderer renderer0 = Renderer::New( geometry, shader );
-  renderer0.SetTextures( textureSet0 );
-  actor0.AddRenderer(renderer0);
-  actor0.SetSize(1, 1);
-  Stage::GetCurrent().Add(actor0);
-  application.SendNotification();
-  application.Render(0);
+  Actor root = Stage::GetCurrent().GetRootLayer();
 
-  Actor actor1 = Actor::New();
-  actor1.SetAnchorPoint(AnchorPoint::CENTER);
-  actor1.SetParentOrigin(AnchorPoint::CENTER);
-  actor1.SetPosition(0.0f,0.0f);
-  Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet1 = CreateTextureSet( image1 );
-  Renderer renderer1 = Renderer::New( geometry, shader );
-  renderer1.SetTextures( textureSet1 );
-  actor1.AddRenderer(renderer1);
-  actor1.SetSize(1, 1);
-  Stage::GetCurrent().Add(actor1);
-  application.SendNotification();
-  application.Render(0);
+  Actor actor0 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer0 = CreateRenderer( actor0, geometry, shader, 0 );
 
-  Actor actor2 = Actor::New();
-  actor2.SetAnchorPoint(AnchorPoint::CENTER);
-  actor2.SetParentOrigin(AnchorPoint::CENTER);
-  actor2.SetPosition(0.0f,0.0f);
-  Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet2 = CreateTextureSet( image2 );
-  Renderer renderer2 = Renderer::New( geometry, shader );
-  renderer2.SetTextures( textureSet2 );
-  actor2.AddRenderer(renderer2);
-  actor2.SetSize(1, 1);
-  Stage::GetCurrent().Add(actor2);
-  application.SendNotification();
-  application.Render(0);
+  Actor actor1 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer1 = CreateRenderer( actor1, geometry, shader, 0 );
 
-  Actor actor3 = Actor::New();
-  actor3.SetAnchorPoint(AnchorPoint::CENTER);
-  actor3.SetParentOrigin(AnchorPoint::CENTER);
-  actor3.SetPosition(0.0f,0.0f);
-  Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet3 = CreateTextureSet( image3 );
-  Renderer renderer3 = Renderer::New( geometry, shader );
-  renderer3.SetTextures( textureSet3 );
-  actor3.AddRenderer(renderer3);
-  actor3.SetSize(1, 1);
-  Stage::GetCurrent().Add(actor3);
+  Actor actor2 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer2 = CreateRenderer( actor2, geometry, shader, 0 );
+
+  Actor actor3 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer3 = CreateRenderer( actor3, geometry, shader, 0 );
+
   application.SendNotification();
   application.Render(0);
 
@@ -1541,80 +1529,19 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
 
-  Actor actor0 = Actor::New();
-  actor0.SetAnchorPoint(AnchorPoint::CENTER);
-  actor0.SetParentOrigin(AnchorPoint::CENTER);
-  actor0.SetPosition(0.0f,0.0f);
-  actor0.SetSize(1, 1);
-  Stage::GetCurrent().Add(actor0);
+  Actor root = Stage::GetCurrent().GetRootLayer();
 
-  Actor actor1 = Actor::New();
-  actor1.SetAnchorPoint(AnchorPoint::CENTER);
-  actor1.SetParentOrigin(AnchorPoint::CENTER);
-  actor1.SetPosition(0.0f,0.0f);
-  actor1.SetSize(1, 1);
-  actor0.Add(actor1);
+  Actor actor0 = CreateActor( root, 0, TEST_LOCATION );
+  Actor actor1 = CreateActor( actor0, 0, TEST_LOCATION );
+  Renderer renderer0 = CreateRenderer( actor0, geometry, shader, 2 );
+  Renderer renderer1 = CreateRenderer( actor0, geometry, shader, 0 );
+  Renderer renderer2 = CreateRenderer( actor0, geometry, shader, 1 );
+  Renderer renderer3 = CreateRenderer( actor1, geometry, shader, 1 );
+  Renderer renderer4 = CreateRenderer( actor1, geometry, shader, 0 );
+  Renderer renderer5 = CreateRenderer( actor1, geometry, shader, -1 );
 
-  //Renderer0
-  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet0 = CreateTextureSet( image0 );
-  Renderer renderer0 = Renderer::New( geometry, shader );
-  renderer0.SetTextures( textureSet0 );
-  renderer0.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
-  actor0.AddRenderer(renderer0);
   application.SendNotification();
   application.Render(0);
-
-  //Renderer1
-  Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet1 = CreateTextureSet( image1 );
-  Renderer renderer1 = Renderer::New( geometry, shader );
-  renderer1.SetTextures( textureSet1 );
-  renderer1.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
-  actor0.AddRenderer(renderer1);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer2
-  Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet2 = CreateTextureSet( image2 );
-  Renderer renderer2 = Renderer::New( geometry, shader );
-  renderer2.SetTextures( textureSet2 );
-  renderer2.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
-  actor0.AddRenderer(renderer2);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer3
-  Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet3 = CreateTextureSet( image3 );
-  Renderer renderer3 = Renderer::New( geometry, shader );
-  renderer3.SetTextures( textureSet3 );
-  renderer3.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
-  actor1.AddRenderer(renderer3);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer4
-  Image image4= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet4 = CreateTextureSet( image4 );
-  Renderer renderer4 = Renderer::New( geometry, shader );
-  renderer4.SetTextures( textureSet4 );
-  renderer4.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
-  actor1.AddRenderer(renderer4);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer5
-  Image image5= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet5 = CreateTextureSet( image5 );
-  Renderer renderer5 = Renderer::New( geometry, shader );
-  renderer5.SetTextures( textureSet5 );
-  renderer5.SetProperty( Renderer::Property::DEPTH_INDEX, -1 );
-  actor1.AddRenderer(renderer5);
-  application.SendNotification();
-  application.Render(0);
-
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace(true);
@@ -1647,6 +1574,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   END_TEST;
 }
 
+
 int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
 {
   TestApplication application;
@@ -1666,9 +1594,10 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
    *          /     |     \                /     |     \
    *        /       |       \            /       |       \
    * renderer0 renderer1  actor2     renderer2 renderer3 renderer4
-   *                        |
+   *    DI:2      DI:0      |           DI:0      DI:1      DI:2
    *                        |
    *                   renderer5
+   *                      DI:-1
    *
    *  actor0 has sibling order 1
    *  actor1 has sibling order 0
@@ -1688,92 +1617,20 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
+  Actor root = Stage::GetCurrent().GetRootLayer();
+  Actor actor0 = CreateActor( root,   1, TEST_LOCATION );
+  Actor actor1 = CreateActor( root,   0, TEST_LOCATION );
+  Actor actor2 = CreateActor( actor0, 0, TEST_LOCATION );
 
-  Actor actor0 = Actor::New();
-  actor0.SetAnchorPoint(AnchorPoint::CENTER);
-  actor0.SetParentOrigin(AnchorPoint::CENTER);
-  actor0.SetPosition(0.0f,0.0f);
-  actor0.SetSize(1, 1);
-  actor0.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, 1 );
-  DALI_TEST_EQUALS( actor0.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 1, TEST_LOCATION );
-  Stage::GetCurrent().Add(actor0);
+  Renderer renderer0 = CreateRenderer( actor0, geometry, shader, 2 );
+  Renderer renderer1 = CreateRenderer( actor0, geometry, shader, 0 );
+  Renderer renderer2 = CreateRenderer( actor1, geometry, shader, 0 );
+  Renderer renderer3 = CreateRenderer( actor1, geometry, shader, 1 );
+  Renderer renderer4 = CreateRenderer( actor1, geometry, shader, 2 );
+  Renderer renderer5 = CreateRenderer( actor2, geometry, shader, -1 );
 
-  Actor actor1 = Actor::New();
-  actor1.SetAnchorPoint(AnchorPoint::CENTER);
-  actor1.SetParentOrigin(AnchorPoint::CENTER);
-  actor1.SetPosition(0.0f,0.0f);
-  actor1.SetSize(1, 1);
-  DALI_TEST_EQUALS( actor1.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 0, TEST_LOCATION );
-  Stage::GetCurrent().Add(actor1);
-
-  Actor actor2 = Actor::New();
-  actor2.SetAnchorPoint(AnchorPoint::CENTER);
-  actor2.SetParentOrigin(AnchorPoint::CENTER);
-  actor2.SetPosition(0.0f,0.0f);
-  actor2.SetSize(1, 1);
-  DALI_TEST_EQUALS( actor1.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), 0, TEST_LOCATION );
-  actor0.Add(actor2);
-
-  //Renderer0
-  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet0 = CreateTextureSet( image0 );
-  Renderer renderer0 = Renderer::New( geometry, shader );
-  renderer0.SetTextures( textureSet0 );
-  renderer0.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
-  actor0.AddRenderer(renderer0);
   application.SendNotification();
-  application.Render(0);
-
-  //Renderer1
-  Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet1 = CreateTextureSet( image1 );
-  Renderer renderer1 = Renderer::New( geometry, shader );
-  renderer1.SetTextures( textureSet1 );
-  renderer1.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
-  actor0.AddRenderer(renderer1);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer2
-  Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet2 = CreateTextureSet( image2 );
-  Renderer renderer2 = Renderer::New( geometry, shader );
-  renderer2.SetTextures( textureSet2 );
-  renderer2.SetProperty( Renderer::Property::DEPTH_INDEX, 0 );
-  actor1.AddRenderer(renderer2);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer3
-  Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet3 = CreateTextureSet( image3 );
-  Renderer renderer3 = Renderer::New( geometry, shader );
-  renderer3.SetTextures( textureSet3 );
-  renderer3.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
-  actor1.AddRenderer(renderer3);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer4
-  Image image4= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet4 = CreateTextureSet( image4 );
-  Renderer renderer4 = Renderer::New( geometry, shader );
-  renderer4.SetTextures( textureSet4 );
-  renderer4.SetProperty( Renderer::Property::DEPTH_INDEX, 2 );
-  actor1.AddRenderer(renderer4);
-  application.SendNotification();
-  application.Render(0);
-
-  //Renderer5
-  Image image5= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet5 = CreateTextureSet( image5 );
-  Renderer renderer5 = Renderer::New( geometry, shader );
-  renderer5.SetTextures( textureSet5 );
-  renderer5.SetProperty( Renderer::Property::DEPTH_INDEX, -1 );
-  actor2.AddRenderer(renderer5);
-  application.SendNotification();
-  application.Render(0);
-
+  application.Render();
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace(true);
@@ -1795,8 +1652,8 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
   DALI_TEST_EQUALS( textureBindIndex[0], 4, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
 
-  //Change sibling order of actor1
-  //New Expected rendering order: renderer1 - renderer0 - renderer2 - renderer3 - renderer4  - renderer5
+  // Change sibling order of actor1
+  // New Expected rendering order: renderer1 - renderer0 - renderer 5 - renderer2 - renderer3 - renderer4
   actor1.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, 2 );
 
   gl.GetTextureTrace().Reset();
@@ -1812,10 +1669,10 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
 
   DALI_TEST_EQUALS( textureBindIndex[1], 0, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[0], 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureBindIndex[2], 2, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureBindIndex[3], 3, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureBindIndex[4], 4, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureBindIndex[5], 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[5], 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[2], 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[3], 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureBindIndex[4], 5, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1827,79 +1684,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
-
-  Actor actor0 = Actor::New();
-  actor0.SetAnchorPoint(AnchorPoint::CENTER);
-  actor0.SetParentOrigin(AnchorPoint::CENTER);
-  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet0 = CreateTextureSet( image0 );
-  Renderer renderer0 = Renderer::New( geometry, shader );
-  renderer0.SetTextures( textureSet0 );
-  actor0.AddRenderer(renderer0);
-  actor0.SetPosition(0.0f,0.0f);
-  actor0.SetSize(100, 100);
-  Stage::GetCurrent().Add(actor0);
-  actor0.SetDrawMode( DrawMode::OVERLAY_2D );
-  application.SendNotification();
-  application.Render(0);
-
-  Actor actor1 = Actor::New();
-  actor1.SetAnchorPoint(AnchorPoint::CENTER);
-  actor1.SetParentOrigin(AnchorPoint::CENTER);
-  Image image1= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet1 = CreateTextureSet( image1 );
-  Renderer renderer1 = Renderer::New( geometry, shader );
-  renderer1.SetTextures( textureSet1 );
-  actor1.SetPosition(0.0f,0.0f);
-  actor1.AddRenderer(renderer1);
-  actor1.SetSize(100, 100);
-  Stage::GetCurrent().Add(actor1);
-  actor1.SetDrawMode( DrawMode::OVERLAY_2D );
-  application.SendNotification();
-  application.Render(0);
-
-  Actor actor2 = Actor::New();
-  actor2.SetAnchorPoint(AnchorPoint::CENTER);
-  actor2.SetParentOrigin(AnchorPoint::CENTER);
-  Image image2= BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet2 = CreateTextureSet( image2 );
-  Renderer renderer2 = Renderer::New( geometry, shader );
-  renderer2.SetTextures( textureSet2 );
-  actor2.AddRenderer(renderer2);
-  actor2.SetPosition(0.0f,0.0f);
-  actor2.SetSize(100, 100);
-  Stage::GetCurrent().Add(actor2);
-  application.SendNotification();
-  application.Render(0);
-
-  Actor actor3 = Actor::New();
-  actor3.SetAnchorPoint(AnchorPoint::CENTER);
-  actor3.SetParentOrigin(AnchorPoint::CENTER);
-  Image image3 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet3 = CreateTextureSet( image3 );
-  Renderer renderer3 = Renderer::New( geometry, shader );
-  renderer3.SetTextures( textureSet3 );
-  actor3.SetPosition(0.0f,0.0f);
-  actor3.AddRenderer(renderer3);
-  actor3.SetSize(100, 100);
-  Stage::GetCurrent().Add(actor3);
-  actor3.SetDrawMode( DrawMode::OVERLAY_2D );
-  application.SendNotification();
-  application.Render(0);
-
-  Actor actor4 = Actor::New();
-  actor4.SetAnchorPoint(AnchorPoint::CENTER);
-  actor4.SetParentOrigin(AnchorPoint::CENTER);
-  Image image4 = BufferImage::New( 64, 64, Pixel::RGB888 );
-  TextureSet textureSet4 = CreateTextureSet( image4 );
-  Renderer renderer4 = Renderer::New( geometry, shader );
-  renderer4.SetTextures( textureSet4 );
-  actor4.AddRenderer(renderer4);
-  actor4.SetPosition(0.0f,0.0f);
-  actor4.SetSize(100, 100);
-  Stage::GetCurrent().Add(actor4);
-  application.SendNotification();
-  application.Render(0);
+  Actor root = Stage::GetCurrent().GetRootLayer();
 
   /*
    * Create the following hierarchy:
@@ -1921,13 +1706,32 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
    *
    *  Expected rendering order : actor2 - actor4 - actor1 - actor0 - actor3
    */
-  Stage::GetCurrent().Add( actor2 );
+
+  Actor actor0 = CreateActor( root, 0, TEST_LOCATION );
+  actor0.SetDrawMode( DrawMode::OVERLAY_2D );
+  Renderer renderer0 = CreateRenderer( actor0, geometry, shader, 0 );
+
+  Actor actor1 = CreateActor( root, 0, TEST_LOCATION );
+  actor1.SetDrawMode( DrawMode::OVERLAY_2D );
+  Renderer renderer1 = CreateRenderer( actor1, geometry, shader, 0 );
+
+  Actor actor2 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer2 = CreateRenderer( actor2, geometry, shader, 0 );
+
+  Actor actor3 = CreateActor( root, 0, TEST_LOCATION );
+  actor3.SetDrawMode( DrawMode::OVERLAY_2D );
+  Renderer renderer3 = CreateRenderer( actor3, geometry, shader, 0 );
+
+  Actor actor4 = CreateActor( root, 0, TEST_LOCATION );
+  Renderer renderer4 = CreateRenderer( actor4, geometry, shader, 0 );
+
+  application.SendNotification();
+  application.Render(0);
+
   actor2.Add(actor1);
   actor2.Add(actor4);
   actor1.Add(actor0);
   actor0.Add(actor3);
-  application.SendNotification();
-  application.Render(0);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace(true);
@@ -2233,10 +2037,13 @@ template< typename T >
 void CheckEnumerationProperty( Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
 {
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( initialValue ) );
+  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( initialValue ) );
   renderer.SetProperty( propertyIndex, firstCheckEnumeration );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
   renderer.SetProperty( propertyIndex, secondCheckString );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
+  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
 }
 
 int UtcDaliRendererEnumProperties(void)

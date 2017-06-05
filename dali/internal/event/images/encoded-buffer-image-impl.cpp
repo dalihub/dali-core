@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   // Get image size from buffer
   Dali::Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
   const ImageDimensions expectedSize = platformAbstraction.GetClosestImageSize( buffer, size, fittingMode, samplingMode, orientationCorrection );
-  image->mWidth = (unsigned int) expectedSize.GetWidth();
-  image->mHeight = (unsigned int) expectedSize.GetHeight();
+  image->mWidth = static_cast<unsigned int>( expectedSize.GetWidth() );
+  image->mHeight = static_cast<unsigned int>( expectedSize.GetHeight() );
 
   // Load the image synchronously
   Integration::BitmapPtr bitmap = platformAbstraction.DecodeBuffer( resourceType, &(buffer->GetVector()[0]), encodedImageByteCount );

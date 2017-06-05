@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1414,21 +1414,47 @@ int UtcDaliRenderTaskSetViewportPosition(void)
   // Set by Property test
   Vector2 newPosition2(32.0f, 32.0f);
   task.SetProperty( RenderTask::Property::VIEWPORT_POSITION, newPosition2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition, TEST_LOCATION ); // still the old position
 
   // Update
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition2, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
 
   Vector2 newPosition3(64.0f, 0.0f);
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_POSITION ), newPosition3, AlphaFunction::LINEAR );
   animation.Play();
 
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition2, TEST_LOCATION );
+
   // Perform 1000ms worth of updates at which point animation should have completed.
   Wait(application, 1000);
   DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  // Create another animation which animates by a certain value
+  const Vector2 newPosition4( 75.0f, 45.0f );
+  const Vector2 relativePosition( newPosition4 - newPosition3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::VIEWPORT_POSITION ), relativePosition );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition3, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentViewportPosition(), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_POSITION ), newPosition4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1462,21 +1488,46 @@ int UtcDaliRenderTaskSetViewportSize(void)
   // Set by Property test
   Vector2 newSize2(50.0f, 50.0f);
   task.SetProperty( RenderTask::Property::VIEWPORT_SIZE, newSize2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize, TEST_LOCATION ); // still the old position
 
   // Update
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( task.GetCurrentViewportSize(), newSize2, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
 
   Vector2 newSize3(10.0f, 10.0f);
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_SIZE ), newSize3, AlphaFunction::LINEAR );
   animation.Play();
 
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE  ), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize2, TEST_LOCATION );
+
   // Perform 1000ms worth of updates at which point animation should have completed.
   Wait(application, 1000);
   DALI_TEST_EQUALS( task.GetCurrentViewportSize(), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE  ), newSize3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  // Create another animation which animates by a certain value
+  const Vector2 newSize4( 75.0f, 45.0f );
+  const Vector2 relativeSize( newSize4 - newSize3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::VIEWPORT_SIZE ), relativeSize );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize3, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentViewportSize(), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector2 >( RenderTask::Property::VIEWPORT_SIZE ), newSize4, Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1503,11 +1554,44 @@ int UtcDaliRenderTaskSetClearColorP(void)
   DALI_TEST_EQUALS( task.GetClearColor(), testColor, TEST_LOCATION );
 
   task.SetProperty( RenderTask::Property::CLEAR_COLOR, testColor2 );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor, TEST_LOCATION ); // still the old color
 
   // Wait a frame.
   Wait(application);
 
   DALI_TEST_EQUALS( task.GetClearColor(), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+
+  Vector4 newColor3(10.0f, 10.0f, 20.0f, 30.0f);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo( Property( task, RenderTask::Property::CLEAR_COLOR ), newColor3, AlphaFunction::LINEAR );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR  ), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), testColor2, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR  ), newColor3, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  // Create another animation which animates by a certain value
+  const Vector4 newColor4( 0.45f, 0.35f, 0.25f, 0.1f );
+  const Vector4 relativeColor( newColor4 - newColor3 );
+  animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( task, RenderTask::Property::CLEAR_COLOR ), relativeColor );
+  animation.Play();
+
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor3, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+
+  // Perform 1000ms worth of updates at which point animation should have completed.
+  Wait(application, 1000);
+  DALI_TEST_EQUALS( task.GetCurrentProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetProperty< Vector4 >( RenderTask::Property::CLEAR_COLOR ), newColor4, Math::MACHINE_EPSILON_10, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -2706,4 +2790,23 @@ int UtcDaliRenderTaskViewportToLocal(void)
 
   END_TEST;
 
+}
+
+int UtcDaliRenderTaskRequiresSync(void)
+{
+  TestApplication application;
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, false );
+
+  DALI_TEST_EQUALS( newTask.GetProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( newTask.GetCurrentProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), false, TEST_LOCATION );
+
+  newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
+
+  DALI_TEST_EQUALS( newTask.GetProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( newTask.GetCurrentProperty< bool >( RenderTask::Property::REQUIRES_SYNC ), true, TEST_LOCATION );
+
+  END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,6 +241,11 @@ void GestureDetector::SetDefaultProperty( Property::Index index, const Property:
 }
 
 Property::Value GestureDetector::GetDefaultProperty(Property::Index index) const
+{
+  return Property::Value();
+}
+
+Property::Value GestureDetector::GetDefaultPropertyCurrentValue( Property::Index index ) const
 {
   return Property::Value();
 }

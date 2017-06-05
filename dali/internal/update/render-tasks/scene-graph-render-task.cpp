@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -254,17 +254,11 @@ bool RenderTask::IsRenderRequired()
   return required;
 }
 
-void RenderTask::SetResourcesFinished( bool resourcesFinished )
-{
-  // resourcesFinished tells us that this render task will render to its FBO
-  mResourcesFinished = resourcesFinished;
-}
-
 // Called every frame regardless of whether render was required.
 // If render was not required, ignore resourcesFinished.
 void RenderTask::UpdateState()
 {
-  TASK_LOG_FMT( Debug::General, "(mResourcesFinished:%s)  FC:%d State:%s RR:%d\n", mResourcesFinished?"T":"F", mFrameCounter, STATE_STRING(mState), mRefreshRate );
+  TASK_LOG_FMT( Debug::General, "FC:%d State:%s RR:%d\n", mFrameCounter, STATE_STRING(mState), mRefreshRate );
 
   switch( mState )
   {
@@ -274,10 +268,7 @@ void RenderTask::UpdateState()
       {
         if( mFrameCounter == 0 )
         {
-          if( mResourcesFinished )
-          {
-            ++mFrameCounter; // Only start skipping frames when resources are loaded
-          }
+          ++mFrameCounter; // Only start skipping frames when resources are loaded
         }
         else // Continue counting to skip frames
         {
@@ -294,10 +285,7 @@ void RenderTask::UpdateState()
 
     case RENDER_ONCE_WAITING_FOR_RESOURCES:
     {
-      if( mResourcesFinished )
-      {
-        mState = RENDERED_ONCE;
-      }
+      mState = RENDERED_ONCE;
     }
     break;
 
@@ -390,8 +378,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
   if( mRequiresSync &&
-      mRefreshRate == Dali::RenderTask::REFRESH_ONCE &&
-      mResourcesFinished )
+      mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
   {
     // create tracker if one doesn't yet exist.
     if( !mRenderSyncTracker )
@@ -484,7 +471,6 @@ RenderTask::RenderTask()
   mCameraNode( NULL ),
   mCamera( NULL ),
   mFrameBuffer(0),
-  mResourcesFinished( false ),
   mWaitingToRender( false ),
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),

@@ -302,6 +302,31 @@ public:
   }
 
   /**
+   * @brief Retrieves the latest value of the property from the scene-graph.
+   *
+   * @SINCE_1_2.41
+   * @param[in] index The index of the property
+   * @return The property value
+   */
+  Property::Value GetCurrentProperty( Property::Index index ) const;
+
+  /**
+   * @brief Convenience function for obtaining the current value of a property of a known type.
+   *
+   * @SINCE_1_2.41
+   * @param[in] index The index of the property
+   * @return The property value
+   * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+   */
+  template <typename T>
+  T GetCurrentProperty( Property::Index index ) const
+  {
+    Property::Value value = GetCurrentProperty( index );
+
+    return T( value.Get<T>() );
+  }
+
+  /**
    * @brief Retrieves all the property indices for this object (including custom properties).
    *
    * @SINCE_1_0.0
@@ -369,6 +394,10 @@ public:
 
 };
 
+/**
+ * @brief This namespace provides a convenient function to create an object with a custom "weight" property.
+ * @SINCE_1_0.0
+ */
 namespace WeightObject
 {
 

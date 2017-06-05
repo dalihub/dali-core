@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 
 } // unnamed namespace
 
-PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager )
+PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager )
 : GestureProcessor( Gesture::Pan ),
   mStage( stage ),
   mGestureManager( gestureManager ),
@@ -114,17 +114,13 @@ PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureMana
   mCurrentPanEvent( NULL ),
   mSceneObject( SceneGraph::PanGesture::New() ) // Create scene object to store pan information.
 {
-  // Pass ownership to scene-graph
-  AddGestureMessage( mStage.GetUpdateManager(), mSceneObject );
+  // Pass ownership to scene-graph; scene object lives for the lifecycle of UpdateManager
+  updateManager.SetPanGestureProcessor( mSceneObject );
 }
 
 PanGestureProcessor::~PanGestureProcessor()
 {
-  if( Stage::IsInstalled() && ( mSceneObject != NULL ) )
-  {
-    RemoveGestureMessage( mStage.GetUpdateManager(), mSceneObject );
-    mSceneObject = NULL; // mSceneObject is about to be destroyed
-  }
+  mSceneObject = NULL; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
 }
 
 void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent )

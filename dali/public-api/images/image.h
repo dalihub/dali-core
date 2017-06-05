@@ -2,7 +2,7 @@
 #define __DALI_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ class Image;
 }
 
 /**
+ * @DEPRECATED_1_2.41
+ *
  * @brief An Image object represents an image resource that can be used for rendering.
  *
  * Image objects can be shared between Actors. This is practical if you have a visual element on screen
@@ -60,6 +62,8 @@ class DALI_IMPORT_API Image : public BaseHandle
 public:
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Type of signal for Image Uploaded.
    * @SINCE_1_0.0
    */
@@ -68,6 +72,8 @@ public:
 public:
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Constructor which creates an empty Image handle.
    *
    * This class has no New method.
@@ -76,34 +82,42 @@ public:
    * Dali::NativeImage::New(), Dali::ResourceImage::New()).
    * @SINCE_1_0.0
    */
-  Image();
+  Image() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
    */
-  ~Image();
+  ~Image() DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
-  Image(const Image& handle);
+  Image(const Image& handle) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
    * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  Image& operator=(const Image& rhs);
+  Image& operator=(const Image& rhs) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Downcasts a handle to Image handle.
    *
    * If handle points to a Image object, the
@@ -112,9 +126,11 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a Image object or an uninitialized handle
    */
-  static Image DownCast( BaseHandle handle );
+  static Image DownCast( BaseHandle handle ) DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns the width of the image.
    *
    * Returns either the requested width or the actual loaded width if no specific size was requested.
@@ -122,9 +138,11 @@ public:
    * @SINCE_1_0.0
    * @return Width of the image in pixels
    */
-  unsigned int GetWidth() const;
+  unsigned int GetWidth() const DALI_DEPRECATED_API;
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief Returns the height of the image.
    *
    * Returns either the requested height or the actual loaded height if no specific size was requested.
@@ -132,11 +150,13 @@ public:
    * @SINCE_1_0.0
    * @return Height of the image in pixels
    */
-  unsigned int GetHeight() const;
+  unsigned int GetHeight() const DALI_DEPRECATED_API;
 
 public: // Signals
 
   /**
+   * @DEPRECATED_1_2.41
+   *
    * @brief This signal is emitted when the image data gets uploaded to GL.
    *
    * It Will be sent after an actor using the image is added to
@@ -145,7 +165,7 @@ public: // Signals
    * @SINCE_1_0.0
    * @return A signal object to Connect() with
    */
-  ImageSignalType& UploadedSignal();
+  ImageSignalType& UploadedSignal() DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 

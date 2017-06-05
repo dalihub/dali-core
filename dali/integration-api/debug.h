@@ -22,6 +22,7 @@
 #include <string>
 #include <sstream>
 #include <list>
+#include <stdint.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -485,7 +486,33 @@ DALI_IMPORT_API std::string MatrixToString(const Matrix& m, size_t precision=3, 
 
 #endif
 
-}}} // Dali/Integration/Debug namespaces
+/********************************************************************************
+ *                            Time instrumentation                              *
+ ********************************************************************************/
+
+#if defined(DEBUG_ENABLED)
+
+void GetNanoseconds( uint64_t& timeInNanoseconds );
+
+#define DALI_LOG_TIMER_START( timeVariable )      \
+  uint64_t timeVariable##1; \
+  Debug::GetNanoseconds( timeVariable##1 );
+
+#define DALI_LOG_TIMER_END( timeVariable, filter, level, preString)  \
+  uint64_t timeVariable##2; \
+  Debug::GetNanoseconds( timeVariable##2 );                             \
+  DALI_LOG_INFO( filter, level, preString " %ld uSec\n", ((timeVariable##2-timeVariable##1)/1000));
+
+#else // DEBUG_ENABLED
+
+#define DALI_LOG_TIMER_START( timeVariable )
+#define DALI_LOG_TIMER_END( timeVariable, filter, level, preString)
+
+#endif
+
+} // Debug
+} // Integration
+} // Dali
 
 
 #endif // __DALI_INTEGRATION_DEBUG_H__

@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/key-event.h>
+#include <dali/internal/event/events/key-event-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -41,10 +42,19 @@ KeyEventProcessor::~KeyEventProcessor()
 
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
-  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<KeyEvent::State>(event.state));
+  bool consumed = false;
+  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
+
+  GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
+  GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
 
   // Emit the key event signal from stage.
-  mStage.EmitKeyEventSignal(keyEvent);
+  consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );
+
+  if( !consumed )
+  {
+    mStage.EmitKeyEventSignal(keyEvent);
+  }
 }
 
 } // namespace Internal

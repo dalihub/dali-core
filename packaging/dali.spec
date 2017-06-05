@@ -1,9 +1,9 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.2.31
+Version:    1.2.42
 Release:    1
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-2-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
@@ -122,9 +122,6 @@ rm -rf %{buildroot}
 cd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
-# LICENSE
-mkdir -p %{buildroot}/usr/share/license
-cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{name}
 
 
 ##############################
@@ -154,7 +151,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}-core.so*
 %defattr(-,app,app,-)
-%{_datadir}/license/%{name}
+%license LICENSE
 
 %files devel
 %defattr(-,root,root,-)

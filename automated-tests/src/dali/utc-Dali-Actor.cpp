@@ -177,6 +177,58 @@ void OnRelayoutCallback( Actor actor )
   gActorNamesRelayout.push_back( actor.GetName() );
 }
 
+struct VisibilityChangedFunctorData
+{
+  VisibilityChangedFunctorData()
+  : actor(),
+    visible( false ),
+    type( DevelActor::VisibilityChange::SELF ),
+    called( false )
+  {
+  }
+
+  void Reset()
+  {
+    actor.Reset();
+    visible = false;
+    type = DevelActor::VisibilityChange::SELF;
+    called = false;
+  }
+
+  void Check( bool compareCalled, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char * location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( actor, compareActor, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( visible, compareVisible, TEST_INNER_LOCATION( location ) );
+    DALI_TEST_EQUALS( (int)type, (int)compareType, TEST_INNER_LOCATION( location ) );
+  }
+
+  void Check( bool compareCalled, const std::string& location )
+  {
+    DALI_TEST_EQUALS( called, compareCalled, TEST_INNER_LOCATION( location ) );
+  }
+
+  Actor actor;
+  bool visible;
+  DevelActor::VisibilityChange::Type type;
+  bool called;
+};
+
+struct VisibilityChangedFunctor
+{
+  VisibilityChangedFunctor( VisibilityChangedFunctorData& dataVar ) : data( dataVar ) { }
+
+  void operator()( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
+  {
+    data.actor = actor;
+    data.visible = visible;
+    data.type = type;
+    data.called = true;
+  }
+
+  VisibilityChangedFunctorData& data;
+};
+
 } // anonymous namespace
 
 
@@ -755,6 +807,9 @@ int UtcDaliActorSetSize01(void)
   // Immediately retrieve the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
   // Flush the queue and render once
   application.SendNotification();
@@ -765,6 +820,16 @@ int UtcDaliActorSetSize01(void)
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  // Check async behaviour
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
   // Change the resize policy and check whether the size stays the same
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
@@ -979,6 +1044,37 @@ int UtcDaliActorSetSizeIndividual(void)
   END_TEST;
 }
 
+int UtcDaliActorSetSizeIndividual02(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  Stage::GetCurrent().Add( actor );
+
+  Vector3 vector( 100.0f, 200.0f, 400.0f );
+  DALI_TEST_CHECK( vector != actor.GetCurrentSize() );
+
+  actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >(), vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_HEIGHT, vector.height );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >(), vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_DEPTH, vector.depth );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >(), vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the width in the new frame
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliActorGetCurrentSize(void)
 {
@@ -1040,7 +1136,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   const Vector3 targetValue( 10.0f, 20.0f, 30.0f );
   animation.AnimateTo( Property( actor, Actor::Property::SIZE ), targetValue );
 
-  DALI_TEST_CHECK( actor.GetTargetSize() == targetValue );
+  DALI_TEST_CHECK( actor.GetTargetSize() == vector );
 
   // Start the animation
   animation.Play();
@@ -1216,28 +1312,46 @@ int UtcDaliActorSetPositionProperties(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
 
   actor.SetProperty( Actor::Property::POSITION_X, vector.x );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentPosition().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::POSITION_Y, vector.y );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentPosition().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::POSITION_Z, vector.z );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentPosition().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -1490,12 +1604,15 @@ int UtcDaliActorSetOrientationProperty(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::ORIENTATION, rotation );
+  DALI_TEST_EQUALS(rotation, actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1691,28 +1808,40 @@ int UtcDaliActorSetScaleIndividual(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentScale());
 
   actor.SetProperty( Actor::Property::SCALE_X, vector.x );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentScale().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SCALE_Y, vector.y );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentScale().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SCALE_Z, vector.z );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentScale().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( vector, actor.GetProperty< Vector3 >( Actor::Property::SCALE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector, actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -1991,38 +2120,55 @@ int UtcDaliActorSetColorIndividual(void)
   DALI_TEST_CHECK(vector != actor.GetCurrentColor());
 
   actor.SetProperty( Actor::Property::COLOR_RED, vector.r );
+  DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.r, actor.GetCurrentColor().r, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.r, actor.GetCurrentProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_GREEN, vector.g );
+  DALI_TEST_EQUALS( vector.g, actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.g, actor.GetCurrentColor().g, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.g, actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.g, actor.GetCurrentProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_BLUE, vector.b );
+  DALI_TEST_EQUALS( vector.b, actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.b, actor.GetCurrentColor().b, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.b, actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.b, actor.GetCurrentProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
+
 
   actor.SetProperty( Actor::Property::COLOR_ALPHA, vector.a );
+  DALI_TEST_EQUALS( vector.a, actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.a, actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.a, actor.GetCurrentProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( vector, actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
 
   actor.SetProperty( DevelActor::Property::OPACITY, 0.2f );
+
 
   // flush the queue and render once
   application.SendNotification();
@@ -2336,9 +2482,9 @@ int UtcDaliActorTouchedSignal(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_CHECK( gTouchCallBackCalled == true );
   END_TEST;
@@ -2366,9 +2512,9 @@ int UtcDaliActorHoveredSignal(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::MOTION );
   point.SetScreenPosition( Vector2( touchPoint.x, touchPoint.y ) );
-  Dali::Integration::HoverEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
+  Dali::Integration::HoverEvent hoverEvent;
+  hoverEvent.AddPoint( point );
+  application.ProcessEvent( hoverEvent );
 
   DALI_TEST_CHECK( gHoverCallBackCalled == true );
   END_TEST;
@@ -3712,17 +3858,33 @@ int UtcDaliActorRemoveRendererP1(void)
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
+  {
+    Geometry geometry = CreateQuadGeometry();
+    Shader shader = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
 
-  actor.AddRenderer( renderer );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
+    actor.AddRenderer( renderer );
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
 
-  actor.RemoveRenderer(renderer);
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+    application.SendNotification();
+    application.Render();
+  }
 
+  {
+    Renderer renderer = actor.GetRendererAt(0);
+    actor.RemoveRenderer(renderer);
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  // Call one final time to ensure that the renderer is actually removed after
+  // the handle goes out of scope, and excercises the deletion code path in
+  // scene graph and render.
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -3741,13 +3903,19 @@ int UtcDaliActorRemoveRendererP2(void)
   Renderer renderer = Renderer::New(geometry, shader);
 
   actor.AddRenderer( renderer );
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetRendererAt(0), renderer, TEST_LOCATION );
 
   actor.RemoveRenderer(0);
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-
+  // Shut down whilst holding onto the renderer handle.
   END_TEST;
 }
 
@@ -4150,10 +4318,10 @@ int UtcDaliActorRaiseLower(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4170,13 +4338,15 @@ int UtcDaliActorRaiseLower(void)
   value.Get( preActorOrder );
 
   DevelActor::Raise( actorB );
+  // Ensure sort order is calculated before next touch event
+  application.SendNotification();
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( postActorOrder );
 
   tet_printf( "Raised ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  true , TEST_LOCATION );
@@ -4190,13 +4360,14 @@ int UtcDaliActorRaiseLower(void)
   value.Get( preActorOrder );
 
   DevelActor::Lower( actorB );
+  application.SendNotification(); // ensure sort order calculated before next touch event
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( postActorOrder );
 
   tet_printf( "Lowered ActorB from (%d) to (%d) \n", preActorOrder, postActorOrder );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false , TEST_LOCATION );
@@ -4302,10 +4473,10 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4316,8 +4487,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf( "RaiseToTop ActorA\n" );
 
   DevelActor::RaiseToTop( actorA );
+  application.SendNotification(); // ensure sorting order is calculated before next touch event
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4346,8 +4518,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf( "RaiseToTop ActorB\n" );
 
   DevelActor::RaiseToTop( actorB );
+  application.SendNotification(); // Ensure sort order is calculated before next touch event
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4383,7 +4556,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4465,10 +4638,10 @@ int UtcDaliActorRaiseAbove(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4479,8 +4652,10 @@ int UtcDaliActorRaiseAbove(void)
   tet_printf( "Raise actor B Above Actor C\n" );
 
   DevelActor::RaiseAbove( actorB, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  true, TEST_LOCATION );
@@ -4492,7 +4667,10 @@ int UtcDaliActorRaiseAbove(void)
 
   DevelActor::RaiseAbove( actorA, actorB );
 
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent ); // process a touch event on ordered actors.
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4601,12 +4779,12 @@ int UtcDaliActorLowerBelow(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   tet_infoline( "UtcDaliActor Test Set up completed \n" );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -4617,11 +4795,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
 
   DevelActor::LowerBelow( actorC, actorB );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent ); // touch event
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4650,11 +4828,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor B below Actor C leaving A on top\n" );
 
   DevelActor::LowerBelow( actorB, actorC );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4680,11 +4858,11 @@ int UtcDaliActorLowerBelow(void)
   tet_printf( "Lower actor A below Actor C leaving C on top\n" );
 
   DevelActor::LowerBelow( actorA, actorC );
-
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   glAbstraction.ResetSetUniformCallStack();
   glSetUniformStack = glAbstraction.GetSetUniformTrace();
@@ -4741,6 +4919,7 @@ int UtcDaliActorMaxSiblingOrder(void)
   Actor sibling = parent.GetChildAt( 5 );
   DevelActor::RaiseToTop( sibling );
 
+  // Ensure sorting happens at end of Core::ProcessEvents()
   application.SendNotification();
   application.Render();
 
@@ -4831,10 +5010,10 @@ int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -4845,8 +5024,10 @@ int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
   tet_printf( "Raise actor A Above Actor C which have different parents\n" );
 
   DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent ); // touch event
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2,  false, TEST_LOCATION );
@@ -4906,14 +5087,16 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   tet_printf( "Raise actor A Above Actor C which have no parents\n" );
 
   DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -4924,13 +5107,14 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorB );
+  tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
+  DevelActor::LowerBelow( actorA, actorC );
 
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
-  DevelActor::LowerBelow( actorA, actorC );
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Actor A not parented so LowerBelow should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
@@ -4947,7 +5131,10 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
   DevelActor::RaiseAbove( actorB, actorC );
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "C not parented so RaiseAbove should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -4958,7 +5145,10 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
   DevelActor::LowerBelow( actorA, actorC );
-  application.ProcessEvent( event );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "C not parented so LowerBelow should show no effect\n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -4968,12 +5158,12 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorC );
-
+  DevelActor::RaiseAbove( actorA, actorC );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
 
-  DevelActor::RaiseAbove( actorA, actorC );
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Raise actor A Above Actor C, now both have same parent \n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5025,19 +5215,17 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
   stage.Add ( actorA );
+  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
+  DevelActor::Raise( actorB );
 
   application.SendNotification();
   application.Render();
 
-  tet_printf( "Raise actor B Above Actor C but B not parented\n" );
-
-  DevelActor::Raise( actorB );
-
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -5049,8 +5237,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   ResetTouchCallbacks();
 
   DevelActor::Lower( actorC );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseAbove should show no effect\n" );
 
@@ -5062,8 +5253,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Lower actor C below B but C not parented\n" );
 
   DevelActor::Lower( actorB );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so Lower should show no effect\n" );
 
@@ -5075,8 +5269,11 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Raise actor B to top\n" );
 
   DevelActor::RaiseToTop( actorB );
+  // Sort actor tree before next touch event
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so RaiseToTop should show no effect\n" );
 
@@ -5089,14 +5286,13 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   stage.Add ( actorB );
 
-  application.SendNotification();
-  application.Render();
-
   tet_printf( "Lower actor C to Bottom, B stays at top\n" );
 
   DevelActor::LowerToBottom( actorC );
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_printf( "Not parented so LowerToBottom should show no effect\n" );
 
@@ -5158,10 +5354,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
   point.SetScreenPosition( Vector2( 10.f, 10.f ) );
-  Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint( point );
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
@@ -5172,8 +5368,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
   DevelActor::RaiseAbove( actorA, actorA );
+  application.SendNotification();
+  application.Render();
 
-  application.ProcessEvent( event );
+  application.ProcessEvent( touchEvent );
 
   tet_infoline( "No target is source Actor so RaiseAbove should show no effect\n" );
 
@@ -5184,7 +5382,10 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   ResetTouchCallbacks();
 
   DevelActor::RaiseAbove( actorA, actorC );
-  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( touchEvent );
 
   tet_infoline( "Raise actor A Above Actor C which will now be successful \n" );
   DALI_TEST_EQUALS( gTouchCallBackCalled,  true, TEST_LOCATION );
@@ -5488,7 +5689,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   parentActorA.SetSize( size2 );
   parentActorA.SetPosition( 0.f, 0.f );
 
-  tet_infoline( "Create Grand Parent Actor 1 TOP_RIGHT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
+  tet_infoline( "Create Grand Parent Actor 1 BOTTOM_LEFT Anchor Point, ParentOrigin::BOTTOM_LEFT and 0,0 position \n" );
 
   Actor grandParentActorA = Actor::New();
   grandParentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
@@ -5517,6 +5718,70 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   DALI_TEST_EQUALS( actorScreenPosition.x,  45.0f , TEST_LOCATION );
   DALI_TEST_EQUALS( actorScreenPosition.y,  770.0f , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
+{
+  tet_infoline( "UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse Check screen position where the position does not use the anchor point" );
+
+  TestApplication application;
+
+  Stage stage( Stage::GetCurrent() );
+
+  tet_infoline( "Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorA = Actor::New();
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actorA.SetSize( 10.0f, 20.0f );
+  stage.Add( actorA );
+
+  tet_infoline( "Create an Actor with AnchorPoint::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorB = Actor::New();
+  actorB.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Vector2 actorBSize( 30.0f, 60.0f );
+  actorB.SetSize( actorBSize );
+  stage.Add( actorB );
+
+  tet_infoline( "Create an actor with AnchorPoint::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
+
+  Actor actorC = Actor::New();
+  actorC.SetAnchorPoint( AnchorPoint::CENTER );
+  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  Vector2 actorCSize( 60.0f, 120.0f );
+  actorC.SetSize( actorCSize );
+  stage.Add( actorC );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Despite differing sizes and anchor-points, the screen position for all actors is the same");
+
+  Vector2 center( stage.GetSize() * 0.5f );
+
+  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+
+  tet_infoline( "Add scale to all actors" );
+
+  actorA.SetScale( 2.0f );
+  actorB.SetScale( 2.0f );
+  actorC.SetScale( 2.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center /* TOP_LEFT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorBSize /* BOTTOM_RIGHT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorCSize * 0.5f /* CENTER Anchor*/, TEST_LOCATION );
 
   END_TEST;
 }
@@ -5695,3 +5960,125 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   END_TEST;
 }
 
+int utcDaliActorVisibilityChangeSignalSelf(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called when the visibility changes for the actor itself" );
+
+  Actor actor = Actor::New();
+
+  VisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
+
+  actor.SetVisible( false );
+
+  data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
+  data.Reset();
+
+  actor.SetVisible( false );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  tet_infoline( "Change the visibility using properties, ensure called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( true /* called */, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+
+  tet_infoline( "Set the visibility to current using properties, ensure not called" );
+  data.Reset();
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  data.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalChildren(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called for the children when the visibility changes for the parent" );
+
+  Actor parent = Actor::New();
+  Actor child = Actor::New();
+  parent.Add( child );
+
+  Actor grandChild = Actor::New();
+  child.Add( grandChild );
+
+  VisibilityChangedFunctorData parentData;
+  VisibilityChangedFunctorData childData;
+  VisibilityChangedFunctorData grandChildData;
+
+  tet_infoline( "Only connect the child and grandchild, ensure they are called and not the parent" );
+  DevelActor::VisibilityChangedSignal( child ).Connect( &application, VisibilityChangedFunctor( childData ) );
+  DevelActor::VisibilityChangedSignal( grandChild ).Connect( &application, VisibilityChangedFunctor( grandChildData ) );
+
+  parent.SetVisible( false );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( true /* called */, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Connect to the parent's signal as well and ensure all three are called" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  DevelActor::VisibilityChangedSignal( parent ).Connect( &application, VisibilityChangedFunctor( parentData ) );
+
+  parent.SetVisible( true );
+  parentData.Check( true /* called */, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+  childData.Check( true /* called */, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+  grandChildData.Check( true /* called */, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
+
+  tet_infoline( "Ensure none of the functors are called if we attempt to change the visibility to what it already is at" );
+  parentData.Reset();
+  childData.Reset();
+  grandChildData.Reset();
+
+  parent.SetVisible( true );
+  parentData.Check( false /* not called */, TEST_LOCATION );
+  childData.Check( false /* not called */, TEST_LOCATION );
+  grandChildData.Check( false /* not called */, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is emitted when the visibility changes when an animation starts" );
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  VisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::VISIBLE ), false );
+
+  data.Check( false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
+  tet_infoline( "Play the animation and check the property value" );
+  animation.Play();
+
+  data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  tet_infoline( "Animation not currently finished, so the current visibility should still be true" );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  END_TEST;
+}

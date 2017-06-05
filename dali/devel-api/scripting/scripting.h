@@ -245,7 +245,7 @@ const char* GetEnumerationName( T value, const StringEnum* table, unsigned int t
 template< typename T >
 const char * GetLinearEnumerationName( T value, const StringEnum* table, unsigned int tableCount )
 {
-  if ( table && ( value > 0 || value <= (int)tableCount ) )
+  if ( table && ( value > 0 || value <= static_cast<int>( tableCount ) ) )
   {
     return table[value].string;
   }

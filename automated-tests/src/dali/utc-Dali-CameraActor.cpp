@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,10 +223,8 @@ int UtcDaliCameraActorSetGetTypeP(void)
   actor.SetType( Dali::Camera::LOOK_AT_TARGET );
   DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
 
-  std::string sValue;
-  actor.GetProperty( CameraActor::Property::TYPE ).Get( sValue );
-  std::string result( "LOOK_AT_TARGET");
-  DALI_TEST_EQUALS( result, sValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( "LOOK_AT_TARGET", actor.GetProperty< std::string >( CameraActor::Property::TYPE ), TEST_LOCATION );
+  DALI_TEST_EQUALS( "LOOK_AT_TARGET", actor.GetCurrentProperty< std::string >( CameraActor::Property::TYPE ), TEST_LOCATION );
   END_TEST;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ void Sampler::SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode:
 {
   if( NULL != mRenderObject )
   {
-    SetFilterModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, (unsigned int)minFilter, (unsigned int)magFilter );
+    SetFilterModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( minFilter ), static_cast< unsigned int >( magFilter ) );
   }
 }
 
@@ -47,7 +47,7 @@ void Sampler::SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWra
 {
   if( NULL != mRenderObject )
   {
-    SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, (unsigned int)rWrap, (unsigned int)sWrap, (unsigned int)tWrap );
+    SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( rWrap ), static_cast< unsigned int >( sWrap ), static_cast< unsigned int >( tWrap ) );
   }
 }
 

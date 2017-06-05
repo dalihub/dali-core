@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,6 +191,11 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
   return Property::Value();
 }
 
+Property::Value Path::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index ); // Event-side only properties
+}
+
 void Path::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
   const Property::Array* array = propertyValue.GetArray();
@@ -343,7 +348,7 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   {
     segment = t * numSegs;
     float segLength = 1.0f / numSegs;
-    float segStart  = (float)segment * segLength;
+    float segStart  = static_cast<float>( segment ) * segLength;
     tLocal = (t - segStart) * numSegs;
   }
 }

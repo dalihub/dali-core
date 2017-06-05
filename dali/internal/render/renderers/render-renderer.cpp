@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ namespace Render
 Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          Render::Geometry* geometry,
                          unsigned int blendingBitmask,
-                         const Vector4* blendColor,
+                         const Vector4& blendColor,
                          FaceCullingMode::Type faceCullingMode,
                          bool preMultipliedAlphaEnabled,
                          DepthWriteMode::Type depthWriteMode,
@@ -124,7 +124,7 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     Render::Geometry* geometry,
                     unsigned int blendingBitmask,
-                    const Vector4* blendColor,
+                    const Vector4& blendColor,
                     FaceCullingMode::Type faceCullingMode,
                     bool preMultipliedAlphaEnabled,
                     DepthWriteMode::Type depthWriteMode,
@@ -147,15 +147,12 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
 {
-  if(  blendingBitmask != 0u )
+  if( blendingBitmask != 0u )
   {
     mBlendingOptions.SetBitmask( blendingBitmask );
   }
 
-  if( blendColor )
-  {
-    mBlendingOptions.SetBlendColor( *blendColor );
-  }
+  mBlendingOptions.SetBlendColor( blendColor );
 }
 
 void Renderer::Initialize( Context& context )
@@ -394,9 +391,9 @@ void Renderer::SetBlendingBitMask( unsigned int bitmask )
   mBlendingOptions.SetBitmask( bitmask );
 }
 
-void Renderer::SetBlendColor( const Vector4* color )
+void Renderer::SetBlendColor( const Vector4& color )
 {
-  mBlendingOptions.SetBlendColor( *color );
+  mBlendingOptions.SetBlendColor( color );
 }
 
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
@@ -527,7 +524,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
 void Renderer::Render( Context& context,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
-                       SceneGraph::Shader& defaultShader,
                        const Matrix& modelMatrix,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -539,14 +535,8 @@ void Renderer::Render( Context& context,
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
   {
-    // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
-    program = defaultShader.GetProgram();
-    DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
-    if( !program )
-    {
-      DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", (void*)&mRenderDataProvider->GetShader() );
-      return;
-    }
+    DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", reinterpret_cast< void* >( &mRenderDataProvider->GetShader() ) );
+    return;
   }
 
   //Set cull face  mode

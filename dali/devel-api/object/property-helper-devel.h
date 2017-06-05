@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_HELPER_DEVEL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,13 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
+  DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL
+ */
+#define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex ) \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty ); \
   DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 /**
@@ -83,5 +90,13 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
   DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex  )
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION
+ *
+ * @note For Read Only properties
+ */
+#define DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( objectNamespace, objectType, text, valueType, enumIndex ) \
+  DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex  )
 
 #endif // __DALI_PROPERTY_HELPER_DEVEL_H__
