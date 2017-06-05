@@ -113,25 +113,27 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-trace-call-stack.cpp
 )
 
-PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
+PKG_CHECK_MODULES(CAPI_LIB REQUIRED
      dali-core
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${${CAPI_LIB}_CFLAGS_OTHER} -O0 -ggdb --coverage -Wall -Werror")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CAPI_LIB_CFLAGS} -O0 -ggdb --coverage -Wall -Werror")
 
-FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
+MESSAGE(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+FOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
     ../../../
-    ${${CAPI_LIB}_INCLUDE_DIRS}
+    ${CAPI_LIB_INCLUDE_DIRS}
     dali-test-suite-utils
 )
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
-    ${${CAPI_LIB}_LIBRARIES}
+    ${CAPI_LIB_LIBRARIES}
     -lpthread
 )
 
