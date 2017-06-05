@@ -181,7 +181,7 @@ NinePatchImage::NinePatchImage( const std::string& filename )
   Integration::BitmapResourceType resourceType;
 
   // Note, bitmap is only destroyed when the image is destroyed.
-  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, filename );
+  Integration::ResourcePointer resource = platformAbstraction.LoadImageSynchronously( resourceType, filename );
   if( resource )
   {
     mBitmap = static_cast<Integration::Bitmap*>( resource.Get());

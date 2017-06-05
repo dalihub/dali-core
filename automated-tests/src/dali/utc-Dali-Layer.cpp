@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -467,7 +467,9 @@ int UtcDaliLayerDefaultProperties(void)
   DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX));
 
   Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
+  DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 
+  v = actor.GetCurrentProperty( Layer::Property::CLIPPING_BOX );
   DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 
   // set the same boundaries, but through a clipping box object
@@ -475,8 +477,10 @@ int UtcDaliLayerDefaultProperties(void)
 
   DALI_TEST_CHECK( actor.GetClippingBox() == testBox );
 
-
   Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
+  DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_2D", TEST_LOCATION );
+
+  behavior = actor.GetCurrentProperty( Layer::Property::BEHAVIOR );
   DALI_TEST_EQUALS(behavior.Get<std::string>().c_str(), "LAYER_2D", TEST_LOCATION );
 
   END_TEST;

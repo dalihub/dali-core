@@ -46,6 +46,14 @@ public:
    * Multi-threading note: this method should be called from the main thread
    */
   virtual void NotifyContextRegained() = 0;
+
+protected:
+
+  /**
+   * Virtual destructor, no deletion through this interface
+   */
+  virtual ~ContextNotifierInterface() {}
+
 };
 
 } // namespace Integration

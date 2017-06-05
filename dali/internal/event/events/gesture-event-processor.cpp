@@ -37,14 +37,14 @@ namespace Dali
 namespace Internal
 {
 
-GestureEventProcessor::GestureEventProcessor(Stage& stage, Integration::GestureManager& gestureManager, Integration::RenderController& renderController)
-: mStage(stage),
-  mGestureManager(gestureManager),
-  mLongPressGestureProcessor(stage, gestureManager),
-  mPanGestureProcessor(stage, gestureManager),
-  mPinchGestureProcessor(stage, gestureManager),
-  mTapGestureProcessor(stage, gestureManager),
-  mRenderController(renderController),
+GestureEventProcessor::GestureEventProcessor( Stage& stage, SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController )
+: mStage( stage ),
+  mGestureManager( gestureManager ),
+  mLongPressGestureProcessor( stage, gestureManager ),
+  mPanGestureProcessor( stage, gestureManager, updateManager ),
+  mPinchGestureProcessor( stage, gestureManager ),
+  mTapGestureProcessor( stage, gestureManager ),
+  mRenderController( renderController ),
   mUpdateRequired( false )
 {
 }

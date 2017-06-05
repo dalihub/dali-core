@@ -51,6 +51,11 @@ TextureSet::TextureSet()
 
 TextureSet::~TextureSet()
 {
+  size_t rendererCount = mRenderers.Size();
+  for( size_t i(0); i<rendererCount; ++i )
+  {
+    mRenderers[i]->TextureSetDeleted();
+  }
 }
 
 void TextureSet::operator delete( void* ptr )

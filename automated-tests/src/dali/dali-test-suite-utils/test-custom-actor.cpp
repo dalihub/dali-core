@@ -245,7 +245,8 @@ TestCustomActor::TestCustomActor()
   mSizeSet( Vector3::ZERO ),
   mTargetSize( Vector3::ZERO ),
   mNego( false ),
-  mDepth(0u)
+  mDepth(0u),
+  develProp6( 10.0f )
 {
 }
 
@@ -254,7 +255,8 @@ TestCustomActor::TestCustomActor(bool nego)
   mDaliProperty( Property::INVALID_INDEX ),
   mSizeSet( Vector3::ZERO ),
   mTargetSize( Vector3::ZERO ),
-  mNego( nego )
+  mNego( nego ),
+  develProp6( 10.0f )
 {
 }
 /**
@@ -500,6 +502,10 @@ Property::Value TestCustomActor::GetProperty( BaseObject* object, Property::Inde
       {
         return Property::Value(actorImpl.develProp5);
       }
+      case Test::DevelTestCustomActor::Property::DEVEL_TEST_PROPERTY6:
+      {
+        return Property::Value(actorImpl.develProp6);
+      }
     }
   }
   return Property::Value();
@@ -518,6 +524,7 @@ DALI_PROPERTY_REGISTRATION( Test, TestCustomActor, "testProperty2", VECTOR4, TES
 DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty3", VECTOR4, DEVEL_TEST_PROPERTY3)
 DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty4", INTEGER, DEVEL_TEST_PROPERTY4)
 DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty5", FLOAT, DEVEL_TEST_PROPERTY5)
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Test, TestCustomActor, "develTestProperty6", FLOAT, DEVEL_TEST_PROPERTY6)
 
 DALI_TYPE_REGISTRATION_END()
 

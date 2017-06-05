@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,11 @@ public: // Default property extensions from Object
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()

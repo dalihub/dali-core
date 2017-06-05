@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,8 @@ void FrameBuffer::Initialize()
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  if( (unsigned int)( texture->GetWidth() / ( 1 << mipmapLevel ) ) == mWidth &&
-      (unsigned int)( texture->GetHeight() / ( 1 << mipmapLevel ) ) == mHeight )
+  if( ( texture->GetWidth() / ( 1u << mipmapLevel ) == mWidth ) &&
+      ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )
   {
     mColor = texture;
     AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );

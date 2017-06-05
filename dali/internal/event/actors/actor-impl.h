@@ -23,12 +23,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -58,6 +60,9 @@ typedef ActorContainer::const_iterator ActorConstIter;
 
 typedef std::vector< RendererPtr > RendererContainer;
 typedef RendererContainer::iterator RendererIter;
+
+class ActorDepthTreeNode;
+typedef Dali::Internal::MemoryPoolObjectAllocator< ActorDepthTreeNode > DepthNodeMemoryPool;
 
 /**
  * Actor is the primary object which Dali applications interact with.
@@ -210,6 +215,7 @@ public:
    * Retrieve a reference to Actor's children.
    * @note Not for public use.
    * @return A reference to the container of children.
+   * @note The internal container is lazily initialized so ensure you check the child count before using the value returned by this method.
    */
   ActorContainer& GetChildrenInternal()
   {
@@ -303,7 +309,7 @@ public:
    * This size will be the size set or if animating then the target size.
    * @return The Actor's size.
    */
-  const Vector3& GetTargetSize() const;
+  Vector3 GetTargetSize() const;
 
   /**
    * Retrieve the Actor's size from update side.
@@ -613,7 +619,7 @@ public:
 
   /**
    * Sets the visibility flag of an actor.
-   * @param [in] visible The new visibility flag.
+   * @param[in] visible The new visibility flag.
    */
   void SetVisible( bool visible );
 
@@ -754,8 +760,7 @@ public:
   }
 
   /**
-   * Get the actor's sorting depth (The hierarchy depth combined with
-   * the sibling order)
+   * Get the actor's sorting depth
    *
    * @return The depth used for hit-testing and renderer sorting
    */
@@ -874,6 +879,24 @@ public:
    *                            RelayoutController algorithm.
    */
   void NegotiateSize( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @brief Set whether size negotiation should use the assigned size of the actor
+   * during relayout for the given dimension(s)
+   *
+   * @param[in] use Whether the assigned size of the actor should be used
+   * @param[in] dimension The dimension(s) to set. Can be a bitfield of multiple dimensions
+   */
+  void SetUseAssignedSize( bool use, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+
+  /**
+   * @brief Returns whether size negotiation should use the assigned size of the actor
+   * during relayout for a single dimension
+   *
+   * @param[in] dimension The dimension to get
+   * @return Return whether the assigned size of the actor should be used. If more than one dimension is requested, just return the first one found
+   */
+  bool GetUseAssignedSize( Dimension::Type dimension ) const;
 
   /**
    * @copydoc Dali::Actor::SetResizePolicy()
@@ -1388,6 +1411,13 @@ public:
   bool EmitWheelEventSignal( const WheelEvent& event );
 
   /**
+   * @brief Emits the visibility change signal for this actor and all its children.
+   * @param[in] visible Whether the actor has become visible or not.
+   * @param[in] type Whether the actor's visible property has changed or a parent's.
+   */
+  void EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1423,6 +1453,11 @@ public:
   Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal();
 
   /**
+   * @copydoc DevelActor::VisibilityChangedSignal
+   */
+  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -1451,46 +1486,12 @@ public:
   // For Animation
 
   /**
-   * This should only be called by Animation, when the actors SIZE property is animated.
-   *
-   * @param[in] animation The animation that resized the actor
-   * @param[in] targetSize The new target size of the actor
-   */
-  void NotifySizeAnimation( Animation& animation, const Vector3& targetSize );
-
-  /**
-   * This should only be called by Animation, when the actors SIZE_WIDTH or SIZE_HEIGHT or SIZE_DEPTH property is animated.
-   *
-   * @param[in] animation The animation that resized the actor
-   * @param[in] targetSize The new target size of the actor
-   * @param[in] property The index of the property being animated
-   */
-  void NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property );
-
-  /**
    * For use in derived classes.
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
    */
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize )
   {
   }
-
-  /**
-   * This should only be called by Animation, when the actors POSITION property is animated.
-   *
-   * @param[in] animation The animation that repositioned the actor
-   * @param[in] targetPosition The new target position of the actor
-   */
-  void NotifyPositionAnimation( Animation& animation, const Vector3& targetPosition );
-
-  /**
-   * This should only be called by Animation, when the actors POSITION_X or POSITION_Y or POSITION_Z property is animated.
-   *
-   * @param[in] animation The animation that repositioned the actor
-   * @param[in] targetPosition The new target position of the actor
-   * @param[in] property The index of the property being animated
-   */
-  void NotifyPositionAnimation( Animation& animation, float targetPosition, Property::Index property );
 
 protected:
 
@@ -1569,6 +1570,26 @@ protected:
   bool IsNodeConnected() const;
 
 public:
+  /**
+   * Trigger a rebuild of the actor depth tree from this root
+   * If a Layer3D is encountered, then this doesn't descend any further.
+   * The mSortedDepth of each actor is set appropriately.
+   */
+  void RebuildDepthTree();
+
+protected:
+
+  /**
+   * Traverse the actor tree, inserting actors into the depth tree in sibling order.
+   * For all actors that share a sibling order, they also share a depth tree, for
+   * optimal render performance.
+   * @param[in] nodeMemoryPool The memory pool used to allocate depth nodes
+   * @param[in,out] depthTreeNode The depth tree node to which to add this actor's children
+   * @return The count of actors in this depth tree
+   */
+  int BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* depthTreeNode );
+
+public:
 
   // Default property extensions from Object
 
@@ -1628,6 +1649,16 @@ public:
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
   virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
@@ -1683,6 +1714,15 @@ public:
   void LowerBelow( Internal::Actor& target );
 
 private:
+
+  struct SendMessage
+  {
+    enum Type
+    {
+      FALSE = 0,
+      TRUE  = 1,
+    };
+  };
 
   // Undefined
   Actor();
@@ -1805,6 +1845,22 @@ private:
   }
 
   /**
+   * @brief Retrieves the cached event side value of a default property.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the cached value of the property if found.
+   * @return True if value set, false otherwise.
+   */
+  bool GetCachedPropertyValue( Property::Index index, Property::Value& value ) const;
+
+  /**
+   * @brief Retrieves the current value of a default property from the scene-graph.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the current scene-graph value of the property
+   * @return True if value set, false otherwise.
+   */
+  bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
+
+  /**
    * @brief Ensure the relayout data is allocated
    */
   void EnsureRelayoutData();
@@ -1846,7 +1902,6 @@ private:
    */
   bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
 
-
   /**
    * @brief Get the current position of the actor in screen coordinates.
    *
@@ -1854,10 +1909,17 @@ private:
    */
   const Vector2 GetCurrentScreenPosition() const;
 
+  /**
+   * Sets the visibility flag of an actor.
+   * @param[in] visible The new visibility flag.
+   * @param[in] sendMessage Whether to send a message to the update thread or not.
+   */
+  void SetVisibleInternal( bool visible, SendMessage::Type sendMessage );
+
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
-  ActorContainer* mChildren;      ///< Container of referenced actors
+  ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized
   RendererContainer* mRenderers;   ///< Renderer container
 
   const SceneGraph::Node* mNode;  ///< Not owned
@@ -1877,13 +1939,18 @@ protected:
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
+  DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
 
-  Vector3         mTargetSize;       ///< Event-side storage for size (not a pointer as most actors will have a size)
-  Vector3         mTargetPosition;   ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Quaternion      mTargetOrientation; ///< Event-side storage for orientation
+  Vector4         mTargetColor;       ///< Event-side storage for color
+  Vector3         mTargetSize;        ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Vector3         mTargetScale;       ///< Event-side storage for scale
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
+  uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
   uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   uint16_t mSiblingOrder;     ///< The sibling order of the actor
 
@@ -1902,6 +1969,7 @@ protected:
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
+  bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
@@ -1912,6 +1980,67 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 };
+
+/**
+ * Helper class to create sorted depth index
+ */
+class ActorDepthTreeNode
+{
+public:
+  ActorDepthTreeNode()
+  : mParentNode(NULL),
+    mNextSiblingNode(NULL),
+    mFirstChildNode(NULL),
+    mSiblingOrder( 0 )
+  {
+  }
+
+  ActorDepthTreeNode( Actor* actor, uint16_t siblingOrder )
+  : mParentNode(NULL),
+    mNextSiblingNode(NULL),
+    mFirstChildNode(NULL),
+    mSiblingOrder( siblingOrder )
+  {
+    mActors.push_back( actor );
+  }
+
+  ~ActorDepthTreeNode()
+  {
+    if( mFirstChildNode )
+    {
+      delete mFirstChildNode;
+      mFirstChildNode = NULL;
+    }
+    if( mNextSiblingNode )
+    {
+      delete mNextSiblingNode;
+      mNextSiblingNode = NULL;
+    }
+    mParentNode = NULL;
+  }
+
+  uint16_t GetSiblingOrder()
+  {
+    return mSiblingOrder;
+  }
+
+  void AddActor( Actor* actor )
+  {
+    mActors.push_back( actor );
+  }
+
+public:
+  std::vector<Actor*> mActors; // Array of actors with the same sibling order and same ancestor sibling orders
+  ActorDepthTreeNode* mParentNode;
+  ActorDepthTreeNode* mNextSiblingNode;
+  ActorDepthTreeNode* mFirstChildNode;
+  uint16_t mSiblingOrder;
+
+private:
+  ActorDepthTreeNode( ActorDepthTreeNode& );
+  ActorDepthTreeNode& operator=(const ActorDepthTreeNode& );
+};
+
 
 } // namespace Internal
 

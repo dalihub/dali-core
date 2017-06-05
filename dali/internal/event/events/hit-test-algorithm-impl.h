@@ -81,6 +81,14 @@ struct HitTestInterface
    * @return true if the layer should consume the hit, false otherwise.
    */
   virtual bool DoesLayerConsumeHit( Layer* layer ) = 0;
+
+protected:
+
+  /**
+   * Virtual destructor, no deletion through this interface
+   */
+  virtual ~HitTestInterface();
+
 };
 
 /**

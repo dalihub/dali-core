@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <iostream>
 #include <cstring>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
@@ -44,6 +45,7 @@ using namespace Dali;
 #define TOKENPASTE(x,y) x y
 #define TOKENPASTE2(x,y) TOKENPASTE( x, y )
 #define TEST_LOCATION TOKENPASTE2( "Test failed in ", TOKENPASTE2( __FILE__, TOKENPASTE2( ", line ", STRINGIZE(__LINE__) ) ) )
+#define TEST_INNER_LOCATION(x) ( std::string(x) + " (" + STRINGIZE(__LINE__) + ")" ).c_str()
 
 #define TET_UNDEF 2
 #define TET_FAIL 1

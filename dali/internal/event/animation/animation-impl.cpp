@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,20 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/radian.h>
-#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
+#include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -113,17 +113,18 @@ AnimationPtr Animation::New(float durationSeconds)
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
-: mEventThreadServices( eventThreadServices ),
+: mAnimation( NULL ),
+  mEventThreadServices( eventThreadServices ),
   mPlaylist( playlist ),
-  mAnimation( NULL ),
-  mNotificationCount( 0 ),
-  mFinishedCallback( NULL ),
-  mFinishedCallbackObject( NULL ),
+  mFinishedSignal(),
+  mConnectors(),
+  mConnectorTargetValues(),
+  mPlayRange( Vector2(0.0f,1.0f)),
   mDurationSeconds( durationSeconds ),
   mSpeedFactor(1.0f),
+  mNotificationCount( 0 ),
   mLoopCount(1),
   mCurrentLoop(0),
-  mPlayRange( Vector2(0.0f,1.0f)),
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
   mDefaultAlpha( defaultAlpha ),
@@ -266,6 +267,8 @@ void Animation::Play()
 
   mState = Dali::Animation::PLAYING;
 
+  NotifyObjects();
+
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
@@ -278,6 +281,8 @@ void Animation::PlayFrom( float progress )
     mPlaylist.OnPlay( *this );
 
     mState = Dali::Animation::PLAYING;
+
+    NotifyObjects();
 
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
@@ -312,6 +317,9 @@ void Animation::Clear()
   // Remove all the connectors
   mConnectors.Clear();
 
+  // Reset the connector target values
+  mConnectorTargetValues.clear();
+
   // Replace the old scene-object with a new one
   DestroySceneObject();
   CreateSceneObject();
@@ -340,12 +348,28 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Time
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = GetImplementation( target.object );
-  const Property::Type targetType = object.GetPropertyType( target.propertyIndex );
+  Object& object = GetImplementation(target.object);
+  const Property::Type targetType = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = relativeValue.GetType();
-  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
 
-  ExtendDuration( period );
+  if ( object.GetPropertyComponentIndex( target.propertyIndex ) != Property::INVALID_COMPONENT_INDEX )
+  {
+    DALI_ASSERT_ALWAYS(Property::FLOAT == destinationType && "Animated value and Property type don't match");
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS(targetType == destinationType && "Animated value and Property type don't match");
+  }
+
+  ExtendDuration(period);
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = relativeValue;
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::BY;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch ( targetType )
   {
@@ -474,6 +498,14 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
   ExtendDuration( period );
 
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = destinationValue;
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = Animation::TO;
+  mConnectorTargetValues.push_back( connectorPair );
+
   switch ( destinationType )
   {
     case Property::BOOLEAN:
@@ -500,31 +532,6 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::FLOAT:
     {
-      if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex ) ||
-           ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) ||
-           ( Dali::Actor::Property::SIZE_DEPTH == targetPropertyIndex ) )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its size is being animated
-          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
-        }
-      }
-      else if ( ( Dali::Actor::Property::POSITION_X == targetPropertyIndex ) ||
-                 ( Dali::Actor::Property::POSITION_Y == targetPropertyIndex ) ||
-                 ( Dali::Actor::Property::POSITION_Z == targetPropertyIndex ) )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its position is being animated
-          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
-        }
-      }
-
       AddAnimatorConnector( AnimatorConnector<float>::New( targetObject,
                                                            targetPropertyIndex,
                                                            componentIndex,
@@ -547,27 +554,6 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR3:
     {
-      if ( Dali::Actor::Property::SIZE == targetPropertyIndex )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its size is being animated
-          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<Vector3>() );
-        }
-      }
-      else if ( Dali::Actor::Property::POSITION == targetPropertyIndex )
-      {
-        // Test whether this is actually an Actor
-        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
-        if ( maybeActor )
-        {
-          // Notify the actor that its position is being animated
-          maybeActor->NotifyPositionAnimation( *this, destinationValue.Get<Vector3>() );
-        }
-      }
-
       AddAnimatorConnector( AnimatorConnector<Vector3>::New( targetObject,
                                                              targetPropertyIndex,
                                                              componentIndex,
@@ -646,6 +632,14 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
   Object& object = GetImplementation( target.object );
 
   ExtendDuration( period );
+
+  // Store data to later notify the object that its property is being animated
+  ConnectorTargetValues connectorPair;
+  connectorPair.targetValue = keyFrames.GetLastKeyFrameValue();
+  connectorPair.connectorIndex = mConnectors.Count();
+  connectorPair.timePeriod = period;
+  connectorPair.animatorType = BETWEEN;
+  mConnectorTargetValues.push_back( connectorPair );
 
   switch(keyFrames.GetType())
   {
@@ -787,12 +781,6 @@ void Animation::EmitSignalFinish()
     Dali::Animation handle( this );
     mFinishedSignal.Emit( handle );
   }
-
-  // This callback is used internally, to avoid the overhead of using a signal.
-  if ( mFinishedCallback )
-  {
-    mFinishedCallback( mFinishedCallbackObject );
-  }
 }
 
 bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -811,12 +799,6 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   }
 
   return connected;
-}
-
-void Animation::SetFinishedCallback( FinishedCallback callback, Object* object )
-{
-  mFinishedCallback = callback;
-  mFinishedCallbackObject = object;
 }
 
 void Animation::AddAnimatorConnector( AnimatorConnectorBase* connector )
@@ -994,6 +976,33 @@ Vector2 Animation::GetPlayRange() const
   return mPlayRange;
 }
 
+bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
+{
+  return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
+}
+
+void Animation::NotifyObjects()
+{
+  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
+  {
+    // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
+    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+
+    // Loop through all connector target values sorted by increasing end time
+    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
+    const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
+    for( ; iter != endIter; ++iter )
+    {
+      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
+
+      Object* object = connector->GetObject();
+      if( object )
+      {
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
+      }
+    }
+  }
+}
 
 } // namespace Internal
 

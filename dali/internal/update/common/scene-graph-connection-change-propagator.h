@@ -53,6 +53,14 @@ public:
      * Inform the observer of the object that the object is about to be destroyed
      */
     virtual void ObservedObjectDestroyed(PropertyOwner& object){}
+
+  protected:
+
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~Observer() {}
+
   };
 
   /**

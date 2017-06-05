@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,12 +302,12 @@ bool Quaternion::operator!=( const Quaternion& rhs ) const
 
 float Quaternion::Length() const
 {
-  return (float)sqrt(mVector.w * mVector.w + mVector.Dot(mVector));
+  return static_cast< float >( sqrt(mVector.w * mVector.w + mVector.Dot(mVector) ) );
 }
 
 float Quaternion::LengthSquared() const
 {
-  return (float)(mVector.w * mVector.w + mVector.Dot(mVector));
+  return static_cast< float >( mVector.w * mVector.w + mVector.Dot(mVector) );
 }
 
 void Quaternion::Normalize()

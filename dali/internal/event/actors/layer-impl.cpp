@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -530,6 +530,21 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
         break;
       }
     } // switch(index)
+  }
+
+  return ret;
+}
+
+Property::Value Layer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  Property::Value ret;
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    ret = Actor::GetDefaultPropertyCurrentValue( index );
+  }
+  else
+  {
+    ret = GetDefaultProperty( index ); // Layer only has event-side properties
   }
 
   return ret;

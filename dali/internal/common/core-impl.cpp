@@ -83,13 +83,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
             GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
 : mRenderController( renderController ),
   mPlatform(platform),
-  mGestureEventProcessor(NULL),
-  mEventProcessor(NULL),
-  mUpdateManager(NULL),
-  mRenderManager(NULL),
-  mDiscardQueue(NULL),
-  mNotificationManager(NULL),
-  mShaderFactory(NULL),
   mIsActive(true),
   mProcessingEvent(false)
 {
@@ -131,8 +124,8 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mStage->Initialize();
 
-  mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
-  mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
+  mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
+  mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
 
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
@@ -165,14 +158,6 @@ Core::~Core()
   // remove (last?) reference to stage
   mStage.Reset();
 
-  delete mEventProcessor;
-  delete mGestureEventProcessor;
-  delete mNotificationManager;
-  delete mShaderFactory;
-  delete mDiscardQueue;
-  delete mUpdateManager;
-  delete mRenderManager;
-  delete mRenderTaskProcessor;
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
@@ -241,9 +226,7 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
 void Core::Render( RenderStatus& status )
 {
-  bool updateRequired = mRenderManager->Render( status );
-
-  status.SetNeedsUpdate( updateRequired );
+  mRenderManager->Render( status );
 }
 
 void Core::Suspend()
@@ -299,6 +282,9 @@ void Core::ProcessEvents()
 
     // Run the size negotiation after event processing finished signal
     mRelayoutController->Relayout();
+
+    // Rebuild depth tree after event processing has finished
+    mStage->RebuildDepthTree();
 
     // Flush any queued messages for the update-thread
     const bool messagesToProcess = mUpdateManager->FlushQueue();

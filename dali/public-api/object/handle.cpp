@@ -130,6 +130,11 @@ Property::Value Handle::GetProperty( Property::Index index ) const
   return GetImplementation(*this).GetProperty( index );
 }
 
+Property::Value Handle::GetCurrentProperty( Property::Index index ) const
+{
+  return GetImplementation( *this ).GetCurrentProperty( index );
+}
+
 void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
   GetImplementation(*this).GetPropertyIndices( indices );

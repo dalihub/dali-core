@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/integration-api/gl-defines.h>
-#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {

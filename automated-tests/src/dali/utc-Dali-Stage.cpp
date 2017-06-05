@@ -20,8 +20,10 @@
 #include <stdlib.h>
 
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/common/stage-devel.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/public-api/events/key-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 
@@ -42,6 +44,8 @@ void stage_test_cleanup(void)
 namespace
 {
 
+const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+
 // Functor for EventProcessingFinished signal
 struct EventProcessingFinishedFunctor
 {
@@ -58,6 +62,50 @@ struct EventProcessingFinishedFunctor
   }
 
   bool& mEventProcessingFinished;
+};
+
+// Stores data that is populated in the KeyEventGeneratedSignal callback and will be read by the TET cases
+struct KeyEventGeneratedSignalData
+{
+  KeyEventGeneratedSignalData()
+  : functorCalled(false)
+  {}
+
+  void Reset()
+  {
+    functorCalled = false;
+
+    receivedKeyEvent.keyModifier = 0;
+    receivedKeyEvent.keyPressedName.clear();
+    receivedKeyEvent.keyPressed.clear();
+  }
+
+  bool functorCalled;
+  KeyEvent receivedKeyEvent;
+};
+
+// Functor that sets the data when called
+struct KeyEventGeneratedReceivedFunctor
+{
+  KeyEventGeneratedReceivedFunctor( KeyEventGeneratedSignalData& data )
+  : signalData( data )
+  {}
+
+  bool operator()( const KeyEvent& keyEvent )
+  {
+    signalData.functorCalled = true;
+    signalData.receivedKeyEvent = keyEvent;
+
+    return true;
+  }
+
+  bool operator()()
+  {
+    signalData.functorCalled = true;
+    return true;
+  }
+
+  KeyEventGeneratedSignalData& signalData;
 };
 
 // Stores data that is populated in the key-event callback and will be read by the TET cases
@@ -142,6 +190,11 @@ struct TouchFunctor
   {
     signalData.functorCalled = true;
     signalData.receivedTouchData = touch;
+  }
+
+  void operator()()
+  {
+    signalData.functorCalled = true;
   }
 
   TouchedSignalData& signalData;
@@ -817,16 +870,20 @@ int UtcDaliStageEventProcessingFinishedN(void)
   END_TEST;
 }
 
-int UtcDaliStageSignalKeyEventP(void)
+int UtcDaliStageKeyEventGeneratedSignalP(void)
 {
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  KeyEventSignalData data;
-  KeyEventReceivedFunctor functor( data );
-  stage.KeyEventSignal().Connect( &application, functor );
+  KeyEventGeneratedSignalData data;
+  KeyEventGeneratedReceivedFunctor functor( data );
+  DevelStage::KeyEventGeneratedSignal( stage ).Connect( &application, functor );
 
-  Integration::KeyEvent event( "i", "i", 0, 0, 0, Integration::KeyEvent::Down );
+  KeyEventGeneratedSignalData data2;
+  KeyEventGeneratedReceivedFunctor functor2( data2 );
+  GetImplementation( stage ).ConnectSignal( &application, "keyEventGenerated", functor2 );
+
+  Integration::KeyEvent event( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -837,7 +894,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up );
+  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -848,7 +905,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down );
+  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -859,7 +916,60 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up );
+  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  application.ProcessEvent( event4 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+  END_TEST;
+}
+
+int UtcDaliStageSignalKeyEventP(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  KeyEventSignalData data;
+  KeyEventReceivedFunctor functor( data );
+  stage.KeyEventSignal().Connect( &application, functor );
+
+  Integration::KeyEvent event( "i", "i", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event2( "i", "i", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  application.ProcessEvent( event2 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event3( "a", "a", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  application.ProcessEvent( event3 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event4( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -1221,12 +1331,17 @@ int UtcDaliStageTouchSignalN(void)
   TouchFunctor functor( data );
   stage.TouchSignal().Connect( &application, functor );
 
+  TouchedSignalData data2;
+  TouchFunctor functor2( data2 );
+  GetImplementation( stage ).ConnectSignal( &application, "touch", functor2 );
+
   // Render and notify.
   application.SendNotification();
   application.Render();
 
   // Confirm functor not called before there has been any touch event.
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, data2.functorCalled, TEST_LOCATION );
 
   // No actors, single touch, down, motion then up.
   {
@@ -1235,7 +1350,11 @@ int UtcDaliStageTouchSignalN(void)
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
     DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0));
+
+    DALI_TEST_EQUALS( true, data2.functorCalled, TEST_LOCATION );
+
     data.Reset();
+    data2.Reset();
 
     // Confirm there is no signal when the touchpoint is only moved.
     GenerateTouch( application, PointState::MOTION, Vector2( 1200.0f, 10.0f ) ); // Some motion
