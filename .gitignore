@@ -37,3 +37,7 @@ BROWSE
 /build/tizen/.cov
 /build/desktop
 /packaging/home*
+GPATH
+GRTAGS
+GSYMS
+GTAGS
