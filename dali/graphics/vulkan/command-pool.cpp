@@ -15,9 +15,10 @@
  *
  */
 
+// INTERNAL INCLUDES
 #include <dali/graphics/vulkan/command-pool.h>
-#include <dali/graphics/vulkan/physical-device.h>
-#include <dali/graphics/vulkan/logical-device.h>
+#include <dali/graphics/vulkan/command-buffer.h>
+#include <dali/graphics/vulkan/graphics.h>
 
 namespace Dali
 {
@@ -26,187 +27,42 @@ namespace Graphics
 namespace Vulkan
 {
 
-
-class CommandPoolImpl : public VkObject
+CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo)
+: mGraphics(graphics)
 {
-public:
-  CommandPoolImpl(const LogicalDevice& device, QueueType type, bool isExclusive, bool createTransient,
-  bool createResetCommandBuffer)
-  : VkObject{},
-    mDevice{ device }, mExclusive{ isExclusive },
-    mResetFlag{ createResetCommandBuffer }, mTransientFlag{ createTransient },
-    mQueueType{ type }
+  mPool = VkAssert(graphics.GetDevice().createCommandPool(createInfo, graphics.GetAllocator()));
+}
+
+CommandPool::~CommandPool()
+{
+  if(mPool)
   {
+    mGraphics.GetDevice().destroyCommandPool(mPool, mGraphics.GetAllocator());
   }
+}
 
-  virtual ~CommandPoolImpl() {};
-
-  bool Initialise();
-
-  const LogicalDevice& GetLogicalDevice() const
-  {
-    return mDevice;
-  }
-
-  // vk objects getters
-public:
-
-  const vk::CommandPool GetCommandPool() const
-  {
-    return mCommandPool;
-  }
-
-  const vk::CommandPoolCreateInfo& GetCommandPoolCreateInfo() const
-  {
-    return mCreateInfo;
-  }
-
-  bool IsExclusive() const
-  {
-    return mExclusive;
-  }
-
-  bool IsTransient() const
-  {
-    return mTransientFlag;
-  }
-
-  bool IsResetFlag() const
-  {
-    return mResetFlag;
-  }
-
-  QueueType GetQueueType() const
-  {
-    return mQueueType;
-  }
-
-  std::vector< CommandBuffer > AllocateCommandBuffers(uint32_t count, bool primary);
-
-private:
-
-  LogicalDevice mDevice { nullptr };
-
-  // vulkan specific
-  vk::CommandPool           mCommandPool{nullptr};
-  vk::CommandPoolCreateInfo mCreateInfo{};
-
-  std::thread::id           mThreadId; // used if exclusive
-
-  // queue properties
-  bool mExclusive{false};
-  bool mResetFlag{false};
-  bool mTransientFlag{false};
-
-  QueueType mQueueType;
-};
-
-bool CommandPoolImpl::Initialise()
+std::unique_ptr< CommandBuffer > CommandPool::AllocateCommandBuffer(
+    const vk::CommandBufferAllocateInfo& info)
 {
-  auto vkDevice = mDevice.GetVkDevice();
-  auto phDevice = mDevice.GetPhysicalDevice();
-
-  vk::CommandPoolCreateFlags flags{};
-  if( mResetFlag )
-  {
-    flags |= vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
-  }
-  if( mTransientFlag )
-  {
-    flags |= vk::CommandPoolCreateFlagBits::eTransient;
-  }
-
-  vk::CommandPoolCreateInfo info;
-
-  info.setQueueFamilyIndex( phDevice.GetQueueFamilyIndex( mQueueType) );
-  info.flags = flags;
-  mCreateInfo = info;
-
-  VkAssertCall( vkDevice.createCommandPool( &info, mDevice.GetVkAllocator(), &mCommandPool ) );
-
-  VkLog("[VULKAN] CommandPoolImpl::Initialise() created!");
-
-  return true;
+  auto copyInfo = info;
+  copyInfo.setCommandPool(mPool);
+  return MakeUnique<CommandBuffer>(mGraphics, *this, copyInfo);
 }
 
-std::vector< CommandBuffer > CommandPoolImpl::AllocateCommandBuffers(uint32_t count, bool primary)
+std::unique_ptr< CommandBuffer > CommandPool::AllocateCommandBuffer(vk::CommandBufferLevel level)
 {
-  return std::move(CommandBuffer::New( CommandPool(this), primary, count ));
+  auto info =
+      vk::CommandBufferAllocateInfo{}.setCommandBufferCount(1).setLevel(level).setCommandPool(
+          mPool);
+  return MakeUnique<CommandBuffer>(mGraphics, *this, info);
 }
 
-CommandPool CommandPool::New(const LogicalDevice& device, QueueType type, bool isExclusive,
-                                         bool createTransient, bool createResetCommandBuffer)
+vk::CommandPool CommandPool::GetPool() const
 {
-  auto impl = new CommandPoolImpl(device, type, isExclusive, createTransient, createResetCommandBuffer);
-  CommandPool retval( impl );
-  if(!impl->Initialise())
-  {
-    retval = nullptr;
-  }
-  return retval;
+  return mPool;
 }
 
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
 
-// Implementation getter
-namespace
-{
-CommandPoolImpl* GetImpl( CommandPool* pool )
-{
-  return static_cast<CommandPoolImpl*>(pool->GetObject());
-}
-CommandPoolImpl* GetImpl( const CommandPool* pool )
-{
-  return static_cast<CommandPoolImpl*>(pool->GetObject());
-}
-}
-bool CommandPool::Initialise()
-{
-  return GetImpl(this)->Initialise();
-}
-
-const vk::CommandPool CommandPool::GetCommandPool() const
-{
-  return GetImpl(this)->GetCommandPool();
-}
-
-const vk::CommandPoolCreateInfo& CommandPool::GetVkCommandPoolCreateInfo() const
-{
-  return GetImpl(this)->GetCommandPoolCreateInfo();
-}
-
-const LogicalDevice& CommandPool::GetLogicalDevice() const
-{
-  return GetImpl(this)->GetLogicalDevice();
-}
-
-std::thread::id CommandPool::GetThreadId() const
-{
-  //return GetImplementation<CommandPoolImpl>(this)->mThreadId;
-  return std::thread::id();
-}
-
-void CommandPool::ThreadAttach()
-{
-
-}
-
-void CommandPool::ThreadDetach()
-{
-
-}
-
-
-std::vector< CommandBuffer > CommandPool::AllocateCommandBuffers(uint32_t count, bool primary)
-{
-  return std::move(GetImpl(this)->AllocateCommandBuffers( count, primary ));
-}
-
-CommandBuffer CommandPool::AllocateCommandBuffer(bool primary)
-{
-  return GetImpl(this)->AllocateCommandBuffers( 1, primary )[0];
-}
-
-
-}
-}
-}
