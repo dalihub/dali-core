@@ -1,3 +1,6 @@
+#ifndef DALI_GRAPHICS_VULKAN_VKSURFACEFACTORY_H
+#define DALI_GRAPHICS_VULKAN_VKSURFACEFACTORY_H
+
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
@@ -15,37 +18,27 @@
  *
  */
 
-#include <dali/graphics/graphics-surface.h>
-#include <dali/graphics/integration/graphics-surface-base.h>
+// EXTERNAL INCLUDES
+// Vulkan
+#include <vulkan/vulkan.hpp>
 
 namespace Dali
 {
 namespace Graphics
 {
-bool GraphicsSurface::Initialise()
+namespace Vulkan
 {
-  return GetObject()->Initialise();
-}
 
-bool GraphicsSurface::Replace()
+class VkSurfaceFactory : public SurfaceFactory
 {
-  return GetObject()->Replace();
-}
+public:
 
-bool GraphicsSurface::Destroy()
-{
-  return GetObject()->Destroy();
-}
+  virtual vk::SurfaceKHR Create( vk::Instance instance, vk::AllocationCallbacks* allocCallbacks, vk::PhysicalDevice physicalDevice ) const = 0;
 
-uint32_t GraphicsSurface::GetWidth()
-{
-  return GetObject()->GetWidth();
-}
+};
 
-uint32_t GraphicsSurface::GetHeight()
-{
-  return GetObject()->GetHeight();
-}
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
 
-}
-}
+#endif // DALI_GRAPHICS_VULKAN_VKSURFACEFACTORY_H

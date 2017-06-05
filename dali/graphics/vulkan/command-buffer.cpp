@@ -15,9 +15,10 @@
  *
  */
 
+// INTERNAL INCLUDES
 #include <dali/graphics/vulkan/command-buffer.h>
 #include <dali/graphics/vulkan/command-pool.h>
-#include <dali/graphics/vulkan/logical-device.h>
+#include <dali/graphics/vulkan/graphics.h>
 
 namespace Dali
 {
@@ -25,218 +26,182 @@ namespace Graphics
 {
 namespace Vulkan
 {
-using State = CommandBufferState;
-class CommandBufferImpl : public VkObject
+
+CommandBuffer::CommandBuffer(Graphics& graphics, CommandPool& ownerPool)
+: CommandBuffer(graphics, ownerPool,
+                vk::CommandBufferAllocateInfo().setCommandBufferCount(1).setLevel(vk::CommandBufferLevel::ePrimary))
 {
-public:
-  CommandBufferImpl(const LogicalDevice& context, const CommandPool& pool,
-                    vk::CommandBufferLevel level, vk::CommandBuffer buffer)
-  : VkObject{}, mPool{pool}, mDevice{context}, mBuffer{buffer}, mLevel{level}
+}
+
+CommandBuffer::CommandBuffer(Graphics& graphics, CommandPool& ownerPool,
+                             const vk::CommandBufferAllocateInfo& allocateInfo)
+: mGraphics(graphics), mCommandPool(ownerPool), mRecording(false)
+{
+  assert(allocateInfo.commandBufferCount == 1 && "Number of buffers to allocate must be equal 1!");
+  mCommandBuffer = VkAssert(mGraphics.GetDevice().allocateCommandBuffers(allocateInfo))[0];
+}
+
+CommandBuffer::~CommandBuffer()
+{
+  if(mCommandBuffer)
+  {
+    mGraphics.GetDevice().freeCommandBuffers(mCommandPool.GetPool(), mCommandBuffer);
+  }
+}
+
+/** Begin recording */
+void CommandBuffer::Begin(vk::CommandBufferUsageFlags usageFlags, vk::CommandBufferInheritanceInfo* inheritanceInfo)
+{
+  assert(!mRecording && "CommandBuffer already is in the recording state");
+  auto info = vk::CommandBufferBeginInfo{};
+  info.setPInheritanceInfo(inheritanceInfo);
+  info.setFlags(usageFlags);
+  VkAssert(mCommandBuffer.begin(info));
+  mRecording = true;
+}
+
+/** Finish recording */
+void CommandBuffer::End()
+{
+  assert(mRecording && "CommandBuffer is not in the recording state!");
+  VkAssert(mCommandBuffer.end());
+  mRecording = false;
+}
+
+/** Reset command buffer */
+void CommandBuffer::Reset()
+{
+  assert(!mRecording && "Can't reset command buffer during recording!");
+  assert(mCommandBuffer && "Invalid command buffer!");
+  mCommandBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
+}
+
+/** Free command buffer */
+void CommandBuffer::Free()
+{
+  assert(mCommandBuffer && "Invalid command buffer!");
+  mGraphics.GetDevice().freeCommandBuffers(mCommandPool.GetPool(), mCommandBuffer);
+}
+
+/** Records image layout transition barrier for one image */
+void CommandBuffer::ImageLayoutTransition(vk::Image            image,
+                                          vk::ImageLayout      oldLayout,
+                                          vk::ImageLayout      newLayout,
+                                          vk::ImageAspectFlags aspectMask)
+{
+  // must be in recording state
+
+  // just push new image barrier until any command is being called or buffer recording ends.
+  // it will make sure we batch barriers together rather than calling cmdPipelineBarrier
+  // for each separately
+  vk::AccessFlags        srcAccessMask, dstAccessMask;
+  vk::PipelineStageFlags srcStageMask, dstStageMask;
+
+  // TODO: add other transitions
+  switch(oldLayout)
+  {
+  case vk::ImageLayout::eUndefined:
+  {
+    srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
+  }
+  break;
+  case vk::ImageLayout::ePresentSrcKHR:
+  {
+    srcStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
+    srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
+  }
+  case vk::ImageLayout::eColorAttachmentOptimal:
+  {
+    srcStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
+  }
+  break;
+  case vk::ImageLayout::eGeneral:
+  case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+  case vk::ImageLayout::eShaderReadOnlyOptimal:
+  case vk::ImageLayout::eTransferSrcOptimal:
+  case vk::ImageLayout::eTransferDstOptimal:
+  case vk::ImageLayout::ePreinitialized:
+  default:
   {
   }
-
-  bool OnSafeDelete() override
-  {
-    // mind that the resources may not be released if the pool doesn't allow
-    // freeing a single command buffer! Synchronization is explicit
-    if(mPool)
-    {
-      mDevice.GetVkDevice().freeCommandBuffers(mPool.GetCommandPool(), 1, &mBuffer);
-      return true;
-    }
-    else
-    {
-      return false;
-    }
   }
 
-  const vk::CommandBuffer& GetVkCommandBuffer() const
+  switch(newLayout)
   {
-    return mBuffer;
+  case vk::ImageLayout::eColorAttachmentOptimal:
+  {
+    dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
+    dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eHostWrite;
+    break;
+  }
+  case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+  {
+    dstStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eEarlyFragmentTests;
+    dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+    break;
+  }
+  case vk::ImageLayout::ePresentSrcKHR:
+  {
+    dstStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
+    dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eMemoryRead;
+  }
+  case vk::ImageLayout::eGeneral:
+  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+  case vk::ImageLayout::eShaderReadOnlyOptimal:
+  case vk::ImageLayout::eTransferSrcOptimal:
+  case vk::ImageLayout::eTransferDstOptimal:
+  case vk::ImageLayout::ePreinitialized:
+  case vk::ImageLayout::eUndefined:
+  default:
+  {
+  }
   }
 
-  const CommandPool& GetCommandPool() const
-  {
-    return mPool;
-  }
+  RecordImageLayoutTransition(image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask,
+                              oldLayout, newLayout, aspectMask);
+}
 
-  State GetState() const
-  {
-    return mState;
-  }
-
-  bool Begin(bool oneTimeSubmit, bool renderPassContinue, bool simultaneousUse);
-  bool End();
-  bool Free();
-  bool Reset();
-
-private:
-  CommandPool            mPool;
-  LogicalDevice          mDevice;
-  vk::CommandBuffer      mBuffer;
-  vk::CommandBufferLevel mLevel;
-
-  // state of command buffer
-  State mState{State::UNDEFINED};
-};
-
-bool CommandBufferImpl::Begin(bool oneTimeSubmit, bool renderPassContinue, bool simultaneousUse)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+void CommandBuffer::RecordImageLayoutTransition(vk::Image image, vk::AccessFlags srcAccessMask,
+                                                vk::AccessFlags dstAccessMask, vk::PipelineStageFlags srcStageMask,
+                                                vk::PipelineStageFlags dstStageMask, vk::ImageLayout oldLayout,
+                                                vk::ImageLayout newLayout, vk::ImageAspectFlags aspectMask)
 {
-  // check state
-  if(mState != State::CREATED && mState != State::UNDEFINED && mState != State::RESET)
-  {
-    VkLog("[VKCMDBUF] Invalid buffer state: %d", static_cast< int >(mState));
-    return false;
-  }
+  vk::ImageSubresourceRange subres;
+  subres.setLayerCount(1).setBaseMipLevel(0).setBaseArrayLayer(0).setLevelCount(1).setAspectMask(aspectMask);
 
-  vk::CommandBufferUsageFlags flags{};
-  if(oneTimeSubmit)
-  {
-    flags |= vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-  }
-  if(renderPassContinue)
-  {
-    flags |= vk::CommandBufferUsageFlagBits::eRenderPassContinue;
-  }
-  if(simultaneousUse)
-  {
-    flags |= vk::CommandBufferUsageFlagBits::eSimultaneousUse;
-  }
 
-  // todo implement inheritance
-  vk::CommandBufferBeginInfo info;
-  info.setFlags(flags).setPInheritanceInfo(nullptr);
-
-  if(VkTestCall(mBuffer.begin(&info)) == vk::Result::eSuccess)
-  {
-    mState = State::RECORDING;
-    return true;
-  }
-
-  return false;
+  auto barrier = vk::ImageMemoryBarrier{};
+  barrier
+                     .setImage(image)
+                     .setSubresourceRange(subres)
+                     .setSrcAccessMask(srcAccessMask)
+                     .setDstAccessMask(dstAccessMask)
+                     .setOldLayout(oldLayout)
+                     .setNewLayout(newLayout);
+  ;
+  // todo: implement barriers batching
+  mCommandBuffer.pipelineBarrier(srcStageMask, dstStageMask, vk::DependencyFlags{}, nullptr, nullptr, barrier);
 }
+#pragma GCC diagnostic pop
 
-bool CommandBufferImpl::End()
+/** Push wait semaphores */
+void CommandBuffer::PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
+                                       const std::vector< vk::PipelineStageFlags >& stages)
 {
-  // check state
-  if(mState != State::RECORDING)
-  {
-    VkLog("[VKCMDBUF] Invalid buffer state: %d, it must be RECORDING", static_cast< int >(mState));
-    return false;
-  }
-
-  if(VkTestCall(mBuffer.end()) == vk::Result::eSuccess)
-  {
-    mState = State::RECORDED;
-    return true;
-  }
-  return false;
+  mWaitSemaphores = semaphores;
+  mWaitStages     = stages;
 }
 
-bool CommandBufferImpl::Free()
+/** Push signal semaphores */
+void CommandBuffer::PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores)
 {
-  // todo
-  assert(false && "CommandBufferImpl::Free() unimplemented!");
+  mSignalSemaphores = semaphores;
 }
 
-bool CommandBufferImpl::Reset()
-{
-  if(vk::Result::eSuccess == VkTestCall(mBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources)))
-  {
-    mState = State::RESET;
-  }
-  return true;
-}
-
-// Implementation getter
-namespace
-{
-CommandBufferImpl* GetImpl(CommandBuffer* handle)
-{
-  return static_cast< CommandBufferImpl* >(handle->GetObject());
-}
-CommandBufferImpl* GetImpl(const CommandBuffer* handle)
-{
-  return static_cast< CommandBufferImpl* >(handle->GetObject());
-}
-}
-
-const vk::CommandBuffer* CommandBuffer::operator->() const
-{
-  auto& vkcmdbuf = GetImpl(this)->GetVkCommandBuffer();
-  return &vkcmdbuf;
-}
-
-std::vector< CommandBuffer > CommandBuffer::New(const CommandPool& pool, bool isPrimary, uint32_t count)
-{
-  auto vkDevice = pool.GetLogicalDevice().GetVkDevice();
-
-  std::vector< vk::CommandBuffer > buffers(count);
-
-  auto bufferLevel = isPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary;
-
-  {
-    vk::CommandBufferAllocateInfo info;
-    info.setCommandBufferCount(count).setCommandPool(pool.GetCommandPool()).setLevel(bufferLevel);
-
-    VkAssertCall(vkDevice.allocateCommandBuffers(&info, buffers.data()));
-  }
-
-  // move buffers data
-  std::vector< CommandBuffer > output(buffers.size());
-
-  for(auto&& cmdbuf : buffers)
-  {
-    output.emplace_back(new CommandBufferImpl(pool.GetLogicalDevice(), pool, bufferLevel, cmdbuf));
-  }
-  return std::move(output);
-}
-
-CommandBuffer CommandBuffer::New(const CommandPool& pool, bool isPrimary)
-{
-  // todo make more efficient implementation
-  return CommandBuffer::New(pool, isPrimary, 1)[0];
-}
-
-bool CommandBuffer::Begin(bool oneTimeSubmit, bool renderPassContinue, bool simultaneousUse)
-{
-  return GetImpl(this)->Begin(oneTimeSubmit, renderPassContinue, simultaneousUse);
-}
-
-bool CommandBuffer::End()
-{
-  return GetImpl(this)->End();
-}
-
-bool CommandBuffer::Free()
-{
-  return GetImpl(this)->Free();
-}
-
-bool CommandBuffer::Reset()
-{
-  return GetImpl(this)->Reset();
-}
-
-CommandBufferState CommandBuffer::GetState() const
-{
-  return GetImpl(this)->GetState();
-}
-
-vk::CommandBuffer CommandBuffer::GetVkBuffer() const
-{
-  return GetImpl(this)->GetVkCommandBuffer();
-}
-
-const CommandPool& CommandBuffer::GetCommandPool() const
-{
-  return GetImpl(this)->GetCommandPool();
-}
-
-std::thread::id CommandBuffer::GetThreadId() const
-{
-  return std::thread::id{};
-}
-}
-}
-}
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali

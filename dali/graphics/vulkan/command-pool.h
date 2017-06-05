@@ -1,5 +1,5 @@
-#ifndef DALI_CORE_VULKAN_COMMAND_POOL_H
-#define DALI_CORE_VULKAN_COMMAND_POOL_H
+#ifndef DALI_GRAPHICS_VULKAN_COMMANDPOOL_H
+#define DALI_GRAPHICS_VULKAN_COMMANDPOOL_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,9 +18,8 @@
  *
  */
 
-#include <dali/graphics/vulkan/command-buffer.h>
-#include <dali/graphics/vulkan/common.h>
-#include <thread>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/types.h>
 
 namespace Dali
 {
@@ -28,38 +27,29 @@ namespace Graphics
 {
 namespace Vulkan
 {
-class LogicalDevice;
 
-//using VulkanCommandBufferArray = std::vector< VulkanCommandBuffer >;
-
-class CommandPool : public VkHandle
+class Graphics;
+class CommandBuffer;
+class CommandPool
 {
 public:
-  CommandPool(VkObject* impl = nullptr) : VkHandle{impl}
-  {
-  }
-  using VkHandle::operator=;
 
-  static CommandPool New(const LogicalDevice& context, QueueType type, bool isExclusive,
-                         bool createTransient, bool createResetCommandBuffer);
+  CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+  ~CommandPool();
 
-  bool Initialise();
+  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( const vk::CommandBufferAllocateInfo& info );
 
-  // attaching to thread will make sure that any attempt of using pool on the
-  // wrong thread will assert
-  void ThreadAttach();
-  void ThreadDetach();
+  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( vk::CommandBufferLevel level );
 
-  const vk::CommandPool            GetCommandPool() const;
-  const LogicalDevice&             GetLogicalDevice() const;
-  const vk::CommandPoolCreateInfo& GetVkCommandPoolCreateInfo() const;
-  std::thread::id                  GetThreadId() const;
+  vk::CommandPool GetPool() const;
 
-  std::vector< CommandBuffer > AllocateCommandBuffers(uint32_t count, bool primary);
-  CommandBuffer AllocateCommandBuffer(bool primary);
+private:
+  Graphics&       mGraphics;
+  vk::CommandPool mPool;
 };
-}
-}
-}
 
-#endif //DALI_CORE_VULKANCOMMANDPOOL_H
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
+
+#endif // DALI_GRAPHICS_VULKAN_COMMANDPOOL_H

@@ -1,5 +1,5 @@
-#ifndef DALI_CORE_GRAPHICS_VULKAN_SURFACE_H
-#define DALI_CORE_GRAPHICS_VULKAN_SURFACE_H
+#ifndef DALI_GRAPHICS_VULKAN_SURFACE_H
+#define DALI_GRAPHICS_VULKAN_SURFACE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,8 +18,8 @@
  *
  */
 
-#include <dali/graphics/graphics-surface.h>
-#include <dali/graphics/vulkan/common.h>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/types.h>
 
 namespace Dali
 {
@@ -27,58 +27,149 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
 /**
- * This is a common handle for Vulkan surface implementation
+ * Vulkan surface is coupled with swapchain -> one swapchain per surface
+ * Swapchain won't exist until surface is used in a such way
+ *
  */
-class Surface : public GraphicsSurface
+class Graphics;
+class CommandBuffer;
+class CommandPool;
+class Surface;
+
+using UniqueSurface       = std::unique_ptr< Surface >;
+using UniqueCommandBuffer = std::unique_ptr< CommandBuffer >;
+using UniqueCommandPool   = std::unique_ptr< CommandPool >;
+
+// simple structure describing single image of swapchain
+// non-copyable, only movable
+struct SwapchainImage
+{
+  SwapchainImage();
+  ~SwapchainImage();
+  SwapchainImage(const SwapchainImage&) = delete;
+  SwapchainImage(SwapchainImage&&)      = default;
+  SwapchainImage& operator=(const SwapchainImage&) = delete;
+  SwapchainImage& operator=(SwapchainImage&&) = default;
+
+  UniqueImage     image;
+  UniqueImageView imageView;
+  vk::Framebuffer framebuffer;
+  vk::ImageLayout layout;
+  vk::Semaphore   acqSem;
+  vk::Semaphore   presentSem;
+
+  // layout transitions, prerecorded command buffers
+  UniqueCommandBuffer layoutToColorCmdBuf;
+  UniqueCommandBuffer mainCmdBuf;
+};
+
+class Surface
 {
 public:
-  Surface(Integration::GraphicsSurfaceBase* impl = nullptr) : GraphicsSurface{impl}
-  {
-  }
-  using GraphicsSurface::operator=;
+  Surface(Graphics& graphics, vk::SurfaceKHR surface, uint32_t bufferCount = 2,
+          bool hasDepthStencil = false);
+  ~Surface();
 
   /**
-   * Returns surface width
-   * @return
+   * Prepares new swapchain image
    */
-  uint32_t GetWidth() const;
+  void AcquireNextImage();
 
   /**
- * Returns surface height
- * @return
- */
-  uint32_t GetHeight() const;
-
-  // Vulkan specific API
-public:
-  /**
- * Returns associated Vulkan surface object
- * @return
- */
-  const vk::SurfaceKHR GetSurface() const;
-
-  /**
-   * Returns current surface format
-   * @return
+   * Presents image
    */
-  const vk::SurfaceFormatKHR& GetFormat() const;
+  void Present();
 
   /**
    *
    * @return
    */
-  const vk::SurfaceCapabilitiesKHR& GetCapabilities() const;
+  vk::RenderPass GetRenderPass() const;
 
   /**
-   * 
+   *
+   * @param index
    * @return
    */
-  const std::vector< vk::SurfaceFormatKHR >& GetAllFormats() const;
+  vk::Framebuffer GetFramebuffer(uint32_t index = -1u) const;
+
+  /**
+   *
+   * @param index
+   * @return
+   */
+  ImageView& GetImageView(uint32_t index = -1u) const;
+
+  /**
+   *
+   * @param index
+   * @return
+   */
+  Image& GetImage(uint32_t index = -1u) const;
+
+  /**
+   *
+   * @return
+   */
+  vk::SurfaceKHR GetSurfaceKHR() const;
+
+private:
+  void CreateSwapchain();
+
+  void CreateVulkanSwapchain();
+
+  void CreateImageView(SwapchainImage& swapImage);
+  void CreateFramebuffer(SwapchainImage& swapImage);
+  void CreateSemaphores(SwapchainImage& swapImage);
+
+  void DestroySwapchain();
+
+  void InitialiseSwapchain();
+
+  void InitialiseRenderPass();
+
+  void AddSwapchainImage(vk::Image image, std::vector< SwapchainImage >& swapchainImages);
+
+  void CreateCommandBuffers();
+
+  void CreateDepthStencil();
+
+  void DestroyDepthStencil();
+
+  void BeginRenderPass();
+
+  void EndRenderPass();
+
+  Graphics&        mGraphics;
+  vk::SurfaceKHR   mSurface;
+  vk::SwapchainKHR mSwapchain;
+
+  vk::Format       mDepthStencilFormat{vk::Format::eD16UnormS8Uint};
+  vk::Image        mDepthStencilImage;
+  vk::ImageView    mDepthStencilImageView;
+  vk::DeviceMemory mDepthStencilMemory;
+
+  UniqueCommandPool mCommandPool;
+
+  vk::Format        mFormat;
+  vk::ColorSpaceKHR mColorSpace;
+  vk::Extent2D      mExtent;
+
+  std::vector< SwapchainImage >                 mSwapImages;
+  std::unique_ptr< vk::SurfaceCapabilitiesKHR > mCapabilities;
+
+  UniqueFence mFrameFence;
+
+  vk::RenderPass mDefaultRenderPass;
+  uint32_t       mBufferCount;
+  uint32_t       mCurrentBufferIndex;
+  bool           mHasDepthStencil;
 };
 
-} // Vulkan
-} // Graphics
-} // Dali
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
 
-#endif //DALI_CORE_GRAPHICS_VULKAN_SURFACE_H
+#endif // DALI_GRAPHICS_VULKAN_SURFACE_H
