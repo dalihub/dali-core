@@ -1,5 +1,5 @@
-#ifndef DALI_CORE_GRAPHICS_VULKAN_FRAMEBUFFER_H
-#define DALI_CORE_GRAPHICS_VULKAN_FRAMEBUFFER_H
+#ifndef DALI_GRAPHICS_VULKAN_FENCE_H
+#define DALI_GRAPHICS_VULKAN_FENCE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,7 +18,8 @@
  *
  */
 
-#include <dali/graphics/vulkan/common.h>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/types.h>
 
 namespace Dali
 {
@@ -27,21 +28,28 @@ namespace Graphics
 namespace Vulkan
 {
 
-class Framebuffer : public VkHandle
+class Graphics;
+class Fence final
 {
 public:
-  OBJECT_HANDLE(Framebuffer)
 
-  const vk::Framebuffer& operator*() const;
+  Fence( Graphics& graphics );
+  Fence( Fence&& ) = default;
+  ~Fence();
 
-  static Framebuffer New( const class LogicalDevice& device, const vk::FramebufferCreateInfo& info );
+  bool Wait( uint32_t timeout = 0u );
+  void Reset();
 
+  vk::Fence GetFence() const;
+
+private:
+
+  Graphics& mGraphics;
+  vk::Fence mFence;
 };
 
-}
-}
-}
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
 
-
-
-#endif //DALI_CORE_FRAMEBUFFER_H
+#endif // DALI_GRAPHICS_VULKAN_FENCE_H

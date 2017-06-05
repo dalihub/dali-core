@@ -1,5 +1,5 @@
-#ifndef DALI_CORE_GRAPHICS_VULKAN_IMAGE_H
-#define DALI_CORE_GRAPHICS_VULKAN_IMAGE_H
+#ifndef DALI_GRAPHICS_VULKAN_IMAGE_H
+#define DALI_GRAPHICS_VULKAN_IMAGE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/common.h>
+#include <dali/graphics/vulkan/types.h>
 
 namespace Dali
 {
@@ -27,36 +27,108 @@ namespace Graphics
 namespace Vulkan
 {
 
-class LogicalDevice;
-class DeviceMemory;
+class ImageView;
+enum class ResourceOwnershipType
+{
+  OWNED,
+  EXTERNAL
+};
 
-class Image : public VkHandle
+class Image : public Resource
 {
 public:
+  /**
+   * Creates new VkImage with given specification, it doesn't
+   * bind the memory.
+   * @param graphics
+   * @param createInfo
+   */
+  Image(Graphics& graphics, const vk::ImageCreateInfo& createInfo);
 
-  Image(VkObject* impl = nullptr ) : VkHandle{impl}{}
-  using VkHandle::operator=;
+  /**
+   * Constructor creates wrapper on the VkImage coming from external
+   * source. It doesn't take over ownership so it's still owner's
+   * responsibility to destroy it and maintain the usage.
+   *
+   * @param graphics
+   * @param externalImage
+   */
+  Image(Graphics& graphics, vk::Image externalImage);
 
-  static Image New( const LogicalDevice& device, const vk::ImageCreateInfo& createInfo );
+  /**
+   * Destructor
+   */
+  virtual ~Image() = default;
 
-  const vk::Image& GetVkResource() const;
-  const vk::Image& operator*() const;
+  /**
+   * Creates UNMANAGED VkImageView from the current image.
+   * Usage requires external lifecycle management and synchronization
+   * Memory MUST be bound for this function to work!
+   * @param info
+   * @return
+   */
+  vk::ImageView CreateUnmanagedView(const vk::ImageViewCreateInfo& info);
 
-  vk::ImageLayout GetLayout() const;
-  void SetLayout( vk::ImageLayout layout );
-  bool BindDeviceMemory( const class DeviceMemory& memory );
-  bool BindDeviceMemory( const class DeviceMemory& memory, size_t offset );
+  /**
+   * Creates MANAGED ImageView from the current image
+   * Memory MUST be bound for this function to work!
+   * @param info
+   * @return
+   */
+  UniqueImageView CreateView(const vk::ImageViewCreateInfo& info);
 
-  vk::ImageMemoryBarrier GetLayoutChangeBarrier( vk::ImageLayout newLayout, vk::AccessFlags srcAccess, vk::AccessFlags dstAccess, vk::ImageAspectFlags imageAspect ) const;
+  /**
+   * Returns underlying Vulkan object
+   * @return
+   */
+  vk::Image GetImage() const
+  {
+    return mImage;
+  }
 
 private:
 
+  Graphics& mGraphics;
+
+  vk::Image       mImage;
+  vk::ImageLayout mLayout;
+
+  ResourceOwnershipType mOwnershipType;
 };
 
+/*
+ * ImageView
+ * todo: move it to its own file
+ */
+class ImageView : public Resource
+{
+public:
+  ImageView(Graphics& graphics, Image& image);
+  ImageView(Graphics& graphics, Image& image, const VkImageViewCreateInfo& createInfo);
 
-} // Vulkan
-} // Graphics
-} // Dali
+  virtual ~ImageView() override;
 
+  const vk::ImageView& GetImageView() const
+  {
+    return mImageView;
+  }
 
-#endif // DALI_CORE_GRAPHICS_VULKAN_IMAGE_H
+  Image& GetImage() const
+  {
+    return mImageRef.GetResource();
+  }
+
+private:
+  Graphics&             mGraphics;
+  ResourceRef<Image>    mImageRef;
+
+  vk::ImageView mImageView;
+};
+
+} // namespace Vulkan
+
+} // namespace Graphics
+
+} // namespace Dali
+
+#endif // DALI_GRAPHICS_VULKAN_IMAGE_H

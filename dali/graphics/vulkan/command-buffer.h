@@ -1,5 +1,5 @@
-#ifndef DALI_CORE_GRAPHICS_VULKAN_COMMAND_BUFFER_H
-#define DALI_CORE_GRAPHICS_VULKAN_COMMAND_BUFFER_H
+#ifndef DALI_GRAPHICS_VULKAN_COMMAND_BUFFER_H
+#define DALI_GRAPHICS_VULKAN_COMMAND_BUFFER_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,8 +18,8 @@
  *
  */
 
-#include <dali/graphics/vulkan/common.h>
-#include <thread>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/types.h>
 
 namespace Dali
 {
@@ -28,46 +28,90 @@ namespace Graphics
 namespace Vulkan
 {
 
-enum class CommandBufferState
-{
-  UNDEFINED,
-  CREATED,
-  RESET,
-  RECORDING,
-  RECORDED,
-  SUBMITTED
-};
-
+class Graphics;
 class CommandPool;
-class CommandBuffer : public VkHandle
+class CommandBuffer
 {
 public:
-  CommandBuffer(VkObject* impl = nullptr) : VkHandle{impl}
+  CommandBuffer() = delete;
+
+  CommandBuffer(Graphics& graphics, CommandPool& ownerPool, vk::CommandBuffer commandBuffer);
+  CommandBuffer(Graphics& graphics, CommandPool& ownerPool, const vk::CommandBufferAllocateInfo& allocateInfo);
+  CommandBuffer(Graphics& graphics, CommandPool& ownerPool);
+
+  ~CommandBuffer();
+
+  /** Begin recording */
+  void Begin(vk::CommandBufferUsageFlags       usageFlags      = vk::CommandBufferUsageFlags{},
+             vk::CommandBufferInheritanceInfo* inheritanceInfo = nullptr);
+
+  /** Finish recording */
+  void End();
+
+  /** Reset command buffer */
+  void Reset();
+
+  /** Free command buffer */
+  void Free();
+
+  /** Records image layout transition barrier for one image */
+  void ImageLayoutTransition(vk::Image image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout, vk::ImageAspectFlags aspectMask);
+
+  /** Push wait semaphores */
+  void PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
+                          const std::vector< vk::PipelineStageFlags >& stages);
+
+  /** Push signal semaphores */
+  void PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores);
+
+  const std::vector< vk::Semaphore >& GetSignalSemaphores() const
   {
+    return mSignalSemaphores;
   }
-  using VkHandle::operator=;
 
-  static std::vector< CommandBuffer > New(const CommandPool& pool, bool isPrimary, uint32_t count);
-  static CommandBuffer New(const CommandPool& pool, bool isPrimary);
+  const std::vector< vk::Semaphore >& GetSWaitSemaphores() const
+  {
+    return mWaitSemaphores;
+  }
 
-  vk::CommandBuffer  GetVkBuffer() const;
-  const CommandPool& GetCommandPool() const;
-  std::thread::id    GetThreadId() const;
+  const std::vector< vk::PipelineStageFlags >& GetWaitSemaphoreStages() const
+  {
+    return mWaitStages;
+  }
 
-  CommandBufferState GetCommandBufferState() const;
+  /** Returns Vulkan object associated with the buffer */
+  inline const vk::CommandBuffer& Get() const
+  {
+    return mCommandBuffer;
+  }
 
-  // operator -> allows to record commands directly into Vulkan command buffer
-  const vk::CommandBuffer* operator->() const;
+private:
+  void RecordImageLayoutTransition(vk::Image             image,
+                                   vk::AccessFlags        srcAccessMask,
+                                   vk::AccessFlags        dstAccessMask,
+                                   vk::PipelineStageFlags srcStageMask,
+                                   vk::PipelineStageFlags dstStageMask,
+                                   vk::ImageLayout        oldLayout,
+                                   vk::ImageLayout        newLayout,
+                                   vk::ImageAspectFlags   aspectMask);
 
-  bool Begin(bool oneTimeSubmit, bool renderPassContinue = false, bool simultaneousUse = false);
-  bool End();
-  bool Free();
-  bool Reset();
+private:
+  Graphics& mGraphics;
 
-  CommandBufferState GetState() const;
+  CommandPool& mCommandPool;
+
+  // semaphores per command buffer
+  std::vector< vk::Semaphore >          mSignalSemaphores;
+  std::vector< vk::Semaphore >          mWaitSemaphores;
+  std::vector< vk::PipelineStageFlags > mWaitStages;
+
+  vk::CommandBuffer mCommandBuffer;
+
+  bool mRecording;
 };
-}
-}
-}
 
-#endif // DALI_CORE_GRAPHICS_VULKAN_COMMAND_BUFFER_H
+} // namespace Vulkan
+} // namespace Graphics
+} // namespace Dali
+
+#endif // DALI_GRAPHICS_VULKAN_COMMAND_BUFFER_H
