@@ -12,6 +12,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-FrustumCulling.cpp
         utc-Dali-Internal-ActorDepth.cpp
+        utc-Dali-Internal-PixelData.cpp
 )
 
 LIST(APPEND TC_SOURCES

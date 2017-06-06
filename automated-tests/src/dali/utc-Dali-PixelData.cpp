@@ -20,6 +20,7 @@
 
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/devel-api/images/pixel-data-mask.h>
 #include <dali/public-api/common/dali-vector.h>
 
 using namespace Dali;
@@ -98,3 +99,133 @@ int UtcDaliPixelDataAssignmentOperator(void)
   END_TEST;
 }
 
+
+int UtcDaliPixelDataMask01(void)
+{
+  TestApplication application;
+
+  unsigned int width = 10u;
+  unsigned int height = 10u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+  PixelData maskData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+
+  width = 20u;
+  height = 20u;
+  Pixel::Format pixelFormat = Pixel::RGBA5551;
+  bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );
+  buffer = new unsigned char [ bufferSize ];
+  PixelData imageData = PixelData::New( buffer, bufferSize, width, height, pixelFormat, PixelData::DELETE_ARRAY );
+
+  Dali::ApplyMask( imageData, maskData );
+
+  // Test that the pixel format has been promoted to RGBA8888
+  DALI_TEST_EQUALS( imageData.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPixelDataMask02(void)
+{
+  TestApplication application;
+
+  unsigned int width = 10u;
+  unsigned int height = 10u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+  PixelData maskData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+
+  width = 20u;
+  height = 20u;
+  Pixel::Format pixelFormat = Pixel::RGBA4444;
+  bufferSize = width*height*Pixel::GetBytesPerPixel( pixelFormat );
+  buffer = new unsigned char [ bufferSize ];
+  PixelData imageData = PixelData::New( buffer, bufferSize, width, height, pixelFormat, PixelData::DELETE_ARRAY );
+
+  Dali::ApplyMask( imageData, maskData );
+
+  // Test that the pixel format has been promoted to RGBA8888
+  DALI_TEST_EQUALS( imageData.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPixelDataMask03(void)
+{
+  TestApplication application;
+
+  unsigned int width = 20u;
+  unsigned int height = 20u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+  PixelData maskData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+
+  width = 10u;
+  height = 10u;
+  Pixel::Format format = Pixel::RGB565;
+  bufferSize = width*height*Pixel::GetBytesPerPixel( format );
+  buffer = new unsigned char [ bufferSize ];
+  PixelData imageData = PixelData::New( buffer, bufferSize, width, height, format, PixelData::DELETE_ARRAY );
+
+  Dali::ApplyMask( imageData, maskData );
+
+  // Test that the pixel format has been promoted to RGBA8888
+  DALI_TEST_EQUALS( imageData.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+  // Can't test the final image directly...
+
+  END_TEST;
+}
+
+
+int UtcDaliPixelDataMask04(void)
+{
+  TestApplication application;
+
+  unsigned int width = 10u;
+  unsigned int height = 10u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+  PixelData maskData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+
+  width = 20u;
+  height = 20u;
+  bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::RGBA8888 );
+  buffer = new unsigned char [ bufferSize ];
+  PixelData imageData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY );
+
+  Dali::ApplyMask( imageData, maskData );
+
+  // Test that the pixel format hasn't changed
+  DALI_TEST_EQUALS( imageData.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+  // Can't test the final image directly...
+
+  END_TEST;
+}
+
+int UtcDaliPixelDataMask05(void)
+{
+  TestApplication application;
+
+  unsigned int width = 20u;
+  unsigned int height = 20u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+  PixelData maskData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+
+  width = 10u;
+  height = 10u;
+  bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::RGBA8888 );
+  buffer = new unsigned char [ bufferSize ];
+  PixelData imageData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY );
+
+  Dali::ApplyMask( imageData, maskData );
+
+  // Test that the pixel format hasn't changed
+  DALI_TEST_EQUALS( imageData.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+  // Can't test the final image directly...
+
+  END_TEST;
+}
