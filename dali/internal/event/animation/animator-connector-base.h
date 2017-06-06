@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ANIMATOR_CONNECTOR_BASE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
@@ -33,14 +31,6 @@ namespace Internal
 {
 
 class Animation;
-class AnimatorConnectorBase;
-
-typedef OwnerPointer<AnimatorConnectorBase> AnimatorConnectorPtr;
-
-typedef OwnerContainer< AnimatorConnectorBase* > AnimatorConnectorContainer;
-
-typedef AnimatorConnectorContainer::Iterator AnimatorConnectorIter;
-typedef AnimatorConnectorContainer::ConstIterator AnimatorConnectorConstIter;
 
 /**
  * An abstract base class for animator connectors.
@@ -89,7 +79,7 @@ public:
    * Retrieve the parent of the AnimatorConnector.
    * @return The parent object, or NULL.
    */
-  Animation* GetParent()
+  Animation* GetParent() const
   {
     return mParent;
   }

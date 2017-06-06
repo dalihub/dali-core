@@ -508,13 +508,16 @@ private:
       }
 
       DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
-      sceneGraphConstraint->SetRemoveAction( mRemoveAction );
+      if( NULL != sceneGraphConstraint )
+      {
+        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
         // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
+        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
-      // Keep a raw-pointer to the scene-graph constraint
-      mSceneGraphConstraint = sceneGraphConstraint;
+        // Keep a raw-pointer to the scene-graph constraint
+        mSceneGraphConstraint = sceneGraphConstraint;
+      }
     }
   }
 

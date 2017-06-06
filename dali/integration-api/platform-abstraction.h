@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Integration
 {
-
+typedef unsigned int ResourceId;
 typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
 
 /**
@@ -41,11 +41,6 @@ typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
 class PlatformAbstraction
 {
 public:
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~PlatformAbstraction() {}
 
   // Resource Loading
 
@@ -94,8 +89,8 @@ public:
                                                bool orientationCorrection = true) = 0;
 
   /**
-   * Request a resource from the native filesystem. This is a synchronous request, i.e.
-   * it will block the main loop whilst executing. It should therefore be used sparingly.
+   * Request an image from the native filesystem. This is a synchronous request, i.e.
+   * it will block the main loop whilst executing.
    *
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.
@@ -103,7 +98,7 @@ public:
    * @param[in] resourcePath The path to the resource
    * @return A pointer to a ref-counted resource
    */
-  virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
+  virtual ResourcePointer LoadImageSynchronously( const BitmapResourceType& resourceType, const std::string& resourcePath ) = 0;
 
   /**
    * Decode a buffer of data synchronously.
@@ -113,7 +108,7 @@ public:
    *
    * @return A pointer to the decoded buffer.
    */
-  virtual BitmapPtr DecodeBuffer( const ResourceType& resourceType, uint8_t * buffer, size_t bufferSize ) = 0;
+  virtual BitmapPtr DecodeBuffer( const BitmapResourceType& resourceType, uint8_t * buffer, size_t bufferSize ) = 0;
 
   /**
    * Load a shader binary file into a buffer
@@ -131,6 +126,13 @@ public:
    * @result             true if the file is saved, else false.
    */
   virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const = 0;
+
+protected:
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~PlatformAbstraction() {}
 
 }; // class PlatformAbstraction
 

@@ -90,8 +90,6 @@ struct RenderManager::Impl
     textureContainer(),
     frameBufferContainer(),
     renderersAdded( false ),
-    firstRenderCompleted( false ),
-    defaultShader( NULL ),
     programController( glAbstraction )
   {
   }
@@ -108,15 +106,7 @@ struct RenderManager::Impl
 
   void RemoveRenderTracker( Render::RenderTracker* renderTracker )
   {
-    DALI_ASSERT_DEBUG( renderTracker != NULL );
-    for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
-    {
-      if( *iter == renderTracker )
-      {
-        mRenderTrackers.Erase( iter );
-        break;
-      }
-    }
+    mRenderTrackers.EraseObject( renderTracker );
   }
 
   void UpdateTrackers()
@@ -155,8 +145,6 @@ struct RenderManager::Impl
 
   RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
 
-  bool                          firstRenderCompleted;     ///< False until the first render is done
-  Shader*                       defaultShader;            ///< Default shader to use
   ProgramController             programController;        ///< Owner of the GL programs
 
 };
@@ -256,19 +244,7 @@ void RenderManager::AddRenderer( Render::Renderer* renderer )
 
 void RenderManager::RemoveRenderer( Render::Renderer* renderer )
 {
-  DALI_ASSERT_DEBUG( NULL != renderer );
-
-  RendererOwnerContainer& renderers = mImpl->rendererContainer;
-
-  // Find the renderer
-  for ( RendererOwnerIter iter = renderers.Begin(); iter != renderers.End(); ++iter )
-  {
-    if ( *iter == renderer )
-    {
-      renderers.Erase( iter ); // Renderer found; now destroy it
-      break;
-    }
-  }
+  mImpl->rendererContainer.EraseObject( renderer );
 }
 
 void RenderManager::AddSampler( Render::Sampler* sampler )
@@ -278,19 +254,7 @@ void RenderManager::AddSampler( Render::Sampler* sampler )
 
 void RenderManager::RemoveSampler( Render::Sampler* sampler )
 {
-  DALI_ASSERT_DEBUG( NULL != sampler );
-
-  SamplerOwnerContainer& samplers = mImpl->samplerContainer;
-
-  // Find the sampler
-  for ( SamplerOwnerIter iter = samplers.Begin(); iter != samplers.End(); ++iter )
-  {
-    if ( *iter == sampler )
-    {
-      samplers.Erase( iter ); // Sampler found; now destroy it
-      break;
-    }
-  }
+  mImpl->samplerContainer.EraseObject( sampler );
 }
 
 void RenderManager::AddTexture( Render::Texture* texture )
@@ -376,19 +340,7 @@ void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 
 void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  DALI_ASSERT_DEBUG( NULL != propertyBuffer );
-
-  PropertyBufferOwnerContainer& propertyBuffers = mImpl->propertyBufferContainer;
-
-  // Find the sampler
-  for ( PropertyBufferOwnerIter iter = propertyBuffers.Begin(); iter != propertyBuffers.End(); ++iter )
-  {
-    if ( *iter == propertyBuffer )
-    {
-      propertyBuffers.Erase( iter ); // Property buffer found; now destroy it
-      break;
-    }
-  }
+  mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
 void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
@@ -413,19 +365,7 @@ void RenderManager::AddGeometry( Render::Geometry* geometry )
 
 void RenderManager::RemoveGeometry( Render::Geometry* geometry )
 {
-  DALI_ASSERT_DEBUG( NULL != geometry );
-
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the geometry
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
-  {
-    if ( *iter == geometry )
-    {
-      geometries.Erase( iter ); // Geometry found; now destroy it
-      break;
-    }
-  }
+  mImpl->geometryContainer.EraseObject( geometry );
 }
 
 void RenderManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
@@ -477,17 +417,12 @@ void RenderManager::RemoveRenderTracker( Render::RenderTracker* renderTracker )
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-void RenderManager::SetDefaultShader( Shader* shader )
-{
-  mImpl->defaultShader = shader;
-}
-
 ProgramCache* RenderManager::GetProgramCache()
 {
   return &(mImpl->programController);
 }
 
-bool RenderManager::Render( Integration::RenderStatus& status )
+void RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -500,56 +435,46 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  // No need to make any gl calls if we've done 1st glClear & don't have any renderers to render during startup.
-  if( !mImpl->firstRenderCompleted || mImpl->renderersAdded )
+  // switch rendering to adaptor provided (default) buffer
+  mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+  mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                           mImpl->defaultSurfaceRect.y,
+                           mImpl->defaultSurfaceRect.width,
+                           mImpl->defaultSurfaceRect.height );
+
+  mImpl->context.ClearColor( mImpl->backgroundColor.r,
+                             mImpl->backgroundColor.g,
+                             mImpl->backgroundColor.b,
+                             mImpl->backgroundColor.a );
+
+  mImpl->context.ClearStencil( 0 );
+
+  // Clear the entire color, depth and stencil buffers for the default framebuffer.
+  // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+  mImpl->context.SetScissorTest( false );
+  mImpl->context.ColorMask( true );
+  mImpl->context.DepthMask( true );
+  mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+  mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
+
+  // reset the program matrices for all programs once per frame
+  // this ensures we will set view and projection matrix once per program per camera
+  mImpl->programController.ResetProgramMatrices();
+
+  size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  for ( size_t i = 0; i < count; ++i )
   {
-    // switch rendering to adaptor provided (default) buffer
-    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+    RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
-    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
-                             mImpl->defaultSurfaceRect.y,
-                             mImpl->defaultSurfaceRect.width,
-                             mImpl->defaultSurfaceRect.height );
-
-    mImpl->context.ClearColor( mImpl->backgroundColor.r,
-                               mImpl->backgroundColor.g,
-                               mImpl->backgroundColor.b,
-                               mImpl->backgroundColor.a );
-
-    mImpl->context.ClearStencil( 0 );
-
-    // Clear the entire color, depth and stencil buffers for the default framebuffer.
-    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
-    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-    mImpl->context.SetScissorTest( false );
-    mImpl->context.ColorMask( true );
-    mImpl->context.DepthMask( true );
-    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
-
-    // reset the program matrices for all programs once per frame
-    // this ensures we will set view and projection matrix once per program per camera
-    mImpl->programController.ResetProgramMatrices();
-
-    // if we don't have default shader, no point doing the render calls
-    if( mImpl->defaultShader )
-    {
-      size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
-      for ( size_t i = 0; i < count; ++i )
-      {
-        RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
-
-        DoRender( instruction, *mImpl->defaultShader );
-      }
-      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-
-      mImpl->UpdateTrackers();
-
-      mImpl->firstRenderCompleted = true;
-    }
+    DoRender( instruction );
   }
+  GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+  mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+  mImpl->UpdateTrackers();
 
   //Notify RenderGeometries that rendering has finished
   for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
@@ -565,11 +490,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
-
-  return false;
 }
 
-void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader )
+void RenderManager::DoRender( RenderInstruction& instruction )
 {
   Rect<int> viewportRect;
   Vector4   clearColor;
@@ -634,7 +557,6 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
-                                    defaultShader,
                                     mImpl->renderBufferIndex );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )

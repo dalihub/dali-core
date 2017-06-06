@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
@@ -191,6 +192,13 @@ public:
   virtual Property::Value GetProperty( Property::Index index ) const;
 
   /**
+   * @brief Retrieves the latest value of the property on the scene-graph.
+   * @param[in]  index  The index of the property required.
+   * @return The latest value of the property on the scene-graph.
+   */
+  virtual Property::Value GetCurrentProperty( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Handle::GetPropertyIndices()
    */
   virtual void GetPropertyIndices( Property::IndexContainer& indices ) const;
@@ -231,6 +239,15 @@ public:
    * @copydoc Dali::Handle::RemovePropertyNotifications()
    */
   virtual void RemovePropertyNotifications();
+
+  /**
+   * Notifies that a property is being animated.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
+   */
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -465,6 +482,23 @@ private: // Default property extensions for derived classes
   virtual Property::Value GetDefaultProperty( Property::Index index ) const = 0;
 
   /**
+   * Retrieve the latest scene-graph value of a default property.
+   * @param[in] index The index of the property.
+   * @return The latest scene-graph value of a default property.
+   */
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+
+  /**
+   * Notifies that a default property is being animated so the deriving class should update the cached value.
+   * @param[in] animation The animation animating the property.
+   * @param[in] index The index of the property.
+   * @param[in] value The value of the property after the animation.
+   * @param[in] animationType Whether the property value given is the target or a relative value.
+   */
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType )
+  { }
+
+  /**
    * @todo this is virtual so that for now actor can override it,
    * it needs to be removed and only have GetSceneObject but that requires changing actor and constraint logic
    * Retrieve the scene-graph object added by this object.
@@ -504,11 +538,11 @@ private:
   void DisablePropertyNotifications();
 
   /**
-   * Get the value of the property.
-   * @param [in] entry An entry from the property lookup container.
-   * @return The new value of the property.
+   * Get the latest value of the property on the scene-graph.
+   * @param[in] entry An entry from the property lookup container.
+   * @return The latest value of the property.
    */
-  Property::Value GetPropertyValue( const PropertyMetadata* entry ) const;
+  Property::Value GetCurrentPropertyValue( const PropertyMetadata* entry ) const;
 
   /**
    * Set the value of scene graph property.

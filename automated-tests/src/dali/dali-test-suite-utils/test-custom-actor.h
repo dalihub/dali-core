@@ -85,7 +85,8 @@ enum Type
   TEST_PROPERTY2 = Test::TestCustomActor::Property::TEST_PROPERTY2,
   DEVEL_TEST_PROPERTY3 = TEST_PROPERTY2+1,
   DEVEL_TEST_PROPERTY4 = TEST_PROPERTY2+2,
-  DEVEL_TEST_PROPERTY5 = TEST_PROPERTY2+3
+  DEVEL_TEST_PROPERTY5 = TEST_PROPERTY2+3,
+  DEVEL_TEST_PROPERTY6 = TEST_PROPERTY2+4
 };
 
 } // Namespace Property
@@ -154,6 +155,7 @@ public:
   Dali::Vector4 develProp3;
   int           develProp4;
   float         develProp5;
+  float         develProp6;
 };
 
 inline TestCustomActor& GetImpl( Test::TestCustomActor& handle )

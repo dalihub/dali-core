@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,28 +288,6 @@ void Renderer::GetBlendEquation( BlendEquation::Type& equationRgb,
   // These are not animatable, the cached values are up-to-date.
   equationRgb   = mBlendingOptions.GetBlendEquationRgb();
   equationAlpha = mBlendingOptions.GetBlendEquationAlpha();
-}
-
-void Renderer::SetBlendColor( const Vector4& color )
-{
-  if( !mBlendColor )
-  {
-    mBlendColor = new Vector4();
-  }
-  if( *mBlendColor != color )
-  {
-    *mBlendColor = color;
-    SetBlendColorMessage( GetEventThreadServices(), *mSceneObject, *mBlendColor );
-  }
-}
-
-Vector4 Renderer::GetBlendColor() const
-{
-  if( mBlendColor )
-  {
-    return *mBlendColor;
-  }
-  return Color::TRANSPARENT; // GL default
 }
 
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
@@ -729,14 +707,7 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
     }
     case Dali::Renderer::Property::BLEND_COLOR:
     {
-      if( mBlendColor )
-      {
-        value = *mBlendColor;
-      }
-      else
-      {
-        value = Color::TRANSPARENT;
-      }
+      value = GetBlendColor();
       break;
     }
     case Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA:
@@ -813,6 +784,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
   return value;
 }
 
+Property::Value Renderer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index ); // Event-side only properties
+}
+
 const SceneGraph::PropertyOwner* Renderer::GetPropertyOwner() const
 {
   return mSceneObject;
@@ -858,7 +834,6 @@ int Renderer::GetPropertyComponentIndex( Property::Index index ) const
 
 Renderer::Renderer()
 : mSceneObject(NULL ),
-  mBlendColor( NULL ),
   mDepthIndex( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
@@ -879,9 +854,25 @@ void Renderer::Initialize()
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
   mSceneObject = SceneGraph::Renderer::New();
-  AddMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
+  AddRendererMessage( updateManager, *mSceneObject );
 
   eventThreadServices.RegisterObject( this );
+}
+
+void Renderer::SetBlendColor( const Vector4& blendColor )
+{
+  mBlendingOptions.SetBlendColor( blendColor );
+  SetBlendColorMessage( GetEventThreadServices(), *mSceneObject, GetBlendColor() );
+}
+
+const Vector4& Renderer::GetBlendColor() const
+{
+  const Vector4* blendColor = mBlendingOptions.GetBlendColor();
+  if( blendColor )
+  {
+    return *blendColor;
+  }
+  return Color::TRANSPARENT; // GL default
 }
 
 Renderer::~Renderer()
@@ -890,7 +881,7 @@ Renderer::~Renderer()
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveMessage( updateManager, updateManager.GetRendererOwner(), *mSceneObject );
+    RemoveRendererMessage( updateManager, *mSceneObject );
 
     eventThreadServices.UnregisterObject( this );
   }

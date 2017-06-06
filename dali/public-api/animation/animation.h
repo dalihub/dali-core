@@ -2,7 +2,7 @@
 #define __DALI_ANIMATION_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,10 @@ class Animation;
  *
  * The overall animation time is superseded by the values given in the TimePeriod structure used when calling the AnimateTo(), AnimateBy(), AnimateBetween() and Animate() methods.
  * If any of the individual calls to those functions exceeds the overall animation time, then the overall animation time is automatically extended.
+ *
+ * Using AnimateTo and AnimateBy for the same property of the same Actor will yield undefined behaviour especially if the TimePeriod overlaps.
+ *
+ * After calling Animation::Play(), Handle::GetProperty will return the target value of the animated property.
  *
  * Signals
  * | %Signal Name | Method                   |

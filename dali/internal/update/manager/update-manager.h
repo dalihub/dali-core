@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
-#include <dali/integration-api/resource-declarations.h>
-
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/common/shader-saver.h>
@@ -31,13 +29,13 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/manager/object-owner-container.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>  // for OwnerPointer< Renderer >
+#include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>   // for OwnerPointer< Shader >
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
@@ -78,7 +76,32 @@ class RenderTaskList;
 class RenderTaskProcessor;
 class RenderQueue;
 class PropertyBuffer;
-class TextureSet;
+
+struct NodeDepthPair
+{
+  SceneGraph::Node* node;
+  uint32_t sortedDepth;
+  NodeDepthPair( SceneGraph::Node* node, uint32_t sortedDepth )
+  : node(node),
+    sortedDepth(sortedDepth)
+  {
+  }
+};
+
+struct NodeDepths
+{
+  std::vector<NodeDepthPair> nodeDepths;
+  NodeDepths( int reserveSize )
+  {
+    nodeDepths.reserve(reserveSize);
+  }
+
+  void Add( SceneGraph::Node* node, uint32_t sortedDepth )
+  {
+    nodeDepths.push_back( NodeDepthPair( node, sortedDepth ) );
+  }
+};
+
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
@@ -118,13 +141,6 @@ public:
   virtual ~UpdateManager();
 
   // Node connection methods
-
-  /**
-   * Get the scene graph side list of RenderTasks.
-   * @param[in] systemLevel True if using the system-level overlay.
-   * @return The list of render tasks
-   */
-  RenderTaskList* GetRenderTaskList( bool systemLevel );
 
   /**
    * Installs a new layer as the root node.
@@ -243,21 +259,6 @@ public:
    */
   void PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode );
 
-  /**
-   * @brief Get the renderer owner
-   *
-   * @return The renderer owner
-   */
-  ObjectOwnerContainer< Renderer >& GetRendererOwner();
-
-  /**
-   * @brief Get the property buffer owner
-   *
-   * @return The property buffer owner
-   */
-  ObjectOwnerContainer< PropertyBuffer >& GetPropertyBufferOwner();
-
-
   // Shaders
 
   /**
@@ -274,21 +275,6 @@ public:
    * @post The shader is destroyed.
    */
   void RemoveShader(Shader* shader);
-
-  /**
-   * Add a newly created TextureSet.
-   * @param[in] textureSet The texture set to add.
-   * @post The TextureSet is owned by the UpdateManager.
-   */
-  void AddTextureSet(TextureSet* textureSet);
-
-  /**
-   * Remove a TextureSet.
-   * @pre The TextureSet has been added to the UpdateManager.
-   * @param[in] textureSet The TextureSet to remove.
-   * @post The TextureSet is destroyed.
-   */
-  void RemoveTextureSet(TextureSet* textureSet);
 
   /**
    * Set the shader program for a Shader object
@@ -311,22 +297,55 @@ public:
    */
   void SetShaderSaver( ShaderSaver& upstream );
 
+  // Renderers
+
+  /**
+   * Add a new renderer to scene
+   * @param renderer to add
+   */
+  void AddRenderer( Renderer* renderer );
+
+  /**
+   * Add a renderer from scene
+   * @param renderer to remove
+   */
+  void RemoveRenderer( Renderer* renderer );
+
   // Gestures
 
   /**
-   * Add a newly created gesture.
-   * @param[in] gesture The gesture to add.
-   * @post The gesture is owned by the UpdateManager.
+   * Set the pan gesture processor.
+   * Pan Gesture processor lives for the lifetime of UpdateManager
+   * @param[in] gesture The gesture processor.
+   * @post The gestureProcessor is owned by the UpdateManager.
    */
-  void AddGesture( PanGesture* gesture );
+  void SetPanGestureProcessor( PanGesture* gestureProcessor );
+
+  // Textures
 
   /**
-   * Remove a gesture.
-   * @pre The gesture has been added to the UpdateManager.
-   * @param[in] gesture The gesture to remove.
-   * @post The gesture is destroyed.
+   * Add a newly created TextureSet.
+   * @param[in] textureSet The texture set to add.
+   * @post The TextureSet is owned by the UpdateManager.
    */
-  void RemoveGesture( PanGesture* gesture );
+  void AddTextureSet( TextureSet* textureSet );
+
+  /**
+   * Remove a TextureSet.
+   * @pre The TextureSet has been added to the UpdateManager.
+   * @param[in] textureSet The TextureSet to remove.
+   * @post The TextureSet is destroyed.
+   */
+  void RemoveTextureSet( TextureSet* textureSet );
+
+  // Render tasks
+
+  /**
+   * Get the scene graph side list of RenderTasks.
+   * @param[in] systemLevel True if using the system-level overlay.
+   * @return The list of render tasks
+   */
+  RenderTaskList* GetRenderTaskList( bool systemLevel );
 
 // Message queue handling
 
@@ -557,6 +576,12 @@ public:
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
 
+  /**
+   * Set the depth indices of all nodes (in LayerUI's)
+   * @param[in] nodeDepths A vector of nodes and associated depth indices
+   */
+  void SetDepthIndices( NodeDepths* nodeDepths );
+
 private:
 
   // Undefined
@@ -571,11 +596,6 @@ private:
    * @return True if the update-thread should keep going.
    */
   unsigned int KeepUpdatingCheck( float elapsedSeconds ) const;
-
-  /**
-   * Post process resources that have been updated by renderer
-   */
-  void PostProcessResources();
 
   /**
    * Helper to reset all Node properties
@@ -935,49 +955,24 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
 }
 
-inline void AddGestureMessage( UpdateManager& manager, PanGesture* gesture )
+inline void AddRendererMessage( UpdateManager& manager, Renderer& object )
 {
-  // Message has ownership of PanGesture while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< PanGesture > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< Renderer > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddGesture, gesture );
+  new (slot) LocalType( &manager, &UpdateManager::AddRenderer, &object );
 }
 
-inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
+inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
 {
-  typedef MessageValue1< UpdateManager, PanGesture* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
-}
-
-template< typename T >
-inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
-{
-  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+  typedef MessageValue1< UpdateManager, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Add, &object );
-}
-
-template< typename T >
-inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
-{
-  typedef MessageValue1< ObjectOwnerContainer<T>, T* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Remove, &object );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderer, &object );
 }
 
 // The render thread can safely change the Shader
@@ -1280,6 +1275,17 @@ inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::Fra
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
+}
+
+inline void SetDepthIndicesMessage( UpdateManager& manager, NodeDepths* nodeDepths )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< NodeDepths > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetDepthIndices, nodeDepths );
 }
 
 

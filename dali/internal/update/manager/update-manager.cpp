@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
-#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
 
@@ -44,7 +43,6 @@
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
-#include <dali/internal/update/manager/object-owner-container.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/update-algorithms.h>
@@ -55,7 +53,6 @@
 #include <dali/internal/update/queue/update-message-queue.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
@@ -101,19 +98,64 @@ namespace Internal
 namespace SceneGraph
 {
 
-typedef OwnerContainer< Shader* >              ShaderContainer;
-typedef ShaderContainer::Iterator              ShaderIter;
-typedef ShaderContainer::ConstIterator         ShaderConstIter;
+namespace
+{
+/**
+ * Helper to reset animate-able objects to base values
+ * @param container to iterate over
+ * @param updateBufferIndex to use
+ */
+template< class T >
+inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex updateBufferIndex )
+{
+  // Reset animatable properties to base values
+  typename OwnerContainer<T*>::Iterator iter = container.Begin();
+  const typename OwnerContainer<T*>::ConstIterator endIter = container.End();
+  for ( ; iter != endIter; ++iter )
+  {
+    (*iter)->ResetToBaseValues( updateBufferIndex );
+  }
+}
 
+/**
+ * Helper to Erase an object from OwnerContainer using discard queue
+ * @param container to remove from
+ * @param object to remove
+ * @param discardQueue to put the object to
+ * @param updateBufferIndex to use
+ */
+template < class T >
+inline void EraseUsingDiscardQueue( OwnerContainer<T*>& container, T* object, DiscardQueue& discardQueue, BufferIndex updateBufferIndex )
+{
+  DALI_ASSERT_DEBUG( object && "NULL object not allowed" );
+
+  typename OwnerContainer<T*>::Iterator iter = container.Begin();
+  const typename OwnerContainer<T*>::ConstIterator endIter = container.End();
+  for ( ; iter != endIter; ++iter )
+  {
+    if ( *iter == object )
+    {
+      // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+      discardQueue.Add( updateBufferIndex, container.Release( iter ) );
+      return;
+    }
+  }
+}
+
+}
+
+typedef OwnerContainer< Shader* >              ShaderOwner;
+typedef ShaderOwner::Iterator                  ShaderIter;
 typedef std::vector<Internal::ShaderDataPtr>   ShaderDataBinaryQueue;
 
-typedef OwnerContainer<PanGesture*>            GestureContainer;
-typedef GestureContainer::Iterator             GestureIter;
-typedef GestureContainer::ConstIterator        GestureConstIter;
+typedef OwnerContainer< TextureSet* >          TextureSetOwner;
+typedef TextureSetOwner::Iterator              TextureSetIter;
 
-typedef OwnerContainer< TextureSet* >          TextureSetContainer;
-typedef TextureSetContainer::Iterator          TextureSetIter;
-typedef TextureSetContainer::ConstIterator     TextureSetConstIter;
+typedef OwnerContainer<Renderer*>              RendererOwner;
+typedef RendererOwner::Iterator                RendererIter;
+
+typedef OwnerContainer< Camera* >              CameraOwner;
+typedef OwnerContainer< PropertyOwner* >       CustomObjectOwner;
 
 /**
  * Structure to contain UpdateManager internal data
@@ -147,19 +189,19 @@ struct UpdateManager::Impl
     systemLevelTaskList( renderMessageDispatcher ),
     root( NULL ),
     systemLevelRoot( NULL ),
-    renderers( sceneGraphBuffers, discardQueue ),
+    renderers(),
     textureSets(),
+    shaders(),
+    panGestureProcessor( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
     keepRenderingSeconds( 0.0f ),
-    animationFinishedDuringUpdate( false ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
-    previousUpdateScene( false ),
     frameCounter( 0 ),
+    animationFinishedDuringUpdate( false ),
+    previousUpdateScene( false ),
     renderTaskWaiting( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
-
-    renderers.SetSceneController( *sceneController );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -237,16 +279,16 @@ struct UpdateManager::Impl
   SortedLayerPointers                 sortedLayers;                  ///< A container of Layer pointers sorted by depth
   SortedLayerPointers                 systemLevelSortedLayers;       ///< A separate container of system-level Layers
 
-  OwnerContainer< Camera* >           cameras;                       ///< A container of cameras
-  OwnerContainer< PropertyOwner* >    customObjects;                 ///< A container of owned objects (with custom properties)
+  CameraOwner                         cameras;                       ///< A container of cameras
+  CustomObjectOwner                   customObjects;                 ///< A container of owned objects (with custom properties)
 
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
-  ObjectOwnerContainer<Renderer>      renderers;
-  TextureSetContainer                 textureSets;                   ///< A container of texture sets
-
-  ShaderContainer                     shaders;                       ///< A container of owned shaders
+  RendererOwner                       renderers;                     ///< A container of owned renderers
+  TextureSetOwner                     textureSets;                   ///< A container of owned texture sets
+  ShaderOwner                         shaders;                       ///< A container of owned shaders
+  OwnerPointer<PanGesture>            panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
   ShaderDataBinaryQueue               renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
@@ -254,14 +296,11 @@ struct UpdateManager::Impl
   Mutex                               compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
-  bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
-
   int                                 nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
-  bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
-
   int                                 frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
 
-  GestureContainer                    gestures;                      ///< A container of owned gesture detectors
+  bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
+  bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
   bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
 
 private:
@@ -387,21 +426,8 @@ void UpdateManager::AddCamera( Camera* camera )
 
 void UpdateManager::RemoveCamera( const Camera* camera )
 {
-  // Find the camera
-  OwnerContainer<Camera*>::Iterator iter = mImpl->cameras.Begin();
-  OwnerContainer<Camera*>::ConstIterator end = mImpl->cameras.End();
-  for ( ; iter != end; ++iter )
-  {
-    Camera* value = *iter;
-    if ( camera == value )
-    {
-      // Transfer ownership to the discard queue
-      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), mImpl->cameras.Release( iter ) );
-
-      return;
-    }
-  }
-
+  // Find the camera and destroy it
+  EraseUsingDiscardQueue( mImpl->cameras, const_cast<Camera*>( camera ), mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::AddObject( PropertyOwner* object )
@@ -413,23 +439,7 @@ void UpdateManager::AddObject( PropertyOwner* object )
 
 void UpdateManager::RemoveObject( PropertyOwner* object )
 {
-  DALI_ASSERT_DEBUG( NULL != object );
-
-  OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
-
-  // Find the object and destroy it
-  for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); iter != customObjects.End(); ++iter )
-  {
-    PropertyOwner* current = *iter;
-    if ( current == object )
-    {
-      customObjects.Erase( iter );
-      return;
-    }
-  }
-
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
+  mImpl->customObjects.EraseObject( object );
 }
 
 void UpdateManager::AddAnimation( Animation* animation )
@@ -484,18 +494,7 @@ void UpdateManager::AddPropertyNotification( PropertyNotification* propertyNotif
 
 void UpdateManager::RemovePropertyNotification( PropertyNotification* propertyNotification )
 {
-  PropertyNotificationContainer &propertyNotifications = mImpl->propertyNotifications;
-  PropertyNotificationIter iter = propertyNotifications.Begin();
-
-  while ( iter != propertyNotifications.End() )
-  {
-    if( *iter == propertyNotification )
-    {
-      propertyNotifications.Erase(iter);
-      break;
-    }
-    ++iter;
-  }
+  mImpl->propertyNotifications.EraseObject( propertyNotification );
 }
 
 void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode )
@@ -504,52 +503,17 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-ObjectOwnerContainer<Renderer>& UpdateManager::GetRendererOwner()
-{
-  return mImpl->renderers;
-}
-
 void UpdateManager::AddShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
-
-  if( mImpl->shaders.Count() == 0 )
-  {
-    // the first added shader becomes our default shader
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    typedef MessageValue1< RenderManager, Shader* > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetDefaultShader, shader );
-  }
 
   mImpl->shaders.PushBack( shader );
 }
 
 void UpdateManager::RemoveShader( Shader* shader )
 {
-  DALI_ASSERT_DEBUG(shader != NULL);
-
-  ShaderContainer& shaders = mImpl->shaders;
-
   // Find the shader and destroy it
-  for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
-  {
-    Shader& current = **iter;
-    if ( &current == shader )
-    {
-      // Transfer ownership to the discard queue
-      // This keeps the shader alive, until the render-thread has finished with it
-      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), shaders.Release( iter ) );
-
-      return;
-    }
-  }
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
+  EraseUsingDiscardQueue( mImpl->shaders, shader, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::SetShaderProgram( Shader* shader,
@@ -579,6 +543,47 @@ void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
   }
 }
 
+void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
+{
+  mImpl->shaderSaver = &upstream;
+}
+
+void UpdateManager::AddRenderer( Renderer* renderer )
+{
+  DALI_ASSERT_DEBUG( renderer != NULL );
+
+  mImpl->renderers.PushBack( renderer );
+
+  renderer->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+}
+
+void UpdateManager::RemoveRenderer( Renderer* renderer )
+{
+  // Find the renderer and destroy it
+  EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  // Need to remove the render object as well
+  renderer->DisconnectFromSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+}
+
+void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
+{
+  DALI_ASSERT_DEBUG( NULL != panGestureProcessor );
+
+  mImpl->panGestureProcessor = panGestureProcessor;
+}
+
+void UpdateManager::AddTextureSet( TextureSet* textureSet )
+{
+  DALI_ASSERT_DEBUG( NULL != textureSet );
+
+  mImpl->textureSets.PushBack( textureSet );
+}
+
+void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
+{
+  mImpl->textureSets.EraseObject( textureSet );
+}
+
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
 {
   if ( !systemLevel )
@@ -590,53 +595,6 @@ RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
   {
     // copy the list, this is only likely to happen once in application life cycle
     return &(mImpl->systemLevelTaskList);
-  }
-}
-
-void UpdateManager::AddGesture( PanGesture* gesture )
-{
-  DALI_ASSERT_DEBUG( NULL != gesture );
-
-  mImpl->gestures.PushBack( gesture );
-}
-
-void UpdateManager::RemoveGesture( PanGesture* gesture )
-{
-  DALI_ASSERT_DEBUG( gesture != NULL );
-
-  GestureContainer& gestures = mImpl->gestures;
-
-  // Find the gesture and destroy it
-  for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
-  {
-    PanGesture& current = **iter;
-    if ( &current == gesture )
-    {
-      mImpl->gestures.Erase( iter );
-      return;
-    }
-  }
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
-}
-
-void UpdateManager::AddTextureSet( TextureSet* textureSet )
-{
-  DALI_ASSERT_DEBUG( NULL != textureSet );
-  mImpl->textureSets.PushBack( textureSet );
-}
-
-void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
-{
-  DALI_ASSERT_DEBUG(textureSet != NULL);
-  size_t textureSetCount( mImpl->textureSets.Size() );
-  for( size_t i(0); i<textureSetCount; ++i )
-  {
-    if( textureSet == mImpl->textureSets[i] )
-    {
-      mImpl->textureSets.Remove( mImpl->textureSets.Begin() + i );
-      return;
-    }
   }
 }
 
@@ -675,54 +633,36 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   // Reset all the nodes
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
-  for(;iter != endIter; ++iter)
+  for( ;iter != endIter; ++iter )
   {
     (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   // Reset system-level render-task list properties to base values
-  const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
-
-  for (RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( bufferIndex );
-  }
+  ResetToBaseValues( mImpl->systemLevelTaskList.GetTasks(), bufferIndex );
 
   // Reset render-task list properties to base values.
-  const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-
-  for (RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( bufferIndex );
-  }
+  ResetToBaseValues( mImpl->taskList.GetTasks(), bufferIndex );
 
   // Reset custom object properties to base values
-  for (OwnerContainer<PropertyOwner*>::Iterator iter = mImpl->customObjects.Begin(); iter != mImpl->customObjects.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( bufferIndex );
-  }
+  ResetToBaseValues( mImpl->customObjects, bufferIndex );
 
-  mImpl->renderers.ResetToBaseValues( bufferIndex );
+  // Reset animatable renderer properties to base values
+  ResetToBaseValues( mImpl->renderers, bufferIndex );
 
   // Reset animatable shader properties to base values
-  for (ShaderIter iter = mImpl->shaders.Begin(); iter != mImpl->shaders.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( bufferIndex );
-  }
+  ResetToBaseValues( mImpl->shaders, bufferIndex );
 }
 
 bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
 {
   bool gestureUpdated( false );
 
-  // constrain gestures... (in construction order)
-  GestureContainer& gestures = mImpl->gestures;
-
-  for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
+  if( mImpl->panGestureProcessor )
   {
-    PanGesture& gesture = **iter;
-    gesture.ResetToBaseValues( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
-    gestureUpdated |= gesture.UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+    // gesture processor only supports default properties
+    mImpl->panGestureProcessor->ResetDefaultProperties( bufferIndex ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
+    gestureUpdated |= mImpl->panGestureProcessor->UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
   }
 
   return gestureUpdated;
@@ -796,7 +736,7 @@ void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
 void UpdateManager::ConstrainShaders( BufferIndex bufferIndex )
 {
   // constrain shaders... (in construction order)
-  ShaderContainer& shaders = mImpl->shaders;
+  ShaderOwner& shaders = mImpl->shaders;
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
@@ -850,14 +790,13 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 {
-  const OwnerContainer<Renderer*>& rendererContainer( mImpl->renderers.GetObjectContainer() );
-  unsigned int rendererCount( rendererContainer.Size() );
-  for( unsigned int i(0); i<rendererCount; ++i )
+  const unsigned int rendererCount = mImpl->renderers.Count();
+  for( unsigned int i = 0; i < rendererCount; ++i )
   {
     //Apply constraints
-    ConstrainPropertyOwner( *rendererContainer[i], bufferIndex );
+    ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
 
-    rendererContainer[i]->PrepareRender( bufferIndex );
+    mImpl->renderers[i]->PrepareRender( bufferIndex );
   }
 }
 
@@ -896,7 +835,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
-  const bool updateScene =                                  // The scene-graph requires an update if..
+  bool updateScene = // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
       IsAnimationRunning()                            ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
@@ -912,8 +851,10 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     mImpl->transformManager.ResetToBaseValue();
   }
 
-  //Process the queued scene messages
-  mImpl->messageQueue.ProcessMessages( bufferIndex );
+  // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
+  // between calling IsSceneUpdateRequired() above and here, so updateScene should
+  // be set again
+  updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
 
   //Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
@@ -1104,9 +1045,19 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
-void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
+void UpdateManager::SetDepthIndices( NodeDepths* nodeDepths )
 {
-  mImpl->shaderSaver = &upstream;
+  if( nodeDepths )
+  {
+    // note,this vector is already in depth order. It could be used as-is to
+    // remove sorting in update algorithm. However, it lacks layer boundary markers.
+    for( std::vector<NodeDepthPair>::iterator iter = nodeDepths->nodeDepths.begin(),
+           end = nodeDepths->nodeDepths.end() ;
+         iter != end ; ++iter )
+    {
+      iter->node->SetDepthIndex( iter->sortedDepth );
+    }
+  }
 }
 
 void UpdateManager::AddSampler( Render::Sampler* sampler )

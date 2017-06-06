@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,17 +255,6 @@ public:
   Render::Renderer& GetRenderer();
 
   /**
-   * Check whether the renderer has been marked as ready to render
-   * ready means that renderer has all resources and should produce correct result
-   * complete means all resources have finished loading
-   * It's possible that renderer is complete but not ready,
-   * for example in case of resource load failed
-   * @param[out] ready TRUE if the renderer has resources to render
-   * @param[out] complete TRUE if the renderer resources are complete
-   */
-  void GetReadyAndComplete( bool& ready, bool& complete ) const;
-
-  /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
@@ -277,7 +266,11 @@ public:
    */
   void TextureSetChanged();
 
-public: // Implementation of ObjectOwnerContainer template methods
+  /**
+   * Called by the TextureSet to notify to the renderer that it is about to be deleted
+   */
+  void TextureSetDeleted();
+
   /**
    * Connect the object to the scene graph
    *
@@ -303,9 +296,6 @@ public: // Implementation of ConnectionChangePropagator
    * @copydoc ConnectionChangePropagator::RemoveObserver
    */
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer){};
-
-public:
-
 
 public: // UniformMap::Observer
   /**
@@ -361,6 +351,12 @@ private:
    */
   RenderDataProvider* NewRenderDataProvider();
 
+  /**
+   * Helper function to retrieve the blend color.
+   * @return The blend color.
+   */
+  const Vector4& GetBlendColor() const;
+
 private:
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
@@ -369,7 +365,7 @@ private:
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   Render::Geometry*            mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
-  Vector4*                     mBlendColor;                       ///< The blend color for blending operation
+  OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
 
@@ -386,13 +382,12 @@ private:
   DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
-  bool                         mResourcesReady;                   ///< Set during the Update algorithm; true if the renderer has resources ready for the current frame.
-  bool                         mFinishedResourceAcquisition;      ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 public:
 
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
+
 };
 
 

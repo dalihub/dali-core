@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,15 +145,15 @@ int UtcDaliShaderConstraint01(void)
   application.Render(0);
 
   // Expect no blue component in either buffer - yellow
-  DALI_TEST_EQUALS( shader.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( shader.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::YELLOW, TEST_LOCATION );
 
   shader.RemoveConstraints();
   shader.SetProperty(colorIndex, Color::WHITE );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( shader.GetProperty<Vector4>(colorIndex), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -244,11 +244,11 @@ int UtcDaliShaderAnimatedProperty01(void)
   application.SendNotification();
   application.Render(500);
 
-  DALI_TEST_EQUALS( shader.GetProperty<Vector4>(colorIndex), Color::WHITE * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::WHITE * 0.5f, TEST_LOCATION );
 
   application.Render(500);
 
-  DALI_TEST_EQUALS( shader.GetProperty<Vector4>(colorIndex), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetCurrentProperty< Vector4 >( colorIndex ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -325,6 +325,18 @@ int UtcDaliShaderProgramProperty(void)
   std::string v = (*outMap)["vertex"].Get<std::string>();
   std::string f = (*outMap)["fragment"].Get<std::string>();
   std::string h = (*outMap)["hints"].Get<std::string>();
+
+  DALI_TEST_CHECK( v == VertexSource );
+  DALI_TEST_CHECK( f == FragmentSource );
+  DALI_TEST_CHECK( h == hintSet );
+
+  value = shader.GetCurrentProperty( Shader::Property::PROGRAM );
+  DALI_TEST_CHECK( value.GetType() == Property::MAP);
+  outMap = value.GetMap();
+
+  v = (*outMap)["vertex"].Get<std::string>();
+  f = (*outMap)["fragment"].Get<std::string>();
+  h = (*outMap)["hints"].Get<std::string>();
 
   DALI_TEST_CHECK( v == VertexSource );
   DALI_TEST_CHECK( f == FragmentSource );

@@ -74,7 +74,19 @@ public:
   class Observer
   {
   public:
+
+    /**
+     * Inform observer that uniform mappings have been changed
+     * @param mappings
+     */
     virtual void UniformMappingsChanged(const UniformMap& mappings) = 0;
+
+  protected:
+
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~Observer() {}
   };
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1053,6 +1053,12 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   (void)customActor.GetProperty< bool >( propertyIndex );
   DALI_TEST_CHECK( getPropertyCalled );
 
+  // Get the property using GetCurrentProperty and ensure GetProperty is called
+  getPropertyCalled = false;
+  DALI_TEST_CHECK( !getPropertyCalled );
+  customActor.GetCurrentProperty< bool >( propertyIndex );
+  DALI_TEST_CHECK( getPropertyCalled );
+
   // Check the property name
   DALI_TEST_EQUALS( customActor.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
   DALI_TEST_EQUALS( typeInfo.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
@@ -1172,16 +1178,21 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   Animation animation = Animation::New(0.2f);
   animation.AnimateTo( Property( customActor, animatablePropertyIndex ), 15.f, AlphaFunction::LINEAR );
   animation.Play();
+
+  // Target value should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 15.0f, TEST_LOCATION );
+
   // Render and notify, animation play for 0.05 seconds
   application.SendNotification();
   application.Render(50);
   DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 22.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 22.5f, TEST_LOCATION );
+
   // Render and notify, animation play for another 0.1 seconds
   application.SendNotification();
   application.Render(100);
   DALI_TEST_EQUALS( 0.75f, animation.GetCurrentProgress(), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 17.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 17.5f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1273,16 +1284,21 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   Animation animation = Animation::New(0.2f);
   animation.AnimateTo( Property( customActor, animatablePropertyIndex ), 20.f, AlphaFunction::LINEAR );
   animation.Play();
+
+  // Target value should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 20.0f, TEST_LOCATION );
+
   // Render and notify, animation play for 0.05 seconds
   application.SendNotification();
   application.Render(50);
   DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 12.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 12.5f, TEST_LOCATION );
+
   // Render and notify, animation play for another 0.1 seconds
   application.SendNotification();
   application.Render(100);
   DALI_TEST_EQUALS( 0.75f, animation.GetCurrentProgress(), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 17.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 17.5f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1378,8 +1394,8 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   DALI_TEST_EQUALS( customPropertyCount + 3u, customActor.GetPropertyCount(), TEST_LOCATION );
 
   // Check the animatable property component value
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 25.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex1 ), 25.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
 
   // Set the animatable property component value
   customActor.SetProperty( animatablePropertyComponentIndex1, 150.0f );
@@ -1389,9 +1405,9 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   application.Render();
 
   // Check the animatable property value
-  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 50.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 50.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
 
   // Set the animatable property component value
   customActor.SetProperty( animatablePropertyComponentIndex2, 225.0f );
@@ -1401,9 +1417,9 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   application.Render();
 
   // Check the animatable property value
-  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 225.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 225.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyComponentIndex2 ), 225.0f, TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by three
   Actor actor = Actor::New();
@@ -1412,6 +1428,183 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   customActor.GetPropertyIndices( indices );
   unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 3u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector2AnimateByP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  const unsigned int index = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
+  const unsigned int xComponentIndex = index + 1;
+  const unsigned int yComponentIndex = index + 2;
+  const Vector2 initialValue( 20.0f, 40.0f );
+
+  // Register animatable property & its components
+  AnimatablePropertyRegistration animatableProperty1( customType1, "animatableProp1", index, initialValue );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent1( customType1, "animatableProp1X", xComponentIndex, index, 0 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent2( customType1, "animatableProp1Y", yComponentIndex, index, 1 );
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property current value
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector2 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+
+  // Do an AnimateBy
+  const Vector2 targetValue( 45.0f, 53.0f );
+  const Vector2 relativeValue( targetValue - initialValue );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( customActor, xComponentIndex ), relativeValue.x );
+  animation.AnimateBy( Property( customActor, yComponentIndex ), relativeValue.y );
+  animation.Play();
+
+  // Target values should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), targetValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), targetValue.y, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector3AnimateByP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  const unsigned int index = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
+  const unsigned int xComponentIndex = index + 1;
+  const unsigned int yComponentIndex = index + 2;
+  const unsigned int zComponentIndex = index + 3;
+  const Vector3 initialValue( 20.0f, 40.0f, 50.0f );
+
+  // Register animatable property & its components
+  AnimatablePropertyRegistration animatableProperty1( customType1, "animatableProp1", index, initialValue );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent1( customType1, "animatableProp1X", xComponentIndex, index, 0 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent2( customType1, "animatableProp1Y", yComponentIndex, index, 1 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent3( customType1, "animatableProp1Z", zComponentIndex, index, 2 );
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( zComponentIndex ), initialValue.z, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property current value
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector3 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( zComponentIndex ), initialValue.z, TEST_LOCATION );
+
+  // Do an AnimateBy
+  const Vector3 targetValue( 45.0f, 53.0f, 25.0f );
+  const Vector3 relativeValue( targetValue - initialValue );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( customActor, xComponentIndex ), relativeValue.x );
+  animation.AnimateBy( Property( customActor, yComponentIndex ), relativeValue.y );
+  animation.AnimateBy( Property( customActor, zComponentIndex ), relativeValue.z );
+  animation.Play();
+
+  // Target values should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), targetValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), targetValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( zComponentIndex ), targetValue.z, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector4AnimateByP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  const unsigned int index = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
+  const unsigned int xComponentIndex = index + 1;
+  const unsigned int yComponentIndex = index + 2;
+  const unsigned int zComponentIndex = index + 3;
+  const unsigned int wComponentIndex = index + 4;
+  const Vector4 initialValue( 20.0f, 40.0f, 50.0f, 60.0f );
+
+  // Register animatable property & its components
+  AnimatablePropertyRegistration animatableProperty1( customType1, "animatableProp1", index, initialValue );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent1( customType1, "animatableProp1X", xComponentIndex, index, 0 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent2( customType1, "animatableProp1Y", yComponentIndex, index, 1 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent3( customType1, "animatableProp1Z", zComponentIndex, index, 2 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent4( customType1, "animatableProp1W", wComponentIndex, index, 3 );
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( zComponentIndex ), initialValue.z, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( wComponentIndex ), initialValue.w, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property current value
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector4 >( index ), initialValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( xComponentIndex ), initialValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( yComponentIndex ), initialValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( zComponentIndex ), initialValue.z, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( wComponentIndex ), initialValue.w, TEST_LOCATION );
+
+  // Do an AnimateBy
+  const Vector4 targetValue( 45.0f, 53.0f, 25.0f, 13.0f );
+  const Vector4 relativeValue( targetValue - initialValue );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateBy( Property( customActor, xComponentIndex ), relativeValue.x );
+  animation.AnimateBy( Property( customActor, yComponentIndex ), relativeValue.y );
+  animation.AnimateBy( Property( customActor, zComponentIndex ), relativeValue.z );
+  animation.AnimateBy( Property( customActor, wComponentIndex ), relativeValue.w );
+  animation.Play();
+
+  // Target values should change straight away
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( index ), targetValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( xComponentIndex ), targetValue.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( yComponentIndex ), targetValue.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( zComponentIndex ), targetValue.z, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( wComponentIndex ), targetValue.w, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2302,6 +2495,274 @@ int UtcDaliTypeInfoGetPropertyCountP2(void)
 
   DALI_TEST_EQUALS( propertyCount > 0 && propertyCount <= indices.Size(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( propertyCount == 2, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGet01(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register a type registered animatable property and ensure set/get behaviour works synchronously" );
+
+  // Register animatable property
+  const int animatablePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  AnimatablePropertyRegistration animatableProperty( customType1, "animatableProp1", animatablePropertyIndex, Property::FLOAT );
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  Stage::GetCurrent().Add(customActor);
+
+  tet_infoline( "Set the value and ensure it changes straight away" );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 0.0f, TEST_LOCATION );
+  customActor.SetProperty( animatablePropertyIndex, 25.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 25.0f, TEST_LOCATION );
+
+  tet_infoline( "Check latest scene-graph value is unchanged" );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 0.0f, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check values after rendering and both retrieval methods should return the latest" );
+
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 25.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( animatablePropertyIndex ), 25.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponentsVector2(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register a type registered animatable property that has component indices and ensure set/get behaviour works synchronously and is the same regardless of how the property is set" );
+
+  // Register the animatable propeties
+  const int basePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  const int componentZeroPropertyIndex( basePropertyIndex + 1 );
+  const int componentOnePropertyIndex( componentZeroPropertyIndex + 1 );
+  AnimatablePropertyRegistration baseAnimatableProperty( customType1, "baseProp", basePropertyIndex, Vector2( 13.0f, 24.0f ) );
+  AnimatablePropertyComponentRegistration componentZeroAnimatableProperty( customType1, "componentZeroProp", componentZeroPropertyIndex, basePropertyIndex, 0 );
+  AnimatablePropertyComponentRegistration componentOneAnimatableProperty( customType1, "componentOneProp", componentOnePropertyIndex, basePropertyIndex, 1 );
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  Stage::GetCurrent().Add(customActor);
+
+  tet_infoline( "Get the component values, they should be the default value of the base-property" );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( basePropertyIndex ), Vector2( 13.0f, 24.0f ), TEST_LOCATION );
+
+  tet_infoline( "Set a component value and ensure it changes for the base property as well" );
+  customActor.SetProperty( componentZeroPropertyIndex, 125.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( basePropertyIndex ), Vector2( 125.0f, 24.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentOnePropertyIndex, 225.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( basePropertyIndex ), Vector2( 125.0f, 225.0f ), TEST_LOCATION );
+
+  tet_infoline( "Check latest scene-graph value is unchanged" );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector2 >( basePropertyIndex ), Vector2( 13.0f, 24.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check values after rendering and both retrieval methods should return the latest" );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( basePropertyIndex ), Vector2( 125.0f, 225.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector2 >( basePropertyIndex ), Vector2( 125.0f, 225.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+
+  tet_infoline( "Set the base property value and ensure the component values reflect the change" );
+  customActor.SetProperty( basePropertyIndex, Vector2( 1.0f, 2.0f ) );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( basePropertyIndex ), Vector2( 1.0f, 2.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponentsVector3(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register a type registered animatable property that has component indices and ensure set/get behaviour works synchronously and is the same regardless of how the property is set" );
+
+  // Register the animatable propeties
+  const int basePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  const int componentZeroPropertyIndex( basePropertyIndex + 1 );
+  const int componentOnePropertyIndex( componentZeroPropertyIndex + 1 );
+  const int componentTwoPropertyIndex( componentOnePropertyIndex + 1 );
+  AnimatablePropertyRegistration baseAnimatableProperty( customType1, "baseProp", basePropertyIndex, Vector3( 13.0f, 24.0f, 35.0 ) );
+  AnimatablePropertyComponentRegistration componentZeroAnimatableProperty( customType1, "componentZeroProp", componentZeroPropertyIndex, basePropertyIndex, 0 );
+  AnimatablePropertyComponentRegistration componentOneAnimatableProperty( customType1, "componentOneProp", componentOnePropertyIndex, basePropertyIndex, 1 );
+  AnimatablePropertyComponentRegistration componentTwoAnimatableProperty( customType1, "componentTwoProp", componentTwoPropertyIndex, basePropertyIndex, 2 );
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  Stage::GetCurrent().Add(customActor);
+
+  tet_infoline( "Get the component values, they should be the default value of the base-property" );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 35.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 13.0f, 24.0f, 35.0f ), TEST_LOCATION );
+
+  tet_infoline( "Set a component value and ensure it changes for the base property as well" );
+  customActor.SetProperty( componentZeroPropertyIndex, 125.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 125.0f, 24.0f, 35.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentOnePropertyIndex, 225.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 125.0f, 225.0f, 35.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentTwoPropertyIndex, 325.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 125.0f, 225.0f, 325.0f ), TEST_LOCATION );
+
+  tet_infoline( "Check latest scene-graph value is unchanged" );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector3 >( basePropertyIndex ), Vector3( 13.0f, 24.0f, 35.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentTwoPropertyIndex ), 35.0f, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check values after rendering and both retrieval methods should return the latest" );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 125.0f, 225.0f, 325.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector3 >( basePropertyIndex ), Vector3( 125.0f, 225.0f, 325.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+
+  tet_infoline( "Set the base property value and ensure the component values reflect the change" );
+  customActor.SetProperty( basePropertyIndex, Vector3( 1.0f, 2.0f, 3.0f ) );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 3.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector3 >( basePropertyIndex ), Vector3( 1.0f, 2.0f, 3.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponentsVector4(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register a type registered animatable property that has component indices and ensure set/get behaviour works synchronously and is the same regardless of how the property is set" );
+
+  // Register the animatable propeties
+  const int basePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  const int componentZeroPropertyIndex( basePropertyIndex + 1 );
+  const int componentOnePropertyIndex( componentZeroPropertyIndex + 1 );
+  const int componentTwoPropertyIndex( componentOnePropertyIndex + 1 );
+  const int componentThreePropertyIndex( componentTwoPropertyIndex + 1 );
+  AnimatablePropertyRegistration baseAnimatableProperty( customType1, "baseProp", basePropertyIndex, Vector4( 13.0f, 24.0f, 35.0, 47.0f ) );
+  AnimatablePropertyComponentRegistration componentZeroAnimatableProperty( customType1, "componentZeroProp", componentZeroPropertyIndex, basePropertyIndex, 0 );
+  AnimatablePropertyComponentRegistration componentOneAnimatableProperty( customType1, "componentOneProp", componentOnePropertyIndex, basePropertyIndex, 1 );
+  AnimatablePropertyComponentRegistration componentTwoAnimatableProperty( customType1, "componentTwoProp", componentTwoPropertyIndex, basePropertyIndex, 2 );
+  AnimatablePropertyComponentRegistration componentThreeAnimatableProperty( customType1, "componentThreeProp", componentThreePropertyIndex, basePropertyIndex, 3 );
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  Stage::GetCurrent().Add(customActor);
+
+  tet_infoline( "Get the component values, they should be the default value of the base-property" );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 35.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentThreePropertyIndex ), 47.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 13.0f, 24.0f, 35.0f, 47.0f ), TEST_LOCATION );
+
+  tet_infoline( "Set a component value and ensure it changes for the base property as well" );
+  customActor.SetProperty( componentZeroPropertyIndex, 125.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 24.0f, 35.0f, 47.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentOnePropertyIndex, 225.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 225.0f, 35.0f, 47.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentTwoPropertyIndex, 325.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 225.0f, 325.0f, 47.0f ), TEST_LOCATION );
+
+  customActor.SetProperty( componentThreePropertyIndex, 435.0f );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentThreePropertyIndex ), 435.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 225.0f, 325.0f, 435.0f ), TEST_LOCATION );
+
+  tet_infoline( "Check latest scene-graph value is unchanged" );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector4 >( basePropertyIndex ), Vector4( 13.0f, 24.0f, 35.0f, 47.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 24.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentTwoPropertyIndex ), 35.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentThreePropertyIndex ), 47.0f, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Check values after rendering and both retrieval methods should return the latest" );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 225.0f, 325.0f, 435.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentThreePropertyIndex ), 435.0f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< Vector4 >( basePropertyIndex ), Vector4( 125.0f, 225.0f, 325.0f, 435.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentZeroPropertyIndex ), 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentOnePropertyIndex ), 225.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentTwoPropertyIndex ), 325.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetCurrentProperty< float >( componentThreePropertyIndex ), 435.0f, TEST_LOCATION );
+
+  tet_infoline( "Set the base property value and ensure the component values reflect the change" );
+  customActor.SetProperty( basePropertyIndex, Vector4( 1.0f, 2.0f, 3.0f, 4.0f ) );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentOnePropertyIndex ), 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 3.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( componentThreePropertyIndex ), 4.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 1.0f, 2.0f, 3.0f, 4.0f ), TEST_LOCATION );
 
   END_TEST;
 }

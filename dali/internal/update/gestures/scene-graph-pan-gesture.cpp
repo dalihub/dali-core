@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, 
       ++iter;
       continue;
     }
-    float previousValueWeight = (float)(MAX_GESTURE_AGE - (lastVSyncTime - lastTime)) / (float)MAX_GESTURE_AGE;
+    float previousValueWeight = ( static_cast< float >( MAX_GESTURE_AGE ) - (lastVSyncTime - lastTime) ) / static_cast< float >( MAX_GESTURE_AGE );
     float velMag = currentGesture.screen.velocity.Length();
     float velDiff = velMag - screenVelocity.Length();
     float acceleration = 0.0f;
@@ -642,7 +642,8 @@ void PanGesture::ResetDefaultProperties( BufferIndex updateBufferIndex )
 }
 
 PanGesture::PanGesture()
-: mGestures(),
+: mPanning(),
+  mGestures(),
   mWritePosition( 0 ),
   mReadPosition( 0 ),
   mNotAtTarget( false ),

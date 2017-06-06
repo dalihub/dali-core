@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ std::string Demangle(const char* symbol)
       size_t tokenLength = endOfToken - startOfToken;
 
       // Allocate space for symbol
-      char *mangledSymbol = (char*)malloc(tokenLength+1u);
+      char *mangledSymbol = reinterpret_cast< char* >( malloc( tokenLength + 1u ) );
       if(mangledSymbol != NULL)
       {
         strncpy(mangledSymbol, startOfToken, tokenLength);

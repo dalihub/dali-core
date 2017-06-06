@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,13 @@ inline void WrapInPlayRange( float& elapsed, const Dali::Vector2& playRangeSecon
   }
 }
 
+/// Compares the end times of the animators and if the end time is less, then it is moved earlier in the list. If end times are the same, then no change.
+bool CompareAnimatorEndTimes( const Dali::Internal::SceneGraph::AnimatorBase* lhs, const Dali::Internal::SceneGraph::AnimatorBase* rhs )
+{
+  return ( ( lhs->GetInitialDelay() + lhs->GetDuration() ) < ( rhs->GetInitialDelay() + rhs->GetDuration() ) );
 }
+
+} // unnamed namespace
 
 namespace Dali
 {
@@ -132,6 +138,9 @@ void Animation::SetPlayRange( const Vector2& range )
 
 void Animation::Play()
 {
+  // Sort according to end time with earlier end times coming first, if the end time is the same, then the animators are not moved
+  std::stable_sort( mAnimators.Begin(), mAnimators.End(), CompareAnimatorEndTimes );
+
   mState = Playing;
 
   if ( mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x*mDurationSeconds )

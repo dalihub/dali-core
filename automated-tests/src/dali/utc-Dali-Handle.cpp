@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -896,8 +896,35 @@ int UtcDaliHandleWeightNew(void)
 {
   TestApplication application;
 
-  Handle handle = WeightObject::New();;
+  Handle handle = WeightObject::New();
   DALI_TEST_CHECK( handle.GetProperty<float>(WeightObject::WEIGHT) == 0.0f );
+
+  // process the message so scene object is added to update manager
+  application.SendNotification();
+  application.Render(0);
+
+  // no message to release scene object in this scenario
+
+  END_TEST;
+}
+
+int UtcDaliHandleWeightNew2(void)
+{
+  TestApplication application;
+
+  // scope for the weight object
+  {
+    Handle handle = WeightObject::New();
+    DALI_TEST_CHECK( handle.GetProperty<float>(WeightObject::WEIGHT) == 0.0f );
+
+    // process the message so scene object is added to update manager
+    application.SendNotification();
+    application.Render(0);
+  }
+  // handle out of scope so object gets destroyed
+  // process the message so update manager destroys the scene object
+  application.SendNotification();
+  application.Render(0);
 
   END_TEST;
 }
@@ -925,3 +952,87 @@ int UtcDaliHandleSetTypeInfo(void)
   END_TEST;
 }
 
+int UtcDaliHandleCustomPropertySynchronousGetSet(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Create a custom property and set the value ensuring it can be retrieved synchronously" );
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  tet_infoline( "Create the custom property with an initial value" );
+  float startValue(1.0f);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), startValue, TEST_LOCATION );
+
+  tet_infoline( "Set the value, retrieve it and ensure both the synchronous and the async version work" );
+  actor.SetProperty( index, 5.0f );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), startValue, TEST_LOCATION );
+
+  tet_infoline( "Render and retrieve values again" );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 5.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyGetType(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Create a custom property and retrieve its type" );
+
+  Handle handle = Handle::New();
+  Property::Index index = handle.RegisterProperty( "testProperty",  1.0f );
+  DALI_TEST_EQUALS( handle.GetPropertyType( index ), Property::FLOAT, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyAccessMode(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Create a custom property and retrieve whether it's animatable etc." );
+
+  Handle handle = Handle::New();
+  Property::Index index = handle.RegisterProperty( "testProperty",  1.0f );
+  DALI_TEST_EQUALS( handle.IsPropertyAnimatable( index ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.IsPropertyWritable( index ), true, TEST_LOCATION );
+
+  index = handle.RegisterProperty( "testProperty2", 1.0f, Property::READ_ONLY );
+  DALI_TEST_EQUALS( handle.IsPropertyAnimatable( index ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.IsPropertyWritable( index ), false, TEST_LOCATION );
+
+  index = handle.RegisterProperty( "testProperty3", 1.0f, Property::READ_WRITE );
+  DALI_TEST_EQUALS( handle.IsPropertyAnimatable( index ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.IsPropertyWritable( index ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleGetCurrentProperty(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Get a default and non-animatable custom property using the GetCurrentProperty API" );
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
+
+  Property::Index index = actor.RegisterProperty( "testProperty3", 1.0f, Property::READ_WRITE );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 1.0f, TEST_LOCATION );
+
+  actor.SetProperty( index, 2.0f );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 2.0f, TEST_LOCATION );
+
+  END_TEST;
+}

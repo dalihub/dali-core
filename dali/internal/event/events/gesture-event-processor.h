@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,11 @@ class GestureManager;
 class RenderController;
 }
 
+namespace SceneGraph
+{
+class UpdateManager;
+}
+
 namespace Internal
 {
 
@@ -56,10 +61,11 @@ public:
   /**
    * Create a gesture event processor.
    * @param[in] stage The stage.
+   * @param[in] updateManager The update manager
    * @param[in] gestureManager The gesture manager
    * @param[in] renderController The render controller
    */
-  GestureEventProcessor(Stage& stage, Integration::GestureManager& gestureManager, Integration::RenderController& renderController);
+  GestureEventProcessor( Stage& stage, SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController );
 
   /**
    * Non-virtual destructor; GestureProcessor is not a base class

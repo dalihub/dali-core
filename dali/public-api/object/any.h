@@ -176,14 +176,11 @@ public:
   template<typename Type>
   const Type& Get() const
   {
-
     if ( NULL == mContainer )
     {
       AssertAlways( "Any::Get(). mContainer is NULL" );
     }
-
-    // Check if the value has the same value than the Any type.
-    if( mContainer->GetType() != typeid( Type ) )
+    else if( mContainer->GetType() != typeid( Type ) ) // Check if the value has the same value than the Any type.
     {
       AssertAlways( "Any::Get(). Trying to retrieve a value of a different type than the template one." );
     }
