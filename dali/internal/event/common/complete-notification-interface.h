@@ -28,7 +28,7 @@ namespace Internal
 
 /**
  * Provides notifications to the event-thread regarding the changes in previous update(s).
- * For example after an animation finished, or after resources were loaded.
+ * For example after an animation finished
  */
 class CompleteNotificationInterface
 {
