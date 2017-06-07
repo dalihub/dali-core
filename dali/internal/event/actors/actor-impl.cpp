@@ -2446,7 +2446,6 @@ void Actor::RebuildDepthTree()
 
   SetDepthIndicesMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths );
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree create time: ");
-  rootNode->~ActorDepthTreeNode();
 }
 
 /**
