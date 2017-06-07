@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,11 +110,9 @@ void PropertyOwner::DisconnectFromSceneGraph( BufferIndex updateBufferIndex )
   mConstraints.Clear();
 }
 
-void PropertyOwner::InstallCustomProperty(PropertyBase* property)
+void PropertyOwner::InstallCustomProperty( OwnerPointer<PropertyBase>& property )
 {
-  DALI_ASSERT_DEBUG( NULL != property );
-
-  mCustomProperties.PushBack( property );
+  mCustomProperties.PushBack( property.Release() );
 }
 
 void PropertyOwner::ResetToBaseValues( BufferIndex updateBufferIndex )
@@ -135,11 +133,10 @@ ConstraintOwnerContainer& PropertyOwner::GetConstraints()
   return mConstraints;
 }
 
-void PropertyOwner::ApplyConstraint( ConstraintBase* constraint )
+void PropertyOwner::ApplyConstraint( OwnerPointer<ConstraintBase>& constraint )
 {
-  mConstraints.PushBack( constraint );
-
   constraint->OnConnect();
+  mConstraints.PushBack( constraint.Release() );
 }
 
 void PropertyOwner::RemoveConstraint( ConstraintBase* constraint )
@@ -161,9 +158,9 @@ PropertyOwner::PropertyOwner()
 {
 }
 
-void PropertyOwner::AddUniformMapping( UniformPropertyMapping* map )
+void PropertyOwner::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
 {
-  mUniformMaps.Add( map );
+  mUniformMaps.Add( map.Release() );
 }
 
 void PropertyOwner::RemoveUniformMapping( const std::string& uniformName )

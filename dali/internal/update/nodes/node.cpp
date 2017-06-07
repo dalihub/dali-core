@@ -167,7 +167,7 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-void Node::AddUniformMapping( UniformPropertyMapping* map )
+void Node::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
 {
   PropertyOwner::AddUniformMapping( map );
   mRegenerateUniformMap = 2;

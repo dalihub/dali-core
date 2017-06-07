@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ struct BasicType
 {
   typedef Type HolderType;
   typedef Type PassingType;
-  static PassingType PassObject( PassingType object ) { return object; }
 };
 
 // For complex types that are copied into the message,
@@ -52,18 +51,17 @@ struct ComplexType
 {
   typedef Type HolderType;
   typedef const Type& PassingType;
-  static PassingType PassObject( PassingType object ) { return object; }
 };
 
 // For complex types that are owned by the message,
-// They are passed as raw pointer and hold in an OwnerPointer
+// They are passed and hold in an OwnerPointer
 template <typename Type>
 struct OwnedType
 {
   typedef OwnerPointer<Type> HolderType;
-  typedef Type* PassingType;
-  static PassingType PassObject( HolderType& object ) { return object.Release(); }
+  typedef OwnerPointer<Type>& PassingType;
 };
+
 
 // Default for Vector3 and other structures
 template <class T> struct ParameterType : public ComplexType< T > {};

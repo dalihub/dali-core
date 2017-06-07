@@ -55,10 +55,12 @@ public:
    * Copy constructor. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer( OwnerPointer& other )
+  OwnerPointer( const OwnerPointer& other )
   : mObject(NULL)
   {
-    Swap( other );
+    // other needs to be const for compiler to pick up this as copy constructor;
+    // though we are using this as move as there can only be one owner
+    Swap( const_cast<OwnerPointer&>( other ) );
   }
 
   /**

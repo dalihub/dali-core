@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,10 +62,9 @@ Dali::RenderTask RenderTaskList::CreateTask()
   if ( mSceneObject )
   {
     SceneGraph::RenderTask* sceneObject = taskImpl->CreateSceneObject();
-    DALI_ASSERT_DEBUG( NULL != sceneObject );
 
-    // Pass ownership to SceneGraph::RenderTaskList
-    AddTaskMessage( mEventThreadServices, *mSceneObject, *sceneObject );
+    OwnerPointer< SceneGraph::RenderTask > transferOwnership( sceneObject );
+    AddTaskMessage( mEventThreadServices, *mSceneObject, transferOwnership );
   }
 
   // Set the default source & camera actors

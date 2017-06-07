@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -256,7 +256,7 @@ public:
    * @param[in] propertyOwner The scene-object that owns the animatable property.
    * @post The animator is owned by this animation.
    */
-  void AddAnimator( AnimatorBase* animator );
+  void AddAnimator( OwnerPointer<AnimatorBase>& animator );
 
   /**
    * Retrieve the animators from an animation.
@@ -462,7 +462,8 @@ inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const 
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::AddAnimator, &animator );
+  OwnerPointer<AnimatorBase> parameter( &animator );
+  new (slot) LocalType( &animation, &Animation::AddAnimator, parameter );
 }
 
 

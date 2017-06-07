@@ -220,7 +220,8 @@ struct UpdateManager::Impl
       (*iter)->SetSourceNode( NULL );
     }
 
-    // UpdateManager owns the Nodes
+    // UpdateManager owns the Nodes. Although Nodes are pool allocated they contain heap allocated parts
+    // like custom properties, which get released here
     Vector<Node*>::Iterator iter = nodes.Begin()+1;
     Vector<Node*>::Iterator endIter = nodes.End();
     for(;iter!=endIter;++iter)
@@ -334,7 +335,7 @@ UpdateManager::~UpdateManager()
   delete mImpl;
 }
 
-void UpdateManager::InstallRoot( SceneGraph::Layer* layer, bool systemLevel )
+void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel )
 {
   DALI_ASSERT_DEBUG( layer->IsLayer() );
   DALI_ASSERT_DEBUG( layer->GetParent() == NULL);
@@ -342,33 +343,34 @@ void UpdateManager::InstallRoot( SceneGraph::Layer* layer, bool systemLevel )
   if ( !systemLevel )
   {
     DALI_ASSERT_DEBUG( mImpl->root == NULL && "Root Node already installed" );
-    mImpl->root = layer;
+    mImpl->root = layer.Release();
     mImpl->root->CreateTransform( &mImpl->transformManager );
+    mImpl->root->SetRoot(true);
   }
   else
   {
     DALI_ASSERT_DEBUG( mImpl->systemLevelRoot == NULL && "System-level Root Node already installed" );
-    mImpl->systemLevelRoot = layer;
+    mImpl->systemLevelRoot = layer.Release();
     mImpl->systemLevelRoot->CreateTransform( &mImpl->transformManager );
+    mImpl->systemLevelRoot->SetRoot(true);
   }
 
-  layer->SetRoot(true);
 }
 
-void UpdateManager::AddNode( Node* node )
+void UpdateManager::AddNode( OwnerPointer<Node>& node )
 {
-  DALI_ASSERT_ALWAYS( NULL != node );
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
 
   // Nodes must be sorted by pointer
+  Node* rawNode = node.Release();
   Vector<Node*>::Iterator begin = mImpl->nodes.Begin();
-  for(Vector<Node*>::Iterator iter = mImpl->nodes.End()-1; iter >= begin; --iter)
+  for( Vector<Node*>::Iterator iter = mImpl->nodes.End()-1; iter >= begin; --iter )
   {
-    if(node > (*iter))
+    if( rawNode > (*iter) )
     {
-      mImpl->nodes.Insert((iter+1), node);
-      node->CreateTransform( &mImpl->transformManager );
-      break;
+      mImpl->nodes.Insert((iter+1), rawNode );
+      rawNode->CreateTransform( &mImpl->transformManager );
+      return;
     }
   }
 }
@@ -413,11 +415,9 @@ void UpdateManager::DestroyNode( Node* node )
   node->OnDestroy();
 }
 
-void UpdateManager::AddCamera( Camera* camera )
+void UpdateManager::AddCamera( OwnerPointer< Camera >& camera )
 {
-  DALI_ASSERT_DEBUG( camera != NULL );
-
-  mImpl->cameras.PushBack( camera ); // takes ownership
+  mImpl->cameras.PushBack( camera.Release() ); // takes ownership
 }
 
 void UpdateManager::RemoveCamera( const Camera* camera )
@@ -426,11 +426,9 @@ void UpdateManager::RemoveCamera( const Camera* camera )
   EraseUsingDiscardQueue( mImpl->cameras, const_cast<Camera*>( camera ), mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
-void UpdateManager::AddObject( PropertyOwner* object )
+void UpdateManager::AddObject( OwnerPointer<PropertyOwner>& object )
 {
-  DALI_ASSERT_DEBUG( NULL != object );
-
-  mImpl->customObjects.PushBack( object );
+  mImpl->customObjects.PushBack( object.Release() );
 }
 
 void UpdateManager::RemoveObject( PropertyOwner* object )
@@ -438,9 +436,9 @@ void UpdateManager::RemoveObject( PropertyOwner* object )
   mImpl->customObjects.EraseObject( object );
 }
 
-void UpdateManager::AddAnimation( Animation* animation )
+void UpdateManager::AddAnimation( OwnerPointer< SceneGraph::Animation >& animation )
 {
-  mImpl->animations.PushBack( animation );
+  mImpl->animations.PushBack( animation.Release() );
 }
 
 void UpdateManager::StopAnimation( Animation* animation )
@@ -483,9 +481,9 @@ bool UpdateManager::IsAnimationRunning() const
   return isRunning;
 }
 
-void UpdateManager::AddPropertyNotification( PropertyNotification* propertyNotification )
+void UpdateManager::AddPropertyNotification( OwnerPointer< PropertyNotification >& propertyNotification )
 {
-  mImpl->propertyNotifications.PushBack( propertyNotification );
+  mImpl->propertyNotifications.PushBack( propertyNotification.Release() );
 }
 
 void UpdateManager::RemovePropertyNotification( PropertyNotification* propertyNotification )
@@ -499,11 +497,9 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-void UpdateManager::AddShader( Shader* shader )
+void UpdateManager::AddShader( OwnerPointer< Shader >& shader )
 {
-  DALI_ASSERT_DEBUG( NULL != shader );
-
-  mImpl->shaders.PushBack( shader );
+  mImpl->shaders.PushBack( shader.Release() );
 }
 
 void UpdateManager::RemoveShader( Shader* shader )
@@ -544,13 +540,10 @@ void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
   mImpl->shaderSaver = &upstream;
 }
 
-void UpdateManager::AddRenderer( Renderer* renderer )
+void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
-  DALI_ASSERT_DEBUG( renderer != NULL );
-
-  mImpl->renderers.PushBack( renderer );
-
   renderer->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  mImpl->renderers.PushBack( renderer.Release() );
 }
 
 void UpdateManager::RemoveRenderer( Renderer* renderer )
@@ -568,11 +561,9 @@ void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
   mImpl->panGestureProcessor = panGestureProcessor;
 }
 
-void UpdateManager::AddTextureSet( TextureSet* textureSet )
+void UpdateManager::AddTextureSet( OwnerPointer< TextureSet >& textureSet )
 {
-  DALI_ASSERT_DEBUG( NULL != textureSet );
-
-  mImpl->textureSets.PushBack( textureSet );
+  mImpl->textureSets.PushBack( textureSet.Release() );
 }
 
 void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
@@ -1041,22 +1032,19 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
-void UpdateManager::SetDepthIndices( NodeDepths* nodeDepths )
+void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
 {
-  if( nodeDepths )
+  // note,this vector is already in depth order. It could be used as-is to
+  // remove sorting in update algorithm. However, it lacks layer boundary markers.
+  for( std::vector<NodeDepthPair>::iterator iter = nodeDepths->nodeDepths.begin(),
+         end = nodeDepths->nodeDepths.end() ;
+       iter != end ; ++iter )
   {
-    // note,this vector is already in depth order. It could be used as-is to
-    // remove sorting in update algorithm. However, it lacks layer boundary markers.
-    for( std::vector<NodeDepthPair>::iterator iter = nodeDepths->nodeDepths.begin(),
-           end = nodeDepths->nodeDepths.end() ;
-         iter != end ; ++iter )
-    {
-      iter->node->SetDepthIndex( iter->sortedDepth );
-    }
+    iter->node->SetDepthIndex( iter->sortedDepth );
   }
 }
 
-void UpdateManager::AddSampler( Render::Sampler* sampler )
+void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
 {
   // Message has ownership of Sampler while in transit from update to render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Sampler > > DerivedType;
@@ -1101,7 +1089,7 @@ void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMod
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetWrapMode, sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
-void UpdateManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::PropertyBuffer > > DerivedType;
@@ -1124,7 +1112,7 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
 }
 
-void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
+void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue2< RenderManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format > > DerivedType;
@@ -1136,7 +1124,7 @@ void UpdateManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuff
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
 }
 
-void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
+void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue3< RenderManager, Render::PropertyBuffer*, OwnerPointer< Dali::Vector<char> >, size_t > DerivedType;
@@ -1148,7 +1136,7 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
 }
 
-void UpdateManager::AddGeometry( Render::Geometry* geometry )
+void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
 {
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
@@ -1204,7 +1192,7 @@ void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
 }
 
-void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
   typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
 
@@ -1212,10 +1200,10 @@ void UpdateManager::AddVertexBuffer( Render::Geometry* geometry, Render::Propert
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddVertexBuffer, geometry, propertyBuffer );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
 }
 
-void UpdateManager::AddTexture( Render::Texture* texture )
+void UpdateManager::AddTexture( OwnerPointer< Render::Texture >& texture )
 {
   // Message has ownership of Texture while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Texture > > DerivedType;
@@ -1224,7 +1212,7 @@ void UpdateManager::AddTexture( Render::Texture* texture )
   unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddTexture, texture );
+  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::AddTexture, texture );
 }
 
 void UpdateManager::RemoveTexture( Render::Texture* texture)

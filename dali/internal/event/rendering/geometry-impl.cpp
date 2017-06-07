@@ -39,7 +39,7 @@ GeometryPtr Geometry::New()
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   mVertexBuffers.push_back( &vertexBuffer );
-  SceneGraph::AddVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
+  SceneGraph::AttachVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
   return mVertexBuffers.size() - 1u;
 }
 
@@ -98,7 +98,8 @@ Geometry::Geometry()
 void Geometry::Initialize()
 {
   mRenderObject = new Render::Geometry();
-  AddGeometry( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  OwnerPointer< Render::Geometry > transferOwnership( mRenderObject );
+  AddGeometry( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 Geometry::~Geometry()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ void PropertyBuffer::SetData( const void* data, std::size_t size )
 
   // create a new DALi vector to store the buffer data
   // the heap allocated vector will end up being owned by Render::PropertyBuffer
-  Dali::Vector<char>* bufferCopy = new Dali::Vector<char>();
+  OwnerPointer< Vector<char> > bufferCopy = new Dali::Vector<char>();
   bufferCopy->Resize( bufferSize );
 
   // copy the data
@@ -179,12 +179,13 @@ PropertyBuffer::PropertyBuffer()
 void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
   mRenderObject = new Render::PropertyBuffer();
-  SceneGraph::AddPropertyBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
+  SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 
   size_t numComponents = formatMap.Count();
 
   // Create the format
-  Render::PropertyBuffer::Format* format = new Render::PropertyBuffer::Format();
+  OwnerPointer< Render::PropertyBuffer::Format> format = new Render::PropertyBuffer::Format();
   format->components.resize( numComponents );
 
   unsigned int currentAlignment = 0u;

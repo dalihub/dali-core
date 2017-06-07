@@ -732,7 +732,7 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( UniformPropertyMapping* map );
+  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
 
   /**
    * @copydoc UniformMap::Remove
