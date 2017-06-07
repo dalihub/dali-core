@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1318,6 +1318,14 @@ int UtcDaliCustomActorSetGetProperty(void)
 
   value = actor.GetProperty( Test::DevelTestCustomActor::Property::DEVEL_TEST_PROPERTY5 );
   DALI_TEST_EQUALS( value.Get<float>(), 40.0f, 0.001f, TEST_LOCATION );
+
+  // Get read-only property
+  value = actor.GetProperty( Test::DevelTestCustomActor::Property::DEVEL_TEST_PROPERTY6 );
+  DALI_TEST_EQUALS( value.Get<float>(), 10.0f, 0.001f, TEST_LOCATION );
+
+  // Attempt to set read-only property and then ensure value hasn't changed
+  actor.SetProperty( Test::DevelTestCustomActor::Property::DEVEL_TEST_PROPERTY6, 40.0f );
+  DALI_TEST_EQUALS( value.Get<float>(), 10.0f, 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
