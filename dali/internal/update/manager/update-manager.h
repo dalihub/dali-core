@@ -90,9 +90,8 @@ struct NodeDepthPair
 
 struct NodeDepths
 {
-  NodeDepths( int reserveSize )
+  NodeDepths()
   {
-    nodeDepths.reserve(reserveSize);
   }
 
   void Add( SceneGraph::Node* node, uint32_t sortedDepth )
