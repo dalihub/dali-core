@@ -2008,15 +2008,17 @@ public:
   {
     if( mFirstChildNode )
     {
-      delete mFirstChildNode;
+      mFirstChildNode->~ActorDepthTreeNode();
       mFirstChildNode = NULL;
     }
     if( mNextSiblingNode )
     {
-      delete mNextSiblingNode;
+      mNextSiblingNode->~ActorDepthTreeNode();
       mNextSiblingNode = NULL;
     }
     mParentNode = NULL;
+
+    mActors.clear();
   }
 
   uint16_t GetSiblingOrder()
