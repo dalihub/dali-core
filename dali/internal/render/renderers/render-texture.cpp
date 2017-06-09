@@ -737,10 +737,19 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   //necessary to upload all the mipmap levels
   mMaxMipMapLevel = ( mMaxMipMapLevel > params.mipmap ) ? mMaxMipMapLevel : params.mipmap;
 
-#if DALI_GLES_VERSION < 30
-  if( pixelDataFormat == GL_RGB && mInternalFormat == GL_RGBA )
+  const bool isSubImage = ( ( params.xOffset != 0 ) ||
+                            ( params.yOffset != 0 ) ||
+                            ( params.width  != ( mWidth  / ( 1 << params.mipmap ) ) ) ||
+                            ( params.height != ( mHeight / ( 1 << params.mipmap ) ) ) );
+
+  bool convert = ( ( pixelDataFormat == GL_RGB ) && ( mInternalFormat == GL_RGBA ) );
+#if DALI_GLES_VERSION >= 30
+  // Don't convert manually from RGB to RGBA if GLES >= 3.0 and a sub-image is uploaded.
+  convert = convert && !isSubImage;
+#endif
+
+  if( convert )
   {
-    //Convert manually from RGB to RGBA if GLES < 3 ( GLES 3 can do the conversion automatically when uploading )
     size_t dataSize = static_cast< size_t >( params.width ) * params.height;
     tempBuffer = new unsigned char[dataSize*4u];
     for( size_t i(0u); i<dataSize; i++ )
@@ -754,7 +763,6 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
     buffer = tempBuffer;
     pixelDataFormat = mInternalFormat;
   }
-#endif
 
   //Upload data to the texture
 
@@ -767,9 +775,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
 
   context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-  if( params.xOffset == 0 && params.yOffset == 0 &&
-      params.width  == ( mWidth  / (1<<params.mipmap) ) &&
-      params.height == ( mHeight / (1<<params.mipmap) ) )
+  if( !isSubImage )
   {
     //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
     if( !mIsCompressed )
