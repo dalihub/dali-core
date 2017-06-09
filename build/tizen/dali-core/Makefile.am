@@ -57,14 +57,17 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
 
 libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
                          graphics/libdali-graphics.a \
+                         $(VULKAN_LIBS) \
                          -lpthread
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
+platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
+platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
@@ -139,6 +142,7 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
 linker_test_CXXFLAGS = \
+  $(VULKAN_LIBS) \
   $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes)
