@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/common/core-impl.h>
+#include <dali/integration-api/graphics/graphics.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
@@ -86,6 +87,10 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mIsActive(true),
   mProcessingEvent(false)
 {
+  // fixme: for now to ensure libgraphics.a won't be removed during linking due to being
+  // entirely unused.
+  Dali::Integration::Graphics::IncludeThisLibrary();
+
   // Create the thread local storage
   CreateThreadLocalStorage();
 

@@ -1,0 +1,9 @@
+# Add graphics integration source files here
+
+graphics_integration_src_files = \
+   $(graphics_integration_dir)/graphics.cpp
+
+graphics_integration_header_files = \
+   $(graphics_integration_dir)/graphics.h \
+   $(graphics_integration_dir)/surface-factory.h \
+   $(graphics_integration_dir)/vulkan/vk-surface-factory.h
