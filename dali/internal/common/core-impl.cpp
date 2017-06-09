@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/common/core-impl.h>
+#include <dali/integration-api/graphics/graphics.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
@@ -26,6 +27,7 @@
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/graphics/graphics.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -65,7 +67,6 @@ Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE
 
 namespace Dali
 {
-
 namespace Internal
 {
 
@@ -77,15 +78,19 @@ using Integration::GlAbstraction;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
+using Integration::Graphics::Graphics;
 
-Core::Core( RenderController& renderController, PlatformAbstraction& platform,
+Core::Core( RenderController& renderController, PlatformAbstraction& platform, Graphics& graphics,
             GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction,
             GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
 : mRenderController( renderController ),
   mPlatform(platform),
   mIsActive(true),
-  mProcessingEvent(false)
+  mProcessingEvent(false),
+  mGraphics(graphics)
 {
+  // fixme: for now to ensure libgraphics.a won't be removed during linking due to being
+
   // Create the thread local storage
   CreateThreadLocalStorage();
 

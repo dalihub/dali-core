@@ -34,6 +34,10 @@ class Core;
 
 namespace Integration
 {
+namespace Graphics
+{
+class Graphics;
+}
 
 class Core;
 class GestureManager;
@@ -44,7 +48,6 @@ class RenderController;
 class SystemOverlay;
 struct Event;
 struct TouchData;
-
 
 /**
  * The reasons why further updates are required.
@@ -200,6 +203,7 @@ public:
    */
   static Core* New(RenderController& renderController,
                    PlatformAbstraction& platformAbstraction,
+                   Graphics::Graphics& graphics,
                    GlAbstraction& glAbstraction,
                    GlSyncAbstraction& glSyncAbstraction,
                    GestureManager& gestureManager,
