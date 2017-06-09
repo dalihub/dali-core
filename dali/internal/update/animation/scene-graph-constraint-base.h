@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,10 @@ public:
 
   /**
    * Constructor
+   * @param ownerContainer the properties to constraint
+   * @oparam removeAction perform when removed
    */
-  ConstraintBase( PropertyOwnerContainer& ownerContainer );
+  ConstraintBase( PropertyOwnerContainer& ownerContainer, RemoveAction removeAction );
 
   /**
    * Virtual destructor.

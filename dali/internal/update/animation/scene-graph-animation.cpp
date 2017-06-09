@@ -248,12 +248,12 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
   mState = Destroyed;
 }
 
-void Animation::AddAnimator( AnimatorBase* animator )
+void Animation::AddAnimator( OwnerPointer<AnimatorBase>& animator )
 {
   animator->ConnectToSceneGraph();
   animator->SetDisconnectAction( mDisconnectAction );
 
-  mAnimators.PushBack( animator );
+  mAnimators.PushBack( animator.Release() );
 }
 
 void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished )

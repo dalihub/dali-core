@@ -160,14 +160,10 @@ void Animation::CreateSceneObject()
 {
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
-  // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
-
-  // Keep a const pointer to the animation.
-  mAnimation = animation;
-
-  // Transfer animation ownership to the update manager through a message
-  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), animation );
+  // Create a new animation, Keep a const pointer to the animation.
+  mAnimation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
+  OwnerPointer< SceneGraph::Animation > transferOwnership( const_cast< SceneGraph::Animation* >( mAnimation ) );
+  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void Animation::DestroySceneObject()

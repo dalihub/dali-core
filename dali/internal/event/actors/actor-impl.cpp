@@ -2138,11 +2138,10 @@ Actor::Actor( DerivedType derivedType )
 
 void Actor::Initialize()
 {
-  // Node creation
-  SceneGraph::Node* node = CreateNode();
-
-  AddNodeMessage( GetEventThreadServices().GetUpdateManager(), *node ); // Pass ownership to scene-graph
-  mNode = node; // Keep raw-pointer to Node
+  // Node creation, keep raw-pointer to Node for messaging
+  mNode = CreateNode();
+  OwnerPointer< SceneGraph::Node > transferOwnership( const_cast< SceneGraph::Node* >( mNode ) );
+  AddNodeMessage( GetEventThreadServices().GetUpdateManager(), transferOwnership );
 
   OnInitialize();
 
@@ -2400,7 +2399,7 @@ void Actor::RebuildDepthTree()
 
   // Vector of scene-graph nodes and their depths to send to UpdateManager
   // in a single message
-  SceneGraph::NodeDepths* sceneGraphNodeDepths = new SceneGraph::NodeDepths(actorCount);
+  OwnerPointer< SceneGraph::NodeDepths > sceneGraphNodeDepths = new SceneGraph::NodeDepths(actorCount);
 
   // Traverse depth tree and set mSortedDepth on each actor and scenegraph node
   uint32_t sortOrder = 1u; // Don't start at zero, as visual depth can be negative

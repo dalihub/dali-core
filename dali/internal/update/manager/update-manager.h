@@ -90,7 +90,6 @@ struct NodeDepthPair
 
 struct NodeDepths
 {
-  std::vector<NodeDepthPair> nodeDepths;
   NodeDepths( int reserveSize )
   {
     nodeDepths.reserve(reserveSize);
@@ -100,6 +99,8 @@ struct NodeDepths
   {
     nodeDepths.push_back( NodeDepthPair( node, sortedDepth ) );
   }
+
+  std::vector<NodeDepthPair> nodeDepths;
 };
 
 
@@ -151,14 +152,15 @@ public:
    * @param[in] systemLevel True if using the system-level overlay.
    * @post The node is owned by UpdateManager.
    */
-  void InstallRoot( Layer* layer, bool systemLevel );
+  void InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel );
 
   /**
    * Add a Node; UpdateManager takes ownership.
    * @pre The node does not have a parent.
+   * @note even though nodes are pool allocated, they also contain other heap allocated data, thus using OwnerPointer when transferring the data
    * @param[in] node The node to add.
    */
-  void AddNode( Node* node );
+  void AddNode( OwnerPointer<Node>& node );
 
   /**
    * Connect a Node to the scene-graph.
@@ -189,7 +191,7 @@ public:
    * Add a camera on scene
    * @param[in] camera to add
    */
-  void AddCamera( Camera* camera );
+  void AddCamera( OwnerPointer< Camera >& camera );
 
   /**
    * Remove a camera from scene
@@ -202,7 +204,7 @@ public:
    * @param[in] object The object to add.
    * @post The object is owned by UpdateManager.
    */
-  void AddObject( PropertyOwner* object );
+  void AddObject( OwnerPointer<PropertyOwner>& object );
 
   /**
    * Remove an object.
@@ -217,7 +219,7 @@ public:
    * @param[in] animation The animation to add.
    * @post The animation is owned by UpdateManager.
    */
-  void AddAnimation( Animation* animation );
+  void AddAnimation( OwnerPointer< SceneGraph::Animation >& animation );
 
   /**
    * Stop an animation.
@@ -244,7 +246,7 @@ public:
    * @param[in] propertyNotification The notification to add
    * @post The propertyNotification is owned by UpdateManager.
    */
-  void AddPropertyNotification( PropertyNotification* propertyNotification );
+  void AddPropertyNotification( OwnerPointer< PropertyNotification >& propertyNotification );
 
   /**
    * Remove a property notification
@@ -266,7 +268,7 @@ public:
    * @param[in] shader The shader to add.
    * @post The shader is owned by the UpdateManager.
    */
-  void AddShader(Shader* shader);
+  void AddShader( OwnerPointer< Shader >& shader );
 
   /**
    * Remove a shader.
@@ -274,7 +276,7 @@ public:
    * @param[in] shader The shader to remove.
    * @post The shader is destroyed.
    */
-  void RemoveShader(Shader* shader);
+  void RemoveShader( Shader* shader );
 
   /**
    * Set the shader program for a Shader object
@@ -303,7 +305,7 @@ public:
    * Add a new renderer to scene
    * @param renderer to add
    */
-  void AddRenderer( Renderer* renderer );
+  void AddRenderer( OwnerPointer< Renderer >& renderer );
 
   /**
    * Add a renderer from scene
@@ -328,7 +330,7 @@ public:
    * @param[in] textureSet The texture set to add.
    * @post The TextureSet is owned by the UpdateManager.
    */
-  void AddTextureSet( TextureSet* textureSet );
+  void AddTextureSet( OwnerPointer< TextureSet >& textureSet );
 
   /**
    * Remove a TextureSet.
@@ -389,7 +391,7 @@ public:
    * @post Sends a message to RenderManager to add the sampler.
    * The sampler will be owned by RenderManager
    */
-  void AddSampler( Render::Sampler* sampler );
+  void AddSampler( OwnerPointer< Render::Sampler >& sampler );
 
   /**
    * Removes an existing sampler from RenderManager
@@ -421,7 +423,7 @@ public:
    * @post Sends a message to RenderManager to add the property buffer.
    * The property buffer will be owned by RenderManager
    */
-  void AddPropertyBuffer( Render::PropertyBuffer* propertryBuffer );
+  void AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertryBuffer );
 
   /**
    * Removes an existing PropertyBuffer from RenderManager
@@ -436,7 +438,7 @@ public:
    * @param[in] format The new format of the buffer
    * @post Sends a message to RenderManager to set the new format to the property buffer.
    */
-  void SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
+  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format );
 
   /**
    * Sets the data of an existing property buffer
@@ -445,7 +447,7 @@ public:
    * @param[in] size The new size of the buffer
    * @post Sends a message to RenderManager to set the new data to the property buffer.
    */
-  void SetPropertyBufferData(Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size);
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
 
   /**
    * Adds a geometry to the RenderManager
@@ -453,7 +455,7 @@ public:
    * @post Sends a message to RenderManager to add the Geometry
    * The geometry will be owned by RenderManager
    */
-  void AddGeometry( Render::Geometry* geometry );
+  void AddGeometry( OwnerPointer< Render::Geometry >& geometry );
 
   /**
    * Removes an existing Geometry from RenderManager
@@ -477,11 +479,11 @@ public:
   void SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices );
 
   /**
-   * Adds a vertex buffer to a geomtry
+   * Adds a vertex buffer to a geometry
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer
    */
-  void AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
+  void AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Removes a vertex buffer from a geometry
@@ -495,7 +497,7 @@ public:
    * @param[in] texture The texture to add
    * The texture will be owned by RenderManager
    */
-  void AddTexture( Render::Texture* texture );
+  void AddTexture( OwnerPointer< Render::Texture >& texture );
 
   /**
    * Removes a texture from the render manager
@@ -580,7 +582,7 @@ public:
    * Set the depth indices of all nodes (in LayerUI's)
    * @param[in] nodeDepths A vector of nodes and associated depth indices
    */
-  void SetDepthIndices( NodeDepths* nodeDepths );
+  void SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths );
 
 private:
 
@@ -672,7 +674,7 @@ private:
 
 // Messages for UpdateManager
 
-inline void InstallRootMessage( UpdateManager& manager, Layer& root, bool systemLevel )
+inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root, bool systemLevel )
 {
   // Message has ownership of Layer while in transit from event -> update
   typedef MessageValue2< UpdateManager, OwnerPointer<Layer>, bool > LocalType;
@@ -681,10 +683,10 @@ inline void InstallRootMessage( UpdateManager& manager, Layer& root, bool system
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, &root, systemLevel );
+  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root, systemLevel );
 }
 
-inline void AddNodeMessage( UpdateManager& manager, Node& node )
+inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
 {
   // Message has ownership of Node while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer<Node> > LocalType;
@@ -693,7 +695,7 @@ inline void AddNodeMessage( UpdateManager& manager, Node& node )
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddNode, &node );
+  new (slot) LocalType( &manager, &UpdateManager::AddNode, node );
 }
 
 inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent, const Node& constChild )
@@ -739,12 +741,11 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
   new (slot) LocalType( &manager, &UpdateManager::DestroyNode, &node );
 }
 
-inline void AddCameraMessage( UpdateManager& manager, const Camera* constCamera )
+inline void AddCameraMessage( UpdateManager& manager, OwnerPointer< Camera >& camera )
 {
   // Message has ownership of Camera while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< Camera > > LocalType;
 
-  Camera* camera = const_cast<Camera*>( constCamera );
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
@@ -763,7 +764,7 @@ inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
   new (slot) LocalType( &manager, &UpdateManager::RemoveCamera, camera );
 }
 
-inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )
+inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner>& object )
 {
   // Message has ownership of object while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer<PropertyOwner> > LocalType;
@@ -786,9 +787,9 @@ inline void RemoveObjectMessage( UpdateManager& manager, PropertyOwner* object )
   new (slot) LocalType( &manager, &UpdateManager::RemoveObject, object );
 }
 
-inline void AddAnimationMessage( UpdateManager& manager, Animation* animation )
+inline void AddAnimationMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Animation >& animation )
 {
-  typedef MessageValue1< UpdateManager, Animation* > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Animation > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -825,7 +826,7 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
   new (slot) LocalType( &manager, &UpdateManager::RemoveAnimation, &animation );
 }
 
-inline void AddPropertyNotificationMessage( UpdateManager& manager, PropertyNotification* propertyNotification )
+inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer< PropertyNotification >& propertyNotification )
 {
   // Message has ownership of PropertyNotification while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< PropertyNotification > > LocalType;
@@ -868,7 +869,7 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
 }
 
 // The render thread can safely change the Shader
-inline void AddShaderMessage( UpdateManager& manager, Shader& shader )
+inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& shader )
 {
   typedef MessageValue1< UpdateManager, OwnerPointer< Shader > > LocalType;
 
@@ -876,7 +877,7 @@ inline void AddShaderMessage( UpdateManager& manager, Shader& shader )
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddShader, &shader );
+  new (slot) LocalType( &manager, &UpdateManager::AddShader, shader );
 }
 
 // The render thread can safely change the Shader
@@ -955,14 +956,14 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
 }
 
-inline void AddRendererMessage( UpdateManager& manager, Renderer& object )
+inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >& object )
 {
   typedef MessageValue1< UpdateManager, OwnerPointer< Renderer > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddRenderer, &object );
+  new (slot) LocalType( &manager, &UpdateManager::AddRenderer, object );
 }
 
 inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
@@ -976,7 +977,7 @@ inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
 }
 
 // The render thread can safely change the Shader
-inline void AddTextureSetMessage( UpdateManager& manager, TextureSet& textureSet )
+inline void AddTextureSetMessage( UpdateManager& manager, OwnerPointer< TextureSet >& textureSet )
 {
   typedef MessageValue1< UpdateManager, OwnerPointer< TextureSet > > LocalType;
 
@@ -984,7 +985,7 @@ inline void AddTextureSetMessage( UpdateManager& manager, TextureSet& textureSet
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddTextureSet, &textureSet );
+  new (slot) LocalType( &manager, &UpdateManager::AddTextureSet, textureSet );
 }
 
 // The render thread can safely change the Shader
@@ -999,7 +1000,7 @@ inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& texture
   new (slot) LocalType( &manager, &UpdateManager::RemoveTextureSet, &textureSet );
 }
 
-inline void AddSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )
+inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< Render::Sampler >& sampler )
 {
   // Message has ownership of Sampler while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< Render::Sampler > > LocalType;
@@ -1008,7 +1009,7 @@ inline void AddSamplerMessage( UpdateManager& manager, Render::Sampler& sampler 
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddSampler, &sampler );
+  new (slot) LocalType( &manager, &UpdateManager::AddSampler, sampler );
 }
 
 inline void RemoveSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )
@@ -1044,7 +1045,7 @@ inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler
   new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
-inline void AddPropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
+inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
   // Message has ownership of propertyBuffer while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< Render::PropertyBuffer > > LocalType;
@@ -1053,7 +1054,7 @@ inline void AddPropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& p
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, &propertyBuffer );
+  new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, propertyBuffer );
 }
 
 inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
@@ -1067,7 +1068,7 @@ inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer
   new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
 }
 
-inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Render::PropertyBuffer::Format* format )
+inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
   // Message has ownership of PropertyBuffer::Format while in transit from event -> update
   typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format> > LocalType;
@@ -1079,7 +1080,7 @@ inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuf
   new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferFormat, &propertyBuffer, format );
 }
 
-inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, Vector<char>* data, size_t size )
+inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   // Message has ownership of PropertyBuffer data while in transit from event -> update
   typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Vector<char> >, size_t  > LocalType;
@@ -1091,7 +1092,7 @@ inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffe
   new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data, size );
 }
 
-inline void AddGeometry( UpdateManager& manager, Render::Geometry& geometry )
+inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry >& geometry )
 {
   // Message has ownership of Geometry while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< Render::Geometry > > LocalType;
@@ -1100,7 +1101,7 @@ inline void AddGeometry( UpdateManager& manager, Render::Geometry& geometry )
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddGeometry, &geometry );
+  new (slot) LocalType( &manager, &UpdateManager::AddGeometry, geometry );
 }
 
 inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
@@ -1114,7 +1115,7 @@ inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
   new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
 }
 
-inline void AddVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
+inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
 {
   typedef MessageValue2< UpdateManager, Render::Geometry*, Render::PropertyBuffer* > LocalType;
 
@@ -1122,7 +1123,7 @@ inline void AddVertexBufferMessage( UpdateManager& manager, Render::Geometry& ge
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
+  new (slot) LocalType( &manager, &UpdateManager::AttachVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
 }
 
 inline void RemoveVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
@@ -1198,7 +1199,7 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
   new (slot) LocalType( &manager, &UpdateManager::SetGeometryType, &geometry, geometryType );
 }
 
-inline void AddTexture( UpdateManager& manager, Render::Texture& texture )
+inline void AddTexture( UpdateManager& manager, OwnerPointer< Render::Texture >& texture )
 {
   // Message has ownership of Texture while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< Render::Texture > > LocalType;
@@ -1207,7 +1208,7 @@ inline void AddTexture( UpdateManager& manager, Render::Texture& texture )
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddTexture, &texture );
+  new (slot) LocalType( &manager, &UpdateManager::AddTexture, texture );
 }
 
 inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
@@ -1277,7 +1278,7 @@ inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::Fra
   new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
 }
 
-inline void SetDepthIndicesMessage( UpdateManager& manager, NodeDepths* nodeDepths )
+inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDepths >& nodeDepths )
 {
   typedef MessageValue1< UpdateManager, OwnerPointer< NodeDepths > > LocalType;
 
@@ -1287,7 +1288,6 @@ inline void SetDepthIndicesMessage( UpdateManager& manager, NodeDepths* nodeDept
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDepthIndices, nodeDepths );
 }
-
 
 } // namespace SceneGraph
 
