@@ -119,7 +119,7 @@ public:
   /**
    * Construct a new UpdateManager.
    * @param[in] notificationManager This should be notified when animations have finished.
-   * @param[in] animationFinishedNotifier The CompleteNotificationInterface that handles animation completions
+   * @param[in] animationPlaylist The CompleteNotificationInterface that handles the animations
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
@@ -128,7 +128,7 @@ public:
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    */
   UpdateManager( NotificationManager& notificationManager,
-                 CompleteNotificationInterface& animationFinishedNotifier,
+                 CompleteNotificationInterface& animationPlaylist,
                  PropertyNotifier& propertyNotifier,
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,

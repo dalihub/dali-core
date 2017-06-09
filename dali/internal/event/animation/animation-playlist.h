@@ -22,7 +22,9 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/update/animation/scene-graph-animation.h>
 
 namespace Dali
 {
@@ -73,6 +75,12 @@ public:
    */
   void OnClear( Animation& animation );
 
+  /**
+   * @brief Notify that an animation has reached a progress marker
+   * @param[in] sceneGraphAnimation scene graph animation that has reached progress
+   */
+  void NotifyProgressReached( const SceneGraph::Animation* sceneGraphAnimation );
+
 private:
 
   /**
@@ -99,6 +107,16 @@ private:
   std::vector< Dali::Animation > mPlaylist; ///< The currently playing animations (owned through handle)
 
 };
+
+/**
+ * Called when an animation reaches a progress marker
+ *
+ * Note animationPlaylist is of type CompleteNotificationInterface because of updateManager only knowing about the interface not actual playlist
+ */
+inline MessageBase* NotifyProgressReachedMessage( CompleteNotificationInterface& animationPlaylist, const SceneGraph::Animation* animation )
+{
+  return new MessageValue1< AnimationPlaylist, const SceneGraph::Animation* >( static_cast<AnimationPlaylist*>(&animationPlaylist), &AnimationPlaylist::NotifyProgressReached, animation );
+}
 
 } // namespace Internal
 

@@ -2,6 +2,7 @@
 devel_api_src_files = \
   $(devel_api_src_dir)/actors/actor-devel.cpp \
   $(devel_api_src_dir)/animation/animation-data.cpp \
+  $(devel_api_src_dir)/animation/animation-devel.cpp \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
   $(devel_api_src_dir)/common/hash.cpp \
   $(devel_api_src_dir)/common/stage-devel.cpp \
@@ -27,7 +28,8 @@ devel_api_core_actors_header_files = \
 
 devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-data.h \
-  $(devel_api_src_dir)/animation/path-constrainer.h
+  $(devel_api_src_dir)/animation/path-constrainer.h \
+  $(devel_api_src_dir)/animation/animation-devel.h
 
 devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/hash.h \
