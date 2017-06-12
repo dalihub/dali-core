@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -1581,13 +1582,10 @@ protected:
 
   /**
    * Traverse the actor tree, inserting actors into the depth tree in sibling order.
-   * For all actors that share a sibling order, they also share a depth tree, for
-   * optimal render performance.
-   * @param[in] nodeMemoryPool The memory pool used to allocate depth nodes
-   * @param[in,out] depthTreeNode The depth tree node to which to add this actor's children
-   * @return The count of actors in this depth tree
+   * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
+   * @param[in,out] depthIndex The current depth index (traversal index)
    */
-  int BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* depthTreeNode );
+  void DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int& depthIndex );
 
 public:
 
@@ -1881,26 +1879,21 @@ private:
 
   /**
    * Set Sibling order
-   * @param[in] order The sibling order this Actor should be
+   * @param[in] order The sibling order this Actor should be. It will place
+   * the actor at this index in it's parent's child array.
    */
   void SetSiblingOrder( unsigned int order);
 
   /**
-   * @brief Re-orders the sibling order when any actor raised to the max level
-   * @param[in] siblings the container of sibling actors
+   * Get Sibling order
+   * @return the order of this actor amongst it's siblings
    */
-  void DefragmentSiblingIndexes( ActorContainer& siblings );
+  unsigned int GetSiblingOrder() const;
 
   /**
-   * @brief Shifts all siblings levels from the target level up by 1 to make space for a newly insert sibling
-   * at an exclusive level.
-   *
-   * @note Used with Raise and Lower API
-   *
-   * @param[in] siblings the actor container of the siblings
-   * @param[in] targetLevelToShiftFrom the sibling level to start shifting from
+   * Request that the stage rebuilds the actor depth indices.
    */
-  bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
+  void RequestRebuildDepthTree();
 
   /**
    * @brief Get the current position of the actor in screen coordinates.
@@ -1952,7 +1945,7 @@ protected:
 
   uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
   uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
-  uint16_t mSiblingOrder;     ///< The sibling order of the actor
+
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
@@ -1980,67 +1973,6 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 };
-
-/**
- * Helper class to create sorted depth index
- */
-class ActorDepthTreeNode
-{
-public:
-  ActorDepthTreeNode()
-  : mParentNode(NULL),
-    mNextSiblingNode(NULL),
-    mFirstChildNode(NULL),
-    mSiblingOrder( 0 )
-  {
-  }
-
-  ActorDepthTreeNode( Actor* actor, uint16_t siblingOrder )
-  : mParentNode(NULL),
-    mNextSiblingNode(NULL),
-    mFirstChildNode(NULL),
-    mSiblingOrder( siblingOrder )
-  {
-    mActors.push_back( actor );
-  }
-
-  ~ActorDepthTreeNode()
-  {
-    if( mFirstChildNode )
-    {
-      delete mFirstChildNode;
-      mFirstChildNode = NULL;
-    }
-    if( mNextSiblingNode )
-    {
-      delete mNextSiblingNode;
-      mNextSiblingNode = NULL;
-    }
-    mParentNode = NULL;
-  }
-
-  uint16_t GetSiblingOrder()
-  {
-    return mSiblingOrder;
-  }
-
-  void AddActor( Actor* actor )
-  {
-    mActors.push_back( actor );
-  }
-
-public:
-  std::vector<Actor*> mActors; // Array of actors with the same sibling order and same ancestor sibling orders
-  ActorDepthTreeNode* mParentNode;
-  ActorDepthTreeNode* mNextSiblingNode;
-  ActorDepthTreeNode* mFirstChildNode;
-  uint16_t mSiblingOrder;
-
-private:
-  ActorDepthTreeNode( ActorDepthTreeNode& );
-  ActorDepthTreeNode& operator=(const ActorDepthTreeNode& );
-};
-
 
 } // namespace Internal
 
