@@ -1053,7 +1053,6 @@ void UpdateManager::SetDepthIndices( NodeDepths* nodeDepths )
     {
       iter->node->SetDepthIndex( iter->sortedDepth );
     }
-    delete nodeDepths;
   }
 }
 
