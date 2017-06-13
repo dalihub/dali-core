@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
    * Add a new RenderTask to the list.
    * @param[in] newTask The RenderTaskList takes ownership of this task.
    */
-  void AddTask( RenderTask* newTask );
+  void AddTask( OwnerPointer< RenderTask >& newTask );
 
   /**
    * Remove a RenderTask from the list.
@@ -109,7 +109,7 @@ private:
 
 // Messages for RenderTaskList
 
-inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, RenderTask& task )
+inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, OwnerPointer< RenderTask >& task )
 {
   // Message has ownership of the RenderTask while in transit from event -> update
   typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
@@ -118,7 +118,7 @@ inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTask
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &list, &RenderTaskList::AddTask, &task );
+  new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
 }
 
 inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, const RenderTask& constTask )

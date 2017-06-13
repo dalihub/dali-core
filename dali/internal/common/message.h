@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_MESSAGE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)( ParameterType< P >::PassObject( param1 ) );
+    (object->*memberFunction)( param1 );
   }
 
 private:
@@ -215,9 +215,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        ParameterType< P1 >::PassObject( param1 ),
-        ParameterType< P2 >::PassObject( param2 ) );
+    (object->*memberFunction)( param1, param2 );
   }
 
 private:
@@ -282,10 +280,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        ParameterType< P1 >::PassObject( param1 ),
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ) );
+    (object->*memberFunction)( param1, param2, param3 );
   }
 
 private:
@@ -355,11 +350,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        ParameterType< P1 >::PassObject( param1 ),
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ),
-        ParameterType< P4 >::PassObject( param4 ) );
+    (object->*memberFunction)( param1, param2, param3, param4 );
   }
 
 private:
@@ -434,12 +425,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        ParameterType< P1 >::PassObject( param1 ),
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ),
-        ParameterType< P4 >::PassObject( param4 ),
-        ParameterType< P5 >::PassObject( param5 ) );
+    (object->*memberFunction)( param1, param2, param3, param4, param5 );
 
   }
 
@@ -520,13 +506,7 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        ParameterType< P1 >::PassObject( param1 ),
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ),
-        ParameterType< P4 >::PassObject( param4 ),
-        ParameterType< P5 >::PassObject( param5 ),
-        ParameterType< P6 >::PassObject( param6 ) );
+    (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
 
   }
 
@@ -638,9 +618,7 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        bufferIndex,
-        ParameterType< P >::PassObject( param ) );
+    (object->*memberFunction)( bufferIndex,  param );
   }
 
 private:
@@ -702,9 +680,7 @@ public:
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)(
-        bufferIndex,
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ) );
+        bufferIndex, param2, param3 );
   }
 
 private:
@@ -771,11 +747,7 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        bufferIndex,
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ),
-        ParameterType< P4 >::PassObject( param4 ) );
+    (object->*memberFunction)( bufferIndex, param2, param3, param4 );
   }
 
 private:
@@ -846,12 +818,7 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        bufferIndex,
-        ParameterType< P2 >::PassObject( param2 ),
-        ParameterType< P3 >::PassObject( param3 ),
-        ParameterType< P4 >::PassObject( param4 ),
-        ParameterType< P5 >::PassObject( param5 ) );
+    (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
   }
 
 private:

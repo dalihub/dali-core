@@ -104,6 +104,29 @@ void AnimationPlaylist::NotifyCompleted()
   }
 }
 
+void AnimationPlaylist::NotifyProgressReached( const SceneGraph::Animation* sceneGraphAnimation )
+{
+  std::vector< Dali::Animation > notifyProgressAnimations; // Will own animations until all emits have been done
+
+  for ( Dali::Vector< Animation* >::Iterator iter = mAnimations.Begin(); iter != mAnimations.End(); ++iter )
+  {
+    Animation* animation = *iter;
+
+    if ( ( animation->GetSceneObject() ) == sceneGraphAnimation )
+    {
+      // Store handles to animations that need signals emitted in the case of an animation being cleared in-between emits
+      notifyProgressAnimations.push_back(  Dali::Animation( animation ) );
+    }
+  }
+
+  for ( std::vector< Dali::Animation >::iterator iter = notifyProgressAnimations.begin(); iter != notifyProgressAnimations.end(); ++iter )
+  {
+    Dali::Animation& handle = *iter;
+
+    GetImplementation(handle).EmitSignalProgressReached();
+  }
+}
+
 } // namespace Internal
 
 } // namespace Dali

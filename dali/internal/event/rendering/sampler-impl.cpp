@@ -68,7 +68,8 @@ void Sampler::Initialize()
   SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
 
   mRenderObject = new Render::Sampler();
-  AddSamplerMessage( updateManager, *mRenderObject );
+  OwnerPointer< Render::Sampler > transferOwnership( mRenderObject );
+  AddSamplerMessage( updateManager, transferOwnership );
 }
 
 Sampler::~Sampler()

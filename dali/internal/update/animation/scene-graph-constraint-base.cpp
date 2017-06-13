@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ namespace SceneGraph
   unsigned int ConstraintBase::mTotalInstanceCount   = 0;
 #endif
 
-ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet )
-: mRemoveAction( Dali::Constraint::DEFAULT_REMOVE_ACTION ),
+ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet, RemoveAction removeAction )
+: mRemoveAction( removeAction ),
   mFirstApply( true ),
   mDisconnected( true ),
   mObservedOwners( ownerSet )

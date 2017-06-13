@@ -1417,16 +1417,16 @@ Renderer CreateRenderer( Actor actor, Geometry geometry, Shader shader, int dept
 
 Actor CreateActor( Actor parent, int siblingOrder, const char* location )
 {
-  Actor actor0 = Actor::New();
-  actor0.SetAnchorPoint(AnchorPoint::CENTER);
-  actor0.SetParentOrigin(AnchorPoint::CENTER);
-  actor0.SetPosition(0.0f,0.0f);
-  actor0.SetSize(100, 100);
-  actor0.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder );
-  DALI_TEST_EQUALS( actor0.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location) );
-  parent.Add(actor0);
+  Actor actor = Actor::New();
+  actor.SetAnchorPoint(AnchorPoint::CENTER);
+  actor.SetParentOrigin(AnchorPoint::CENTER);
+  actor.SetPosition(0.0f,0.0f);
+  actor.SetSize(100, 100);
+  parent.Add(actor);
+  actor.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder );
+  DALI_TEST_EQUALS( actor.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location) );
 
-  return actor0;
+  return actor;
 }
 
 int UtcDaliRendererRenderOrder2DLayer(void)
@@ -1562,7 +1562,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   //Check that renderer0 has been rendered after renderer2
   DALI_TEST_GREATER( textureBindIndex[4], textureBindIndex[5], TEST_LOCATION );
 
-  //Check that renderer0 has been rendered after renderer2
+  //Check that renderer5 has been rendered after renderer2
   DALI_TEST_GREATER( textureBindIndex[5], textureBindIndex[0], TEST_LOCATION );
 
   //Check that renderer0 has been rendered after renderer2

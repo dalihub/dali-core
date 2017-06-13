@@ -93,32 +93,6 @@ inline const Vector2& GetDefaultDimensionPadding()
 
 const SizeScalePolicy::Type DEFAULT_SIZE_SCALE_POLICY = SizeScalePolicy::USE_SIZE_SET;
 
-int GetSiblingOrder( ActorPtr actor )
-{
-  Property::Value value  = actor->GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
-  int order;
-  value.Get( order );
-  return order;
-}
-
-bool ValidateActors( const Internal::Actor& actor, const Internal::Actor& target )
-{
-  bool validTarget = true;
-
-  if( &actor == &target )
-  {
-    DALI_LOG_WARNING( "Source actor and target actor can not be the same, Sibling order not changed.\n" );
-    validTarget = false;
-  }
-  else if( actor.GetParent() != target.GetParent() )
-  {
-    DALI_LOG_WARNING( "Source actor and target actor need to have common parent, Sibling order not changed.\n" );
-    validTarget = false;
-  }
-
-  return validTarget;
-}
-
 } // unnamed namespace
 
 /**
@@ -2112,7 +2086,6 @@ Actor::Actor( DerivedType derivedType )
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mSortedDepth( 0u ),
   mDepth( 0u ),
-  mSiblingOrder(0u),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
@@ -2138,11 +2111,10 @@ Actor::Actor( DerivedType derivedType )
 
 void Actor::Initialize()
 {
-  // Node creation
-  SceneGraph::Node* node = CreateNode();
-
-  AddNodeMessage( GetEventThreadServices().GetUpdateManager(), *node ); // Pass ownership to scene-graph
-  mNode = node; // Keep raw-pointer to Node
+  // Node creation, keep raw-pointer to Node for messaging
+  mNode = CreateNode();
+  OwnerPointer< SceneGraph::Node > transferOwnership( const_cast< SceneGraph::Node* >( mNode ) );
+  AddNodeMessage( GetEventThreadServices().GetUpdateManager(), transferOwnership );
 
   OnInitialize();
 
@@ -2384,203 +2356,42 @@ bool Actor::IsNodeConnected() const
   return connected;
 }
 
-// This method generates the depth tree using the recursive function below,
-// then walks the tree and sets a depth index based on traversal order. It
-// sends a single message to update manager to update all the actor's nodes in this
-// tree with the depth index. The sceneGraphNodeDepths vector's elements are ordered
-// by depth, and could be used to reduce sorting in the update thread.
+// This method initiates traversal of the actor tree using depth-first
+// traversal to set a depth index based on traversal order. It sends a
+// single message to update manager to update all the actor's nodes in
+// this tree with the depth index. The sceneGraphNodeDepths vector's
+// elements are ordered by depth, and could be used to reduce sorting
+// in the update thread.
 void Actor::RebuildDepthTree()
 {
   DALI_LOG_TIMER_START(depthTimer);
 
-  DepthNodeMemoryPool nodeMemoryPool;
-  ActorDepthTreeNode* rootNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( this, mSiblingOrder );
-
-  int actorCount = BuildDepthTree( nodeMemoryPool, rootNode );
-
   // Vector of scene-graph nodes and their depths to send to UpdateManager
   // in a single message
-  SceneGraph::NodeDepths* sceneGraphNodeDepths = new SceneGraph::NodeDepths(actorCount);
+  OwnerPointer<SceneGraph::NodeDepths> sceneGraphNodeDepths( new SceneGraph::NodeDepths() );
 
-  // Traverse depth tree and set mSortedDepth on each actor and scenegraph node
-  uint32_t sortOrder = 1u; // Don't start at zero, as visual depth can be negative
-  ActorDepthTreeNode* currentNode = rootNode;
-  bool firstVisit = true;
-  while( currentNode != rootNode || firstVisit)
-  {
-    firstVisit = false;
-
-    // Visit node, performing action
-    for( std::vector<Actor*>::iterator iter = currentNode->mActors.begin(); iter != currentNode->mActors.end(); ++iter )
-    {
-      (*iter)->mSortedDepth = sortOrder * DevelLayer::SIBLING_ORDER_MULTIPLIER;
-      sceneGraphNodeDepths->Add( const_cast<SceneGraph::Node*>((*iter)->mNode), (*iter)->mSortedDepth );
-    }
-    ++sortOrder;
-
-    // Descend tree
-    if( currentNode->mFirstChildNode )
-    {
-      currentNode = currentNode->mFirstChildNode;
-    }
-    else // leaf node, goto next sibling, or return up tree.
-    {
-      bool breakout=false;
-      while( ! currentNode->mNextSiblingNode )
-      {
-        if( currentNode == rootNode ) // If we get to root of tree, stop
-        {
-          breakout = true;
-          break;
-        }
-        currentNode = currentNode->mParentNode;
-      }
-
-      if( breakout )
-      {
-        break;
-      }
-      currentNode = currentNode->mNextSiblingNode;
-    }
-  }
+  int depthIndex = 1;
+  DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
 
   SetDepthIndicesMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths );
-  DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree create time: ");
+  DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-/**
- * Structure to store the actor's associated node in the depth tree for child
- * traversal
- */
-struct ActorNodePair
+void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int& depthIndex )
 {
-  Actor* actor;
-  ActorDepthTreeNode* node;
-  ActorNodePair( Actor* actor, ActorDepthTreeNode* node )
-  : actor(actor),
-    node(node)
-  {
-  }
-};
-
-/*
- * Descend actor tree, building a depth tree based on actor's sibling order.
- * Actors with the same sibling order share the same depth tree. Siblings
- * in the depth tree are ordered by actor's sibling order.
- *
- * An actor tree like this:
- *
- *                  Root (SO:0)
- *                 _/    |   \_
- *               _/      |     \_
- *             _/        |       \_
- *            /          |         \
- *        A(SO:1)     B(SO:2)    C(SO:1)
- *         _/\_          |         _/ \_
- *        /    \         |       /       \
- *     D(SO:0) E(SO:0) F(SO:0) G(SO:1)  H(SO:0)
- *
- * will end up as a depth tree like this:
- *
- *     RootNode [ Root ] -> NULL
- *       |(mFC)
- *       V                (mNS)
- *     Node [ A, C ] ------------------------>  Node [ B ] -> NULL
- *       |                                        |
- *       V                                        V
- *     Node [ D, E, H ] -> Node [ G ] -> NULL   Node [ F ] -> NULL
- *       |                   |                    |
- *       V                   V                    V
- *     NULL                NULL                 NULL
- *
- * (All nodes also point to their parents to enable storage free traversal)
- */
-int Actor::BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* node )
-{
-  int treeCount=1; // Count self and children
+  mSortedDepth = depthIndex * DevelLayer::SIBLING_ORDER_MULTIPLIER;
+  sceneGraphNodeDepths->Add( const_cast<SceneGraph::Node*>( mNode ), mSortedDepth );
 
   // Create/add to children of this node
   if( mChildren )
   {
-    std::vector<ActorNodePair> storedChildren;
-    storedChildren.reserve( mChildren->size() );
-
     for( ActorContainer::iterator it = mChildren->begin(); it != mChildren->end(); ++it )
     {
       Actor* childActor = (*it).Get();
-      if( childActor->IsLayer() )
-      {
-        Layer* layer = static_cast<Layer*>(childActor);
-        if( layer->GetBehavior() == Dali::Layer::LAYER_3D )
-        {
-          // Ignore this actor and children.
-          continue;
-        }
-      }
-
-      // If no existing depth node children
-      if( node->mFirstChildNode == NULL )
-      {
-        node->mFirstChildNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( childActor, childActor->mSiblingOrder );
-        node->mFirstChildNode->mParentNode = node;
-        storedChildren.push_back(ActorNodePair( childActor, node->mFirstChildNode ));
-      }
-      else // find child node with matching sibling order (insertion sort)
-      {
-        bool addedChildActor = false;
-
-        // depth tree child nodes ordered by sibling order
-        ActorDepthTreeNode* lastNode = NULL;
-        for( ActorDepthTreeNode* childNode = node->mFirstChildNode; childNode != NULL; childNode = childNode->mNextSiblingNode )
-        {
-          uint16_t actorSiblingOrder = childActor->mSiblingOrder;
-          uint16_t currentSiblingOrder = childNode->GetSiblingOrder();
-
-          if( actorSiblingOrder == currentSiblingOrder )
-          {
-            // Don't need a new depth node, add to existing node
-            childNode->AddActor( childActor );
-            storedChildren.push_back(ActorNodePair( childActor, childNode ));
-            addedChildActor = true;
-            break;
-          }
-          else if( actorSiblingOrder < currentSiblingOrder )
-          {
-            break;
-          }
-          lastNode = childNode;
-        }
-
-        // No matching sibling order - create new node and insert into sibling list
-        if( !addedChildActor )
-        {
-          ActorDepthTreeNode* newNode = new (nodeMemoryPool.AllocateRaw()) ActorDepthTreeNode( childActor, childActor->mSiblingOrder );
-
-          newNode->mParentNode = node;
-          storedChildren.push_back(ActorNodePair( childActor, newNode ));
-
-          if( lastNode == NULL ) // Insert at start of siblings
-          {
-            ActorDepthTreeNode* nextNode = node->mFirstChildNode;
-            node->mFirstChildNode = newNode;
-            newNode->mNextSiblingNode = nextNode;
-          }
-          else // insert into siblings after last node
-          {
-            newNode->mNextSiblingNode = lastNode->mNextSiblingNode;
-            lastNode->mNextSiblingNode = newNode;
-          }
-        }
-      }
-    }
-
-    // Order of descent doesn't matter; we're using insertion to sort.
-    for( std::vector<ActorNodePair>::iterator iter = storedChildren.begin(); iter != storedChildren.end(); ++iter )
-    {
-      treeCount += iter->actor->BuildDepthTree( nodeMemoryPool, iter->node );
+      ++depthIndex;
+      childActor->DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
     }
   }
-  return treeCount;
 }
 
 unsigned int Actor::GetDefaultPropertyCount() const
@@ -3016,10 +2827,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
       if( property.Get( value ) )
       {
-        if( static_cast<unsigned int>(value) != mSiblingOrder )
-        {
-          SetSiblingOrder( value );
-        }
+        SetSiblingOrder( value );
       }
       break;
     }
@@ -4278,7 +4086,7 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
 
     case Dali::DevelActor::Property::SIBLING_ORDER:
     {
-      value = static_cast<int>(mSiblingOrder);
+      value = static_cast<int>( GetSiblingOrder() );
       break;
     }
 
@@ -5249,8 +5057,58 @@ void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
 
 void Actor::SetSiblingOrder( unsigned int order )
 {
-  mSiblingOrder = std::min( order, static_cast<unsigned int>( DevelLayer::SIBLING_ORDER_MULTIPLIER ) );
+  if ( mParent )
+  {
+    ActorContainer& siblings = *(mParent->mChildren);
+    unsigned int currentOrder = GetSiblingOrder();
 
+    if( order != currentOrder )
+    {
+      if( order == 0 )
+      {
+        LowerToBottom();
+      }
+      else if( order < siblings.size() -1 )
+      {
+        if( order > currentOrder )
+        {
+          RaiseAbove( *siblings[order] );
+        }
+        else
+        {
+          LowerBelow( *siblings[order] );
+        }
+      }
+      else
+      {
+        RaiseToTop();
+      }
+    }
+  }
+}
+
+unsigned int Actor::GetSiblingOrder() const
+{
+  unsigned int order = 0;
+
+  if ( mParent )
+  {
+    ActorContainer& siblings = *(mParent->mChildren);
+    for( size_t i=0; i<siblings.size(); ++i )
+    {
+      if( siblings[i] == this )
+      {
+        order = i;
+        break;
+      }
+    }
+  }
+
+  return order;
+}
+
+void Actor::RequestRebuildDepthTree()
+{
   if( mIsOnStage )
   {
     StagePtr stage = Stage::GetCurrent();
@@ -5261,180 +5119,26 @@ void Actor::SetSiblingOrder( unsigned int order )
   }
 }
 
-void Actor::DefragmentSiblingIndexes( ActorContainer& siblings )
-{
-  // Sibling index may not be in consecutive order as the sibling range is limited ( DevelLayer::SIBLING_ORDER_MULTIPLIER )
-  // we need to remove the gaps and ensure the number start from 0 and consecutive hence have a full range.
-
-  // Start at index 0, while index <= highest order
-  // Find next index higher than 0
-  //   if nextHigher > index+1
-  //      set all nextHigher orders to index+1
-
-  // Limitation: May reach the ceiling of DevelLayer::SIBLING_ORDER_MULTIPLIER with highest sibling.
-
-  ActorIter end = siblings.end();
-  int highestOrder = 0;
-  for( ActorIter iter = siblings.begin(); iter != end; ++iter )
-  {
-    ActorPtr sibling = (*iter);
-    int siblingOrder = sibling->mSiblingOrder;
-    highestOrder = std::max( highestOrder, siblingOrder );
-  }
-
-  for ( int index = 0; index <= highestOrder; index++ )
-  {
-    int nextHighest = -1;
-
-    // Find Next highest
-    for( ActorIter iter = siblings.begin(); iter != end; ++iter )
-    {
-      ActorPtr sibling = (*iter);
-      int siblingOrder = sibling->mSiblingOrder;
-
-      if ( siblingOrder > index )
-      {
-        if ( nextHighest == -1 )
-        {
-          nextHighest = siblingOrder;
-        }
-        nextHighest = std::min( nextHighest, siblingOrder );
-      }
-    }
-
-    // Check if a gap exists between indexes, if so set next index to consecutive number
-    if ( ( nextHighest - index ) > 1 )
-    {
-      for( ActorIter iter = siblings.begin(); iter != end; ++iter )
-      {
-        ActorPtr sibling = (*iter);
-        int siblingOrder = sibling->mSiblingOrder;
-        if ( siblingOrder == nextHighest )
-        {
-          sibling->mSiblingOrder =  index + 1;
-          if ( sibling->mSiblingOrder >= Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER )
-          {
-            DALI_LOG_WARNING( "Reached max sibling order level for raising / lowering actors\n" );
-            sibling->mSiblingOrder = Dali::DevelLayer::SIBLING_ORDER_MULTIPLIER;
-          }
-          sibling->SetSiblingOrder( sibling->mSiblingOrder );
-        }
-      }
-    }
-  }
-}
-
-bool Actor::ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom )
-{
-  // Allows exclusive levels for an actor by shifting all sibling levels at the target and above by 1
-  bool defragmentationRequired( false );
-  ActorIter end = siblings.end();
-  for( ActorIter iter = siblings.begin(); ( iter != end ) ; ++iter )
-  {
-    // Move actors at nearest order and above up by 1
-    ActorPtr sibling = (*iter);
-    if ( sibling != this )
-    {
-      // Iterate through container of actors, any actor with a sibling order of the target or greater should
-      // be incremented by 1.
-      if ( sibling->mSiblingOrder >= targetLevelToShiftFrom )
-      {
-        sibling->mSiblingOrder++;
-        if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
-        {
-          // If a sibling order raises so that it is only 1 from the maximum allowed then set flag so
-          // can re-order all sibling orders.
-          defragmentationRequired = true;
-        }
-        sibling->SetSiblingOrder( sibling->mSiblingOrder );
-      }
-    }
-  }
-  return defragmentationRequired;
-}
-
 void Actor::Raise()
 {
-  /*
-     1) Check if already at top and nothing to be done.
-        This Actor can have highest sibling order but if not exclusive then another actor at same sibling
-        order can be positioned above it due to insertion order of actors.
-     2) Find nearest sibling level above, these are the siblings this actor needs to be above
-     3) a) There may be other levels above this target level
-        b) Increment all sibling levels at the level above nearest(target)
-        c) Now have a vacant sibling level
-     4) Set this actor's sibling level to nearest +1 as now vacated.
-
-     Note May not just be sibling level + 1 as could be empty levels in-between
-
-     Example:
-
-     1 ) Initial order
-        ActorC ( sibling level 4 )
-        ActorB ( sibling level 3 )
-        ActorA ( sibling level 1 )
-
-     2 )  ACTION: Raise A above B
-        a) Find nearest level above A = Level 3
-        b) Increment levels above Level 3
-
-           ActorC ( sibling level 5 )
-           ActorB ( sibling level 3 )  NEAREST
-           ActorA ( sibling level 1 )
-
-     3 ) Set Actor A sibling level to nearest +1 as vacant
-
-         ActorC ( sibling level 5 )
-         ActorA ( sibling level 4 )
-         ActorB ( sibling level 3 )
-
-     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-         remove any empty sibling order gaps and start from sibling level 0 again.
-         If the number of actors reaches this maximum and all using exclusive sibling order values then
-         defragmention will stop and new sibling orders will be set to same max value.
-  */
   if ( mParent )
   {
-    int nearestLevel = mSiblingOrder;
-    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
-    bool defragmentationRequired( false );
-
-    ActorContainer* siblings = mParent->mChildren;
-
-    // Find Nearest sibling level above this actor
-    ActorIter end = siblings->end();
-    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.back() != this ) // If not already at end
     {
-      ActorPtr sibling = (*iter);
-      if ( sibling != this )
+      for( size_t i=0; i<siblings.size(); ++i )
       {
-        int order = GetSiblingOrder( sibling );
-
-        if ( ( order >= mSiblingOrder ) )
+        if( siblings[i] == this )
         {
-          int distanceToNextLevel =  order - mSiblingOrder;
-          if ( distanceToNextLevel < shortestDistanceToNextLevel )
-          {
-            nearestLevel = order;
-            shortestDistanceToNextLevel = distanceToNextLevel;
-          }
+          // Swap with next
+          ActorPtr next = siblings[i+1];
+          siblings[i+1] = this;
+          siblings[i] = next;
+          break;
         }
       }
     }
-
-    if ( nearestLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at top
-    {
-      mSiblingOrder = nearestLevel + 1; // Set sibling level to that above the nearest level
-      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
-      // Move current actor to newly vacated order level
-      SetSiblingOrder( mSiblingOrder );
-      if ( defragmentationRequired )
-      {
-        DefragmentSiblingIndexes( *siblings );
-      }
-    }
-    SetSiblingOrder( mSiblingOrder );
+    RequestRebuildDepthTree();
   }
   else
   {
@@ -5444,63 +5148,24 @@ void Actor::Raise()
 
 void Actor::Lower()
 {
-  /**
-    1) Check if actor already at bottom and if nothing needs to be done
-       This Actor can have lowest sibling order but if not exclusive then another actor at same sibling
-       order can be positioned above it due to insertion order of actors so need to move this actor below it.
-    2) Find nearest sibling level below, this Actor needs to be below it
-    3) a) Need to vacate a sibling level below nearest for this actor to occupy
-       b) Shift up all sibling order values of actor at the nearest level and levels above it to vacate a level.
-       c) Set this actor's sibling level to this newly vacated level.
-    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-       If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-       remove any empty sibling order gaps and start from sibling level 0 again.
-       If the number of actors reaches this maximum and all using exclusive sibling order values then
-       defragmention will stop and new sibling orders will be set to same max value.
-  */
-
   if ( mParent )
   {
-    // 1) Find nearest level below
-    int nearestLevel = mSiblingOrder;
-    int shortestDistanceToNextLevel = DevelLayer::SIBLING_ORDER_MULTIPLIER;
-
-    ActorContainer* siblings = mParent->mChildren;
-
-    ActorIter end = siblings->end();
-    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.front() != this ) // If not already at beginning
     {
-      ActorPtr sibling = (*iter);
-      if ( sibling != this )
+      for( size_t i=0; i<siblings.size(); ++i )
       {
-        int order = GetSiblingOrder( sibling );
-
-        if ( order <= mSiblingOrder )
+        if( siblings[i] == this )
         {
-          int distanceToNextLevel =  mSiblingOrder - order;
-          if ( distanceToNextLevel < shortestDistanceToNextLevel )
-          {
-            nearestLevel = order;
-            shortestDistanceToNextLevel = distanceToNextLevel;
-          }
+          // Swap with previous
+          ActorPtr previous = siblings[i-1];
+          siblings[i-1] = this;
+          siblings[i] = previous;
+          break;
         }
       }
     }
-
-    bool defragmentationRequired ( false );
-
-    // 2) If actor already not at bottom, raise all actors at required level and above
-    if ( shortestDistanceToNextLevel < DevelLayer::SIBLING_ORDER_MULTIPLIER ) // Actor is not already exclusively at bottom
-    {
-      mSiblingOrder = nearestLevel;
-      defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
-      // Move current actor to newly vacated order
-      SetSiblingOrder( mSiblingOrder );
-      if ( defragmentationRequired )
-      {
-        DefragmentSiblingIndexes( *siblings );
-      }
-    }
+    RequestRebuildDepthTree();
   }
   else
   {
@@ -5510,50 +5175,19 @@ void Actor::Lower()
 
 void Actor::RaiseToTop()
 {
-  /**
-    1 ) Find highest sibling order actor
-    2 ) If highest sibling level not itself then set sibling order to that + 1
-    3 ) highest sibling order can be same as itself so need to increment over that
-    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-        remove any empty sibling order gaps and start from sibling level 0 again.
-        If the number of actors reaches this maximum and all using exclusive sibling order values then
-        defragmention will stop and new sibling orders will be set to same max value.
-   */
-
   if ( mParent )
   {
-    int maxOrder = 0;
-
-    ActorContainer* siblings = mParent->mChildren;
-
-    ActorIter end = siblings->end();
-    for( ActorIter iter = siblings->begin(); iter != end; ++iter )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.back() != this ) // If not already at end
     {
-      ActorPtr sibling = (*iter);
-      if ( sibling != this )
+      ActorContainer::iterator iter = std::find( siblings.begin(), siblings.end(), this );
+      if( iter != siblings.end() )
       {
-        maxOrder = std::max( GetSiblingOrder( sibling ), maxOrder );
+        siblings.erase(iter);
+        siblings.push_back(ActorPtr(this));
       }
     }
-
-    bool defragmentationRequired( false );
-
-    if ( maxOrder >= mSiblingOrder )
-    {
-      mSiblingOrder = maxOrder + 1;
-      if ( mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
-      {
-        defragmentationRequired = true;
-      }
-    }
-
-    SetSiblingOrder( mSiblingOrder );
-
-    if ( defragmentationRequired )
-    {
-      DefragmentSiblingIndexes( *siblings );
-    }
+    RequestRebuildDepthTree();
   }
   else
   {
@@ -5563,62 +5197,21 @@ void Actor::RaiseToTop()
 
 void Actor::LowerToBottom()
 {
-  /**
-    See Actor::LowerToBottom()
-
-    1 ) Check if this actor already at exclusively at the bottom, if so then no more to be done.
-    2 ) a ) Check if the bottom position 0 is vacant.
-        b ) If 0 position is not vacant then shift up all sibling order values from 0 and above
-        c ) 0 sibling position is vacant.
-    3 ) Set this actor to vacant sibling order 0;
-    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-        remove any empty sibling order gaps and start from sibling level 0 again.
-        If the number of actors reaches this maximum and all using exclusive sibling order values then
-        defragmention will stop and new sibling orders will be set to same max value.
-   */
-
   if ( mParent )
   {
-    bool defragmentationRequired( false );
-    bool orderZeroFree ( true );
-
-    ActorContainer* siblings = mParent->mChildren;
-
-    bool actorAtLowestOrder = true;
-    ActorIter end = siblings->end();
-    for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.front() != this ) // If not already at bottom,
     {
-      ActorPtr sibling = (*iter);
-      if ( sibling != this )
-      {
-        int siblingOrder = GetSiblingOrder( sibling );
-        if ( siblingOrder <= mSiblingOrder )
-        {
-          actorAtLowestOrder = false;
-        }
+      ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-        if ( siblingOrder == 0 )
-        {
-          orderZeroFree = false;
-        }
+      ActorContainer::iterator iter = std::find( siblings.begin(), siblings.end(), this );
+      if( iter != siblings.end() )
+      {
+        siblings.erase(iter);
+        siblings.insert(siblings.begin(), thisPtr);
       }
     }
-
-    if ( ! actorAtLowestOrder  )
-    {
-      if ( ! orderZeroFree )
-      {
-        defragmentationRequired = ShiftSiblingsLevels( *siblings, 0 );
-      }
-      mSiblingOrder = 0;
-      SetSiblingOrder( mSiblingOrder );
-
-      if ( defragmentationRequired )
-      {
-        DefragmentSiblingIndexes( *siblings );
-      }
-    }
+    RequestRebuildDepthTree();
   }
   else
   {
@@ -5628,36 +5221,25 @@ void Actor::LowerToBottom()
 
 void Actor::RaiseAbove( Internal::Actor& target )
 {
-  /**
-    1 ) a) Find target actor's sibling order
-        b) If sibling order of target is the same as this actor then need to this Actor's sibling order
-           needs to be above it or the insertion order will determine which is drawn on top.
-    2 ) Shift up by 1 all sibling order greater than target sibling order
-    3 ) Set this actor to the sibling order to target +1 as will be a newly vacated gap above
-    4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-        If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-        remove any empty sibling order gaps and start from sibling level 0 again.
-        If the number of actors reaches this maximum and all using exclusive sibling order values then
-        defragmention will stop and new sibling orders will be set to same max value.
-   */
-
   if ( mParent )
   {
-    if ( ValidateActors( *this, target ) )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.back() != this && target.mParent == mParent ) // If not already at top
     {
-       // Find target's sibling order
-       // Set actor sibling order to this number +1
-      int targetSiblingOrder = GetSiblingOrder( &target );
-      ActorContainer* siblings = mParent->mChildren;
-      mSiblingOrder = targetSiblingOrder + 1;
-      bool defragmentationRequired = ShiftSiblingsLevels( *siblings, mSiblingOrder );
+      ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      SetSiblingOrder( mSiblingOrder );
-
-      if ( defragmentationRequired )
+      ActorContainer::iterator targetIter = std::find( siblings.begin(), siblings.end(), &target );
+      ActorContainer::iterator thisIter = std::find( siblings.begin(), siblings.end(), this );
+      if( thisIter < targetIter )
       {
-        DefragmentSiblingIndexes( *(mParent->mChildren) );
+        siblings.erase(thisIter);
+        // Erasing early invalidates the targetIter. (Conversely, inserting first may also
+        // invalidate thisIter)
+        targetIter = std::find( siblings.begin(), siblings.end(), &target );
+        ++targetIter;
+        siblings.insert(targetIter, thisPtr);
       }
+      RequestRebuildDepthTree();
     }
   }
   else
@@ -5668,59 +5250,22 @@ void Actor::RaiseAbove( Internal::Actor& target )
 
 void Actor::LowerBelow( Internal::Actor& target )
 {
-  /**
-     1 ) a) Find target actor's sibling order
-         b) If sibling order of target is the same as this actor then need to this Actor's sibling order
-            needs to be below it or the insertion order will determine which is drawn on top.
-     2 ) Shift the target sibling order and all sibling orders at that level or above by 1
-     3 ) Set this actor to the sibling order of the target before it changed.
-     4 ) Sibling order levels have a maximum defined in DevelLayer::SIBLING_ORDER_MULTIPLIER
-         If shifting causes this ceiling to be reached. then a defragmentation can be performed to
-         remove any empty sibling order gaps and start from sibling level 0 again.
-         If the number of actors reaches this maximum and all using exclusive sibling order values then
-         defragmention will stop and new sibling orders will be set to same max value.
-   */
-
   if ( mParent )
   {
-    if ( ValidateActors( *this, target )  )
+    ActorContainer& siblings = *(mParent->mChildren);
+    if( siblings.front() != this && target.mParent == mParent ) // If not already at bottom
     {
-      bool defragmentationRequired ( false );
-      // Find target's sibling order
-      // Set actor sibling order to target sibling order - 1
-      int targetSiblingOrder = GetSiblingOrder( &target);
-      ActorContainer* siblings = mParent->mChildren;
-      if ( targetSiblingOrder == 0 )
-      {
-        //lower to botton
-        ActorIter end = siblings->end();
-        for( ActorIter iter = siblings->begin(); ( iter != end ) ; ++iter )
-        {
-          ActorPtr sibling = (*iter);
-          if ( sibling != this )
-          {
-            sibling->mSiblingOrder++;
-            if ( sibling->mSiblingOrder + 1 >= DevelLayer::SIBLING_ORDER_MULTIPLIER )
-            {
-              defragmentationRequired = true;
-            }
-            sibling->SetSiblingOrder( sibling->mSiblingOrder );
-          }
-        }
-        mSiblingOrder = 0;
-      }
-      else
-      {
-        defragmentationRequired = ShiftSiblingsLevels( *siblings, targetSiblingOrder );
+      ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-        mSiblingOrder = targetSiblingOrder;
-      }
-      SetSiblingOrder( mSiblingOrder );
+      ActorContainer::iterator targetIter = std::find( siblings.begin(), siblings.end(), &target );
+      ActorContainer::iterator thisIter = std::find( siblings.begin(), siblings.end(), this );
 
-      if ( defragmentationRequired )
+      if( thisIter > targetIter )
       {
-        DefragmentSiblingIndexes( *(mParent->mChildren) );
+        siblings.erase(thisIter); // this only invalidates iterators at or after this point.
+        siblings.insert(targetIter, thisPtr);
       }
+      RequestRebuildDepthTree();
     }
   }
   else

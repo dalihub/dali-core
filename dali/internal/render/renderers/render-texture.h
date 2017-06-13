@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,6 +172,7 @@ private:
   GLenum mPixelDataType;                ///< The data type of the pixel data
   unsigned int mWidth;                  ///< Width of the texture
   unsigned int mHeight;                 ///< Height of the texture
+  unsigned int mMaxMipMapLevel;         ///< Maximum mipmap level
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
 };

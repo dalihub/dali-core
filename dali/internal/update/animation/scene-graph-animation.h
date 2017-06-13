@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,12 @@ public:
    * @param[in] durationSeconds The duration in seconds.
    */
   void SetDuration(float durationSeconds);
+
+  /**
+   * Set the progress marker to trigger notification
+   * @param[in] progress percent of progress to trigger notification, 0.0f < progress <= 1.0f
+   */
+  void SetProgressNotification( float progress );
 
   /**
    * Retrieve the duration of the animation.
@@ -256,7 +262,7 @@ public:
    * @param[in] propertyOwner The scene-object that owns the animatable property.
    * @post The animator is owned by this animation.
    */
-  void AddAnimator( AnimatorBase* animator );
+  void AddAnimator( OwnerPointer<AnimatorBase>& animator );
 
   /**
    * Retrieve the animators from an animation.
@@ -274,8 +280,9 @@ public:
    * @param[in] elapsedSeconds The time elapsed since the previous frame.
    * @param[out] looped True if the animation looped
    * @param[out] finished True if the animation has finished.
+   * @param[out] progressReached True if progress marker reached
    */
-  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished );
+  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached );
 
 
 protected:
@@ -331,6 +338,10 @@ protected:
   int mCurrentLoop;              // Current loop number
 
   Vector2 mPlayRange;
+
+  float mProgressMarker;                // Progress marker to trigger a notification
+  bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
+
   AnimatorContainer mAnimators;
 };
 
@@ -354,6 +365,18 @@ inline void SetDurationMessage( EventThreadServices& eventThreadServices, const 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetDuration, durationSeconds );
 }
+
+inline void SetProgressNotificationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetProgressNotification, progress );
+}
+
 
 inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const Animation& animation, int loopCount )
 {
@@ -462,7 +485,8 @@ inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const 
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::AddAnimator, &animator );
+  OwnerPointer<AnimatorBase> parameter( &animator );
+  new (slot) LocalType( &animation, &Animation::AddAnimator, parameter );
 }
 
 

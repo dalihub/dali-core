@@ -229,12 +229,12 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
   mImpl->defaultSurfaceRect = rect;
 }
 
-void RenderManager::AddRenderer( Render::Renderer* renderer )
+void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
 {
   // Initialize the renderer as we are now in render thread
   renderer->Initialize( mImpl->context );
 
-  mImpl->rendererContainer.PushBack( renderer );
+  mImpl->rendererContainer.PushBack( renderer.Release() );
 
   if( !mImpl->renderersAdded )
   {
@@ -247,9 +247,9 @@ void RenderManager::RemoveRenderer( Render::Renderer* renderer )
   mImpl->rendererContainer.EraseObject( renderer );
 }
 
-void RenderManager::AddSampler( Render::Sampler* sampler )
+void RenderManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
 {
-  mImpl->samplerContainer.PushBack( sampler );
+  mImpl->samplerContainer.PushBack( sampler.Release() );
 }
 
 void RenderManager::RemoveSampler( Render::Sampler* sampler )
@@ -257,10 +257,10 @@ void RenderManager::RemoveSampler( Render::Sampler* sampler )
   mImpl->samplerContainer.EraseObject( sampler );
 }
 
-void RenderManager::AddTexture( Render::Texture* texture )
+void RenderManager::AddTexture( OwnerPointer< Render::Texture >& texture )
 {
-  mImpl->textureContainer.PushBack( texture );
-  texture->Initialize(mImpl->context);
+  texture->Initialize( mImpl->context );
+  mImpl->textureContainer.PushBack( texture.Release() );
 }
 
 void RenderManager::RemoveTexture( Render::Texture* texture )
@@ -333,9 +333,9 @@ void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
   frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
-void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
-  mImpl->propertyBufferContainer.PushBack( propertyBuffer );
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );
 }
 
 void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
@@ -343,14 +343,14 @@ void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
-void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
+void RenderManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
-  propertyBuffer->SetFormat( format );
+  propertyBuffer->SetFormat( format.Release() );
 }
 
-void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
+void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
-  propertyBuffer->SetData( data, size );
+  propertyBuffer->SetData( data.Release(), size );
 }
 
 void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
@@ -358,9 +358,9 @@ void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uns
   geometry->SetIndexBuffer( indices );
 }
 
-void RenderManager::AddGeometry( Render::Geometry* geometry )
+void RenderManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
 {
-  mImpl->geometryContainer.PushBack( geometry );
+  mImpl->geometryContainer.PushBack( geometry.Release() );
 }
 
 void RenderManager::RemoveGeometry( Render::Geometry* geometry )
@@ -368,7 +368,7 @@ void RenderManager::RemoveGeometry( Render::Geometry* geometry )
   mImpl->geometryContainer.EraseObject( geometry );
 }
 
-void RenderManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 

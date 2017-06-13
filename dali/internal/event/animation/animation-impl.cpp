@@ -128,7 +128,8 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
   mDefaultAlpha( defaultAlpha ),
-  mState(Dali::Animation::STOPPED)
+  mState(Dali::Animation::STOPPED),
+  mProgressReachedMarker( 0.0f )
 {
 }
 
@@ -160,14 +161,10 @@ void Animation::CreateSceneObject()
 {
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
-  // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
-
-  // Keep a const pointer to the animation.
-  mAnimation = animation;
-
-  // Transfer animation ownership to the update manager through a message
-  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), animation );
+  // Create a new animation, Keep a const pointer to the animation.
+  mAnimation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
+  OwnerPointer< SceneGraph::Animation > transferOwnership( const_cast< SceneGraph::Animation* >( mAnimation ) );
+  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void Animation::DestroySceneObject()
@@ -193,6 +190,17 @@ void Animation::SetDuration(float seconds)
 
   // mAnimation is being used in a separate thread; queue a message to set the value
   SetDurationMessage( mEventThreadServices, *mAnimation, seconds );
+}
+
+void Animation::SetProgressNotification( float progress )
+{
+  // mAnimation is being used in a separate thread; queue a message to set the value
+  mProgressReachedMarker = progress;
+}
+
+float Animation::GetProgressNotification()
+{
+  return mProgressReachedMarker;
 }
 
 float Animation::GetDuration() const
@@ -269,6 +277,8 @@ void Animation::Play()
 
   NotifyObjects();
 
+  SendFinalProgressNotificationMessage();
+
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
@@ -283,6 +293,8 @@ void Animation::PlayFrom( float progress )
     mState = Dali::Animation::PLAYING;
 
     NotifyObjects();
+
+    SendFinalProgressNotificationMessage();
 
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
@@ -774,12 +786,26 @@ Dali::Animation::AnimationSignalType& Animation::FinishedSignal()
   return mFinishedSignal;
 }
 
+Dali::Animation::AnimationSignalType& Animation::ProgressReachedSignal()
+{
+  return mProgressReachedSignal;
+}
+
 void Animation::EmitSignalFinish()
 {
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Animation handle( this );
     mFinishedSignal.Emit( handle );
+  }
+}
+
+void Animation::EmitSignalProgressReached()
+{
+  if ( !mProgressReachedSignal.Empty() )
+  {
+    Dali::Animation handle( this );
+    mProgressReachedSignal.Emit( handle );
   }
 }
 
@@ -1001,6 +1027,16 @@ void Animation::NotifyObjects()
         object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
       }
     }
+  }
+}
+
+
+void Animation::SendFinalProgressNotificationMessage()
+{
+  if ( mProgressReachedMarker > 0.0f )
+  {
+    float progressMarkerSeconds = mDurationSeconds * mProgressReachedMarker;
+    SetProgressNotificationMessage( mEventThreadServices, *mAnimation, progressMarkerSeconds );
   }
 }
 

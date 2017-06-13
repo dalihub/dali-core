@@ -4734,9 +4734,14 @@ int UtcDaliActorLowerBelow(void)
   actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
 
-  stage.Add( actorA );
-  stage.Add( actorB );
-  stage.Add( actorC );
+  Actor container = Actor::New();
+  container.SetParentOrigin( ParentOrigin::CENTER );
+  container.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  stage.Add( container );
+
+  container.Add( actorA );
+  container.Add( actorB );
+  container.Add( actorC );
 
   ResetTouchCallbacks();
 
@@ -4814,10 +4819,38 @@ int UtcDaliActorLowerBelow(void)
   indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
-  tet_infoline( "Testing B above A and C at bottom\n" );
-  bool BAC = ( indexB > indexA) &&  ( indexA > indexC ); // B at TOP, then A then C at bottom
+  tet_infoline( "Testing render order is A, C, B" );
+  DALI_TEST_EQUALS( indexC > indexA, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexB > indexC, true, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( BAC, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor C below Actor A leaving B on top\n" );
+
+  DevelActor::LowerBelow( actorC, actorA );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( touchEvent );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.Render();
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  DALI_TEST_EQUALS( indexA > indexC, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexB > indexA, true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, true, TEST_LOCATION );
@@ -4845,101 +4878,14 @@ int UtcDaliActorLowerBelow(void)
   indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
-  bool ACB = ( indexA > indexC) &&  ( indexC > indexB ); // A on TOP, then C then B at bottom
-
-  DALI_TEST_EQUALS( ACB, true, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( gTouchCallBackCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
-
-  ResetTouchCallbacks();
-
-  tet_printf( "Lower actor A below Actor C leaving C on top\n" );
-
-  DevelActor::LowerBelow( actorA, actorC );
-  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
-  application.SendNotification();
-  application.Render();
-
-  application.ProcessEvent( touchEvent );
-
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
-
-  application.Render();
-  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
-
-  // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
-
-  bool CAB = ( indexC > indexA) &&  ( indexA > indexB );
-
-  DALI_TEST_EQUALS( CAB, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexC > indexB, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexA > indexC, true, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliActorMaxSiblingOrder(void)
-{
-  tet_infoline( "UtcDaliActor De-fragment of sibling order once max index reached\n" );
 
-  TestApplication application;
-
-  int testOrders[] = { 0,1,3,5,17,998, 999 };
-  int resultingOrders[] = { 0,1,2,3,4,6,5 };
-
-  const int TEST_ORDERS_COUNT = sizeof( testOrders ) / sizeof( testOrders[0] );
-
-  Stage stage( Stage::GetCurrent() );
-
-  Actor parent = Actor::New();
-
-  for ( int index = 0; index < TEST_ORDERS_COUNT; index++ )
-  {
-    Actor newActor = Actor::New();
-    newActor.SetProperty(Dali::DevelActor::Property::SIBLING_ORDER, testOrders[index] );
-    parent.Add( newActor );
-  }
-  stage.Add( parent );
-
-  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
-  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
-  {
-    Actor sibling = parent.GetChildAt( index );
-    int siblingOrder = 0;
-    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
-    value.Get( siblingOrder );
-    tet_printf( "%d, ", siblingOrder );
-  }
-  tet_printf( "\n" );
-
-  Actor sibling = parent.GetChildAt( 5 );
-  DevelActor::RaiseToTop( sibling );
-
-  // Ensure sorting happens at end of Core::ProcessEvents()
-  application.SendNotification();
-  application.Render();
-
-  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
-  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
-  {
-    Actor sibling = parent.GetChildAt( index );
-    int siblingOrder = 0;
-    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
-    value.Get( siblingOrder );
-    tet_printf( "%d, ", siblingOrder );
-    DALI_TEST_EQUALS( siblingOrder,  resultingOrders[ index] , TEST_LOCATION );
-  }
-
-  tet_printf( "\n" );
-
-  END_TEST;
-}
-
-int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
+int UtcDaliActorRaiseAboveDifferentParentsN(void)
 {
   tet_infoline( "UtcDaliActor RaiseToAbove test with actor and target actor having different parents \n" );
 

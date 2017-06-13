@@ -212,7 +212,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   {
     if( mResendFlag & RESEND_DATA_PROVIDER )
     {
-      RenderDataProvider* dataProvider = NewRenderDataProvider();
+      OwnerPointer<RenderDataProvider> dataProvider = NewRenderDataProvider();
 
       typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
       unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
@@ -530,7 +530,8 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
   mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                          mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
 
-  mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
+  OwnerPointer< Render::Renderer > transferOwnership( mRenderer );
+  mSceneController->GetRenderMessageDispatcher().AddRenderer( transferOwnership );
 }
 
 //Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )

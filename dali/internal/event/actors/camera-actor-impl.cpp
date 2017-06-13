@@ -146,12 +146,11 @@ CameraActorPtr CameraActor::New( const Size& size )
 
   actor->SetName("DefaultCamera");
 
-  // Create scene-object and transfer ownership through message
-  SceneGraph::Camera* sceneObject = SceneGraph::Camera::New();
-  AddCameraMessage( actor->GetEventThreadServices().GetUpdateManager(), sceneObject );
-
-  // Keep raw pointer for message passing
-  actor->mSceneObject = sceneObject;
+  // Create scene-object and keep raw pointer for message passing
+  SceneGraph::Camera* camera = SceneGraph::Camera::New();
+  actor->mSceneObject = camera;
+  OwnerPointer< SceneGraph::Camera > transferOwnership( camera );
+  AddCameraMessage( actor->GetEventThreadServices().GetUpdateManager(), transferOwnership );
 
   actor->SetPerspectiveProjection( size );
 
