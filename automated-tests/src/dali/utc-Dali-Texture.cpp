@@ -16,6 +16,8 @@
  */
 
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/pixel-data-devel.h>
+#include <dali/devel-api/images/pixel-devel.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 
@@ -408,60 +410,107 @@ int UtcDaliTextureUpload04(void)
 
 int UtcDaliTextureUpload05(void)
 {
-  TestApplication application;
-
-  //Create a texture with a compressed format
-  unsigned int width(64);
-  unsigned int height(64);
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, width, height );
-
-  application.GetGlAbstraction().EnableTextureCallTrace(true);
-
-  application.SendNotification();
-  application.Render();
-
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-
-  //CompressedTexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+  Pixel::Format COMPRESSED_PIXEL_FORMATS[] =
   {
-    std::stringstream out;
-    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
-    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
-  }
+    Pixel::COMPRESSED_R11_EAC,
+    Pixel::COMPRESSED_SIGNED_R11_EAC,
+    Pixel::COMPRESSED_RG11_EAC,
+    Pixel::COMPRESSED_SIGNED_RG11_EAC,
+    Pixel::COMPRESSED_RGB8_ETC2,
+    Pixel::COMPRESSED_SRGB8_ETC2,
+    Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+    Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+    Pixel::COMPRESSED_RGBA8_ETC2_EAC,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,
+    Pixel::COMPRESSED_RGB8_ETC1,
+    Pixel::COMPRESSED_RGB_PVRTC_4BPPV1,
+    Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR,
+    Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,
+    Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,
+  };
+  const unsigned int NUMBER_OF_COMPRESSED_PIXEL_FORMATS = sizeof( COMPRESSED_PIXEL_FORMATS ) / sizeof( Pixel::Format );
 
-  //Upload data to the texture
-  callStack.Reset();
-
-  unsigned int bufferSize( width * height * 4 );
-  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
-  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, PixelData::FREE );
-  texture.Upload( pixelData );
-  application.SendNotification();
-  application.Render();
-
-  //CompressedTexImage2D should be called to upload the data
+  for( unsigned int index = 0; index < NUMBER_OF_COMPRESSED_PIXEL_FORMATS; ++index )
   {
-    std::stringstream out;
-    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
-    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
+    TestApplication application;
+
+    //Create a texture with a compressed format
+    unsigned int width(64);
+    unsigned int height(64);
+    Texture texture = Texture::New( TextureType::TEXTURE_2D, COMPRESSED_PIXEL_FORMATS[index], width, height );
+
+    application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+    application.SendNotification();
+    application.Render();
+
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+    //CompressedTexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+      DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
+    }
+
+    //Upload data to the texture
+    callStack.Reset();
+
+    unsigned int bufferSize( width * height * 4 );
+    unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+    PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, COMPRESSED_PIXEL_FORMATS[index], PixelData::FREE );
+    texture.Upload( pixelData );
+    application.SendNotification();
+    application.Render();
+
+    //CompressedTexImage2D should be called to upload the data
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+      DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str() ) );
+    }
+
+    //Upload part of the texture
+    callStack.Reset();
+    bufferSize =  width * height * 2;
+    buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+    PixelData pixelDataSubImage = PixelData::New( buffer, bufferSize, width, height, COMPRESSED_PIXEL_FORMATS[index], PixelData::FREE );
+    texture.Upload( pixelDataSubImage, 0u, 0u, width/2, height/2, width/2, height/2 );
+    application.SendNotification();
+    application.Render();
+
+    //CompressedTexSubImage2D should be called to upload the data
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D <<", "<< 0u << ", " << width/2 << ", " <<  height/2 << ", " << width/2 << ", " <<  height/2;
+      DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexSubImage2D", out.str().c_str() ) );
+    }
   }
-
-  //Upload part of the texture
-  callStack.Reset();
-  bufferSize =  width * height * 2;
-  buffer = reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
-  PixelData pixelDataSubImage = PixelData::New( buffer, bufferSize, width, height, Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR, PixelData::FREE );
-  texture.Upload( pixelDataSubImage, 0u, 0u, width/2, height/2, width/2, height/2 );
-  application.SendNotification();
-  application.Render();
-
-  //CompressedTexSubImage2D should be called to upload the data
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D <<", "<< 0u << ", " << width/2 << ", " <<  height/2 << ", " << width/2 << ", " <<  height/2;
-    DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexSubImage2D", out.str().c_str() ) );
-  }
-
 
   END_TEST;
 }
@@ -506,6 +555,61 @@ int UtcDaliTextureUpload06(void)
     std::stringstream out;
     out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextureUpload07(void)
+{
+  DevelPixel::Format FLOATING_POINT_PIXEL_FORMATS[] =
+  {
+    DevelPixel::RGB16F,
+    DevelPixel::RGB32F,
+  };
+  const unsigned int NUMBER_OF_FLOATING_POINT_PIXEL_FORMATS = sizeof( FLOATING_POINT_PIXEL_FORMATS ) / sizeof( DevelPixel::Format );
+
+  for( unsigned int index = 0; index < NUMBER_OF_FLOATING_POINT_PIXEL_FORMATS; ++index )
+  {
+    TestApplication application;
+
+    //Create the texture
+    unsigned int width(64);
+    unsigned int height(64);
+    tet_infoline( "Creating a floating point texture" );
+    Texture texture = Texture::New( TextureType::TEXTURE_2D, static_cast<Pixel::Format>( FLOATING_POINT_PIXEL_FORMATS[index] ), width, height );
+
+    application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+    application.SendNotification();
+    application.Render();
+
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+    tet_infoline( "TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu" );
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+      DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
+    }
+
+    tet_infoline( "Upload data to the texture" );
+    callStack.Reset();
+
+    tet_infoline( "Creating a RGB pixel buffer and adding that to the texture to ensure it is handled correctly" );
+    unsigned int bufferSize( width * height * 3 );
+    unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+    PixelData pixelData = DevelPixelData::New( buffer, bufferSize, width, height, FLOATING_POINT_PIXEL_FORMATS[index], PixelData::FREE );
+    texture.Upload( pixelData );
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline( "TexImage2D should be called to upload the data" );
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
+      DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
+    }
   }
 
   END_TEST;
