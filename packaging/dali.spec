@@ -86,8 +86,8 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 export DALI_DATA_RW_DIR
 export DALI_DATA_RO_DIR
 
-# Default to GLES 2.0 if not specified.
-%{!?target_gles_version: %define target_gles_version 20}
+# Default to GLES 3.0 if not specified.
+%{!?target_gles_version: %define target_gles_version 30}
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
