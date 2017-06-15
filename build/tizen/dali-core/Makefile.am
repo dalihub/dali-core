@@ -48,8 +48,11 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                          $(dali_core_includes) \
                          $(DALI_CFLAGS)
 
+
+DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
+
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
-                      graphics/libdali-graphics.a \
+                      $(VULKAN_LIBS) \
                       -lpthread
 
 dali_core_includes = \
@@ -76,9 +79,11 @@ endif
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
+platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
+platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
