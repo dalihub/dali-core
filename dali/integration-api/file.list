@@ -40,6 +40,11 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/system-overlay.h \
    $(platform_abstraction_src_dir)/lockless-buffer.h
 
+graphics_integration_header_files = \
+   $(platform_abstraction_src_dir)/graphics/graphics.h \
+   $(platform_abstraction_src_dir)/graphics/surface-factory.h \
+   $(platform_abstraction_src_dir)/graphics/vulkan/vk-surface-factory.h
+
 platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/event.h \
    $(platform_abstraction_src_dir)/events/gesture-event.h \

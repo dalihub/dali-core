@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,12 +23,15 @@ include ../../../../dali/graphics-api/file.list
 graphics_src_dir = ../../../../dali/graphics
 include ../../../../dali/graphics/file.list
 
+graphics_integration_dir = ../../../../dali/integration-api/graphics
+include ../../../../dali/integration-api/graphics/file.list
 
 # Build the graphics library
 noinst_LIBRARIES = libdali-graphics.a
 
 libdali_graphics_a_SOURCES = $(graphics_api_src_files) \
-                             $(graphics_src_files)
+                             $(graphics_src_files) \
+                             $(graphics_integration_src_files)
 
 #libdali_graphics_a_LDFLAGS = -fPIC
 
