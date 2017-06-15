@@ -32,6 +32,10 @@ namespace Dali
 
 namespace Integration
 {
+namespace Graphics
+{
+class Graphics;
+}
 class RenderController;
 class PlatformAbstraction;
 class GestureManager;
@@ -76,6 +80,7 @@ public:
    */
   Core( Integration::RenderController& renderController,
         Integration::PlatformAbstraction& platform,
+        Integration::Graphics::Graphics& graphics,
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
@@ -276,6 +281,8 @@ private:
   OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
+
+  Integration::Graphics::Graphics& mGraphics; ///< Graphics object
 
   friend class ThreadLocalStorage;
 
