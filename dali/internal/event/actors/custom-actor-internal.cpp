@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {
@@ -47,6 +48,12 @@ CustomActor::CustomActor(CustomActorImpl& extension)
 
 CustomActor::~CustomActor()
 {
+}
+
+Dali::TypeInfo CustomActor::GetTypeInfo()
+{
+  Dali::TypeInfo handle ( const_cast<Dali::Internal::TypeInfo*>(Object::GetTypeInfo()) );
+  return handle;
 }
 
 } // namespace Internal
