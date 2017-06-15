@@ -55,16 +55,21 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS)
 
+
+libdali_core_la_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
+
 libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
-                         graphics/libdali-graphics.a \
+                         $(VULKAN_LIBS) \
                          -lpthread
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
+platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
+platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
@@ -127,22 +132,23 @@ packagedoxy_HEADERS = $(package_doxy_files)
 
 # linking test
 
-noinst_PROGRAMS = linker.test
+#noinst_PROGRAMS = linker.test
 
-linker_test_SOURCES = linker-test.cpp  \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
+#linker_test_SOURCES = linker-test.cpp  \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
+#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
-linker_test_CXXFLAGS = \
-  $(cxx_flags) \
-  -I../../../automated-tests/src/dali/dali-test-suite-utils \
-  $(dali_core_includes)
+#linker_test_CXXFLAGS = \
+#  $(VULKAN_LIBS) \
+#  $(cxx_flags) \
+#  -I../../../automated-tests/src/dali/dali-test-suite-utils \
+#  $(dali_core_includes)
 
-linker_test_DEPENDENCIES = libdali-core.la
-linker_test_LDADD = \
-  libdali-core.la
+#linker_test_DEPENDENCIES = libdali-core.la
+#linker_test_LDADD = \
+#  libdali-core.la
