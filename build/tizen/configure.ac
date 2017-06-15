@@ -67,7 +67,7 @@ AC_ARG_ENABLE([gles],
               [AC_HELP_STRING([--enable-gles],
                               [Specify the OpenGL ES version for backwards compatibility])],
               [enable_gles=$enableval],
-              [enable_gles=30])
+              [enable_gles=20])
 
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
