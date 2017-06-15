@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/core-impl.h>
 
 namespace Dali
@@ -30,11 +31,11 @@ namespace Dali
 namespace Integration
 {
 
-Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction,
+Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction, Graphics::Graphics& graphics,
                 GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager, ResourcePolicy::DataRetention policy )
 {
   Core* instance = new Core;
-  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager, policy );
+  instance->mImpl = new Internal::Core( renderController, platformAbstraction, graphics, glAbstraction, glSyncAbstraction, gestureManager, policy );
 
   return instance;
 }
