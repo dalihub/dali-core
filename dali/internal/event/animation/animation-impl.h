@@ -84,6 +84,16 @@ public:
   void SetDuration(float seconds);
 
   /**
+   * @copydoc Dali::DevelAnimation::SetProgressNotification()
+   */
+  void SetProgressNotification( float progress );
+
+  /**
+   * @copydoc Dali::DevelAnimation::GetProgressNotification()
+   */
+  float GetProgressNotification();
+
+  /**
    * @copydoc Dali::Animation::GetDuration()
    */
   float GetDuration() const;
@@ -192,9 +202,19 @@ public:
   Dali::Animation::AnimationSignalType& FinishedSignal();
 
   /**
+   * @copydoc Dali::DevelAnimation::ProgressHasBeenReachedSignal()
+   */
+  Dali::Animation::AnimationSignalType& ProgressReachedSignal();
+
+  /**
    * Emit the Finished signal
    */
   void EmitSignalFinish();
+
+  /**
+   * Emit the ProgressReached signal
+   */
+  void EmitSignalProgressReached();
 
   /**
    * Connects a callback function with the object's signals.
@@ -480,6 +500,11 @@ private:
    */
   void NotifyObjects();
 
+  /**
+   * Sends message to SceneGraph with final progress value
+   */
+  void SendFinalProgressNotificationMessage();
+
 private:
 
   const SceneGraph::Animation* mAnimation;
@@ -488,6 +513,8 @@ private:
   AnimationPlaylist& mPlaylist;
 
   Dali::Animation::AnimationSignalType mFinishedSignal;
+
+  Dali::Animation::AnimationSignalType mProgressReachedSignal;
 
   typedef OwnerContainer< AnimatorConnectorBase* > AnimatorConnectorContainer;
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
@@ -506,6 +533,7 @@ private:
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
   Dali::Animation::State mState;
+  float mProgressReachedMarker;
 };
 
 } // namespace Internal

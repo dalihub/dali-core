@@ -35,6 +35,7 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/effects/shader-factory.h>
+#include <dali/internal/event/animation/animation-playlist.h>
 
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -161,7 +162,7 @@ typedef OwnerContainer< PropertyOwner* >       CustomObjectOwner;
 struct UpdateManager::Impl
 {
   Impl( NotificationManager& notificationManager,
-        CompleteNotificationInterface& animationFinishedNotifier,
+        CompleteNotificationInterface& animationPlaylist,
         PropertyNotifier& propertyNotifier,
         DiscardQueue& discardQueue,
         RenderController& renderController,
@@ -172,7 +173,7 @@ struct UpdateManager::Impl
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
     transformManager(),
-    animationFinishedNotifier( animationFinishedNotifier ),
+    animationPlaylist( animationPlaylist ),
     propertyNotifier( propertyNotifier ),
     shaderSaver( NULL ),
     discardQueue( discardQueue ),
@@ -254,7 +255,7 @@ struct UpdateManager::Impl
   RenderMessageDispatcher             renderMessageDispatcher;       ///< Used for passing messages to the render-thread
   NotificationManager&                notificationManager;           ///< Queues notification messages for the event-thread.
   TransformManager                    transformManager;              ///< Used to update the transformation matrices of the nodes
-  CompleteNotificationInterface&      animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
+  CompleteNotificationInterface&      animationPlaylist;             ///< Holds handles to all the animations
   PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
   ShaderSaver*                        shaderSaver;                   ///< Saves shader binaries.
   DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
@@ -660,12 +661,19 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
   AnimationContainer &animations = mImpl->animations;
   AnimationIter iter = animations.Begin();
   bool animationLooped = false;
+
   while ( iter != animations.End() )
   {
     Animation* animation = *iter;
     bool finished = false;
     bool looped = false;
-    animation->Update( bufferIndex, elapsedSeconds, looped, finished );
+    bool progressMarkerReached = false;
+    animation->Update( bufferIndex, elapsedSeconds, looped, finished, progressMarkerReached );
+
+    if ( progressMarkerReached )
+    {
+      mImpl->notificationManager.QueueMessage( Internal::NotifyProgressReachedMessage( mImpl->animationPlaylist, animation ) );
+    }
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
     animationLooped = animationLooped || looped;
@@ -685,7 +693,7 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
   if ( mImpl->animationFinishedDuringUpdate || animationLooped )
   {
     // The application should be notified by NotificationManager, in another thread
-    mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationFinishedNotifier );
+    mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationPlaylist );
   }
 }
 

@@ -110,9 +110,45 @@ public:
    */
   unsigned int GetBufferSize() const;
 
-private:
+  /**
+   * Apply the mask to this data
+   * @param[in] mask The mask to apply
+   */
+  void ApplyMask( const PixelData& mask );
 
-  /*
+private:
+  /**
+   * Release the buffer
+   */
+  void ReleaseBuffer();
+
+  /**
+   * Apply the mask to this data's alpha channel
+   * @param[in] mask The mask to apply
+   */
+  void ApplyMaskToAlphaChannel( const PixelData& mask );
+
+  /**
+   * Convert to RGBA8888 and apply the mask's alpha channel
+   * to this data's alpha channel
+   * @param[in] mask The mask to apply
+   */
+  void AddAlphaChannel( const PixelData& mask );
+
+  /**
+   * Apply the mask to this data's color channels (e.g. to apply vignette)
+   * @param[in] mask The mask to apply
+   */
+  void ApplyMaskToColorChannels( const PixelData& mask );
+
+  /**
+   * Read a weighted sample from a pixel (of unknown size)
+   * @param[in] x The x coordinate to sample from
+   * @param[in] y The y coordinate to sample from
+   */
+  float ReadWeightedSample( float x, float y ) const;
+
+   /*
    * Undefined copy constructor.
    */
   PixelData(const PixelData& other);
@@ -120,7 +156,7 @@ private:
   /*
    * Undefined assignment operator.
    */
-  PixelData& operator = (const PixelData& other);
+  PixelData& operator= (const PixelData& other);
 
 private:
 

@@ -173,9 +173,16 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       result = CompareType<Quaternion>(a, b, epsilon);
       break;
     }
+    case Property::STRING:
+    {
+      std::string a, b;
+      q1.Get(a);
+      q2.Get(b);
+      result = (a.compare(b) == 0);
+      break;
+    }
     case Property::MATRIX:
     case Property::MATRIX3:
-    case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
     {

@@ -74,7 +74,9 @@ Animation::Animation( float durationSeconds, float speedFactor, const Vector2& p
   mPlayedCount(0),
   mLoopCount(loopCount),
   mCurrentLoop(0),
-  mPlayRange( playRange )
+  mPlayRange( playRange ),
+  mProgressMarker(0.0f),
+  mProgressReachedSignalRequired( false )
 {
 }
 
@@ -90,6 +92,15 @@ void Animation::operator delete( void* ptr )
 void Animation::SetDuration(float durationSeconds)
 {
   mDurationSeconds = durationSeconds;
+}
+
+void Animation::SetProgressNotification( float progress )
+{
+  mProgressMarker = progress;
+  if ( mProgressMarker > 0.0f )
+  {
+    mProgressReachedSignalRequired = true;
+  }
 }
 
 void Animation::SetLoopCount(int loopCount)
@@ -256,7 +267,7 @@ void Animation::AddAnimator( OwnerPointer<AnimatorBase>& animator )
   mAnimators.PushBack( animator.Release() );
 }
 
-void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished )
+void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached )
 {
   looped = false;
   finished = false;
@@ -271,6 +282,13 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   if (mState == Playing)
   {
     mElapsedSeconds += elapsedSeconds * mSpeedFactor;
+
+    if ( mProgressReachedSignalRequired && ( mElapsedSeconds >= mProgressMarker ) )
+    {
+      // The application should be notified by NotificationManager, in another thread
+      progressReached = true;
+      mProgressReachedSignalRequired = false;
+    }
   }
 
   Vector2 playRangeSeconds = mPlayRange * mDurationSeconds;
@@ -280,7 +298,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
     // loop forever
     WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
 
-    UpdateAnimators(bufferIndex, false, false);
+    UpdateAnimators(bufferIndex, false, false );
 
     // don't increment mPlayedCount as event loop tracks this to indicate animation finished (end of all loops)
   }
@@ -293,11 +311,12 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
 
     WrapInPlayRange( mElapsedSeconds, playRangeSeconds );
 
-    UpdateAnimators(bufferIndex, false, false);
+    UpdateAnimators(bufferIndex, false, false );
 
     if(looped)
     {
       ++mCurrentLoop;
+      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
       // don't increment mPlayedCount until the finished final loop
     }
   }
@@ -309,7 +328,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
                  ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
 
     // update with bake if finished
-    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished);
+    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished );
 
     if(finished)
     {
@@ -323,6 +342,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
         DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
       }
 
+      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
       mElapsedSeconds = playRangeSeconds.x;
       mState = Stopped;
     }
