@@ -58,6 +58,13 @@ public:
     return *mImpl;
   }
 
+  /**
+   * Get the type info associated with this object.
+   *
+   * @return The type info
+   */
+  Dali::TypeInfo GetTypeInfo();
+
 protected:
 
   /**

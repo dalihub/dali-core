@@ -1,6 +1,7 @@
 # Add devel source files here for DALi internal developer files used by Adaptor & Toolkit
 devel_api_src_files = \
   $(devel_api_src_dir)/actors/actor-devel.cpp \
+  $(devel_api_src_dir)/actors/custom-actor-devel.cpp \
   $(devel_api_src_dir)/animation/animation-data.cpp \
   $(devel_api_src_dir)/animation/animation-devel.cpp \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
@@ -10,6 +11,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/images/distance-field.cpp \
   $(devel_api_src_dir)/images/texture-set-image.cpp \
   $(devel_api_src_dir)/images/nine-patch-image.cpp \
+  $(devel_api_src_dir)/images/pixel-data-devel.cpp \
   $(devel_api_src_dir)/images/pixel-data-mask.cpp \
   $(devel_api_src_dir)/object/handle-devel.cpp \
   $(devel_api_src_dir)/object/weak-handle.cpp \
@@ -24,6 +26,7 @@ devel_api_src_files = \
 
 devel_api_core_actors_header_files = \
   $(devel_api_src_dir)/actors/actor-devel.h \
+  $(devel_api_src_dir)/actors/custom-actor-devel.h \
   $(devel_api_src_dir)/actors/layer-devel.h
 
 devel_api_core_animation_header_files = \
@@ -46,9 +49,11 @@ devel_api_core_events_header_files = \
 devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/distance-field.h \
   $(devel_api_src_dir)/images/native-image-interface-extension.h \
-  $(devel_api_src_dir)/images/texture-set-image.h \
   $(devel_api_src_dir)/images/nine-patch-image.h \
-  $(devel_api_src_dir)/images/pixel-data-mask.h
+  $(devel_api_src_dir)/images/texture-set-image.h \
+  $(devel_api_src_dir)/images/pixel-data-devel.h \
+  $(devel_api_src_dir)/images/pixel-data-mask.h \
+  $(devel_api_src_dir)/images/pixel-devel.h
 
 devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/csharp-type-info.h \

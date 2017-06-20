@@ -168,7 +168,8 @@ private:
   Type mType;                           ///< Type of the texture
   Render::Sampler mSampler;             ///< The current sampler state
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
-  GLenum mInternalFormat;               ///< The format of the pixel data
+  GLenum mGlFormat;                     ///< The gl format of the pixel data
+  GLint mGlInternalFormat;              ///< The gl internal format of the pixel data
   GLenum mPixelDataType;                ///< The data type of the pixel data
   unsigned int mWidth;                  ///< Width of the texture
   unsigned int mHeight;                 ///< Height of the texture
