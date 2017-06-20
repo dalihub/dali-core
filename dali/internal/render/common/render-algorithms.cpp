@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,12 +123,13 @@ inline void SetupClipping( const RenderItem& item, Context& context, uint32_t& l
       context.StencilMask( 0xff );
       context.Clear( GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
     }
-    else if( ( currentStencilDepth < lastStencilDepth ) || ( clippingId != lastClippingId ) )
+    else if( ( currentStencilDepth < lastStencilDepth ) ||
+           ( ( currentStencilDepth == lastStencilDepth ) && ( clippingId > lastClippingId ) ) )
     {
       // The above if() statement tests if we need to clear some (not all) stencil bit-planes.
       // We need to do this if either of the following are true:
-      //   1) We traverse up the scene-graph to a previous stencil
-      //   2) We are at the same stencil depth but the clipping Id has changed.
+      //   1) We traverse up the scene-graph to a previous stencil depth
+      //   2) We are at the same stencil depth but the clipping Id has increased.
       //
       // This calculation takes the new depth to move to, and creates an inverse-mask of that number of consecutive bits.
       // This has the effect of clearing everything except the bit-planes up to (and including) our current depth.
