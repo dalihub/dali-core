@@ -20,32 +20,13 @@
 
 // INTERNAL_INCLUDES
 #include <dali/public-api/events/key-event.h>
+#include <dali/devel-api/events/device.h>
 
 namespace Dali
 {
 
 namespace DevelKeyEvent
 {
-
-namespace DeviceClass
-{
-
-/**
- * @brief An enum of Device Classe types.
- */
-enum Type
-{
-  NONE,      ///< Not a device
-  USER,      ///< The user/seat (the user themselves)
-  KEYBOARD,  ///< A regular keyboard, numberpad or attached buttons
-  MOUSE,     ///< A mouse, trackball or touchpad relative motion device
-  TOUCH,     ///< A touchscreen with fingers or stylus
-  PEN,       ///< A special pen device
-  POINTER,   ///< A laser pointer, wii-style or 7"minority report" pointing device
-  GAMEPAD    ///< A gamepad controller or joystick
-};
-
-} // namespace DeviceClass
 
 /**
  * @brief Get the device name the key event originated from
@@ -58,10 +39,20 @@ DALI_IMPORT_API std::string GetDeviceName( const KeyEvent& keyEvent );
 /**
  * @brief Get the device class the key event originated from
  *
+ * The device class type is classification type of the input device of event received
  * @param[in] keyEvent The KeyEvent to retrieve the device class from
- * @return The device class
+ * @return The type of the device class
  */
-DALI_IMPORT_API DeviceClass::Type GetDeviceClass( const KeyEvent& keyEvent );
+DALI_IMPORT_API DevelDevice::Class::Type GetDeviceClass( const KeyEvent& keyEvent );
+
+/**
+ * @brief Get the device subclass the key event originated from
+ *
+ * The device subclass type is subclassification type of the input device of event received.
+ * @param[in] keyEvent The KeyEvent to retrieve the device subclass from
+ * @return The type of the device subclass
+ */
+DALI_IMPORT_API DevelDevice::Subclass::Type GetDeviceSubclass( const KeyEvent& keyEvent );
 
 } // namespace DevelKeyEvent
 

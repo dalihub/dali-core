@@ -159,6 +159,24 @@ void TouchData::AddPoint( const Integration::Point& point )
   mPoints.push_back( point );
 }
 
+DevelDevice::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetDeviceClass();
+  }
+  return DevelDevice::Class::NONE;
+}
+
+DevelDevice::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetDeviceSubclass();
+  }
+  return DevelDevice::Subclass::NONE;
+}
+
 } // namsespace Internal
 
 } // namespace Dali
