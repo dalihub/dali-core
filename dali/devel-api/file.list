@@ -1,6 +1,7 @@
 # Add devel source files here for DALi internal developer files used by Adaptor & Toolkit
 devel_api_src_files = \
   $(devel_api_src_dir)/actors/actor-devel.cpp \
+  $(devel_api_src_dir)/actors/custom-actor-devel.cpp \
   $(devel_api_src_dir)/animation/animation-data.cpp \
   $(devel_api_src_dir)/animation/animation-devel.cpp \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
@@ -25,6 +26,7 @@ devel_api_src_files = \
 
 devel_api_core_actors_header_files = \
   $(devel_api_src_dir)/actors/actor-devel.h \
+  $(devel_api_src_dir)/actors/custom-actor-devel.h \
   $(devel_api_src_dir)/actors/layer-devel.h
 
 devel_api_core_animation_header_files = \
