@@ -289,9 +289,10 @@ void TransformManager::Update()
         if( (mInheritanceMode[i] & INHERIT_POSITION) == 0 )
         {
           //Don't inherit position
+          CalculateCenterPosition( centerPosition, mTxComponentStatic[ i ], mTxComponentAnimatable[ i ], mSize[ i ], half, topLeft );
           mLocal[i].SetTransformComponents( localScale, localOrientation, Vector3::ZERO );
           Matrix::Multiply( mWorld[i], mLocal[i], parentMatrix );
-          mWorld[i].SetTranslation( mTxComponentAnimatable[i].mPosition);
+          mWorld[i].SetTranslation( mTxComponentAnimatable[i].mPosition + centerPosition );
         }
         else
         {
