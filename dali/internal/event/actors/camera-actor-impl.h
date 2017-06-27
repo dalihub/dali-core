@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_CAMERA_ACTOR_H__
-#define __DALI_INTERNAL_CAMERA_ACTOR_H__
+#ifndef DALI_INTERNAL_CAMERA_ACTOR_H
+#define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -275,6 +275,13 @@ private:
    */
   virtual ~CameraActor();
 
+
+  /**
+   * @copydoc Dali::Internal::Actor::OnInitialize()
+   */
+  virtual void OnInitialize();
+
+
 private: // Data
 
   const SceneGraph::Camera* mSceneObject; ///< Not owned
@@ -318,4 +325,4 @@ inline const Internal::CameraActor& GetImplementation(const Dali::CameraActor& c
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_CAMERA_ACTOR_H__
+#endif // DALI_INTERNAL_CAMERA_ACTOR_H

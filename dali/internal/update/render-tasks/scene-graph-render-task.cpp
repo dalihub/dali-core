@@ -201,28 +201,26 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
   // If the source node of the render task is invisible we should still render
   // We want the render task to complete and possible clear colors to happen
 
-  // Check source node
-  if ( NULL == mSourceNode ||
-       ( !mSourceNode->IsRoot() && NULL == mSourceNode->GetParent() ) )
+  // Check the source node.
+  if( NULL == mSourceNode ||
+      ( !mSourceNode->IsRoot() && NULL == mSourceNode->GetParent() ) )
   {
-    TASK_LOG_FMT(Debug::General, " =F  No source actor  FC:%d\n", mFrameCounter );
+    TASK_LOG_FMT( Debug::General, " Source actor not on stage.  Frame counter: %d\n", mFrameCounter );
 
-    // Source node is missing or disconnected
+    // The source node is missing or disconnected.
     return false;
   }
 
   // Check camera node
-  if ( NULL == mCameraNode ||
-       NULL == mCameraNode->GetParent() ||
-       NULL == mCamera )
+  if( NULL == mCameraNode ||
+      NULL == mCameraNode->GetParent() ||
+      NULL == mCamera )
   {
-    // Camera node is missing or disconnected
+    // The camera node is missing or disconnected.
     TASK_LOG_FMT(Debug::General, " =F  No Camera  FC:%d\n", mFrameCounter );
-
     return false;
   }
 
-  mCamera->Update( updateBufferIndex, *mCameraNode );
   return true;
 }
 
