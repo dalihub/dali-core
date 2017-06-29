@@ -18,8 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/signals/functor-delegate.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/compile-time-assert.h>
+// EXTERNAL INCLUDES
+#include <type_traits>
 
 namespace Dali
 {
@@ -31,7 +31,7 @@ namespace
  * functions and regular functions.
  * If this assert fails, please implement the template specialisation for C functions.
  */
-DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ) );
+static_assert( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ), "Need to implement template specialisation for C functions" );
 }
 
 FunctorDelegate::~FunctorDelegate()

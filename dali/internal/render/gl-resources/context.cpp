@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 #include <cstring>
+#include <type_traits>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -39,7 +39,7 @@ namespace Internal
 namespace // unnamed namespace
 {
 
-DALI_COMPILE_TIME_ASSERT( TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS );
+static_assert( TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS, "TEXTURE_UNIT_LAST is greater than Context::MAX_TEXTURE_UNITS" );
 
 /**
  * GL error strings
