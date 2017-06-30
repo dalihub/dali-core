@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_CORE_H__
-#define __DALI_INTEGRATION_CORE_H__
+#ifndef DALI_INTEGRATION_CORE_H
+#define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,26 +118,52 @@ public:
    * Constructor
    */
   RenderStatus()
-  : needsUpdate(false)
+  : needsUpdate( false ),
+    needsPostRender( false )
   {
   }
 
   /**
    * Set whether update needs to run following a render.
-   * This might be because render has sent messages to update, or it has
-   * some textures to upload over several frames.
+   * @param[in] updateRequired Set to true if an update is required to be run
    */
-  void SetNeedsUpdate(bool updateRequired) { needsUpdate = updateRequired; }
+  void SetNeedsUpdate( bool updateRequired )
+  {
+    needsUpdate = updateRequired;
+  }
 
   /**
    * Query the update status following rendering of a frame.
-   * @return true if update should run.
+   * @return True if update is required to be run
    */
-  bool NeedsUpdate() { return needsUpdate; }
+  bool NeedsUpdate() const
+  {
+    return needsUpdate;
+  }
+
+  /**
+   * Sets if a post-render should be run.
+   * If nothing is rendered this frame, we can skip post-render.
+   * @param[in] postRenderRequired Set to True if post-render is required to be run
+   */
+  void SetNeedsPostRender( bool postRenderRequired )
+  {
+    needsPostRender = postRenderRequired;
+  }
+
+  /**
+   * Queries if a post-render should be run.
+   * @return True if post-render is required to be run
+   */
+  bool NeedsPostRender() const
+  {
+    return needsPostRender;
+  }
 
 private:
 
-  bool needsUpdate;
+  bool needsUpdate      :1;  ///< True if update is required to be run
+  bool needsPostRender  :1;  ///< True if post-render is required to be run.
 };
 
 /**
@@ -413,4 +439,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_CORE_H__
+#endif // DALI_INTEGRATION_CORE_H
