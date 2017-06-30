@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,6 +182,11 @@ Camera::~Camera()
 {
 }
 
+void Camera::SetNode( const Node* node )
+{
+  mNode = node;
+}
+
 void Camera::SetType( Dali::Camera::Type type )
 {
   mType = type;
@@ -284,14 +289,14 @@ const PropertyInputImpl* Camera::GetViewMatrix() const
   return &mViewMatrix;
 }
 
-void Camera::Update( BufferIndex updateBufferIndex, const Node& owningNode )
+void Camera::Update( BufferIndex updateBufferIndex )
 {
   // if owning node has changes in world position we need to update camera for next 2 frames
-  if( owningNode.IsLocalMatrixDirty() )
+  if( mNode->IsLocalMatrixDirty() )
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if( owningNode.GetDirtyFlags() & VisibleFlag )
+  if( mNode->GetDirtyFlags() & VisibleFlag )
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,
@@ -301,7 +306,7 @@ void Camera::Update( BufferIndex updateBufferIndex, const Node& owningNode )
   }
 
   // if either matrix changed, we need to recalculate the inverse matrix for hit testing to work
-  unsigned int viewUpdateCount = UpdateViewMatrix( updateBufferIndex, owningNode );
+  unsigned int viewUpdateCount = UpdateViewMatrix( updateBufferIndex );
   unsigned int projectionUpdateCount = UpdateProjection( updateBufferIndex );
 
   // if model or view matrix changed we need to either recalculate the inverse VP or copy previous
@@ -328,7 +333,7 @@ bool Camera::ViewMatrixUpdated()
   return 0u != mUpdateViewFlag;
 }
 
-unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex, const Node& owningNode )
+unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex )
 {
   unsigned int retval( mUpdateViewFlag );
   if( 0u != mUpdateViewFlag )
@@ -346,7 +351,7 @@ unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex, const Node
         case Dali::Camera::FREE_LOOK:
         {
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          viewMatrix = owningNode.GetWorldMatrix( updateBufferIndex );
+          viewMatrix = mNode->GetWorldMatrix( updateBufferIndex );
           viewMatrix.Invert();
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
@@ -354,7 +359,7 @@ unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex, const Node
           // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
         {
-          const Matrix& owningNodeMatrix( owningNode.GetWorldMatrix( updateBufferIndex ) );
+          const Matrix& owningNodeMatrix( mNode->GetWorldMatrix( updateBufferIndex ) );
           Vector3 position, scale;
           Quaternion orientation;
           owningNodeMatrix.GetTransformComponents( position, orientation, scale );
