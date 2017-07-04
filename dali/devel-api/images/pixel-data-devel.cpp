@@ -38,6 +38,14 @@ PixelData New( unsigned char* buffer,
   return PixelData( internal.Get() );
 }
 
+PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData )
+{
+  Internal::PixelData& pixelDataImpl = GetImplementation( pixelData );
+  PixelDataBuffer pixelDataBuffer = pixelDataImpl.ReleaseBuffer();
+  pixelData.Reset();
+  return pixelDataBuffer;
+}
+
 } // namespace DevelPixelData
 
 } // namespace Dali

@@ -31,7 +31,7 @@ namespace DevelPixelData
 {
 
 /**
- * @brief Creates a PixelData object.
+ * @brief Creates a PixelData object, using development pixel formats
  *
  * @param[in] buffer          The raw pixel data
  * @param[in] bufferSize      The size of the buffer in bytes
@@ -47,6 +47,37 @@ DALI_IMPORT_API PixelData New( unsigned char* buffer,
                                unsigned int height,
                                DevelPixel::Format pixelFormat,
                                PixelData::ReleaseFunction releaseFunction );
+
+/**
+ * Struct to keep the buffer pointer and the allocation method.
+ *
+ * @note Need to find a better solution - one library should not
+ * be freeing data from a different source with potentially
+ * different allocators.
+ */
+struct PixelDataBuffer
+{
+  unsigned char* buffer;
+  unsigned int bufferSize;
+  PixelData::ReleaseFunction releaseFunction;
+
+  PixelDataBuffer(  unsigned char* buffer,
+                    unsigned int bufferSize,
+                    PixelData::ReleaseFunction releaseFunction )
+  : buffer(buffer),
+    bufferSize(bufferSize),
+    releaseFunction(releaseFunction)
+  {
+  }
+};
+
+/**
+ * Get the buffer from a pixel data object, zero it in the pixel data object
+ * and release the handle.
+ * @param[in,out] pixelData The pixel data object to take the buffer from
+ * @return the buffer and the data release mechanism
+ */
+PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData );
 
 } // namespace DevelPixelData
 

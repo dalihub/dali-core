@@ -188,7 +188,7 @@ public:
 
   /**
    * Add a camera on scene
-   * @param[in] camera to add
+   * @param[in] camera The camera to add
    */
   void AddCamera( OwnerPointer< Camera >& camera );
 

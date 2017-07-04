@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,17 +48,7 @@ my @system_packages = (
     "doxygen",
     "lcov",
     "libcurl4-gnutls-dev",
-);
-
-my @emscripten_system_packages = (
-    "gnome-common",
     "curl",
-    "tar",
-    "build-essential",
-    "cmake",
-    "nodejs",
-    "default-jre",
-    "python2.7"
 );
 
 # Some packages like require building from source
@@ -74,10 +64,6 @@ my @source_pkgs = (
      # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
      # upgrading DALi to use  c++0x or c++11
      "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
-
-    {"name" => "emscripten",
-     "portable" => "https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz"
-    }
 );
 
 ### Detect any http proxy, part of v8 installation requires this information
@@ -147,17 +133,14 @@ else
 my $src_path         = "$root_path/src-packages";
 my $sbs_path         = "$root_path/target";
 my $install_path     = "$root_path/opt";
-my $emscripten_path  = "$root_path/emsdk_portable";
 
 my $opt_create=0;
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
-my $opt_emscripten=0;
 
 GetOptions("create"     => \$opt_create,
            "setenv"     => \$opt_setenv,
-           "emscripten" => \$opt_emscripten,
            "help"       => \$opt_help,
            "man"        => \$opt_man) or pod2usage(2);
 
@@ -193,23 +176,6 @@ sub in_dali_env
 
 sub create_setenv
 {
-    if( ( -d $emscripten_path ) || $opt_emscripten )
-    {
-        print <<"EOF";
-#
-# Emscripten environment
-#  - which brazenly overwrites PATH so we set this first
-#  - NB: If you change the tools within emsdk then you'll need to recreate this file
-#
-
-EOF
-        my $emsdk_env_file = $emscripten_path . '/emsdk_set_env.sh';
-        open(FILE, $emsdk_env_file) or die "Can't read file enscripten env file" . $emsdk_env_file;
-        my @emsdk_env = <FILE>;
-        close (FILE);
-        print @emsdk_env;
-    }
-
     print <<"EOF";
 #
 # To use the desktop libraries, please add the following lines to your .bashrc or
@@ -256,11 +222,6 @@ sub check_system_packages
 
     check_system_package(@system_packages);
 
-    if($opt_emscripten)
-    {
-        check_system_package(@emscripten_system_packages);
-    }
-
     my $gnome_v =`dpkg -l gnome-common| tail -1| sed "s/ \\+/ /g" | cut -d' ' -f 3`;
     my @am = split(/\./, `automake --version | head -1 | cut -f4 -d' '`);
     if($gnome_v =~ /$2.24/ && $am[1]>10)
@@ -289,10 +250,6 @@ sub check_source_packages
         if($pkg eq "v8")
         {
             install_v8( $pkgref );
-        }
-        elsif($pkg eq "emscripten" && $opt_emscripten)
-        {
-            install_emscripten( $pkgref );
         }
     }
 }
@@ -577,62 +534,6 @@ END
 }
 
 ################################################################################
-#
-# install the latest emscripten in a portable directory
-#
-################################################################################
-sub install_emscripten
-{
-    my $info = $_[0];
-    my $ret;
-    print( "Checking if Emscripten is up to date\n");
-
-    my $portable = $info->{"portable"};
-
-    my $current_dir = getcwd();
-
-    print( "\n");
-    print( "Installing or updating Emscripten.\n");
-    print( ".....You may need a cup of tea.\n");
-    print( ".......... In fact, take the afternoon off.\n");
-    print( "\n");
-
-    if(-e $emscripten_path)
-    {
-        chdir( $emscripten_path );
-    }
-    else
-    {
-        chdir( $root_path );
-
-        system("curl -O " . $portable) == 0
-            or die "curl failed with error $?. :" . $portable;
-
-        my($filename, $dirs, $suffix) = fileparse($portable);
-
-        system("tar -xvf " . $filename . $suffix) == 0
-            or die "tar unpack failed (nb tar.gz is the presumed downloaded format):" . $filename . $suffix;
-
-        system("rm " . $filename . $suffix) == 0
-            or die "Cannot remove emsdk portable tar file:" . $filename . $suffix;
-
-        chdir( $emscripten_path );
-    }
-
-    system("./emsdk update") == 0
-        or die "Cannot run emsdk? Did the install fail?";
-
-    system("./emsdk install latest");
-    system("./emsdk activate latest");
-    system("bash -c \"source ./emsdk_env.sh\""); # emsdk uses popd ie expects bash
-
-    system("emsdk list");
-
-    chdir($current_dir);
-}
-
-
-################################################################################
 #                                       MAIN
 ################################################################################
 
@@ -704,10 +605,6 @@ Create a DALi environment directory in the current directory.
 =item B<-s|--setenv>
 
 Display environment variables to setup.
-
-=item B<-e|--emscripten>
-
-Include emscripten (use with -c to install with emscripten or -s to setup env vars with emscripten).
 
 =item B<-h|--help>
 

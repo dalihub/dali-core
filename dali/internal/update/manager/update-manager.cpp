@@ -198,7 +198,8 @@ struct UpdateManager::Impl
     frameCounter( 0 ),
     animationFinishedDuringUpdate( false ),
     previousUpdateScene( false ),
-    renderTaskWaiting( false )
+    renderTaskWaiting( false ),
+    renderersAdded( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -302,6 +303,7 @@ struct UpdateManager::Impl
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
   bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
   bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
+  bool                                renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
 
 private:
 
@@ -545,6 +547,7 @@ void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
   renderer->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   mImpl->renderers.PushBack( renderer.Release() );
+  mImpl->renderersAdded = true;
 }
 
 void UpdateManager::RemoveRenderer( Renderer* renderer )
@@ -893,27 +896,37 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
-    //Process the RenderTasks; this creates the instructions for rendering the next frame.
-    //reset the update buffer index and make sure there is enough room in the instruction container
-    mImpl->renderInstructions.ResetAndReserve( bufferIndex,
-                                               mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
-
-    if ( NULL != mImpl->root )
+    //Update cameras
+    const CameraOwner::Iterator endCameraIterator = mImpl->cameras.End();
+    for( CameraOwner::Iterator cameraIterator = mImpl->cameras.Begin(); endCameraIterator != cameraIterator; ++cameraIterator )
     {
-      mImpl->renderTaskProcessor.Process( bufferIndex,
-                                        mImpl->taskList,
-                                        *mImpl->root,
-                                        mImpl->sortedLayers,
-                                        mImpl->renderInstructions );
+      ( *cameraIterator )->Update( bufferIndex );
+    }
 
-      // Process the system-level RenderTasks last
-      if ( NULL != mImpl->systemLevelRoot )
+    //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
+    //reset the update buffer index and make sure there is enough room in the instruction container
+    if( mImpl->renderersAdded )
+    {
+      mImpl->renderInstructions.ResetAndReserve( bufferIndex,
+                                                 mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
+
+      if ( NULL != mImpl->root )
       {
         mImpl->renderTaskProcessor.Process( bufferIndex,
-                                          mImpl->systemLevelTaskList,
-                                          *mImpl->systemLevelRoot,
-                                          mImpl->systemLevelSortedLayers,
+                                          mImpl->taskList,
+                                          *mImpl->root,
+                                          mImpl->sortedLayers,
                                           mImpl->renderInstructions );
+
+        // Process the system-level RenderTasks last
+        if ( NULL != mImpl->systemLevelRoot )
+        {
+          mImpl->renderTaskProcessor.Process( bufferIndex,
+                                            mImpl->systemLevelTaskList,
+                                            *mImpl->systemLevelRoot,
+                                            mImpl->systemLevelSortedLayers,
+                                            mImpl->renderInstructions );
+        }
       }
     }
   }

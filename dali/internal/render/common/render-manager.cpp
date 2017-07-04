@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ struct RenderManager::Impl
     samplerContainer(),
     textureContainer(),
     frameBufferContainer(),
-    renderersAdded( false ),
+    lastFrameWasRendered( false ),
     programController( glAbstraction )
   {
   }
@@ -141,7 +141,7 @@ struct RenderManager::Impl
   PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
   GeometryOwnerContainer        geometryContainer;        ///< List of owned Geometries
 
-  bool                          renderersAdded;
+  bool                          lastFrameWasRendered;     ///< Keeps track of the last frame being rendered due to having render instructions
 
   RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
 
@@ -235,11 +235,6 @@ void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
   renderer->Initialize( mImpl->context );
 
   mImpl->rendererContainer.PushBack( renderer.Release() );
-
-  if( !mImpl->renderersAdded )
-  {
-    mImpl->renderersAdded = true;
-  }
 }
 
 void RenderManager::RemoveRenderer( Render::Renderer* renderer )
@@ -435,52 +430,65 @@ void RenderManager::Render( Integration::RenderStatus& status )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  // switch rendering to adaptor provided (default) buffer
-  mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+  const size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  const bool haveInstructions = count > 0u;
 
-  mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
-                           mImpl->defaultSurfaceRect.y,
-                           mImpl->defaultSurfaceRect.width,
-                           mImpl->defaultSurfaceRect.height );
-
-  mImpl->context.ClearColor( mImpl->backgroundColor.r,
-                             mImpl->backgroundColor.g,
-                             mImpl->backgroundColor.b,
-                             mImpl->backgroundColor.a );
-
-  mImpl->context.ClearStencil( 0 );
-
-  // Clear the entire color, depth and stencil buffers for the default framebuffer.
-  // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
-  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-  mImpl->context.SetScissorTest( false );
-  mImpl->context.ColorMask( true );
-  mImpl->context.DepthMask( true );
-  mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-  mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
-
-  // reset the program matrices for all programs once per frame
-  // this ensures we will set view and projection matrix once per program per camera
-  mImpl->programController.ResetProgramMatrices();
-
-  size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
-  for ( size_t i = 0; i < count; ++i )
+  // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
+  if( haveInstructions || mImpl->lastFrameWasRendered )
   {
-    RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+    // Mark that we will require a post-render step to be performed (includes swap-buffers).
+    status.SetNeedsPostRender( true );
 
-    DoRender( instruction );
+    // switch rendering to adaptor provided (default) buffer
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                             mImpl->defaultSurfaceRect.y,
+                             mImpl->defaultSurfaceRect.width,
+                             mImpl->defaultSurfaceRect.height );
+
+    mImpl->context.ClearColor( mImpl->backgroundColor.r,
+                               mImpl->backgroundColor.g,
+                               mImpl->backgroundColor.b,
+                               mImpl->backgroundColor.a );
+
+    mImpl->context.ClearStencil( 0 );
+
+    // Clear the entire color, depth and stencil buffers for the default framebuffer.
+    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+    mImpl->context.SetScissorTest( false );
+    mImpl->context.ColorMask( true );
+    mImpl->context.DepthMask( true );
+    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, Context::FORCE_CLEAR );
+
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    mImpl->programController.ResetProgramMatrices();
+
+    for( size_t i = 0; i < count; ++i )
+    {
+      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+
+      DoRender( instruction );
+    }
+
+    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+    mImpl->UpdateTrackers();
+
+    //Notify RenderGeometries that rendering has finished
+    for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
+    {
+      (*iter)->OnRenderFinished();
+    }
   }
-  GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-  mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
-  mImpl->UpdateTrackers();
-
-  //Notify RenderGeometries that rendering has finished
-  for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
-  {
-    (*iter)->OnRenderFinished();
-  }
+  // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
+  mImpl->lastFrameWasRendered = haveInstructions;
 
   /**
    * The rendering has finished; swap to the next buffer.

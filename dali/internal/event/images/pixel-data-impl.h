@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/images/pixel-data-devel.h>
 
 namespace Dali
 {
@@ -111,44 +112,14 @@ public:
   unsigned int GetBufferSize() const;
 
   /**
-   * Apply the mask to this data
-   * @param[in] mask The mask to apply
+   * Return the buffer pointer and reset the internal buffer to zero.
+   * @return The buffer pointer and associated data.
    */
-  void ApplyMask( const PixelData& mask );
+  DevelPixelData::PixelDataBuffer ReleaseBuffer();
 
 private:
-  /**
-   * Release the buffer
-   */
-  void ReleaseBuffer();
 
-  /**
-   * Apply the mask to this data's alpha channel
-   * @param[in] mask The mask to apply
-   */
-  void ApplyMaskToAlphaChannel( const PixelData& mask );
-
-  /**
-   * Convert to RGBA8888 and apply the mask's alpha channel
-   * to this data's alpha channel
-   * @param[in] mask The mask to apply
-   */
-  void AddAlphaChannel( const PixelData& mask );
-
-  /**
-   * Apply the mask to this data's color channels (e.g. to apply vignette)
-   * @param[in] mask The mask to apply
-   */
-  void ApplyMaskToColorChannels( const PixelData& mask );
-
-  /**
-   * Read a weighted sample from a pixel (of unknown size)
-   * @param[in] x The x coordinate to sample from
-   * @param[in] y The y coordinate to sample from
-   */
-  float ReadWeightedSample( float x, float y ) const;
-
-   /*
+  /*
    * Undefined copy constructor.
    */
   PixelData(const PixelData& other);
@@ -156,7 +127,7 @@ private:
   /*
    * Undefined assignment operator.
    */
-  PixelData& operator= (const PixelData& other);
+  PixelData& operator = (const PixelData& other);
 
 private:
 

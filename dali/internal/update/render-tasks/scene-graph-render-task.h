@@ -33,7 +33,6 @@ namespace Dali
 
 namespace Internal
 {
-class FrameBufferTexture;
 
 namespace Render
 {
@@ -375,8 +374,6 @@ private:
   bool mExclusive: 1; ///< Whether the render task has exclusive access to the source actor (node in the scene graph implementation).
   bool mClearEnabled: 1; ///< Whether previous results are cleared.
   bool mCullMode: 1; ///< Whether renderers should be frustum culled
-
-  FrameBufferTexture* mRenderTarget;
 
   State mState;                     ///< Render state.
   unsigned int mRefreshRate;        ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames

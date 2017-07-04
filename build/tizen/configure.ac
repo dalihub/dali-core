@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,12 +45,6 @@ AC_ARG_ENABLE([debug],
               [enable_debug=$enableval],
               [enable_debug=no])
 
-AC_ARG_ENABLE([emscripten],
-              [AC_HELP_STRING([--enable-emscripten],
-                              [Emscripten builds])],
-              [enable_emscripten=$enableval],
-              [enable_emscripten=no])
-
 AC_ARG_ENABLE([backtrace],
               [AC_HELP_STRING([--enable-backtrace],
                               [Backtrace for exceptions])],
@@ -79,20 +73,12 @@ if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_CFLAGS="$DALI_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
-if test "x$enable_emscripten" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
-  # Automatically turn off backtrace support and mutex locks
-  enable_backtrace="no"
-  enable_lock_backtrace="no"
-fi
-
-# Must come after Emscripten feature test
 if test "x$enable_lock_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DLOCK_BACKTRACE_ENABLED"
   enable_backtrace="yes"
 fi
 
-# Must come after Emscripten & locks backtrace feature test
+# Must come after locks backtrace feature test
 if test "x$enable_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DBACKTRACE_ENABLED"
 fi
@@ -136,7 +122,6 @@ Configuration
   Debug Build:                      $enable_debug
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
-  Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
 "

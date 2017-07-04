@@ -4218,6 +4218,98 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyClippingActorDrawOrder(void)
+{
+  // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
+  tet_infoline( "Testing Actor::Property::CLIPPING_MODE draw order" );
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  /* We create a small tree of actors as follows:
+
+                           A
+                          / \
+     Clipping enabled -> B   D
+                         |   |
+                         C   E
+
+     The correct draw order is "ABCDE" (the same as if clipping was not enabled).
+  */
+  Actor actors[5];
+  for( int i = 0; i < 5; ++i )
+  {
+    BufferImage image = BufferImage::New( 16u, 16u );
+    Actor actor = CreateRenderableActor( image );
+
+    // Setup dimensions and position so actor is not skipped by culling.
+    actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+    actor.SetSize( 16.0f, 16.0f );
+
+    if( i == 0 )
+    {
+      actor.SetParentOrigin( ParentOrigin::CENTER );
+    }
+    else
+    {
+      float b = i > 2 ? 1.0f : -1.0f;
+      actor.SetParentOrigin( Vector3( 0.5 + ( 0.2f * b ), 0.8f, 0.8f ) );
+    }
+
+    actors[i] = actor;
+  }
+
+  // Enable clipping on the actor at the top of the left branch.
+  actors[1].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  // Build the scene graph.
+  Stage::GetCurrent().Add( actors[0] );
+
+  // Left branch:
+  actors[0].Add( actors[1] );
+  actors[1].Add( actors[2] );
+
+  // Right branch:
+  actors[0].Add( actors[3] );
+  actors[3].Add( actors[4] );
+
+  // Gather the call trace.
+  enabledDisableTrace.Reset();
+  enabledDisableTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+  enabledDisableTrace.Enable( false );
+
+  /* Check stencil is enabled and disabled again (as right-hand branch of tree is drawn).
+
+     Note: Correct enable call trace:    StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960 StackTrace: Index:2, Function:Disable, ParamList:2960
+           Incorrect enable call trace:  StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960
+  */
+  size_t startIndex = 0u;
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Enable",  "3042", startIndex ) );
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Enable",  "2960", startIndex ) ); // 2960 is GL_STENCIL_TEST
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Disable", "2960", startIndex ) );
+
+  // Swap the clipping actor from top of left branch to top of right branch.
+  actors[1].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+  actors[3].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  // Gather the call trace.
+  enabledDisableTrace.Reset();
+  enabledDisableTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+  enabledDisableTrace.Enable( false );
+
+  // Check stencil is enabled but NOT disabled again (as right-hand branch of tree is drawn).
+  // This proves the draw order has remained the same.
+  startIndex = 0u;
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex(  "Enable",  "2960", startIndex ) );
+  DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Disable", "2960", startIndex ) );
+
+  END_TEST;
+}
+
 int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 {
   // This test checks that an actor with clipping will be ignored if overridden by the Renderer properties.
