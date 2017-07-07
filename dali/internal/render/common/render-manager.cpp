@@ -436,6 +436,9 @@ void RenderManager::Render( Integration::RenderStatus& status )
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
   if( haveInstructions || mImpl->lastFrameWasRendered )
   {
+    // Mark that we will require a post-render step to be performed (includes swap-buffers).
+    status.SetNeedsPostRender( true );
+
     // switch rendering to adaptor provided (default) buffer
     mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 
