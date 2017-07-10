@@ -29,7 +29,9 @@ namespace Internal
 
 TexturePtr Texture::New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
 {
-  TexturePtr texture( new Texture( type, format, width, height ) );
+  constexpr auto max_value = std::numeric_limits< uint16_t >::max();
+  DALI_ASSERT_ALWAYS( ( width < max_value )&&( height < max_value )&& "Size out of range" );
+  TexturePtr texture( new Texture( type, format, ImageDimensions( width, height) ) );
   texture->Initialize();
   return texture;
 }
@@ -46,14 +48,13 @@ Render::Texture* Texture::GetRenderObject() const
   return mRenderObject;
 }
 
-Texture::Texture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
+Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
   mNativeImage(),
+  mSize( size ),
   mType( type ),
-  mFormat( format ),
-  mWidth( width ),
-  mHeight( height )
+  mFormat( format )
 {
 }
 
@@ -61,10 +62,9 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
   mNativeImage( nativeImageInterface ),
+  mSize( nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight() ),
   mType( TextureType::TEXTURE_2D ),
-  mFormat( Pixel::RGB888 ),
-  mWidth( nativeImageInterface->GetWidth() ),
-  mHeight( nativeImageInterface->GetHeight() )
+  mFormat( Pixel::RGB888 )
 {
 }
 
@@ -78,7 +78,7 @@ void Texture::Initialize()
     }
     else
     {
-      mRenderObject = new Render::Texture( mType, mFormat, mWidth, mHeight );
+      mRenderObject = new Render::Texture( mType, mFormat, mSize );
     }
 
     OwnerPointer< Render::Texture > transferOwnership( mRenderObject );
@@ -100,10 +100,19 @@ bool Texture::Upload( PixelDataPtr pixelData )
 }
 
 bool Texture::Upload( PixelDataPtr pixelData,
-                         unsigned int layer, unsigned int mipmap,
-                         unsigned int xOffset, unsigned int yOffset,
-                         unsigned int width, unsigned int height )
+                      unsigned int layer, unsigned int mipmap,
+                      unsigned int xOffset, unsigned int yOffset,
+                      unsigned int width, unsigned int height )
 {
+  constexpr auto max_value = std::numeric_limits< uint16_t >::max();
+  DALI_ASSERT_ALWAYS( layer < max_value &&
+                      mipmap < max_value &&
+                      xOffset < max_value &&
+                      yOffset < max_value &&
+                      width < max_value &&
+                      height < max_value &&
+                      "Parameter value out of range" );
+
   bool result(false);
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
@@ -127,15 +136,20 @@ bool Texture::Upload( PixelDataPtr pixelData,
           {
             DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture\n");
           }
-          else if( ( xOffset + width  > ( mWidth  / (1<<mipmap) ) ) ||
-              ( yOffset + height > ( mHeight / (1<<mipmap) ) ) )
+          else if( ( xOffset + width  > ( mSize.GetWidth()  / (1u << mipmap) ) ) ||
+              ( yOffset + height > ( mSize.GetHeight() / (1u << mipmap) ) ) )
           {
             DALI_LOG_ERROR( "Texture update area out of bounds\n");
           }
           else
           {
             //Parameters are correct. Send message to upload data to the texture
-            UploadParams params = { layer, mipmap, xOffset, yOffset, width, height };
+            UploadParams params = { static_cast< uint16_t >( layer ),
+                                    static_cast< uint16_t >( mipmap ),
+                                    static_cast< uint16_t >( xOffset ),
+                                    static_cast< uint16_t >( yOffset ),
+                                    static_cast< uint16_t >( width ),
+                                    static_cast< uint16_t >( height ) };
             UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
             result = true;
           }
@@ -161,12 +175,12 @@ void Texture::GenerateMipmaps()
 
 unsigned int Texture::GetWidth() const
 {
-  return mWidth;
+  return mSize.GetWidth();
 }
 
 unsigned int Texture::GetHeight() const
 {
-  return mHeight;
+  return mSize.GetHeight();
 }
 
 } // namespace Internal
