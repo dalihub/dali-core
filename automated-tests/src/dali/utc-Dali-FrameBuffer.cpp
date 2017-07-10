@@ -326,6 +326,10 @@ int UtcDaliFramebufferContextLoss(void)
   DALI_TEST_CHECK( frameBuffer );
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
 
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
   application.SendNotification();
   application.Render(16);
 
