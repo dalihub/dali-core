@@ -47,6 +47,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 
   GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
   GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
+  GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
 
   // Emit the key event signal from stage.
   consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );

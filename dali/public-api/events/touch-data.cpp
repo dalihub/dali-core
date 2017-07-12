@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/events/touch-event-devel.h>
 #include <dali/internal/event/events/touch-data-impl.h>
 
 #include <cstdio>
@@ -100,6 +101,16 @@ float TouchData::GetPressure( std::size_t point ) const
 Degree TouchData::GetAngle( std::size_t point ) const
 {
   return GetImplementation( *this ).GetAngle( point );
+}
+
+DevelDevice::Class::Type DevelTouchData::GetDeviceClass( const TouchData& touch, std::size_t point )
+{
+  return GetImplementation( touch ).GetDeviceClass( point );
+}
+
+DevelDevice::Subclass::Type DevelTouchData::GetDeviceSubclass( const TouchData& touch, std::size_t point )
+{
+  return GetImplementation( touch ).GetDeviceSubclass( point );
 }
 
 TouchData::TouchData( Internal::TouchData* internal )

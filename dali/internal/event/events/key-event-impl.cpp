@@ -39,7 +39,8 @@ namespace Internal
 
 KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
 : mDeviceName( "" ),
-  mDeviceClass( DevelKeyEvent::DeviceClass::NONE )
+  mDeviceClass( DevelDevice::Class::NONE ),
+  mDeviceSubclass( DevelDevice::Subclass::NONE )
 {
   keyEventImplMap[keyEvent] = this;
 }
@@ -62,6 +63,7 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
   {
     mDeviceName = rhs.mDeviceName;
     mDeviceClass = rhs.mDeviceClass;
+    mDeviceSubclass = rhs.mDeviceSubclass;
   }
 
   return *this;
@@ -77,14 +79,24 @@ void KeyEventImpl::SetDeviceName( const std::string& deviceName )
   mDeviceName = deviceName;
 }
 
-DevelKeyEvent::DeviceClass::Type KeyEventImpl::GetDeviceClass() const
+DevelDevice::Class::Type KeyEventImpl::GetDeviceClass() const
 {
   return mDeviceClass;
 }
 
-void KeyEventImpl::SetDeviceClass( const DevelKeyEvent::DeviceClass::Type& deviceClass )
+void KeyEventImpl::SetDeviceClass( DevelDevice::Class::Type deviceClass )
 {
   mDeviceClass = deviceClass;
+}
+
+DevelDevice::Subclass::Type KeyEventImpl::GetDeviceSubclass() const
+{
+  return mDeviceSubclass;
+}
+
+void KeyEventImpl::SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass )
+{
+  mDeviceSubclass = deviceSubclass;
 }
 
 } // namsespace Internal
