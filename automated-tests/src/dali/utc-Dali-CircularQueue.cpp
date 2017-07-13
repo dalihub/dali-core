@@ -20,7 +20,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/public-api/common/circular-queue.h>
+#include <dali/devel-api/common/circular-queue.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;

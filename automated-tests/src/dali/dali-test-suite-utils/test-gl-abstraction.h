@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -426,6 +426,7 @@ public:
       paramName<<"texture["<<i<<"]";
       namedParams[paramName.str()] = ToString(textures[i]);
       mDeletedTextureIds.push_back(textures[i]);
+      mNumGeneratedTextures--;
     }
     out << "]";
 
@@ -642,6 +643,7 @@ public:
       {
         *(textures+i) = ++mLastAutoTextureIdUsed;
       }
+      mNumGeneratedTextures++;
     }
 
     TraceCallStack::NamedParams namedParams;
@@ -661,6 +663,15 @@ public:
     }
 
     mTextureTrace.PushCall("GenTextures", out.str(), namedParams);
+  }
+
+  inline GLuint GetLastGenTextureId()
+  {
+    return mLastAutoTextureIdUsed;
+  }
+  inline GLuint GetNumGeneratedTextures()
+  {
+    return mNumGeneratedTextures;
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
@@ -2158,6 +2169,7 @@ private:
 
   // Data for manipulating the IDs returned by GenTextures
   GLuint mLastAutoTextureIdUsed;
+  GLuint mNumGeneratedTextures;
   std::vector<GLuint> mNextTextureIds;
   std::vector<GLuint> mDeletedTextureIds;
   std::vector<GLuint> mBoundTextures;
