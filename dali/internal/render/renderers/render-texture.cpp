@@ -623,20 +623,20 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 } //Unnamed namespace
 
 
-Texture::Texture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
-:mId( 0 ),
- mTarget( ( type == TextureType::TEXTURE_2D ) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
- mType( type ),
- mSampler(),
- mNativeImage(),
- mGlFormat( GL_RGB ),
- mGlInternalFormat( GL_RGB ),
- mPixelDataType( GL_UNSIGNED_BYTE ),
- mWidth( width ),
- mHeight( height ),
- mMaxMipMapLevel( 0 ),
- mHasAlpha( HasAlpha( format ) ),
- mIsCompressed( IsCompressedFormat( format ) )
+Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
+: mNativeImage(),
+  mSampler(),
+  mId( 0 ),
+  mTarget( ( type == TextureType::TEXTURE_2D ) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
+  mGlInternalFormat( GL_RGB ),
+  mGlFormat( GL_RGB ),
+  mPixelDataType( GL_UNSIGNED_BYTE ),
+  mWidth( size.GetWidth() ),
+  mHeight( size.GetHeight() ),
+  mMaxMipMapLevel( 0 ),
+  mType( type ),
+  mHasAlpha( HasAlpha( format ) ),
+  mIsCompressed( IsCompressedFormat( format ) )
 {
   PixelFormatToGl( static_cast<DevelPixel::Format>( format ),
                    mGlFormat,
@@ -645,19 +645,19 @@ Texture::Texture( Type type, Pixel::Format format, unsigned int width, unsigned 
 }
 
 Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
-:mId( 0 ),
- mTarget( GL_TEXTURE_2D ),
- mType( TextureType::TEXTURE_2D ),
- mSampler(),
- mNativeImage( nativeImageInterface ),
- mGlFormat( GL_RGB ),
- mGlInternalFormat( GL_RGB ),
- mPixelDataType( GL_UNSIGNED_BYTE ),
- mWidth( nativeImageInterface->GetWidth() ),
- mHeight( nativeImageInterface->GetHeight() ),
- mMaxMipMapLevel( 0 ),
- mHasAlpha( nativeImageInterface->RequiresBlending() ),
- mIsCompressed( false )
+: mNativeImage( nativeImageInterface ),
+  mSampler(),
+  mId( 0 ),
+  mTarget( GL_TEXTURE_2D ),
+  mGlInternalFormat( GL_RGB ),
+  mGlFormat( GL_RGB ),
+  mPixelDataType( GL_UNSIGNED_BYTE ),
+  mWidth( nativeImageInterface->GetWidth() ),
+  mHeight( nativeImageInterface->GetHeight() ),
+  mMaxMipMapLevel( 0 ),
+  mType( TextureType::TEXTURE_2D ),
+  mHasAlpha( nativeImageInterface->RequiresBlending() ),
+  mIsCompressed( false )
 {
 }
 
