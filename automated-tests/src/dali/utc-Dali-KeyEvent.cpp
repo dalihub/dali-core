@@ -311,9 +311,10 @@ int UtcDaliIntegrationKeyEvent(void)
     const unsigned long timeStamp(132);
     const Integration::KeyEvent::State keyState(Integration::KeyEvent::Up);
     const std::string deviceName("hwKeyboard");
-    const DevelKeyEvent::DeviceClass::Type deviceClass = DevelKeyEvent::DeviceClass::KEYBOARD;
+    const DevelDevice::Class::Type deviceClass = DevelDevice::Class::KEYBOARD;
+    const DevelDevice::Subclass::Type deviceSubclass = DevelDevice::Subclass::NONE;
 
-    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState, deviceName, deviceClass );
+    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState, deviceName, deviceClass, deviceSubclass );
     DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
     DALI_TEST_CHECK( keyEvent.keyName == keyName );
     DALI_TEST_CHECK( keyEvent.keyString == keyString );
@@ -323,6 +324,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_EQUALS( keyEvent.state, keyState, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceName, deviceName, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceClass, deviceClass, TEST_LOCATION);
+    DALI_TEST_EQUALS( keyEvent.deviceSubclass, deviceSubclass, TEST_LOCATION);
   }
   END_TEST;
 }
@@ -343,7 +345,8 @@ int UtcDaliIntegrationKeyEventConvertor(void)
   DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
   DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
   DALI_TEST_EQUALS( keyEvent.deviceName, "", TEST_LOCATION);
-  DALI_TEST_EQUALS( keyEvent.deviceClass, DevelKeyEvent::DeviceClass::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS( keyEvent.deviceClass, DevelDevice::Class::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS( keyEvent.deviceSubclass, DevelDevice::Subclass::NONE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -365,7 +368,18 @@ int UtcDaliKeyEventSetDeviceClass(void)
 
   KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
 
-  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceClass( event ), DevelKeyEvent::DeviceClass::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceClass( event ), DevelDevice::Class::NONE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventSetDeviceSubclass(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
+
+  DALI_TEST_EQUALS( DevelKeyEvent::GetDeviceSubclass( event ), DevelDevice::Subclass::NONE, TEST_LOCATION);
 
   END_TEST;
 }

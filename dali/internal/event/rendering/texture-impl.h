@@ -23,6 +23,7 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
@@ -48,12 +49,12 @@ public:
    */
   struct UploadParams
   {
-    unsigned int layer;    ///< Specifies the layer of a cube map or array texture
-    unsigned int mipmap;   ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
-    unsigned int xOffset;  ///< Specifies a texel offset in the x direction within the texture array.
-    unsigned int yOffset;  ///< Specifies a texel offset in the y direction within the texture array.
-    unsigned int width;    ///< Specifies the width of the texture subimage
-    unsigned int height;   ///< Specifies the height of the texture subimage.
+    uint16_t layer;    ///< Specifies the layer of a cube map or array texture
+    uint16_t mipmap;   ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+    uint16_t xOffset;  ///< Specifies a texel offset in the x direction within the texture array.
+    uint16_t yOffset;  ///< Specifies a texel offset in the y direction within the texture array.
+    uint16_t width;    ///< Specifies the width of the texture subimage
+    uint16_t height;   ///< Specifies the height of the texture subimage.
   };
 
   /**
@@ -115,10 +116,9 @@ private: // implementation
    * Constructor
    * @param[in] type The type of the texture
    * @param[in] format The format of the pixel data
-   * @param[in] width The width of the texture
-   * @param[in] height The height of the texture
+   * @param[in] size The size of the texture
    */
-  Texture(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
+  Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size );
 
   /**
    * Constructor from native image
@@ -148,10 +148,10 @@ private: // data
   Internal::Render::Texture* mRenderObject;            ///<The Render::Texture associated to this texture
 
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
-  Dali::TextureType::Type mType;      ///< Texture type (cached)
-  Pixel::Format mFormat;              ///< Pixel format
-  unsigned int mWidth;                ///< Width of the texture
-  unsigned int mHeight;               ///< Height of the texture
+  ImageDimensions mSize;                ///< Size of the texture
+  Dali::TextureType::Type mType;        ///< Texture type (cached)
+  Pixel::Format mFormat;                ///< Pixel format
+
 };
 
 } // namespace Internal

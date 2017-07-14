@@ -28,6 +28,8 @@ Point::Point()
 : mTouchPoint( 0, TouchPoint::Started, 0.0f, 0.0f ),
   mEllipseRadius(),
   mAngle( 0.0f ),
+  mDeviceClass( DevelDevice::Class::NONE ),
+  mDeviceSubclass( DevelDevice::Subclass::NONE ),
   mPressure( 1.0f ),
   mRadius( 0.0f )
 {
@@ -37,6 +39,8 @@ Point::Point( const TouchPoint& touchPoint )
 : mTouchPoint( touchPoint ),
   mEllipseRadius(),
   mAngle( 0.0f ),
+  mDeviceClass( DevelDevice::Class::NONE ),
+  mDeviceSubclass( DevelDevice::Subclass::NONE ),
   mPressure( 1.0f ),
   mRadius( 0.0f )
 {
@@ -140,6 +144,26 @@ const Vector2& Point::GetLocalPosition() const
 const TouchPoint& Point::GetTouchPoint() const
 {
   return mTouchPoint;
+}
+
+void Point::SetDeviceClass( DevelDevice::Class::Type deviceClass )
+{
+  mDeviceClass = deviceClass;
+}
+
+void Point::SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass )
+{
+  mDeviceSubclass = deviceSubclass;
+}
+
+DevelDevice::Class::Type Point::GetDeviceClass() const
+{
+  return mDeviceClass;
+}
+
+DevelDevice::Subclass::Type Point::GetDeviceSubclass() const
+{
+  return mDeviceSubclass;
 }
 
 } // namespace Integration

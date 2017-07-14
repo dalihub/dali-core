@@ -158,6 +158,20 @@ public:
    */
   void AddPoint( const Integration::Point& point );
 
+    /**
+   * @brief Get the device class the mouse/touch event originated from
+   *
+   * @return The device class
+   */
+  DevelDevice::Class::Type GetDeviceClass( std::size_t point ) const;
+
+  /**
+   * @brief Get the device subclass the mouse/touch event originated from
+   *
+   * @return The device subclass
+   */
+  DevelDevice::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
+
 private:
 
   /// Undefined Copy constructor
@@ -165,6 +179,8 @@ private:
 
   /// Undefined
   TouchData& operator=( const TouchData& other );
+
+private:
 
   std::vector< Integration::Point > mPoints; ///< Container of the points for this touch event.
   unsigned long mTime; ///< The time (in ms) that the touch event occurred.

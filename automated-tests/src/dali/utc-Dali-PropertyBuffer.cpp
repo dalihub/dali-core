@@ -118,40 +118,46 @@ int UtcDaliPropertyBufferSetData01(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat );
-  DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
+  {
+    PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat );
+    DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
 
-  const float halfQuadSize = .5f;
-  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
-  TexturedQuadVertex texturedQuadVertexData[4] = {
-    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
-    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
-    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
-    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+    const float halfQuadSize = .5f;
+    struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+    TexturedQuadVertex texturedQuadVertexData[4] = {
+      { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+      { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+      { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+      { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
 
-  propertyBuffer.SetData( texturedQuadVertexData, 4 );
+    propertyBuffer.SetData( texturedQuadVertexData, 4 );
 
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( propertyBuffer );
+    Geometry geometry = Geometry::New();
+    geometry.AddVertexBuffer( propertyBuffer );
 
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
-  Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
-  actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+    Shader shader = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
+    Actor actor = Actor::New();
+    actor.SetSize(Vector3::ONE * 100.f);
+    actor.AddRenderer(renderer);
+    Stage::GetCurrent().Add(actor);
 
+    application.SendNotification();
+    application.Render(0);
+    application.Render();
+    application.SendNotification();
+
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+        application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
+
+  }
+  // end of scope to let the buffer and geometry die; do another notification and render to get the deletion processed
   application.SendNotification();
   application.Render(0);
-  application.Render();
-  application.SendNotification();
-
-  const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-      application.GetGlAbstraction().GetBufferDataCalls();
-
-  DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
 
   END_TEST;
 }
