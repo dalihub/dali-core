@@ -24,6 +24,8 @@
 namespace Dali
 {
 
+class FrameCallbackInterface;
+
 namespace DevelStage
 {
 
@@ -64,6 +66,27 @@ DALI_CORE_API void SetRenderingBehavior( Dali::Stage stage, Rendering renderingB
  * @return The rendering behavior of DALi.
  */
 DALI_CORE_API Rendering GetRenderingBehavior( Dali::Stage stage );
+
+/*
+ * @brief The FrameCallbackInterface implementation added gets called on every frame from the update-thread.
+ *
+ * @param[in] stage The stage to set the FrameCallbackInterface implementation on
+ * @param[in] frameCallback An implementation of the FrameCallbackInterface
+ * @param[in] rootActor The root-actor in the scene that the callback applies to
+ *
+ * @note Only the rootActor and it's children will be parsed by the UpdateProxy.
+ * @note If the rootActor is destroyed, then the callback is automatically removed
+ * @see FrameCallbackInterface
+ */
+DALI_IMPORT_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor );
+
+/**
+ * @brief Removes the specified FrameCallbackInterface implementation from being called on every frame.
+ *
+ * @param[in] stage The stage to clear the FrameCallbackInterface on
+ * @param[in] frameCallback The FrameCallbackInterface implementation to remove
+ */
+DALI_IMPORT_API void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback );
 
 } // namespace DevelStage
 

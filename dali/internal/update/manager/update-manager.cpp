@@ -44,6 +44,7 @@
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/update-algorithms.h>
@@ -195,6 +196,7 @@ struct UpdateManager::Impl
     shaders(),
     panGestureProcessor( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
+    frameCallbackProcessor( NULL ),
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
@@ -256,6 +258,18 @@ struct UpdateManager::Impl
     delete sceneController;
   }
 
+  /**
+   * Lazy init for FrameCallbackProcessor.
+   */
+  FrameCallbackProcessor& GetFrameCallbackProcessor()
+  {
+    if( ! frameCallbackProcessor )
+    {
+      frameCallbackProcessor = new FrameCallbackProcessor( transformManager, *root );
+    }
+    return *frameCallbackProcessor;
+  }
+
   SceneGraphBuffers                    sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
   RenderMessageDispatcher              renderMessageDispatcher;       ///< Used for passing messages to the render-thread
   NotificationManager&                 notificationManager;           ///< Queues notification messages for the event-thread.
@@ -299,6 +313,8 @@ struct UpdateManager::Impl
   std::vector<Internal::ShaderDataPtr> renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
   std::vector<Internal::ShaderDataPtr> updateCompiledShaders;         ///< Shaders to be sent from Update to Event
   Mutex                                compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
+
+  OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor;        ///< Owned FrameCallbackProcessor, only created if required.
 
   float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
@@ -879,6 +895,12 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update the transformations of all the nodes
     mImpl->transformManager.Update();
 
+    // Call the frame-callback-processor if set
+    if( mImpl->frameCallbackProcessor )
+    {
+      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
+    }
+
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
@@ -1068,6 +1090,16 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
   mImpl->surfaceRectChanged = false;
 
   return surfaceRectChanged;
+}
+
+void UpdateManager::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+{
+  mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
+}
+
+void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
+{
+  mImpl->GetFrameCallbackProcessor().RemoveFrameCallback( frameCallback );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
