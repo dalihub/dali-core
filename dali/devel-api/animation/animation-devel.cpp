@@ -40,6 +40,11 @@ Animation::AnimationSignalType& ProgressReachedSignal( Animation animation )
   return GetImplementation( animation ).ProgressReachedSignal();
 }
 
+void PlayAfter( Animation animation, float delaySeconds )
+{
+  GetImplementation( animation ).PlayAfter( delaySeconds );
+}
+
 } // namespace DevelAnimation
 
 } // namespace Dali
