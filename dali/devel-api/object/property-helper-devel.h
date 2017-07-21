@@ -39,6 +39,11 @@
   DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 /**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL
+ */
+#define DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex) \
+  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace::Property::enumIndex, Dali::Property::valueType );
+/**
  * @brief These macros are used to define properties for implementations of CustomActor.
  *
  * These macros should be used when defining devel properties
@@ -98,5 +103,14 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( objectNamespace, objectType, text, valueType, enumIndex ) \
   DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex  )
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL
+ *
+ * @note Animatible property registration
+ */
+#define DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
+  DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex )
+
 
 #endif // __DALI_PROPERTY_HELPER_DEVEL_H__

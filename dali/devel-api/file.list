@@ -34,6 +34,7 @@ devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-devel.h
 
 devel_api_core_common_header_files = \
+  $(devel_api_src_dir)/common/circular-queue.h \
   $(devel_api_src_dir)/common/dali-vector-devel.h \
   $(devel_api_src_dir)/common/hash.h \
   $(devel_api_src_dir)/common/map-wrapper.h \
