@@ -1,3 +1,6 @@
+#ifndef DALI_VECTOR_DEVEL_H
+#define DALI_VECTOR_DEVEL_H
+
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
@@ -15,35 +18,37 @@
  *
  */
 
-// HEADER
-#include <dali/public-api/dali-core-version.h>
-
 // EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <iostream>
-#endif
+
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
-
-const unsigned int CORE_MAJOR_VERSION = 1;
-const unsigned int CORE_MINOR_VERSION = 2;
-const unsigned int CORE_MICRO_VERSION = 49;
-const char * const CORE_BUILD_DATE    = __DATE__ " " __TIME__;
-
-#ifdef DEBUG_ENABLED
-namespace
+/**
+ * Dali::Vector support for C++11 Range-based for loop: for( item : container )
+ *
+ * @param vector The vector to iterate
+ * @return The start iterator
+ */
+template< class T >
+typename T::Iterator begin( T& vector )
 {
-/// Allows the printing of the version number ONLY when debug is enabled
-struct PrintVersion
+    return vector.Begin();
+}
+
+/**
+ * Dali::Vector support for C++11 Range-based for loop: for( item : container )
+ *
+ * @param vector The vector to iterate
+ * @return The end iterator
+ */
+template< class T >
+typename T::Iterator end( T& vector )
 {
-  PrintVersion()
-  {
-    std::cerr << "DALi Core:      " << CORE_MAJOR_VERSION << "." << CORE_MINOR_VERSION << "." << CORE_MICRO_VERSION << " (" << CORE_BUILD_DATE << ")" << std::endl;
-  }
-};
-PrintVersion CORE_VERSION;
-} // unnamed namespace
-#endif
+    return vector.End();
+}
 
 } // namespace Dali
+
+#endif /* DALI_VECTOR_DEVEL_H */

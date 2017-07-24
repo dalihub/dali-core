@@ -124,9 +124,15 @@ std::string DevelKeyEvent::GetDeviceName( const KeyEvent& keyEvent )
   return GetImplementation( &keyEvent )->GetDeviceName();
 }
 
-DevelKeyEvent::DeviceClass::Type DevelKeyEvent::GetDeviceClass( const KeyEvent& keyEvent )
+DevelDevice::Class::Type DevelKeyEvent::GetDeviceClass( const KeyEvent& keyEvent )
 {
   return GetImplementation( &keyEvent )->GetDeviceClass();
 }
+
+DevelDevice::Subclass::Type DevelKeyEvent::GetDeviceSubclass( const KeyEvent& keyEvent )
+{
+  return GetImplementation( &keyEvent )->GetDeviceSubclass();
+}
+
 
 } // namespace Dali

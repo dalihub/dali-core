@@ -72,7 +72,8 @@ struct KeyEvent : public Event
            unsigned long timeStamp,
            const State& keyState,
            const std::string deviceName,
-           const DevelKeyEvent::DeviceClass::Type deviceClass );
+           const DevelDevice::Class::Type deviceClass,
+           const DevelDevice::Subclass::Type deviceSubclass );
 
   /*
    * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
@@ -126,7 +127,12 @@ struct KeyEvent : public Event
   /**
    * Class of device KeyEvent originated from
    */
-  DevelKeyEvent::DeviceClass::Type deviceClass;
+  DevelDevice::Class::Type deviceClass;
+
+  /**
+   * Subclass of device KeyEvent originated from
+   */
+  DevelDevice::Subclass::Type deviceSubclass;
 };
 
 } // namespace Integration

@@ -34,6 +34,8 @@ devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-devel.h
 
 devel_api_core_common_header_files = \
+  $(devel_api_src_dir)/common/circular-queue.h \
+  $(devel_api_src_dir)/common/dali-vector-devel.h \
   $(devel_api_src_dir)/common/hash.h \
   $(devel_api_src_dir)/common/map-wrapper.h \
   $(devel_api_src_dir)/common/owner-container.h \
@@ -43,6 +45,8 @@ devel_api_core_common_header_files = \
 
 devel_api_core_events_header_files = \
   $(devel_api_src_dir)/events/hit-test-algorithm.h \
+  $(devel_api_src_dir)/events/device.h \
+  $(devel_api_src_dir)/events/touch-event-devel.h \
   $(devel_api_src_dir)/events/key-event-devel.h
 
 devel_api_core_images_header_files = \

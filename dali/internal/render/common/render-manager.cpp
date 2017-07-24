@@ -48,28 +48,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-typedef OwnerContainer< Render::Renderer* >    RendererOwnerContainer;
-typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
-
-typedef OwnerContainer< Render::Geometry* >    GeometryOwnerContainer;
-typedef GeometryOwnerContainer::Iterator       GeometryOwnerIter;
-
-typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
-typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
-
-typedef OwnerContainer< Render::Texture* >   TextureOwnerContainer;
-typedef TextureOwnerContainer::Iterator         TextureOwnerIter;
-
-typedef OwnerContainer< Render::FrameBuffer* >  FrameBufferOwnerContainer;
-typedef FrameBufferOwnerContainer::Iterator     FrameBufferOwnerIter;
-
-typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
-typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
-
-typedef OwnerContainer< Render::RenderTracker* > RenderTrackerContainer;
-typedef RenderTrackerContainer::Iterator         RenderTrackerIter;
-typedef RenderTrackerContainer::ConstIterator    RenderTrackerConstIter;
-
 /**
  * Structure to contain internal data
  */
@@ -111,41 +89,41 @@ struct RenderManager::Impl
 
   void UpdateTrackers()
   {
-    for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
+    for( auto&& iter : mRenderTrackers )
     {
-      (*iter)->PollSyncObject();
+      iter->PollSyncObject();
     }
   }
 
   // the order is important for destruction,
   // programs are owned by context at the moment.
-  Context                       context;                  ///< holds the GL state
-  Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
-  RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
+  Context                                   context;                 ///< holds the GL state
+  Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
+  RenderQueue                               renderQueue;             ///< A message queue for receiving messages from the update-thread.
 
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
-  RenderInstructionContainer    instructions;
+  RenderInstructionContainer                instructions;
 
-  Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
+  Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
-  unsigned int                  frameCount;               ///< The current frame count
-  BufferIndex                   renderBufferIndex;        ///< The index of the buffer to read from; this is opposite of the "update" buffer
+  unsigned int                              frameCount;              ///< The current frame count
+  BufferIndex                               renderBufferIndex;       ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                     defaultSurfaceRect;       ///< Rectangle for the default surface we are rendering to
+  Rect<int>                                 defaultSurfaceRect;      ///< Rectangle for the default surface we are rendering to
 
-  RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
-  SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
-  TextureOwnerContainer         textureContainer;         ///< List of owned textures
-  FrameBufferOwnerContainer     frameBufferContainer;     ///< List of owned framebuffers
-  PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
-  GeometryOwnerContainer        geometryContainer;        ///< List of owned Geometries
+  OwnerContainer< Render::Renderer* >       rendererContainer;       ///< List of owned renderers
+  OwnerContainer< Render::Sampler* >        samplerContainer;        ///< List of owned samplers
+  OwnerContainer< Render::Texture* >        textureContainer;        ///< List of owned textures
+  OwnerContainer< Render::FrameBuffer* >    frameBufferContainer;    ///< List of owned framebuffers
+  OwnerContainer< Render::PropertyBuffer* > propertyBufferContainer; ///< List of owned property buffers
+  OwnerContainer< Render::Geometry* >       geometryContainer;       ///< List of owned Geometries
 
-  bool                          lastFrameWasRendered;     ///< Keeps track of the last frame being rendered due to having render instructions
+  bool                                      lastFrameWasRendered;    ///< Keeps track of the last frame being rendered due to having render instructions
 
-  RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
+  OwnerContainer< Render::RenderTracker* >  mRenderTrackers;         ///< List of render trackers
 
-  ProgramController             programController;        ///< Owner of the GL programs
+  ProgramController                         programController;        ///< Owner of the GL programs
 
 };
 
@@ -188,24 +166,21 @@ void RenderManager::ContextDestroyed()
   mImpl->programController.GlContextDestroyed();
 
   //Inform textures
-  for( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
+  for( auto&& texture : mImpl->textureContainer )
   {
-    (*iter)->GlContextDestroyed();
+    texture->GlContextDestroyed();
   }
 
   //Inform framebuffers
-  for( FrameBufferOwnerIter iter = mImpl->frameBufferContainer.Begin(); iter != mImpl->frameBufferContainer.End(); ++iter )
+  for( auto&& framebuffer : mImpl->frameBufferContainer )
   {
-    (*iter)->GlContextDestroyed();
+    framebuffer->GlContextDestroyed();
   }
 
   // inform renderers
-  RendererOwnerContainer::Iterator end = mImpl->rendererContainer.End();
-  RendererOwnerContainer::Iterator iter = mImpl->rendererContainer.Begin();
-  for( ; iter != end; ++iter )
+  for( auto&& renderer : mImpl->rendererContainer )
   {
-    GlResourceOwner* renderer = *iter;
-    renderer->GlContextDestroyed(); // Clear up vertex buffers
+    renderer->GlContextDestroyed();
   }
 }
 
@@ -262,16 +237,14 @@ void RenderManager::RemoveTexture( Render::Texture* texture )
 {
   DALI_ASSERT_DEBUG( NULL != texture );
 
-  TextureOwnerContainer& textures = mImpl->textureContainer;
-
-  // Find the texture
-  for ( TextureOwnerIter iter = textures.Begin(); iter != textures.End(); ++iter )
+  // Find the texture, use reference to pointer so we can do the erase safely
+  for ( auto&& iter : mImpl->textureContainer )
   {
-    if ( *iter == texture )
+    if ( iter == texture )
     {
       texture->Destroy( mImpl->context );
-      textures.Erase( iter ); // Texture found; now destroy it
-      break;
+      mImpl->textureContainer.Erase( &iter ); // Texture found; now destroy it
+      return;
     }
   }
 }
@@ -309,15 +282,13 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != frameBuffer );
 
-  FrameBufferOwnerContainer& framebuffers = mImpl->frameBufferContainer;
-
-  // Find the sampler
-  for ( FrameBufferOwnerIter iter = framebuffers.Begin(); iter != framebuffers.End(); ++iter )
+  // Find the sampler, use reference so we can safely do the erase
+  for ( auto&& iter : mImpl->frameBufferContainer )
   {
-    if ( *iter == frameBuffer )
+    if ( iter == frameBuffer )
     {
       frameBuffer->Destroy( mImpl->context );
-      framebuffers.Erase( iter ); // frameBuffer found; now destroy it
+      mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
       break;
     }
   }
@@ -367,14 +338,12 @@ void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::Prop
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the renderer
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  // Find the geometry
+  for ( auto&& iter : mImpl->geometryContainer )
   {
-    if ( *iter == geometry )
+    if ( iter == geometry )
     {
-      (*iter)->AddPropertyBuffer( propertyBuffer );
+      iter->AddPropertyBuffer( propertyBuffer );
       break;
     }
   }
@@ -384,14 +353,12 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the renderer
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  // Find the geometry
+  for ( auto&& iter : mImpl->geometryContainer )
   {
-    if ( *iter == geometry )
+    if ( iter == geometry )
     {
-      (*iter)->RemovePropertyBuffer( propertyBuffer );
+      iter->RemovePropertyBuffer( propertyBuffer );
       break;
     }
   }
@@ -481,9 +448,9 @@ void RenderManager::Render( Integration::RenderStatus& status )
     mImpl->UpdateTrackers();
 
     //Notify RenderGeometries that rendering has finished
-    for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
+    for ( auto&& iter : mImpl->geometryContainer )
     {
-      (*iter)->OnRenderFinished();
+      iter->OnRenderFinished();
     }
   }
 

@@ -108,11 +108,10 @@ template< class T >
 inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex updateBufferIndex )
 {
   // Reset animatable properties to base values
-  typename OwnerContainer<T*>::Iterator iter = container.Begin();
-  const typename OwnerContainer<T*>::ConstIterator endIter = container.End();
-  for ( ; iter != endIter; ++iter )
+  // use reference to avoid extra copies of the iterator
+  for( auto&& iter : container )
   {
-    (*iter)->ResetToBaseValues( updateBufferIndex );
+    iter->ResetToBaseValues( updateBufferIndex );
   }
 }
 
@@ -128,33 +127,19 @@ inline void EraseUsingDiscardQueue( OwnerContainer<T*>& container, T* object, Di
 {
   DALI_ASSERT_DEBUG( object && "NULL object not allowed" );
 
-  typename OwnerContainer<T*>::Iterator iter = container.Begin();
-  const typename OwnerContainer<T*>::ConstIterator endIter = container.End();
-  for ( ; iter != endIter; ++iter )
+  // need to use the reference version of auto as we need the pointer to the pointer for the Release call below
+  for( auto&& iter : container )
   {
-    if ( *iter == object )
+    if ( iter == object )
     {
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
-      discardQueue.Add( updateBufferIndex, container.Release( iter ) );
-      return;
+      discardQueue.Add( updateBufferIndex, container.Release( &iter ) ); // take the address of the reference to a pointer (iter)
+      return; // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
 }
 
 }
-
-typedef OwnerContainer< Shader* >              ShaderOwner;
-typedef ShaderOwner::Iterator                  ShaderIter;
-typedef std::vector<Internal::ShaderDataPtr>   ShaderDataBinaryQueue;
-
-typedef OwnerContainer< TextureSet* >          TextureSetOwner;
-typedef TextureSetOwner::Iterator              TextureSetIter;
-
-typedef OwnerContainer<Renderer*>              RendererOwner;
-typedef RendererOwner::Iterator                RendererIter;
-
-typedef OwnerContainer< Camera* >              CameraOwner;
-typedef OwnerContainer< PropertyOwner* >       CustomObjectOwner;
 
 /**
  * Structure to contain UpdateManager internal data
@@ -211,15 +196,15 @@ struct UpdateManager::Impl
   {
     // Disconnect render tasks from nodes, before destroying the nodes
     RenderTaskList::RenderTaskContainer& tasks = taskList.GetTasks();
-    for (RenderTaskList::RenderTaskContainer::Iterator iter = tasks.Begin(); iter != tasks.End(); ++iter)
+    for ( auto&& iter : tasks )
     {
-      (*iter)->SetSourceNode( NULL );
+      iter->SetSourceNode( NULL );
     }
     // ..repeat for system level RenderTasks
     RenderTaskList::RenderTaskContainer& systemLevelTasks = systemLevelTaskList.GetTasks();
-    for (RenderTaskList::RenderTaskContainer::Iterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter)
+    for ( auto&& iter : systemLevelTasks )
     {
-      (*iter)->SetSourceNode( NULL );
+      iter->SetSourceNode( NULL );
     }
 
     // UpdateManager owns the Nodes. Although Nodes are pool allocated they contain heap allocated parts
@@ -252,58 +237,58 @@ struct UpdateManager::Impl
     delete sceneController;
   }
 
-  SceneGraphBuffers                   sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
-  RenderMessageDispatcher             renderMessageDispatcher;       ///< Used for passing messages to the render-thread
-  NotificationManager&                notificationManager;           ///< Queues notification messages for the event-thread.
-  TransformManager                    transformManager;              ///< Used to update the transformation matrices of the nodes
-  CompleteNotificationInterface&      animationPlaylist;             ///< Holds handles to all the animations
-  PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
-  ShaderSaver*                        shaderSaver;                   ///< Saves shader binaries.
-  DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
-  RenderController&                   renderController;              ///< render controller
-  SceneControllerImpl*                sceneController;               ///< scene controller
-  RenderManager&                      renderManager;                 ///< This is responsible for rendering the results of each "update"
-  RenderQueue&                        renderQueue;                   ///< Used to queue messages for the next render
-  RenderInstructionContainer&         renderInstructions;            ///< Used to prepare the render instructions
-  RenderTaskProcessor&                renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
+  SceneGraphBuffers                    sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
+  RenderMessageDispatcher              renderMessageDispatcher;       ///< Used for passing messages to the render-thread
+  NotificationManager&                 notificationManager;           ///< Queues notification messages for the event-thread.
+  TransformManager                     transformManager;              ///< Used to update the transformation matrices of the nodes
+  CompleteNotificationInterface&       animationPlaylist;             ///< Holds handles to all the animations
+  PropertyNotifier&                    propertyNotifier;              ///< Provides notification to applications when properties are modified.
+  ShaderSaver*                         shaderSaver;                   ///< Saves shader binaries.
+  DiscardQueue&                        discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
+  RenderController&                    renderController;              ///< render controller
+  SceneControllerImpl*                 sceneController;               ///< scene controller
+  RenderManager&                       renderManager;                 ///< This is responsible for rendering the results of each "update"
+  RenderQueue&                         renderQueue;                   ///< Used to queue messages for the next render
+  RenderInstructionContainer&          renderInstructions;            ///< Used to prepare the render instructions
+  RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
-  Vector4                             backgroundColor;               ///< The glClear color used at the beginning of each frame.
+  Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
-  RenderTaskList                      taskList;                      ///< The list of scene graph render-tasks
-  RenderTaskList                      systemLevelTaskList;           ///< Separate render-tasks for system-level content
+  RenderTaskList                       taskList;                      ///< The list of scene graph render-tasks
+  RenderTaskList                       systemLevelTaskList;           ///< Separate render-tasks for system-level content
 
-  Layer*                              root;                          ///< The root node (root is a layer)
-  Layer*                              systemLevelRoot;               ///< A separate root-node for system-level content
+  Layer*                               root;                          ///< The root node (root is a layer)
+  Layer*                               systemLevelRoot;               ///< A separate root-node for system-level content
 
-  Vector<Node*>                       nodes;                         ///< A container of all instantiated nodes
+  Vector<Node*>                        nodes;                         ///< A container of all instantiated nodes
 
-  SortedLayerPointers                 sortedLayers;                  ///< A container of Layer pointers sorted by depth
-  SortedLayerPointers                 systemLevelSortedLayers;       ///< A separate container of system-level Layers
+  SortedLayerPointers                  sortedLayers;                  ///< A container of Layer pointers sorted by depth
+  SortedLayerPointers                  systemLevelSortedLayers;       ///< A separate container of system-level Layers
 
-  CameraOwner                         cameras;                       ///< A container of cameras
-  CustomObjectOwner                   customObjects;                 ///< A container of owned objects (with custom properties)
+  OwnerContainer< Camera* >            cameras;                       ///< A container of cameras
+  OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
 
-  AnimationContainer                  animations;                    ///< A container of owned animations
-  PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
+  AnimationContainer                   animations;                    ///< A container of owned animations
+  PropertyNotificationContainer        propertyNotifications;         ///< A container of owner property notifications.
 
-  RendererOwner                       renderers;                     ///< A container of owned renderers
-  TextureSetOwner                     textureSets;                   ///< A container of owned texture sets
-  ShaderOwner                         shaders;                       ///< A container of owned shaders
-  OwnerPointer<PanGesture>            panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
+  OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
+  OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
+  OwnerContainer< Shader* >            shaders;                       ///< A container of owned shaders
+  OwnerPointer< PanGesture >           panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
-  MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
-  ShaderDataBinaryQueue               renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
-  ShaderDataBinaryQueue               updateCompiledShaders;         ///< Shaders to be sent from Update to Event
-  Mutex                               compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
+  MessageQueue                         messageQueue;                  ///< The messages queued from the event-thread
+  std::vector<Internal::ShaderDataPtr> renderCompiledShaders;         ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
+  std::vector<Internal::ShaderDataPtr> updateCompiledShaders;         ///< Shaders to be sent from Update to Event
+  Mutex                                compiledShaderMutex;           ///< lock to ensure no corruption on the renderCompiledShaders
 
-  float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
-  int                                 nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
-  int                                 frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+  float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
+  int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
+  int                                  frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
 
-  bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
-  bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
-  bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
-  bool                                renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
+  bool                                 animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
+  bool                                 previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
+  bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
+  bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
 
 private:
 
@@ -464,24 +449,19 @@ void UpdateManager::RemoveAnimation( Animation* animation )
 
 bool UpdateManager::IsAnimationRunning() const
 {
-  bool isRunning(false);
-  AnimationContainer& animations = mImpl->animations;
-
   // Find any animation that isn't stopped or paused
-
-  const AnimationIter endIter = animations.End();
-  for ( AnimationIter iter = animations.Begin(); !isRunning && iter != endIter; ++iter )
+  for ( auto&& iter : mImpl->animations )
   {
-    const Animation::State state = (*iter)->GetState();
+    const Animation::State state = iter->GetState();
 
     if (state != Animation::Stopped &&
         state != Animation::Paused)
     {
-      isRunning = true;
+      return true; // stop iteration as soon as first one is found
     }
   }
 
-  return isRunning;
+  return false;
 }
 
 void UpdateManager::AddPropertyNotification( OwnerPointer< PropertyNotification >& propertyNotification )
@@ -703,12 +683,9 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
 {
   //Constrain custom objects (in construction order)
-  OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
-  const OwnerContainer< PropertyOwner* >::Iterator endIter = customObjects.End();
-  for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
+  for ( auto&& object : mImpl->customObjects )
   {
-    PropertyOwner& object = **iter;
-    ConstrainPropertyOwner( object, bufferIndex );
+    ConstrainPropertyOwner( *object, bufferIndex );
   }
 }
 
@@ -716,46 +693,37 @@ void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
 {
   // Constrain system-level render-tasks
   const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
-  for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
+  for ( auto&& task : systemLevelTasks )
   {
-    RenderTask& task = **iter;
-    ConstrainPropertyOwner( task, bufferIndex );
+    ConstrainPropertyOwner( *task, bufferIndex );
   }
 
   // Constrain render-tasks
   const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-  for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
+  for ( auto&& task : tasks )
   {
-    RenderTask& task = **iter;
-    ConstrainPropertyOwner( task, bufferIndex );
+    ConstrainPropertyOwner( *task, bufferIndex );
   }
 }
 
 void UpdateManager::ConstrainShaders( BufferIndex bufferIndex )
 {
   // constrain shaders... (in construction order)
-  ShaderOwner& shaders = mImpl->shaders;
-  for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
+  for ( auto&& shader : mImpl->shaders )
   {
-    Shader& shader = **iter;
-    ConstrainPropertyOwner( shader, bufferIndex );
+    ConstrainPropertyOwner( *shader, bufferIndex );
   }
 }
 
 void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 {
-  PropertyNotificationContainer &notifications = mImpl->propertyNotifications;
-  PropertyNotificationIter iter = notifications.Begin();
-
-  while ( iter != notifications.End() )
+  for( auto&& notification : mImpl->propertyNotifications )
   {
-    PropertyNotification* notification = *iter;
     bool valid = notification->Check( bufferIndex );
     if(valid)
     {
       mImpl->notificationManager.QueueMessage( PropertyChangedMessage( mImpl->propertyNotifier, notification, notification->GetValidity() ) );
     }
-    ++iter;
   }
 }
 
@@ -774,11 +742,9 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
     if( mImpl->updateCompiledShaders.size() > 0 )
     {
       ShaderSaver& factory = *mImpl->shaderSaver;
-      ShaderDataBinaryQueue::iterator i   = mImpl->updateCompiledShaders.begin();
-      ShaderDataBinaryQueue::iterator end = mImpl->updateCompiledShaders.end();
-      for( ; i != end; ++i )
+      for( auto&& shader : mImpl->updateCompiledShaders )
       {
-        mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, *i ) );
+        mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, shader ) );
       }
       // we don't need them in update anymore
       mImpl->updateCompiledShaders.clear();
@@ -897,10 +863,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     ProcessPropertyNotifications( bufferIndex );
 
     //Update cameras
-    const CameraOwner::Iterator endCameraIterator = mImpl->cameras.End();
-    for( CameraOwner::Iterator cameraIterator = mImpl->cameras.Begin(); endCameraIterator != cameraIterator; ++cameraIterator )
+    for( auto&& cameraIterator : mImpl->cameras )
     {
-      ( *cameraIterator )->Update( bufferIndex );
+      cameraIterator->Update( bufferIndex );
     }
 
     //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
@@ -934,21 +899,17 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // check the countdown and notify (note, at the moment this is only done for normal tasks, not for systemlevel tasks)
   bool doRenderOnceNotify = false;
   mImpl->renderTaskWaiting = false;
-  const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-  for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(), endIter = tasks.End();
-        endIter != iter; ++iter )
+  for ( auto&& renderTask : mImpl->taskList.GetTasks() )
   {
-    RenderTask& renderTask(*(*iter));
+    renderTask->UpdateState();
 
-    renderTask.UpdateState();
-
-    if( renderTask.IsWaitingToRender() &&
-        renderTask.ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+    if( renderTask->IsWaitingToRender() &&
+        renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
     {
       mImpl->renderTaskWaiting = true; // keep update/render threads alive
     }
 
-    if( renderTask.HasRendered() )
+    if( renderTask->HasRendered() )
     {
       doRenderOnceNotify = true;
     }
@@ -1057,11 +1018,9 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
 {
   // note,this vector is already in depth order. It could be used as-is to
   // remove sorting in update algorithm. However, it lacks layer boundary markers.
-  for( std::vector<NodeDepthPair>::iterator iter = nodeDepths->nodeDepths.begin(),
-         end = nodeDepths->nodeDepths.end() ;
-       iter != end ; ++iter )
+  for( auto&& iter : nodeDepths->nodeDepths )
   {
-    iter->node->SetDepthIndex( iter->sortedDepth );
+    iter.node->SetDepthIndex( iter.sortedDepth );
   }
 }
 
