@@ -193,7 +193,7 @@ export PATH=$install_path/bin:\$PATH
 export LD_LIBRARY_PATH=$install_path/lib:\$LD_LIBRARY_PATH
 export INCLUDEDIR=$install_path/include
 export PKG_CONFIG_PATH=$install_path/lib/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
-
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DALI_WINDOW_WIDTH=480
 export DALI_WINDOW_HEIGHT=800
 
