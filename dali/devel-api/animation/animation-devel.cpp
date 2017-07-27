@@ -45,6 +45,16 @@ void PlayAfter( Animation animation, float delaySeconds )
   GetImplementation( animation ).PlayAfter( delaySeconds );
 }
 
+void SetLoopingMode( Animation animation, LoopingMode loopingMode )
+{
+  GetImplementation( animation ).SetLoopingMode( loopingMode );
+}
+
+LoopingMode GetLoopingMode( Animation animation )
+{
+  return GetImplementation(animation).GetLoopingMode();
+}
+
 } // namespace DevelAnimation
 
 } // namespace Dali
