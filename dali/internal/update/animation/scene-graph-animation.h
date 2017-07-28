@@ -204,11 +204,17 @@ public:
    */
   void Play();
 
-  /*
+  /**
    * Play the animation from a given point
    * @param[in] progress A value between [0,1] form where the animation should start playing
    */
   void PlayFrom( float progress );
+
+  /**
+   * @brief Play the animation after a given delay time.
+   * @param[in] delaySeconds The delay time
+   */
+  void PlayAfter( float delaySeconds );
 
   /**
    * Pause the animation.
@@ -325,24 +331,27 @@ private:
 
 protected:
 
-  float mDurationSeconds;
-  float mSpeedFactor;
-  EndAction mEndAction;
-  EndAction mDisconnectAction;
+  AnimatorContainer mAnimators;
 
-  State mState;
+  Vector2 mPlayRange;
+
+  float mDurationSeconds;
+  float mDelaySeconds;
   float mElapsedSeconds;
+  float mSpeedFactor;
+  float mProgressMarker;         // Progress marker to trigger a notification
+
   int mPlayedCount;              // Incremented at end of animation or completion of all loops
                                  // Never incremented when looping forever. Event thread tracks to signal end.
   int mLoopCount;                // N loop setting
   int mCurrentLoop;              // Current loop number
 
-  Vector2 mPlayRange;
+  EndAction mEndAction;
+  EndAction mDisconnectAction;
 
-  float mProgressMarker;                // Progress marker to trigger a notification
+  State mState;
+
   bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
-
-  AnimatorContainer mAnimators;
 };
 
 }; //namespace SceneGraph
@@ -489,6 +498,16 @@ inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &animation, &Animation::AddAnimator, parameter );
 }
 
+inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const Animation& animation, float delaySeconds )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::PlayAfter, delaySeconds );
+}
 
 } // namespace SceneGraph
 

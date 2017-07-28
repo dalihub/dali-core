@@ -170,6 +170,11 @@ public:
   void PlayFrom( float progress );
 
   /**
+   * @copydoc Dali::Animation::PlayAfter()
+   */
+  void PlayAfter( float delaySeconds );
+
+  /**
    * @copydoc Dali::Animation::Pause()
    */
   void Pause();
@@ -534,6 +539,7 @@ private:
   AlphaFunction mDefaultAlpha;
   Dali::Animation::State mState;
   float mProgressReachedMarker;
+  float mDelaySeconds;
 };
 
 } // namespace Internal
