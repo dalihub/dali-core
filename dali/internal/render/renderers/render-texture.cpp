@@ -17,12 +17,12 @@
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-texture.h>
 
+// EXTERNAL INCLUDES
+#include <math.h>   //floor, log2
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/images/pixel-devel.h>
 #include <dali/devel-api/images/native-image-interface-extension.h>
-
-// EXTERNAL INCLUDES
-#include <math.h>   //floor, log2
 
 namespace Dali
 {

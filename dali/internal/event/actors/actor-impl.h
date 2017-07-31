@@ -1869,7 +1869,7 @@ private:
    * @param[in] size The size to apply the policy to
    * @return Return the adjusted size
    */
-  Vector2 ApplySizeSetPolicy( const Vector2 size );
+  Vector2 ApplySizeSetPolicy( const Vector2& size );
 
   /**
    * Retrieve the parent object of an Actor.
