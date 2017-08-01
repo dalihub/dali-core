@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,42 +61,27 @@ TypeRegistry::~TypeRegistry()
   mRegistryLut.clear();
 }
 
-Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::string &uniqueTypeName )
+Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::string& uniqueTypeName )
 {
-  Dali::TypeInfo ret;
-
-  RegistryMap::iterator iter = mRegistryLut.find(uniqueTypeName);
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    ret = iter->second;
+    // Note! mRegistryLut contains Dali::TypeInfo handles, so cannot call GetTypeName()
+    // as it calls us back resulting in infinite loop (GetTypeName is in BaseHandle part)
+    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    {
+      return iter;
+    }
   }
-  else
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", uniqueTypeName.c_str());
-  }
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", uniqueTypeName.c_str() );
 
-  return ret;
+  return Dali::TypeInfo();
 }
 
 Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
 {
-  Dali::TypeInfo ret;
+  std::string typeName = DemangleClassName( registerType.name() );
 
-  std::string typeName = DemangleClassName(registerType.name());
-
-  RegistryMap::iterator iter = mRegistryLut.find(typeName);
-
-  if( iter != mRegistryLut.end() )
-  {
-    ret = iter->second;
-  }
-  else
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", registerType.name());
-  }
-
-  return ret;
+  return GetTypeInfo( typeName );
 }
 
 size_t TypeRegistry::GetTypeNameCount() const
@@ -105,15 +90,13 @@ size_t TypeRegistry::GetTypeNameCount() const
 }
 
 
-std::string TypeRegistry::GetTypeName(size_t index) const
+std::string TypeRegistry::GetTypeName( size_t index ) const
 {
   std::string name;
 
   if( index < mRegistryLut.size() )
   {
-    RegistryMap::const_iterator iter = mRegistryLut.begin();
-    std::advance(iter, index);
-    name = iter->first;
+    name = GetImplementation( mRegistryLut[ index ] ).GetName();
   }
 
   return name;
@@ -123,7 +106,7 @@ std::string TypeRegistry::GetTypeName(size_t index) const
 bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
                              Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
 {
-  std::string uniqueTypeName  = DemangleClassName(theTypeInfo.name());
+  std::string uniqueTypeName  = DemangleClassName( theTypeInfo.name() );
 
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit );
 }
@@ -131,61 +114,55 @@ bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_
 bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
                              Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
 {
-  bool ret = false;
+  std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
-  std::string baseTypeName    = DemangleClassName(baseTypeInfo.name());
-
-  RegistryMap::iterator iter = mRegistryLut.find(uniqueTypeName);
-
-  if( iter == mRegistryLut.end() )
+  // check for duplicates using uniqueTypeName
+  for( auto&& iter : mRegistryLut )
   {
-    mRegistryLut[uniqueTypeName] = Dali::TypeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance));
-    ret = true;
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str());
+    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    {
+      DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
+      DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
+      return false;
+    }
   }
-  else
-  {
-    DALI_LOG_WARNING("Duplicate name for TypeRegistry for '%s'\n", + uniqueTypeName.c_str());
-    DALI_ASSERT_ALWAYS(!"Duplicate type name for Type Registation");
-  }
+
+  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 
   if( callCreateOnInit )
   {
     mInitFunctions.push_back(createInstance);
   }
 
-  return ret;
+  return true;
 }
 
 bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
     Dali::CSharpTypeInfo::CreateFunction createInstance )
 {
+  std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
-  bool ret = false;
-
-  std::string baseTypeName    = DemangleClassName(baseTypeInfo.name());
-
-  RegistryMap::iterator iter = mRegistryLut.find(uniqueTypeName);
-
-  if( iter == mRegistryLut.end() )
+  // check for duplicates using uniqueTypeName
+  for( auto&& iter : mRegistryLut )
   {
-    mRegistryLut[uniqueTypeName] = Dali::TypeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance));
-    ret = true;
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str());
-  }
-  else
-  {
-    DALI_LOG_WARNING("Duplicate name for TypeRegistry for '%s'\n", + uniqueTypeName.c_str());
-    DALI_ASSERT_ALWAYS(!"Duplicate type name for Type Registation");
+    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    {
+      DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
+      DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
+      return false;
+    }
   }
 
-  return ret;
+  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 
+  return true;
 }
 
 void TypeRegistry::CallInitFunctions(void) const
 {
-  for( InitFunctions::const_iterator iter = mInitFunctions.begin(); iter != mInitFunctions.end(); ++iter)
+  for( auto&& iter : mInitFunctions )
   {
     (*iter)();
   }
@@ -198,45 +175,41 @@ std::string TypeRegistry::RegistrationName( const std::type_info& registerType )
 
 void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( typeRegistration.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddConnectorFunction( name, func );
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddConnectorFunction( name, func );
+      break;
+    }
   }
 }
 
-bool TypeRegistry::RegisterAction( TypeRegistration &registered, const std::string &name, Dali::TypeInfo::ActionFunction f)
+bool TypeRegistry::RegisterAction( TypeRegistration& typeRegistration, const std::string &name, Dali::TypeInfo::ActionFunction f )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddActionFunction( name, f );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddActionFunction( name, f );
+      return true;
+    }
   }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 
-bool TypeRegistry::RegisterProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
+bool TypeRegistry::RegisterProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddProperty( name, index, type, setFunc, getFunc );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddProperty( name, index, type, setFunc, getFunc );
+      return true;
+    }
   }
 
   return false;
@@ -244,87 +217,81 @@ bool TypeRegistry::RegisterProperty( TypeRegistration& registered, const std::st
 
 bool TypeRegistry::RegisterProperty( const std::string& objectName, const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( objectName );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddProperty( name, index, type, setFunc, getFunc );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == objectName )
+    {
+      impl.AddProperty( name, index, type, setFunc, getFunc );
+      return true;
+    }
   }
 
   return false;
-
 }
 
 
-bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddAnimatableProperty( name, index, type );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddAnimatableProperty( name, index, type );
+      return true;
+    }
   }
 
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value )
+bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, const Property::Value& value )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddAnimatableProperty( name, index, value );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddAnimatableProperty( name, index, value );
+      return true;
+    }
   }
 
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
+bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
+      return true;
+    }
   }
 
   return false;
 }
 
-bool TypeRegistry::RegisterChildProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterChildProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
 {
-  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
-
-  if( iter != mRegistryLut.end() )
+  for( auto&& iter : mRegistryLut )
   {
-    DALI_ASSERT_DEBUG(iter->second);
-
-    GetImplementation(iter->second).AddChildProperty( name, index, type );
-
-    return true;
+    auto&& impl = GetImplementation( iter );
+    if( impl.GetName() == typeRegistration.RegisteredName() )
+    {
+      impl.AddChildProperty( name, index, type );
+      return true;
+    }
   }
 
   return false;
 }
 
-bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string &actionName, const Property::Map &properties)
+bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string& actionName, const Property::Map& properties )
 {
   bool done = false;
 
@@ -332,12 +299,13 @@ bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string &act
 
   while( type )
   {
-    if(GetImplementation(type).DoActionTo(object, actionName, properties))
+    auto&& impl = GetImplementation( type );
+    if( impl.DoActionTo( object, actionName, properties ) )
     {
       done = true;
       break;
     }
-    type = GetTypeInfo( type.GetBaseName() );
+    type = GetTypeInfo( impl.GetBaseName() );
   }
 
   return done;
@@ -351,12 +319,13 @@ bool TypeRegistry::ConnectSignal( BaseObject* object, ConnectionTrackerInterface
 
   while( type )
   {
-    connected = GetImplementation(type).ConnectSignal( object, connectionTracker, signalName, functor );
+    auto&& impl = GetImplementation( type );
+    connected = impl.ConnectSignal( object, connectionTracker, signalName, functor );
     if( connected )
     {
       break;
     }
-    type = GetTypeInfo( type.GetBaseName() );
+    type = GetTypeInfo( impl.GetBaseName() );
   }
 
   if( !connected )

@@ -880,7 +880,7 @@ int UtcDaliTypeRegistryRegisteredNameN(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "Duplicate type name for Type Registation", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Duplicate type name in Type Registration", TEST_LOCATION );
   }
 
   END_TEST;
