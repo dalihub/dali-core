@@ -4742,7 +4742,7 @@ void Actor::NegotiateDimensions( const Vector2& allocatedSize )
   }
 }
 
-Vector2 Actor::ApplySizeSetPolicy( const Vector2 size )
+Vector2 Actor::ApplySizeSetPolicy( const Vector2& size )
 {
   switch( mRelayoutData->sizeSetPolicy )
   {
@@ -4864,8 +4864,6 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   SetNegotiatedSize( container );
 
   // Negotiate down to children
-  const Vector2 newBounds = mTargetSize.GetVectorXY();
-
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
   {
     ActorPtr child = GetChildAt( i );
@@ -4887,7 +4885,7 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
     // Only relayout if required
     if( child->RelayoutRequired() )
     {
-      container.Add( Dali::Actor( child.Get() ), newBounds );
+      container.Add( Dali::Actor( child.Get() ), mTargetSize.GetVectorXY() );
     }
   }
   DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
