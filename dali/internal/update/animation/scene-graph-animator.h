@@ -69,7 +69,7 @@ public:
    */
   AnimatorBase()
   : mDurationSeconds(1.0f),
-    mInitialDelaySeconds(0.0f),
+    mIntervalDelaySeconds(0.0f),
     mAlphaFunction(AlphaFunction::DEFAULT),
     mDisconnectAction(Dali::Animation::BakeFinal),
     mActive(false),
@@ -116,18 +116,18 @@ public:
    * The default is zero i.e. no delay.
    * @param [in] seconds The delay in seconds.
    */
-  void SetInitialDelay(float seconds)
+  void SetIntervalDelay(float seconds)
   {
-    mInitialDelaySeconds = seconds;
+    mIntervalDelaySeconds = seconds;
   }
 
   /**
-   * Retrieve the initial delay of the animator.
+   * Retrieve the delay before the animator should take effect.
    * @return The delay in seconds.
    */
-  float GetInitialDelay() const
+  float GetIntervalDelay() const
   {
-    return mInitialDelaySeconds;
+    return mIntervalDelaySeconds;
   }
 
   /**
@@ -357,7 +357,7 @@ protected:
   }
 
   float mDurationSeconds;
-  float mInitialDelaySeconds;
+  float mIntervalDelaySeconds;
 
   AlphaFunction mAlphaFunction;
 
@@ -397,7 +397,7 @@ public:
                                                animatorFunction );
 
     animator->SetAlphaFunction( alphaFunction );
-    animator->SetInitialDelay( timePeriod.delaySeconds );
+    animator->SetIntervalDelay( timePeriod.delaySeconds );
     animator->SetDuration( timePeriod.durationSeconds );
 
     return animator;
@@ -550,7 +550,7 @@ public:
                                                animatorFunction );
 
     animator->SetAlphaFunction( alphaFunction );
-    animator->SetInitialDelay( timePeriod.delaySeconds );
+    animator->SetIntervalDelay( timePeriod.delaySeconds );
     animator->SetDuration( timePeriod.durationSeconds );
 
     return animator;

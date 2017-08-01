@@ -129,7 +129,8 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mDisconnectAction( disconnectAction ),
   mDefaultAlpha( defaultAlpha ),
   mState(Dali::Animation::STOPPED),
-  mProgressReachedMarker( 0.0f )
+  mProgressReachedMarker( 0.0f ),
+  mDelaySeconds( 0.0f )
 {
 }
 
@@ -299,6 +300,26 @@ void Animation::PlayFrom( float progress )
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
   }
+}
+
+void Animation::PlayAfter( float delaySeconds )
+{
+  // The negative delay means play immediately.
+  delaySeconds = std::max( 0.f, delaySeconds );
+
+  mDelaySeconds = delaySeconds;
+
+  // Update the current playlist
+  mPlaylist.OnPlay( *this );
+
+  mState = Dali::Animation::PLAYING;
+
+  NotifyObjects();
+
+  SendFinalProgressNotificationMessage();
+
+  // mAnimation is being used in a separate thread; queue a message to set the value
+  PlayAfterMessage( mEventThreadServices, *mAnimation, delaySeconds );
 }
 
 void Animation::Pause()

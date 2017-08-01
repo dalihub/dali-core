@@ -19,18 +19,25 @@
 #include <dali/internal/event/events/key-event-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/devel-api/common/dali-vector-devel.h>
 
 namespace Dali
 {
 
 namespace
 {
-
-typedef std::map< const KeyEvent*, Internal::KeyEventImpl*> KeyEventMap;
-typedef KeyEventMap::iterator KeyEventMapIter;
-
-KeyEventMap keyEventImplMap;
+/**
+ * This container stores a mapping between public key event and impl as we cannot add data members in public one.
+ * In practice this keeps the impl "alive" in between KeyEvent constructor and destructor calls so that getter
+ * methods can be called to access the new data members. There is a 1:1 mapping between KeyEvent and KeyEventImpl.
+ */
+struct KeyImplMapping
+{
+  KeyEvent* keyEvent;
+  Internal::KeyEventImpl* impl;
+};
+Vector< KeyImplMapping > gKeyEventToImplMapping;
 
 }
 
@@ -42,17 +49,17 @@ KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
   mDeviceClass( DevelDevice::Class::NONE ),
   mDeviceSubclass( DevelDevice::Subclass::NONE )
 {
-  keyEventImplMap[keyEvent] = this;
+  gKeyEventToImplMapping.PushBack( { keyEvent, this } );
 }
 
 KeyEventImpl::~KeyEventImpl()
 {
-  for( KeyEventMapIter iter = keyEventImplMap.begin(); iter != keyEventImplMap.end(); ++iter )
+  for( auto&& iter : gKeyEventToImplMapping )
   {
-    if( this == iter->second )
+    if( this == iter.impl )
     {
-      keyEventImplMap.erase( iter );
-      break;
+      gKeyEventToImplMapping.Erase( &iter ); // iter is reference to KeyImplMapping, take address of it for Erase
+      return;
     }
   }
 }
@@ -103,12 +110,28 @@ void KeyEventImpl::SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass
 
 Internal::KeyEventImpl* GetImplementation( KeyEvent* keyEvent )
 {
-  return keyEventImplMap[keyEvent];
+  Internal::KeyEventImpl* impl( NULL );
+  for( auto&& iter : gKeyEventToImplMapping )
+  {
+    if( iter.keyEvent == keyEvent )
+    {
+      impl = iter.impl;
+    }
+  }
+  return impl;
 }
 
 const Internal::KeyEventImpl* GetImplementation( const KeyEvent* keyEvent )
 {
-  return keyEventImplMap[keyEvent];
+  Internal::KeyEventImpl* impl( NULL );
+  for( auto&& iter : gKeyEventToImplMapping )
+  {
+    if( iter.keyEvent == keyEvent )
+    {
+      impl = iter.impl;
+    }
+  }
+  return impl;
 }
 
 } // namespace Dali

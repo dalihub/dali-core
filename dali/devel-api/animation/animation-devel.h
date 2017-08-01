@@ -51,6 +51,16 @@ DALI_IMPORT_API float GetProgressNotification( Animation animation );
  */
 DALI_IMPORT_API Animation::AnimationSignalType& ProgressReachedSignal( Animation animation );
 
+/**
+ * @brief Play the animation after a given delay time.
+ *
+ * The delay time is not included in the looping time.
+ * When the delay time is negative value, it would treat as play immediately.
+ * @param[in] animation The animation object to perform this operation on
+ * @param[in] delaySeconds The delay time
+ */
+DALI_IMPORT_API void PlayAfter( Animation animation, float delaySeconds );
+
 } // namespace DevelAnimation
 
 } // namespace Dali
