@@ -135,7 +135,7 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   {
     Property::Value value( Property::ARRAY );
     Property::Array* array = value.GetArray();
-    size_t count( mValue.Size() );
+    size_t count( mProgress.Size() );
 
     if( array )
     {
