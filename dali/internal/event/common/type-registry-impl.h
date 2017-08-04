@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/object/csharp-type-info.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
@@ -215,13 +214,11 @@ public:
 
 private:
   /*
-   * Map from type name to TypeInfo
+   * Mapping from type name to TypeInfo
    */
-  typedef std::map<std::string, Dali::TypeInfo> RegistryMap;
-  RegistryMap mRegistryLut;
+  std::vector< Dali::TypeInfo > mRegistryLut;
 
-  typedef std::vector<Dali::TypeInfo::CreateFunction> InitFunctions;
-  InitFunctions mInitFunctions;
+  std::vector< Dali::TypeInfo::CreateFunction > mInitFunctions;
 
 private:
   TypeRegistry();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ int UtcDaliRegisterCSharpTypeN(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "Duplicate type name for Type Registation", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Duplicate type name in Type Registration", TEST_LOCATION );
   }
 
   END_TEST;

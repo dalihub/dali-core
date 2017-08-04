@@ -199,8 +199,7 @@ inline void SetupStencilBuffer( const RenderItem& item, Context& context, bool& 
 
       // Setup the color buffer based on the RenderMode.
       context.ColorMask( renderMode == RenderMode::COLOR );
-      return;
-      break; // Break statement for consistency (although return will be called instead).
+      break;
     }
 
     case RenderMode::STENCIL:
