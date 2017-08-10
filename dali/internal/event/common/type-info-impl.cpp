@@ -639,7 +639,10 @@ const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
     return GetImplementation(base).GetChildPropertyName( index );
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+  DALI_LOG_WARNING("Cannot find property index");
+
+  static std::string emptyString;
+  return emptyString;
 }
 
 Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
