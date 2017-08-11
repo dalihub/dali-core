@@ -32,7 +32,7 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/internal/update/animation/property-accessor.h>
-
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -70,11 +70,14 @@ public:
   AnimatorBase()
   : mDurationSeconds(1.0f),
     mIntervalDelaySeconds(0.0f),
+    mSpeedFactor(1.0f),
+    mLoopCount(1),
     mAlphaFunction(AlphaFunction::DEFAULT),
     mDisconnectAction(Dali::Animation::BakeFinal),
     mActive(false),
     mEnabled(true),
-    mConnectedToSceneGraph(false)
+    mConnectedToSceneGraph(false),
+    mAutoReverseEnabled( false )
   {
   }
 
@@ -109,6 +112,36 @@ public:
   float GetDuration() const
   {
     return mDurationSeconds;
+  }
+
+  void SetSpeedFactor( float factor )
+  {
+    mSpeedFactor = factor;
+  }
+
+  void SetLoopCount(int loopCount)
+  {
+    mLoopCount = loopCount;
+  }
+
+  float SetProgress( float progress )
+  {
+    float value = 0.0f;
+
+    if( mAutoReverseEnabled )
+    {
+      if( mSpeedFactor > 0.0f )
+      {
+        value = 1.0f - 2.0f * std::abs( progress - 0.5f );
+      }
+      // Reverse mode
+      else if( mSpeedFactor < 0.0f )
+      {
+        value = 2.0f * std::abs( progress - 0.5f );
+      }
+    }
+
+    return value;
   }
 
   /**
@@ -148,7 +181,7 @@ public:
     return mAlphaFunction;
   }
 
-  /*
+  /**
    * Applies the alpha function to the specified progress
    * @param[in] Current progress
    * @return The progress after the alpha function has been aplied
@@ -317,7 +350,7 @@ public:
     return mActive;
   }
 
-  /*
+  /**
    * Retrive wheter the animator's target object is valid and on the stage.
    * @return The enabled state.
    */
@@ -325,6 +358,16 @@ public:
   {
     return mEnabled;
   }
+
+  /**
+   * @brief Sets the looping mode.
+   * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
+   */
+  void SetLoopingMode( bool loopingMode )
+  {
+    mAutoReverseEnabled = loopingMode;
+  }
+
   /**
    * Returns wheter the target object of the animator is still valid
    * or has been destroyed.
@@ -358,6 +401,9 @@ protected:
 
   float mDurationSeconds;
   float mIntervalDelaySeconds;
+  float mSpeedFactor;
+
+  int mLoopCount;
 
   AlphaFunction mAlphaFunction;
 
@@ -365,6 +411,7 @@ protected:
   bool mActive:1;                                   ///< Animator is "active" while it's running.
   bool mEnabled:1;                                  ///< Animator is "enabled" while its target object is valid and on the stage.
   bool mConnectedToSceneGraph:1;                    ///< True if ConnectToSceneGraph() has been called in update-thread.
+  bool mAutoReverseEnabled:1;
 };
 
 /**
@@ -462,7 +509,13 @@ public:
    */
   virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
   {
-    float alpha = ApplyAlphaFunction(progress);
+    if( mLoopCount != 1 ) // Looping mode
+    {
+      // Update the progress value
+      progress = SetProgress( progress );
+    }
+
+    float alpha = ApplyAlphaFunction( progress );
 
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
@@ -615,7 +668,13 @@ public:
    */
   virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
   {
-    float alpha = ApplyAlphaFunction(progress);
+    if( mLoopCount != 1 ) // Looping mode
+    {
+      // Update the progress value
+      progress = SetProgress( progress );
+    }
+
+    float alpha = ApplyAlphaFunction( progress );
 
     const T& current = mPropertyAccessor.Get( bufferIndex );
 

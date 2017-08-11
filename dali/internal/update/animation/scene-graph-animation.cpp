@@ -77,7 +77,8 @@ Animation::Animation( float durationSeconds, float speedFactor, const Vector2& p
   mEndAction(endAction),
   mDisconnectAction(disconnectAction),
   mState(Stopped),
-  mProgressReachedSignalRequired( false )
+  mProgressReachedSignalRequired( false ),
+  mAutoReverseEnabled( false )
 {
 }
 
@@ -276,6 +277,20 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
   }
 
   mState = Destroyed;
+}
+
+void Animation::SetLoopingMode( bool loopingMode )
+{
+  mAutoReverseEnabled = loopingMode;
+
+  for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+  {
+    // Send some variables together to figure out the Animation status
+    (*iter)->SetSpeedFactor( mSpeedFactor );
+    (*iter)->SetLoopCount( mLoopCount );
+
+    (*iter)->SetLoopingMode( loopingMode );
+  }
 }
 
 void Animation::AddAnimator( OwnerPointer<AnimatorBase>& animator )

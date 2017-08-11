@@ -130,7 +130,8 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mDefaultAlpha( defaultAlpha ),
   mState(Dali::Animation::STOPPED),
   mProgressReachedMarker( 0.0f ),
-  mDelaySeconds( 0.0f )
+  mDelaySeconds( 0.0f ),
+  mAutoReverseEnabled( false )
 {
 }
 
@@ -1021,6 +1022,19 @@ void Animation::SetPlayRange( const Vector2& range)
 Vector2 Animation::GetPlayRange() const
 {
   return mPlayRange;
+}
+
+void Animation::SetLoopingMode( DevelAnimation::LoopingMode loopingMode )
+{
+  mAutoReverseEnabled = ( loopingMode == DevelAnimation::LoopingMode::AUTO_REVERSE );
+
+  // mAnimation is being used in a separate thread; queue a message to set play range
+  SetLoopingModeMessage( mEventThreadServices, *mAnimation, mAutoReverseEnabled );
+}
+
+DevelAnimation::LoopingMode Animation::GetLoopingMode()
+{
+  return mAutoReverseEnabled ? DevelAnimation::LoopingMode::AUTO_REVERSE : DevelAnimation::LoopingMode::RESTART;
 }
 
 bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
