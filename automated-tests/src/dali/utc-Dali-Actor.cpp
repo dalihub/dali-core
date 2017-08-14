@@ -6120,3 +6120,79 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
 
   END_TEST;
 }
+
+int UtcDaliActorLayoutDirectionProperty(void)
+{
+  TestApplication application;
+  tet_infoline( "Check layout direction property" );
+
+  Actor actor0 = Actor::New();
+  DALI_TEST_EQUALS( actor0.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Stage::GetCurrent().Add( actor0 );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor1 = Actor::New();
+  DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor2 = Actor::New();
+  DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor3 = Actor::New();
+  DALI_TEST_EQUALS( actor3.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor4 = Actor::New();
+  DALI_TEST_EQUALS( actor4.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor5 = Actor::New();
+  DALI_TEST_EQUALS( actor5.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor6 = Actor::New();
+  DALI_TEST_EQUALS( actor6.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor7 = Actor::New();
+  DALI_TEST_EQUALS( actor7.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor8 = Actor::New();
+  DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  Actor actor9 = Actor::New();
+  DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+
+  actor1.Add( actor2 );
+  actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+
+  actor0.Add( actor1 );
+  DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor3 );
+  actor3.Add( actor4 );
+  actor4.Add( actor5 );
+  actor5.Add( actor6 );
+  actor5.Add( actor7 );
+  actor7.Add( actor8 );
+  actor8.Add( actor9 );
+  actor3.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "LTR" );
+
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE ), true, TEST_LOCATION );
+  actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE, false );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE ), false, TEST_LOCATION );
+
+  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+
+  DALI_TEST_EQUALS( actor3.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor4.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor5.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor6.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor7.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+
+  actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+
+  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "LTR" );
+  DALI_TEST_EQUALS( actor7.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+
+  END_TEST;
+}

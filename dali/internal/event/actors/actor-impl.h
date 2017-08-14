@@ -1909,6 +1909,13 @@ private:
    */
   void SetVisibleInternal( bool visible, SendMessage::Type sendMessage );
 
+  /**
+   * @brief Propagates layout direction recursively.
+   * @param[in] actor The actor for seting layout direction.
+   * @param[in] direction New layout direction.
+   */
+  void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor::LayoutDirection::Type direction );
+
 protected:
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
@@ -1963,6 +1970,8 @@ protected:
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
+  bool mLayoutDirectionInheritance                 : 1; ///< Whether the actor inherits the layout direction from parent.
+  DevelActor::LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
