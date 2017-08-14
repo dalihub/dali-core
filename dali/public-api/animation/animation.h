@@ -340,7 +340,7 @@ public:
    */
   AlphaFunction GetDefaultAlphaFunction() const;
 
-  /*
+  /**
    * @brief Sets the progress of the animation.
    *
    * The animation will play (or continue playing) from this point. The progress

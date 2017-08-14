@@ -21,6 +21,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/internal/event/rendering/texture-impl.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ KeyEvent::KeyEvent()
 }
 
 KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
-                    unsigned long timeStamp, const State& keyState, const std::string deviceName,
+                    unsigned long timeStamp, const State& keyState, const std::string& deviceName,
                     const DevelDevice::Class::Type deviceClass, const DevelDevice::Subclass::Type deviceSubclass )
 : Event( Key ),
   keyName( keyName ),

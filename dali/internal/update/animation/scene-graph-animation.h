@@ -106,7 +106,7 @@ public:
     return mDurationSeconds;
   }
 
-  /*
+  /**
    * Retrieve the current progress of the animation.
    * @return The current progress as a normalized value between [0,1].
    */
@@ -120,7 +120,7 @@ public:
     return 0.0f;
   }
 
-  /*
+  /**
    * Sets the progress of the animation.
    * @param[in] The new progress as a normalized value between [0,1]
    */
@@ -129,6 +129,10 @@ public:
     mElapsedSeconds = mDurationSeconds * progress;
   }
 
+  /**
+   * Specifies a speed factor for the animation.
+   * @param[in] factor A value which will multiply the velocity
+   */
   void SetSpeedFactor( float factor )
   {
     mSpeedFactor = factor;
@@ -150,7 +154,7 @@ public:
     return mLoopCount != 1;
   }
 
-  /*
+  /**
    * Get the loop count
    * @return the loop count
    */
@@ -262,6 +266,14 @@ public:
   }
 
   /**
+   * @brief Sets the looping mode.
+   *
+   * Animation plays forwards and then restarts from the beginning or runs backwards again.
+   * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
+   */
+  void SetLoopingMode( bool loopingMode );
+
+  /**
    * Add a newly created animator.
    * Animators are automatically removed, when orphaned from an animatable scene object.
    * @param[in] animator The animator to add.
@@ -352,6 +364,7 @@ protected:
   State mState;
 
   bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
+  bool mAutoReverseEnabled;             // Flag to identify that the looping mode is auto reverse.
 };
 
 }; //namespace SceneGraph
@@ -507,6 +520,17 @@ inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const An
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::PlayAfter, delaySeconds );
+}
+
+inline void SetLoopingModeMessage( EventThreadServices& eventThreadServices, const Animation& animation, bool loopingMode )
+{
+  typedef MessageValue1< Animation, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetLoopingMode, loopingMode );
 }
 
 } // namespace SceneGraph
