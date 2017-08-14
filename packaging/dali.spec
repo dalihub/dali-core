@@ -107,9 +107,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
       --enable-gles=%{target_gles_version} \
-%if 0%{?enable_debug}
       --enable-debug \
-%endif
       --infodir=%{_infodir}
 
 make %{?jobs:-j%jobs}
