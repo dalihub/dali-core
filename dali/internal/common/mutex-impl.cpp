@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,11 +59,11 @@ struct BackTraceInfo
   int size;                                  ///< Number of frames in the frame array (can be less than MAX_NUM_STACK_FRAMES)
 };
 
-__thread BackTraceInfo gBackTraceInfo[ MAX_LOCK_SUPPORT ]; ///< Thread local storage for the backtrace of the locks
+thread_local BackTraceInfo gBackTraceInfo[ MAX_LOCK_SUPPORT ]; ///< Thread local storage for the backtrace of the locks
 
 #endif // LOCK_BACKTRACE_ENABLED
 
-__thread unsigned int gThreadLockCount = 0; ///<
+thread_local unsigned int gThreadLockCount = 0; ///< Thread local storage for the backtrace of the locks
 } // unnamed namespace
 
 void Lock( pthread_mutex_t* mutex )
