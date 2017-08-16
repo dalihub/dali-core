@@ -2,7 +2,7 @@
 #define __DALI_COMPILE_TIME_ASSERT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,12 @@ namespace Dali
  * @{
  */
 
-template <bool x> struct CompileTimeAssertBool;    ///< Bool Template to test condition
-template <> struct CompileTimeAssertBool<true> {}; ///< Specialize for true, but not for false @SINCE_1_0.0
-
-template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditional template CompileTimeAsserBool @SINCE_1_0.0
-
 /**
  * @brief Use DALI_COMPILE_TIME_ASSERT to test expressions at compile time.
  *
- * If x is false, then 'sizeof' will be attempted with incomplete type.
  * @SINCE_1_0.0
  */
-#define DALI_COMPILE_TIME_ASSERT( x ) typedef Dali::CompileTimeAssertInt< sizeof( Dali::CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType __attribute__((__unused__))
+#define DALI_COMPILE_TIME_ASSERT( x ) static_assert( x, #x );
 
 /**
  * @}
