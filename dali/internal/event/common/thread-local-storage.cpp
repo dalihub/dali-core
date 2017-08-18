@@ -30,7 +30,7 @@ namespace Internal
 
 namespace
 {
-__thread ThreadLocalStorage* threadLocal = NULL;
+thread_local ThreadLocalStorage* threadLocal = NULL;
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
