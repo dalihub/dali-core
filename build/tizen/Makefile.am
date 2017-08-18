@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@ rename_cov_data:
 cov_data: rename_cov_data
 	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --base-directory . --directory . -c -o dali.info
 	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --remove dali.info "*/dali-env/*" "/usr/include/*" "public-api/shader-effects/*" "*/image-actor*" -o dali.info
-
 	@test -z $(COVERAGE_OUTPUT_DIR) || mkdir -p $(COVERAGE_OUTPUT_DIR)
 
 coverage: cov_data
