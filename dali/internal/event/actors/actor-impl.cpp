@@ -1994,6 +1994,15 @@ void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityCha
   }
 }
 
+void Actor::EmitLayoutDirectionChangedSignal( DevelActor::LayoutDirection::Type type )
+{
+  if( ! mLayoutDirectionChangedSignal.Empty() )
+  {
+    Dali::Actor handle( this );
+    mLayoutDirectionChangedSignal.Emit( handle, type );
+  }
+}
+
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return mTouchedSignal;
@@ -2032,6 +2041,11 @@ Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 DevelActor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
 {
   return mVisibilityChangedSignal;
+}
+
+DevelActor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
+{
+  return mLayoutDirectionChangedSignal;
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -5326,6 +5340,7 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor:
     if( actor->mLayoutDirection != direction)
     {
       actor->mLayoutDirection = direction;
+      actor->EmitLayoutDirectionChangedSignal( direction );
       actor->RelayoutRequest();
     }
 

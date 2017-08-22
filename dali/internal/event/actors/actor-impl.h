@@ -1419,6 +1419,12 @@ public:
   void EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type );
 
   /**
+   * @brief Emits the layout direction change signal for this actor and all its children.
+   * @param[in] type Whether the actor's layout direction property has changed or a parent's.
+   */
+  void EmitLayoutDirectionChangedSignal( DevelActor::LayoutDirection::Type type );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1457,6 +1463,11 @@ public:
    * @copydoc DevelActor::VisibilityChangedSignal
    */
   DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
+
+  /**
+   * @copydoc DevelActor::LayoutDirectionChangedSignal
+   */
+  DevelActor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1940,6 +1951,7 @@ protected:
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
+  DevelActor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
 
   Quaternion      mTargetOrientation; ///< Event-side storage for orientation
   Vector4         mTargetColor;       ///< Event-side storage for color
