@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEMP=`getopt -o dhsSm --long debug,help,serial,tct,modules -n 'execute.sh' -- "$@"`
+TEMP=`getopt -o dhsSmf --long debug,help,failnorerun,serial,tct,modules -n 'execute.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -11,6 +11,7 @@ function usage
 {
     echo -e "Usage: execute.sh [-d][-s|-S|-r] [module|testcase]"
     echo -e "       execute.sh\t\tExecute test cases from all modules in parallel"
+    echo -e "       execute.sh -f \tExecute test cases from all modules in parallel without rerunning failed test cases"
     echo -e "       execute.sh -d <testcase>\tDebug testcase"
     echo -e "       execute.sh [module]\tExecute test cases from the given module in parallel"
     echo -e "       execute.sh -s [module]\t\tExecute test cases in serial using Testkit-Lite"
@@ -23,11 +24,13 @@ opt_tct=0
 opt_serial=""
 opt_modules=0
 opt_debug=0
+opt_noFailedRerun="";
 while true ; do
     case "$1" in
         -h|--help)     usage ;;
         -d|--debug)    opt_debug=1 ; shift ;;
         -s|--tct)      opt_tct=1 ; shift ;;
+        -f|--nofailedrerun) opt_noFailedRerun="-f" ; shift ;;
         -S|--serial)   opt_serial="-s" ; shift ;;
         -m|--modules)  opt_modules=1 ; shift ;;
         --) shift; break;;
@@ -116,7 +119,7 @@ else
         do
             echo -e "$ASCII_BOLD"
             echo -e "Executing $mod$ASCII_RESET"
-            build/src/$mod/tct-$mod-core -r $opt_serial
+            build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun
         done
         summary_end
 
@@ -126,7 +129,7 @@ else
         summary_start
         module=$1
         shift;
-        build/src/$module/tct-$module-core -r $opt_serial $*
+        build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $*
         summary_end
 
     else
