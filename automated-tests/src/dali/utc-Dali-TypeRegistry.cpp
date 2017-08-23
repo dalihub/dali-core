@@ -1429,6 +1429,16 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 3u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
 
+  // Attempt to animate component property, it should not crash
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( customActor, animatablePropertyComponentIndex1 ), 200.0f );
+  animation.Play();
+
+  // Check the property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(200.0f, 225.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 225.0f, TEST_LOCATION );
+
   END_TEST;
 }
 
