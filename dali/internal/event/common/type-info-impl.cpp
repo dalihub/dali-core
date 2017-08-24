@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -715,7 +715,15 @@ Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
 
   if ( iter != mRegisteredProperties.end() )
   {
-    type = iter->second.type;
+    if( iter->second.componentIndex == Property::INVALID_COMPONENT_INDEX )
+    {
+      type = iter->second.type;
+    }
+    else
+    {
+      // If component index is set, then we should return FLOAT
+      type = Property::FLOAT;
+    }
   }
   else
   {
