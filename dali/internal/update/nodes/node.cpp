@@ -37,7 +37,7 @@ int gNodeCount =0;
 // Called when the process is about to exit, Node count should be zero at this point.
 void __attribute__ ((destructor)) ShutDown(void)
 {
-//DALI_ASSERT_DEBUG( (gNodeCount == 0) && "Node memory leak");
+DALI_ASSERT_DEBUG( (gNodeCount == 0) && "Node memory leak");
 }
 #endif
 }
