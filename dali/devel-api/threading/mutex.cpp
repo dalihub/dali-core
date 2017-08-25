@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,29 @@
 #include <dali/devel-api/threading/mutex.h>
 
 // EXTERNAL INCLUDES
-#include <pthread.h>
+#include <mutex>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/common/mutex-impl.h>
+#include <dali/internal/common/mutex-trace.h>
 
 namespace Dali
 {
 
 struct Mutex::MutexImpl
 {
-  pthread_mutex_t mutex;
+  std::mutex mutex;
   bool locked;
 };
 
 Mutex::Mutex()
 : mImpl( new MutexImpl )
 {
-  if( pthread_mutex_init( &mImpl->mutex, NULL ) )
-  {
-    DALI_LOG_ERROR( "Unable to initialise Mutex\n" );
-  }
   mImpl->locked = false;
 }
 
 Mutex::~Mutex()
 {
-  if( pthread_mutex_destroy( &mImpl->mutex ) )
-  {
-    DALI_LOG_ERROR( "Unable to destroy Mutex\n" );
-  }
   // nothing else to do as there is no Lock/Unlock API
   // ScopedLock destructor will always unlock the mutex
   delete mImpl;
@@ -63,14 +55,16 @@ bool Mutex::IsLocked()
 Mutex::ScopedLock::ScopedLock( Mutex& mutex )
 : mMutex( mutex )
 {
-  Internal::Mutex::Lock( &mMutex.mImpl->mutex );
+  mMutex.mImpl->mutex.lock();
+  Internal::MutexTrace::Lock(); // matching sequence in conditional-wait.cpp
   mMutex.mImpl->locked = true;
 }
 
 Mutex::ScopedLock::~ScopedLock()
 {
   mMutex.mImpl->locked = false;
-  Internal::Mutex::Unlock( &mMutex.mImpl->mutex );
+  Internal::MutexTrace::Unlock(); // reverse sequence from lock
+  mMutex.mImpl->mutex.unlock();
 }
 
 } // namespace Dali
