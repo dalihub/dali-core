@@ -116,7 +116,19 @@ enum Type
    * @note If false, then the top-left of the actor is used for the position.
    * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
    */
-  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4
+  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4,
+
+  /**
+   * @brief The direction of layout.
+   * @details Name "layoutDirection", type Property::STRING.
+   */
+  LAYOUT_DIRECTION = CLIPPING_MODE + 5,
+
+  /**
+   * @brief Determines whether child actors inherit the layout direction from a parent.
+   * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
+   */
+  LAYOUT_DIRECTION_INHERITANCE = CLIPPING_MODE + 6
 };
 
 } // namespace Property
@@ -131,6 +143,17 @@ enum Type
 };
 
 } // namespace VisibilityChange
+
+namespace LayoutDirection
+{
+
+enum Type
+{
+  LTR,   ///< Left to Right direction (Default).
+  RTL    ///< Right to Left direction.
+};
+
+} // namespace
 
 typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChangedSignalType; ///< Signal type of VisibilityChangedSignal
 
