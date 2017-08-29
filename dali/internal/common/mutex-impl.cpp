@@ -16,7 +16,8 @@
  */
 
 // HEADER
-#include <dali/internal/common/mutex-trace.h>
+#include <dali/internal/common/mutex-impl.h>
+
 
 #ifdef LOCK_BACKTRACE_ENABLED
 // EXTERNAL INCLUDES
@@ -41,7 +42,7 @@ extern std::string Demangle( const char* symbol );
 namespace Internal
 {
 
-namespace MutexTrace
+namespace Mutex
 {
 
 namespace
@@ -65,7 +66,7 @@ thread_local BackTraceInfo gBackTraceInfo[ MAX_LOCK_SUPPORT ]; ///< Thread local
 thread_local unsigned int gThreadLockCount = 0; ///< Thread local storage for the backtrace of the locks
 } // unnamed namespace
 
-void Lock()
+void Lock( pthread_mutex_t* mutex )
 {
   ++gThreadLockCount;
 
@@ -105,14 +106,23 @@ void Lock()
   //DALI_ASSERT_DEBUG( gThreadLockCount == 1 );
 
 #endif // LOCK_BACKTRACE_ENABLED
+
+  if( pthread_mutex_lock( mutex ) )
+  {
+    DALI_LOG_ERROR( "Error calling pthread_mutex_lock\n" );
+  }
 }
 
-void Unlock()
+void Unlock( pthread_mutex_t* mutex )
 {
+  if( pthread_mutex_unlock( mutex ) )
+  {
+    DALI_LOG_ERROR( "Error calling pthread_mutex_unlock\n" );
+  }
   --gThreadLockCount;
 }
 
-} // namespace MutexTrace
+} // namespace Mutex
 
 } // namespace Internal
 

@@ -53,7 +53,8 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS)
 
-libdali_core_la_LIBADD = $(DALI_LDFLAGS)
+libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
+                         -lpthread
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api

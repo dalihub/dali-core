@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,78 +19,77 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 
 // EXTERNAL INCLUDES
-#include <mutex>
-#include <condition_variable>
+#include <pthread.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/common/mutex-trace.h>
+#include <dali/internal/common/mutex-impl.h>
 
 namespace Dali
 {
-/**
- * Data members for ConditionalWait
- */
+
 struct ConditionalWait::ConditionalWaitImpl
 {
-  std::mutex mutex;
-  std::condition_variable condition;
+  pthread_mutex_t mutex;
+  pthread_cond_t condition;
   volatile unsigned int count;
 };
 
-/**
- * Data members for ConditionalWait::ScopedLock
- */
-struct ConditionalWait::ScopedLock::ScopedLockImpl
-{
-  ScopedLockImpl( ConditionalWait& wait )
-  : wait( wait ),
-    lock( wait.mImpl->mutex ) // locks for the lifecycle of this object
-  { }
-  ConditionalWait& wait;
-  std::unique_lock<std::mutex> lock;
-};
 
-ConditionalWait::ScopedLock::ScopedLock( ConditionalWait& wait )
-: mImpl( new ConditionalWait::ScopedLock::ScopedLockImpl( wait ) )
+ConditionalWait::ScopedLock::ScopedLock( ConditionalWait& wait ) : mWait(wait)
 {
-  Internal::MutexTrace::Lock(); // matching sequence in mutex.cpp
+  Internal::Mutex::Lock( &wait.mImpl->mutex );
 }
 
 ConditionalWait::ScopedLock::~ScopedLock()
 {
-  Internal::MutexTrace::Unlock();
-  delete mImpl;
-}
-
-ConditionalWait& ConditionalWait::ScopedLock::GetLockedWait() const
-{
-  return mImpl->wait; // mImpl can never be NULL
+  ConditionalWait& wait = mWait;
+  Internal::Mutex::Unlock( &wait.mImpl->mutex );
 }
 
 ConditionalWait::ConditionalWait()
 : mImpl( new ConditionalWaitImpl )
 {
+  if( pthread_mutex_init( &mImpl->mutex, NULL ) )
+  {
+    DALI_LOG_ERROR( "Unable to initialise mutex in ConditionalWait\n" );
+  }
+  if( pthread_cond_init( &mImpl->condition, NULL ) )
+  {
+    DALI_LOG_ERROR( "Unable to initialise conditional\n" );
+  }
   mImpl->count = 0;
 }
 
 ConditionalWait::~ConditionalWait()
 {
+  if( pthread_cond_destroy( &mImpl->condition ) )
+  {
+    DALI_LOG_ERROR( "Unable to destroy conditional\n" );
+  }
+  if( pthread_mutex_destroy( &mImpl->mutex ) )
+  {
+    DALI_LOG_ERROR( "Unable to destroy mutex in ConditionalWait\n" );
+  }
   delete mImpl;
 }
 
 void ConditionalWait::Notify()
 {
-  // conditional wait requires a lock to be held
-  ScopedLock lock( *this );
+  // pthread_cond_wait requires a lock to be held
+  Internal::Mutex::Lock( &mImpl->mutex );
   volatile unsigned int previousCount = mImpl->count;
   mImpl->count = 0; // change state before broadcast as that may wake clients immediately
-  // notify does nothing if the thread is not waiting but still has a system call overhead
-  // notify all threads to continue
+  // broadcast does nothing if the thread is not waiting but still has a system call overhead
+  // broadcast all threads to continue
   if( 0 != previousCount )
   {
-    mImpl->condition.notify_all(); // no return value
+    if( pthread_cond_broadcast( &mImpl->condition ) )
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast\n" );
+    }
   }
+  Internal::Mutex::Unlock( &mImpl->mutex );
 }
 
 void ConditionalWait::Notify( const ScopedLock& scope )
@@ -100,26 +99,35 @@ void ConditionalWait::Notify( const ScopedLock& scope )
 
   volatile unsigned int previousCount = mImpl->count;
   mImpl->count = 0; // change state before broadcast as that may wake clients immediately
-  // notify does nothing if the thread is not waiting but still has a system call overhead
-  // notify all threads to continue
+  // broadcast does nothing if the thread is not waiting but still has a system call overhead
+  // broadcast all threads to continue
   if( 0 != previousCount )
   {
-    mImpl->condition.notify_all(); // no return value
+    if( pthread_cond_broadcast( &mImpl->condition ) )
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_broadcast\n" );
+    }
   }
 }
 
 void ConditionalWait::Wait()
 {
-  // conditional wait requires a lock to be held
-  ScopedLock scope( *this );
+  // pthread_cond_wait requires a lock to be held
+  Internal::Mutex::Lock( &mImpl->mutex );
   ++(mImpl->count);
-  // conditional wait may wake up without anyone calling Notify
+  // pthread_cond_wait may wake up without anyone calling Notify
   do
   {
     // wait while condition changes
-    mImpl->condition.wait( scope.mImpl->lock ); // need to pass in the std::unique_lock
+    if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait\n" );
+      break;
+    }
   }
   while( 0 != mImpl->count );
+  // when condition returns the mutex is locked so release the lock
+  Internal::Mutex::Unlock( &mImpl->mutex );
 }
 
 void ConditionalWait::Wait( const ScopedLock& scope )
@@ -129,11 +137,16 @@ void ConditionalWait::Wait( const ScopedLock& scope )
 
   ++(mImpl->count);
 
-  // conditional wait may wake up without anyone calling Notify
+  // pthread_cond_wait may wake up without anyone calling Notify so loop until
+  // count has been reset in a notify:
   do
   {
     // wait while condition changes
-    mImpl->condition.wait( scope.mImpl->lock ); // need to pass in the std::unique_lock
+    if( pthread_cond_wait( &mImpl->condition, &mImpl->mutex ) ) // releases the lock whilst waiting
+    {
+      DALI_LOG_ERROR( "Error calling pthread_cond_wait\n" );
+      break;
+    }
   }
   while( 0 != mImpl->count );
 
