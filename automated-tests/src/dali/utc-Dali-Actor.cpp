@@ -6163,11 +6163,16 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor1.Add( actor2 );
   gLayoutDirectionType = DevelActor::LayoutDirection::LTR;
   DevelActor::LayoutDirectionChangedSignal( actor2 ).Connect( LayoutDirectionChanged );
+
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
   actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::RTL );
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+
   DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
   DALI_TEST_EQUALS( gLayoutDirectionType, DevelActor::LayoutDirection::RTL, TEST_LOCATION );
 
+  actor1.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
   actor0.Add( actor1 );
   DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
@@ -6182,9 +6187,9 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor3.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
   actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
 
-  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE ), true, TEST_LOCATION );
-  actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE, false );
-  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, false );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
 
   actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
 
@@ -6204,6 +6209,10 @@ int UtcDaliActorLayoutDirectionProperty(void)
   DALI_TEST_EQUALS( actor7.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
   DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
   DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+
+  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  DALI_TEST_EQUALS( actor8.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
 
   END_TEST;
 }

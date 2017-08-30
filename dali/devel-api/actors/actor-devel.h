@@ -120,7 +120,7 @@ enum Type
 
   /**
    * @brief The direction of layout.
-   * @details Name "layoutDirection", type Property::STRING.
+   * @details Name "layoutDirection", type Property::INTEGER, @see LayoutDirection::Type for supported values.
    */
   LAYOUT_DIRECTION = CLIPPING_MODE + 5,
 
@@ -128,7 +128,7 @@ enum Type
    * @brief Determines whether child actors inherit the layout direction from a parent.
    * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
    */
-  LAYOUT_DIRECTION_INHERITANCE = CLIPPING_MODE + 6
+  INHERIT_LAYOUT_DIRECTION = CLIPPING_MODE + 6
 };
 
 } // namespace Property
@@ -149,8 +149,8 @@ namespace LayoutDirection
 
 enum Type
 {
-  LTR,   ///< Left to Right direction (Default).
-  RTL    ///< Right to Left direction.
+  LTR,   ///< Layout direction is from Left to Right direction (Default).
+  RTL    ///< Layout direction is from Right to Left direction.
 };
 
 } // namespace
