@@ -33,8 +33,6 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 cd automated-tests
 %make_install
-mkdir -p %{buildroot}/opt/usr/share/license
-cp %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/opt/usr/share/license/%{name}
 mkdir -p %{buildroot}/tmp/
 cp %{_builddir}/%{name}-%{version}/automated-tests/scripts/add_all_smack_rule.sh %{buildroot}/tmp/
 cp %{_builddir}/%{name}-%{version}/automated-tests/scripts/all_smack.rule %{buildroot}/tmp/
@@ -46,6 +44,6 @@ cp %{_builddir}/%{name}-%{version}/automated-tests/scripts/all_smack.rule %{buil
 
 %files
 /opt/usr/bin/*
-/opt/usr/share/license/%{name}
 /tmp/add_all_smack_rule.sh
 /tmp/all_smack.rule
+%license LICENSE
