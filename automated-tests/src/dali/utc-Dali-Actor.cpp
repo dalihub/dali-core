@@ -51,6 +51,8 @@ bool gHoverCallBackCalled=false;
 
 static bool gTestConstraintCalled;
 
+DevelActor::LayoutDirection::Type gLayoutDirectionType;
+
 struct TestConstraint
 {
   void operator()( Vector4& color, const PropertyInputContainer& /* inputs */ )
@@ -6121,6 +6123,12 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   END_TEST;
 }
 
+
+static void LayoutDirectionChanged( Actor actor, DevelActor::LayoutDirection::Type type )
+{
+  gLayoutDirectionType = type;
+}
+
 int UtcDaliActorLayoutDirectionProperty(void)
 {
   TestApplication application;
@@ -6153,9 +6161,12 @@ int UtcDaliActorLayoutDirectionProperty(void)
   DALI_TEST_EQUALS( actor9.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
 
   actor1.Add( actor2 );
-  actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  gLayoutDirectionType = DevelActor::LayoutDirection::LTR;
+  DevelActor::LayoutDirectionChangedSignal( actor2 ).Connect( LayoutDirectionChanged );
+  actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::RTL );
   DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "RTL", TEST_LOCATION );
+  DALI_TEST_EQUALS( gLayoutDirectionType, DevelActor::LayoutDirection::RTL, TEST_LOCATION );
 
   actor0.Add( actor1 );
   DALI_TEST_EQUALS( actor1.GetProperty< std::string >( DevelActor::Property::LAYOUT_DIRECTION ), "LTR", TEST_LOCATION );
@@ -6169,7 +6180,7 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor7.Add( actor8 );
   actor8.Add( actor9 );
   actor3.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
-  actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "LTR" );
+  actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
 
   DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE ), true, TEST_LOCATION );
   actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE, false );
