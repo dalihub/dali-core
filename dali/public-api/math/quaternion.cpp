@@ -40,18 +40,18 @@ const Quaternion Quaternion::IDENTITY;
  * Default Constructor
  */
 Quaternion::Quaternion()
- : mVector( 0.0f, 0.0f, 0.0f, 1.0f )
+: mVector( 0.0f, 0.0f, 0.0f, 1.0f )
 {
 }
 
-Quaternion::Quaternion( float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta ) :
-  mVector( iBySineTheta, jBySineTheta, kBySineTheta, cosThetaBy2 )
+Quaternion::Quaternion( float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta )
+: mVector( iBySineTheta, jBySineTheta, kBySineTheta, cosThetaBy2 )
 {
 }
 
 Quaternion::Quaternion( const Vector4& vector )
+: mVector( vector )
 {
-  mVector = vector;
 }
 
 Quaternion::Quaternion( Radian angle, const Vector3& axis )

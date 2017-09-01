@@ -8,7 +8,7 @@ int main(int argc, char * const argv[])
 {
   int result = TestHarness::EXIT_STATUS_BAD_ARGUMENT;
 
-  const char* optString = "rs";
+  const char* optString = "sf";
   bool optRerunFailed(true);
   bool optRunSerially(false);
 
@@ -18,8 +18,8 @@ int main(int argc, char * const argv[])
     nextOpt = getopt( argc, argv, optString );
     switch(nextOpt)
     {
-      case 'r':
-        optRerunFailed = true;
+      case 'f':
+        optRerunFailed = false;
         break;
       case 's':
         optRunSerially = true;
