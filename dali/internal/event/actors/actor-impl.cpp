@@ -2887,10 +2887,10 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::DevelActor::Property::LAYOUT_DIRECTION:
     {
       Dali::DevelActor::LayoutDirection::Type direction = mLayoutDirection;
+      mInheritLayoutDirection = false;
 
       if( Scripting::GetEnumerationProperty< DevelActor::LayoutDirection::Type >( property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction ) )
       {
-        mInheritLayoutDirection = false;
         InheritLayoutDirectionRecursively( this, direction, true );
       }
       break;
