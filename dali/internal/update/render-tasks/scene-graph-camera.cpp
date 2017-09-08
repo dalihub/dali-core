@@ -154,6 +154,7 @@ const Vector3 Camera::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
 Camera::Camera()
 : mUpdateViewFlag( UPDATE_COUNT ),
   mUpdateProjectionFlag( UPDATE_COUNT ),
+  mNode( NULL ),
   mType( DEFAULT_TYPE ),
   mProjectionMode( DEFAULT_MODE ),
   mInvertYAxis( DEFAULT_INVERT_Y_AXIS ),
