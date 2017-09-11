@@ -34,27 +34,41 @@ include ../../../doc/file.list
 
 # Build the Dali libtool library
 
-lib_LTLIBRARIES = libdali-core.la
+DALI_CORE_LA_SOURCES = $(internal_src_files) \
+                       $(platform_abstraction_src_files) \
+                       $(public_api_src_files) \
+                       $(devel_api_src_files)
 
-libdali_core_la_SOURCES = $(internal_src_files) \
-                          $(platform_abstraction_src_files) \
-                          $(public_api_src_files) \
-                          $(devel_api_src_files)
+DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
+                        -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
+                        -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
+                         $(cxx_flags) \
+                         $(dali_core_includes) \
+                         $(DALI_CFLAGS)
+
+DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
+                      -lpthread
 
 dali_core_includes = \
         -I../../..
 
-cxx_flags = -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal
+if ENABLE_CXX03_ABI
 
-libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
-                           -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
-                           -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
-                           $(cxx_flags) \
-                           $(dali_core_includes) \
-                           $(DALI_CFLAGS)
+lib_LTLIBRARIES = libdali-core.la
 
-libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
-                         -lpthread
+libdali_core_la_SOURCES = $(DALI_CORE_LA_SOURCES)
+libdali_core_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
+libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+
+else
+
+lib_LTLIBRARIES = libdali-core-cxx11.la
+
+libdali_core_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
+libdali_core_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
+libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+
+endif
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
@@ -141,6 +155,32 @@ linker_test_CXXFLAGS = \
   $(dali_core_includes) \
   $(DALI_CFLAGS)
 
+if ENABLE_CXX03_ABI
+
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
   libdali-core.la
+
+if ENABLE_RENAME_SO
+#rename
+install: install-am
+	rm -rf $(libdir)/libdali-core.so
+	rm -rf $(libdir)/libdali-core-cxx03.so
+	ln -s $(libdir)/libdali-core.so.0.0.* $(libdir)/libdali-core-cxx03.so
+endif
+
+else
+
+linker_test_DEPENDENCIES = libdali-core-cxx11.la
+linker_test_LDADD = \
+  libdali-core-cxx11.la
+
+if ENABLE_RENAME_SO
+#rename
+install: install-am
+	rm -rf $(libdir)/libdali-core-cxx11.so
+	rm -rf $(libdir)/libdali-core.so
+	ln -s $(libdir)/libdali-core-cxx11.so.0.0.* $(libdir)/libdali-core.so
+endif
+
+endif
