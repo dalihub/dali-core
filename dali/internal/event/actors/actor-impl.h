@@ -1921,18 +1921,6 @@ private:
   void SetVisibleInternal( bool visible, SendMessage::Type sendMessage );
 
   /**
-   * Set whether a child actor inherits it's parent's layout direction. Default is to inherit.
-   * @param[in] inherit - true if the actor should inherit layout direction, false otherwise.
-   */
-  void SetInheritLayoutDirection( bool inherit );
-
-  /**
-   * Returns whether the actor inherits it's parent's layout direction.
-   * @return true if the actor inherits it's parent's layout direction, false otherwise.
-   */
-  bool IsLayoutDirectionInherited() const;
-
-  /**
    * @brief Propagates layout direction recursively.
    * @param[in] actor The actor for seting layout direction.
    * @param[in] direction New layout direction.
@@ -1994,7 +1982,7 @@ protected:
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
-  bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
+  bool mLayoutDirectionInheritance                 : 1; ///< Whether the actor inherits the layout direction from parent.
   DevelActor::LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited

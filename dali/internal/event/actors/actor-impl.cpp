@@ -213,7 +213,7 @@ DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali:
 DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
 DALI_PROPERTY( "layoutDirection",           STRING,  true,  false, false, Dali::DevelActor::Property::LAYOUT_DIRECTION )
-DALI_PROPERTY( "inheritLayoutDirection",    BOOLEAN,  true,  false, false, Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION )
+DALI_PROPERTY( "layoutDirectionInheritance",    BOOLEAN,  true,  false, false, Dali::DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -2124,7 +2124,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritScale( true ),
   mPositionUsesAnchorPoint( true ),
   mVisible( true ),
-  mInheritLayoutDirection( true ),
+  mLayoutDirectionInheritance( true ),
   mLayoutDirection( DevelActor::LayoutDirection::LTR ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
@@ -2887,22 +2887,24 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::DevelActor::Property::LAYOUT_DIRECTION:
     {
       Dali::DevelActor::LayoutDirection::Type direction = mLayoutDirection;
+      bool flag = false;
 
       if( Scripting::GetEnumerationProperty< DevelActor::LayoutDirection::Type >( property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction ) )
       {
-        mInheritLayoutDirection = true;
+        flag = mLayoutDirectionInheritance;
+        mLayoutDirectionInheritance = true;
         InheritLayoutDirectionRecursively( this, direction );
-        mInheritLayoutDirection = false;
+        mLayoutDirectionInheritance = flag;
       }
       break;
     }
 
-    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION:
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE:
     {
       bool value = false;
-      if( property.Get( value ) )
+      if( property.Get( value ) && value != mLayoutDirectionInheritance )
       {
-        SetInheritLayoutDirection( value );
+        mLayoutDirectionInheritance = value;
       }
       break;
     }
@@ -4155,9 +4157,9 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
       break;
     }
 
-    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION:
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION_INHERITANCE:
     {
-      value = IsLayoutDirectionInherited();
+      value = mLayoutDirectionInheritance;
       break;
     }
 
@@ -5331,27 +5333,9 @@ void Actor::LowerBelow( Internal::Actor& target )
   }
 }
 
-void Actor::SetInheritLayoutDirection( bool inherit )
-{
-  if( mInheritLayoutDirection != inherit )
-  {
-    mInheritLayoutDirection = inherit;
-
-    if( inherit && mParent )
-    {
-      InheritLayoutDirectionRecursively( this, mParent->mLayoutDirection );
-    }
-  }
-}
-
-bool Actor::IsLayoutDirectionInherited() const
-{
-  return mInheritLayoutDirection;
-}
-
 void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor::LayoutDirection::Type direction )
 {
-  if( actor && actor->mInheritLayoutDirection )
+  if( actor && actor->mLayoutDirectionInheritance )
   {
     if( actor->mLayoutDirection != direction)
     {
@@ -5369,6 +5353,7 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor:
       }
     }
   }
+
 }
 
 } // namespace Internal
