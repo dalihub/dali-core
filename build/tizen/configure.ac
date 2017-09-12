@@ -31,7 +31,7 @@ AC_SUBST(DALI_VERSION)
 DALI_CFLAGS=-DPLATFORM_TIZEN
 
 # Use C++ 11
-DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast"
+DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal"
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],
@@ -62,6 +62,25 @@ AC_ARG_ENABLE([gles],
                               [Specify the OpenGL ES version for backwards compatibility])],
               [enable_gles=$enableval],
               [enable_gles=20])
+
+AC_ARG_ENABLE([cxx03_abi],
+              [AC_HELP_STRING([--enable-cxx03-abi],
+                              [Specify abi for the build])],
+              [enable_cxx03_abi=$enableval],
+              [enable_cxx03_abi=no])
+
+AC_ARG_ENABLE([rename_so],
+              [AC_HELP_STRING([--enable-rename-so],
+                              [Specify whether so file is renamed or not])],
+              [enable_rename_so=$enableval],
+              [enable_rename_so=yes])
+
+AM_CONDITIONAL([ENABLE_CXX03_ABI], [test x$enable_cxx03_abi = xyes])
+AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
+
+if test "x$enable_cxx03_abi" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
+fi
 
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
@@ -107,11 +126,15 @@ AC_SUBST(DALI_LDFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
-AC_CONFIG_FILES([
- Makefile
- dali-core/Makefile
- dali-core.pc
-])
+AC_CONFIG_FILES([Makefile dali-core/Makefile])
+
+if test "x$enable_cxx03_abi" = "xyes"; then
+AC_CONFIG_FILES([dali-core-cxx03.pc])
+fi
+
+if test "x$enable_cxx03_abi" != "xyes"; then
+AC_CONFIG_FILES([dali-core.pc])
+fi
 
 AC_OUTPUT
 

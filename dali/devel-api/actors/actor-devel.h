@@ -116,7 +116,19 @@ enum Type
    * @note If false, then the top-left of the actor is used for the position.
    * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
    */
-  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4
+  POSITION_USES_ANCHOR_POINT = CLIPPING_MODE + 4,
+
+  /**
+   * @brief The direction of layout.
+   * @details Name "layoutDirection", type Property::INTEGER, @see LayoutDirection::Type for supported values.
+   */
+  LAYOUT_DIRECTION = CLIPPING_MODE + 5,
+
+  /**
+   * @brief Determines whether child actors inherit the layout direction from a parent.
+   * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
+   */
+  INHERIT_LAYOUT_DIRECTION = CLIPPING_MODE + 6
 };
 
 } // namespace Property
@@ -132,7 +144,20 @@ enum Type
 
 } // namespace VisibilityChange
 
-typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChangedSignalType; ///< Signal type of VisibilityChangedSignal
+namespace LayoutDirection
+{
+
+enum Type
+{
+  LTR,   ///< Layout direction is from Left to Right direction.
+  RTL    ///< Layout direction is from Right to Left direction.
+};
+
+} // namespace
+
+typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChangedSignalType; ///< Signal type of VisibilityChangedSignalType
+
+typedef Signal< void ( Actor, LayoutDirection::Type ) > LayoutDirectionChangedSignalType; ///< Signal type of LayoutDirectionChangedSignal
 
 /**
  * @brief Raise actor above the next highest level of actor(s).
@@ -218,6 +243,20 @@ DALI_IMPORT_API void LowerBelow( Actor actor, Dali::Actor target );
  * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
  */
 DALI_IMPORT_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
+
+/**
+ * @brief This signal is emitted when the layout direction property of this or a parent actor is changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
+ * @endcode
+ * actor: The actor, or child of actor, whose laytou direction has changed
+ * type: Whether the actor's layout direction property has changed or a parent's.
+ * @return The signal to connect to
+ * @pre The Actor has been initialized.
+ */
+DALI_IMPORT_API LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal( Actor actor );
 
 } // namespace DevelActor
 

@@ -60,6 +60,11 @@ VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor )
   return GetImplementation( actor ).VisibilityChangedSignal();
 }
 
+LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal( Actor actor )
+{
+  return GetImplementation( actor ).LayoutDirectionChangedSignal();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

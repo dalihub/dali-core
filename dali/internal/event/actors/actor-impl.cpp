@@ -212,6 +212,8 @@ DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali:
 DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
 DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
+DALI_PROPERTY( "layoutDirection",           STRING,  true,  false, false, Dali::DevelActor::Property::LAYOUT_DIRECTION )
+DALI_PROPERTY( "inheritLayoutDirection",    BOOLEAN,  true,  false, false, Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -307,6 +309,10 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, DISABLED )
 DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, CLIP_CHILDREN )
 DALI_ENUM_TO_STRING_TABLE_END( CLIPPING_MODE )
 
+DALI_ENUM_TO_STRING_TABLE_BEGIN( LAYOUT_DIRECTION )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelActor::LayoutDirection, LTR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelActor::LayoutDirection, RTL )
+DALI_ENUM_TO_STRING_TABLE_END( LAYOUT_DIRECTION )
 
 bool GetAnchorPointConstant( const std::string& value, Vector3& anchor )
 {
@@ -488,6 +494,8 @@ void Actor::Add( Actor& child )
 
       // Notification for derived classes
       OnChildAdd( child );
+
+      InheritLayoutDirectionRecursively( ActorPtr( &child ), mLayoutDirection );
 
       // Only put in a relayout request if there is a suitable dependency
       if( RelayoutDependentOnChildren() )
@@ -1986,6 +1994,15 @@ void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityCha
   }
 }
 
+void Actor::EmitLayoutDirectionChangedSignal( DevelActor::LayoutDirection::Type type )
+{
+  if( ! mLayoutDirectionChangedSignal.Empty() )
+  {
+    Dali::Actor handle( this );
+    mLayoutDirectionChangedSignal.Emit( handle, type );
+  }
+}
+
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return mTouchedSignal;
@@ -2024,6 +2041,11 @@ Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 DevelActor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
 {
   return mVisibilityChangedSignal;
+}
+
+DevelActor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
+{
+  return mLayoutDirectionChangedSignal;
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2102,6 +2124,8 @@ Actor::Actor( DerivedType derivedType )
   mInheritScale( true ),
   mPositionUsesAnchorPoint( true ),
   mVisible( true ),
+  mInheritLayoutDirection( true ),
+  mLayoutDirection( DevelActor::LayoutDirection::LTR ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
@@ -2856,6 +2880,28 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
         {
           SetPositionUsesAnchorPointMessage( GetEventThreadServices(), *mNode, mPositionUsesAnchorPoint );
         }
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION:
+    {
+      Dali::DevelActor::LayoutDirection::Type direction = mLayoutDirection;
+      mInheritLayoutDirection = false;
+
+      if( Scripting::GetEnumerationProperty< DevelActor::LayoutDirection::Type >( property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction ) )
+      {
+        InheritLayoutDirectionRecursively( this, direction, true );
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION:
+    {
+      bool value = false;
+      if( property.Get( value ) )
+      {
+        SetInheritLayoutDirection( value );
       }
       break;
     }
@@ -4102,6 +4148,18 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
       break;
     }
 
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION:
+    {
+      value = mLayoutDirection;
+      break;
+    }
+
+    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION:
+    {
+      value = IsLayoutDirectionInherited();
+      break;
+    }
+
     default:
     {
       // Must be a scene-graph only property
@@ -5269,6 +5327,46 @@ void Actor::LowerBelow( Internal::Actor& target )
   else
   {
     DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+  }
+}
+
+void Actor::SetInheritLayoutDirection( bool inherit )
+{
+  if( mInheritLayoutDirection != inherit )
+  {
+    mInheritLayoutDirection = inherit;
+
+    if( inherit && mParent )
+    {
+      InheritLayoutDirectionRecursively( this, mParent->mLayoutDirection );
+    }
+  }
+}
+
+bool Actor::IsLayoutDirectionInherited() const
+{
+  return mInheritLayoutDirection;
+}
+
+void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor::LayoutDirection::Type direction, bool set )
+{
+  if( actor && ( actor->mInheritLayoutDirection || set ) )
+  {
+    if( actor->mLayoutDirection != direction)
+    {
+      actor->mLayoutDirection = direction;
+      actor->EmitLayoutDirectionChangedSignal( direction );
+      actor->RelayoutRequest();
+    }
+
+    if( actor->GetChildCount() > 0 )
+    {
+      ActorContainer& children = actor->GetChildrenInternal();
+      for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
+      {
+        InheritLayoutDirectionRecursively( *iter, direction );
+      }
+    }
   }
 }
 

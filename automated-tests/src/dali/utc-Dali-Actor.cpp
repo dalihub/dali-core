@@ -51,6 +51,8 @@ bool gHoverCallBackCalled=false;
 
 static bool gTestConstraintCalled;
 
+DevelActor::LayoutDirection::Type gLayoutDirectionType;
+
 struct TestConstraint
 {
   void operator()( Vector4& color, const PropertyInputContainer& /* inputs */ )
@@ -6117,6 +6119,100 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   application.Render( 1100 ); // After the animation
 
   DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+static void LayoutDirectionChanged( Actor actor, DevelActor::LayoutDirection::Type type )
+{
+  gLayoutDirectionType = type;
+}
+
+int UtcDaliActorLayoutDirectionProperty(void)
+{
+  TestApplication application;
+  tet_infoline( "Check layout direction property" );
+
+  Actor actor0 = Actor::New();
+  DALI_TEST_EQUALS( actor0.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Stage::GetCurrent().Add( actor0 );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor1 = Actor::New();
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor2 = Actor::New();
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor3 = Actor::New();
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor4 = Actor::New();
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor5 = Actor::New();
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor6 = Actor::New();
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor7 = Actor::New();
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor8 = Actor::New();
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  Actor actor9 = Actor::New();
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+
+  actor1.Add( actor2 );
+  gLayoutDirectionType = DevelActor::LayoutDirection::LTR;
+  DevelActor::LayoutDirectionChangedSignal( actor2 ).Connect( LayoutDirectionChanged );
+
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::RTL );
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( gLayoutDirectionType, DevelActor::LayoutDirection::RTL, TEST_LOCATION );
+
+  actor1.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  actor0.Add( actor1 );
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor3 );
+  actor3.Add( actor4 );
+  actor4.Add( actor5 );
+  actor5.Add( actor6 );
+  actor5.Add( actor7 );
+  actor7.Add( actor8 );
+  actor8.Add( actor9 );
+  actor3.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
+
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, false );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+
+  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+
+  actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+
+  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+
+  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
 
   END_TEST;
 }

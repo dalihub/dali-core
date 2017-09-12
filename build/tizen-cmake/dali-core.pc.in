@@ -1,10 +1,10 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
 apiversion=@DALI_VERSION@
-libdir=@libdir@
-includedir=@devincludepath@
+libdir=@LIBDIR@
+includedir=@DEV_INCLUDE_PATH@
 
-Name: Dali 3D engine
+Name: DALi 3D Engine
 Description: Cross platform 3D Engine
 Version: ${apiversion}
 Requires:
