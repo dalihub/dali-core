@@ -117,6 +117,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
                m1[6],  m1[7], m1[8],   m2[6],  m2[7], m2[8]);
 
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
   else
   {
@@ -147,6 +148,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, float eps
                m1[6],  m1[7], m1[8],   m2[6],  m2[7], m2[8]);
 
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
   else
   {
@@ -183,6 +185,7 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, const char*
               m1[12], m1[13], m1[14], m1[15],  m2[12], m2[13], m2[14], m2[15]);
 
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
   else
   {
@@ -214,6 +217,7 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, float epsil
               m1[12], m1[13], m1[14], m1[15],  m2[12], m2[13], m2[14], m2[15]);
 
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
   else
   {
@@ -251,6 +255,7 @@ void DALI_TEST_EQUALS( Property::Value& str1, const char* str2, const char* loca
   else
   {
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
 }
 
@@ -265,6 +270,7 @@ void DALI_TEST_ASSERT( DaliException& e, std::string conditionSubString, const c
   {
     fprintf(stderr, "Expected substring '%s' : actual exception string '%s' : location %s\n", conditionSubString.c_str(), e.condition, location );
     tet_result(TET_FAIL);
+    throw("TET_FAIL");
   }
   else
   {
@@ -294,6 +300,7 @@ void ConstraintAppliedCheck::CheckSignalReceived()
   {
     fprintf(stderr,  "Expected Applied signal was not received\n" );
     tet_result( TET_FAIL );
+    throw("TET_FAIL");
   }
   else
   {
@@ -307,6 +314,7 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   {
     fprintf(stderr,  "Unexpected Applied signal was received\n" );
     tet_result( TET_FAIL );
+    throw("TET_FAIL");
   }
   else
   {
