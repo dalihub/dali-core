@@ -48,6 +48,7 @@ inline float Range(float f0, float f1)
 {
   float min = std::min(f0, f1);
   float max = std::max(f0, f1);
+  srand( time( NULL ) );
   return min + (rand() & 0xfff) * (max-min) * (1.0f/4095.0f);
 }
 
