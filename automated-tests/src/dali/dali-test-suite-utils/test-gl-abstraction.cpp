@@ -85,6 +85,7 @@ void TestGlAbstraction::Initialize()
   mEnableDisableTrace.Reset();
   mShaderTrace.Reset();
   mStencilFunctionTrace.Reset();
+  mScissorTrace.Reset();
   mTextureTrace.Reset();
   mTexParamaterTrace.Reset();
   mDrawTrace.Reset();

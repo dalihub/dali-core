@@ -33,6 +33,7 @@ namespace Dali
  * @{
  */
 
+class Vector2;
 class Quaternion;
 
 /**
@@ -316,13 +317,23 @@ public:
   static void Multiply( Matrix& result, const Matrix& lhs, const Quaternion& rhs );
 
   /**
-   * @brief The multiplication operator.
+   * @brief The multiplication by Vector4 operator.
    *
    * @SINCE_1_0.0
-   * @param[in] rhs The Matrix to multiply this by
-   * @return A matrix containing the result
+   * @param[in] rhs The Vector4 coordinates to multiply this matrix by
+   * @return A Vector4 containing the result coordinates
    */
   Vector4 operator*(const Vector4& rhs) const;
+
+  /**
+   * @brief The multiplication by Vector2 operator.
+   * Note: This performs an optimized 2D transformation.
+   *
+   * @SINCE_1_2.59
+   * @param[in] rhs The Vector2 coordinates to multiply this matrix by
+   * @return A Vector2 containing the result coordinates
+   */
+  Vector2 operator*( const Vector2& rhs ) const;
 
   /**
    * @brief The equality operator.

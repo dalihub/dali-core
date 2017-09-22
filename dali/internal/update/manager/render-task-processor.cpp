@@ -87,15 +87,17 @@ Layer* FindLayer( Node& node )
  * Rebuild the Layer::colorRenderables and overlayRenderables members,
  * including only renderers which are included in the current render-task.
  *
- * @param[in] updateBufferIndex The current update buffer index.
- * @param[in] node The current node of the scene-graph.
- * @param[in] currentLayer The current layer containing lists of opaque/transparent renderables.
- * @param[in] renderTask The current render-task.
- * @param[in] inheritedDrawMode The draw mode of the parent
- * @param[in] parentDepthIndex The inherited parent node depth index
- * @param[in] currentClippingId The current Clipping Id
- *              Note: ClippingId is passed by reference, so it is permanently modified when traversing back up the tree for uniqueness.
- * @param[in] clippingDepth The current clipping depth
+ * @param[in]  updateBufferIndex The current update buffer index.
+ * @param[in]  node The current node of the scene-graph.
+ * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables.
+ * @param[in]  renderTask The current render-task.
+ * @param[in]  inheritedDrawMode The draw mode of the parent
+ * @param[in]  parentDepthIndex The inherited parent node depth index
+ * @param[in]  currentClippingId The current Clipping Id
+ *               Note: ClippingId is passed by reference, so it is permanently modified when traversing back up the tree for uniqueness.
+ * @param[in]  clippingDepth The current stencil clipping depth
+ * @param[in]  clippingDepth The current scissor clipping depth
+ * @param[out] clippingUsed  Gets set to true if any clipping nodes have been found
  */
 void AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,
@@ -103,7 +105,9 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
                             RenderTask& renderTask,
                             int inheritedDrawMode,
                             uint32_t& currentClippingId,
-                            uint32_t clippingDepth )
+                            uint32_t clippingDepth,
+                            uint32_t scissorDepth,
+                            bool& clippingUsed )
 {
   // Short-circuit for invisible nodes
   if( !node.IsVisible( updateBufferIndex ) )
@@ -135,13 +139,24 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
   DALI_ASSERT_DEBUG( NULL != layer );
 
   // Update the clipping Id and depth for this node (if clipping is enabled).
-  if( DALI_UNLIKELY( node.GetClippingMode() != ClippingMode::DISABLED ) )
+  const Dali::ClippingMode::Type clippingMode = node.GetClippingMode();
+  if( DALI_UNLIKELY( clippingMode != ClippingMode::DISABLED ) )
   {
-    ++currentClippingId; // This modifies the reference passed in as well as the local value, causing the value to be global to the recursion.
-    ++clippingDepth;     // This only modifies the local value (which is passed in when the method recurses).
+    if( DALI_LIKELY( clippingMode == ClippingMode::CLIP_TO_BOUNDING_BOX ) )
+    {
+      ++scissorDepth;        // This only modifies the local value (which is passed in when the method recurses).
+    }
+    else
+    {
+      // We only need clipping Id for stencil clips. This means we can deliberately avoid modifying it for bounding box clips,
+      // thus allowing bounding box clipping to still detect clip depth changes without turning on the stencil buffer for non-clipped nodes.
+      ++currentClippingId;   // This modifies the reference passed in as well as the local value, causing the value to be global to the recursion.
+      ++clippingDepth;       // This only modifies the local value (which is passed in when the method recurses).
+    }
+    clippingUsed = true;
   }
   // Set the information in the node.
-  node.SetClippingInformation( currentClippingId, clippingDepth );
+  node.SetClippingInformation( currentClippingId, clippingDepth, scissorDepth );
 
   const unsigned int count = node.GetRendererCount();
   for( unsigned int i = 0; i < count; ++i )
@@ -165,7 +180,7 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
   for( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth );
+    AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed );
   }
 }
 
@@ -248,10 +263,9 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                              renderTask,
                              sourceNode->GetDrawMode(),
                              clippingId,
-                             0u );
-
-      // If the clipping Id is still 0 after adding all Renderables, there is no clipping required for this RenderTaskList.
-      hasClippingNodes = clippingId != 0u;
+                             0u,
+                             0u,
+                             hasClippingNodes );
 
       mRenderInstructionProcessor.Prepare( updateBufferIndex,
                                   sortedLayers,
@@ -267,6 +281,7 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
   // Now that the off screen renders are done we can process on screen render tasks.
   // Reset the clipping Id for the OnScreen render tasks.
   clippingId = 0u;
+  hasClippingNodes = false;
   for ( RenderTaskList::RenderTaskContainer::Iterator iter = taskContainer.Begin(); endIter != iter; ++iter )
   {
     RenderTask& renderTask = **iter;
@@ -308,10 +323,9 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                              renderTask,
                              sourceNode->GetDrawMode(),
                              clippingId,
-                             0u );
-
-      // If the clipping Id is still 0 after adding all Renderables, there is no clipping required for this RenderTaskList.
-      hasClippingNodes = clippingId != 0;
+                             0u,
+                             0u,
+                             hasClippingNodes );
 
       mRenderInstructionProcessor.Prepare( updateBufferIndex,
                                   sortedLayers,
