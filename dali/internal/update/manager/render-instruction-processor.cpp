@@ -162,7 +162,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
   bool inside( true );
   const Node* node = renderable.mNode;
 
-  if( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
+  if( cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside = ( boundingSphere.w > Math::MACHINE_EPSILON_1000 ) &&
@@ -171,20 +171,28 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if( inside )
   {
-    Renderer::Opacity opacity = renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode );
+    Renderer::Opacity opacity = renderable.mRenderer ? renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
     if( opacity != Renderer::TRANSPARENT )
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
-      item.mRenderer = &renderable.mRenderer->GetRenderer();
-      item.mNode = renderable.mNode;
-      item.mTextureSet = renderable.mRenderer->GetTextures();
-      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
-      item.mDepthIndex = renderable.mRenderer->GetDepthIndex();
 
+      item.mNode = renderable.mNode;
+      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
       if( !isLayer3d )
       {
-        item.mDepthIndex += renderable.mNode->GetDepthIndex();
+        item.mDepthIndex = renderable.mNode->GetDepthIndex();
+      }
+
+      if( DALI_LIKELY( renderable.mRenderer ) )
+      {
+        item.mRenderer =   &renderable.mRenderer->GetRenderer();
+        item.mTextureSet =  renderable.mRenderer->GetTextures();
+        item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
+      }
+      else
+      {
+        item.mRenderer = nullptr;
       }
 
       // Save ModelView matrix onto the item.
@@ -327,7 +335,10 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
+      if( item.mRenderer )
+      {
+        item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
+      }
 
       // texture set
       mSortingHelper[ index ].textureSet = item.mTextureSet;

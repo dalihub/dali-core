@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_MATH_H__
-#define __DALI_INTERNAL_MATH_H__
+#ifndef DALI_INTERNAL_MATH_H
+#define DALI_INTERNAL_MATH_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@
 namespace Dali
 {
 
+class Vector2;
+class Matrix;
+
 namespace Internal
 {
 
@@ -29,13 +32,24 @@ typedef float Vec4[4];
 typedef float Mat4[16];
 
 /**
- * @brief Applies a transformation matrix to a vector
+ * @brief Applies a transformation matrix to a Vector3
  *
  * @param[out] result The transformed vector
  * @param[in] m The transformation matrix
  * @param[in] v The vector to transform
  */
 void TransformVector3( Vec3 result, const Mat4 m, const Vec3 v );
+
+/**
+ * @brief Applies a transformation matrix to a Vector2
+ * Note: This performs an optimized 2D transformation.
+ *
+ * @param[in] matrix      The matrix to transform by
+ * @param[in] x           The x coordinate to multiply the matrix by
+ * @param[in] y           The y coordinate to multiply the matrix by
+ * @return                A Vector2 containing the resulting coordinates
+ */
+Vector2 Transform2D( const Matrix& matrix, const float x, const float y );
 
 /**
  * @brief Computes the length of a vector3
@@ -49,4 +63,4 @@ float Length( const Vec3 v );
 
 } // namespace Dali
 
-#endif  //__DALI_INTERNAL_MATH_H__
+#endif  // DALI_INTERNAL_MATH_H
