@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
             GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
 : mRenderController( renderController ),
   mPlatform(platform),
-  mIsActive(true),
   mProcessingEvent(false)
 {
   // Create the thread local storage
@@ -117,7 +116,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
-  mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
+  mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager, mRenderController ) );
 
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
@@ -229,19 +228,6 @@ void Core::Render( RenderStatus& status )
   mRenderManager->Render( status );
 }
 
-void Core::Suspend()
-{
-  mIsActive = false;
-}
-
-void Core::Resume()
-{
-  mIsActive = true;
-
-  // trigger processing of events queued up while paused
-  ProcessEvents();
-}
-
 void Core::SceneCreated()
 {
   mStage->EmitSceneCreatedSignal();
@@ -260,7 +246,7 @@ void Core::ProcessEvents()
   if( mProcessingEvent )
   {
     DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!\n" );
-    mRenderController.RequestProcessEventsOnIdle();
+    mRenderController.RequestProcessEventsOnIdle( false );
     return;
   }
 
@@ -274,29 +260,27 @@ void Core::ProcessEvents()
 
   mNotificationManager->ProcessMessages();
 
-  // Avoid allocating MessageBuffers, triggering size-negotiation or sending any other spam whilst paused
-  if( mIsActive )
+  // Emit signal here to inform listeners that event processing has finished.
+  mStage->EmitEventProcessingFinishedSignal();
+
+  // Run the size negotiation after event processing finished signal
+  mRelayoutController->Relayout();
+
+  // Rebuild depth tree after event processing has finished
+  mStage->RebuildDepthTree();
+
+  // Flush any queued messages for the update-thread
+  const bool messagesToProcess = mUpdateManager->FlushQueue();
+
+  // Check if the touch or gestures require updates.
+  const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
+  // Check if the next update is forced.
+  const bool forceUpdate = mStage->IsNextUpdateForced();
+
+  if( messagesToProcess || gestureNeedsUpdate || forceUpdate )
   {
-    // Emit signal here to inform listeners that event processing has finished.
-    mStage->EmitEventProcessingFinishedSignal();
-
-    // Run the size negotiation after event processing finished signal
-    mRelayoutController->Relayout();
-
-    // Rebuild depth tree after event processing has finished
-    mStage->RebuildDepthTree();
-
-    // Flush any queued messages for the update-thread
-    const bool messagesToProcess = mUpdateManager->FlushQueue();
-
-    // Check if the touch or gestures require updates.
-    const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
-
-    if( messagesToProcess || gestureNeedsUpdate )
-    {
-      // tell the render controller to keep update thread running
-      mRenderController.RequestUpdate();
-    }
+    // tell the render controller to keep update thread running
+    mRenderController.RequestUpdate( forceUpdate );
   }
 
   mRelayoutController->SetProcessingCoreEvents( false );
