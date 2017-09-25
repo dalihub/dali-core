@@ -193,7 +193,7 @@ unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool
   // If we are outside, then we have to request a call to Core::ProcessEvents() on idle.
   if ( false == mImpl->processingEvents )
   {
-    mImpl->renderController.RequestProcessEventsOnIdle();
+    mImpl->renderController.RequestProcessEventsOnIdle( false );
   }
 
   return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );
