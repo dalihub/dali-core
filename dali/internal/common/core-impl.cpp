@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -274,6 +274,9 @@ void Core::ProcessEvents()
   // Run the size negotiation after event processing finished signal
   mRelayoutController->Relayout();
 
+  // Run any registered processors
+  RunProcessors();
+
   // Rebuild depth tree after event processing has finished
   mStage->RebuildDepthTree();
 
@@ -320,6 +323,34 @@ ViewMode Core::GetViewMode() const
 void Core::SetStereoBase( float stereoBase )
 {
   mStage->SetStereoBase( stereoBase );
+}
+
+void Core::RegisterProcessor( Integration::Processor& processor )
+{
+  mProcessors.PushBack(&processor);
+}
+
+void Core::UnregisterProcessor( Integration::Processor& processor )
+{
+  auto iter = std::find( mProcessors.Begin(), mProcessors.End(), &processor );
+  if( iter != mProcessors.End() )
+  {
+    mProcessors.Erase( iter );
+  }
+}
+
+void Core::RunProcessors()
+{
+  // Copy processor pointers to prevent changes to vector affecting loop iterator.
+  Dali::Vector<Integration::Processor*> processors( mProcessors );
+
+  for( auto processor : processors )
+  {
+    if( processor )
+    {
+      processor->Process();
+    }
+  }
 }
 
 float Core::GetStereoBase() const

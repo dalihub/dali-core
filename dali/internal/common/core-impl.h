@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
@@ -33,6 +34,7 @@ namespace Dali
 
 namespace Integration
 {
+class Processor;
 class RenderController;
 class PlatformAbstraction;
 class GestureManager;
@@ -187,7 +189,24 @@ public:
    */
   float GetStereoBase() const;
 
-private:  // for use by ThreadLocalStorage
+
+  /**
+   * @copydoc Dali::Integration::Core::RegisterProcessor
+   */
+  void RegisterProcessor( Dali::Integration::Processor& processor );
+
+  /**
+   * @copydoc Dali::Integration::Core::UnregisterProcessor
+   */
+  void UnregisterProcessor( Dali::Integration::Processor& processor );
+
+private:
+  /**
+   * Run each registered processor
+   */
+  void RunProcessors();
+
+  // for use by ThreadLocalStorage
 
   /**
    * Returns the current stage.
@@ -269,6 +288,7 @@ private:
   OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
+  Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
 
   friend class ThreadLocalStorage;
 
