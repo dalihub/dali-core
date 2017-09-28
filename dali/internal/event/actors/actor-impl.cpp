@@ -5209,7 +5209,7 @@ void Actor::Lower()
     ActorContainer& siblings = *(mParent->mChildren);
     if( siblings.front() != this ) // If not already at beginning
     {
-      for( size_t i=0; i<siblings.size(); ++i )
+      for( size_t i=1; i<siblings.size(); ++i )
       {
         if( siblings[i] == this )
         {

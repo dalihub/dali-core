@@ -139,7 +139,24 @@ inline void EraseUsingDiscardQueue( OwnerContainer<T*>& container, T* object, Di
   }
 }
 
+/**
+ * Descends into node's hierarchy and sorts the children of each child according to their depth-index.
+ * @param[in] node The node whose hierarchy to descend
+ */
+void SortSiblingNodesRecursively( Node& node )
+{
+  NodeContainer& container = node.GetChildren();
+  std::sort( container.Begin(), container.End(),
+             []( Node* a, Node* b ) { return a->GetDepthIndex() < b->GetDepthIndex(); } );
+
+  // Descend tree and sort as well
+  for( auto&& iter : container )
+  {
+    SortSiblingNodesRecursively( *iter );
+  }
 }
+
+} // unnamed namespace
 
 /**
  * Structure to contain UpdateManager internal data
@@ -1022,6 +1039,9 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
   {
     iter.node->SetDepthIndex( iter.sortedDepth );
   }
+
+  // Go through node hierarchy and rearrange siblings according to depth-index
+  SortSiblingNodesRecursively( *( mImpl->root ) );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
