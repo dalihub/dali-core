@@ -50,7 +50,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/images/nine-patch-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/texture-set-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-data-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-registry.h

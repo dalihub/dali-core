@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,6 +143,15 @@ void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int& byteOffset, int& 
     case Dali::Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
     {
       DALI_LOG_ERROR("Pixel formats for compressed images are not compatible with simple masking-out of per-pixel alpha.\n");
+      byteOffset=0;
+      bitMask=0;
+      break;
+    }
+
+    case Dali::Pixel::RGB16F:
+    case Dali::Pixel::RGB32F:
+    {
+      DALI_LOG_ERROR("Pixel format not compatible.\n");
       byteOffset=0;
       bitMask=0;
       break;

@@ -53,8 +53,7 @@ devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/native-image-interface-extension.h \
   $(devel_api_src_dir)/images/nine-patch-image.h \
   $(devel_api_src_dir)/images/texture-set-image.h \
-  $(devel_api_src_dir)/images/pixel-data-devel.h \
-  $(devel_api_src_dir)/images/pixel-devel.h
+  $(devel_api_src_dir)/images/pixel-data-devel.h
 
 devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/csharp-type-info.h \
