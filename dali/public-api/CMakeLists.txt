@@ -191,6 +191,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry-helper.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task-list.h
