@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/devel-api/common/dali-vector-devel.h>
 
 namespace Dali
 {
