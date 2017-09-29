@@ -126,6 +126,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/vector-wrapper.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/view-mode.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/device.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-detector.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hover-event.h

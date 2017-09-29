@@ -132,6 +132,7 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/view-mode.h
 
 public_api_core_events_header_files = \
+  $(public_api_src_dir)/events/device.h \
   $(public_api_src_dir)/events/gesture.h \
   $(public_api_src_dir)/events/gesture-detector.h \
   $(public_api_src_dir)/events/hover-event.h \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/system-overlay.h>
-#include <dali/devel-api/events/touch-event-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -51,8 +50,8 @@ struct TestPoint
   Vector2 ellipseRadius;
   float pressure;
   Degree angle;
-  DevelDevice::Class::Type deviceClass;
-  DevelDevice::Subclass::Type deviceSubclass;
+  Device::Class::Type deviceClass;
+  Device::Subclass::Type deviceSubclass;
 
   TestPoint()
   : deviceId(-1), state(PointState::FINISHED), radius(0), pressure(0)
@@ -142,8 +141,8 @@ struct TouchDataFunctor
       p.ellipseRadius = touchData.GetEllipseRadius(i);
       p.pressure = touchData.GetPressure(i);
       p.angle = touchData.GetAngle(i);
-      p.deviceClass = DevelTouchData::GetDeviceClass(touchData, i);
-      p.deviceSubclass = DevelTouchData::GetDeviceSubclass(touchData, i);
+      p.deviceClass = touchData.GetDeviceClass(i);
+      p.deviceSubclass = touchData.GetDeviceSubclass(i);
       signalData.touchData.points.push_back(p);
     }
 
@@ -286,8 +285,8 @@ Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vecto
   Integration::Point point;
   point.SetState( state );
   point.SetScreenPosition( screenPosition );
-  point.SetDeviceClass( DevelDevice::Class::TOUCH );
-  point.SetDeviceSubclass( DevelDevice::Subclass::NONE );
+  point.SetDeviceClass( Device::Class::TOUCH );
+  point.SetDeviceSubclass( Device::Subclass::NONE );
   touchEvent.points.push_back( point );
   return touchEvent;
 }
@@ -2007,7 +2006,7 @@ int UtcDaliTouchDataGetDeviceAPINegative(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
 
   TouchData data = handleData.touchData;
-  DALI_TEST_EQUALS( DevelTouchData::GetDeviceClass( data, -1 ), DevelDevice::Class::NONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelTouchData::GetDeviceSubclass( data, -1 ), DevelDevice::Subclass::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.GetDeviceClass( -1 ), Device::Class::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.GetDeviceSubclass( -1 ), Device::Subclass::NONE, TEST_LOCATION );
   END_TEST;
 }

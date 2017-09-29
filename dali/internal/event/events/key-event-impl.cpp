@@ -45,8 +45,8 @@ namespace Internal
 
 KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
 : mDeviceName( "" ),
-  mDeviceClass( DevelDevice::Class::NONE ),
-  mDeviceSubclass( DevelDevice::Subclass::NONE )
+  mDeviceClass( Device::Class::NONE ),
+  mDeviceSubclass( Device::Subclass::NONE )
 {
   gKeyEventToImplMapping.PushBack( { keyEvent, this } );
 }
@@ -85,22 +85,22 @@ void KeyEventImpl::SetDeviceName( const std::string& deviceName )
   mDeviceName = deviceName;
 }
 
-DevelDevice::Class::Type KeyEventImpl::GetDeviceClass() const
+Device::Class::Type KeyEventImpl::GetDeviceClass() const
 {
   return mDeviceClass;
 }
 
-void KeyEventImpl::SetDeviceClass( DevelDevice::Class::Type deviceClass )
+void KeyEventImpl::SetDeviceClass( Device::Class::Type deviceClass )
 {
   mDeviceClass = deviceClass;
 }
 
-DevelDevice::Subclass::Type KeyEventImpl::GetDeviceSubclass() const
+Device::Subclass::Type KeyEventImpl::GetDeviceSubclass() const
 {
   return mDeviceSubclass;
 }
 
-void KeyEventImpl::SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass )
+void KeyEventImpl::SetDeviceSubclass( Device::Subclass::Type deviceSubclass )
 {
   mDeviceSubclass = deviceSubclass;
 }

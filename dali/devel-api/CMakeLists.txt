@@ -40,9 +40,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/device.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-event-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/key-event-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/native-image-interface-extension.h
