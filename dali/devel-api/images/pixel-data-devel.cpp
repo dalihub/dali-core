@@ -27,17 +27,6 @@ namespace Dali
 namespace DevelPixelData
 {
 
-PixelData New( unsigned char* buffer,
-               unsigned int bufferSize,
-               unsigned int width,
-               unsigned int height,
-               DevelPixel::Format pixelFormat,
-               PixelData::ReleaseFunction releaseFunction )
-{
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, bufferSize, width, height, static_cast<Pixel::Format>( pixelFormat ), releaseFunction );
-  return PixelData( internal.Get() );
-}
-
 PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData )
 {
   Internal::PixelData& pixelDataImpl = GetImplementation( pixelData );

@@ -32,7 +32,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/animation/animation-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/common/circular-queue.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector-devel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/hash.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/map-wrapper.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/owner-container.h
@@ -50,7 +49,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/images/nine-patch-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/texture-set-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-data-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-registry.h

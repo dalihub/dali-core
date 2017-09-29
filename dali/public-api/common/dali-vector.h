@@ -2,7 +2,7 @@
 #define __DALI_VECTOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -486,6 +486,26 @@ public: // API
     ItemType* address = reinterpret_cast<ItemType*>( VectorBase::mData );
     address += VectorBase::Count();
     return address;
+  }
+
+  /**
+   * Support for C++11 Range-based for loop: for( item : container ).
+   * @SINCE_1_2.60
+   * @return The start iterator
+   */
+  Iterator begin() const
+  {
+    return Begin();
+  }
+
+  /**
+   * Support for C++11 Range-based for loop: for( item : container ).
+   * @SINCE_1_2.60
+   * @return The end iterator
+   */
+  Iterator end() const
+  {
+    return End();
   }
 
   /**
