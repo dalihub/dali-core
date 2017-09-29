@@ -56,7 +56,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-registry.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/handle-devel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/property-helper-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/rendering/renderer-devel.h
 

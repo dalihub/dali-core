@@ -13,7 +13,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/images/nine-patch-image.cpp \
   $(devel_api_src_dir)/images/pixel-data-devel.cpp \
   $(devel_api_src_dir)/object/handle-devel.cpp \
-  $(devel_api_src_dir)/object/weak-handle.cpp \
   $(devel_api_src_dir)/object/csharp-type-registry.cpp \
   $(devel_api_src_dir)/scripting/scripting.cpp \
   $(devel_api_src_dir)/signals/signal-delegate.cpp \
@@ -61,8 +60,7 @@ devel_api_core_object_header_files = \
   $(devel_api_src_dir)/object/csharp-type-info.h \
   $(devel_api_src_dir)/object/csharp-type-registry.h \
   $(devel_api_src_dir)/object/handle-devel.h \
-  $(devel_api_src_dir)/object/property-helper-devel.h \
-  $(devel_api_src_dir)/object/weak-handle.h
+  $(devel_api_src_dir)/object/property-helper-devel.h
 
 devel_api_core_rendering_header_files = \
   $(devel_api_src_dir)/rendering/renderer-devel.h

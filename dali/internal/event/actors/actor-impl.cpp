@@ -33,7 +33,6 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/object/weak-handle.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/common/event-thread-services.h>
