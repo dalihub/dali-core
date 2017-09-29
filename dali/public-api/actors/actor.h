@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -308,6 +308,21 @@ public:
       MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2     @SINCE_1_0.0
       INHERIT_POSITION,                                   ///< name "inheritPosition",       type bool        @SINCE_1_1.24
       CLIPPING_MODE,                                      ///< name "clippingMode",          type String      @SINCE_1_2_5
+
+      /**
+       * @brief The direction of the layout.
+       * @details Name "layoutDirection", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2.60
+       * @see LayoutDirection::Type for supported values.
+       */
+      LAYOUT_DIRECTION,
+
+      /**
+       * @brief Determines whether child actors inherit the layout direction from a parent.
+       * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
+       * @SINCE_1_2.60
+       */
+      INHERIT_LAYOUT_DIRECTION,
     };
   };
 
@@ -320,6 +335,7 @@ public:
   typedef Signal< void (Actor) > OnStageSignalType;                         ///< Stage connection signal type @SINCE_1_0.0
   typedef Signal< void (Actor) > OffStageSignalType;                        ///< Stage disconnection signal type @SINCE_1_0.0
   typedef Signal< void (Actor) > OnRelayoutSignalType;                      ///< Called when the actor is relaid out @SINCE_1_0.0
+  typedef Signal< void ( Actor, LayoutDirection::Type ) > LayoutDirectionChangedSignalType; ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
 
@@ -1238,6 +1254,62 @@ public:
    */
   bool IsKeyboardFocusable() const;
 
+  /**
+   * @brief Raise actor above the next sibling actor.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   */
+  void Raise();
+
+  /**
+   * @brief Lower the actor below the previous sibling actor.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   */
+  void Lower();
+
+  /**
+   * @brief Raise actor above all other sibling actors.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   */
+  void RaiseToTop();
+
+  /**
+   * @brief Lower actor to the bottom of all other sibling actors.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   */
+  void LowerToBottom();
+
+  /**
+   * @brief Raises the actor above the target actor.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   * @pre The target actor is a sibling.
+   */
+  void RaiseAbove( Actor target );
+
+  /**
+   * @brief Lower the actor to below the target actor.
+   *
+   * @SINCE_1_2.60
+   * @pre The Actor has been initialized.
+   * @pre The Actor has been parented.
+   * @pre The target actor is a sibling.
+   */
+  void LowerBelow( Actor target );
+
   // SIZE NEGOTIATION
 
   /**
@@ -1554,6 +1626,22 @@ public: // Signals
    * @return The signal
    */
   OnRelayoutSignalType& OnRelayoutSignal();
+
+  /**
+   * @brief This signal is emitted when the layout direction property of this or a parent actor is changed.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
+   * @endcode
+   * actor: The actor, or child of actor, whose laytou direction has changed
+   * type: Whether the actor's layout direction property has changed or a parent's.
+   *
+   * @SINCE_1_2.60
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
 
 public: // Not intended for application developers
 
