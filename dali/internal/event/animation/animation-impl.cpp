@@ -1024,17 +1024,17 @@ Vector2 Animation::GetPlayRange() const
   return mPlayRange;
 }
 
-void Animation::SetLoopingMode( DevelAnimation::LoopingMode loopingMode )
+void Animation::SetLoopingMode( Dali::Animation::LoopingMode loopingMode )
 {
-  mAutoReverseEnabled = ( loopingMode == DevelAnimation::LoopingMode::AUTO_REVERSE );
+  mAutoReverseEnabled = ( loopingMode == Dali::Animation::LoopingMode::AUTO_REVERSE );
 
   // mAnimation is being used in a separate thread; queue a message to set play range
   SetLoopingModeMessage( mEventThreadServices, *mAnimation, mAutoReverseEnabled );
 }
 
-DevelAnimation::LoopingMode Animation::GetLoopingMode()
+Dali::Animation::LoopingMode Animation::GetLoopingMode() const
 {
-  return mAutoReverseEnabled ? DevelAnimation::LoopingMode::AUTO_REVERSE : DevelAnimation::LoopingMode::RESTART;
+  return mAutoReverseEnabled ? Dali::Animation::AUTO_REVERSE : Dali::Animation::RESTART;
 }
 
 bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )

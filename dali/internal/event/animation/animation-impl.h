@@ -398,12 +398,12 @@ public:
   /**
    * @copydoc Dali::Animation::SetLoopingMode()
    */
-  void SetLoopingMode( Dali::DevelAnimation::LoopingMode loopingMode );
+  void SetLoopingMode( Dali::Animation::LoopingMode loopingMode );
 
   /**
    * @copydoc Dali::Animation::GetLoopingMode()
    */
-  Dali::DevelAnimation::LoopingMode GetLoopingMode();
+  Dali::Animation::LoopingMode GetLoopingMode() const;
 
 public: // For connecting animators to animations
 
