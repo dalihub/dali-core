@@ -99,6 +99,7 @@ Node::Node()
   mExclusiveRenderTask( NULL ),
   mChildren(),
   mClippingDepth( 0u ),
+  mScissorDepth( 0u ),
   mDepthIndex( 0u ),
   mRegenerateUniformMap( 0 ),
   mDirtyFlags( AllFlags ),
