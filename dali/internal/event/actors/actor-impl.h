@@ -1422,7 +1422,7 @@ public:
    * @brief Emits the layout direction change signal for this actor and all its children.
    * @param[in] type Whether the actor's layout direction property has changed or a parent's.
    */
-  void EmitLayoutDirectionChangedSignal( DevelActor::LayoutDirection::Type type );
+  void EmitLayoutDirectionChangedSignal( LayoutDirection::Type type );
 
   /**
    * @copydoc Dali::Actor::TouchedSignal()
@@ -1465,9 +1465,9 @@ public:
   DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
 
   /**
-   * @copydoc DevelActor::LayoutDirectionChangedSignal
+   * @copydoc LayoutDirectionChangedSignal
    */
-  DevelActor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
+  Dali::Actor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1937,7 +1937,7 @@ private:
    * @param[in] actor The actor for seting layout direction.
    * @param[in] direction New layout direction.
    */
-  void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::DevelActor::LayoutDirection::Type direction, bool set = false );
+  void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set = false );
 
 protected:
 
@@ -1963,7 +1963,7 @@ protected:
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
-  DevelActor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
+  Dali::Actor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
 
   Quaternion      mTargetOrientation; ///< Event-side storage for orientation
   Vector4         mTargetColor;       ///< Event-side storage for color
@@ -1995,7 +1995,7 @@ protected:
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
-  DevelActor::LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
+  LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited

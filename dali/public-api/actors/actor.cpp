@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -444,6 +444,36 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
+void Actor::Raise()
+{
+  GetImplementation( *this ).Raise();
+}
+
+void Actor::Lower()
+{
+  GetImplementation( *this ).Lower();
+}
+
+void Actor::RaiseToTop()
+{
+  GetImplementation( *this ).RaiseToTop();
+}
+
+void Actor::LowerToBottom()
+{
+  GetImplementation( *this ).LowerToBottom();
+}
+
+void Actor::RaiseAbove( Actor target )
+{
+  GetImplementation( *this ).RaiseAbove( GetImplementation( target ) );
+}
+
+void Actor::LowerBelow( Actor target )
+{
+  GetImplementation( *this ).LowerBelow( GetImplementation( target ) );
+}
+
 void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   GetImplementation(*this).SetResizePolicy( policy, dimension );
@@ -599,6 +629,11 @@ void Actor::RemoveRenderer( unsigned int index )
 Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
   return GetImplementation(*this).OnRelayoutSignal();
+}
+
+Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
+{
+  return GetImplementation( *this ).LayoutDirectionChangedSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

@@ -32,7 +32,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/animation/animation-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/common/circular-queue.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector-devel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/hash.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/map-wrapper.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/owner-container.h
@@ -41,22 +40,17 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/device.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-event-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/key-event-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/native-image-interface-extension.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/nine-patch-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/texture-set-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-data-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-registry.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/handle-devel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/property-helper-devel.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/rendering/renderer-devel.h
 

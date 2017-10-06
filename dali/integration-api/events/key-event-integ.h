@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/public-api/events/key-event.h>
-#include <dali/devel-api/events/key-event-devel.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -72,8 +71,8 @@ struct KeyEvent : public Event
            unsigned long timeStamp,
            const State& keyState,
            const std::string& deviceName,
-           const DevelDevice::Class::Type deviceClass,
-           const DevelDevice::Subclass::Type deviceSubclass );
+           const Device::Class::Type deviceClass,
+           const Device::Subclass::Type deviceSubclass );
 
   /*
    * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
@@ -127,12 +126,12 @@ struct KeyEvent : public Event
   /**
    * Class of device KeyEvent originated from
    */
-  DevelDevice::Class::Type deviceClass;
+  Device::Class::Type deviceClass;
 
   /**
    * Subclass of device KeyEvent originated from
    */
-  DevelDevice::Subclass::Type deviceSubclass;
+  Device::Subclass::Type deviceSubclass;
 };
 
 } // namespace Integration

@@ -126,6 +126,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/vector-wrapper.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/view-mode.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/device.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-detector.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hover-event.h
@@ -191,6 +192,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry-helper.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task-list.h

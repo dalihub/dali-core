@@ -51,7 +51,7 @@ bool gHoverCallBackCalled=false;
 
 static bool gTestConstraintCalled;
 
-DevelActor::LayoutDirection::Type gLayoutDirectionType;
+LayoutDirection::Type gLayoutDirectionType;
 
 struct TestConstraint
 {
@@ -4431,7 +4431,7 @@ int UtcDaliActorRaiseLower(void)
   Property::Value value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
-  DevelActor::Raise( actorB );
+  actorB.Raise();
   // Ensure sort order is calculated before next touch event
   application.SendNotification();
 
@@ -4453,7 +4453,7 @@ int UtcDaliActorRaiseLower(void)
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
-  DevelActor::Lower( actorB );
+  actorB.Lower();
   application.SendNotification(); // ensure sort order calculated before next touch event
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
@@ -4580,7 +4580,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorA\n" );
 
-  DevelActor::RaiseToTop( actorA );
+  actorA.RaiseToTop();
   application.SendNotification(); // ensure sorting order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -4611,7 +4611,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorB\n" );
 
-  DevelActor::RaiseToTop( actorB );
+  actorB.RaiseToTop();
   application.SendNotification(); // Ensure sort order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -4642,11 +4642,11 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "LowerToBottom ActorA then ActorB leaving Actor C at Top\n" );
 
-  DevelActor::LowerToBottom( actorA );
+  actorA.LowerToBottom();
   application.SendNotification();
   application.Render();
 
-  DevelActor::LowerToBottom( actorB );
+  actorB.LowerToBottom();
   application.SendNotification();
   application.Render();
 
@@ -4745,7 +4745,7 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor B Above Actor C\n" );
 
-  DevelActor::RaiseAbove( actorB, actorC );
+  actorB.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -4759,7 +4759,7 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor A Above Actor B\n" );
 
-  DevelActor::RaiseAbove( actorA, actorB );
+  actorA.RaiseAbove( actorB );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -4893,7 +4893,7 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
 
-  DevelActor::LowerBelow( actorC, actorB );
+  actorC.LowerBelow( actorB );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -4925,7 +4925,7 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor C below Actor A leaving B on top\n" );
 
-  DevelActor::LowerBelow( actorC, actorA );
+  actorC.LowerBelow( actorA );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -4954,7 +4954,7 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor B below Actor C leaving A on top\n" );
 
-  DevelActor::LowerBelow( actorB, actorC );
+  actorB.LowerBelow( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5063,7 +5063,7 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   tet_printf( "Raise actor A Above Actor C which have different parents\n" );
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5132,7 +5132,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Raise actor A Above Actor C which have no parents\n" );
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5148,7 +5148,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   stage.Add ( actorB );
   tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
-  DevelActor::LowerBelow( actorA, actorC );
+  actorA.LowerBelow( actorC );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -5170,7 +5170,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   application.Render();
 
   tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
-  DevelActor::RaiseAbove( actorB, actorC );
+  actorB.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5184,7 +5184,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
-  DevelActor::LowerBelow( actorA, actorC );
+  actorA.LowerBelow( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5198,7 +5198,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorC );
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5260,7 +5260,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   stage.Add ( actorA );
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
-  DevelActor::Raise( actorB );
+  actorB.Raise();
 
   application.SendNotification();
   application.Render();
@@ -5276,7 +5276,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
   ResetTouchCallbacks();
 
-  DevelActor::Lower( actorC );
+  actorC.Lower();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5292,7 +5292,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Lower actor C below B but C not parented\n" );
 
-  DevelActor::Lower( actorB );
+  actorB.Lower();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5308,7 +5308,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Raise actor B to top\n" );
 
-  DevelActor::RaiseToTop( actorB );
+  actorB.RaiseToTop();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5328,7 +5328,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Lower actor C to Bottom, B stays at top\n" );
 
-  DevelActor::LowerToBottom( actorC );
+  actorC.LowerToBottom();
   application.SendNotification();
   application.Render();
 
@@ -5407,7 +5407,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
-  DevelActor::RaiseAbove( actorA, actorA );
+  actorA.RaiseAbove( actorA );
   application.SendNotification();
   application.Render();
 
@@ -5421,7 +5421,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   ResetTouchCallbacks();
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   application.SendNotification();
   application.Render();
 
@@ -6124,7 +6124,7 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
 }
 
 
-static void LayoutDirectionChanged( Actor actor, DevelActor::LayoutDirection::Type type )
+static void LayoutDirectionChanged( Actor actor, LayoutDirection::Type type )
 {
   gLayoutDirectionType = type;
 }
@@ -6135,47 +6135,47 @@ int UtcDaliActorLayoutDirectionProperty(void)
   tet_infoline( "Check layout direction property" );
 
   Actor actor0 = Actor::New();
-  DALI_TEST_EQUALS( actor0.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor0.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Stage::GetCurrent().Add( actor0 );
 
   application.SendNotification();
   application.Render();
 
   Actor actor1 = Actor::New();
-  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor2 = Actor::New();
-  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor3 = Actor::New();
-  DALI_TEST_EQUALS( actor3.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor4 = Actor::New();
-  DALI_TEST_EQUALS( actor4.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor5 = Actor::New();
-  DALI_TEST_EQUALS( actor5.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor6 = Actor::New();
-  DALI_TEST_EQUALS( actor6.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor7 = Actor::New();
-  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor8 = Actor::New();
-  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   Actor actor9 = Actor::New();
-  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   actor1.Add( actor2 );
-  gLayoutDirectionType = DevelActor::LayoutDirection::LTR;
-  DevelActor::LayoutDirectionChangedSignal( actor2 ).Connect( LayoutDirectionChanged );
+  gLayoutDirectionType = LayoutDirection::LEFT_TO_RIGHT;
+  actor2.LayoutDirectionChangedSignal().Connect( LayoutDirectionChanged );
 
-  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
-  actor1.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::RTL );
-  DALI_TEST_EQUALS( actor1.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor1.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( gLayoutDirectionType, DevelActor::LayoutDirection::RTL, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( gLayoutDirectionType, LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION );
 
-  actor1.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  actor1.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
   actor0.Add( actor1 );
-  DALI_TEST_EQUALS( actor1.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor3 );
   actor3.Add( actor4 );
@@ -6184,35 +6184,35 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor5.Add( actor7 );
   actor7.Add( actor8 );
   actor8.Add( actor9 );
-  actor3.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
-  actor5.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
+  actor3.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
+  actor5.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
 
-  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
-  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, false );
-  DALI_TEST_EQUALS( actor8.GetProperty< bool >( DevelActor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor8.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, false );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
 
-  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
+  actor7.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
 
-  DALI_TEST_EQUALS( actor3.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor4.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor5.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor6.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
-  actor8.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, "RTL" );
-  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  actor8.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
-  actor7.SetProperty( DevelActor::Property::LAYOUT_DIRECTION, DevelActor::LayoutDirection::LTR );
-  DALI_TEST_EQUALS( actor7.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::RTL ), TEST_LOCATION );
+  actor7.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
-  actor8.SetProperty( DevelActor::Property::INHERIT_LAYOUT_DIRECTION, true );
-  DALI_TEST_EQUALS( actor8.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor9.GetProperty< int >( DevelActor::Property::LAYOUT_DIRECTION ), static_cast< int >( DevelActor::LayoutDirection::LTR ), TEST_LOCATION );
+  actor8.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   END_TEST;
 }

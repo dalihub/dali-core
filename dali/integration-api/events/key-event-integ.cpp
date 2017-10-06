@@ -33,14 +33,14 @@ KeyEvent::KeyEvent()
   time( 0 ),
   state( KeyEvent::Down ),
   deviceName( "" ),
-  deviceClass( DevelDevice::Class::NONE ),
-  deviceSubclass( DevelDevice::Subclass::NONE )
+  deviceClass( Device::Class::NONE ),
+  deviceSubclass( Device::Subclass::NONE )
 {
 }
 
 KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
                     unsigned long timeStamp, const State& keyState, const std::string& deviceName,
-                    const DevelDevice::Class::Type deviceClass, const DevelDevice::Subclass::Type deviceSubclass )
+                    const Device::Class::Type deviceClass, const Device::Subclass::Type deviceSubclass )
 : Event( Key ),
   keyName( keyName ),
   keyString( keyString ),
@@ -63,8 +63,8 @@ KeyEvent::KeyEvent( const Dali::KeyEvent& event )
   time( event.time ),
   state( static_cast< Integration::KeyEvent::State >( event.state ) ),
   deviceName( "" ),
-  deviceClass( DevelDevice::Class::NONE ),
-  deviceSubclass( DevelDevice::Subclass::NONE )
+  deviceClass( Device::Class::NONE ),
+  deviceSubclass( Device::Subclass::NONE )
 {
 }
 
