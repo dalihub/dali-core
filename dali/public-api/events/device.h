@@ -75,17 +75,19 @@ namespace Subclass
  */
 enum Type
 {
-  NONE, ///< Not a device. @SINCE_1_2.60
-  FINGER, ///< The normal flat of your finger. @SINCE_1_2.60
-  FINGERNAIL, ///< A fingernail. @SINCE_1_2.60
-  KNUCKLE, ///< A Knuckle. @SINCE_1_2.60
-  PALM, ///< The palm of a users hand. @SINCE_1_2.60
-  HAND_SIDE, ///< The side of your hand. @SINCE_1_2.60
-  HAND_FLAT, ///< The flat of your hand. @SINCE_1_2.60
-  PEN_TIP, ///< The tip of a pen. @SINCE_1_2.60
-  TRACKPAD, ///< A trackpad style mouse. @SINCE_1_2.60
-  TRACKPOINT, //< A trackpoint style mouse. @SINCE_1_2.60
-  TRACKBALL, ///< A trackball style mouse. @SINCE_1_2.60
+  NONE,              ///< Not a device. @SINCE_1_2.60
+  FINGER,            ///< The normal flat of your finger. @SINCE_1_2.60
+  FINGERNAIL,        ///< A fingernail. @SINCE_1_2.60
+  KNUCKLE,           ///< A Knuckle. @SINCE_1_2.60
+  PALM,              ///< The palm of a users hand. @SINCE_1_2.60
+  HAND_SIDE,         ///< The side of your hand. @SINCE_1_2.60
+  HAND_FLAT,         ///< The flat of your hand. @SINCE_1_2.60
+  PEN_TIP,           ///< The tip of a pen. @SINCE_1_2.60
+  TRACKPAD,          ///< A trackpad style mouse. @SINCE_1_2.60
+  TRACKPOINT,        ///< A trackpoint style mouse. @SINCE_1_2.60
+  TRACKBALL,         ///< A trackball style mouse. @SINCE_1_2.60
+  REMOCON,           ///< A remote controller. @SINCE_1_2.61
+  VIRTUAL_KEYBOARD,  ///< A virtual keyboard. @SINCE_1_2.61
 };
 
 } // namespace Subclass
