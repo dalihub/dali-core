@@ -11819,6 +11819,125 @@ int UtcDaliAnimationSetLoopingModeP2(void)
   END_TEST;
 }
 
+int UtcDaliAnimationSetLoopingModeP3(void)
+{
+  // Test Loop Count is 1 (== default) and Loop mode being set
+  TestApplication application;
+  Stage stage( Stage::GetCurrent() );
+
+  // LoopingMode::AUTO_REVERSE
+  {
+    Actor actor = Actor::New();
+    stage.Add( actor );
+
+    float durationSeconds( 1.0f );
+    Animation animation = Animation::New( durationSeconds );
+    DALI_TEST_CHECK(1 == animation.GetLoopCount());
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
+
+    animation.SetLoopingMode( Animation::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
+
+    // Start the animation
+    animation.Play();
+    application.Render(0);
+    application.SendNotification();
+
+    application.Render( static_cast< unsigned int >( durationSeconds * 0.5f * 1000.0f )/* 50% time progress */ );
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+
+    // AUTO_REVERSE mode means, for Animation duration time, the actor starts from the beginning, passes the targetPosition,
+    // and arrives at the beginning.
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 0.5f * 1000.0f )/* 100% time progress */ );
+
+    application.SendNotification();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 1.0f * 1000.0f ) + 1u /*just beyond the animation duration*/ );
+
+    application.SendNotification();
+    application.Render(0);
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+
+    // After all animation finished, arrives at the beginning.
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+    finishCheck.Reset();
+  }
+
+  // LoopingMode::AUTO_REVERSE in Reverse mode, which begin from the end
+  {
+    Actor actor = Actor::New();
+    stage.Add( actor );
+
+    float durationSeconds( 1.0f );
+    Animation animation = Animation::New( durationSeconds );
+    DALI_TEST_CHECK(1 == animation.GetLoopCount());
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    // Specify a negative multiplier to play the animation in reverse
+    animation.SetSpeedFactor( -1.0f );
+
+    Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
+
+    animation.SetLoopingMode( Animation::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
+
+    // Start the animation
+    animation.Play();
+    application.Render(0);
+    application.SendNotification();
+
+    application.Render( static_cast< unsigned int >( durationSeconds * 0.5f * 1000.0f )/* 50% time progress */ );
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+
+    // Setting a negative speed factor is to play the animation in reverse.
+    // So, when LoopingMode::AUTO_REVERSE and SetSpeedFactor( -1.0f ) is, for Animation duration time,
+    // the actor starts from the targetPosition, passes the beginning, and arrives at the targetPosition.
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 0.5f * 1000.0f )/* 100% time progress */ );
+
+    application.SendNotification();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 1.0f * 1000.0f ) + 1u /*just beyond the animation duration*/ );
+
+    application.SendNotification();
+    application.Render(0);
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+
+    // After all animation finished, arrives at the target.
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+    finishCheck.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimationGetLoopingModeP(void)
 {
   TestApplication application;
