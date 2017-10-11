@@ -110,6 +110,7 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     {
       // already handled by higher level code
     }
@@ -317,6 +318,7 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     {
       // already handled by higher level code
     }

@@ -18,6 +18,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/constants.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-common.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/extents.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-detector.cpp
@@ -119,6 +120,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/constants.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-common.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/extents.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/intrusive-ptr.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/loading-state.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage.h
