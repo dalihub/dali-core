@@ -11375,7 +11375,7 @@ int UtcDaliAnimationPlayAfterP(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
 
   // Play animation after the initial delay time
-  DevelAnimation::PlayAfter( animation, 0.2f );
+  animation.PlayAfter( 0.2f );
   application.SendNotification();
   application.Render(0); // start animation
 
@@ -11435,7 +11435,7 @@ int UtcDaliAnimationPlayAfterP2(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
 
   // Play animation after the initial delay time
-  DevelAnimation::PlayAfter( animation, 0.2f );
+  animation.PlayAfter( 0.2f );
   application.SendNotification();
   application.Render(0); // start animation
 
@@ -11505,7 +11505,7 @@ int UtcDaliAnimationPlayAfterP3(void)
   animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
 
   // When the delay time is negative value, it would treat as play immediately.
-  DevelAnimation::PlayAfter( animation, -2.0f );
+  animation.PlayAfter( -2.0f );
   application.SendNotification();
   application.Render(0); // start animation
 
@@ -11550,7 +11550,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
 
     float durationSeconds( 1.0f );
     Animation animation = Animation::New( durationSeconds );
-    DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::RESTART );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::RESTART );
 
     Vector3 targetPosition(10.0f, 10.0f, 10.0f);
     animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
@@ -11584,8 +11584,8 @@ int UtcDaliAnimationSetLoopingModeP(void)
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
     animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
 
-    DevelAnimation::SetLoopingMode( animation, DevelAnimation::LoopingMode::AUTO_REVERSE );
-    DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::AUTO_REVERSE );
+    animation.SetLoopingMode( Animation::LoopingMode::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
 
     // Start the animation
     animation.Play();
@@ -11641,8 +11641,8 @@ int UtcDaliAnimationSetLoopingModeP(void)
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
     animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
 
-    DevelAnimation::SetLoopingMode( animation, DevelAnimation::LoopingMode::AUTO_REVERSE );
-    DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::AUTO_REVERSE );
+    animation.SetLoopingMode( Animation::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
 
     // Start the animation
     animation.Play();
@@ -11706,8 +11706,8 @@ int UtcDaliAnimationSetLoopingModeP2(void)
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
     animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
 
-    DevelAnimation::SetLoopingMode( animation, DevelAnimation::LoopingMode::AUTO_REVERSE );
-    DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::AUTO_REVERSE );
+    animation.SetLoopingMode( Animation::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
 
     // Start the animation
     animation.Play();
@@ -11771,8 +11771,8 @@ int UtcDaliAnimationSetLoopingModeP2(void)
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
     animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition );
 
-    DevelAnimation::SetLoopingMode( animation, DevelAnimation::LoopingMode::AUTO_REVERSE );
-    DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::AUTO_REVERSE );
+    animation.SetLoopingMode( Animation::AUTO_REVERSE );
+    DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
 
     // Start the animation
     animation.Play();
@@ -11826,10 +11826,10 @@ int UtcDaliAnimationGetLoopingModeP(void)
   Animation animation = Animation::New(1.0f);
 
   // default mode
-  DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::RESTART );
+  DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::RESTART );
 
-  DevelAnimation::SetLoopingMode( animation, DevelAnimation::LoopingMode::AUTO_REVERSE );
-  DALI_TEST_CHECK( DevelAnimation::GetLoopingMode( animation ) == DevelAnimation::AUTO_REVERSE );
+  animation.SetLoopingMode( Animation::AUTO_REVERSE );
+  DALI_TEST_CHECK( animation.GetLoopingMode() == Animation::AUTO_REVERSE );
 
   END_TEST;
 }

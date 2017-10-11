@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/pixel-data-devel.h>
-#include <dali/devel-api/images/pixel-devel.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 
@@ -562,12 +561,12 @@ int UtcDaliTextureUpload06(void)
 
 int UtcDaliTextureUpload07(void)
 {
-  DevelPixel::Format FLOATING_POINT_PIXEL_FORMATS[] =
+  Pixel::Format FLOATING_POINT_PIXEL_FORMATS[] =
   {
-    DevelPixel::RGB16F,
-    DevelPixel::RGB32F,
+    Pixel::RGB16F,
+    Pixel::RGB32F,
   };
-  const unsigned int NUMBER_OF_FLOATING_POINT_PIXEL_FORMATS = sizeof( FLOATING_POINT_PIXEL_FORMATS ) / sizeof( DevelPixel::Format );
+  const unsigned int NUMBER_OF_FLOATING_POINT_PIXEL_FORMATS = sizeof( FLOATING_POINT_PIXEL_FORMATS ) / sizeof( Pixel::Format );
 
   for( unsigned int index = 0; index < NUMBER_OF_FLOATING_POINT_PIXEL_FORMATS; ++index )
   {
@@ -577,7 +576,7 @@ int UtcDaliTextureUpload07(void)
     unsigned int width(64);
     unsigned int height(64);
     tet_infoline( "Creating a floating point texture" );
-    Texture texture = Texture::New( TextureType::TEXTURE_2D, static_cast<Pixel::Format>( FLOATING_POINT_PIXEL_FORMATS[index] ), width, height );
+    Texture texture = Texture::New( TextureType::TEXTURE_2D, FLOATING_POINT_PIXEL_FORMATS[index], width, height );
 
     application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -599,7 +598,7 @@ int UtcDaliTextureUpload07(void)
     tet_infoline( "Creating a RGB pixel buffer and adding that to the texture to ensure it is handled correctly" );
     unsigned int bufferSize( width * height * 3 );
     unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
-    PixelData pixelData = DevelPixelData::New( buffer, bufferSize, width, height, FLOATING_POINT_PIXEL_FORMATS[index], PixelData::FREE );
+    PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, FLOATING_POINT_PIXEL_FORMATS[index], PixelData::FREE );
     texture.Upload( pixelData );
     application.SendNotification();
     application.Render();

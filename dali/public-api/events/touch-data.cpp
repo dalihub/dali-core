@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/devel-api/events/touch-event-devel.h>
 #include <dali/internal/event/events/touch-data-impl.h>
 
 #include <cstdio>
@@ -103,14 +102,14 @@ Degree TouchData::GetAngle( std::size_t point ) const
   return GetImplementation( *this ).GetAngle( point );
 }
 
-DevelDevice::Class::Type DevelTouchData::GetDeviceClass( const TouchData& touch, std::size_t point )
+Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
 {
-  return GetImplementation( touch ).GetDeviceClass( point );
+  return GetImplementation( *this ).GetDeviceClass( point );
 }
 
-DevelDevice::Subclass::Type DevelTouchData::GetDeviceSubclass( const TouchData& touch, std::size_t point )
+Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
 {
-  return GetImplementation( touch ).GetDeviceSubclass( point );
+  return GetImplementation( *this ).GetDeviceSubclass( point );
 }
 
 TouchData::TouchData( Internal::TouchData* internal )

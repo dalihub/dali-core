@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TOUCH_DATA_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,19 +158,19 @@ public:
    */
   void AddPoint( const Integration::Point& point );
 
-    /**
+  /**
    * @brief Get the device class the mouse/touch event originated from
    *
    * @return The device class
    */
-  DevelDevice::Class::Type GetDeviceClass( std::size_t point ) const;
+  Device::Class::Type GetDeviceClass( std::size_t point ) const;
 
   /**
    * @brief Get the device subclass the mouse/touch event originated from
    *
    * @return The device subclass
    */
-  DevelDevice::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
+  Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
 
 private:
 

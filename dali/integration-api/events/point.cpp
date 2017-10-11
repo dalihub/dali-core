@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ Point::Point()
 : mTouchPoint( 0, TouchPoint::Started, 0.0f, 0.0f ),
   mEllipseRadius(),
   mAngle( 0.0f ),
-  mDeviceClass( DevelDevice::Class::NONE ),
-  mDeviceSubclass( DevelDevice::Subclass::NONE ),
+  mDeviceClass( Device::Class::NONE ),
+  mDeviceSubclass( Device::Subclass::NONE ),
   mPressure( 1.0f ),
   mRadius( 0.0f )
 {
@@ -39,8 +39,8 @@ Point::Point( const TouchPoint& touchPoint )
 : mTouchPoint( touchPoint ),
   mEllipseRadius(),
   mAngle( 0.0f ),
-  mDeviceClass( DevelDevice::Class::NONE ),
-  mDeviceSubclass( DevelDevice::Subclass::NONE ),
+  mDeviceClass( Device::Class::NONE ),
+  mDeviceSubclass( Device::Subclass::NONE ),
   mPressure( 1.0f ),
   mRadius( 0.0f )
 {
@@ -146,22 +146,22 @@ const TouchPoint& Point::GetTouchPoint() const
   return mTouchPoint;
 }
 
-void Point::SetDeviceClass( DevelDevice::Class::Type deviceClass )
+void Point::SetDeviceClass( Device::Class::Type deviceClass )
 {
   mDeviceClass = deviceClass;
 }
 
-void Point::SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass )
+void Point::SetDeviceSubclass( Device::Subclass::Type deviceSubclass )
 {
   mDeviceSubclass = deviceSubclass;
 }
 
-DevelDevice::Class::Type Point::GetDeviceClass() const
+Device::Class::Type Point::GetDeviceClass() const
 {
   return mDeviceClass;
 }
 
-DevelDevice::Subclass::Type Point::GetDeviceSubclass() const
+Device::Subclass::Type Point::GetDeviceSubclass() const
 {
   return mDeviceSubclass;
 }

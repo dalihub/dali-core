@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/key-event.h>
-#include <dali/devel-api/events/key-event-devel.h>
 
 namespace Dali
 {
@@ -68,28 +67,28 @@ public:
    *
    * @return The device class
    */
-  DevelDevice::Class::Type GetDeviceClass() const;
+  Device::Class::Type GetDeviceClass() const;
 
   /**
    * @brief Set the device class to the KeyEvent
    *
    * @param[in] deviceClass Device class to set
    */
-  void SetDeviceClass( DevelDevice::Class::Type deviceClass );
+  void SetDeviceClass( Device::Class::Type deviceClass );
 
   /**
    * @brief Get the device subclass the key event originated from
    *
    * @return The device subclass
    */
-  DevelDevice::Subclass::Type GetDeviceSubclass() const;
+  Device::Subclass::Type GetDeviceSubclass() const;
 
   /**
    * @brief Set the device subclass to the KeyEvent
    *
    * @param[in] deviceClass Device subclass to set
    */
-  void SetDeviceSubclass( DevelDevice::Subclass::Type deviceSubclass );
+  void SetDeviceSubclass( Device::Subclass::Type deviceSubclass );
 
 private:
 
@@ -102,8 +101,8 @@ private:
 private:
 
   std::string mDeviceName;
-  DevelDevice::Class::Type mDeviceClass;
-  DevelDevice::Subclass::Type mDeviceSubclass;
+  Device::Class::Type mDeviceClass;
+  Device::Subclass::Type mDeviceSubclass;
 };
 
 } // namespace Internal
