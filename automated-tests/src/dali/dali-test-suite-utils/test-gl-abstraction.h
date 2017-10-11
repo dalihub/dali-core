@@ -949,15 +949,6 @@ public:
     mScissorParams.y = y;
     mScissorParams.width = width;
     mScissorParams.height = height;
-
-    std::stringstream out;
-    out << x << ", " << y << ", " << width << ", " << height;
-    TraceCallStack::NamedParams namedParams;
-    namedParams["x"] = ToString( x );
-    namedParams["y"] = ToString( y );
-    namedParams["width"] = ToString( width );
-    namedParams["height"] = ToString( height );
-    mScissorTrace.PushCall( "Scissor", out.str(), namedParams );
   }
 
   inline void ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length)
@@ -1960,11 +1951,6 @@ public: // TEST FUNCTIONS
   inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
   inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
 
-  //Methods for Scissor verification
-  inline void EnableScissorCallTrace(bool enable) { mScissorTrace.Enable(enable); }
-  inline void ResetScissorCallStack() { mScissorTrace.Reset(); }
-  inline TraceCallStack& GetScissorTrace() { return mScissorTrace; }
-
   //Methods for Uniform function verification
   inline void EnableSetUniformCallTrace(bool enable) { mSetUniformTrace.Enable(enable); }
   inline void ResetSetUniformCallStack() { mSetUniformTrace.Reset(); }
@@ -2203,7 +2189,6 @@ private:
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;
   TraceCallStack mStencilFunctionTrace;
-  TraceCallStack mScissorTrace;
   TraceCallStack mSetUniformTrace;
 
   // Shaders & Uniforms

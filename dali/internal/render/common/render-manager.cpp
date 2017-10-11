@@ -59,7 +59,6 @@ struct RenderManager::Impl
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     instructions(),
-    renderAlgorithms(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
@@ -105,7 +104,6 @@ struct RenderManager::Impl
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
   RenderInstructionContainer                instructions;
-  Render::RenderAlgorithms                  renderAlgorithms;        ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
   Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
@@ -532,7 +530,9 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->context.SetScissorTest( false );
   }
 
-  mImpl->renderAlgorithms.ProcessRenderInstruction( instruction, mImpl->context, mImpl->renderBufferIndex );
+  Render::ProcessRenderInstruction( instruction,
+                                    mImpl->context,
+                                    mImpl->renderBufferIndex );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

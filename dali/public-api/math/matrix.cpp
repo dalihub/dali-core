@@ -25,7 +25,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/quaternion.h>
@@ -463,24 +462,6 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
                  : "q0", "q9", "q10", "q11", "memory" );
 #endif
   return temp;
-}
-
-Vector2 Matrix::operator*( const Vector2& rhs ) const
-{
-  MATH_INCREASE_BY( PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4 );
-
-  #ifndef __ARM_NEON__
-    // The following optimizations are applied:
-    // pMatrix[8 -> 11] are optimized out.
-    // pMatrix[12 -> 15] are always multiplied by 1.
-    // z & w results are unneeded and so not calculated.
-    return Vector2( rhs.x * mMatrix[0] + rhs.y * mMatrix[4] + mMatrix[12], rhs.x * mMatrix[1] + rhs.y * mMatrix[5] + mMatrix[13] );
-  #else
-    // Call the operator*( Vector4 ) version for NEON.
-    // It is suggested the NEON version is removed for this simple case, as the CPU optimization surpasses the NEON overhead.
-    const Vector4 result( operator*( Vector4( rhs.x, rhs.y, 0.0f, 1.0f ) ) );
-    return Vector2( result.x, result.y );
-  #endif
 }
 
 bool Matrix::operator==(const Matrix& rhs) const

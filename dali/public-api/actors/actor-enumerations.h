@@ -172,8 +172,7 @@ namespace ClippingMode
   enum Type
   {
     DISABLED,                     ///< This Actor will not clip its children. @SINCE_1_2_5
-    CLIP_CHILDREN,                ///< This Actor will clip all children to within the visible pixels of this actors renderer (the actor will also be visible itself). @SINCE_1_2_5
-    CLIP_TO_BOUNDING_BOX          ///< This Actor will clip all children within a screen-aligned rectangle encompassing its boundaries (the actor will NOT be visible itself). @SINCE_1_2.59
+    CLIP_CHILDREN,                ///< This Actor will clip all children to within its boundaries (the actor will also be visible itself). @SINCE_1_2_5
   };
 }
 

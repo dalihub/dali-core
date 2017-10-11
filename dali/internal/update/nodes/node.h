@@ -140,14 +140,13 @@ public:
    * A value is calculated that can be used during sorting to increase sort speed.
    * @param[in] clippingId The Clipping ID of the node to set
    * @param[in] clippingDepth The Clipping Depth of the node to set
-   * @param[in] scissorDepth The Scissor Clipping Depth of the node to set
    */
-  void SetClippingInformation( const uint32_t clippingId, const uint32_t clippingDepth, const uint32_t scissorDepth )
+  void SetClippingInformation( const uint32_t clippingId, const uint32_t clippingDepth )
   {
-    // We only set up the sort value if we have a stencil clipping depth, IE. At least 1 clipping node has been hit.
+    // We only set up the sort value if we have a clipping depth, IE. At least 1 clipping node has been hit.
     // If not, if we traverse down a clipping tree and back up, and there is another
     // node on the parent, this will have a non-zero clipping ID that must be ignored
-    if( clippingDepth > 0u )
+    if( DALI_LIKELY( clippingDepth > 0u ) )
     {
       mClippingDepth = clippingDepth;
 
@@ -162,10 +161,6 @@ public:
       // If we do not have a clipping depth, then set this to 0 so we do not have a Clipping ID either.
       mClippingSortModifier = 0u;
     }
-
-    // The scissor depth does not modify the clipping sort modifier (as scissor clips are 2D only).
-    // For this reason we can always update the member variable.
-    mScissorDepth = scissorDepth;
   }
 
   /**
@@ -184,15 +179,6 @@ public:
   uint32_t GetClippingDepth() const
   {
     return mClippingDepth;
-  }
-
-  /**
-   * Gets the Scissor Clipping Depth for this node.
-   * @return The Scissor Clipping Depth for this node.
-   */
-  uint32_t GetScissorDepth() const
-  {
-    return mScissorDepth;
   }
 
   /**
@@ -879,8 +865,7 @@ protected:
 
   CollectedUniformMap                mCollectedUniformMap[2]; ///< Uniform maps of the node
   unsigned int                       mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
-  uint32_t                           mClippingDepth;          ///< The number of stencil clipping nodes deep this node is
-  uint32_t                           mScissorDepth;           ///< The number of scissor clipping nodes deep this node is
+  uint32_t                           mClippingDepth;          ///< The number of clipping nodes deep this node is
 
   uint32_t                           mDepthIndex;             ///< Depth index of the node
 
