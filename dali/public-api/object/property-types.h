@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/quaternion.h>
@@ -91,6 +92,8 @@ template <>
 inline Property::Type Get<Property::Map>()    { return Property::MAP; }
 template <>
 inline Property::Type Get<Property::Array>()  { return Property::ARRAY; }
+template <>
+inline Property::Type Get<Extents>()          { return Property::EXTENTS; }
 
 
 }; // namespace PropertyTypes
