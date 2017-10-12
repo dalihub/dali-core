@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
+#define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,6 +139,7 @@ public: // Data
   Vector4  mClearColor;                 ///< Optional color to clear with
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
   bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
+  bool     mIgnoreRenderToFbo:1;        ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
 
@@ -156,4 +157,4 @@ private: // Data
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H

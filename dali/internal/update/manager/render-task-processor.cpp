@@ -189,7 +189,6 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
   }
 }
 
-
 /**
  * Process the list of render-tasks; the output is a series of render instructions.
  * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque renderers which are ready to render.
@@ -200,6 +199,8 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
  * @param[in]  sortedLayers               The layers containing lists of opaque / transparent renderables.
  * @param[out] instructions               The instructions for rendering the next frame.
  * @param[in]  renderInstructionProcessor An instance of the RenderInstructionProcessor used to sort and handle the renderers for each layer.
+ * @param[in]  renderToFboEnabled         Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
+ * @param[in]  isRenderingToFbo           Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
  * @param[in]  processOffscreen           Whether the offscreen render tasks are the ones processed. Otherwise it processes the onscreen tasks.
  */
 void ProcessTasks( BufferIndex updateBufferIndex,
@@ -208,19 +209,27 @@ void ProcessTasks( BufferIndex updateBufferIndex,
                    SortedLayerPointers& sortedLayers,
                    RenderInstructionContainer& instructions,
                    RenderInstructionProcessor& renderInstructionProcessor,
+                   bool renderToFboEnabled,
+                   bool isRenderingToFbo,
                    bool processOffscreen )
 {
   uint32_t clippingId = 0u;
   bool hasClippingNodes = false;
 
+  bool isFirstRenderTask = true;
   for( RenderTaskList::RenderTaskContainer::Iterator iter = taskContainer.Begin(), endIter = taskContainer.End(); endIter != iter; ++iter )
   {
     RenderTask& renderTask = **iter;
 
-    const bool hasFrameBuffer = renderTask.GetFrameBuffer() != 0;
+    const bool hasFrameBuffer = NULL != renderTask.GetFrameBuffer();
+    const bool isDefaultRenderTask = isFirstRenderTask;
+    isFirstRenderTask = false;
 
-    if( ( !processOffscreen && hasFrameBuffer ) ||
-        ( processOffscreen && !hasFrameBuffer ) ||
+    if( ( !renderToFboEnabled && ( ( !processOffscreen && hasFrameBuffer ) ||
+                                   ( processOffscreen && !hasFrameBuffer ) ) ) ||
+        ( renderToFboEnabled && ( ( processOffscreen && !hasFrameBuffer ) ||
+                                  ( isDefaultRenderTask && processOffscreen ) ||
+                                  ( !isDefaultRenderTask && !processOffscreen && hasFrameBuffer ) ) ) ||
         !renderTask.ReadyToRender( updateBufferIndex ) )
     {
       // Skip to next task.
@@ -242,6 +251,8 @@ void ProcessTasks( BufferIndex updateBufferIndex,
       // Skip to next task as no layer.
       continue;
     }
+
+    const unsigned int currentNumberOfInstructions = instructions.Count( updateBufferIndex );
 
     if( renderTask.IsRenderRequired() )
     {
@@ -267,6 +278,16 @@ void ProcessTasks( BufferIndex updateBufferIndex,
                                           hasClippingNodes,
                                           instructions );
     }
+
+    if( !processOffscreen && isDefaultRenderTask && renderToFboEnabled && !isRenderingToFbo && hasFrameBuffer )
+    {
+      // Traverse the instructions of the default render task and mark them to be rendered into the frame buffer.
+      for( unsigned int index = currentNumberOfInstructions, count = instructions.Count( updateBufferIndex ); index < count; ++index )
+      {
+        RenderInstruction& instruction = instructions.At( updateBufferIndex, index );
+        instruction.mIgnoreRenderToFbo = true;
+      }
+    }
   }
 }
 
@@ -284,7 +305,9 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    RenderTaskList& renderTasks,
                                    Layer& rootNode,
                                    SortedLayerPointers& sortedLayers,
-                                   RenderInstructionContainer& instructions )
+                                   RenderInstructionContainer& instructions,
+                                   bool renderToFboEnabled,
+                                   bool isRenderingToFbo )
 {
   RenderTaskList::RenderTaskContainer& taskContainer = renderTasks.GetTasks();
 
@@ -310,7 +333,10 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                 sortedLayers,
                 instructions,
                 mRenderInstructionProcessor,
+                renderToFboEnabled,
+                isRenderingToFbo,
                 true );
+
   DALI_LOG_INFO( gRenderTaskLogFilter, Debug::General, "RenderTaskProcessor::Process() Onscreen\n" );
 
   // Now that the off screen renders are done we can process on screen render tasks.
@@ -322,6 +348,8 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                 sortedLayers,
                 instructions,
                 mRenderInstructionProcessor,
+                renderToFboEnabled,
+                isRenderingToFbo,
                 false );
 }
 

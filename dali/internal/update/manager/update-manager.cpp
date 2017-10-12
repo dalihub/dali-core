@@ -806,7 +806,9 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 
 unsigned int UpdateManager::Update( float elapsedSeconds,
                                     unsigned int lastVSyncTimeMilliseconds,
-                                    unsigned int nextVSyncTimeMilliseconds )
+                                    unsigned int nextVSyncTimeMilliseconds,
+                                    bool renderToFboEnabled,
+                                    bool isRenderingToFbo )
 {
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
@@ -895,19 +897,23 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       if ( NULL != mImpl->root )
       {
         mImpl->renderTaskProcessor.Process( bufferIndex,
-                                          mImpl->taskList,
-                                          *mImpl->root,
-                                          mImpl->sortedLayers,
-                                          mImpl->renderInstructions );
+                                            mImpl->taskList,
+                                            *mImpl->root,
+                                            mImpl->sortedLayers,
+                                            mImpl->renderInstructions,
+                                            renderToFboEnabled,
+                                            isRenderingToFbo );
 
         // Process the system-level RenderTasks last
         if ( NULL != mImpl->systemLevelRoot )
         {
           mImpl->renderTaskProcessor.Process( bufferIndex,
-                                            mImpl->systemLevelTaskList,
-                                            *mImpl->systemLevelRoot,
-                                            mImpl->systemLevelSortedLayers,
-                                            mImpl->renderInstructions );
+                                              mImpl->systemLevelTaskList,
+                                              *mImpl->systemLevelRoot,
+                                              mImpl->systemLevelSortedLayers,
+                                              mImpl->renderInstructions,
+                                              renderToFboEnabled,
+                                              isRenderingToFbo );
         }
       }
     }

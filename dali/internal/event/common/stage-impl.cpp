@@ -39,6 +39,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 
 using Dali::Internal::SceneGraph::Node;
 
@@ -95,8 +96,9 @@ StagePtr Stage::New( AnimationPlaylist& playlist,
   return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager, renderController ) );
 }
 
-void Stage::Initialize()
+void Stage::Initialize( bool renderToFbo )
 {
+  mRenderToFbo = renderToFbo;
   mObjectRegistry = ObjectRegistry::New();
 
   // Create the ordered list of layers
@@ -230,12 +232,22 @@ void Stage::SurfaceResized( float width, float height )
     // if single render task to screen then set its viewport parameters
     if( 1 == mRenderTaskList->GetTaskCount() )
     {
-      Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask( 0u );
+      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
 
-      if(!mDefaultRenderTask.GetTargetFrameBuffer())
+      if(!defaultRenderTask.GetTargetFrameBuffer())
       {
-        mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+        defaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
       }
+    }
+
+    if( mRenderToFbo )
+    {
+      Dali::FrameBuffer frameBuffer = Dali::FrameBuffer::New( width, height, Dali::FrameBuffer::Attachment::NONE );
+      Dali::Texture texture = Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGB888, width, height );
+      frameBuffer.AttachColorTexture( texture );
+
+      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
+      defaultRenderTask.SetFrameBuffer( frameBuffer );
     }
   }
 }
@@ -712,7 +724,8 @@ Stage::Stage( AnimationPlaylist& playlist,
   mTopMargin( 0 ),
   mSystemOverlay( NULL ),
   mDepthTreeDirty( false ),
-  mForceNextUpdate( false )
+  mForceNextUpdate( false ),
+  mRenderToFbo( false )
 {
 }
 

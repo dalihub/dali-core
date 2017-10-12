@@ -79,7 +79,8 @@ public:
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
-        ResourcePolicy::DataRetention dataRetentionPolicy );
+        ResourcePolicy::DataRetention dataRetentionPolicy,
+        bool renderToFboEnabled );
 
   /**
    * Destructor
@@ -129,7 +130,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status );
+  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
 
   /**
    * @copydoc Dali::Integration::Core::Render()
