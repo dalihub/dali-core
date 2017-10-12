@@ -549,9 +549,15 @@ public:
    * @param[in] elapsedSeconds The elapsed time that should be applied to animations.
    * @param[in] lastVSyncTimeMilliseconds The last time, in milliseconds, that we had a VSync.
    * @param[in] nextVSyncTimeMilliseconds The estimated time, in milliseconds, of the next VSync.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
    * @return True if further updates are required e.g. during animations.
    */
-  unsigned int Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds );
+  unsigned int Update( float elapsedSeconds,
+                       unsigned int lastVSyncTimeMilliseconds,
+                       unsigned int nextVSyncTimeMilliseconds,
+                       bool renderToFboEnabled,
+                       bool isRenderingToFbo );
 
   /**
    * Set the background color i.e. the glClear color used at the beginning of each frame.

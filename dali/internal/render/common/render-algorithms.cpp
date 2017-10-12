@@ -366,12 +366,11 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item, Context& co
   }
 }
 
-inline void RenderAlgorithms::ProcessRenderList(
-  const RenderList& renderList,
-  Context& context,
-  BufferIndex bufferIndex,
-  const Matrix& viewMatrix,
-  const Matrix& projectionMatrix )
+inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
+                                                 Context& context,
+                                                 BufferIndex bufferIndex,
+                                                 const Matrix& viewMatrix,
+                                                 const Matrix& projectionMatrix )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 

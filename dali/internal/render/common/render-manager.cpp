@@ -61,7 +61,7 @@ struct RenderManager::Impl
     instructions(),
     renderAlgorithms(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    frameCount( 0 ),
+    frameCount( 0u ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
@@ -394,7 +394,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
   DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
 
   // Increment the frame count at the beginning of each frame
-  ++(mImpl->frameCount);
+  ++mImpl->frameCount;
 
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
@@ -409,7 +409,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
     status.SetNeedsPostRender( true );
 
     // switch rendering to adaptor provided (default) buffer
-    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
 
     mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
                              mImpl->defaultSurfaceRect.y,
@@ -483,7 +483,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
   }
 
-  if( instruction.mFrameBuffer != 0 )
+  if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
     instruction.mFrameBuffer->Bind( mImpl->context );
     if ( instruction.mIsViewportSet )

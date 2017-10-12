@@ -78,9 +78,13 @@ using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
 
-Core::Core( RenderController& renderController, PlatformAbstraction& platform,
-            GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction,
-            GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
+Core::Core( RenderController& renderController,
+            PlatformAbstraction& platform,
+            GlAbstraction& glAbstraction,
+            GlSyncAbstraction& glSyncAbstraction,
+            GestureManager& gestureManager,
+            ResourcePolicy::DataRetention dataRetentionPolicy,
+            bool renderToFboEnabled )
 : mRenderController( renderController ),
   mPlatform(platform),
   mProcessingEvent(false)
@@ -121,7 +125,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
-  mStage->Initialize();
+  mStage->Initialize( renderToFboEnabled );
 
   mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
   mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
@@ -204,7 +208,7 @@ void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
 }
 
-void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status )
+void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
@@ -214,7 +218,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Use the estimated time diff till we render as the elapsed time.
   status.keepUpdating = mUpdateManager->Update( elapsedSeconds,
                                                 lastVSyncTimeMilliseconds,
-                                                nextVSyncTimeMilliseconds );
+                                                nextVSyncTimeMilliseconds,
+                                                renderToFboEnabled,
+                                                isRenderingToFbo );
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();

@@ -30,11 +30,22 @@ namespace Dali
 namespace Integration
 {
 
-Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction,
-                GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager, ResourcePolicy::DataRetention policy )
+Core* Core::New( RenderController& renderController,
+                 PlatformAbstraction& platformAbstraction,
+                 GlAbstraction& glAbstraction,
+                 GlSyncAbstraction& glSyncAbstraction,
+                 GestureManager& gestureManager,
+                 ResourcePolicy::DataRetention policy,
+                 bool renderToFboEnabled )
 {
   Core* instance = new Core;
-  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager, policy );
+  instance->mImpl = new Internal::Core( renderController,
+                                        platformAbstraction,
+                                        glAbstraction,
+                                        glSyncAbstraction,
+                                        gestureManager,
+                                        policy,
+                                        renderToFboEnabled );
 
   return instance;
 }
@@ -99,9 +110,9 @@ unsigned int Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status )
+  void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
-  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status );
+  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }
 
 void Core::Render( RenderStatus& status )

@@ -216,14 +216,16 @@ public:
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController& renderController,
-                   PlatformAbstraction& platformAbstraction,
-                   GlAbstraction& glAbstraction,
-                   GlSyncAbstraction& glSyncAbstraction,
-                   GestureManager& gestureManager,
-                   ResourcePolicy::DataRetention policy);
+  static Core* New( RenderController& renderController,
+                    PlatformAbstraction& platformAbstraction,
+                    GlAbstraction& glAbstraction,
+                    GlSyncAbstraction& glSyncAbstraction,
+                    GestureManager& gestureManager,
+                    ResourcePolicy::DataRetention policy,
+                    bool renderToFboEnabled );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -339,8 +341,15 @@ public:
    * @param[in] nextVSyncTimeMilliseconds The time of the next predicted VSync in milliseconds
    * @param[out] status showing whether further updates are required. This also shows
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status );
+  void Update( float elapsedSeconds,
+               unsigned int lastVSyncTimeMilliseconds,
+               unsigned int nextVSyncTimeMilliseconds,
+               UpdateStatus& status,
+               bool renderToFboEnabled,
+               bool isRenderingToFbo );
 
   /**
    * Render the next frame. This method should be preceded by a call up Update.

@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_STAGE_H__
-#define __DALI_INTERNAL_STAGE_H__
+#ifndef DALI_INTERNAL_STAGE_H
+#define DALI_INTERNAL_STAGE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -87,8 +87,9 @@ public:
 
   /**
    * Initialize the stage.
+   * @param[in] renderToFbo Whether to render into a Frame Buffer Object.
    */
-  void Initialize();
+  void Initialize( bool renderToFbo );
 
   /**
    * Uninitialize the stage.
@@ -525,9 +526,6 @@ private:
 
   Integration::SystemOverlay* mSystemOverlay; ///< SystemOverlay stage access
 
-  bool mDepthTreeDirty; ///< True if the depth tree needs recalculating
-  bool mForceNextUpdate; ///< True if the next rendering is really required.
-
   // The key event signal
   Dali::Stage::KeyEventSignalType                 mKeyEventSignal;
   Dali::DevelStage::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
@@ -546,6 +544,10 @@ private:
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 
   Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
+
+  bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
+  bool mForceNextUpdate:1; ///< True if the next rendering is really required.
+  bool mRenderToFbo:1;     ///< Whether to render to a Frame Buffer Object.
 };
 
 } // namespace Internal
@@ -572,4 +574,4 @@ inline const Internal::Stage& GetImplementation(const Dali::Stage& stage)
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_STAGE_H__
+#endif // DALI_INTERNAL_STAGE_H
