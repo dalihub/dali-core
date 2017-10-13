@@ -3988,7 +3988,7 @@ void CheckColorMask( TestGlAbstraction& glAbstraction, bool maskValue )
 int UtcDaliActorPropertyClippingP(void)
 {
   // This test checks the clippingMode property.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE P" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: P" );
   TestApplication application;
 
   Actor actor = Actor::New();
@@ -4005,7 +4005,7 @@ int UtcDaliActorPropertyClippingP(void)
     DALI_TEST_EQUALS<int>( value, ClippingMode::DISABLED, TEST_LOCATION );
   }
 
-  // Check setting the property.
+  // Check setting the property to the stencil mode.
   actor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
   // Check the new value was set.
@@ -4018,13 +4018,25 @@ int UtcDaliActorPropertyClippingP(void)
     DALI_TEST_EQUALS<int>( value, ClippingMode::CLIP_CHILDREN, TEST_LOCATION );
   }
 
+  // Check setting the property to the scissor mode.
+  actor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  // Check the new value was set.
+  getValue = actor.GetProperty( Actor::Property::CLIPPING_MODE );
+  getValueResult = getValue.Get( value );
+  DALI_TEST_CHECK( getValueResult );
+
+  if( getValueResult )
+  {
+    DALI_TEST_EQUALS<int>( value, ClippingMode::CLIP_TO_BOUNDING_BOX, TEST_LOCATION );
+  }
   END_TEST;
 }
 
 int UtcDaliActorPropertyClippingN(void)
 {
   // Negative test case for Clipping.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE N" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: N" );
   TestApplication application;
 
   Actor actor = Actor::New();
@@ -4059,7 +4071,7 @@ int UtcDaliActorPropertyClippingN(void)
 int UtcDaliActorPropertyClippingActor(void)
 {
   // This test checks that an actor is correctly setup for clipping.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor" );
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4095,7 +4107,7 @@ int UtcDaliActorPropertyClippingActor(void)
 int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
 {
   // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor enable and then disable" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable" );
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4141,12 +4153,11 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   END_TEST;
 }
 
-
 int UtcDaliActorPropertyClippingNestedChildren(void)
 {
   // This test checks that a hierarchy of actors are clipped correctly by
   // writing to and reading from the correct bit-planes of the stencil buffer.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE nested children" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN nested children" );
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& stencilTrace = glAbstraction.GetStencilFunctionTrace();
@@ -4223,7 +4234,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
 int UtcDaliActorPropertyClippingActorDrawOrder(void)
 {
   // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE draw order" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN draw order" );
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
@@ -4312,6 +4323,134 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyScissorClippingActor(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 imageSize( 16.0f, 16.0f );
+
+  // Create a clipping actor.
+  Actor clippingActorA = CreateActorWithContent();
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  Stage::GetCurrent().Add( clippingActorA );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+  compareParametersString << "0, 0, " << imageSize.x << ", " << imageSize.y;
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 0, 0, 16, 16
+
+  clippingActorA.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check the scissor was set, and the coordinates are correct.
+  compareParametersString.str( std::string() );
+  compareParametersString.clear();
+  compareParametersString << ( stageSize.x - imageSize.x ) << ", " << ( stageSize.y - imageSize.y ) << ", " << imageSize.x << ", " << imageSize.y;
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 464, 784, 16, 16
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActorNested(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 imageSize( 16.0f, 16.0f );
+
+  /* Create a nest of 2 scissors to test nesting (intersecting clips).
+
+     A is drawn first - with scissor clipping on
+     B is drawn second - also with scissor clipping on
+     C is the generated clipping region, the intersection ( A ∩ B )
+
+           ┏━━━━━━━┓                   ┌───────┐
+           ┃     B ┃                   │     B │
+       ┌───╂┄┄┄┐   ┃               ┌┄┄┄╆━━━┓   │
+       │   ┃   ┊   ┃     ━━━━━>    ┊   ┃ C ┃   │
+       │   ┗━━━┿━━━┛               ┊   ┗━━━╃───┘
+       │ A     │                   ┊ A     ┊
+       └───────┘                   └┄┄┄┄┄┄┄┘
+
+     We then reposition B around each corner of A to test the 4 overlap combinations (thus testing intersecting works correctly).
+  */
+
+  // Create a clipping actor.
+  Actor clippingActorA = CreateActorWithContent();
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetParentOrigin( ParentOrigin::CENTER );
+  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  Stage::GetCurrent().Add( clippingActorA );
+
+  // Create a child clipping actor.
+  Actor clippingActorB = CreateActorWithContent();
+  clippingActorB.SetParentOrigin( ParentOrigin::CENTER );
+  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  clippingActorA.Add( clippingActorB );
+
+  // positionModifiers is an array of positions to position B around.
+  // expect is an array of expected scissor clip coordinate results.
+  const Vector2 positionModifiers[4] = { Vector2( 1.0f, 1.0f ),     Vector2( -1.0f, 1.0f ),    Vector2( -1.0f, -1.0f ),   Vector2( 1.0f, -1.0f )    };
+  const Vector4 expect[4] =            { Vector4( 240, 392, 8, 8 ), Vector4( 232, 392, 8, 8 ), Vector4( 232, 400, 8, 8 ), Vector4( 240, 400, 8, 8 ) };
+
+  // Loop through each overlap combination.
+  for( unsigned int test = 0u; test < 4u; ++test )
+  {
+    // Position the child clipping actor so it intersects with the 1st clipping actor. This changes each loop.
+    const Vector2 position = ( imageSize / 2.0f ) * positionModifiers[test];
+    clippingActorB.SetPosition( position.x, position.y );
+
+    // Gather the call trace.
+    GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+    // Check we are writing to the color buffer.
+    CheckColorMask( glAbstraction, true );
+
+    // Check scissor test was enabled.
+    DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+    // Check the scissor was set, and the coordinates are correct.
+    const Vector4& expectResults( expect[test] );
+    std::stringstream compareParametersString;
+    compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
+    DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with the expected result
+  }
+
+  END_TEST;
+}
+
 int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 {
   // This test checks that an actor with clipping will be ignored if overridden by the Renderer properties.
@@ -4343,6 +4482,19 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilFunc" ) );
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilMask" ) );
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilOp" ) );
+
+  // Check that scissor clipping is overriden by the renderer properties.
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check the stencil buffer was not enabled.
+  DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );    // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  DALI_TEST_CHECK( !scissorTrace.FindMethod( "StencilFunc" ) );
 
   END_TEST;
 }

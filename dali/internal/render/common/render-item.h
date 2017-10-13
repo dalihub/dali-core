@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,21 @@ struct RenderItem
    * Non-virtual destructor; RenderItem is not suitable as a base class.
    */
   ~RenderItem();
+
+  /**
+   * @brief This method is an optimized calculation of a viewport-space AABB (Axis-Aligned-Bounding-Box).
+   *
+   * We use the model-view-matrix, but we do not use projection. Therefore we assume Z = 0.
+   * As the box is Axis-Aligned (in viewport space) rotations on Z axis are correctly delt with by expanding the box as necessary.
+   * Rotations on X & Y axis will resize the AABB, but it will not handle the projection error due to the new coordinates having non-zero Z values.
+   *
+   * Note: We pass in the viewport dimensions rather than allow the caller to modify the raw AABB in order to optimally generate the final result.
+   *
+   * @param[in]    viewportWidth     The width of the viewport to calculate for
+   * @param[in]    viewportHeight    The height of the viewport to calculate for
+   * @return                         The AABB coordinates in viewport-space (x, y, width, height)
+   */
+  ClippingBox CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const;
 
   /**
    * Overriden delete operator.

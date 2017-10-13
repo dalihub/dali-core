@@ -48,6 +48,16 @@ inline float Range(float f0, float f1)
 {
   float min = std::min(f0, f1);
   float max = std::max(f0, f1);
+
+  // Ensure we initialize only once. As it's inlined, this static variable will exist in the code-block using it, thus,
+  // will be created and then initialized again when another code-block uses this.
+  static bool initialized( false );
+  if( !initialized )
+  {
+    srand( time( NULL ) );
+    initialized = true;
+  }
+
   return min + (rand() & 0xfff) * (max-min) * (1.0f/4095.0f);
 }
 
