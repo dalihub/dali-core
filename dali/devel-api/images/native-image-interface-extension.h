@@ -64,6 +64,12 @@ public:
     return NULL;
   }
 
+  /*
+   * @brief When native image is destroyed, Call TriggerEventInterface callback.
+   *
+   */
+  virtual void SetDestructorNotification(void* notification) = 0;
+
 protected:
 
   /**
