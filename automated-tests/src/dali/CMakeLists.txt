@@ -27,6 +27,7 @@ SET(TC_SOURCES
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
         utc-Dali-EncodedBufferImage.cpp
+        utc-Dali-Extents.cpp
         utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameBufferImage.cpp
         utc-Dali-Geometry.cpp

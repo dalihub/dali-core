@@ -105,6 +105,15 @@ inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
 }
 
 template <>
+inline bool CompareType<Extents>(Extents extents1, Extents extents2, float epsilon)
+{
+  return (extents1.start == extents2.start) &&
+         (extents1.end == extents2.end) &&
+         (extents1.top == extents2.top) &&
+         (extents1.bottom == extents2.bottom);
+}
+
+template <>
 inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2, float epsilon)
 {
   Property::Type type = q1.GetType();
@@ -189,6 +198,14 @@ inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2,
       //TODO: Implement this?
       DALI_ASSERT_ALWAYS( 0 && "Not implemented");
       result = false;
+      break;
+    }
+    case Property::EXTENTS:
+    {
+      Extents a, b;
+      q1.Get(a);
+      q2.Get(b);
+      result = CompareType<Extents>( a, b, epsilon );
       break;
     }
     case Property::NONE:

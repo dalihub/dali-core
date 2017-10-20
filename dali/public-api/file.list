@@ -19,6 +19,7 @@ public_api_src_files = \
   $(public_api_src_dir)/common/constants.cpp \
   $(public_api_src_dir)/common/dali-common.cpp \
   $(public_api_src_dir)/common/dali-vector.cpp \
+  $(public_api_src_dir)/common/extents.cpp \
   $(public_api_src_dir)/common/stage.cpp \
   $(public_api_src_dir)/events/gesture.cpp \
   $(public_api_src_dir)/events/gesture-detector.cpp \
@@ -124,6 +125,7 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/constants.h \
   $(public_api_src_dir)/common/dali-common.h \
   $(public_api_src_dir)/common/dali-vector.h \
+  $(public_api_src_dir)/common/extents.h \
   $(public_api_src_dir)/common/intrusive-ptr.h \
   $(public_api_src_dir)/common/loading-state.h \
   $(public_api_src_dir)/common/stage.h \

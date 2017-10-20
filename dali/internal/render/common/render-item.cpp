@@ -48,6 +48,7 @@ RenderItem::RenderItem()
   mSize(),
   mRenderer( NULL ),
   mNode( NULL ),
+  mTextureSet( NULL ),
   mDepthIndex( 0 ),
   mIsOpaque( true )
 {

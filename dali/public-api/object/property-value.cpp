@@ -22,6 +22,7 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
@@ -136,6 +137,12 @@ struct Property::Value::Impl
   {
   }
 
+  Impl( const Extents& extentsValue )
+  : type( Property::EXTENTS ),
+    extentsValue( new Extents( extentsValue ) )
+  {
+  }
+
   /**
    * Destructor, takes care of releasing the dynamically allocated types
    */
@@ -200,6 +207,11 @@ struct Property::Value::Impl
         delete mapValue;
         break;
       }
+      case Property::EXTENTS:
+      {
+        delete extentsValue;
+        break;
+      }
     }
   }
 
@@ -221,6 +233,7 @@ public: // Data
     Rect<int>* rectValue;
     Property::Array* arrayValue;
     Property::Map* mapValue;
+    Extents* extentsValue;
   };
 
 private:
@@ -317,6 +330,11 @@ Property::Value::Value( Property::Map& mapValue )
 {
 }
 
+Property::Value::Value( const Extents& extentsValue )
+: mImpl( new Impl( extentsValue ) )
+{
+}
+
 Property::Value::Value( Type type )
 : mImpl( NULL )
 {
@@ -385,6 +403,11 @@ Property::Value::Value( Type type )
     case Property::MAP:
     {
       mImpl = new Impl( Property::Map() );
+      break;
+    }
+    case Property::EXTENTS:
+    {
+      mImpl = new Impl( Extents() );
       break;
     }
     case Property::NONE:
@@ -486,6 +509,11 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
         *mImpl->mapValue = *value.mImpl->mapValue; // type cannot change in mImpl so map is allocated
         break;
       }
+      case Property::EXTENTS:
+      {
+        *mImpl->extentsValue = *value.mImpl->extentsValue; // type cannot change in mImpl so extents is allocated
+        break;
+      }
       case Property::NONE:
       { // mImpl will be NULL, there's no way to get to this case
       }
@@ -560,6 +588,11 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       case Property::MAP:
       {
         newImpl = new Impl( *value.mImpl->mapValue ); // type cannot change in mImpl so map is allocated
+        break;
+      }
+      case Property::EXTENTS:
+      {
+        newImpl = new Impl( *value.mImpl->extentsValue ); // type cannot change in mImpl so extents is allocated
         break;
       }
       case Property::NONE:
@@ -804,6 +837,28 @@ Property::Map* Property::Value::GetMap() const
   return map;
 }
 
+bool Property::Value::Get( Extents& extentsValue ) const
+{
+  bool converted = false;
+  if( mImpl )
+  {
+    if( mImpl->type == EXTENTS )
+    {
+      extentsValue = *(mImpl->extentsValue);
+      converted = true;
+    }
+    else if( mImpl->type == VECTOR4 )
+    {
+      extentsValue.start = static_cast< uint16_t >( mImpl->vector4Value->x );
+      extentsValue.end = static_cast< uint16_t >( mImpl->vector4Value->y );
+      extentsValue.top = static_cast< uint16_t >( mImpl->vector4Value->z );
+      extentsValue.bottom = static_cast< uint16_t >( mImpl->vector4Value->w );
+      converted = true;
+    }
+  }
+  return converted;
+}
+
 std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
 {
   if( value.mImpl )
@@ -875,6 +930,11 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
       case Dali::Property::MAP:
       {
         stream << *(value.GetMap());
+        break;
+      }
+      case Dali::Property::EXTENTS:
+      {
+        stream << *impl.extentsValue;
         break;
       }
       case Dali::Property::NONE:
