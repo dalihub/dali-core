@@ -2,7 +2,7 @@
 #define __DALI_RANDOM_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,13 @@ inline float Range(float f0, float f1)
   static bool initialized( false );
   if( !initialized )
   {
-    srand( time( NULL ) );
+    auto seed = time( NULL );
+    srand( seed );
     initialized = true;
   }
 
-  return min + (rand() & 0xfff) * (max-min) * (1.0f/4095.0f);
+  auto randValue = rand();
+  return (randValue & 0xfff) * (1.0f/4095.0f) * (max-min) + min;
 }
 
 /**
