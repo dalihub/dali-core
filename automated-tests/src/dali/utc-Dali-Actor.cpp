@@ -3947,18 +3947,23 @@ int UtcDaliActorRemoveRendererN(void)
 }
 
 // Clipping test helper functions:
-Actor CreateActorWithContent()
+Actor CreateActorWithContent( uint32_t width, uint32_t height)
 {
-  BufferImage image = BufferImage::New( 16u, 16u );
+  BufferImage image = BufferImage::New( width, height );
   Actor actor = CreateRenderableActor( image );
 
   // Setup dimensions and position so actor is not skipped by culling.
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  actor.SetSize( 16.0f, 16.0f );
+  actor.SetSize( width, height );
   actor.SetParentOrigin( ParentOrigin::CENTER );
   actor.SetAnchorPoint( AnchorPoint::CENTER );
 
   return actor;
+}
+
+Actor CreateActorWithContent16x16()
+{
+  return CreateActorWithContent( 16, 16 );
 }
 
 void GenerateTrace( TestApplication& application, TraceCallStack& enabledDisableTrace, TraceCallStack& stencilTrace )
@@ -4080,7 +4085,7 @@ int UtcDaliActorPropertyClippingActor(void)
   size_t startIndex = 0u;
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
@@ -4116,7 +4121,7 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   size_t startIndex = 0u;
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
@@ -4164,24 +4169,24 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
   // Create a child actor.
-  Actor childDepth2 = CreateActorWithContent();
+  Actor childDepth2 = CreateActorWithContent16x16();
   actorDepth1Clip.Add( childDepth2 );
 
   // Create another clipping actor.
-  Actor childDepth2Clip = CreateActorWithContent();
+  Actor childDepth2Clip = CreateActorWithContent16x16();
   childDepth2Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   childDepth2.Add( childDepth2Clip );
 
   // Create another 2 child actors. We do this so 2 nodes will have the same clipping ID.
   // This tests the sort algorithm.
-  Actor childDepth3 = CreateActorWithContent();
+  Actor childDepth3 = CreateActorWithContent16x16();
   childDepth2Clip.Add( childDepth3 );
-  Actor childDepth4 = CreateActorWithContent();
+  Actor childDepth4 = CreateActorWithContent16x16();
   childDepth3.Add( childDepth4 );
 
   // Gather the call trace.
@@ -4337,7 +4342,7 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   const Vector2 imageSize( 16.0f, 16.0f );
 
   // Create a clipping actor.
-  Actor clippingActorA = CreateActorWithContent();
+  Actor clippingActorA = CreateActorWithContent16x16();
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
@@ -4374,6 +4379,60 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyScissorClippingActorSiblings(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actors which are siblings" );
+  TestApplication application;
+
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 sizeA{ stageSize.width, stageSize.height * 0.25f };
+  const Vector2 sizeB{ stageSize.width, stageSize.height * 0.05f };
+
+  // Create a clipping actors.
+  Actor clippingActorA = CreateActorWithContent( sizeA.width, sizeA.height );
+  Actor clippingActorB = CreateActorWithContent( sizeB.width, sizeB.height );
+
+  clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorB.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
+  clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  Stage::GetCurrent().Add( clippingActorA );
+  Stage::GetCurrent().Add( clippingActorB );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+
+  std::string clipA( "0, 500, 480, 200" );
+  std::string clipB( "0, 380, 480, 40" );
+
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipA ) );
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipB ) );
+
+  END_TEST;
+}
+
 int UtcDaliActorPropertyScissorClippingActorNested(void)
 {
   // This test checks that an actor is correctly setup for clipping.
@@ -4405,7 +4464,7 @@ int UtcDaliActorPropertyScissorClippingActorNested(void)
   */
 
   // Create a clipping actor.
-  Actor clippingActorA = CreateActorWithContent();
+  Actor clippingActorA = CreateActorWithContent16x16();
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetParentOrigin( ParentOrigin::CENTER );
@@ -4414,7 +4473,7 @@ int UtcDaliActorPropertyScissorClippingActorNested(void)
   Stage::GetCurrent().Add( clippingActorA );
 
   // Create a child clipping actor.
-  Actor clippingActorB = CreateActorWithContent();
+  Actor clippingActorB = CreateActorWithContent16x16();
   clippingActorB.SetParentOrigin( ParentOrigin::CENTER );
   clippingActorB.SetAnchorPoint( AnchorPoint::CENTER );
   clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
@@ -4462,7 +4521,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
