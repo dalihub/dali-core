@@ -197,44 +197,46 @@ void Stage::Remove( Actor& actor )
   mRootLayer->Remove( actor );
 }
 
-void Stage::SurfaceResized(float width, float height)
+void Stage::SurfaceResized( float width, float height )
 {
-  mSurfaceSize.width = width;
-  mSurfaceSize.height = height;
-
-  // Internally we want to report the actual size of the stage.
-  mSize.width = width;
-  mSize.height = height - mTopMargin;
-
-  // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-  mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
-
-  // Adjust the camera height to allow for top-margin
-  SetDefaultCameraPosition();
-
-  mRootLayer->SetSize( mSize.width, mSize.height );
-
-  // Repeat for SystemOverlay actors
-  if( mSystemOverlay )
+  if( ( fabs( width - mSurfaceSize.width ) > Math::MACHINE_EPSILON_1000 ) || ( fabs( height - mSurfaceSize.height ) > Math::MACHINE_EPSILON_1000 ) )
   {
-    // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
-    // This will remain unaffected by changes in SetDefaultCameraPosition()
-    mSystemOverlay->GetImpl()->SetSize( width, height );
-  }
+    mSurfaceSize.width = width;
+    mSurfaceSize.height = height;
 
-  SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+    // Internally we want to report the actual size of the stage.
+    mSize.width = width;
+    mSize.height = height - mTopMargin;
 
-  // if single render task to screen then set its viewport parameters
-  if( 1 == mRenderTaskList->GetTaskCount() )
-  {
-    Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask(0);
+    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
+    mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
 
-    if(!mDefaultRenderTask.GetTargetFrameBuffer())
+    // Adjust the camera height to allow for top-margin
+    SetDefaultCameraPosition();
+
+    mRootLayer->SetSize( mSize.width, mSize.height );
+
+    // Repeat for SystemOverlay actors
+    if( mSystemOverlay )
     {
-      mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+      // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
+      // This will remain unaffected by changes in SetDefaultCameraPosition()
+      mSystemOverlay->GetImpl()->SetSize( width, height );
+    }
+
+    SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+
+    // if single render task to screen then set its viewport parameters
+    if( 1 == mRenderTaskList->GetTaskCount() )
+    {
+      Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask( 0u );
+
+      if(!mDefaultRenderTask.GetTargetFrameBuffer())
+      {
+        mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+      }
     }
   }
-
 }
 
 Vector2 Stage::GetSize() const
