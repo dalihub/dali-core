@@ -818,7 +818,7 @@ const Vector2 Actor::GetCurrentScreenPosition() const
   {
     StagePtr stage = Stage::GetCurrent();
     Vector3 worldPosition =  mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
-    Vector3 actorSize = GetCurrentSize() * GetCurrentScale();
+    Vector3 actorSize = GetCurrentSize() * GetCurrentWorldScale();
     Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
     Vector3 halfActorSize( actorSize * 0.5f );
     Vector3 anchorPointOffSet = halfActorSize - actorSize * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
