@@ -5742,6 +5742,26 @@ int UtcDaliActorGetScreenPosition(void)
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0\n",  actorWorldPosition.x, actorWorldPosition.y );
   tet_printf( "Actor Screen Position( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0 \n", actorScreenPosition.x, actorScreenPosition.y );
 
+  tet_infoline( "UtcDaliActorGetScreenPosition Scale parent and check child's screen position \n" );
+
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetPosition( 30.0, 30.0 );
+
+  Actor actorB = Actor::New();
+  actorB.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorB.SetSize( size2 );
+  actorB.SetPosition( 10.f, 10.f );
+  actorA.Add( actorB );
+
+  actorA.SetScale( 2.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  actorScreenPosition = actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  50lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  50lu , TEST_LOCATION );
 
   END_TEST;
 }
