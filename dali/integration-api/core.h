@@ -186,12 +186,6 @@ private:
  *
  * 7) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
  *
- * Suspend/Resume behaviour:
- *
- * The Core has no knowledge of the application lifecycle, but can be suspended.
- * In the suspended state, input events will not be processed, and animations will not progress any further.
- * The Core can still render in the suspended state; the same frame will be produced each time.
- *
  * Multi-threading notes:
  *
  * The Dali API methods are not reentrant.  If you access the API from multiple threads simultaneously, then the results
@@ -302,25 +296,6 @@ public:
   void SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical);
 
   // Core Lifecycle
-
-  /**
-   * Put Core into the suspended state.
-   * Any ongoing event processing will be cancelled, for example multi-touch sequences.
-   * The core expects the system has suspended us. Animation time will continue during the suspended
-   * state.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is in the suspended state.
-   */
-  void Suspend();
-
-  /**
-   * Resume the Core from the suspended state.
-   * At the first update, the elapsed time passed to the animations will be equal to the time spent
-   * suspended.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is not in the suspended state.
-   */
-  void Resume();
 
   /**
    * Notify Core that the scene has been created.

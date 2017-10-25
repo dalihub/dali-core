@@ -37,6 +37,34 @@ void utc_dali_internal_core_cleanup()
   test_return_value = TET_PASS;
 }
 
+namespace
+{
+
+class RelayoutSignalHandler : public Dali::ConnectionTracker
+{
+public:
+
+  RelayoutSignalHandler( TestApplication& application )
+  : mApplication( application ),
+    mSignalCalled( false )
+  {
+  }
+
+  // callback to be connected to RelayoutSignal
+  void RelayoutCallback( Actor actor  )
+  {
+    tet_infoline("RelayoutCallback is called");
+
+    mSignalCalled = true;
+
+    mApplication.SendNotification();
+  }
+
+  TestApplication& mApplication;
+  bool   mSignalCalled;
+};
+
+} // anonymous namespace
 
 int UtcDaliCoreTopMargin(void)
 {
@@ -63,6 +91,33 @@ int UtcDaliCoreTopMargin(void)
 
   DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_WIDTH,             newWidth,  TEST_LOCATION );
   DALI_TEST_EQUALS( (TestApplication::DEFAULT_SURFACE_HEIGHT - margin), newHeight, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessEvents(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ProcessEvents");
+
+  Vector3 size( 100.0f, 100.0f, 0.0f );
+  Vector3 position( 100.0f, 100.0f, 0.0f );
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  actor.SetSize( size );
+  actor.SetPosition( position );
+  Stage::GetCurrent().Add( actor );
+
+  RelayoutSignalHandler relayoutSignal( application );
+  actor.OnRelayoutSignal().Connect( &relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( relayoutSignal.mSignalCalled, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::POSITION ).Get< Vector3 >(), position, TEST_LOCATION );
 
   END_TEST;
 }

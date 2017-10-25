@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,9 +89,10 @@ SignalConnectorType signalConnector9( mType, SIGNAL_TOUCH,                     &
 StagePtr Stage::New( AnimationPlaylist& playlist,
                      PropertyNotificationManager& propertyNotificationManager,
                      SceneGraph::UpdateManager& updateManager,
-                     NotificationManager& notificationManager )
+                     NotificationManager& notificationManager,
+                     Integration::RenderController& renderController )
 {
-  return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager ) );
+  return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager, renderController ) );
 }
 
 void Stage::Initialize()
@@ -697,24 +698,32 @@ void Stage::RebuildDepthTree()
 Stage::Stage( AnimationPlaylist& playlist,
               PropertyNotificationManager& propertyNotificationManager,
               SceneGraph::UpdateManager& updateManager,
-              NotificationManager& notificationManager )
+              NotificationManager& notificationManager,
+              Integration::RenderController& renderController )
 : mAnimationPlaylist( playlist ),
-  mPropertyNotificationManager(propertyNotificationManager),
-  mUpdateManager(updateManager),
-  mNotificationManager(notificationManager),
-  mSize(Vector2::ZERO),
-  mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
+  mPropertyNotificationManager( propertyNotificationManager ),
+  mUpdateManager( updateManager ),
+  mNotificationManager( notificationManager ),
+  mRenderController( renderController ),
+  mSize( Vector2::ZERO ),
+  mBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
   mTopMargin( 0 ),
-  mSystemOverlay(NULL),
-  mDepthTreeDirty( false )
+  mSystemOverlay( NULL ),
+  mDepthTreeDirty( false ),
+  mForceNextUpdate( false )
 {
 }
 
 SceneGraph::UpdateManager& Stage::GetUpdateManager()
 {
   return mUpdateManager;
+}
+
+Integration::RenderController& Stage::GetRenderController()
+{
+  return mRenderController;
 }
 
 unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
@@ -725,6 +734,18 @@ unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
 BufferIndex Stage::GetEventBufferIndex() const
 {
   return mUpdateManager.GetEventBufferIndex();
+}
+
+void Stage::ForceNextUpdate()
+{
+  mForceNextUpdate = true;
+}
+
+bool Stage::IsNextUpdateForced()
+{
+  bool nextUpdateForced = mForceNextUpdate;
+  mForceNextUpdate = false;
+  return nextUpdateForced;
 }
 
 Stage::~Stage()
