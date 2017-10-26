@@ -316,20 +316,36 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   if (mState == Playing)
   {
     // If there is delay time before Animation starts, wait the Animation until mDelaySeconds.
-    if( mDelaySeconds > 0)
+    if( mDelaySeconds > 0.0f )
     {
-      mDelaySeconds = mDelaySeconds - ( elapsedSeconds * mSpeedFactor );
+      float reduceSeconds = fabsf( elapsedSeconds * mSpeedFactor );
+      if( reduceSeconds > mDelaySeconds )
+      {
+        if( mSpeedFactor < 0.0f )
+        {
+          mElapsedSeconds -= reduceSeconds - mDelaySeconds;
+        }
+        else
+        {
+          mElapsedSeconds += reduceSeconds - mDelaySeconds;
+        }
+        mDelaySeconds = 0.0f;
+      }
+      else
+      {
+        mDelaySeconds -= reduceSeconds;
+      }
     }
     else
     {
-      mElapsedSeconds += elapsedSeconds * mSpeedFactor;
+      mElapsedSeconds += ( elapsedSeconds * mSpeedFactor );
+    }
 
-      if ( mProgressReachedSignalRequired && ( mElapsedSeconds >= mProgressMarker ) )
-      {
-        // The application should be notified by NotificationManager, in another thread
-        progressReached = true;
-        mProgressReachedSignalRequired = false;
-      }
+    if ( mProgressReachedSignalRequired && ( mElapsedSeconds >= mProgressMarker ) )
+    {
+      // The application should be notified by NotificationManager, in another thread
+      progressReached = true;
+      mProgressReachedSignalRequired = false;
     }
   }
 
