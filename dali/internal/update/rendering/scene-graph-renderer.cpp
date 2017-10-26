@@ -174,11 +174,7 @@ void Renderer::operator delete( void* ptr )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  if( mRegenerateUniformMap == UNIFORM_MAP_READY )
-  {
-    mUniformMapChanged[updateBufferIndex] = false;
-  }
-  else
+  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
