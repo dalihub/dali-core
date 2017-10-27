@@ -636,6 +636,7 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 
 void Renderer::TextureSetChanged()
 {
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
@@ -643,6 +644,7 @@ void Renderer::TextureSetDeleted()
 {
   mTextureSet = NULL;
 
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 void Renderer::ConnectionsChanged( PropertyOwner& object )
