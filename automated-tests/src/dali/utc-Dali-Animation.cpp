@@ -11359,96 +11359,31 @@ int UtcDaliAnimationPlayAfterP(void)
 
   tet_printf("Testing that playing after 2 seconds\n");
 
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
-
-  // Build the animation
-  float durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
-
-  bool signalReceived( false );
-  AnimationFinishCheck finishCheck( signalReceived );
-  animation.FinishedSignal().Connect( &application, finishCheck );
-  application.SendNotification();
-
-  Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
-  animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
-
-  // Play animation after the initial delay time
-  animation.PlayAfter( 0.2f );
-  application.SendNotification();
-  application.Render(0); // start animation
-
-  application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move
-
-  application.Render( static_cast< unsigned int >( durationSeconds * 500.0f )/* 50% animation progress, 0% animator progress */ );
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of TimePeriod in seconds
-
-  application.SendNotification();
-  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 75% animation progress, 50% animator progress */ );
-
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.5f ), TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f ) + 1u/*just beyond the animation duration*/ );
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
-
-  // Check that nothing has changed after a couple of buffer swaps
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliAnimationPlayAfterP2(void)
-{
-  TestApplication application;
-
-  tet_printf("Testing that playing after 2 seconds before looping\n");
-
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
-
-  // Build the animation
-  float durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
-  animation.SetLooping( true );
-
-  bool signalReceived( false );
-  AnimationFinishCheck finishCheck( signalReceived );
-  animation.FinishedSignal().Connect( &application, finishCheck );
-  application.SendNotification();
-
-  Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
-  animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
-
-  // Play animation after the initial delay time
-  animation.PlayAfter( 0.2f );
-  application.SendNotification();
-  application.Render(0); // start animation
-
-  for( int iterations = 0; iterations < 3; ++iterations )
   {
-    // The initial delay time of PlayAfter() applies only once in looping mode.
-    if( iterations == 0 )
-    {
-      application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
-      application.SendNotification();
-      finishCheck.CheckSignalNotReceived();
-      DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move
-    }
+    Actor actor = Actor::New();
+    Stage::GetCurrent().Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
+
+    // Play animation after the initial delay time
+    animation.PlayAfter( 0.2f );
+    application.SendNotification();
+    application.Render(0); // start animation
+
+    application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move
 
     application.Render( static_cast< unsigned int >( durationSeconds * 500.0f )/* 50% animation progress, 0% animator progress */ );
 
@@ -11465,21 +11400,216 @@ int UtcDaliAnimationPlayAfterP2(void)
     DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.5f ), TEST_LOCATION );
 
     application.SendNotification();
-    application.Render( static_cast< unsigned int >( durationSeconds * 250.0f ) /* 100% progress */ );
+    application.Render( static_cast< unsigned int >( durationSeconds * 250.0f ) + 1u/*just beyond the animation duration*/ );
 
     // We did expect the animation to finish
     application.SendNotification();
-    finishCheck.CheckSignalNotReceived();
+    finishCheck.CheckSignalReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+    // Check that nothing has changed after a couple of buffer swaps
+    application.Render(0);
     DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
   }
 
-  animation.SetLooping(false);
-  application.SendNotification();
-  application.Render( static_cast< unsigned int >( durationSeconds * 1000.0f ) + 1u /*just beyond the animation duration*/ );
+  tet_printf("Testing that playing after 2 seconds with negative speedfactor\n");
+  // SpeedFactor < 0
+  {
+    Actor actor = Actor::New();
+    Stage::GetCurrent().Add(actor);
 
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetSpeedFactor( -1.0f ); // Set SpeedFactor as < 0
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
+
+    // Play animation after the initial delay time
+    animation.PlayAfter( 0.2f );
+    application.SendNotification();
+    application.Render(0); // start animation
+
+    application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 1.0f ), TEST_LOCATION ); // Not move. NOTE SpeedFactor < 0 so 'targetPosition' is start position.
+
+    application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 25% animation progress, 50% animator progress */ );
+
+    // We didn't expect the animation to finish yet
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.5f ), TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 50% animation progress, 100% animator progress */ );
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 500.0f ) + 1u/*just beyond the animation duration*/ );
+
+    // We did expect the animation to finish
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of Timeperiod in seconds
+
+    // Check that nothing has changed after a couple of buffer swaps
+    application.Render(0);
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(0.0, 0.0, 0.0), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayAfterP2(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing that playing after 2 seconds before looping\n");
+
+  {
+    Actor actor = Actor::New();
+    Stage::GetCurrent().Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetLooping( true );
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
+
+    // Play animation after the initial delay time
+    animation.PlayAfter( 0.2f );
+    application.SendNotification();
+    application.Render(0); // start animation
+
+    for( int iterations = 0; iterations < 3; ++iterations )
+    {
+      // The initial delay time of PlayAfter() applies only once in looping mode.
+      if( iterations == 0 )
+      {
+        application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
+        application.SendNotification();
+        finishCheck.CheckSignalNotReceived();
+        DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move
+      }
+
+      application.Render( static_cast< unsigned int >( durationSeconds * 500.0f )/* 50% animation progress, 0% animator progress */ );
+
+      // We didn't expect the animation to finish yet
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of TimePeriod in seconds
+
+      application.SendNotification();
+      application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 75% animation progress, 50% animator progress */ );
+
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.5f ), TEST_LOCATION );
+
+      application.SendNotification();
+      application.Render( static_cast< unsigned int >( durationSeconds * 250.0f ) /* 100% progress */ );
+
+      // We did expect the animation to finish
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+    }
+
+    animation.SetLooping(false);
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 1000.0f ) + 1u /*just beyond the animation duration*/ );
+
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  }
+
+  tet_printf("Testing that playing after 2 seconds before looping with negative speedfactor\n");
+  // SpeedFactor < 0
+  {
+    Actor actor = Actor::New();
+    Stage::GetCurrent().Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetLooping( true );
+    animation.SetSpeedFactor( -1.0f ); //Set SpeedFactor as < 0
+
+    bool signalReceived( false );
+    AnimationFinishCheck finishCheck( signalReceived );
+    animation.FinishedSignal().Connect( &application, finishCheck );
+    application.SendNotification();
+
+    Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
+
+    // Play animation after the initial delay time
+    animation.PlayAfter( 0.2f );
+    application.SendNotification();
+    application.Render(0); // start animation
+
+    for( int iterations = 0; iterations < 3; ++iterations )
+    {
+      // The initial delay time of PlayAfter() applies only once in looping mode.
+      if( iterations == 0 )
+      {
+        application.Render( durationSeconds * 200.f ); // The intial delay time of PlayAfter
+        application.SendNotification();
+        finishCheck.CheckSignalNotReceived();
+        DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 1.0f ), TEST_LOCATION ); // Not move. NOTE SpeedFactor < 0 so 'targetPosition' is start position.
+      }
+
+      application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 25% animation progress, 50% animator progress */ );
+
+      // We didn't expect the animation to finish yet
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.5f ), TEST_LOCATION );
+
+      application.SendNotification();
+      application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 50% animation progress, 100% animator progress */ );
+
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION );
+
+      application.SendNotification();
+      application.Render( static_cast< unsigned int >( durationSeconds * 500.0f ) /* 100% progress */ );
+
+      // We did expect the animation to finish
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS( actor.GetCurrentPosition(),  ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of TimePeriod in second
+    }
+
+    animation.SetLooping(false);
+    application.SendNotification();
+    application.Render( static_cast< unsigned int >( durationSeconds * 1000.0f ) + 1u /*just beyond the animation duration*/ );
+
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(0.0, 0.0, 0.0), TEST_LOCATION );
+  }
+
   END_TEST;
 }
 
@@ -11525,6 +11655,81 @@ int UtcDaliAnimationPlayAfterP3(void)
 
   application.SendNotification();
   application.Render( static_cast< unsigned int >( durationSeconds * 250.0f ) + 1u/*just beyond the animation duration*/ );
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayAfterP4(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing that PlayAfter with progress value\n");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  bool signalReceived( false );
+  AnimationFinishCheck finishCheck( signalReceived );
+  animation.FinishedSignal().Connect( &application, finishCheck );
+  application.SendNotification();
+
+  Vector3 targetPosition( 100.0f, 100.0f, 100.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR, TimePeriod( 0.5f, 0.5f ) );
+
+  // Delay time is 0.3s. So after duration times, progress must be 70%. animation will finished at 1.3s.
+  animation.PlayAfter( durationSeconds * 0.3f );
+  application.SendNotification();
+  application.Render(0); // start animation
+
+  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 5/6 delay progress, 0% animation progress, 0% animator progress */ );
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of PlayAfter
+
+  application.SendNotification();
+  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 100% delay progress, 20% animation progress, 0% animator progress */ );
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of TimePeriod in seconds
+
+  application.SendNotification();
+  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 100% delay progress, 45% animation progress, 0% animator progress */ );
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.0f ), TEST_LOCATION ); // Not move - A delay time of TimePeriod in seconds
+
+  application.SendNotification();
+  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 100% delay progress, 70% animation progress, 40% animator progress */ );
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.4f ), TEST_LOCATION ); // 40% of animator progress
+
+  application.SendNotification();
+  application.Render( static_cast< unsigned int >( durationSeconds * 250.0f )/* 100% delay progress, 95% animation progress, 90% animator progress */ );
+
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), ( targetPosition * 0.9f ), TEST_LOCATION ); // 90% of animator progress
+
+  application.SendNotification();
+  application.Render( static_cast< unsigned int >( durationSeconds * 50.0f ) + 1u/*just beyond the animation duration*/ );
 
   // We did expect the animation to finish
   application.SendNotification();
@@ -12112,6 +12317,118 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
+{
+  tet_infoline( "Multiple animations with different progress markers" );
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  Animation animationAlpha = Animation::New(0.0f);
+  Animation animationBeta = Animation::New(0.0f);
+
+  //Set duration
+  float durationSeconds(1.0f);
+  float delaySeconds(0.5f);
+  animationAlpha.SetDuration(durationSeconds);
+  animationBeta.SetDuration(durationSeconds);
+
+  bool progressSignalReceivedAlpha(false);
+  bool progressSignalReceivedBeta(false);
+
+  AnimationProgressCheck progressCheckAlpha(progressSignalReceivedAlpha, "animation:Alpha");
+  AnimationProgressCheck progressCheckBeta(progressSignalReceivedBeta, "animation:Beta" );
+
+  DevelAnimation::ProgressReachedSignal( animationAlpha ).Connect( &application, progressCheckAlpha );
+  DevelAnimation::ProgressReachedSignal( animationBeta ).Connect( &application, progressCheckBeta);
+  application.SendNotification();
+
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animationAlpha.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animationBeta.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  tet_infoline( "AnimationAlpha Progress notification set to 30%" );
+  DevelAnimation::SetProgressNotification( animationAlpha, 0.3f );
+
+  tet_infoline( "AnimationBeta Progress notification set to ~0% (==Notify when delay is done)" );
+  DevelAnimation::SetProgressNotification( animationBeta, Math::MACHINE_EPSILON_1 );
+
+  application.SendNotification();
+  application.Render( );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  // Start the animations from 10% progress
+  animationAlpha.PlayAfter(delaySeconds);
+  animationBeta.PlayAfter(delaySeconds);
+
+  application.SendNotification();
+  application.Render(0); // start animation
+  application.Render(delaySeconds * 500.0f ); // 50% wait progress
+
+  tet_infoline( "Delay at 50% - No signals to be received" );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  application.SendNotification();
+  application.Render(delaySeconds * 500.0f + durationSeconds * 50.0f ); // 100% wait, 5% progress
+  application.SendNotification();
+  tet_infoline( "Delay at 100%, Animation at 5% - Beta signal should be received" );
+  DALI_TEST_EQUALS( 0.05f, animationBeta.GetCurrentProgress(), TEST_LOCATION );
+
+  progressCheckBeta.CheckSignalReceived();
+  progressCheckAlpha.CheckSignalNotReceived();
+
+  tet_infoline( "Progress check reset" );
+  progressCheckAlpha.Reset();
+  progressCheckBeta.Reset();
+
+  application.Render(durationSeconds * 200.0f ); // 25% progress
+  tet_infoline( "Animation at 25% - No signals to be received" );
+  application.SendNotification();
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  application.Render(durationSeconds * 200.0f ); // 45% progress
+  tet_infoline( "Animation at 45% - Alpha should receive signal, Beta should not" );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( 0.45f, animationAlpha.GetCurrentProgress(), TEST_LOCATION );
+
+  progressCheckAlpha.CheckSignalReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  tet_infoline( "Progress check reset" );
+  progressCheckAlpha.Reset();
+  progressCheckBeta.Reset();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*150.0f)/* 60% progress */);
+  application.SendNotification();
+
+  tet_infoline( "Animation at 60%" );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
+  application.SendNotification();
+  tet_infoline( "Animation at 80%" );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
+  // We did expect the animation to finish
+  tet_infoline( "Animation finished" );
+
+  END_TEST;
+}
 
 int UtcDaliAnimationProgressCallbackLongDurationP(void)
 {
