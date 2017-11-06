@@ -351,16 +351,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
 
   Vector2 playRangeSeconds = mPlayRange * mDurationSeconds;
 
-  if( 0 == mLoopCount )
-  {
-    // loop forever
-    WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
-
-    UpdateAnimators(bufferIndex, false, false );
-
-    // don't increment mPlayedCount as event loop tracks this to indicate animation finished (end of all loops)
-  }
-  else if( mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
+  if( 0 == mLoopCount || mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
   {
     // looping
     looped =  (mState == Playing                                                 &&
@@ -373,7 +364,10 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
 
     if(looped)
     {
-      ++mCurrentLoop;
+      if( mLoopCount != 0 )
+      {
+        ++mCurrentLoop;
+      }
       mProgressReachedSignalRequired = mProgressMarker > 0.0f;
       // don't increment mPlayedCount until the finished final loop
     }
