@@ -2278,6 +2278,8 @@ int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
   renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
   renderer.SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR_STENCIL );
+  // Set a different stencil function as the last one is cached.
+  renderer.SetProperty( Renderer::Property::STENCIL_FUNCTION, StencilFunction::ALWAYS );
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetStencilTestString() ) );
@@ -2443,7 +2445,7 @@ int UtcDaliRendererSetStencilOperation(void)
   }; const int StencilOperationLookupTableCount = sizeof( StencilOperationLookupTable ) / sizeof( StencilOperationLookupTable[0] );
 
   // Set all 3 StencilOperation properties to a default.
-  renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::ZERO );
+  renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::KEEP );
   renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::ZERO );
   renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::ZERO );
 
@@ -2459,40 +2461,48 @@ int UtcDaliRendererSetStencilOperation(void)
    *  - Checks the correct parameters to "glStencilFunc" were used
    *  - Checks the above for all 3 parameter placements of StencilOperation ( OnFail, OnZFail, OnPass )
    */
-  int stencilOperationPropertyKeys[] = { Renderer::Property::STENCIL_OPERATION_ON_FAIL, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS };
   std::string methodString( "StencilOp" );
 
-  for( int parameterIndex = 0; parameterIndex < 3; ++parameterIndex )
+  for( int i = 0; i < StencilOperationLookupTableCount; ++i )
   {
-    for( int i = 0; i < StencilOperationLookupTableCount; ++i )
+    for( int j = 0; j < StencilOperationLookupTableCount; ++j )
     {
-      // Set the property (outer loop causes all 3 different properties to be set separately).
-      renderer.SetProperty( stencilOperationPropertyKeys[ parameterIndex ], static_cast<Dali::StencilFunction::Type>( i ) );
-
-      // Check GetProperty returns the same value.
-      DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( stencilOperationPropertyKeys[ parameterIndex ] ).Get<int>() ), i, TEST_LOCATION );
-
-      // Reset the trace debug.
-      ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
-
-      // Check the function is called and the parameters are correct.
-      // Set the expected parameter value at its correct index (only)
-      parameters[ parameterIndex ] = StencilOperationLookupTable[ i ];
-
-      // Build the parameter list.
-      std::stringstream parameterStream;
-      for( int parameterBuild = 0; parameterBuild < 3; ++parameterBuild )
+      for( int k = 0; k < StencilOperationLookupTableCount; ++k )
       {
-        parameterStream << parameters[ parameterBuild ];
-        // Comma-separate the parameters.
-        if( parameterBuild < 2 )
-        {
-          parameterStream << ", ";
-        }
-      }
+        // Set the property (outer loop causes all 3 different properties to be set separately).
+        renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL, static_cast<Dali::StencilFunction::Type>( i ) );
+        renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, static_cast<Dali::StencilFunction::Type>( j ) );
+        renderer.SetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, static_cast<Dali::StencilFunction::Type>( k ) );
 
-      // Check the function was called and the parameters were correct.
-      DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+        // Check GetProperty returns the same value.
+        DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_FAIL ).Get<int>() ), i, TEST_LOCATION );
+        DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL ).Get<int>() ), j, TEST_LOCATION );
+        DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS ).Get<int>() ), k, TEST_LOCATION );
+
+        // Reset the trace debug.
+        ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+        // Check the function is called and the parameters are correct.
+        // Set the expected parameter value at its correct index (only)
+        parameters[ 0u ] = StencilOperationLookupTable[ i ];
+        parameters[ 1u ] = StencilOperationLookupTable[ j ];
+        parameters[ 2u ] = StencilOperationLookupTable[ k ];
+
+        // Build the parameter list.
+        std::stringstream parameterStream;
+        for( int parameterBuild = 0; parameterBuild < 3; ++parameterBuild )
+        {
+          parameterStream << parameters[ parameterBuild ];
+          // Comma-separate the parameters.
+          if( parameterBuild < 2 )
+          {
+            parameterStream << ", ";
+          }
+        }
+
+        // Check the function was called and the parameters were correct.
+        DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
+      }
     }
   }
 

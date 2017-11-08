@@ -1497,10 +1497,15 @@ public:
    */
   void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
+    if( ( func != mStencilFunc ) || ( ref != mStencilFuncRef ) || ( mask != mStencilFuncMask ) )
+    {
+      mStencilFunc = func;
+      mStencilFuncRef = ref;
+      mStencilFuncMask = mask;
 
-
-    LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
+      LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
+    }
   }
 
   /**
@@ -1540,8 +1545,15 @@ public:
    */
   void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
-    LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass) );
+    if( ( fail != mStencilOpFail ) || ( zfail != mStencilOpDepthFail ) || ( zpass != mStencilOpDepthPass ) )
+    {
+      mStencilOpFail = fail;
+      mStencilOpDepthFail = zfail;
+      mStencilOpDepthPass = zpass;
+
+      LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass) );
+    }
   }
 
   /**
@@ -1748,6 +1760,14 @@ private: // Data
   // glBlendEquationSeparate state
   GLenum mBlendEquationSeparateModeRGB;    ///< Controls RGB blend mode
   GLenum mBlendEquationSeparateModeAlpha;  ///< Controls Alpha blend mode
+
+  // glStencilFunc() and glStencilOp() state.
+  GLenum mStencilFunc;
+  GLint mStencilFuncRef;
+  GLuint mStencilFuncMask;
+  GLenum mStencilOpFail;
+  GLenum mStencilOpDepthFail;
+  GLenum mStencilOpDepthPass;
 
   GLenum mDepthFunction;  ///The depth function
 
