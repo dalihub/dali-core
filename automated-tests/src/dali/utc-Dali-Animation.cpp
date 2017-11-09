@@ -12317,6 +12317,121 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationMultipleProgressSignalsP2(void)
+{
+  tet_infoline( "Multiple animations with different progress markers and big step time" );
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  Animation animationAlpha = Animation::New(0.0f);
+  Animation animationBeta = Animation::New(0.0f);
+
+  //Set duration
+  const float durationSeconds(1.0f);
+  animationAlpha.SetDuration(durationSeconds);
+  animationBeta.SetDuration(durationSeconds);
+
+  bool progressSignalReceivedAlpha(false);
+  bool progressSignalReceivedBeta(false);
+
+  AnimationProgressCheck progressCheckAlpha(progressSignalReceivedAlpha, "animation:Alpha");
+  AnimationProgressCheck progressCheckBeta(progressSignalReceivedBeta, "animation:Beta" );
+
+  DevelAnimation::ProgressReachedSignal( animationAlpha ).Connect( &application, progressCheckAlpha );
+  DevelAnimation::ProgressReachedSignal( animationBeta ).Connect( &application, progressCheckBeta);
+  application.SendNotification();
+
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animationAlpha.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animationBeta.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  tet_infoline( "AnimationAlpha Progress notification set to 1%" );
+  DevelAnimation::SetProgressNotification( animationAlpha, 0.01f );
+
+  tet_infoline( "AnimationBeta Progress notification set to 99%" );
+  DevelAnimation::SetProgressNotification( animationBeta, 0.99f );
+
+  application.SendNotification();
+  application.Render( );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  // Start the animations unlimited looping
+  animationAlpha.SetLooping( true );
+  animationBeta.SetLooping( true );
+  animationAlpha.Play();
+  animationBeta.Play();
+
+  application.SendNotification();
+  application.Render(0); // start animation
+  application.Render(durationSeconds*20.0f ); // 2% progress
+  application.SendNotification();
+  DALI_TEST_EQUALS( 0.02f, animationAlpha.GetCurrentProgress(), TEST_LOCATION );
+
+  tet_infoline( "Animation at 2% - Alpha signals should be received, Beta should not." );
+
+  progressCheckAlpha.CheckSignalReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  tet_infoline( "Progress check reset" );
+  progressCheckAlpha.Reset();
+  progressCheckBeta.Reset();
+
+  application.SendNotification();
+  application.Render(durationSeconds*960.0f ); // 98% progress
+  application.SendNotification();
+  tet_infoline( "Animation at 98% - No signal received" );
+  DALI_TEST_EQUALS( 0.98f, animationAlpha.GetCurrentProgress(), TEST_LOCATION );
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalNotReceived();
+
+  application.SendNotification();
+  application.Render(durationSeconds*40.0f ); // 2% progress
+  application.SendNotification();
+  tet_infoline( "Animation loop once and now 2% - Alpha and Beta should receive signal" );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( 0.02f, animationBeta.GetCurrentProgress(), TEST_LOCATION );
+
+  progressCheckAlpha.CheckSignalReceived();
+  progressCheckBeta.CheckSignalReceived();
+
+  tet_infoline( "Progress check reset" );
+  progressCheckAlpha.Reset();
+  progressCheckBeta.Reset();
+
+  application.SendNotification();
+  application.Render(durationSeconds*980.0f ); // 100% progress
+  application.SendNotification();
+  tet_infoline( "Animation loop one more time. and now 100% - Beta should receive signal, Alhpa sholud not" );
+  application.SendNotification();
+
+  progressCheckAlpha.CheckSignalNotReceived();
+  progressCheckBeta.CheckSignalReceived();
+
+  tet_infoline( "Progress check reset" );
+  progressCheckAlpha.Reset();
+  progressCheckBeta.Reset();
+
+  animationAlpha.SetLooping( false );
+  animationBeta.SetLooping( false );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*2000.0f) + 1u/*just beyond the animation duration*/);
+  application.SendNotification();
+
+  // We did expect the animation to finish
+  tet_infoline( "Animation finished" );
+
+  END_TEST;
+}
+
 int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
 {
   tet_infoline( "Multiple animations with different progress markers" );
@@ -12441,11 +12556,11 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
   Animation animation = Animation::New(0.0f);
 
   //Set duration
-  float durationSeconds(1.0f);
+  const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
   // Set Looping Count
-  int loopCount( 4 );
+  const int loopCount( 4 );
   animation.SetLoopCount( loopCount );
 
   bool finishedSignalReceived(false);
@@ -12529,7 +12644,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   Animation animation = Animation::New(0.0f);
 
   //Set duration
-  float durationSeconds(1.0f);
+  const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
   // Set Looping Unlmited
@@ -12607,6 +12722,224 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   application.SendNotification();
 
   finishCheck.CheckSignalReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  Animation animation = Animation::New(0.0f);
+
+  //Set duration
+  const float durationSeconds(1.0f);
+  animation.SetDuration(durationSeconds);
+
+  //Set speed negative
+  animation.SetSpeedFactor( -1.0f );
+
+  // Set Looping Unlmited
+  animation.SetLooping( true );
+
+  bool finishedSignalReceived(false);
+  bool progressSignalReceived(false);
+
+  AnimationFinishCheck finishCheck(finishedSignalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  AnimationProgressCheck progressCheck(progressSignalReceived);
+  DevelAnimation::ProgressReachedSignal( animation ).Connect( &application, progressCheck);
+  application.SendNotification();
+
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  tet_infoline( "Animation Progress notification set to 50%" );
+  DevelAnimation::SetProgressNotification( animation, 0.5f );
+
+  application.SendNotification();
+  application.Render( );
+
+  progressCheck.CheckSignalNotReceived();
+
+  animation.Play();
+
+  for(int count = 0; count < 4; count++)
+  {
+    application.SendNotification();
+    application.Render(0); // start animation
+    progressCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(durationSeconds*0.25*1000.0f ); // 25% progress
+    DALI_TEST_EQUALS( 0.75f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    tet_infoline( "Animation at 25%" );
+
+    progressCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(durationSeconds*0.25*1000.0f ); // 50% progress
+    application.SendNotification();
+    tet_infoline( "Animation at 50%" );
+    DALI_TEST_EQUALS( 0.5f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    progressCheck.CheckSignalReceived();
+
+    tet_infoline( "Progress check reset" );
+    progressCheck.Reset();
+
+    application.Render(durationSeconds*0.25*1000.0f ); // 75% progress
+    tet_infoline( "Animation at 75%" );
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    progressCheck.CheckSignalNotReceived();
+
+    application.Render(durationSeconds*0.25*1000.0f ); // 100% progress
+    tet_infoline( "Animation at 100%" );
+    application.SendNotification();
+
+    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+  }
+  finishCheck.CheckSignalNotReceived();
+
+  animation.Stop();
+  animation.SetLooping( false );
+  animation.SetLoopCount( 4 );
+  animation.Play();
+  application.Render(0u);
+  application.SendNotification();
+
+  for(int count = 0; count < 4; count++)
+  {
+    application.SendNotification();
+    application.Render(0); // start animation
+    progressCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(durationSeconds*0.25*1000.0f ); // 25% progress
+    DALI_TEST_EQUALS( 0.75f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    tet_infoline( "Animation at 25%" );
+
+    progressCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(durationSeconds*0.25*1000.0f ); // 50% progress
+    application.SendNotification();
+    tet_infoline( "Animation at 50%" );
+    DALI_TEST_EQUALS( 0.5f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    progressCheck.CheckSignalReceived();
+
+    tet_infoline( "Progress check reset" );
+    progressCheck.Reset();
+
+    application.Render(durationSeconds*0.25*1000.0f ); // 75% progress
+    tet_infoline( "Animation at 75%" );
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( 0.25f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+    progressCheck.CheckSignalNotReceived();
+
+    application.Render(durationSeconds*0.25*1000.0f ); // 100% progress
+    tet_infoline( "Animation at 100%" );
+    application.SendNotification();
+
+    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    application.SendNotification();
+  }
+  application.Render(10u);
+  application.SendNotification();
+  application.Render(0u);
+  application.SendNotification();
+
+  finishCheck.CheckSignalReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  Animation animation = Animation::New(0.0f);
+
+  //Set duration
+  const float durationSeconds(1.0f);
+  animation.SetDuration(durationSeconds);
+
+  bool finishedSignalReceived(false);
+  bool progressSignalReceived(false);
+
+  AnimationFinishCheck finishCheck(finishedSignalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  AnimationProgressCheck progressCheck(progressSignalReceived);
+  DevelAnimation::ProgressReachedSignal( animation ).Connect( &application, progressCheck);
+  application.SendNotification();
+
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  tet_infoline( "Animation Progress PlayRange as 10% ~ 90%" );
+  animation.SetPlayRange( Vector2( 0.1f, 0.9f ) );
+
+  tet_infoline( "Animation Progress notification set to >90% that never can notificated" );
+  DevelAnimation::SetProgressNotification( animation, 0.9f + Math::MACHINE_EPSILON_1 );
+
+  application.SendNotification();
+  application.Render( );
+
+  progressCheck.CheckSignalNotReceived();
+
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0); // start animation
+  application.Render(durationSeconds*0.25*1000.0f ); // 35% progress
+  DALI_TEST_EQUALS( 0.35f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+  tet_infoline( "Animation at 35%" );
+
+  progressCheck.CheckSignalNotReceived();
+
+  application.SendNotification();
+  application.Render(durationSeconds*0.25*1000.0f ); // 60% progress
+  application.SendNotification();
+  DALI_TEST_EQUALS( 0.6f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+  tet_infoline( "Animation at 60%" );
+
+  progressCheck.CheckSignalNotReceived();
+
+  application.Render(durationSeconds*0.25*1000.0f ); // 85% progress
+  tet_infoline( "Animation at 85%" );
+  application.SendNotification();
+  DALI_TEST_EQUALS( 0.85f, animation.GetCurrentProgress(), TEST_LOCATION );
+
+  progressCheck.CheckSignalNotReceived();
+
+  application.Render(durationSeconds*0.25*1000.0f ); // 90% progress
+  tet_infoline( "Animation over 90%" );
+  application.SendNotification();
+
+  // progress never signaled because playrange is 90%
+  progressCheck.CheckSignalNotReceived();
 
   END_TEST;
 }
