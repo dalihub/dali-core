@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -80,7 +81,9 @@ public:
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
-        bool renderToFboEnabled );
+        Integration::RenderToFrameBuffer renderToFboEnabled,
+        Integration::DepthBufferAvailable depthBufferAvailable,
+        Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Destructor

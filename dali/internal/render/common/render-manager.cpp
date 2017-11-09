@@ -54,7 +54,9 @@ namespace SceneGraph
 struct RenderManager::Impl
 {
   Impl( Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction )
+        Integration::GlSyncAbstraction& glSyncAbstraction,
+        Integration::DepthBufferAvailable depthBufferAvailableParam,
+        Integration::StencilBufferAvailable stencilBufferAvailableParam )
   : context( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
@@ -69,7 +71,9 @@ struct RenderManager::Impl
     textureContainer(),
     frameBufferContainer(),
     lastFrameWasRendered( false ),
-    programController( glAbstraction )
+    programController( glAbstraction ),
+    depthBufferAvailable( depthBufferAvailableParam ),
+    stencilBufferAvailable( stencilBufferAvailableParam )
   {
   }
 
@@ -127,14 +131,21 @@ struct RenderManager::Impl
 
   ProgramController                         programController;        ///< Owner of the GL programs
 
+  Integration::DepthBufferAvailable         depthBufferAvailable;     ///< Whether the depth buffer is available
+  Integration::StencilBufferAvailable       stencilBufferAvailable;   ///< Whether the stencil buffer is available
+
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
-                                   Integration::GlSyncAbstraction& glSyncAbstraction )
+                                   Integration::GlSyncAbstraction& glSyncAbstraction,
+                                   Integration::DepthBufferAvailable depthBufferAvailable,
+                                   Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   RenderManager* manager = new RenderManager;
   manager->mImpl = new Impl( glAbstraction,
-                             glSyncAbstraction );
+                             glSyncAbstraction,
+                             depthBufferAvailable,
+                             stencilBufferAvailable );
   return manager;
 }
 
@@ -421,17 +432,31 @@ void RenderManager::Render( Integration::RenderStatus& status )
                                mImpl->backgroundColor.b,
                                mImpl->backgroundColor.a );
 
-    mImpl->context.ClearStencil( 0 );
-
-    // Clear the entire color, depth and stencil buffers for the default framebuffer.
-    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+    // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
+    // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
     // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
     // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+
     mImpl->context.SetScissorTest( false );
+
+    GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
+
     mImpl->context.ColorMask( true );
-    mImpl->context.DepthMask( true );
-    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, Context::FORCE_CLEAR );
+
+    if( mImpl->depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
+    {
+      mImpl->context.DepthMask( true );
+      clearMask |= GL_DEPTH_BUFFER_BIT;
+    }
+
+    if( mImpl->stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+    {
+      mImpl->context.ClearStencil( 0 );
+      mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+      clearMask |= GL_STENCIL_BUFFER_BIT;
+    }
+
+    mImpl->context.Clear( clearMask, Context::FORCE_CLEAR );
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
@@ -532,7 +557,12 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->context.SetScissorTest( false );
   }
 
-  mImpl->renderAlgorithms.ProcessRenderInstruction( instruction, mImpl->context, mImpl->renderBufferIndex );
+  mImpl->renderAlgorithms.ProcessRenderInstruction(
+      instruction,
+      mImpl->context,
+      mImpl->renderBufferIndex,
+      mImpl->depthBufferAvailable,
+      mImpl->stencilBufferAvailable );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

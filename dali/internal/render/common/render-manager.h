@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
@@ -71,12 +72,15 @@ public:
 
   /**
    * Construct a new RenderManager.
-   * @param[in]  glAbstraction The GL abstraction used for rendering.
-   * @param[in]  glSyncAbstraction The GL sync abstraction used fence sync creation/deletion.
-   * @param[out] resourcePostProcessQueue A queue for sending rendered texture ids to the update-thread.*
+   * @param[in]  glAbstraction           The GL abstraction used for rendering.
+   * @param[in]  glSyncAbstraction       The GL sync abstraction used fence sync creation/deletion.
+   * @param[in]  depthBufferAvailable    Whether the depth buffer is available
+   * @param[in]  stencilBufferAvailable  Whether the stencil buffer is available
    */
   static RenderManager* New( Integration::GlAbstraction& glAbstraction,
-                             Integration::GlSyncAbstraction& glSyncAbstraction );
+                             Integration::GlSyncAbstraction& glSyncAbstraction,
+                             Integration::DepthBufferAvailable depthBufferAvailable,
+                             Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor; not intended as a base class

@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/common/render-list.h>
 
@@ -52,11 +53,17 @@ class RenderAlgorithms
 
     /**
      * Process a render-instruction.
-     * @param[in] instruction The render-instruction to process.
-     * @param[in] context     The GL context.
-     * @param[in] bufferIndex The current render buffer index (previous update buffer)
+     * @param[in] instruction            The render-instruction to process.
+     * @param[in] context                The GL context.
+     * @param[in] bufferIndex            The current render buffer index (previous update buffer)
+     * @param[in] depthBufferAvailable   Whether the depth buffer is available
+     * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      */
-    void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction, Context& context, BufferIndex bufferIndex );
+    void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
+                                   Context& context,
+                                   BufferIndex bufferIndex,
+                                   Integration::DepthBufferAvailable depthBufferAvailable,
+                                   Integration::StencilBufferAvailable stencilBufferAvailable );
 
   private:
 
@@ -88,18 +95,32 @@ class RenderAlgorithms
      * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList. Used by StencilMode::ON.
      * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
      * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
+     * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
      */
-    inline void SetupClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context, bool& usedStencilBuffer, uint32_t& lastClippingDepth, uint32_t& lastClippingId );
+    inline void SetupClipping( const Dali::Internal::SceneGraph::RenderItem& item,
+                               Context& context,
+                               bool& usedStencilBuffer,
+                               uint32_t& lastClippingDepth,
+                               uint32_t& lastClippingId,
+                               Integration::StencilBufferAvailable stencilBufferAvailable );
 
     /**
      * @brief Process a render-list.
-     * @param[in] renderList       The render-list to process.
-     * @param[in] context          The GL context.
-     * @param[in] buffer           The current render buffer index (previous update buffer)
-     * @param[in] viewMatrix       The view matrix from the appropriate camera.
-     * @param[in] projectionMatrix The projection matrix from the appropriate camera.
+     * @param[in] renderList             The render-list to process.
+     * @param[in] context                The GL context.
+     * @param[in] buffer                 The current render buffer index (previous update buffer)
+     * @param[in] viewMatrix             The view matrix from the appropriate camera.
+     * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
+     * @param[in] depthBufferAvailable   Whether the depth buffer is available
+     * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      */
-    inline void ProcessRenderList( const Dali::Internal::SceneGraph::RenderList& renderList, Context& context, BufferIndex bufferIndex, const Matrix& viewMatrix, const Matrix& projectionMatrix );
+    inline void ProcessRenderList( const Dali::Internal::SceneGraph::RenderList& renderList,
+                                   Context& context,
+                                   BufferIndex bufferIndex,
+                                   const Matrix& viewMatrix,
+                                   const Matrix& projectionMatrix,
+                                   Integration::DepthBufferAvailable depthBufferAvailable,
+                                   Integration::StencilBufferAvailable stencilBufferAvailable );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );

@@ -68,7 +68,9 @@ void TestApplication::Initialize()
                                         mGlSyncAbstraction,
                                         mGestureManager,
                                         mDataRetentionPolicy,
-                                        false );
+                                        Integration::RenderToFrameBuffer::FALSE,
+                                        Integration::DepthBufferAvailable::TRUE,
+                                        Integration::StencilBufferAvailable::TRUE );
 
   mCore->ContextCreated();
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
