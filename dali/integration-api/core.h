@@ -18,10 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
@@ -217,6 +218,8 @@ public:
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] depthBufferAvailable Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -225,7 +228,9 @@ public:
                     GlSyncAbstraction& glSyncAbstraction,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
-                    bool renderToFboEnabled );
+                    RenderToFrameBuffer renderToFboEnabled,
+                    DepthBufferAvailable depthBufferAvailable,
+                    StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
