@@ -860,8 +860,7 @@ bool Texture::Bind( Context& context, unsigned int textureUnit, Render::Sampler*
 
   if( mId != 0 )
   {
-    context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
-    context.BindTexture( mTarget, mId );
+    context.BindTextureForUnit( static_cast<TextureUnit>( textureUnit ), mTarget, mId );
     ApplySampler( context, sampler );
 
     if( mNativeImage )

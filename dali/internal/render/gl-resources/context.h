@@ -262,26 +262,12 @@ public:
    * @param textureunit to bind to
    * @param texture to bind
    */
-  void BindTextureForUnit( TextureUnit textureunit, GLuint texture )
+  void BindTextureForUnit( TextureUnit textureunit, int target, GLuint texture )
   {
-    if( mBound2dTextureId[ textureunit ] != texture )
+    if( mBoundTextureId[ textureunit ] != texture )
     {
       ActiveTexture( textureunit );
-      Bind2dTexture( texture );
-    }
-  }
-
-  /**
-   * Wrapper for OpenGL ES 2.0 glBindTexture(GL_TEXTURE_2D)
-   */
-  void Bind2dTexture( GLuint texture )
-  {
-    if (mBound2dTextureId[ mActiveTextureUnit ] != texture)
-    {
-      mBound2dTextureId[ mActiveTextureUnit ] = texture;
-
-      LOG_GL("BindTexture GL_TEXTURE_2D %d\n", texture);
-      CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(GL_TEXTURE_2D, texture) );
+      BindTexture( target, texture );
     }
   }
 
@@ -290,22 +276,13 @@ public:
    */
   void BindTexture( int target, GLuint texture )
   {
-    if (mBound2dTextureId[ mActiveTextureUnit ] != texture)
+    if (mBoundTextureId[ mActiveTextureUnit ] != texture)
     {
-      mBound2dTextureId[ mActiveTextureUnit ] = texture;
+      mBoundTextureId[ mActiveTextureUnit ] = texture;
 
       LOG_GL("BindTexture target(%d) %d\n", target, texture);
       CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(target, texture) );
     }
-  }
-
-  /**
-   * Wrapper for OpenGL ES 2.0 glBindTexture(GL_TEXTURE_CUBE_MAP)
-   */
-  void BindCubeMapTexture( GLuint texture )
-  {
-    LOG_GL("BindTexture GL_TEXTURE_CUBE_MAP %d\n", texture);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(GL_TEXTURE_CUBE_MAP, texture) );
   }
 
   /**
@@ -669,7 +646,7 @@ public:
     // when creating new textures
     for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
     {
-       mBound2dTextureId[ i ] = 0;
+       mBoundTextureId[ i ] = 0;
     }
   }
 
@@ -1497,10 +1474,15 @@ public:
    */
   void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
+    if( ( func != mStencilFunc ) || ( ref != mStencilFuncRef ) || ( mask != mStencilFuncMask ) )
+    {
+      mStencilFunc = func;
+      mStencilFuncRef = ref;
+      mStencilFuncMask = mask;
 
-
-    LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
+      LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
+    }
   }
 
   /**
@@ -1540,8 +1522,15 @@ public:
    */
   void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
-    LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass) );
+    if( ( fail != mStencilOpFail ) || ( zfail != mStencilOpDepthFail ) || ( zpass != mStencilOpDepthPass ) )
+    {
+      mStencilOpFail = fail;
+      mStencilOpDepthFail = zfail;
+      mStencilOpDepthPass = zpass;
+
+      LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass) );
+    }
   }
 
   /**
@@ -1734,7 +1723,7 @@ private: // Data
 
   // glBindTexture() state
   TextureUnit mActiveTextureUnit;
-  GLuint mBound2dTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture(GL_TEXTURE_2D)
+  GLuint mBoundTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture()
 
   // glBlendColor() state
   Vector4 mBlendColor; ///< Blend color
@@ -1748,6 +1737,14 @@ private: // Data
   // glBlendEquationSeparate state
   GLenum mBlendEquationSeparateModeRGB;    ///< Controls RGB blend mode
   GLenum mBlendEquationSeparateModeAlpha;  ///< Controls Alpha blend mode
+
+  // glStencilFunc() and glStencilOp() state.
+  GLenum mStencilFunc;
+  GLint mStencilFuncRef;
+  GLuint mStencilFuncMask;
+  GLenum mStencilOpFail;
+  GLenum mStencilOpDepthFail;
+  GLenum mStencilOpDepthPass;
 
   GLenum mDepthFunction;  ///The depth function
 
