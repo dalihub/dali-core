@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_DEBUG_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <sstream>
 #include <list>
 #include <stdint.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -40,6 +42,26 @@ struct Vector4;
 class Matrix3;
 class Matrix;
 class Quaternion;
+
+#if defined(DEBUG_ENABLED)
+
+// Less opaque types for debugger
+typedef std::vector<Dali::Property::Value> DebugPropertyValueArray;
+typedef std::pair< Property::Index, Property::Value > DebugIndexValuePair;
+typedef std::vector<Dali::StringValuePair> DebugStringValueContainer;
+typedef std::vector< DebugIndexValuePair > DebugIndexValueContainer;
+
+struct DebugPropertyValueMap
+{
+  DebugStringValueContainer stringValues;
+  DebugIndexValueContainer  intValues;
+};
+
+// Fake globals for gdb typedefs
+extern Dali::DebugPropertyValueArray gValueArray;
+extern Dali::DebugPropertyValueMap   gValueMap;
+
+#endif
 
 namespace Integration
 {

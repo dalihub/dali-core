@@ -736,6 +736,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     case Property::NONE:
     {
       DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
@@ -762,7 +763,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     }
 
     // queue a message to add the property
-    InstallCustomPropertyMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *scenePropertyOwner, newProperty.Release() ); // Message takes ownership
+    InstallCustomPropertyMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *scenePropertyOwner, newProperty ); // Message takes ownership
 
     // notify the derived class (optional) method in case it needs to do some more work on the new property
     // note! have to use the local pointer as OwnerPointer now points to NULL as it handed over its ownership
@@ -1026,9 +1027,9 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
 
     if( sceneObject != NULL )
     {
-      SceneGraph::UniformPropertyMapping* map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
+      OwnerPointer< SceneGraph::UniformPropertyMapping > map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
       // Message takes ownership of Uniform map (and will delete it after copy)
-      AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *sceneObject, map);
+      AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *sceneObject, map );
     }
     else
     {

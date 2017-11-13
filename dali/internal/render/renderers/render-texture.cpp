@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-texture.h>
-#include <dali/devel-api/images/native-image-interface-extension.h>
 
 // EXTERNAL INCLUDES
 #include <math.h>   //floor, log2
+
+// INTERNAL INCLUDES
+#include <dali/devel-api/images/native-image-interface-extension.h>
 
 namespace Dali
 {
@@ -121,43 +123,44 @@ GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )
 }
 
 /**
- * @brief Retrive GL internal format and pixel data type from a Pixel::Format
- * @param[in] pixelFormat The pixel format
- * @param[out] pixelDataType The data type of the pixel data
- * @param[out] internalFormat The internal format
+ * @brief Retrives the GL format, GL internal format and pixel data type from a Pixel::Format
+ * @param[in] pixelFormat The pixel format.
+ * @param[out] glFormat The gl format.
+ * @param[out] glInternalFormat The gl internal format.
+ * @param[out] pixelDataType The data type of the pixel data.
  */
-void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat )
+void PixelFormatToGl( Pixel::Format pixelFormat, GLenum& glFormat, GLint& glInternalFormat, GLenum& pixelDataType )
 {
   // Compressed textures have no pixelDataType, so init to an invalid value:
   pixelDataType  = -1;
 
-  switch( pixelformat )
+  switch( pixelFormat )
   {
     case Pixel::A8:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_ALPHA;
+      glFormat= GL_ALPHA;
       break;
     }
 
     case Pixel::L8:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_LUMINANCE;
+      glFormat= GL_LUMINANCE;
       break;
     }
 
     case Pixel::LA88:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_LUMINANCE_ALPHA;
+      glFormat= GL_LUMINANCE_ALPHA;
       break;
     }
 
     case Pixel::RGB565:
     {
       pixelDataType = GL_UNSIGNED_SHORT_5_6_5;
-      internalFormat= GL_RGB;
+      glFormat= GL_RGB;
       break;
     }
 
@@ -166,9 +169,9 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
       DALI_LOG_ERROR("Pixel format BGR565 is not supported by GLES.\n");
       pixelDataType  = GL_UNSIGNED_SHORT_5_6_5;
 #ifdef _ARCH_ARM_
-      internalFormat= GL_BGRA_EXT; // alpha is reserved but not used
+      glFormat= GL_BGRA_EXT; // alpha is reserved but not used
 #else
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
 #endif
       break;
     }
@@ -176,7 +179,7 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::RGBA4444:
     {
       pixelDataType = GL_UNSIGNED_SHORT_4_4_4_4;
-      internalFormat= GL_RGBA;
+      glFormat= GL_RGBA;
       break;
     }
 
@@ -185,9 +188,9 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
       DALI_LOG_ERROR("Pixel format BGRA4444 is not supported by GLES.\n");
       pixelDataType  = GL_UNSIGNED_SHORT_4_4_4_4;
 #ifdef _ARCH_ARM_
-      internalFormat= GL_BGRA_EXT; // alpha is reserved but not used
+      glFormat= GL_BGRA_EXT; // alpha is reserved but not used
 #else
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
 #endif
       break;
     }
@@ -195,7 +198,7 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::RGBA5551:
     {
       pixelDataType = GL_UNSIGNED_SHORT_5_5_5_1;
-      internalFormat= GL_RGBA;
+      glFormat= GL_RGBA;
       break;
     }
 
@@ -204,9 +207,9 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
       DALI_LOG_ERROR("Pixel format BGRA5551 is not supported by GLES.\n");
       pixelDataType  = GL_UNSIGNED_SHORT_5_5_5_1;
 #ifdef _ARCH_ARM_
-      internalFormat= GL_BGRA_EXT; // alpha is reserved but not used
+      glFormat= GL_BGRA_EXT; // alpha is reserved but not used
 #else
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
 #endif
       break;
     }
@@ -214,14 +217,14 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::RGB888:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_RGB;
+      glFormat= GL_RGB;
       break;
     }
 
     case Pixel::RGB8888:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
       break;
     }
 
@@ -229,9 +232,9 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     {
       pixelDataType = GL_UNSIGNED_BYTE;
 #ifdef GL_BGRA_EXT
-      internalFormat= GL_BGRA_EXT; // alpha is reserved but not used
+      glFormat= GL_BGRA_EXT; // alpha is reserved but not used
 #else
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
 #endif
     break;
     }
@@ -239,7 +242,7 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::RGBA8888:
     {
       pixelDataType = GL_UNSIGNED_BYTE;
-      internalFormat= GL_RGBA;
+      glFormat= GL_RGBA;
       break;
     }
 
@@ -247,9 +250,9 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     {
       pixelDataType = GL_UNSIGNED_BYTE;
 #ifdef GL_BGRA_EXT
-      internalFormat= GL_BGRA_EXT; // alpha is reserved but not used
+      glFormat= GL_BGRA_EXT; // alpha is reserved but not used
 #else
-      internalFormat= GL_RGBA;     // alpha is reserved but not used
+      glFormat= GL_RGBA;     // alpha is reserved but not used
 #endif
       break;
     }
@@ -258,13 +261,13 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::COMPRESSED_RGB8_ETC1:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using non-standard GLES 2.0 extension compressed pixel format COMPRESSED_RGB8_ETC1.\n" );
-      internalFormat = 0x8D64; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
+      glFormat = 0x8D64; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
       break;
     }
     case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using non-standard GLES 2.0 extension compressed pixel format COMPRESSED_RGB_PVRTC_4BPPV1.\n" );
-      internalFormat = 0x8C00; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
+      glFormat = 0x8C00; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
       break;
     }
 
@@ -272,61 +275,61 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::COMPRESSED_R11_EAC:
     {
       DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_R11_EAC.\n");
-      internalFormat = GL_COMPRESSED_R11_EAC;
+      glFormat = GL_COMPRESSED_R11_EAC;
       break;
     }
     case Pixel::COMPRESSED_SIGNED_R11_EAC:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SIGNED_R11_EAC.\n" );
-      internalFormat = GL_COMPRESSED_SIGNED_R11_EAC;
+      glFormat = GL_COMPRESSED_SIGNED_R11_EAC;
       break;
     }
     case Pixel::COMPRESSED_RG11_EAC:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RG11_EAC.\n" );
-      internalFormat = GL_COMPRESSED_RG11_EAC;
+      glFormat = GL_COMPRESSED_RG11_EAC;
       break;
     }
     case Pixel::COMPRESSED_SIGNED_RG11_EAC:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SIGNED_RG11_EAC.\n" );
-      internalFormat = GL_COMPRESSED_SIGNED_RG11_EAC;
+      glFormat = GL_COMPRESSED_SIGNED_RG11_EAC;
       break;
     }
     case Pixel::COMPRESSED_RGB8_ETC2:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGB8_ETC2.\n" );
-      internalFormat = GL_COMPRESSED_RGB8_ETC2;
+      glFormat = GL_COMPRESSED_RGB8_ETC2;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ETC2:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_ETC2.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ETC2;
+      glFormat = GL_COMPRESSED_SRGB8_ETC2;
       break;
     }
     case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2.\n" );
-      internalFormat = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+      glFormat = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+      glFormat = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
       break;
     }
     case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGBA8_ETC2_EAC.\n" );
-      internalFormat = GL_COMPRESSED_RGBA8_ETC2_EAC;
+      glFormat = GL_COMPRESSED_RGBA8_ETC2_EAC;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ETC2_EAC.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
       break;
     }
 
@@ -334,180 +337,210 @@ void PixelFormatToGl( Pixel::Format pixelformat, unsigned& pixelDataType, unsign
     case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_4x4_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_5x4_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_5x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_6x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_6x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x8_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x8_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x10_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_12x10_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
       break;
     }
     case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_12x12_KHR.\n" );
-      internalFormat = GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
+      glFormat = GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
       break;
     }
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
     {
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR.\n" );
-      internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+      break;
+    }
+
+    // GLES 3.0 floating point formats.
+    case Pixel::RGB16F:
+    {
+      glFormat = GL_RGB;
+      pixelDataType = GL_HALF_FLOAT;
+      break;
+    }
+    case Pixel::RGB32F:
+    {
+      glFormat = GL_RGB;
+      pixelDataType = GL_FLOAT;
       break;
     }
 
     case Pixel::INVALID:
     {
       DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
-      internalFormat = 0;
+      glFormat = 0;
       break;
     }
   }
+
+  switch( pixelFormat )
+  {
+    case Pixel::RGB16F:
+    case Pixel::RGB32F: // FALL THROUGH
+    {
+      glInternalFormat = GL_R11F_G11F_B10F;
+      break;
+    }
+    default:
+    {
+      glInternalFormat = glFormat;
+    }
+  }
+
 }
+
 
 /**
  * @brief Whether specified pixel format is compressed.
@@ -533,6 +566,8 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
     case Pixel::BGR8888:
     case Pixel::RGBA8888:
     case Pixel::BGRA8888:
+    case Pixel::RGB16F:
+    case Pixel::RGB32F:
     case Pixel::INVALID:
     {
       return false;
@@ -589,34 +624,41 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 } //Unnamed namespace
 
 
-Texture::Texture( Type type, Pixel::Format format, unsigned int width, unsigned int height )
-:mId( 0 ),
- mTarget( (type == TextureType::TEXTURE_2D)? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
- mType( type ),
- mSampler(),
- mNativeImage(),
- mInternalFormat(GL_RGB),
- mPixelDataType(GL_UNSIGNED_BYTE),
- mWidth( width ),
- mHeight( height ),
- mHasAlpha( HasAlpha( format ) ),
- mIsCompressed( IsCompressedFormat( format ) )
+Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
+: mNativeImage(),
+  mSampler(),
+  mId( 0 ),
+  mTarget( ( type == TextureType::TEXTURE_2D ) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP ),
+  mGlInternalFormat( GL_RGB ),
+  mGlFormat( GL_RGB ),
+  mPixelDataType( GL_UNSIGNED_BYTE ),
+  mWidth( size.GetWidth() ),
+  mHeight( size.GetHeight() ),
+  mMaxMipMapLevel( 0 ),
+  mType( type ),
+  mHasAlpha( HasAlpha( format ) ),
+  mIsCompressed( IsCompressedFormat( format ) )
 {
-  PixelFormatToGl( format, mPixelDataType, mInternalFormat );
+  PixelFormatToGl( format,
+                   mGlFormat,
+                   mGlInternalFormat,
+                   mPixelDataType );
 }
 
 Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
-:mId( 0 ),
- mTarget( GL_TEXTURE_2D ),
- mType( TextureType::TEXTURE_2D ),
- mSampler(),
- mNativeImage( nativeImageInterface ),
- mInternalFormat(GL_RGB),
- mPixelDataType(GL_UNSIGNED_BYTE),
- mWidth( nativeImageInterface->GetWidth() ),
- mHeight( nativeImageInterface->GetHeight() ),
- mHasAlpha( nativeImageInterface->RequiresBlending() ),
- mIsCompressed( false )
+: mNativeImage( nativeImageInterface ),
+  mSampler(),
+  mId( 0 ),
+  mTarget( GL_TEXTURE_2D ),
+  mGlInternalFormat( GL_RGB ),
+  mGlFormat( GL_RGB ),
+  mPixelDataType( GL_UNSIGNED_BYTE ),
+  mWidth( nativeImageInterface->GetWidth() ),
+  mHeight( nativeImageInterface->GetHeight() ),
+  mMaxMipMapLevel( 0 ),
+  mType( TextureType::TEXTURE_2D ),
+  mHasAlpha( nativeImageInterface->RequiresBlending() ),
+  mIsCompressed( false )
 {
 }
 
@@ -689,11 +731,11 @@ void Texture::Initialize(Context& context)
     {
       if( !mIsCompressed )
       {
-        context.TexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+        context.TexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, 0 );
       }
       else
       {
-        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
+        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, 0 );
       }
     }
     else if( mType == TextureType::TEXTURE_CUBE )
@@ -702,14 +744,14 @@ void Texture::Initialize(Context& context)
       {
         for( unsigned int i(0); i<6; ++i )
         {
-          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, mInternalFormat, mPixelDataType, 0 );
+          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, 0 );
         }
       }
       else
       {
         for( unsigned int i(0); i<6; ++i )
         {
-          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, mWidth, mHeight, 0, 0, 0 );
+          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, 0 );
         }
       }
       context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
@@ -727,14 +769,29 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   //This buffer is only used if manually converting from RGB to RGBA
   unsigned char* tempBuffer(0);
 
-  //Get pixel format and data type of the data contained in the PixelData object
-  GLenum pixelDataFormat, pixelDataElementType;
-  PixelFormatToGl( pixelData->GetPixelFormat(), pixelDataElementType, pixelDataFormat );
+  //Retrieves the pixel data element type, the gl format and gl internal format of the data contained in the PixelData object.
+  GLenum glFormat;
+  GLint glInternalFormat;
+  GLenum pixelDataElementType;
+  PixelFormatToGl( pixelData->GetPixelFormat(), glFormat, glInternalFormat, pixelDataElementType );
 
-#if DALI_GLES_VERSION < 30
-  if( pixelDataFormat == GL_RGB && mInternalFormat == GL_RGBA )
+  //Get the maximum mipmap level to set GL_TEXTURE_MAX_LEVEL parameter in GLES3x because is not
+  //necessary to upload all the mipmap levels
+  mMaxMipMapLevel = ( mMaxMipMapLevel > params.mipmap ) ? mMaxMipMapLevel : params.mipmap;
+
+  const bool isSubImage = ( ( params.xOffset != 0 ) ||
+                            ( params.yOffset != 0 ) ||
+                            ( params.width  != ( mWidth  / ( 1 << params.mipmap ) ) ) ||
+                            ( params.height != ( mHeight / ( 1 << params.mipmap ) ) ) );
+
+  bool convert = ( ( glFormat == GL_RGB ) && ( mGlFormat == GL_RGBA ) );
+#if DALI_GLES_VERSION >= 30
+  // Don't convert manually from RGB to RGBA if GLES >= 3.0 and a sub-image is uploaded.
+  convert = convert && !isSubImage;
+#endif
+
+  if( convert )
   {
-    //Convert manually from RGB to RGBA if GLES < 3 ( GLES 3 can do the conversion automatically when uploading )
     size_t dataSize = static_cast< size_t >( params.width ) * params.height;
     tempBuffer = new unsigned char[dataSize*4u];
     for( size_t i(0u); i<dataSize; i++ )
@@ -746,9 +803,8 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
     }
 
     buffer = tempBuffer;
-    pixelDataFormat = mInternalFormat;
+    glFormat = mGlFormat; // Set the glFormat to GL_RGBA
   }
-#endif
 
   //Upload data to the texture
 
@@ -761,18 +817,16 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
 
   context.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-  if( params.xOffset == 0 && params.yOffset == 0 &&
-      params.width  == ( mWidth  / (1<<params.mipmap) ) &&
-      params.height == ( mHeight / (1<<params.mipmap) ) )
+  if( !isSubImage )
   {
     //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
     if( !mIsCompressed )
     {
-      context.TexImage2D( target, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelDataFormat, pixelDataElementType, buffer );
+      context.TexImage2D( target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, glFormat, pixelDataElementType, buffer );
     }
     else
     {
-      context.CompressedTexImage2D( target, params.mipmap, mInternalFormat, params.width, params.height, 0, pixelData->GetBufferSize(), buffer );
+      context.CompressedTexImage2D( target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, pixelData->GetBufferSize(), buffer );
     }
   }
   else
@@ -782,13 +836,13 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
     {
       context.TexSubImage2D( target, params.mipmap,
                              params.xOffset, params.yOffset, params.width, params.height,
-                             pixelDataFormat, pixelDataElementType, buffer );
+                             glFormat, pixelDataElementType, buffer );
     }
     else
     {
       context.CompressedTexSubImage2D( target, params.mipmap,
                                        params.xOffset, params.yOffset, params.width, params.height,
-                                       pixelDataFormat, pixelData->GetBufferSize(), buffer );
+                                       glFormat, pixelData->GetBufferSize(), buffer );
     }
   }
 
@@ -806,8 +860,7 @@ bool Texture::Bind( Context& context, unsigned int textureUnit, Render::Sampler*
 
   if( mId != 0 )
   {
-    context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
-    context.BindTexture( mTarget, mId );
+    context.BindTextureForUnit( static_cast<TextureUnit>( textureUnit ), mTarget, mId );
     ApplySampler( context, sampler );
 
     if( mNativeImage )
@@ -860,6 +913,15 @@ void Texture::ApplySampler( Context& context, Render::Sampler* sampler )
         context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, mode );
       }
     }
+
+#if DALI_GLES_VERSION >= 30
+    //In GLES 3.0 we do not need to upload all of the mipmap levels, but GL_TEXTURE_MAX_LEVEL must be set
+    if(mMaxMipMapLevel)
+    {
+      context.TexParameteri( mTarget, GL_TEXTURE_MAX_LEVEL, mMaxMipMapLevel );
+    }
+#endif
+
   }
 }
 
@@ -870,6 +932,8 @@ bool Texture::HasAlphaChannel()
 
 void Texture::GenerateMipmaps( Context& context )
 {
+  //GL_TEXTURE_MAX_LEVEL does not need to be set when mipmaps are generated by GL
+  mMaxMipMapLevel = 0;
   context.BindTexture( mTarget, mId );
   context.GenerateMipmap( mTarget );
 }

@@ -128,7 +128,10 @@ Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylis
   mEndAction( endAction ),
   mDisconnectAction( disconnectAction ),
   mDefaultAlpha( defaultAlpha ),
-  mState(Dali::Animation::STOPPED)
+  mState(Dali::Animation::STOPPED),
+  mProgressReachedMarker( 0.0f ),
+  mDelaySeconds( 0.0f ),
+  mAutoReverseEnabled( false )
 {
 }
 
@@ -160,14 +163,10 @@ void Animation::CreateSceneObject()
 {
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
-  // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
-
-  // Keep a const pointer to the animation.
-  mAnimation = animation;
-
-  // Transfer animation ownership to the update manager through a message
-  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), animation );
+  // Create a new animation, Keep a const pointer to the animation.
+  mAnimation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
+  OwnerPointer< SceneGraph::Animation > transferOwnership( const_cast< SceneGraph::Animation* >( mAnimation ) );
+  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void Animation::DestroySceneObject()
@@ -193,6 +192,17 @@ void Animation::SetDuration(float seconds)
 
   // mAnimation is being used in a separate thread; queue a message to set the value
   SetDurationMessage( mEventThreadServices, *mAnimation, seconds );
+}
+
+void Animation::SetProgressNotification( float progress )
+{
+  // mAnimation is being used in a separate thread; queue a message to set the value
+  mProgressReachedMarker = progress;
+}
+
+float Animation::GetProgressNotification()
+{
+  return mProgressReachedMarker;
 }
 
 float Animation::GetDuration() const
@@ -269,6 +279,8 @@ void Animation::Play()
 
   NotifyObjects();
 
+  SendFinalProgressNotificationMessage();
+
   // mAnimation is being used in a separate thread; queue a Play message
   PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
@@ -284,9 +296,31 @@ void Animation::PlayFrom( float progress )
 
     NotifyObjects();
 
+    SendFinalProgressNotificationMessage();
+
     // mAnimation is being used in a separate thread; queue a Play message
     PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
   }
+}
+
+void Animation::PlayAfter( float delaySeconds )
+{
+  // The negative delay means play immediately.
+  delaySeconds = std::max( 0.f, delaySeconds );
+
+  mDelaySeconds = delaySeconds;
+
+  // Update the current playlist
+  mPlaylist.OnPlay( *this );
+
+  mState = Dali::Animation::PLAYING;
+
+  NotifyObjects();
+
+  SendFinalProgressNotificationMessage();
+
+  // mAnimation is being used in a separate thread; queue a message to set the value
+  PlayAfterMessage( mEventThreadServices, *mAnimation, delaySeconds );
 }
 
 void Animation::Pause()
@@ -774,12 +808,26 @@ Dali::Animation::AnimationSignalType& Animation::FinishedSignal()
   return mFinishedSignal;
 }
 
+Dali::Animation::AnimationSignalType& Animation::ProgressReachedSignal()
+{
+  return mProgressReachedSignal;
+}
+
 void Animation::EmitSignalFinish()
 {
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Animation handle( this );
     mFinishedSignal.Emit( handle );
+  }
+}
+
+void Animation::EmitSignalProgressReached()
+{
+  if ( !mProgressReachedSignal.Empty() )
+  {
+    Dali::Animation handle( this );
+    mProgressReachedSignal.Emit( handle );
   }
 }
 
@@ -976,6 +1024,19 @@ Vector2 Animation::GetPlayRange() const
   return mPlayRange;
 }
 
+void Animation::SetLoopingMode( Dali::Animation::LoopingMode loopingMode )
+{
+  mAutoReverseEnabled = ( loopingMode == Dali::Animation::LoopingMode::AUTO_REVERSE );
+
+  // mAnimation is being used in a separate thread; queue a message to set play range
+  SetLoopingModeMessage( mEventThreadServices, *mAnimation, mAutoReverseEnabled );
+}
+
+Dali::Animation::LoopingMode Animation::GetLoopingMode() const
+{
+  return mAutoReverseEnabled ? Dali::Animation::AUTO_REVERSE : Dali::Animation::RESTART;
+}
+
 bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
 {
   return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
@@ -1001,6 +1062,16 @@ void Animation::NotifyObjects()
         object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
       }
     }
+  }
+}
+
+
+void Animation::SendFinalProgressNotificationMessage()
+{
+  if ( mProgressReachedMarker > 0.0f )
+  {
+    float progressMarkerSeconds = mDurationSeconds * mProgressReachedMarker;
+    SetProgressNotificationMessage( mEventThreadServices, *mAnimation, progressMarkerSeconds );
   }
 }
 

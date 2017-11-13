@@ -2,7 +2,7 @@
 #define __DALI_COMMON_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-
-#ifdef EMSCRIPTEN
-#include <emscripten/emscripten.h>
-#endif
 
 /*
  * Definitions for shared library support.
@@ -64,21 +60,6 @@
 #define _CPP11
 #else
 // C++0x not supported
-#endif
-
-#ifdef EMSCRIPTEN
-
-#ifndef __clang__
-# error not clang?
-#endif
-
-// clang cpp11 check is per feature
-#if !__has_feature(cxx_constexpr)
-# error constexpr needed for compile-time-math. Use -std=c+11
-#endif
-
-#define _CPP11
-
 #endif
 
 /**
@@ -170,24 +151,12 @@ public:
 #define ASSERT_LOCATION NULL
 #endif
 
-#ifdef EMSCRIPTEN
-
-#define DALI_ASSERT_ALWAYS(cond)                \
-  if(DALI_UNLIKELY(!(cond))) \
-  { \
-    Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
-    throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
-    EM_ASM(print(new Error().stack)); \
-  }
-#else
-
 #define DALI_ASSERT_ALWAYS(cond)                \
   if(DALI_UNLIKELY(!(cond))) \
   { \
     Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
     throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
   }
-#endif
 
 #define DALI_ABORT(message)                \
   { \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/signals/functor-delegate.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/compile-time-assert.h>
+// EXTERNAL INCLUDES
+#include <type_traits>
 
 namespace Dali
 {
@@ -31,9 +31,7 @@ namespace
  * functions and regular functions.
  * If this assert fails, please implement the template specialisation for C functions.
  */
-#if !defined(EMSCRIPTEN)
-DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ) );
-#endif
+static_assert( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ), "Need to implement template specialisation for C functions" );
 }
 
 FunctorDelegate::~FunctorDelegate()

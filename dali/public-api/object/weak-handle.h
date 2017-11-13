@@ -1,8 +1,8 @@
-#ifndef __DALI_WEAK_HANDLE_H__
-#define __DALI_WEAK_HANDLE_H__
+#ifndef DALI_WEAK_HANDLE_H
+#define DALI_WEAK_HANDLE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,18 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_object
+ * @{
+ */
 
 /**
- * @brief Base class to store a weak pointer to an internal Dali object. The handle to the object
- * can be accessed if the object exists, and such access is not reference counted. When the object
- * is deleted, the weak pointer will be set to NULL, and any further attmpt to access to a deleted
- * object will return an empty handle.
+ * @brief Base class to store a weak pointer to an internal DALi object.
  *
+ * The handle to the object can be accessed if the object exists, and such access is not reference counted.
+ * When the object is deleted, the weak pointer will be set to NULL, and any further attempt to access to a
+ * deleted object will return an empty handle.
+ * @SINCE_1_2.60
  */
 class DALI_IMPORT_API WeakHandleBase
 {
@@ -39,24 +44,28 @@ public:
 
   /**
    * @brief Default constructor which provides an uninitialized Dali::WeakHandleBase.
+   * @SINCE_1_2.60
    */
   WeakHandleBase();
 
   /**
-   * @brief This constructor creates a weak handle of the Dali object.
+   * @brief This constructor creates a weak handle of the DALi object.
    *
-   * @param [in] handle A reference to the handle of the Dali object.
+   * @SINCE_1_2.60
+   * @param [in] handle A reference to the handle of the DALi object
    */
   WeakHandleBase( Handle& handle );
 
   /**
    * @brief Destructor to free resources.
+   * @SINCE_1_2.60
    */
   ~WeakHandleBase();
 
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_2.60
    * @param [in] handle A reference to the copied WeakHandleBase
    */
   WeakHandleBase(const WeakHandleBase& handle);
@@ -64,7 +73,8 @@ public:
   /**
    * @brief Assignment operator.
    *
-   * It makes this WeakHandleBase point to the same internal Dali object as the copied WeakHandleBase
+   * It makes this WeakHandleBase point to the same internal DALi object as the copied WeakHandleBase
+   * @SINCE_1_2.60
    * @param [in] rhs  A reference to the copied WeakHandleBase
    * @return A reference to this WeakHandleBase
    */
@@ -73,41 +83,49 @@ public:
   /**
    * @brief Equality operator overload.
    *
-   * @param [in] rhs A reference to the compared WeakHandleBase.
-   * @return true if the handle points to the same Dali resource, or if both are uninitialized.
+   * @SINCE_1_2.60
+   * @param [in] rhs A reference to the compared WeakHandleBase
+   * @return true if the handle points to the same DALi resource, or if both are uninitialized
    */
   bool operator==(const WeakHandleBase& rhs) const;
 
   /**
    * @brief Inequality operator overload.
    *
-   * @param [in] rhs A reference to the compared WeakHandleBase.
-   * @return true if the handle points to the different Dali resources.
+   * @SINCE_1_2.60
+   * @param [in] rhs A reference to the compared WeakHandleBase
+   * @return true if the handle points to the different DALi resources
    */
   bool operator!=(const WeakHandleBase& rhs) const;
 
   /**
-   * @brief Gets the handle to the Dali object.
+   * @brief Gets the handle to the DALi object.
    *
-   * @return The handle of the Dali object pointed by this WeakHandleBase or an empty handle if the Dali object doesn't exist.
+   * @SINCE_1_2.60
+   * @return The handle of the DALi object pointed by this WeakHandleBase or an empty handle if the DALi object doesn't exist
    */
   Handle GetBaseHandle() const;
 
   /**
-   * @brief Resets this weak handle to not point to any Dali object
+   * @brief Resets this weak handle to not point to any DALi object
+   * @SINCE_1_2.60
    */
   void Reset();
 
 
 protected:
 
+  /// @cond internal
   struct Impl;
   Impl* mImpl;
+  /// @endcond
 };
 
 
 /**
- * @brief Weak handle for the given type of Dali object.
+ * @brief Weak handle for the given type of DALi object.
+ * @SINCE_1_2.60
+ * @see WeakHandleBase
  */
 template < class T >
 class WeakHandle : public WeakHandleBase
@@ -185,6 +203,9 @@ public:
   }
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
-#endif // __DALI_WEAK_HANDLE_H__
+#endif // DALI_WEAK_HANDLE_H

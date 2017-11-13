@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_STAGE_H__
-#define __DALI_INTERNAL_STAGE_H__
+#ifndef DALI_INTERNAL_STAGE_H
+#define DALI_INTERNAL_STAGE_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ struct Vector2;
 namespace Integration
 {
 class SystemOverlay;
+class RenderController;
 }
 
 namespace Internal
@@ -76,16 +77,19 @@ public:
    * @param[in] propertyNotificationManager
    * @param[in] updateManager
    * @param[in] notificationManager
+   * @param[in] renderController
    */
   static StagePtr New( AnimationPlaylist& playlist,
                        PropertyNotificationManager& propertyNotificationManager,
                        SceneGraph::UpdateManager& updateManager,
-                       NotificationManager& notificationManager );
+                       NotificationManager& notificationManager,
+                       Integration::RenderController& renderController );
 
   /**
    * Initialize the stage.
+   * @param[in] renderToFbo Whether to render into a Frame Buffer Object.
    */
-  void Initialize();
+  void Initialize( bool renderToFbo );
 
   /**
    * Uninitialize the stage.
@@ -425,6 +429,11 @@ public: // Implementation of EventThreadServices
   virtual SceneGraph::UpdateManager& GetUpdateManager();
 
   /**
+   * @copydoc EventThreadServices::GetRenderController
+   */
+  virtual Integration::RenderController& GetRenderController();
+
+  /**
    * @copydoc EventThreadServices::ReserveMessageSlot
    */
   virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene );
@@ -433,6 +442,16 @@ public: // Implementation of EventThreadServices
    * @copydoc EventThreadServices::GetEventBufferIndex
    */
   virtual BufferIndex GetEventBufferIndex() const;
+
+  /**
+   * @copydoc EventThreadServices::ForceNextUpdate
+   */
+  virtual void ForceNextUpdate();
+
+  /**
+   * @copydoc EventThreadServices::IsNextUpdateForced
+   */
+  virtual bool IsNextUpdateForced();
 
   /**
    * Request that the depth tree is rebuilt
@@ -453,7 +472,8 @@ private:
   Stage( AnimationPlaylist& playlist,
          PropertyNotificationManager& propertyNotificationManager,
          SceneGraph::UpdateManager& updateManager,
-         NotificationManager& notificationManager );
+         NotificationManager& notificationManager,
+         Integration::RenderController& renderController );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -470,6 +490,8 @@ private:
   SceneGraph::UpdateManager& mUpdateManager;
 
   NotificationManager& mNotificationManager;
+
+  Integration::RenderController& mRenderController;
 
   // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 mSize;
@@ -514,7 +536,6 @@ private:
   // The touched signals
   Dali::Stage::TouchedSignalType                  mTouchedSignal;
   Dali::Stage::TouchSignalType                    mTouchSignal;
-  bool mDepthTreeDirty; ///< True if the depth tree needs recalculating
 
   // The wheel event signal
   Dali::Stage::WheelEventSignalType               mWheelEventSignal;
@@ -523,6 +544,10 @@ private:
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 
   Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
+
+  bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
+  bool mForceNextUpdate:1; ///< True if the next rendering is really required.
+  bool mRenderToFbo:1;     ///< Whether to render to a Frame Buffer Object.
 };
 
 } // namespace Internal
@@ -549,4 +574,4 @@ inline const Internal::Stage& GetImplementation(const Dali::Stage& stage)
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_STAGE_H__
+#endif // DALI_INTERNAL_STAGE_H

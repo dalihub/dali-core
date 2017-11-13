@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ RenderMessageDispatcher::~RenderMessageDispatcher()
 {
 }
 
-void RenderMessageDispatcher::AddRenderer( Render::Renderer& renderer )
+void RenderMessageDispatcher::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
 {
   // Message has ownership of renderer while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Renderer > > DerivedType;
@@ -53,7 +53,7 @@ void RenderMessageDispatcher::AddRenderer( Render::Renderer& renderer )
   unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderer, &renderer );
+  new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderer, renderer );
 }
 
 void RenderMessageDispatcher::RemoveRenderer( Render::Renderer& renderer )

@@ -1,5 +1,5 @@
-#ifndef __DALI_ANIMATION_H__
-#define __DALI_ANIMATION_H__
+#ifndef DALI_ANIMATION_H
+#define DALI_ANIMATION_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -158,6 +158,17 @@ public:
     STOPPED,   ///< Animation has stopped @SINCE_1_1.21
     PLAYING,   ///< The animation is playing @SINCE_1_1.21
     PAUSED     ///< The animation is paused @SINCE_1_1.21
+  };
+
+  /**
+   * @brief Enumeration for what looping mode is in.
+   *
+   * @SINCE_1_2.60
+   */
+  enum LoopingMode
+  {
+    RESTART,      ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning. @SINCE_1_2.60
+    AUTO_REVERSE  ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again. @SINCE_1_2.60
   };
 
   /**
@@ -340,7 +351,7 @@ public:
    */
   AlphaFunction GetDefaultAlphaFunction() const;
 
-  /*
+  /**
    * @brief Sets the progress of the animation.
    *
    * The animation will play (or continue playing) from this point. The progress
@@ -419,6 +430,16 @@ public:
   void PlayFrom( float progress );
 
   /**
+   * @brief Play the animation after a given delay time.
+   *
+   * The delay time is not included in the looping time.
+   * When the delay time is negative value, it would treat as play immediately.
+   * @SINCE_1_2.60
+   * @param[in] delaySeconds The delay time
+   */
+  void PlayAfter( float delaySeconds );
+
+  /**
    * @brief Pauses the animation.
    * @SINCE_1_0.0
    */
@@ -444,6 +465,23 @@ public:
    * @SINCE_1_0.0
    */
   void Clear();
+
+  /**
+   * @brief Sets the looping mode.
+   *
+   * Animation plays forwards and then restarts from the beginning or runs backwards again.
+   * @SINCE_1_2.60
+   * @param[in] loopingMode The looping mode is one of RESTART and AUTO_REVERSE
+   */
+  void SetLoopingMode( LoopingMode loopingMode );
+
+  /**
+   * @brief Gets one of the current looping mode.
+   *
+   * @SINCE_1_2.60
+   * @return The current looping mode
+   */
+  LoopingMode GetLoopingMode() const;
 
   /**
    * @brief Connects to this signal to be notified when an Animation's animations have finished.
@@ -720,4 +758,4 @@ public: // Not intended for use by Application developers
  */
 } // namespace Dali
 
-#endif // __DALI_ANIMATION_H__
+#endif // DALI_ANIMATION_H

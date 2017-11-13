@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTIVE_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,33 +173,21 @@ private:
       if( targetProperty->IsTransformManagerProperty() )  //It is a property managed by the transform manager
       {
         // Connect the constraint
-        SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraph::Constraint<PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
-                                                                                      propertyOwners,
-                                                                                      func );
-        DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
-        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
-
-        // object is being used in a separate thread; queue a message to apply the constraint
-        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
-
-        // Keep a raw-pointer to the scene-graph constraint
-        mSceneGraphConstraint = sceneGraphConstraint;
+        mSceneGraphConstraint = SceneGraph::Constraint<PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
+                                                                                                                           propertyOwners,
+                                                                                                                           func,
+                                                                                                                           mRemoveAction );
       }
       else  //SceneGraph property
       {
         // Connect the constraint
-        SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
-                                                                                      propertyOwners,
-                                                                                      func );
-        DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
-        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
-
-        // object is being used in a separate thread; queue a message to apply the constraint
-        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
-
-        // Keep a raw-pointer to the scene-graph constraint
-        mSceneGraphConstraint = sceneGraphConstraint;
+        mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
+                                                           propertyOwners,
+                                                           func,
+                                                           mRemoveAction );
       }
+      OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
+      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, transferOwnership );
     }
   }
 
@@ -408,8 +396,6 @@ private:
 
       const int componentIndex = mTargetObject->GetPropertyComponentIndex( mTargetIndex );
 
-      SceneGraph::ConstraintBase* sceneGraphConstraint( NULL );
-
       if ( Property::INVALID_COMPONENT_INDEX == componentIndex )
       {
         // Not a Vector2, Vector3 or Vector4 component, expecting float type
@@ -417,9 +403,7 @@ private:
 
         typedef SceneGraph::Constraint< float, PropertyAccessor<float> > SceneGraphConstraint;
 
-        sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
-                                                           propertyOwners,
-                                                           func );
+        mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
       }
       else
       {
@@ -432,12 +416,12 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector2> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector2> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
         }
         else if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
@@ -448,17 +432,17 @@ private:
             if ( 0 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,0> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
             else if ( 1 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,1> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
             else if ( 2 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,2> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
           }
           else
@@ -466,17 +450,17 @@ private:
             if ( 0 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
             else if ( 1 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
             else if ( 2 == componentIndex )
             {
               typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
-              sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+              mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
           }
         }
@@ -487,36 +471,30 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
           else if ( 2 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
           else if ( 3 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorW<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+            mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
         }
       }
 
-      DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
-      if( NULL != sceneGraphConstraint )
+      if( mSceneGraphConstraint )
       {
-        sceneGraphConstraint->SetRemoveAction( mRemoveAction );
-
-        // object is being used in a separate thread; queue a message to apply the constraint
-        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
-
-        // Keep a raw-pointer to the scene-graph constraint
-        mSceneGraphConstraint = sceneGraphConstraint;
+        OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
+        ApplyConstraintMessage( GetEventThreadServices(), *targetObject, transferOwnership );
       }
     }
   }

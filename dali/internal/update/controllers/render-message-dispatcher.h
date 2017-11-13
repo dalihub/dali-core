@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
@@ -32,7 +33,6 @@ class MessageBase;
 
 namespace Render
 {
-class Renderer;
 class RenderTracker;
 }
 namespace SceneGraph
@@ -63,7 +63,7 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer ownership is transferred.
    */
-  void AddRenderer( Render::Renderer& renderer );
+  void AddRenderer( OwnerPointer< Render::Renderer >& renderer );
 
   /**
    * Remove a Renderer.

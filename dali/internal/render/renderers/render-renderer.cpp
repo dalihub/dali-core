@@ -164,14 +164,14 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProvider )
+void Renderer::SetRenderDataProvider( OwnerPointer<SceneGraph::RenderDataProvider>& dataProvider )
 {
   mRenderDataProvider = dataProvider;
   mUpdateAttributesLocation = true;
 
-  //Check that the number of textures match the number of samplers in the shader
-  size_t textureCount =  dataProvider->GetTextures().size();
-  Program* program = dataProvider->GetShader().GetProgram();
+  // Check that the number of textures match the number of samplers in the shader
+  size_t textureCount =  mRenderDataProvider->GetTextures().size();
+  Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( program && program->GetActiveSamplerCount() != textureCount )
   {
     DALI_LOG_WARNING("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",

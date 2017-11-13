@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -325,6 +325,10 @@ int UtcDaliFramebufferContextLoss(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
   DALI_TEST_CHECK( frameBuffer );
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   application.SendNotification();
   application.Render(16);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ int UtcDaliPixelHasAlpha(void)
 
   tet_infoline("UtcDaliPixelHasAlpha");
 
-  TestPixelEnumSize( 54 );
+  TestPixelEnumSize( 56 );
 
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::INVALID ) == false ); // For completeness
 
@@ -111,6 +111,9 @@ int UtcDaliPixelHasAlpha(void)
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR ) == true );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR ) == true );
 
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB16F ) == false );
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB32F ) == false );
+
   END_TEST;
 }
 
@@ -125,6 +128,9 @@ int UtcDaliPixelGetBytesPerPixel(void)
   TestApplication application;
 
   tet_infoline("UtcDaliPixelGetBytesPerPixel");
+
+  // Be sure that the number of cases tested below is correct:
+  TestPixelEnumSize( 56 );
 
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::INVALID ) == 0 ); // For completeness
 
@@ -190,6 +196,9 @@ int UtcDaliPixelGetBytesPerPixel(void)
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR ) == 0 );
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR ) == 0 );
 
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::RGB16F ) == 12 );
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::RGB32F ) == 24 );
+
   END_TEST;
 }
 
@@ -209,7 +218,7 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   int bitMask = 0;
 
   // Be sure that the number of cases tested below is correct:
-  TestPixelEnumSize( 54 );
+  TestPixelEnumSize( 56 );
 
   Pixel::GetAlphaOffsetAndMask( Pixel::INVALID, byteOffset, bitMask ); // For completeness
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
@@ -323,6 +332,11 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   Pixel::GetAlphaOffsetAndMask( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR, byteOffset, bitMask );
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
   Pixel::GetAlphaOffsetAndMask( Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR, byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+
+  Pixel::GetAlphaOffsetAndMask( Pixel::RGB16F, byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+  Pixel::GetAlphaOffsetAndMask( Pixel::RGB32F, byteOffset, bitMask );
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
 
   END_TEST;

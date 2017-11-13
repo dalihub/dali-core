@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_EVENT_THREAD_SERVICES_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,11 @@ namespace Dali
 {
 
 class BaseObject;
+
+namespace Integration
+{
+class RenderController;
+}
 
 namespace Internal
 {
@@ -74,6 +79,13 @@ public:
   virtual SceneGraph::UpdateManager& GetUpdateManager() = 0;
 
   /**
+   * @brief Get a reference to the RenderController
+   *
+   * @return the render controller
+   */
+  virtual Integration::RenderController& GetRenderController() = 0;
+
+  /**
    * Reserve space for another message in the queue; this must then be initialized by the caller.
    * The message will be read from the update-thread after the next FlushMessages is called.
    * @post Calling this method may invalidate any previously returned slots.
@@ -87,6 +99,18 @@ public:
    * @return the current event-buffer index.
    */
   virtual BufferIndex GetEventBufferIndex() const  = 0;
+
+  /**
+   * @brief Indicate that the next rendering is really required.
+   */
+  virtual void ForceNextUpdate() = 0;
+
+  /**
+   * @brief Check if the next rendering is really required.
+   *
+   * @return true if the next rendering is really required.
+   */
+  virtual bool IsNextUpdateForced() = 0;
 
   /**
    * @return true if core is still running and we can send messages

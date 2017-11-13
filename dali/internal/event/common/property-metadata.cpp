@@ -57,6 +57,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     case Property::BOOLEAN:
     case Property::INTEGER:
     case Property::FLOAT:
@@ -165,6 +166,7 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::STRING:
       case Property::ARRAY:
       case Property::MAP:
+      case Property::EXTENTS:
       case Property::BOOLEAN:
       case Property::INTEGER:
       case Property::FLOAT:
@@ -262,6 +264,7 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     case Property::MATRIX:
     case Property::MATRIX3:
     {

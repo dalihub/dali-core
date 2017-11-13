@@ -51,6 +51,8 @@ bool gHoverCallBackCalled=false;
 
 static bool gTestConstraintCalled;
 
+LayoutDirection::Type gLayoutDirectionType;
+
 struct TestConstraint
 {
   void operator()( Vector4& color, const PropertyInputContainer& /* inputs */ )
@@ -3945,18 +3947,23 @@ int UtcDaliActorRemoveRendererN(void)
 }
 
 // Clipping test helper functions:
-Actor CreateActorWithContent()
+Actor CreateActorWithContent( uint32_t width, uint32_t height)
 {
-  BufferImage image = BufferImage::New( 16u, 16u );
+  BufferImage image = BufferImage::New( width, height );
   Actor actor = CreateRenderableActor( image );
 
   // Setup dimensions and position so actor is not skipped by culling.
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  actor.SetSize( 16.0f, 16.0f );
+  actor.SetSize( width, height );
   actor.SetParentOrigin( ParentOrigin::CENTER );
   actor.SetAnchorPoint( AnchorPoint::CENTER );
 
   return actor;
+}
+
+Actor CreateActorWithContent16x16()
+{
+  return CreateActorWithContent( 16, 16 );
 }
 
 void GenerateTrace( TestApplication& application, TraceCallStack& enabledDisableTrace, TraceCallStack& stencilTrace )
@@ -3986,7 +3993,7 @@ void CheckColorMask( TestGlAbstraction& glAbstraction, bool maskValue )
 int UtcDaliActorPropertyClippingP(void)
 {
   // This test checks the clippingMode property.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE P" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: P" );
   TestApplication application;
 
   Actor actor = Actor::New();
@@ -4003,7 +4010,7 @@ int UtcDaliActorPropertyClippingP(void)
     DALI_TEST_EQUALS<int>( value, ClippingMode::DISABLED, TEST_LOCATION );
   }
 
-  // Check setting the property.
+  // Check setting the property to the stencil mode.
   actor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
   // Check the new value was set.
@@ -4016,13 +4023,25 @@ int UtcDaliActorPropertyClippingP(void)
     DALI_TEST_EQUALS<int>( value, ClippingMode::CLIP_CHILDREN, TEST_LOCATION );
   }
 
+  // Check setting the property to the scissor mode.
+  actor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  // Check the new value was set.
+  getValue = actor.GetProperty( Actor::Property::CLIPPING_MODE );
+  getValueResult = getValue.Get( value );
+  DALI_TEST_CHECK( getValueResult );
+
+  if( getValueResult )
+  {
+    DALI_TEST_EQUALS<int>( value, ClippingMode::CLIP_TO_BOUNDING_BOX, TEST_LOCATION );
+  }
   END_TEST;
 }
 
 int UtcDaliActorPropertyClippingN(void)
 {
   // Negative test case for Clipping.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE N" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: N" );
   TestApplication application;
 
   Actor actor = Actor::New();
@@ -4057,7 +4076,7 @@ int UtcDaliActorPropertyClippingN(void)
 int UtcDaliActorPropertyClippingActor(void)
 {
   // This test checks that an actor is correctly setup for clipping.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor" );
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4066,7 +4085,7 @@ int UtcDaliActorPropertyClippingActor(void)
   size_t startIndex = 0u;
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
@@ -4093,7 +4112,7 @@ int UtcDaliActorPropertyClippingActor(void)
 int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
 {
   // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor enable and then disable" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable" );
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4102,7 +4121,7 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   size_t startIndex = 0u;
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
@@ -4139,36 +4158,35 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   END_TEST;
 }
 
-
 int UtcDaliActorPropertyClippingNestedChildren(void)
 {
   // This test checks that a hierarchy of actors are clipped correctly by
   // writing to and reading from the correct bit-planes of the stencil buffer.
-  tet_infoline( "Testing Actor::Property::CLIPPING_MODE nested children" );
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN nested children" );
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& stencilTrace = glAbstraction.GetStencilFunctionTrace();
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
   // Create a child actor.
-  Actor childDepth2 = CreateActorWithContent();
+  Actor childDepth2 = CreateActorWithContent16x16();
   actorDepth1Clip.Add( childDepth2 );
 
   // Create another clipping actor.
-  Actor childDepth2Clip = CreateActorWithContent();
+  Actor childDepth2Clip = CreateActorWithContent16x16();
   childDepth2Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   childDepth2.Add( childDepth2Clip );
 
   // Create another 2 child actors. We do this so 2 nodes will have the same clipping ID.
   // This tests the sort algorithm.
-  Actor childDepth3 = CreateActorWithContent();
+  Actor childDepth3 = CreateActorWithContent16x16();
   childDepth2Clip.Add( childDepth3 );
-  Actor childDepth4 = CreateActorWithContent();
+  Actor childDepth4 = CreateActorWithContent16x16();
   childDepth3.Add( childDepth4 );
 
   // Gather the call trace.
@@ -4218,6 +4236,280 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyClippingActorDrawOrder(void)
+{
+  // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN draw order" );
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  /* We create a small tree of actors as follows:
+
+                           A
+                          / \
+     Clipping enabled -> B   D
+                         |   |
+                         C   E
+
+     The correct draw order is "ABCDE" (the same as if clipping was not enabled).
+  */
+  Actor actors[5];
+  for( int i = 0; i < 5; ++i )
+  {
+    BufferImage image = BufferImage::New( 16u, 16u );
+    Actor actor = CreateRenderableActor( image );
+
+    // Setup dimensions and position so actor is not skipped by culling.
+    actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+    actor.SetSize( 16.0f, 16.0f );
+
+    if( i == 0 )
+    {
+      actor.SetParentOrigin( ParentOrigin::CENTER );
+    }
+    else
+    {
+      float b = i > 2 ? 1.0f : -1.0f;
+      actor.SetParentOrigin( Vector3( 0.5 + ( 0.2f * b ), 0.8f, 0.8f ) );
+    }
+
+    actors[i] = actor;
+  }
+
+  // Enable clipping on the actor at the top of the left branch.
+  actors[1].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  // Build the scene graph.
+  Stage::GetCurrent().Add( actors[0] );
+
+  // Left branch:
+  actors[0].Add( actors[1] );
+  actors[1].Add( actors[2] );
+
+  // Right branch:
+  actors[0].Add( actors[3] );
+  actors[3].Add( actors[4] );
+
+  // Gather the call trace.
+  enabledDisableTrace.Reset();
+  enabledDisableTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+  enabledDisableTrace.Enable( false );
+
+  /* Check stencil is enabled and disabled again (as right-hand branch of tree is drawn).
+
+     Note: Correct enable call trace:    StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960 StackTrace: Index:2, Function:Disable, ParamList:2960
+           Incorrect enable call trace:  StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960
+  */
+  size_t startIndex = 0u;
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Enable",  "3042", startIndex ) );
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Enable",  "2960", startIndex ) ); // 2960 is GL_STENCIL_TEST
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Disable", "2960", startIndex ) );
+
+  // Swap the clipping actor from top of left branch to top of right branch.
+  actors[1].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+  actors[3].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  // Gather the call trace.
+  enabledDisableTrace.Reset();
+  enabledDisableTrace.Enable( true );
+  application.SendNotification();
+  application.Render();
+  enabledDisableTrace.Enable( false );
+
+  // Check stencil is enabled but NOT disabled again (as right-hand branch of tree is drawn).
+  // This proves the draw order has remained the same.
+  startIndex = 0u;
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex(  "Enable",  "2960", startIndex ) );
+  DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Disable", "2960", startIndex ) );
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActor(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 imageSize( 16.0f, 16.0f );
+
+  // Create a clipping actor.
+  Actor clippingActorA = CreateActorWithContent16x16();
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  Stage::GetCurrent().Add( clippingActorA );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+  compareParametersString << "0, 0, " << imageSize.x << ", " << imageSize.y;
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 0, 0, 16, 16
+
+  clippingActorA.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check the scissor was set, and the coordinates are correct.
+  compareParametersString.str( std::string() );
+  compareParametersString.clear();
+  compareParametersString << ( stageSize.x - imageSize.x ) << ", " << ( stageSize.y - imageSize.y ) << ", " << imageSize.x << ", " << imageSize.y;
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 464, 784, 16, 16
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActorSiblings(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actors which are siblings" );
+  TestApplication application;
+
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 sizeA{ stageSize.width, stageSize.height * 0.25f };
+  const Vector2 sizeB{ stageSize.width, stageSize.height * 0.05f };
+
+  // Create a clipping actors.
+  Actor clippingActorA = CreateActorWithContent( sizeA.width, sizeA.height );
+  Actor clippingActorB = CreateActorWithContent( sizeB.width, sizeB.height );
+
+  clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorB.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
+  clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  Stage::GetCurrent().Add( clippingActorA );
+  Stage::GetCurrent().Add( clippingActorB );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+
+  std::string clipA( "0, 500, 480, 200" );
+  std::string clipB( "0, 380, 480, 40" );
+
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipA ) );
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipB ) );
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActorNested(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 imageSize( 16.0f, 16.0f );
+
+  /* Create a nest of 2 scissors to test nesting (intersecting clips).
+
+     A is drawn first - with scissor clipping on
+     B is drawn second - also with scissor clipping on
+     C is the generated clipping region, the intersection ( A ∩ B )
+
+           ┏━━━━━━━┓                   ┌───────┐
+           ┃     B ┃                   │     B │
+       ┌───╂┄┄┄┐   ┃               ┌┄┄┄╆━━━┓   │
+       │   ┃   ┊   ┃     ━━━━━>    ┊   ┃ C ┃   │
+       │   ┗━━━┿━━━┛               ┊   ┗━━━╃───┘
+       │ A     │                   ┊ A     ┊
+       └───────┘                   └┄┄┄┄┄┄┄┘
+
+     We then reposition B around each corner of A to test the 4 overlap combinations (thus testing intersecting works correctly).
+  */
+
+  // Create a clipping actor.
+  Actor clippingActorA = CreateActorWithContent16x16();
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetParentOrigin( ParentOrigin::CENTER );
+  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  Stage::GetCurrent().Add( clippingActorA );
+
+  // Create a child clipping actor.
+  Actor clippingActorB = CreateActorWithContent16x16();
+  clippingActorB.SetParentOrigin( ParentOrigin::CENTER );
+  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+  clippingActorA.Add( clippingActorB );
+
+  // positionModifiers is an array of positions to position B around.
+  // expect is an array of expected scissor clip coordinate results.
+  const Vector2 positionModifiers[4] = { Vector2( 1.0f, 1.0f ),     Vector2( -1.0f, 1.0f ),    Vector2( -1.0f, -1.0f ),   Vector2( 1.0f, -1.0f )    };
+  const Vector4 expect[4] =            { Vector4( 240, 392, 8, 8 ), Vector4( 232, 392, 8, 8 ), Vector4( 232, 400, 8, 8 ), Vector4( 240, 400, 8, 8 ) };
+
+  // Loop through each overlap combination.
+  for( unsigned int test = 0u; test < 4u; ++test )
+  {
+    // Position the child clipping actor so it intersects with the 1st clipping actor. This changes each loop.
+    const Vector2 position = ( imageSize / 2.0f ) * positionModifiers[test];
+    clippingActorB.SetPosition( position.x, position.y );
+
+    // Gather the call trace.
+    GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+    // Check we are writing to the color buffer.
+    CheckColorMask( glAbstraction, true );
+
+    // Check scissor test was enabled.
+    DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+    // Check the scissor was set, and the coordinates are correct.
+    const Vector4& expectResults( expect[test] );
+    std::stringstream compareParametersString;
+    compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
+    DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with the expected result
+  }
+
+  END_TEST;
+}
+
 int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 {
   // This test checks that an actor with clipping will be ignored if overridden by the Renderer properties.
@@ -4229,7 +4521,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
   // Create a clipping actor.
-  Actor actorDepth1Clip = CreateActorWithContent();
+  Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   Stage::GetCurrent().Add( actorDepth1Clip );
 
@@ -4249,6 +4541,19 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilFunc" ) );
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilMask" ) );
   DALI_TEST_CHECK( !stencilTrace.FindMethod( "StencilOp" ) );
+
+  // Check that scissor clipping is overriden by the renderer properties.
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+
+  actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check the stencil buffer was not enabled.
+  DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );    // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  DALI_TEST_CHECK( !scissorTrace.FindMethod( "StencilFunc" ) );
 
   END_TEST;
 }
@@ -4337,7 +4642,7 @@ int UtcDaliActorRaiseLower(void)
   Property::Value value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
-  DevelActor::Raise( actorB );
+  actorB.Raise();
   // Ensure sort order is calculated before next touch event
   application.SendNotification();
 
@@ -4359,7 +4664,7 @@ int UtcDaliActorRaiseLower(void)
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
-  DevelActor::Lower( actorB );
+  actorB.Lower();
   application.SendNotification(); // ensure sort order calculated before next touch event
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
@@ -4486,7 +4791,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorA\n" );
 
-  DevelActor::RaiseToTop( actorA );
+  actorA.RaiseToTop();
   application.SendNotification(); // ensure sorting order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -4517,7 +4822,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorB\n" );
 
-  DevelActor::RaiseToTop( actorB );
+  actorB.RaiseToTop();
   application.SendNotification(); // Ensure sort order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -4548,11 +4853,11 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "LowerToBottom ActorA then ActorB leaving Actor C at Top\n" );
 
-  DevelActor::LowerToBottom( actorA );
+  actorA.LowerToBottom();
   application.SendNotification();
   application.Render();
 
-  DevelActor::LowerToBottom( actorB );
+  actorB.LowerToBottom();
   application.SendNotification();
   application.Render();
 
@@ -4651,7 +4956,7 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor B Above Actor C\n" );
 
-  DevelActor::RaiseAbove( actorB, actorC );
+  actorB.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -4665,7 +4970,7 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor A Above Actor B\n" );
 
-  DevelActor::RaiseAbove( actorA, actorB );
+  actorA.RaiseAbove( actorB );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -4734,9 +5039,14 @@ int UtcDaliActorLowerBelow(void)
   actorC.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
 
-  stage.Add( actorA );
-  stage.Add( actorB );
-  stage.Add( actorC );
+  Actor container = Actor::New();
+  container.SetParentOrigin( ParentOrigin::CENTER );
+  container.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  stage.Add( container );
+
+  container.Add( actorA );
+  container.Add( actorB );
+  container.Add( actorC );
 
   ResetTouchCallbacks();
 
@@ -4794,7 +5104,7 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
 
-  DevelActor::LowerBelow( actorC, actorB );
+  actorC.LowerBelow( actorB );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -4814,10 +5124,38 @@ int UtcDaliActorLowerBelow(void)
   indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
-  tet_infoline( "Testing B above A and C at bottom\n" );
-  bool BAC = ( indexB > indexA) &&  ( indexA > indexC ); // B at TOP, then A then C at bottom
+  tet_infoline( "Testing render order is A, C, B" );
+  DALI_TEST_EQUALS( indexC > indexA, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexB > indexC, true, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( BAC, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
+
+  ResetTouchCallbacks();
+
+  tet_printf( "Lower actor C below Actor A leaving B on top\n" );
+
+  actorC.LowerBelow( actorA );
+  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( touchEvent );
+
+  glAbstraction.ResetSetUniformCallStack();
+  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  application.Render();
+  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
+
+  // Test order of uniforms in stack
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
+
+  DALI_TEST_EQUALS( indexA > indexC, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexB > indexA, true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( gTouchCallBackCalled2, true, TEST_LOCATION );
@@ -4827,7 +5165,7 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor B below Actor C leaving A on top\n" );
 
-  DevelActor::LowerBelow( actorB, actorC );
+  actorB.LowerBelow( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -4845,101 +5183,14 @@ int UtcDaliActorLowerBelow(void)
   indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
   indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
 
-  bool ACB = ( indexA > indexC) &&  ( indexC > indexB ); // A on TOP, then C then B at bottom
-
-  DALI_TEST_EQUALS( ACB, true, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( gTouchCallBackCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( gTouchCallBackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( gTouchCallBackCalled3, false , TEST_LOCATION );
-
-  ResetTouchCallbacks();
-
-  tet_printf( "Lower actor A below Actor C leaving C on top\n" );
-
-  DevelActor::LowerBelow( actorA, actorC );
-  // Ensure sorting happens at end of Core::ProcessEvents() before next touch
-  application.SendNotification();
-  application.Render();
-
-  application.ProcessEvent( touchEvent );
-
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
-
-  application.Render();
-  tet_printf( "Trace:%s \n", glSetUniformStack.GetTraceString().c_str() );
-
-  // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "3" );
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "2" );
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams( "uRendererColor",  "1" );
-
-  bool CAB = ( indexC > indexA) &&  ( indexA > indexB );
-
-  DALI_TEST_EQUALS( CAB, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexC > indexB, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( indexA > indexC, true, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliActorMaxSiblingOrder(void)
-{
-  tet_infoline( "UtcDaliActor De-fragment of sibling order once max index reached\n" );
 
-  TestApplication application;
-
-  int testOrders[] = { 0,1,3,5,17,998, 999 };
-  int resultingOrders[] = { 0,1,2,3,4,6,5 };
-
-  const int TEST_ORDERS_COUNT = sizeof( testOrders ) / sizeof( testOrders[0] );
-
-  Stage stage( Stage::GetCurrent() );
-
-  Actor parent = Actor::New();
-
-  for ( int index = 0; index < TEST_ORDERS_COUNT; index++ )
-  {
-    Actor newActor = Actor::New();
-    newActor.SetProperty(Dali::DevelActor::Property::SIBLING_ORDER, testOrders[index] );
-    parent.Add( newActor );
-  }
-  stage.Add( parent );
-
-  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
-  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
-  {
-    Actor sibling = parent.GetChildAt( index );
-    int siblingOrder = 0;
-    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
-    value.Get( siblingOrder );
-    tet_printf( "%d, ", siblingOrder );
-  }
-  tet_printf( "\n" );
-
-  Actor sibling = parent.GetChildAt( 5 );
-  DevelActor::RaiseToTop( sibling );
-
-  // Ensure sorting happens at end of Core::ProcessEvents()
-  application.SendNotification();
-  application.Render();
-
-  tet_printf( "Sibling Order %d children :",  parent.GetChildCount() );
-  for ( unsigned int index = 0; index < parent.GetChildCount(); index ++)
-  {
-    Actor sibling = parent.GetChildAt( index );
-    int siblingOrder = 0;
-    Property::Value value = sibling.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
-    value.Get( siblingOrder );
-    tet_printf( "%d, ", siblingOrder );
-    DALI_TEST_EQUALS( siblingOrder,  resultingOrders[ index] , TEST_LOCATION );
-  }
-
-  tet_printf( "\n" );
-
-  END_TEST;
-}
-
-int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
+int UtcDaliActorRaiseAboveDifferentParentsN(void)
 {
   tet_infoline( "UtcDaliActor RaiseToAbove test with actor and target actor having different parents \n" );
 
@@ -5023,7 +5274,7 @@ int UtcDaliActorRaiseAboveLowerBelowDifferentParentsN(void)
 
   tet_printf( "Raise actor A Above Actor C which have different parents\n" );
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5092,7 +5343,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Raise actor A Above Actor C which have no parents\n" );
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5108,7 +5359,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   stage.Add ( actorB );
   tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
-  DevelActor::LowerBelow( actorA, actorC );
+  actorA.LowerBelow( actorC );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -5130,7 +5381,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   application.Render();
 
   tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
-  DevelActor::RaiseAbove( actorB, actorC );
+  actorB.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5144,7 +5395,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
-  DevelActor::LowerBelow( actorA, actorC );
+  actorA.LowerBelow( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5158,7 +5409,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   ResetTouchCallbacks();
 
   stage.Add ( actorC );
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5220,7 +5471,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   stage.Add ( actorA );
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
-  DevelActor::Raise( actorB );
+  actorB.Raise();
 
   application.SendNotification();
   application.Render();
@@ -5236,7 +5487,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
   ResetTouchCallbacks();
 
-  DevelActor::Lower( actorC );
+  actorC.Lower();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5252,7 +5503,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Lower actor C below B but C not parented\n" );
 
-  DevelActor::Lower( actorB );
+  actorB.Lower();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5268,7 +5519,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Raise actor B to top\n" );
 
-  DevelActor::RaiseToTop( actorB );
+  actorB.RaiseToTop();
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5288,7 +5539,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   tet_printf( "Lower actor C to Bottom, B stays at top\n" );
 
-  DevelActor::LowerToBottom( actorC );
+  actorC.LowerToBottom();
   application.SendNotification();
   application.Render();
 
@@ -5367,7 +5618,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
-  DevelActor::RaiseAbove( actorA, actorA );
+  actorA.RaiseAbove( actorA );
   application.SendNotification();
   application.Render();
 
@@ -5381,7 +5632,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   ResetTouchCallbacks();
 
-  DevelActor::RaiseAbove( actorA, actorC );
+  actorA.RaiseAbove( actorC );
   application.SendNotification();
   application.Render();
 
@@ -5491,6 +5742,26 @@ int UtcDaliActorGetScreenPosition(void)
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0\n",  actorWorldPosition.x, actorWorldPosition.y );
   tet_printf( "Actor Screen Position( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0 \n", actorScreenPosition.x, actorScreenPosition.y );
 
+  tet_infoline( "UtcDaliActorGetScreenPosition Scale parent and check child's screen position \n" );
+
+  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetPosition( 30.0, 30.0 );
+
+  Actor actorB = Actor::New();
+  actorB.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorB.SetSize( size2 );
+  actorB.SetPosition( 10.f, 10.f );
+  actorA.Add( actorB );
+
+  actorA.SetScale( 2.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  actorScreenPosition = actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+
+  DALI_TEST_EQUALS( actorScreenPosition.x,  50lu , TEST_LOCATION );
+  DALI_TEST_EQUALS( actorScreenPosition.y,  50lu , TEST_LOCATION );
 
   END_TEST;
 }
@@ -6079,6 +6350,100 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   application.Render( 1100 ); // After the animation
 
   DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+static void LayoutDirectionChanged( Actor actor, LayoutDirection::Type type )
+{
+  gLayoutDirectionType = type;
+}
+
+int UtcDaliActorLayoutDirectionProperty(void)
+{
+  TestApplication application;
+  tet_infoline( "Check layout direction property" );
+
+  Actor actor0 = Actor::New();
+  DALI_TEST_EQUALS( actor0.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Stage::GetCurrent().Add( actor0 );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor1 = Actor::New();
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor2 = Actor::New();
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor3 = Actor::New();
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor4 = Actor::New();
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor5 = Actor::New();
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor6 = Actor::New();
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor7 = Actor::New();
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor8 = Actor::New();
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Actor actor9 = Actor::New();
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
+  actor1.Add( actor2 );
+  gLayoutDirectionType = LayoutDirection::LEFT_TO_RIGHT;
+  actor2.LayoutDirectionChangedSignal().Connect( LayoutDirectionChanged );
+
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor1.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( actor1.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( gLayoutDirectionType, LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION );
+
+  actor1.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  actor0.Add( actor1 );
+  DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor3 );
+  actor3.Add( actor4 );
+  actor4.Add( actor5 );
+  actor5.Add( actor6 );
+  actor5.Add( actor7 );
+  actor7.Add( actor8 );
+  actor8.Add( actor9 );
+  actor3.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
+  actor5.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
+
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), true, TEST_LOCATION );
+  actor8.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, false );
+  DALI_TEST_EQUALS( actor8.GetProperty< bool >( Actor::Property::INHERIT_LAYOUT_DIRECTION ), false, TEST_LOCATION );
+
+  actor7.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
+
+  DALI_TEST_EQUALS( actor3.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor4.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor5.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor6.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
+  actor8.SetProperty( Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT" );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  actor7.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
+  DALI_TEST_EQUALS( actor7.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  actor8.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
+  DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   END_TEST;
 }

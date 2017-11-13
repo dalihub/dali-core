@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,8 @@ struct DALI_IMPORT_API Property
     ROTATION,        ///< either a quaternion or an axis angle rotation @SINCE_1_0.0
     STRING,          ///< A string type @SINCE_1_0.0
     ARRAY,           ///< an array of Property::Value @SINCE_1_0.0
-    MAP              ///< a string key to Property:value mapping @SINCE_1_0.0
+    MAP,             ///< a string key to Property:value mapping @SINCE_1_0.0
+    EXTENTS          ///< a collection of 4 x uint16_t @SINCE_1_2.62
   };
 
   /**

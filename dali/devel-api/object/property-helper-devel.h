@@ -31,9 +31,6 @@
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
   DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
-/**
- * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL
- */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty ); \
   DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
@@ -98,5 +95,31 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( objectNamespace, objectType, text, valueType, enumIndex ) \
   DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex  )
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION
+ *
+ * @note Animatable property registration
+ */
+#define DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
+  DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, DALI_TOKEN_PASTE( Devel, objectType ), text, valueType, enumIndex )
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION
+ *
+ * @note Animatable property registration with default value
+ *
+ */
+#define DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( objectNamespace, objectType, text, value, enumIndex ) \
+  DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, DALI_TOKEN_PASTE( Devel, objectType ) , text, value, enumIndex )
+
+/**
+ * @copydoc DALI_DEVEL_PROPERTY_REGISTRATION
+ *
+ * @note Component registration for a Devel Animatable property
+ *
+ */
+#define DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex ) \
+  DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, DALI_TOKEN_PASTE( Devel, objectType ), text, enumIndex, baseEnumIndex, componentIndex )
 
 #endif // __DALI_PROPERTY_HELPER_DEVEL_H__

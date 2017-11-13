@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,8 @@ namespace
  * @param[in] rhs Right hand side item
  * @return True if left item is greater than right
  */
-bool PartialCompareItems( const RenderInstructionProcessor::SortAttributes& lhs,
-                          const RenderInstructionProcessor::SortAttributes& rhs )
+inline bool PartialCompareItems( const RenderInstructionProcessor::SortAttributes& lhs,
+                                 const RenderInstructionProcessor::SortAttributes& rhs )
 {
   if( lhs.shader == rhs.shader )
   {
@@ -86,27 +86,9 @@ bool CompareItems( const RenderInstructionProcessor::SortAttributes& lhs, const 
   // encapsulates the same data (e.g. the middle-order bits of the ptrs).
   if( lhs.renderItem->mDepthIndex == rhs.renderItem->mDepthIndex )
   {
-    return PartialCompareItems(lhs, rhs);
+    return PartialCompareItems( lhs, rhs );
   }
   return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
-}
-
-/**
- * Function which sorts render items by clipping hierarchy, then depth index and instance
- * ptrs of shader/geometry/material.
- * @param[in] lhs Left hand side item
- * @param[in] rhs Right hand side item
- * @return True if left item is greater than right
- */
-bool CompareItemsWithClipping( const RenderInstructionProcessor::SortAttributes& lhs, const RenderInstructionProcessor::SortAttributes& rhs )
-{
-  // Items must be sorted in order of clipping first, otherwise incorrect clipping regions could be used.
-  if( lhs.renderItem->mNode->mClippingSortModifier == rhs.renderItem->mNode->mClippingSortModifier )
-  {
-    return CompareItems( lhs, rhs );
-  }
-
-  return lhs.renderItem->mNode->mClippingSortModifier < rhs.renderItem->mNode->mClippingSortModifier;
 }
 
 /**
@@ -118,7 +100,7 @@ bool CompareItemsWithClipping( const RenderInstructionProcessor::SortAttributes&
  */
 bool CompareItems3D( const RenderInstructionProcessor::SortAttributes& lhs, const RenderInstructionProcessor::SortAttributes& rhs )
 {
-  bool lhsIsOpaque = lhs.renderItem->mIsOpaque;
+  const bool lhsIsOpaque = lhs.renderItem->mIsOpaque;
   if( lhsIsOpaque == rhs.renderItem->mIsOpaque )
   {
     if( lhsIsOpaque )
@@ -180,7 +162,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
   bool inside( true );
   const Node* node = renderable.mNode;
 
-  if( cull && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
+  if( cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside = ( boundingSphere.w > Math::MACHINE_EPSILON_1000 ) &&
@@ -189,20 +171,28 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if( inside )
   {
-    Renderer::Opacity opacity = renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode );
+    Renderer::Opacity opacity = renderable.mRenderer ? renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
     if( opacity != Renderer::TRANSPARENT )
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
-      item.mRenderer = &renderable.mRenderer->GetRenderer();
-      item.mNode = renderable.mNode;
-      item.mTextureSet = renderable.mRenderer->GetTextures();
-      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
-      item.mDepthIndex = renderable.mRenderer->GetDepthIndex();
 
+      item.mNode = renderable.mNode;
+      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
       if( !isLayer3d )
       {
-        item.mDepthIndex += renderable.mNode->GetDepthIndex();
+        item.mDepthIndex = renderable.mNode->GetDepthIndex();
+      }
+
+      if( DALI_LIKELY( renderable.mRenderer ) )
+      {
+        item.mRenderer =   &renderable.mRenderer->GetRenderer();
+        item.mTextureSet =  renderable.mRenderer->GetTextures();
+        item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
+      }
+      else
+      {
+        item.mRenderer = nullptr;
       }
 
       // Save ModelView matrix onto the item.
@@ -307,10 +297,9 @@ RenderInstructionProcessor::RenderInstructionProcessor()
 : mSortingHelper()
 {
   // Set up a container of comparators for fast run-time selection.
-  mSortComparitors.Reserve( 4u );
+  mSortComparitors.Reserve( 3u );
 
   mSortComparitors.PushBack( CompareItems );
-  mSortComparitors.PushBack( CompareItemsWithClipping );
   mSortComparitors.PushBack( CompareItems3D );
   mSortComparitors.PushBack( CompareItems3DWithClipping );
 }
@@ -346,7 +335,10 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
+      if( item.mRenderer )
+      {
+        item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
+      }
 
       // texture set
       mSortingHelper[ index ].textureSet = item.mTextureSet;
@@ -378,12 +370,11 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
     }
   }
 
-  // Here we detemine which comparitor (of the 4) to use.
-  // The comparitors work like a bitmask.
-  //   1 << 0  is added to select a clipping comparitor.
-  //   1 << 1  is added for 3D comparitors.
-  const unsigned int comparitorIndex = ( respectClippingOrder                         ? ( 1u << 0u ) : 0u ) |
-                                       ( layer.GetBehavior() == Dali::Layer::LAYER_3D ? ( 1u << 1u ) : 0u );
+  // Here we determine which comparitor (of the 3) to use.
+  //   0 is LAYER_UI
+  //   1 is LAYER_3D
+  //   2 is LAYER_3D + Clipping
+  const unsigned int comparitorIndex = layer.GetBehavior() == Dali::Layer::LAYER_3D ? respectClippingOrder ? 2u : 1u : 0u;
 
   std::stable_sort( mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[ comparitorIndex ] );
 

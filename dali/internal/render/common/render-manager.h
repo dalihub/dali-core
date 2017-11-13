@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer is owned by RenderManager
    */
-  void AddRenderer( Render::Renderer* renderer );
+  void AddRenderer( OwnerPointer< Render::Renderer >& renderer );
 
   /**
    * Remove a Renderer from the render manager.
@@ -152,7 +152,7 @@ public:
    * @param[in] sampler The sampler to add.
    * @post sampler is owned by RenderManager
    */
-  void AddSampler( Render::Sampler* sampler );
+  void AddSampler( OwnerPointer< Render::Sampler >& sampler );
 
   /**
    * Remove a sampler from the render manager.
@@ -181,7 +181,7 @@ public:
    * @param[in] propertyBuffer The property buffer to add.
    * @post propertBuffer is owned by RenderManager
    */
-  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer );
+  void AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer );
 
   /**
    * Remove a property buffer from the render manager.
@@ -195,7 +195,7 @@ public:
    * @param[in] geometry The geometry to add.
    * @post geometry is owned by RenderManager
    */
-  void AddGeometry( Render::Geometry* geometry );
+  void AddGeometry( OwnerPointer< Render::Geometry >& geometry );
 
   /**
    * Remove a geometry from the render manager.
@@ -209,7 +209,7 @@ public:
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer to remove.
    */
-  void AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
+  void AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Remove a property buffer from a Render::Geometry from the render manager.
@@ -224,7 +224,7 @@ public:
    * @param[in] propertyBuffer The property buffer.
    * @param[in] format The new format of the buffer
    */
-  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format );
+  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format );
 
   /**
    * Sets the data of an existing property buffer
@@ -232,7 +232,7 @@ public:
    * @param[in] data The new data of the buffer
    * @param[in] size The new size of the buffer
    */
-  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size );
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
 
   /**
    * Sets the data for the index buffer of an existing geometry
@@ -252,7 +252,7 @@ public:
    * Adds a texture to the render manager
    * @param[in] texture The texture to add
    */
-  void AddTexture( Render::Texture* texture );
+  void AddTexture( OwnerPointer< Render::Texture >& texture );
 
   /**
    * Removes a texture from the render manager
@@ -319,7 +319,7 @@ public:
 
   /**
    * Renders the results of the previous "update" traversal.
-   * @param[out] status contains the flag that indicates if render instructions exist
+   * @param[out] status contains the rendering flags.
    */
   void Render( Integration::RenderStatus& status );
 
