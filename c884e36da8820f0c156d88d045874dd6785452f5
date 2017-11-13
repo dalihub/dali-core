@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a3eacf2c_0d267746",
+        "filename": "dali/internal/render/renderers/render-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 741,
+      "author": {
+        "id": 1012192
+      },
+      "writtenOn": "2017-11-13T15:40:27Z",
+      "side": 1,
+      "message": "It is possible this condition is different for GLES \u003e\u003d 30, it needs to be verified.",
+      "range": {
+        "startLine": 741,
+        "startChar": 2,
+        "endLine": 741,
+        "endChar": 63
+      },
+      "revId": "c884e36da8820f0c156d88d045874dd6785452f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
