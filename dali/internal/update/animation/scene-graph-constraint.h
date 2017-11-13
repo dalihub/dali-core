@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,18 +52,21 @@ public:
    * @param[in] targetProperty The target property.
    * @param[in] ownerSet A set of property owners; func is connected to the properties provided by these objects.
    * @param[in] func The function to calculate the final constrained value.
+   * @param[in] removeAction Remove action to perform when constraint is removed
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New( const PropertyBase& targetProperty,
                               PropertyOwnerContainer& ownerContainer,
-                              ConstraintFunctionPtr func )
+                              ConstraintFunctionPtr func,
+                              RemoveAction removeAction )
   {
     // Scene-graph thread can edit these objects
     PropertyBase& property = const_cast< PropertyBase& >( targetProperty );
 
     return new Constraint< PropertyType, PropertyAccessorType >( property,
                                                                  ownerContainer,
-                                                                 func );
+                                                                 func,
+                                                                 removeAction );
   }
 
   /**
@@ -113,8 +116,9 @@ private:
    */
   Constraint( PropertyBase& targetProperty,
               PropertyOwnerContainer& ownerContainer,
-              ConstraintFunctionPtr func )
-  : ConstraintBase( ownerContainer ),
+              ConstraintFunctionPtr func,
+              RemoveAction removeAction )
+  : ConstraintBase( ownerContainer, removeAction ),
     mTargetProperty( &targetProperty ),
     mFunc( func )
   {

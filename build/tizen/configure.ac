@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ AC_SUBST(DALI_VERSION)
 DALI_CFLAGS=-DPLATFORM_TIZEN
 
 # Use C++ 11
-DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast"
+DALI_CFLAGS="$DALI_CFLAGS -std=c++11 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal"
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],
@@ -44,12 +44,6 @@ AC_ARG_ENABLE([debug],
                               [Turns on debugging])],
               [enable_debug=$enableval],
               [enable_debug=no])
-
-AC_ARG_ENABLE([emscripten],
-              [AC_HELP_STRING([--enable-emscripten],
-                              [Emscripten builds])],
-              [enable_emscripten=$enableval],
-              [enable_emscripten=no])
 
 AC_ARG_ENABLE([backtrace],
               [AC_HELP_STRING([--enable-backtrace],
@@ -69,6 +63,25 @@ AC_ARG_ENABLE([gles],
               [enable_gles=$enableval],
               [enable_gles=20])
 
+AC_ARG_ENABLE([cxx03_abi],
+              [AC_HELP_STRING([--enable-cxx03-abi],
+                              [Specify abi for the build])],
+              [enable_cxx03_abi=$enableval],
+              [enable_cxx03_abi=no])
+
+AC_ARG_ENABLE([rename_so],
+              [AC_HELP_STRING([--enable-rename-so],
+                              [Specify whether so file is renamed or not])],
+              [enable_rename_so=$enableval],
+              [enable_rename_so=yes])
+
+AM_CONDITIONAL([ENABLE_CXX03_ABI], [test x$enable_cxx03_abi = xyes])
+AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
+
+if test "x$enable_cxx03_abi" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
+fi
+
 AC_ARG_ENABLE([vulkan],
               [AC_HELP_STRING([--enable-vulkan],
                               [Enables Vulkan support])],
@@ -85,20 +98,12 @@ if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_CFLAGS="$DALI_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
-if test "x$enable_emscripten" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
-  # Automatically turn off backtrace support and mutex locks
-  enable_backtrace="no"
-  enable_lock_backtrace="no"
-fi
-
-# Must come after Emscripten feature test
 if test "x$enable_lock_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DLOCK_BACKTRACE_ENABLED"
   enable_backtrace="yes"
 fi
 
-# Must come after Emscripten & locks backtrace feature test
+# Must come after locks backtrace feature test
 if test "x$enable_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DBACKTRACE_ENABLED"
 fi
@@ -141,12 +146,15 @@ AC_SUBST(DALI_LDFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
-AC_CONFIG_FILES([
- Makefile
- dali-core/Makefile
- dali-core/graphics/Makefile
- dali-core.pc
-])
+AC_CONFIG_FILES([Makefile dali-core/Makefile dali-core/graphics/Makefile])
+
+if test "x$enable_cxx03_abi" = "xyes"; then
+AC_CONFIG_FILES([dali-core-cxx03.pc])
+fi
+
+if test "x$enable_cxx03_abi" != "xyes"; then
+AC_CONFIG_FILES([dali-core.pc])
+fi
 
 AC_OUTPUT
 
@@ -157,7 +165,6 @@ Configuration
   Debug Build:                      $enable_debug
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
-  Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
   Vulkan Support:                   $enable_vulkan

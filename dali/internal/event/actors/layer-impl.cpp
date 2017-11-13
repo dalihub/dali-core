@@ -96,12 +96,11 @@ LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool syst
 {
   LayerPtr root( new Layer( Actor::ROOT_LAYER ) );
 
-  // Second-phase construction
-  SceneGraph::Layer* layer = static_cast<SceneGraph::Layer*>( root->CreateNode() );
-  InstallRootMessage( manager, *layer, systemLevel ); // Transfer ownership to scene-graph
-
-  // Keep a raw pointer to the layer node.
-  root->mNode = layer;
+  // Second-phase construction, keep a raw pointer to the layer node.
+  SceneGraph::Layer* rootLayer = static_cast<SceneGraph::Layer*>( root->CreateNode() );
+  root->mNode = rootLayer;
+  OwnerPointer< SceneGraph::Layer > transferOwnership( rootLayer );
+  InstallRootMessage( manager, transferOwnership, systemLevel );
 
   // root actor is immediately considered to be on-stage
   root->mIsOnStage = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1338,6 +1338,28 @@ int UtcDaliVectorMatrixP(void)
   tet_result(TET_PASS); // for now
   END_TEST;
 }
+
+int UtcDaliVectorCpp11ForP(void)
+{
+  Vector< Vector3 > classvector;
+  for ( auto i : classvector )
+  {
+    std::ignore = i;
+    tet_result( TET_FAIL );
+  }
+
+  classvector.PushBack( Vector3( 0.1f, 0.2f, 0.3f ) );
+  classvector.PushBack( Vector3( 0.1f, 0.2f, 0.3f ) );
+  classvector.PushBack( Vector3( 0.1f, 0.2f, 0.3f ) );
+
+  for ( auto i : classvector )
+  {
+    DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), i, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 
 /*
  * this does not compile at the moment

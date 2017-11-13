@@ -880,7 +880,7 @@ int UtcDaliTypeRegistryRegisteredNameN(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "Duplicate type name for Type Registation", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Duplicate type name in Type Registration", TEST_LOCATION );
   }
 
   END_TEST;
@@ -1429,6 +1429,16 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 3u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
 
+  // Attempt to animate component property, it should not crash
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( customActor, animatablePropertyComponentIndex1 ), 200.0f );
+  animation.Play();
+
+  // Check the property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(200.0f, 225.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 225.0f, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1715,6 +1725,8 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   Property::Type type = typeInfoImpl.GetChildPropertyType( typeInfoImpl.GetChildPropertyIndex("childProp4") );
   DALI_TEST_EQUALS( type, Property::INTEGER, TEST_LOCATION );
 
+  std::string unRegisteredChildName( typeInfoImpl.GetChildPropertyName( CHILD_PROPERTY_REGISTRATION_START_INDEX + 4 ) );
+  DALI_TEST_EQUALS( unRegisteredChildName, "", TEST_LOCATION );
 
   // Create a child actor
   Actor childActor = Actor::New();

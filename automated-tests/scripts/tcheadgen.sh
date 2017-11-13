@@ -6,7 +6,7 @@ if [[ -z $1 ]]; then
 fi
 
 FILE="$PWD/$1"
-TFILE="/tmp/retr.csv"
+TFILE="/tmp/retr.csv$$"
 HEADER_NAME=$(echo $1 | tr '[:lower:]' '[:upper:]' | sed -e 's/-/_/g' -e 's/\./_/')
 SCRIPT_DIR="$(cd "$(dirname $0)" && pwd)"
 
@@ -71,3 +71,5 @@ print "};"
 print ""
 print "#endif // __" HEADER_NAME "__"
 }' $TFILE > $FILE
+unlink $TFILE
+

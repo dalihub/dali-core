@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,16 @@ float TouchData::GetPressure( std::size_t point ) const
 Degree TouchData::GetAngle( std::size_t point ) const
 {
   return GetImplementation( *this ).GetAngle( point );
+}
+
+Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceClass( point );
+}
+
+Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceSubclass( point );
 }
 
 TouchData::TouchData( Internal::TouchData* internal )

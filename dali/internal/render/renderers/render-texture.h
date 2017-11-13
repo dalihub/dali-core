@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -46,10 +47,9 @@ public:
    * Constructor
    * @param[in] type The type of the texture
    * @param[in] format The format of the pixel data
-   * @param[in] width The width of the texture
-   * @param[in] height The height of the texture
+   * @param[in] size The size of the texture
    */
-  Texture( Type type, Pixel::Format format, unsigned int width, unsigned int height );
+  Texture( Type type, Pixel::Format format, ImageDimensions size );
 
   /**
    * Constructor from native image
@@ -67,7 +67,7 @@ public:
    * Creates the texture and reserves memory for the first mipmap level
    * @param[in] context The GL context
    */
-  void Initialize(Context& context);
+  void Initialize( Context& context );
 
   /**
    * Deletes the texture from the GPU
@@ -119,24 +119,6 @@ public:
   }
 
   /**
-   * Get the width of the texture
-   * @return Width of the texture
-   */
-  unsigned int GetWidth() const
-  {
-    return mWidth;
-  }
-
-  /**
-   * Get the height of the texture
-   * @return Height of the texture
-   */
-  unsigned int GetHeight() const
-  {
-    return mHeight;
-  }
-
-  /**
    * Get the type of the texture
    * @return Type of the texture
    */
@@ -163,17 +145,20 @@ private:
    */
   void ApplySampler( Context& context, Render::Sampler* sampler );
 
+  NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
+  Render::Sampler mSampler;             ///< The current sampler state
   GLuint mId;                           ///< Id of the texture
   GLuint mTarget;                       ///< Specifies the target to which the texture is bound.
-  Type mType;                           ///< Type of the texture
-  Render::Sampler mSampler;             ///< The current sampler state
-  NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
-  GLenum mInternalFormat;               ///< The format of the pixel data
+  GLint mGlInternalFormat;              ///< The gl internal format of the pixel data
+  GLenum mGlFormat;                     ///< The gl format of the pixel data
   GLenum mPixelDataType;                ///< The data type of the pixel data
-  unsigned int mWidth;                  ///< Width of the texture
-  unsigned int mHeight;                 ///< Height of the texture
+  uint16_t mWidth;                      ///< Width of the texture
+  uint16_t mHeight;                     ///< Height of the texture
+  uint16_t mMaxMipMapLevel;             ///< Maximum mipmap level
+  Type mType:2;                         ///< Type of the texture
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
+
 };
 
 

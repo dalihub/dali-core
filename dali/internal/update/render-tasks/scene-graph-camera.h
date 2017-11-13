@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
+#define DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,12 @@ public:
    * Destructor
    */
   ~Camera();
+
+  /**
+   * Set the node this scene graph camera belongs to.
+   * @param[in] node The owning node.
+   */
+  void SetNode( const Node* node );
 
   /**
    * @copydoc Dali::Internal::CameraActor::SetType
@@ -219,9 +225,8 @@ public:
    * Updates view and projection matrices.
    * Called by the render task using the camera
    * @param[in] updateBufferIndex The buffer to read from.
-   * @param[in] owningNode The node that owns the camera
    */
-  void Update( BufferIndex updateBufferIndex, const Node& owningNode );
+  void Update( BufferIndex updateBufferIndex );
 
   /**
    * @return true if the view matrix of camera is updated this or the previous frame
@@ -244,10 +249,9 @@ private:
   /**
    * Recalculates the view matrix.
    * @param[in] bufferIndex The current update buffer index.
-   * @param[in] owningNode to use for calculations.
    * @return count how many frames ago the matrix was changed.
    */
-  unsigned int UpdateViewMatrix( BufferIndex updateBufferIndex, const Node& owningNode );
+  unsigned int UpdateViewMatrix( BufferIndex updateBufferIndex );
 
   /**
    * Recalculates the projection matrix.
@@ -268,6 +272,7 @@ private:
 
   unsigned int                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   unsigned int                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
+  const Node*                   mNode;                 ///< The node this scene graph camera belongs to
 
 public:  // PROPERTIES
   Dali::Camera::Type            mType;                 // Non-animatable
@@ -444,4 +449,4 @@ inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, con
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_CAMERA_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_CAMERA_H

@@ -2,7 +2,7 @@
 #define __DALI_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/device.h>
 
 namespace Dali
 {
@@ -124,6 +125,32 @@ struct DALI_IMPORT_API KeyEvent
    * @return True if alt modifier
    */
   bool IsAltModifier() const;
+
+  /**
+   * @brief Get the device name the key event originated from.
+   *
+   * @SINCE_1_2.60
+   * @return The device name
+   */
+  std::string GetDeviceName() const;
+
+  /**
+   * @brief Get the device class the key event originated from.
+   *
+   * The device class type is classification type of the input device of event received
+   * @SINCE_1_2.60
+   * @return The type of the device class
+   */
+  Device::Class::Type GetDeviceClass() const;
+
+  /**
+   * @brief Get the device subclass the key event originated from.
+   *
+   * The device subclass type is subclassification type of the input device of event received.
+   * @SINCE_1_2.60
+   * @return The type of the device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass() const;
 
   // Data
 

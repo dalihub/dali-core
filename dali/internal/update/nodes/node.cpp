@@ -99,6 +99,7 @@ Node::Node()
   mExclusiveRenderTask( NULL ),
   mChildren(),
   mClippingDepth( 0u ),
+  mScissorDepth( 0u ),
   mDepthIndex( 0u ),
   mRegenerateUniformMap( 0 ),
   mDirtyFlags( AllFlags ),
@@ -167,7 +168,7 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-void Node::AddUniformMapping( UniformPropertyMapping* map )
+void Node::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
 {
   PropertyOwner::AddUniformMapping( map );
   mRegenerateUniformMap = 2;

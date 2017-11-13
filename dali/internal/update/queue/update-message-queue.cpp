@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool
   // If we are outside, then we have to request a call to Core::ProcessEvents() on idle.
   if ( false == mImpl->processingEvents )
   {
-    mImpl->renderController.RequestProcessEventsOnIdle();
+    mImpl->renderController.RequestProcessEventsOnIdle( false );
   }
 
   return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );

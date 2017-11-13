@@ -23,6 +23,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -82,6 +83,16 @@ public:
    * @copydoc Dali::Animation::SetDuration()
    */
   void SetDuration(float seconds);
+
+  /**
+   * @copydoc Dali::DevelAnimation::SetProgressNotification()
+   */
+  void SetProgressNotification( float progress );
+
+  /**
+   * @copydoc Dali::DevelAnimation::GetProgressNotification()
+   */
+  float GetProgressNotification();
 
   /**
    * @copydoc Dali::Animation::GetDuration()
@@ -160,6 +171,11 @@ public:
   void PlayFrom( float progress );
 
   /**
+   * @copydoc Dali::Animation::PlayAfter()
+   */
+  void PlayAfter( float delaySeconds );
+
+  /**
    * @copydoc Dali::Animation::Pause()
    */
   void Pause();
@@ -192,9 +208,19 @@ public:
   Dali::Animation::AnimationSignalType& FinishedSignal();
 
   /**
+   * @copydoc Dali::DevelAnimation::ProgressHasBeenReachedSignal()
+   */
+  Dali::Animation::AnimationSignalType& ProgressReachedSignal();
+
+  /**
    * Emit the Finished signal
    */
   void EmitSignalFinish();
+
+  /**
+   * Emit the ProgressReached signal
+   */
+  void EmitSignalProgressReached();
 
   /**
    * Connects a callback function with the object's signals.
@@ -339,35 +365,45 @@ public:
    */
   void Hide(Actor& actor, float delaySeconds);
 
-  /*
+  /**
    * @copydoc Dali::Animation::SetCurrentProgress()
    */
   void SetCurrentProgress(float progress);
 
-  /*
+  /**
    * @copydoc Dali::Animation::GetCurrentProgress()
    */
   float GetCurrentProgress();
 
-  /*
+  /**
    * @copydoc Dali::Animation::SetSpeedFactor()
    */
   void SetSpeedFactor( float factor );
 
-  /*
+  /**
    * @copydoc Dali::Animation::GetSpeedFactor()
    */
   float GetSpeedFactor() const;
 
-  /*
+  /**
    * @copydoc Dali::Animation::SetPlayRange()
    */
   void SetPlayRange( const Vector2& range );
 
-  /*
-   * @copydoc Dali::Animation::GetPlayRange
+  /**
+   * @copydoc Dali::Animation::GetPlayRange()
    */
   Vector2 GetPlayRange() const;
+
+  /**
+   * @copydoc Dali::Animation::SetLoopingMode()
+   */
+  void SetLoopingMode( Dali::Animation::LoopingMode loopingMode );
+
+  /**
+   * @copydoc Dali::Animation::GetLoopingMode()
+   */
+  Dali::Animation::LoopingMode GetLoopingMode() const;
 
 public: // For connecting animators to animations
 
@@ -480,6 +516,11 @@ private:
    */
   void NotifyObjects();
 
+  /**
+   * Sends message to SceneGraph with final progress value
+   */
+  void SendFinalProgressNotificationMessage();
+
 private:
 
   const SceneGraph::Animation* mAnimation;
@@ -488,6 +529,8 @@ private:
   AnimationPlaylist& mPlaylist;
 
   Dali::Animation::AnimationSignalType mFinishedSignal;
+
+  Dali::Animation::AnimationSignalType mProgressReachedSignal;
 
   typedef OwnerContainer< AnimatorConnectorBase* > AnimatorConnectorContainer;
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
@@ -506,6 +549,9 @@ private:
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
   Dali::Animation::State mState;
+  float mProgressReachedMarker;
+  float mDelaySeconds;
+  bool mAutoReverseEnabled;  ///< Flag to identify that the looping mode is auto reverse.
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ struct TestPoint
   Vector2 ellipseRadius;
   float pressure;
   Degree angle;
+  Device::Class::Type deviceClass;
+  Device::Subclass::Type deviceSubclass;
 
   TestPoint()
   : deviceId(-1), state(PointState::FINISHED), radius(0), pressure(0)
@@ -139,6 +141,8 @@ struct TouchDataFunctor
       p.ellipseRadius = touchData.GetEllipseRadius(i);
       p.pressure = touchData.GetPressure(i);
       p.angle = touchData.GetAngle(i);
+      p.deviceClass = touchData.GetDeviceClass(i);
+      p.deviceSubclass = touchData.GetDeviceSubclass(i);
       signalData.touchData.points.push_back(p);
     }
 
@@ -281,6 +285,8 @@ Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vecto
   Integration::Point point;
   point.SetState( state );
   point.SetScreenPosition( screenPosition );
+  point.SetDeviceClass( Device::Class::TOUCH );
+  point.SetDeviceSubclass( Device::Subclass::NONE );
   touchEvent.points.push_back( point );
   return touchEvent;
 }
@@ -1972,6 +1978,35 @@ int UtcDaliTouchDataAndEventUsage(void)
   DALI_TEST_EQUALS( true, touchEventFunctorCalled, TEST_LOCATION );
 
   END_TEST;
+}
 
+int UtcDaliTouchDataGetDeviceAPINegative(void)
+{
+  TestApplication application;
 
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  HandleData handleData;
+  TouchDataHandleFunctor functor( handleData );
+  actor.TouchSignal().Connect( &application, functor );
+
+  Vector2 screenCoordinates( 10.0f, 10.0f );
+  Vector2 localCoordinates;
+  actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
+
+  // Emit a down signal
+  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
+
+  TouchData data = handleData.touchData;
+  DALI_TEST_EQUALS( data.GetDeviceClass( -1 ), Device::Class::NONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.GetDeviceSubclass( -1 ), Device::Subclass::NONE, TEST_LOCATION );
+  END_TEST;
 }

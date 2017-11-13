@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+apiversion=@DALI_VERSION@
+libdir=@libdir@
+includedir=@devincludepath@
+
+Name: Dali 3D engine
+Description: Cross platform 3D Engine
+Version: ${apiversion}
+Requires:
+Libs: -L${libdir} -ldali-core-cxx03
+Cflags: -I${includedir} -std=c++11

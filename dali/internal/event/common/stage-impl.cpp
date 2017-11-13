@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 
 using Dali::Internal::SceneGraph::Node;
 
@@ -89,13 +90,15 @@ SignalConnectorType signalConnector9( mType, SIGNAL_TOUCH,                     &
 StagePtr Stage::New( AnimationPlaylist& playlist,
                      PropertyNotificationManager& propertyNotificationManager,
                      SceneGraph::UpdateManager& updateManager,
-                     NotificationManager& notificationManager )
+                     NotificationManager& notificationManager,
+                     Integration::RenderController& renderController )
 {
-  return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager ) );
+  return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager, renderController ) );
 }
 
-void Stage::Initialize()
+void Stage::Initialize( bool renderToFbo )
 {
+  mRenderToFbo = renderToFbo;
   mObjectRegistry = ObjectRegistry::New();
 
   // Create the ordered list of layers
@@ -197,44 +200,56 @@ void Stage::Remove( Actor& actor )
   mRootLayer->Remove( actor );
 }
 
-void Stage::SurfaceResized(float width, float height)
+void Stage::SurfaceResized( float width, float height )
 {
-  mSurfaceSize.width = width;
-  mSurfaceSize.height = height;
-
-  // Internally we want to report the actual size of the stage.
-  mSize.width = width;
-  mSize.height = height - mTopMargin;
-
-  // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-  mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
-
-  // Adjust the camera height to allow for top-margin
-  SetDefaultCameraPosition();
-
-  mRootLayer->SetSize( mSize.width, mSize.height );
-
-  // Repeat for SystemOverlay actors
-  if( mSystemOverlay )
+  if( ( fabs( width - mSurfaceSize.width ) > Math::MACHINE_EPSILON_1000 ) || ( fabs( height - mSurfaceSize.height ) > Math::MACHINE_EPSILON_1000 ) )
   {
-    // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
-    // This will remain unaffected by changes in SetDefaultCameraPosition()
-    mSystemOverlay->GetImpl()->SetSize( width, height );
-  }
+    mSurfaceSize.width = width;
+    mSurfaceSize.height = height;
 
-  SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+    // Internally we want to report the actual size of the stage.
+    mSize.width = width;
+    mSize.height = height - mTopMargin;
 
-  // if single render task to screen then set its viewport parameters
-  if( 1 == mRenderTaskList->GetTaskCount() )
-  {
-    Dali::RenderTask mDefaultRenderTask = mRenderTaskList->GetTask(0);
+    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
+    mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
 
-    if(!mDefaultRenderTask.GetTargetFrameBuffer())
+    // Adjust the camera height to allow for top-margin
+    SetDefaultCameraPosition();
+
+    mRootLayer->SetSize( mSize.width, mSize.height );
+
+    // Repeat for SystemOverlay actors
+    if( mSystemOverlay )
     {
-      mDefaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+      // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
+      // This will remain unaffected by changes in SetDefaultCameraPosition()
+      mSystemOverlay->GetImpl()->SetSize( width, height );
+    }
+
+    SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+
+    // if single render task to screen then set its viewport parameters
+    if( 1 == mRenderTaskList->GetTaskCount() )
+    {
+      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
+
+      if(!defaultRenderTask.GetTargetFrameBuffer())
+      {
+        defaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+      }
+    }
+
+    if( mRenderToFbo )
+    {
+      Dali::FrameBuffer frameBuffer = Dali::FrameBuffer::New( width, height, Dali::FrameBuffer::Attachment::NONE );
+      Dali::Texture texture = Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGB888, width, height );
+      frameBuffer.AttachColorTexture( texture );
+
+      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
+      defaultRenderTask.SetFrameBuffer( frameBuffer );
     }
   }
-
 }
 
 Vector2 Stage::GetSize() const
@@ -695,24 +710,33 @@ void Stage::RebuildDepthTree()
 Stage::Stage( AnimationPlaylist& playlist,
               PropertyNotificationManager& propertyNotificationManager,
               SceneGraph::UpdateManager& updateManager,
-              NotificationManager& notificationManager )
+              NotificationManager& notificationManager,
+              Integration::RenderController& renderController )
 : mAnimationPlaylist( playlist ),
-  mPropertyNotificationManager(propertyNotificationManager),
-  mUpdateManager(updateManager),
-  mNotificationManager(notificationManager),
-  mSize(Vector2::ZERO),
-  mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
+  mPropertyNotificationManager( propertyNotificationManager ),
+  mUpdateManager( updateManager ),
+  mNotificationManager( notificationManager ),
+  mRenderController( renderController ),
+  mSize( Vector2::ZERO ),
+  mBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
   mTopMargin( 0 ),
-  mSystemOverlay(NULL),
-  mDepthTreeDirty( false )
+  mSystemOverlay( NULL ),
+  mDepthTreeDirty( false ),
+  mForceNextUpdate( false ),
+  mRenderToFbo( false )
 {
 }
 
 SceneGraph::UpdateManager& Stage::GetUpdateManager()
 {
   return mUpdateManager;
+}
+
+Integration::RenderController& Stage::GetRenderController()
+{
+  return mRenderController;
 }
 
 unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
@@ -723,6 +747,18 @@ unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
 BufferIndex Stage::GetEventBufferIndex() const
 {
   return mUpdateManager.GetEventBufferIndex();
+}
+
+void Stage::ForceNextUpdate()
+{
+  mForceNextUpdate = true;
+}
+
+bool Stage::IsNextUpdateForced()
+{
+  bool nextUpdateForced = mForceNextUpdate;
+  mForceNextUpdate = false;
+  return nextUpdateForced;
 }
 
 Stage::~Stage()

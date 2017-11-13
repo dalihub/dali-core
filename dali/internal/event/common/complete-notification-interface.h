@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_COMPLETE_NOTIFICATION_INTERFACE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Internal
 
 /**
  * Provides notifications to the event-thread regarding the changes in previous update(s).
- * For example after an animation finished, or after resources were loaded.
+ * For example after an animation finished
  */
 class CompleteNotificationInterface
 {

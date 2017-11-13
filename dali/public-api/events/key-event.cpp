@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali/public-api/events/key-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/events/key-event-devel.h>
 #include <dali/internal/event/events/key-event-impl.h>
 
 namespace Dali
@@ -119,14 +118,20 @@ bool KeyEvent::IsAltModifier() const
   return false;
 }
 
-std::string DevelKeyEvent::GetDeviceName( const KeyEvent& keyEvent )
+std::string KeyEvent::GetDeviceName() const
 {
-  return GetImplementation( &keyEvent )->GetDeviceName();
+  return GetImplementation( this )->GetDeviceName();
 }
 
-DevelKeyEvent::DeviceClass::Type DevelKeyEvent::GetDeviceClass( const KeyEvent& keyEvent )
+Device::Class::Type KeyEvent::GetDeviceClass() const
 {
-  return GetImplementation( &keyEvent )->GetDeviceClass();
+  return GetImplementation( this )->GetDeviceClass();
 }
+
+Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
+{
+  return GetImplementation( this )->GetDeviceSubclass();
+}
+
 
 } // namespace Dali

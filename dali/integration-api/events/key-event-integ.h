@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/public-api/events/key-event.h>
-#include <dali/devel-api/events/key-event-devel.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -71,8 +70,9 @@ struct KeyEvent : public Event
            int keyModifier,
            unsigned long timeStamp,
            const State& keyState,
-           const std::string deviceName,
-           const DevelKeyEvent::DeviceClass::Type deviceClass );
+           const std::string& deviceName,
+           const Device::Class::Type deviceClass,
+           const Device::Subclass::Type deviceSubclass );
 
   /*
    * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
@@ -126,7 +126,12 @@ struct KeyEvent : public Event
   /**
    * Class of device KeyEvent originated from
    */
-  DevelKeyEvent::DeviceClass::Type deviceClass;
+  Device::Class::Type deviceClass;
+
+  /**
+   * Subclass of device KeyEvent originated from
+   */
+  Device::Subclass::Type deviceSubclass;
 };
 
 } // namespace Integration

@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -1418,6 +1419,12 @@ public:
   void EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type );
 
   /**
+   * @brief Emits the layout direction change signal for this actor and all its children.
+   * @param[in] type Whether the actor's layout direction property has changed or a parent's.
+   */
+  void EmitLayoutDirectionChangedSignal( LayoutDirection::Type type );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1456,6 +1463,11 @@ public:
    * @copydoc DevelActor::VisibilityChangedSignal
    */
   DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
+
+  /**
+   * @copydoc LayoutDirectionChangedSignal
+   */
+  Dali::Actor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1581,13 +1593,10 @@ protected:
 
   /**
    * Traverse the actor tree, inserting actors into the depth tree in sibling order.
-   * For all actors that share a sibling order, they also share a depth tree, for
-   * optimal render performance.
-   * @param[in] nodeMemoryPool The memory pool used to allocate depth nodes
-   * @param[in,out] depthTreeNode The depth tree node to which to add this actor's children
-   * @return The count of actors in this depth tree
+   * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
+   * @param[in,out] depthIndex The current depth index (traversal index)
    */
-  int BuildDepthTree( DepthNodeMemoryPool& nodeMemoryPool, ActorDepthTreeNode* depthTreeNode );
+  void DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int& depthIndex );
 
 public:
 
@@ -1871,7 +1880,7 @@ private:
    * @param[in] size The size to apply the policy to
    * @return Return the adjusted size
    */
-  Vector2 ApplySizeSetPolicy( const Vector2 size );
+  Vector2 ApplySizeSetPolicy( const Vector2& size );
 
   /**
    * Retrieve the parent object of an Actor.
@@ -1881,26 +1890,21 @@ private:
 
   /**
    * Set Sibling order
-   * @param[in] order The sibling order this Actor should be
+   * @param[in] order The sibling order this Actor should be. It will place
+   * the actor at this index in it's parent's child array.
    */
   void SetSiblingOrder( unsigned int order);
 
   /**
-   * @brief Re-orders the sibling order when any actor raised to the max level
-   * @param[in] siblings the container of sibling actors
+   * Get Sibling order
+   * @return the order of this actor amongst it's siblings
    */
-  void DefragmentSiblingIndexes( ActorContainer& siblings );
+  unsigned int GetSiblingOrder() const;
 
   /**
-   * @brief Shifts all siblings levels from the target level up by 1 to make space for a newly insert sibling
-   * at an exclusive level.
-   *
-   * @note Used with Raise and Lower API
-   *
-   * @param[in] siblings the actor container of the siblings
-   * @param[in] targetLevelToShiftFrom the sibling level to start shifting from
+   * Request that the stage rebuilds the actor depth indices.
    */
-  bool ShiftSiblingsLevels( ActorContainer& siblings, int targetLevelToShiftFrom );
+  void RequestRebuildDepthTree();
 
   /**
    * @brief Get the current position of the actor in screen coordinates.
@@ -1915,6 +1919,25 @@ private:
    * @param[in] sendMessage Whether to send a message to the update thread or not.
    */
   void SetVisibleInternal( bool visible, SendMessage::Type sendMessage );
+
+  /**
+   * Set whether a child actor inherits it's parent's layout direction. Default is to inherit.
+   * @param[in] inherit - true if the actor should inherit layout direction, false otherwise.
+   */
+  void SetInheritLayoutDirection( bool inherit );
+
+  /**
+   * Returns whether the actor inherits it's parent's layout direction.
+   * @return true if the actor inherits it's parent's layout direction, false otherwise.
+   */
+  bool IsLayoutDirectionInherited() const;
+
+  /**
+   * @brief Propagates layout direction recursively.
+   * @param[in] actor The actor for seting layout direction.
+   * @param[in] direction New layout direction.
+   */
+  void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set = false );
 
 protected:
 
@@ -1940,6 +1963,7 @@ protected:
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
+  Dali::Actor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
 
   Quaternion      mTargetOrientation; ///< Event-side storage for orientation
   Vector4         mTargetColor;       ///< Event-side storage for color
@@ -1952,7 +1976,7 @@ protected:
 
   uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
   uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
-  uint16_t mSiblingOrder;     ///< The sibling order of the actor
+
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
@@ -1970,6 +1994,8 @@ protected:
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
+  bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
+  LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
@@ -1980,67 +2006,6 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 };
-
-/**
- * Helper class to create sorted depth index
- */
-class ActorDepthTreeNode
-{
-public:
-  ActorDepthTreeNode()
-  : mParentNode(NULL),
-    mNextSiblingNode(NULL),
-    mFirstChildNode(NULL),
-    mSiblingOrder( 0 )
-  {
-  }
-
-  ActorDepthTreeNode( Actor* actor, uint16_t siblingOrder )
-  : mParentNode(NULL),
-    mNextSiblingNode(NULL),
-    mFirstChildNode(NULL),
-    mSiblingOrder( siblingOrder )
-  {
-    mActors.push_back( actor );
-  }
-
-  ~ActorDepthTreeNode()
-  {
-    if( mFirstChildNode )
-    {
-      delete mFirstChildNode;
-      mFirstChildNode = NULL;
-    }
-    if( mNextSiblingNode )
-    {
-      delete mNextSiblingNode;
-      mNextSiblingNode = NULL;
-    }
-    mParentNode = NULL;
-  }
-
-  uint16_t GetSiblingOrder()
-  {
-    return mSiblingOrder;
-  }
-
-  void AddActor( Actor* actor )
-  {
-    mActors.push_back( actor );
-  }
-
-public:
-  std::vector<Actor*> mActors; // Array of actors with the same sibling order and same ancestor sibling orders
-  ActorDepthTreeNode* mParentNode;
-  ActorDepthTreeNode* mNextSiblingNode;
-  ActorDepthTreeNode* mFirstChildNode;
-  uint16_t mSiblingOrder;
-
-private:
-  ActorDepthTreeNode( ActorDepthTreeNode& );
-  ActorDepthTreeNode& operator=(const ActorDepthTreeNode& );
-};
-
 
 } // namespace Internal
 

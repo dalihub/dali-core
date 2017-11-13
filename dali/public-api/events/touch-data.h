@@ -2,7 +2,7 @@
 #define __DALI_TOUCH_DATA_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/device.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/math/degree.h>
@@ -219,6 +220,26 @@ public:
    * @note If point is greater than GetPointCount() then this method will return Degree().
    */
   Degree GetAngle( std::size_t point ) const;
+
+  /**
+   * @brief Get the device class type the mouse/touch event originated from.
+   *
+   * The device class type is classification type of the input device of event received.
+   * @SINCE_1_2.60
+   * @param[in] point The point required
+   * @return The type of the device class
+   */
+  Device::Class::Type GetDeviceClass( std::size_t point ) const;
+
+  /**
+   * @brief Get the device subclass type the mouse/touch event originated from.
+   *
+   * The device subclass type is subclassification type of the input device of event received.
+   * @SINCE_1_2.60
+   * @param[in] point The point required
+   * @return The type of the device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
 
 public: // Not intended for application developers
 

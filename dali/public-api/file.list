@@ -19,6 +19,7 @@ public_api_src_files = \
   $(public_api_src_dir)/common/constants.cpp \
   $(public_api_src_dir)/common/dali-common.cpp \
   $(public_api_src_dir)/common/dali-vector.cpp \
+  $(public_api_src_dir)/common/extents.cpp \
   $(public_api_src_dir)/common/stage.cpp \
   $(public_api_src_dir)/events/gesture.cpp \
   $(public_api_src_dir)/events/gesture-detector.cpp \
@@ -86,6 +87,7 @@ public_api_src_files = \
   $(public_api_src_dir)/signals/functor-delegate.cpp \
   $(public_api_src_dir)/object/type-info.cpp \
   $(public_api_src_dir)/object/type-registry.cpp \
+  $(public_api_src_dir)/object/weak-handle.cpp \
   $(public_api_src_dir)/dali-core-version.cpp
 
 
@@ -123,6 +125,7 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/constants.h \
   $(public_api_src_dir)/common/dali-common.h \
   $(public_api_src_dir)/common/dali-vector.h \
+  $(public_api_src_dir)/common/extents.h \
   $(public_api_src_dir)/common/intrusive-ptr.h \
   $(public_api_src_dir)/common/loading-state.h \
   $(public_api_src_dir)/common/stage.h \
@@ -131,6 +134,7 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/view-mode.h
 
 public_api_core_events_header_files = \
+  $(public_api_src_dir)/events/device.h \
   $(public_api_src_dir)/events/gesture.h \
   $(public_api_src_dir)/events/gesture-detector.h \
   $(public_api_src_dir)/events/hover-event.h \
@@ -198,7 +202,8 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/ref-object.h \
   $(public_api_src_dir)/object/type-info.h \
   $(public_api_src_dir)/object/type-registry.h \
-  $(public_api_src_dir)/object/type-registry-helper.h
+  $(public_api_src_dir)/object/type-registry-helper.h \
+  $(public_api_src_dir)/object/weak-handle.h
 
 public_api_core_render_tasks_header_files = \
   $(public_api_src_dir)/render-tasks/render-task.h \

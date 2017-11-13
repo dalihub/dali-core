@@ -127,13 +127,10 @@ CustomObject::~CustomObject()
 
 CustomObject::CustomObject()
 {
-  PropertyOwner* updateObject = PropertyOwner::New();
+  mUpdateObject = PropertyOwner::New();
 
-  // Pass ownership to the update-thread
-  AddObjectMessage( GetEventThreadServices().GetUpdateManager(), updateObject );
-
-  // Keep as const since this should only be modified from update-thread
-  mUpdateObject = updateObject;
+  OwnerPointer< PropertyOwner > transferOwnership( mUpdateObject );
+  AddObjectMessage( GetEventThreadServices().GetUpdateManager(), transferOwnership );
 }
 
 } // namespace Internal

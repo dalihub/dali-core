@@ -138,21 +138,12 @@ void BuildOrthoPickingRay( const Matrix& viewMatrix,
 
 CameraActorPtr CameraActor::New( const Size& size )
 {
-  CameraActorPtr actor(new CameraActor());
+  CameraActorPtr actor( new CameraActor() );
 
   // Second-phase construction
-
   actor->Initialize();
 
-  actor->SetName("DefaultCamera");
-
-  // Create scene-object and transfer ownership through message
-  SceneGraph::Camera* sceneObject = SceneGraph::Camera::New();
-  AddCameraMessage( actor->GetEventThreadServices().GetUpdateManager(), sceneObject );
-
-  // Keep raw pointer for message passing
-  actor->mSceneObject = sceneObject;
-
+  actor->SetName( "DefaultCamera" );
   actor->SetPerspectiveProjection( size );
 
   // By default Actors face in the positive Z direction in world space
@@ -187,6 +178,21 @@ CameraActor::~CameraActor()
     // Create scene-object and transfer ownership through message
     RemoveCameraMessage( GetEventThreadServices().GetUpdateManager(), mSceneObject );
   }
+}
+
+void CameraActor::OnInitialize()
+{
+  // Create scene-object and keep raw pointer for message passing.
+  SceneGraph::Camera* sceneGraphCamera = SceneGraph::Camera::New();
+
+  // Store a pointer to this camera node inside the scene-graph camera.
+  sceneGraphCamera->SetNode( mNode );
+
+  mSceneObject = sceneGraphCamera;
+  OwnerPointer< SceneGraph::Camera > sceneGraphCameraOwner( sceneGraphCamera );
+
+  // Send message to inform update of this camera (and move ownership).
+  AddCameraMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphCameraOwner );
 }
 
 void CameraActor::SetTarget( const Vector3& target )

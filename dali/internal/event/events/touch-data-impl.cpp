@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,24 @@ Integration::Point& TouchData::GetPoint( std::size_t point )
 void TouchData::AddPoint( const Integration::Point& point )
 {
   mPoints.push_back( point );
+}
+
+Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetDeviceClass();
+  }
+  return Device::Class::NONE;
+}
+
+Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetDeviceSubclass();
+  }
+  return Device::Subclass::NONE;
 }
 
 } // namsespace Internal

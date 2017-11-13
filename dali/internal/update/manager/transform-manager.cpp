@@ -21,10 +21,10 @@
 //EXTERNAL INCLUDES
 #include <algorithm>
 #include <cstring>
+#include <type_traits>
 
 //INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/internal/common/math.h>
 
 namespace Dali
@@ -44,8 +44,8 @@ static const float gDefaultTransformComponentAnimatableData[] = { 1.0f, 1.0f, 1.
 //Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
 static const float gDefaultTransformComponentStaticData[] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, true };
 
-DALI_COMPILE_TIME_ASSERT( sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable) );
-DALI_COMPILE_TIME_ASSERT( sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic) );
+static_assert( sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable), "gDefaultTransformComponentAnimatableData should have the same number of floats as specified in TransformComponentAnimatable" );
+static_assert( sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic), "gDefaultTransformComponentStaticData should have the same number of floats as specified in TransformComponentStatic" );
 
 /**
  * @brief Calculates the center position for the transform component
@@ -289,9 +289,10 @@ void TransformManager::Update()
         if( (mInheritanceMode[i] & INHERIT_POSITION) == 0 )
         {
           //Don't inherit position
+          CalculateCenterPosition( centerPosition, mTxComponentStatic[ i ], mTxComponentAnimatable[ i ], mSize[ i ], half, topLeft );
           mLocal[i].SetTransformComponents( localScale, localOrientation, Vector3::ZERO );
           Matrix::Multiply( mWorld[i], mLocal[i], parentMatrix );
-          mWorld[i].SetTranslation( mTxComponentAnimatable[i].mPosition);
+          mWorld[i].SetTranslation( mTxComponentAnimatable[i].mPosition + centerPosition );
         }
         else
         {

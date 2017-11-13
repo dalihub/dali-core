@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 
+#include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
@@ -1326,6 +1327,21 @@ int UtcDaliCustomActorSetGetProperty(void)
   // Attempt to set read-only property and then ensure value hasn't changed
   actor.SetProperty( Test::DevelTestCustomActor::Property::DEVEL_TEST_PROPERTY6, 40.0f );
   DALI_TEST_EQUALS( value.Get<float>(), 10.0f, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int utcDaliActorGetTypeInfo(void)
+{
+  TestApplication application;
+  tet_infoline( "Get the type info of a derived actor" );
+
+  Test::TestCustomActor customActor = Test::TestCustomActor::New();
+
+  Dali::TypeInfo typeInfo = Dali::DevelCustomActor::GetTypeInfo( customActor );
+
+  DALI_TEST_EQUALS( typeInfo.GetName(), std::string("TestCustomActor"), TEST_LOCATION );
 
   END_TEST;
 }

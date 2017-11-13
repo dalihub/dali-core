@@ -4,8 +4,8 @@ apiversion=@DALI_VERSION@
 libdir=@libdir@
 includedir=@devincludepath@
 
-Name: Samsung OpenGLES Toolkit
-Description: 3D Canvas Toolkit using OpenGLES
+Name: Dali 3D engine
+Description: Cross platform 3D Engine
 Version: ${apiversion}
 Requires:
 Libs: -L${libdir} -ldali-core

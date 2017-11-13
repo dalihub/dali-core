@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,15 @@
 
 namespace Dali
 {
+
+#ifdef DEBUG_ENABLED
+
+// Fake globals for gdb typedefs
+Dali::DebugPropertyValueArray gValueArray;
+Dali::DebugPropertyValueMap   gValueMap;
+
+#endif
+
 
 namespace // unnamed namespace
 {
@@ -85,7 +94,7 @@ namespace Integration
 namespace Log
 {
 
-__thread LogFunction gthreadLocalLogFunction = NULL;
+thread_local LogFunction gthreadLocalLogFunction = NULL;
 
 /* Forward declarations */
 std::string FormatToString(const char *format, ...);
