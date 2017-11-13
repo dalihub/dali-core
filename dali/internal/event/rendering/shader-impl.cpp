@@ -302,8 +302,8 @@ void Shader::Initialize(
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
   mSceneObject = new SceneGraph::Shader( hints );
 
-  // Add to update manager
-  AddShaderMessage( updateManager, *mSceneObject );
+  OwnerPointer< SceneGraph::Shader > transferOwnership( mSceneObject );
+  AddShaderMessage( updateManager, transferOwnership );
 
   // Try to load a precompiled shader binary for the source pair:
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();

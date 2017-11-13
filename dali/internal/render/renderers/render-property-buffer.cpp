@@ -35,6 +35,7 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     case Property::RECTANGLE:
     case Property::ROTATION:
     {
@@ -76,6 +77,7 @@ size_t GetPropertyImplementationGlSize( Property::Type propertyType )
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::EXTENTS:
     case Property::RECTANGLE:
     case Property::ROTATION:
     {

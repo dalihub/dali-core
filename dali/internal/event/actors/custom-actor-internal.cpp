@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {
@@ -47,6 +48,12 @@ CustomActor::CustomActor(CustomActorImpl& extension)
 
 CustomActor::~CustomActor()
 {
+}
+
+Dali::TypeInfo CustomActor::GetTypeInfo()
+{
+  Dali::TypeInfo handle ( const_cast<Dali::Internal::TypeInfo*>(Object::GetTypeInfo()) );
+  return handle;
 }
 
 } // namespace Internal

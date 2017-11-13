@@ -25,36 +25,6 @@ namespace Dali
 namespace DevelActor
 {
 
-void Raise( Actor actor )
-{
-  GetImplementation( actor ).Raise();
-}
-
-void Lower( Actor actor )
-{
-  GetImplementation( actor ).Lower();
-}
-
-void RaiseToTop( Actor actor )
-{
-  GetImplementation( actor ).RaiseToTop();
-}
-
-void LowerToBottom( Actor actor )
-{
-  GetImplementation( actor ).LowerToBottom();
-}
-
-void RaiseAbove( Actor actor, Actor target )
-{
-  GetImplementation( actor ).RaiseAbove( GetImplementation( target ) );
-}
-
-void LowerBelow( Actor actor, Actor target )
-{
-  GetImplementation( actor ).LowerBelow( GetImplementation( target ) );
-}
-
 VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor )
 {
   return GetImplementation( actor ).VisibilityChangedSignal();

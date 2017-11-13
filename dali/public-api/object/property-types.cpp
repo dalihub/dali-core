@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ const char* const PROPERTY_TYPE_NAMES[] =
   "STRING",
   "ARRAY",
   "MAP",
+  "EXTENTS",
 };
 const unsigned int PROPERTY_TYPE_NAMES_COUNT = sizeof( PROPERTY_TYPE_NAMES ) / sizeof( const char* );
 }

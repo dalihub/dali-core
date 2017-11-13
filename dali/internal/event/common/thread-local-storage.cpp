@@ -30,11 +30,7 @@ namespace Internal
 
 namespace
 {
-#if defined(EMSCRIPTEN)
-ThreadLocalStorage* threadLocal = NULL;
-#else
-__thread ThreadLocalStorage* threadLocal = NULL;
-#endif
+thread_local ThreadLocalStorage* threadLocal = NULL;
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)

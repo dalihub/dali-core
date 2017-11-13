@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_CORE_H__
-#define __DALI_INTEGRATION_CORE_H__
+#ifndef DALI_INTEGRATION_CORE_H
+#define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,26 +118,52 @@ public:
    * Constructor
    */
   RenderStatus()
-  : needsUpdate(false)
+  : needsUpdate( false ),
+    needsPostRender( false )
   {
   }
 
   /**
    * Set whether update needs to run following a render.
-   * This might be because render has sent messages to update, or it has
-   * some textures to upload over several frames.
+   * @param[in] updateRequired Set to true if an update is required to be run
    */
-  void SetNeedsUpdate(bool updateRequired) { needsUpdate = updateRequired; }
+  void SetNeedsUpdate( bool updateRequired )
+  {
+    needsUpdate = updateRequired;
+  }
 
   /**
    * Query the update status following rendering of a frame.
-   * @return true if update should run.
+   * @return True if update is required to be run
    */
-  bool NeedsUpdate() { return needsUpdate; }
+  bool NeedsUpdate() const
+  {
+    return needsUpdate;
+  }
+
+  /**
+   * Sets if a post-render should be run.
+   * If nothing is rendered this frame, we can skip post-render.
+   * @param[in] postRenderRequired Set to True if post-render is required to be run
+   */
+  void SetNeedsPostRender( bool postRenderRequired )
+  {
+    needsPostRender = postRenderRequired;
+  }
+
+  /**
+   * Queries if a post-render should be run.
+   * @return True if post-render is required to be run
+   */
+  bool NeedsPostRender() const
+  {
+    return needsPostRender;
+  }
 
 private:
 
-  bool needsUpdate;
+  bool needsUpdate      :1;  ///< True if update is required to be run
+  bool needsPostRender  :1;  ///< True if post-render is required to be run.
 };
 
 /**
@@ -159,12 +185,6 @@ private:
  * 6) Provide an implementation of the GlAbstraction interface, used to access OpenGL services.
  *
  * 7) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
- *
- * Suspend/Resume behaviour:
- *
- * The Core has no knowledge of the application lifecycle, but can be suspended.
- * In the suspended state, input events will not be processed, and animations will not progress any further.
- * The Core can still render in the suspended state; the same frame will be produced each time.
  *
  * Multi-threading notes:
  *
@@ -196,14 +216,16 @@ public:
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController& renderController,
-                   PlatformAbstraction& platformAbstraction,
-                   GlAbstraction& glAbstraction,
-                   GlSyncAbstraction& glSyncAbstraction,
-                   GestureManager& gestureManager,
-                   ResourcePolicy::DataRetention policy);
+  static Core* New( RenderController& renderController,
+                    PlatformAbstraction& platformAbstraction,
+                    GlAbstraction& glAbstraction,
+                    GlSyncAbstraction& glSyncAbstraction,
+                    GestureManager& gestureManager,
+                    ResourcePolicy::DataRetention policy,
+                    bool renderToFboEnabled );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -278,25 +300,6 @@ public:
   // Core Lifecycle
 
   /**
-   * Put Core into the suspended state.
-   * Any ongoing event processing will be cancelled, for example multi-touch sequences.
-   * The core expects the system has suspended us. Animation time will continue during the suspended
-   * state.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is in the suspended state.
-   */
-  void Suspend();
-
-  /**
-   * Resume the Core from the suspended state.
-   * At the first update, the elapsed time passed to the animations will be equal to the time spent
-   * suspended.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is not in the suspended state.
-   */
-  void Resume();
-
-  /**
    * Notify Core that the scene has been created.
    */
   void SceneCreated();
@@ -338,8 +341,15 @@ public:
    * @param[in] nextVSyncTimeMilliseconds The time of the next predicted VSync in milliseconds
    * @param[out] status showing whether further updates are required. This also shows
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status );
+  void Update( float elapsedSeconds,
+               unsigned int lastVSyncTimeMilliseconds,
+               unsigned int nextVSyncTimeMilliseconds,
+               UpdateStatus& status,
+               bool renderToFboEnabled,
+               bool isRenderingToFbo );
 
   /**
    * Render the next frame. This method should be preceded by a call up Update.
@@ -413,4 +423,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_CORE_H__
+#endif // DALI_INTEGRATION_CORE_H

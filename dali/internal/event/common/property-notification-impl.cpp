@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,19 +212,16 @@ void PropertyNotification::CreateSceneObject()
   // this method can be called from constructor and on stage connection
   if( !mPropertyNotification )
   {
-    // Create a new PropertyNotification, temporarily owned
-    SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mObject,
-                                                                                                    mObjectPropertyIndex,
-                                                                                                    mPropertyType,
-                                                                                                    mComponentIndex,
-                                                                                                    GetImplementation(mCondition).type,
-                                                                                                    mRawConditionArgs,
-                                                                                                    mNotifyMode );
-    // Keep a const pointer to the PropertyNotification.
-    mPropertyNotification = propertyNotification;
-
-    // Transfer scene object ownership to the update manager through a message
-    AddPropertyNotificationMessage( mUpdateManager, propertyNotification );
+    // Create a new PropertyNotification, keep a const pointer to it
+    mPropertyNotification = SceneGraph::PropertyNotification::New( *mObject,
+                                                                   mObjectPropertyIndex,
+                                                                   mPropertyType,
+                                                                   mComponentIndex,
+                                                                   GetImplementation( mCondition ).type,
+                                                                   mRawConditionArgs,
+                                                                   mNotifyMode );
+    OwnerPointer< SceneGraph::PropertyNotification > transferOwnership( const_cast<SceneGraph::PropertyNotification*>( mPropertyNotification ) );
+    AddPropertyNotificationMessage( mUpdateManager, transferOwnership );
   }
 }
 

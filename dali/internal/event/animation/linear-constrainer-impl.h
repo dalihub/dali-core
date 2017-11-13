@@ -110,7 +110,7 @@ struct LinearConstraintFunctor
       }
       else
       {
-        while( t >= mProgress[min] && min < valueCount-1 )
+        while( ( min < valueCount-1 )&&( t >= mProgress[min] ) )
         {
           min++;
         }
@@ -118,7 +118,7 @@ struct LinearConstraintFunctor
         min--;
         max = min+1;
 
-        if( min >= valueCount-1)
+        if( min >= valueCount-1 )
         {
           min = max = valueCount-1;
           tLocal = 0.0f;

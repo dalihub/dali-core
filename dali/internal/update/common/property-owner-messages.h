@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_MESSAGES_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ private:
 
 // Messages for PropertyOwner
 
-inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, PropertyBase* property )
+inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<PropertyBase>& property )
 {
   typedef MessageValue1< PropertyOwner, OwnerPointer<PropertyBase> > LocalType;
 
@@ -233,7 +233,7 @@ inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServic
   new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, property );
 }
 
-inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, ConstraintBase& constraint )
+inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<ConstraintBase>& constraint )
 {
   typedef MessageValue1< PropertyOwner, OwnerPointer<ConstraintBase> > LocalType;
 
@@ -241,7 +241,7 @@ inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, co
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &PropertyOwner::ApplyConstraint, &constraint );
+  new (slot) LocalType( &owner, &PropertyOwner::ApplyConstraint, constraint );
 }
 
 inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const ConstraintBase& constConstraint )
@@ -258,17 +258,23 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
   new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );
 }
 
-inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, UniformPropertyMapping* map )
+inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer< UniformPropertyMapping >& map )
 {
   typedef MessageValue1< PropertyOwner, OwnerPointer< UniformPropertyMapping > > LocalType;
+
+  // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
   new (slot) LocalType( &owner, &PropertyOwner::AddUniformMapping, map );
 }
 
 inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const std::string& uniformName )
 {
   typedef MessageValue1< PropertyOwner, std::string > LocalType;
+
+  // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
   new (slot) LocalType( &owner, &PropertyOwner::RemoveUniformMapping, uniformName );
 }
 

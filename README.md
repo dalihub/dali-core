@@ -13,9 +13,6 @@
          * [NON-SMACK Targets](#non-smack-targets)
          * [SMACK enabled Targets](#smack-enabled-targets)
          * [DEBUG Builds](#debug-builds)
-      * [3. Building DALi as Javascript using Emscripten](#3-building-dali-as-javascript-using-emscripten)
-         * [Environment for Emscripten Javascript builds](#environment-for-emscripten-javascript-builds)
-         * [Building the repository as Javascript using Emscripten](#building-the-repository-as-javascript-using-emscripten)
 
 # Build Instructions
 
@@ -96,48 +93,4 @@ See the README.md in dali-core/automated-tests.
 ### DEBUG Builds
 
          $ gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
-
-## 3. Building DALi as Javascript using Emscripten
-
-
-### Environment for Emscripten Javascript builds
-
-To build the Javascript version of DALi, the Emscripten SDK is required.
-Installation of this is built in to the main dali_env script.
-
-First create a directory for the environment:
-
-         $ mkdir -p ~/dali-env-emscripten
-
-Now run the dali_env script. This will download and build the Emscripten SDK, which may take several minutes.
-The script may ask for your password as it will need to install any package prerequisites.
-Note the "-e" option for Emscripten.
-
-         $ cd ~/dali-env-emscripten
-         $ PATH-TO-DALI-CORE/build/scripts/dali_env -c -e
-
-Create the setenv script. A new section for Emscripten will be created at the top.
-
-         $ ./dali-env/opt/bin/dali_env -s > setenv
-
-Run the setenv script to setup environment variables.
-
-         $ . ./setenv
-
-Warning: As of 19/01/2015 with a userID > 6 digits there was a bug in llvm that caused
-the build to fail. So I've used the incoming branches of the emscripten sdk and not latest.
-
-### Building the repository as Javascript using Emscripten
-
-Clean the build first:
-
-         $ cd ./dali-core/build/tizen
-         $ git clean -dxf
-         $ autoreconf --install
-
-Use llvm's drop in replacements for configure & make:
-
-         $ emconfigure ./configure --verbose --prefix=$DESKTOP_PREFIX --enable-emscripten=yes --enable-debug=yes --enable-profile=UBUNTU --enable-gles=20
-         $ emmake make install -j8
-
 

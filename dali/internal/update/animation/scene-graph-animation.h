@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,12 @@ public:
   void SetDuration(float durationSeconds);
 
   /**
+   * Set the progress marker to trigger notification
+   * @param[in] progress percent of progress to trigger notification, 0.0f < progress <= 1.0f
+   */
+  void SetProgressNotification( float progress );
+
+  /**
    * Retrieve the duration of the animation.
    * @return The duration in seconds.
    */
@@ -100,7 +106,7 @@ public:
     return mDurationSeconds;
   }
 
-  /*
+  /**
    * Retrieve the current progress of the animation.
    * @return The current progress as a normalized value between [0,1].
    */
@@ -114,7 +120,7 @@ public:
     return 0.0f;
   }
 
-  /*
+  /**
    * Sets the progress of the animation.
    * @param[in] The new progress as a normalized value between [0,1]
    */
@@ -123,6 +129,10 @@ public:
     mElapsedSeconds = mDurationSeconds * progress;
   }
 
+  /**
+   * Specifies a speed factor for the animation.
+   * @param[in] factor A value which will multiply the velocity
+   */
   void SetSpeedFactor( float factor )
   {
     mSpeedFactor = factor;
@@ -144,7 +154,7 @@ public:
     return mLoopCount != 1;
   }
 
-  /*
+  /**
    * Get the loop count
    * @return the loop count
    */
@@ -198,11 +208,17 @@ public:
    */
   void Play();
 
-  /*
+  /**
    * Play the animation from a given point
    * @param[in] progress A value between [0,1] form where the animation should start playing
    */
   void PlayFrom( float progress );
+
+  /**
+   * @brief Play the animation after a given delay time.
+   * @param[in] delaySeconds The delay time
+   */
+  void PlayAfter( float delaySeconds );
 
   /**
    * Pause the animation.
@@ -250,13 +266,21 @@ public:
   }
 
   /**
+   * @brief Sets the looping mode.
+   *
+   * Animation plays forwards and then restarts from the beginning or runs backwards again.
+   * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
+   */
+  void SetLoopingMode( bool loopingMode );
+
+  /**
    * Add a newly created animator.
    * Animators are automatically removed, when orphaned from an animatable scene object.
    * @param[in] animator The animator to add.
    * @param[in] propertyOwner The scene-object that owns the animatable property.
    * @post The animator is owned by this animation.
    */
-  void AddAnimator( AnimatorBase* animator );
+  void AddAnimator( OwnerPointer<AnimatorBase>& animator );
 
   /**
    * Retrieve the animators from an animation.
@@ -274,8 +298,9 @@ public:
    * @param[in] elapsedSeconds The time elapsed since the previous frame.
    * @param[out] looped True if the animation looped
    * @param[out] finished True if the animation has finished.
+   * @param[out] progressReached True if progress marker reached
    */
-  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished );
+  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached );
 
 
 protected:
@@ -318,20 +343,28 @@ private:
 
 protected:
 
-  float mDurationSeconds;
-  float mSpeedFactor;
-  EndAction mEndAction;
-  EndAction mDisconnectAction;
+  AnimatorContainer mAnimators;
 
-  State mState;
+  Vector2 mPlayRange;
+
+  float mDurationSeconds;
+  float mDelaySeconds;
   float mElapsedSeconds;
+  float mSpeedFactor;
+  float mProgressMarker;         // Progress marker to trigger a notification
+
   int mPlayedCount;              // Incremented at end of animation or completion of all loops
                                  // Never incremented when looping forever. Event thread tracks to signal end.
   int mLoopCount;                // N loop setting
   int mCurrentLoop;              // Current loop number
 
-  Vector2 mPlayRange;
-  AnimatorContainer mAnimators;
+  EndAction mEndAction;
+  EndAction mDisconnectAction;
+
+  State mState;
+
+  bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
+  bool mAutoReverseEnabled;             // Flag to identify that the looping mode is auto reverse.
 };
 
 }; //namespace SceneGraph
@@ -354,6 +387,18 @@ inline void SetDurationMessage( EventThreadServices& eventThreadServices, const 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetDuration, durationSeconds );
 }
+
+inline void SetProgressNotificationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetProgressNotification, progress );
+}
+
 
 inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const Animation& animation, int loopCount )
 {
@@ -462,9 +507,31 @@ inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const 
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::AddAnimator, &animator );
+  OwnerPointer<AnimatorBase> parameter( &animator );
+  new (slot) LocalType( &animation, &Animation::AddAnimator, parameter );
 }
 
+inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const Animation& animation, float delaySeconds )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::PlayAfter, delaySeconds );
+}
+
+inline void SetLoopingModeMessage( EventThreadServices& eventThreadServices, const Animation& animation, bool loopingMode )
+{
+  typedef MessageValue1< Animation, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetLoopingMode, loopingMode );
+}
 
 } // namespace SceneGraph
 

@@ -62,13 +62,13 @@ void TestApplication::Initialize()
   // We always need the first update!
   mStatus.keepUpdating = Integration::KeepUpdating::STAGE_KEEP_RENDERING;
 
-  mCore = Dali::Integration::Core::New(
-    mRenderController,
-    mPlatformAbstraction,
-    mGlAbstraction,
-    mGlSyncAbstraction,
-    mGestureManager,
-    mDataRetentionPolicy);
+  mCore = Dali::Integration::Core::New( mRenderController,
+                                        mPlatformAbstraction,
+                                        mGlAbstraction,
+                                        mGlSyncAbstraction,
+                                        mGestureManager,
+                                        mDataRetentionPolicy,
+                                        false );
 
   mCore->ContextCreated();
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
@@ -171,7 +171,7 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
   unsigned int nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
   float elapsedSeconds = intervalMilliseconds / 1e3f;
 
-  mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus );
+  mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false );
 
   GetRenderController().Initialize();
 

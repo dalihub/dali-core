@@ -23,10 +23,8 @@
 #include <string>
 #include <cstdio>
 
-#ifndef EMSCRIPTEN // cxxabi not supported
-# include <execinfo.h>
-# include <cxxabi.h>
-#endif
+#include <execinfo.h>
+#include <cxxabi.h>
 
 #include <cstring>
 

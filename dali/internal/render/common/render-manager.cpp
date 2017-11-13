@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,28 +48,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-typedef OwnerContainer< Render::Renderer* >    RendererOwnerContainer;
-typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
-
-typedef OwnerContainer< Render::Geometry* >    GeometryOwnerContainer;
-typedef GeometryOwnerContainer::Iterator       GeometryOwnerIter;
-
-typedef OwnerContainer< Render::Sampler* >    SamplerOwnerContainer;
-typedef SamplerOwnerContainer::Iterator       SamplerOwnerIter;
-
-typedef OwnerContainer< Render::Texture* >   TextureOwnerContainer;
-typedef TextureOwnerContainer::Iterator         TextureOwnerIter;
-
-typedef OwnerContainer< Render::FrameBuffer* >  FrameBufferOwnerContainer;
-typedef FrameBufferOwnerContainer::Iterator     FrameBufferOwnerIter;
-
-typedef OwnerContainer< Render::PropertyBuffer* > PropertyBufferOwnerContainer;
-typedef PropertyBufferOwnerContainer::Iterator    PropertyBufferOwnerIter;
-
-typedef OwnerContainer< Render::RenderTracker* > RenderTrackerContainer;
-typedef RenderTrackerContainer::Iterator         RenderTrackerIter;
-typedef RenderTrackerContainer::ConstIterator    RenderTrackerConstIter;
-
 /**
  * Structure to contain internal data
  */
@@ -81,15 +59,16 @@ struct RenderManager::Impl
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     instructions(),
+    renderAlgorithms(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    frameCount( 0 ),
+    frameCount( 0u ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
     samplerContainer(),
     textureContainer(),
     frameBufferContainer(),
-    renderersAdded( false ),
+    lastFrameWasRendered( false ),
     programController( glAbstraction )
   {
   }
@@ -111,41 +90,42 @@ struct RenderManager::Impl
 
   void UpdateTrackers()
   {
-    for(RenderTrackerIter iter = mRenderTrackers.Begin(), end = mRenderTrackers.End(); iter != end; ++iter)
+    for( auto&& iter : mRenderTrackers )
     {
-      (*iter)->PollSyncObject();
+      iter->PollSyncObject();
     }
   }
 
   // the order is important for destruction,
   // programs are owned by context at the moment.
-  Context                       context;                  ///< holds the GL state
-  Integration::GlSyncAbstraction& glSyncAbstraction;      ///< GL sync abstraction
-  RenderQueue                   renderQueue;              ///< A message queue for receiving messages from the update-thread.
+  Context                                   context;                 ///< holds the GL state
+  Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
+  RenderQueue                               renderQueue;             ///< A message queue for receiving messages from the update-thread.
 
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
-  RenderInstructionContainer    instructions;
+  RenderInstructionContainer                instructions;
+  Render::RenderAlgorithms                  renderAlgorithms;        ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  Vector4                       backgroundColor;          ///< The glClear color used at the beginning of each frame.
+  Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
-  unsigned int                  frameCount;               ///< The current frame count
-  BufferIndex                   renderBufferIndex;        ///< The index of the buffer to read from; this is opposite of the "update" buffer
+  unsigned int                              frameCount;              ///< The current frame count
+  BufferIndex                               renderBufferIndex;       ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                     defaultSurfaceRect;       ///< Rectangle for the default surface we are rendering to
+  Rect<int>                                 defaultSurfaceRect;      ///< Rectangle for the default surface we are rendering to
 
-  RendererOwnerContainer        rendererContainer;        ///< List of owned renderers
-  SamplerOwnerContainer         samplerContainer;         ///< List of owned samplers
-  TextureOwnerContainer         textureContainer;         ///< List of owned textures
-  FrameBufferOwnerContainer     frameBufferContainer;     ///< List of owned framebuffers
-  PropertyBufferOwnerContainer  propertyBufferContainer;  ///< List of owned property buffers
-  GeometryOwnerContainer        geometryContainer;        ///< List of owned Geometries
+  OwnerContainer< Render::Renderer* >       rendererContainer;       ///< List of owned renderers
+  OwnerContainer< Render::Sampler* >        samplerContainer;        ///< List of owned samplers
+  OwnerContainer< Render::Texture* >        textureContainer;        ///< List of owned textures
+  OwnerContainer< Render::FrameBuffer* >    frameBufferContainer;    ///< List of owned framebuffers
+  OwnerContainer< Render::PropertyBuffer* > propertyBufferContainer; ///< List of owned property buffers
+  OwnerContainer< Render::Geometry* >       geometryContainer;       ///< List of owned Geometries
 
-  bool                          renderersAdded;
+  bool                                      lastFrameWasRendered;    ///< Keeps track of the last frame being rendered due to having render instructions
 
-  RenderTrackerContainer        mRenderTrackers;          ///< List of render trackers
+  OwnerContainer< Render::RenderTracker* >  mRenderTrackers;         ///< List of render trackers
 
-  ProgramController             programController;        ///< Owner of the GL programs
+  ProgramController                         programController;        ///< Owner of the GL programs
 
 };
 
@@ -188,24 +168,21 @@ void RenderManager::ContextDestroyed()
   mImpl->programController.GlContextDestroyed();
 
   //Inform textures
-  for( TextureOwnerIter iter = mImpl->textureContainer.Begin(); iter != mImpl->textureContainer.End(); ++iter )
+  for( auto&& texture : mImpl->textureContainer )
   {
-    (*iter)->GlContextDestroyed();
+    texture->GlContextDestroyed();
   }
 
   //Inform framebuffers
-  for( FrameBufferOwnerIter iter = mImpl->frameBufferContainer.Begin(); iter != mImpl->frameBufferContainer.End(); ++iter )
+  for( auto&& framebuffer : mImpl->frameBufferContainer )
   {
-    (*iter)->GlContextDestroyed();
+    framebuffer->GlContextDestroyed();
   }
 
   // inform renderers
-  RendererOwnerContainer::Iterator end = mImpl->rendererContainer.End();
-  RendererOwnerContainer::Iterator iter = mImpl->rendererContainer.Begin();
-  for( ; iter != end; ++iter )
+  for( auto&& renderer : mImpl->rendererContainer )
   {
-    GlResourceOwner* renderer = *iter;
-    renderer->GlContextDestroyed(); // Clear up vertex buffers
+    renderer->GlContextDestroyed();
   }
 }
 
@@ -229,17 +206,12 @@ void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
   mImpl->defaultSurfaceRect = rect;
 }
 
-void RenderManager::AddRenderer( Render::Renderer* renderer )
+void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
 {
   // Initialize the renderer as we are now in render thread
   renderer->Initialize( mImpl->context );
 
-  mImpl->rendererContainer.PushBack( renderer );
-
-  if( !mImpl->renderersAdded )
-  {
-    mImpl->renderersAdded = true;
-  }
+  mImpl->rendererContainer.PushBack( renderer.Release() );
 }
 
 void RenderManager::RemoveRenderer( Render::Renderer* renderer )
@@ -247,9 +219,9 @@ void RenderManager::RemoveRenderer( Render::Renderer* renderer )
   mImpl->rendererContainer.EraseObject( renderer );
 }
 
-void RenderManager::AddSampler( Render::Sampler* sampler )
+void RenderManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
 {
-  mImpl->samplerContainer.PushBack( sampler );
+  mImpl->samplerContainer.PushBack( sampler.Release() );
 }
 
 void RenderManager::RemoveSampler( Render::Sampler* sampler )
@@ -257,26 +229,24 @@ void RenderManager::RemoveSampler( Render::Sampler* sampler )
   mImpl->samplerContainer.EraseObject( sampler );
 }
 
-void RenderManager::AddTexture( Render::Texture* texture )
+void RenderManager::AddTexture( OwnerPointer< Render::Texture >& texture )
 {
-  mImpl->textureContainer.PushBack( texture );
-  texture->Initialize(mImpl->context);
+  texture->Initialize( mImpl->context );
+  mImpl->textureContainer.PushBack( texture.Release() );
 }
 
 void RenderManager::RemoveTexture( Render::Texture* texture )
 {
   DALI_ASSERT_DEBUG( NULL != texture );
 
-  TextureOwnerContainer& textures = mImpl->textureContainer;
-
-  // Find the texture
-  for ( TextureOwnerIter iter = textures.Begin(); iter != textures.End(); ++iter )
+  // Find the texture, use reference to pointer so we can do the erase safely
+  for ( auto&& iter : mImpl->textureContainer )
   {
-    if ( *iter == texture )
+    if ( iter == texture )
     {
       texture->Destroy( mImpl->context );
-      textures.Erase( iter ); // Texture found; now destroy it
-      break;
+      mImpl->textureContainer.Erase( &iter ); // Texture found; now destroy it
+      return;
     }
   }
 }
@@ -314,15 +284,13 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != frameBuffer );
 
-  FrameBufferOwnerContainer& framebuffers = mImpl->frameBufferContainer;
-
-  // Find the sampler
-  for ( FrameBufferOwnerIter iter = framebuffers.Begin(); iter != framebuffers.End(); ++iter )
+  // Find the sampler, use reference so we can safely do the erase
+  for ( auto&& iter : mImpl->frameBufferContainer )
   {
-    if ( *iter == frameBuffer )
+    if ( iter == frameBuffer )
     {
       frameBuffer->Destroy( mImpl->context );
-      framebuffers.Erase( iter ); // frameBuffer found; now destroy it
+      mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
       break;
     }
   }
@@ -333,9 +301,9 @@ void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
   frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
-void RenderManager::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
-  mImpl->propertyBufferContainer.PushBack( propertyBuffer );
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );
 }
 
 void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
@@ -343,14 +311,14 @@ void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
-void RenderManager::SetPropertyBufferFormat(Render::PropertyBuffer* propertyBuffer, Render::PropertyBuffer::Format* format )
+void RenderManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
-  propertyBuffer->SetFormat( format );
+  propertyBuffer->SetFormat( format.Release() );
 }
 
-void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, Dali::Vector<char>* data, size_t size )
+void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
-  propertyBuffer->SetData( data, size );
+  propertyBuffer->SetData( data.Release(), size );
 }
 
 void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
@@ -358,9 +326,9 @@ void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uns
   geometry->SetIndexBuffer( indices );
 }
 
-void RenderManager::AddGeometry( Render::Geometry* geometry )
+void RenderManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
 {
-  mImpl->geometryContainer.PushBack( geometry );
+  mImpl->geometryContainer.PushBack( geometry.Release() );
 }
 
 void RenderManager::RemoveGeometry( Render::Geometry* geometry )
@@ -368,18 +336,16 @@ void RenderManager::RemoveGeometry( Render::Geometry* geometry )
   mImpl->geometryContainer.EraseObject( geometry );
 }
 
-void RenderManager::AddVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the renderer
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  // Find the geometry
+  for ( auto&& iter : mImpl->geometryContainer )
   {
-    if ( *iter == geometry )
+    if ( iter == geometry )
     {
-      (*iter)->AddPropertyBuffer( propertyBuffer );
+      iter->AddPropertyBuffer( propertyBuffer );
       break;
     }
   }
@@ -389,14 +355,12 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
-  GeometryOwnerContainer& geometries = mImpl->geometryContainer;
-
-  // Find the renderer
-  for ( GeometryOwnerIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  // Find the geometry
+  for ( auto&& iter : mImpl->geometryContainer )
   {
-    if ( *iter == geometry )
+    if ( iter == geometry )
     {
-      (*iter)->RemovePropertyBuffer( propertyBuffer );
+      iter->RemovePropertyBuffer( propertyBuffer );
       break;
     }
   }
@@ -430,57 +394,70 @@ void RenderManager::Render( Integration::RenderStatus& status )
   DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
 
   // Increment the frame count at the beginning of each frame
-  ++(mImpl->frameCount);
+  ++mImpl->frameCount;
 
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  // switch rendering to adaptor provided (default) buffer
-  mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+  const size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  const bool haveInstructions = count > 0u;
 
-  mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
-                           mImpl->defaultSurfaceRect.y,
-                           mImpl->defaultSurfaceRect.width,
-                           mImpl->defaultSurfaceRect.height );
-
-  mImpl->context.ClearColor( mImpl->backgroundColor.r,
-                             mImpl->backgroundColor.g,
-                             mImpl->backgroundColor.b,
-                             mImpl->backgroundColor.a );
-
-  mImpl->context.ClearStencil( 0 );
-
-  // Clear the entire color, depth and stencil buffers for the default framebuffer.
-  // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
-  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-  mImpl->context.SetScissorTest( false );
-  mImpl->context.ColorMask( true );
-  mImpl->context.DepthMask( true );
-  mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-  mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
-
-  // reset the program matrices for all programs once per frame
-  // this ensures we will set view and projection matrix once per program per camera
-  mImpl->programController.ResetProgramMatrices();
-
-  size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
-  for ( size_t i = 0; i < count; ++i )
+  // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
+  if( haveInstructions || mImpl->lastFrameWasRendered )
   {
-    RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+    // Mark that we will require a post-render step to be performed (includes swap-buffers).
+    status.SetNeedsPostRender( true );
 
-    DoRender( instruction );
+    // switch rendering to adaptor provided (default) buffer
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
+
+    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                             mImpl->defaultSurfaceRect.y,
+                             mImpl->defaultSurfaceRect.width,
+                             mImpl->defaultSurfaceRect.height );
+
+    mImpl->context.ClearColor( mImpl->backgroundColor.r,
+                               mImpl->backgroundColor.g,
+                               mImpl->backgroundColor.b,
+                               mImpl->backgroundColor.a );
+
+    mImpl->context.ClearStencil( 0 );
+
+    // Clear the entire color, depth and stencil buffers for the default framebuffer.
+    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+    mImpl->context.SetScissorTest( false );
+    mImpl->context.ColorMask( true );
+    mImpl->context.DepthMask( true );
+    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, Context::FORCE_CLEAR );
+
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    mImpl->programController.ResetProgramMatrices();
+
+    for( size_t i = 0; i < count; ++i )
+    {
+      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+
+      DoRender( instruction );
+    }
+
+    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+    mImpl->UpdateTrackers();
+
+    //Notify RenderGeometries that rendering has finished
+    for ( auto&& iter : mImpl->geometryContainer )
+    {
+      iter->OnRenderFinished();
+    }
   }
-  GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-  mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
-  mImpl->UpdateTrackers();
-
-  //Notify RenderGeometries that rendering has finished
-  for ( GeometryOwnerIter iter = mImpl->geometryContainer.Begin(); iter != mImpl->geometryContainer.End(); ++iter )
-  {
-    (*iter)->OnRenderFinished();
-  }
+  // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
+  mImpl->lastFrameWasRendered = haveInstructions;
 
   /**
    * The rendering has finished; swap to the next buffer.
@@ -506,7 +483,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
   }
 
-  if( instruction.mFrameBuffer != 0 )
+  if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
     instruction.mFrameBuffer->Bind( mImpl->context );
     if ( instruction.mIsViewportSet )
@@ -555,9 +532,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->context.SetScissorTest( false );
   }
 
-  Render::ProcessRenderInstruction( instruction,
-                                    mImpl->context,
-                                    mImpl->renderBufferIndex );
+  mImpl->renderAlgorithms.ProcessRenderInstruction( instruction, mImpl->context, mImpl->renderBufferIndex );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

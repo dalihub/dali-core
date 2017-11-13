@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -426,6 +426,7 @@ public:
       paramName<<"texture["<<i<<"]";
       namedParams[paramName.str()] = ToString(textures[i]);
       mDeletedTextureIds.push_back(textures[i]);
+      mNumGeneratedTextures--;
     }
     out << "]";
 
@@ -642,6 +643,7 @@ public:
       {
         *(textures+i) = ++mLastAutoTextureIdUsed;
       }
+      mNumGeneratedTextures++;
     }
 
     TraceCallStack::NamedParams namedParams;
@@ -661,6 +663,15 @@ public:
     }
 
     mTextureTrace.PushCall("GenTextures", out.str(), namedParams);
+  }
+
+  inline GLuint GetLastGenTextureId()
+  {
+    return mLastAutoTextureIdUsed;
+  }
+  inline GLuint GetNumGeneratedTextures()
+  {
+    return mNumGeneratedTextures;
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
@@ -938,6 +949,15 @@ public:
     mScissorParams.y = y;
     mScissorParams.width = width;
     mScissorParams.height = height;
+
+    std::stringstream out;
+    out << x << ", " << y << ", " << width << ", " << height;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["x"] = ToString( x );
+    namedParams["y"] = ToString( y );
+    namedParams["width"] = ToString( width );
+    namedParams["height"] = ToString( height );
+    mScissorTrace.PushCall( "Scissor", out.str(), namedParams );
   }
 
   inline void ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length)
@@ -1940,6 +1960,11 @@ public: // TEST FUNCTIONS
   inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
   inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
 
+  //Methods for Scissor verification
+  inline void EnableScissorCallTrace(bool enable) { mScissorTrace.Enable(enable); }
+  inline void ResetScissorCallStack() { mScissorTrace.Reset(); }
+  inline TraceCallStack& GetScissorTrace() { return mScissorTrace; }
+
   //Methods for Uniform function verification
   inline void EnableSetUniformCallTrace(bool enable) { mSetUniformTrace.Enable(enable); }
   inline void ResetSetUniformCallStack() { mSetUniformTrace.Reset(); }
@@ -2158,6 +2183,7 @@ private:
 
   // Data for manipulating the IDs returned by GenTextures
   GLuint mLastAutoTextureIdUsed;
+  GLuint mNumGeneratedTextures;
   std::vector<GLuint> mNextTextureIds;
   std::vector<GLuint> mDeletedTextureIds;
   std::vector<GLuint> mBoundTextures;
@@ -2177,6 +2203,7 @@ private:
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;
   TraceCallStack mStencilFunctionTrace;
+  TraceCallStack mScissorTrace;
   TraceCallStack mSetUniformTrace;
 
   // Shaders & Uniforms

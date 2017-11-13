@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
 
   if ( !mProcessingCoreEvents )
   {
-    mRenderController.RequestProcessEventsOnIdle();
+    mRenderController.RequestProcessEventsOnIdle( false );
   }
 }
 

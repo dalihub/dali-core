@@ -40,11 +40,24 @@ using namespace Dali;
 #define STRINGIZE_I(text) #text
 #define STRINGIZE(text) STRINGIZE_I(text)
 
-// the following is the other compilers way of token pasting, gcc seems to just concatenate strings automatically
-//#define TOKENPASTE(x,y) x ## y
-#define TOKENPASTE(x,y) x y
-#define TOKENPASTE2(x,y) TOKENPASTE( x, y )
-#define TEST_LOCATION TOKENPASTE2( "Test failed in ", TOKENPASTE2( __FILE__, TOKENPASTE2( ", line ", STRINGIZE(__LINE__) ) ) )
+/**
+ * Inspired by https://stackoverflow.com/questions/1706346/file-macro-manipulation-handling-at-compile-time
+ * answer by Chetan Reddy
+ */
+constexpr int32_t basenameIndex( const char * const path, const int32_t index = 0, const int32_t slashIndex = -1 )
+{
+   return path[ index ]
+       ? ( path[ index ] == '/'
+           ? basenameIndex( path, index + 1, index )
+           : basenameIndex( path, index + 1, slashIndex ) )
+       : ( slashIndex + 1 );
+}
+
+#define __FILELINE__ ( { static const int32_t basenameIdx = basenameIndex( __FILE__ ); \
+                         static_assert (basenameIdx >= 0, "compile-time basename" );   \
+                         __FILE__ ":" STRINGIZE(__LINE__) + basenameIdx ; } )
+
+#define TEST_LOCATION __FILELINE__
 #define TEST_INNER_LOCATION(x) ( std::string(x) + " (" + STRINGIZE(__LINE__) + ")" ).c_str()
 
 #define TET_UNDEF 2
@@ -73,7 +86,7 @@ if ( (condition) )                                                              
 }                                                                                         \
 else                                                                                      \
 {                                                                                         \
-  fprintf(stderr, "%s Failed in %s at line %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);    \
+  fprintf(stderr, "Test failed in %s, condition: %s\n", __FILELINE__, #condition );       \
   tet_result(TET_FAIL);                                                                   \
   throw("TET_FAIL");                                                                      \
 }
@@ -97,14 +110,22 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
   {
     std::ostringstream o;
     o << value1 << " == " << value2 << std::endl;
-    fprintf(stderr, "%s, checking %s", location, o.str().c_str());
+    fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {
     tet_result(TET_PASS);
   }
 }
+
+/**
+ * Test whether two values are equal.
+ * @param[in] value1 The first value
+ * @param[in] value2 The second value
+ */
+#define DALI_TEST_EQUAL( v1, v2 ) DALI_TEST_EQUALS( v1, v2, __FILELINE__ )
 
 template<typename Type>
 inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char* location)
@@ -113,8 +134,9 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char
   {
     std::ostringstream o;
     o << value1 << " == " << value2 << std::endl;
-    fprintf(stderr, "%s, checking %s", location, o.str().c_str());
+    fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {
@@ -129,8 +151,9 @@ inline void DALI_TEST_NOT_EQUALS(Type value1, Type value2, float epsilon, const 
   {
     std::ostringstream o;
     o << value1 << " !=  " << value2 << std::endl;
-    fprintf(stderr, "%s, checking %s", location, o.str().c_str());
+    fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {
@@ -151,13 +174,15 @@ inline void DALI_TEST_EQUALS<TimePeriod>( TimePeriod value1, TimePeriod value2, 
 {
   if ((fabs(value1.durationSeconds - value2.durationSeconds) > epsilon))
   {
-    fprintf(stderr, "%s, checking durations %f == %f, epsilon %f\n", location, value1.durationSeconds, value2.durationSeconds, epsilon);
+    fprintf(stderr, "Test failed in %s, checking durations %f == %f, epsilon %f\n", location, value1.durationSeconds, value2.durationSeconds, epsilon);
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else if ((fabs(value1.delaySeconds - value2.delaySeconds) > epsilon))
   {
-    fprintf(stderr, "%s, checking delays %f == %f, epsilon %f\n", location, value1.delaySeconds, value2.delaySeconds, epsilon);
+    fprintf(stderr, "Test failed in %s, checking delays %f == %f, epsilon %f\n", location, value1.delaySeconds, value2.delaySeconds, epsilon);
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {
@@ -232,8 +257,9 @@ inline void DALI_TEST_EQUALS<const char*>( const char* str1, const char* str2, c
 {
   if (strcmp(str1, str2))
   {
-    fprintf(stderr, "%s, checking '%s' == '%s'\n", location, str1, str2);
+    fprintf(stderr, "Test failed in %s, checking '%s' == '%s'\n", location, str1, str2);
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {
@@ -289,8 +315,9 @@ void DALI_TEST_GREATER( T value1, T value2, const char* location)
 {
   if (!(value1 > value2))
   {
-    std::cerr << location << ", checking " << value1 <<" > " << value2 << "\n";
+    std::cerr << "Test failed in " << location << ", checking " << value1 <<" > " << value2 << "\n";
     tet_result(TET_FAIL);
+    throw("TET_FAIL");                                                                      \
   }
   else
   {

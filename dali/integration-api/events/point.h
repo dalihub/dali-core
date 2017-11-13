@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_POINT_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/events/touch-point.h>
+#include <dali/public-api/events/device.h>
 
 namespace Dali
 {
@@ -106,6 +107,18 @@ struct DALI_IMPORT_API Point
   void SetAngle( Degree angle );
 
   /**
+   * @brief Sets the class of the device for the event
+   * @param[in] deviceClass The class of the device.
+   */
+  void SetDeviceClass( Device::Class::Type deviceClass );
+
+  /**
+   * @brief Sets the subclass of the device for the event
+   * @param[in] deviceSubclass The subclass of the device.
+   */
+  void SetDeviceSubclass( Device::Subclass::Type deviceSubclass );
+
+  /**
    * @brief Retrieve the Unique Device ID of the point.
    * @return The Unique Device ID of the point.
    */
@@ -153,6 +166,20 @@ struct DALI_IMPORT_API Point
    */
   Degree GetAngle() const;
 
+  /**
+   * @brief Retrieve the class of the device for the event.
+   * @return The class of the device
+   */
+  Device::Class::Type GetDeviceClass() const;
+
+  /**
+   * @brief Retrieve the subclass of the device for the event.
+   * @return The subclass of the device
+   */
+  Device::Subclass::Type GetDeviceSubclass() const;
+
+
+
 public: // Not intended for Integration API developers
 
   /**
@@ -192,6 +219,8 @@ private:
   TouchPoint mTouchPoint; ///< Stores screen position, device Id, local & screen positions and the hit-actor. @see TouchPoint
   Vector2 mEllipseRadius; ///< Radius of both the horizontal and vertical radius (useful if an ellipse).
   Degree mAngle; ///< The angle of the press point, relative to the Y-Axis.
+  Device::Class::Type mDeviceClass;
+  Device::Subclass::Type mDeviceSubclass;
   float mPressure; ///< The touch pressure.
   float mRadius; ///< Radius of the press point, an average of the ellipse radius.
 };

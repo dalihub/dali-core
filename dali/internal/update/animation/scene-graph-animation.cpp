@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
-
+#include <dali/public-api/math/math-utils.h>
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
@@ -45,7 +45,7 @@ inline void WrapInPlayRange( float& elapsed, const Dali::Vector2& playRangeSecon
 /// Compares the end times of the animators and if the end time is less, then it is moved earlier in the list. If end times are the same, then no change.
 bool CompareAnimatorEndTimes( const Dali::Internal::SceneGraph::AnimatorBase* lhs, const Dali::Internal::SceneGraph::AnimatorBase* rhs )
 {
-  return ( ( lhs->GetInitialDelay() + lhs->GetDuration() ) < ( rhs->GetInitialDelay() + rhs->GetDuration() ) );
+  return ( ( lhs->GetIntervalDelay() + lhs->GetDuration() ) < ( rhs->GetIntervalDelay() + rhs->GetDuration() ) );
 }
 
 } // unnamed namespace
@@ -65,16 +65,20 @@ Animation* Animation::New( float durationSeconds, float speedFactor, const Vecto
 }
 
 Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, int loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
-: mDurationSeconds(durationSeconds),
+: mPlayRange( playRange ),
+  mDurationSeconds( durationSeconds ),
+  mDelaySeconds( 0.0f ),
+  mElapsedSeconds( playRange.x*mDurationSeconds ),
   mSpeedFactor( speedFactor ),
+  mProgressMarker( 0.0f ),
+  mPlayedCount( 0 ),
+  mLoopCount(loopCount),
+  mCurrentLoop(0),
   mEndAction(endAction),
   mDisconnectAction(disconnectAction),
   mState(Stopped),
-  mElapsedSeconds(playRange.x*mDurationSeconds),
-  mPlayedCount(0),
-  mLoopCount(loopCount),
-  mCurrentLoop(0),
-  mPlayRange( playRange )
+  mProgressReachedSignalRequired( false ),
+  mAutoReverseEnabled( false )
 {
 }
 
@@ -90,6 +94,15 @@ void Animation::operator delete( void* ptr )
 void Animation::SetDuration(float durationSeconds)
 {
   mDurationSeconds = durationSeconds;
+}
+
+void Animation::SetProgressNotification( float progress )
+{
+  mProgressMarker = progress;
+  if ( mProgressMarker > 0.0f )
+  {
+    mProgressReachedSignalRequired = true;
+  }
 }
 
 void Animation::SetLoopCount(int loopCount)
@@ -163,6 +176,24 @@ void Animation::PlayFrom( float progress )
     mState = Playing;
 
     SetAnimatorsActive( true );
+  }
+}
+
+void Animation::PlayAfter( float delaySeconds )
+{
+  if( mState != Playing )
+  {
+    mDelaySeconds = delaySeconds;
+    mState = Playing;
+
+    if ( mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x*mDurationSeconds )
+    {
+      mElapsedSeconds = mPlayRange.y * mDurationSeconds;
+    }
+
+    SetAnimatorsActive( true );
+
+    mCurrentLoop = 0;
   }
 }
 
@@ -248,15 +279,29 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
   mState = Destroyed;
 }
 
-void Animation::AddAnimator( AnimatorBase* animator )
+void Animation::SetLoopingMode( bool loopingMode )
+{
+  mAutoReverseEnabled = loopingMode;
+
+  for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+  {
+    // Send some variables together to figure out the Animation status
+    (*iter)->SetSpeedFactor( mSpeedFactor );
+    (*iter)->SetLoopCount( mLoopCount );
+
+    (*iter)->SetLoopingMode( loopingMode );
+  }
+}
+
+void Animation::AddAnimator( OwnerPointer<AnimatorBase>& animator )
 {
   animator->ConnectToSceneGraph();
   animator->SetDisconnectAction( mDisconnectAction );
 
-  mAnimators.PushBack( animator );
+  mAnimators.PushBack( animator.Release() );
 }
 
-void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished )
+void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached )
 {
   looped = false;
   finished = false;
@@ -270,21 +315,43 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   // The animation must still be applied when Paused/Stopping
   if (mState == Playing)
   {
-    mElapsedSeconds += elapsedSeconds * mSpeedFactor;
+    // If there is delay time before Animation starts, wait the Animation until mDelaySeconds.
+    if( mDelaySeconds > 0.0f )
+    {
+      float reduceSeconds = fabsf( elapsedSeconds * mSpeedFactor );
+      if( reduceSeconds > mDelaySeconds )
+      {
+        if( mSpeedFactor < 0.0f )
+        {
+          mElapsedSeconds -= reduceSeconds - mDelaySeconds;
+        }
+        else
+        {
+          mElapsedSeconds += reduceSeconds - mDelaySeconds;
+        }
+        mDelaySeconds = 0.0f;
+      }
+      else
+      {
+        mDelaySeconds -= reduceSeconds;
+      }
+    }
+    else
+    {
+      mElapsedSeconds += ( elapsedSeconds * mSpeedFactor );
+    }
+
+    if ( mProgressReachedSignalRequired && ( mElapsedSeconds >= mProgressMarker ) )
+    {
+      // The application should be notified by NotificationManager, in another thread
+      progressReached = true;
+      mProgressReachedSignalRequired = false;
+    }
   }
 
   Vector2 playRangeSeconds = mPlayRange * mDurationSeconds;
 
-  if( 0 == mLoopCount )
-  {
-    // loop forever
-    WrapInPlayRange(mElapsedSeconds, playRangeSeconds);
-
-    UpdateAnimators(bufferIndex, false, false);
-
-    // don't increment mPlayedCount as event loop tracks this to indicate animation finished (end of all loops)
-  }
-  else if( mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
+  if( 0 == mLoopCount || mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
   {
     // looping
     looped =  (mState == Playing                                                 &&
@@ -293,11 +360,15 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
 
     WrapInPlayRange( mElapsedSeconds, playRangeSeconds );
 
-    UpdateAnimators(bufferIndex, false, false);
+    UpdateAnimators(bufferIndex, false, false );
 
     if(looped)
     {
-      ++mCurrentLoop;
+      if( mLoopCount != 0 )
+      {
+        ++mCurrentLoop;
+      }
+      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
       // don't increment mPlayedCount until the finished final loop
     }
   }
@@ -309,7 +380,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
                  ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
 
     // update with bake if finished
-    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished);
+    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished );
 
     if(finished)
     {
@@ -323,6 +394,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
         DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
       }
 
+      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
       mElapsedSeconds = playRangeSeconds.x;
       mState = Stopped;
     }
@@ -349,15 +421,16 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
     {
       if( animator->IsEnabled() )
       {
-        const float initialDelay( animator->GetInitialDelay() );
-        if( elapsedSecondsClamped >= initialDelay )
+        const float intervalDelay( animator->GetIntervalDelay() );
+
+        if( elapsedSecondsClamped >= intervalDelay )
         {
           // Calculate a progress specific to each individual animator
           float progress(1.0f);
           const float animatorDuration = animator->GetDuration();
           if (animatorDuration > 0.0f) // animators can be "immediate"
           {
-            progress = Clamp((elapsedSecondsClamped - initialDelay) / animatorDuration, 0.0f , 1.0f );
+            progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f , 1.0f );
           }
           animator->Update(bufferIndex, progress, bake);
         }

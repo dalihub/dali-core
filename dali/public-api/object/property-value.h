@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_VALUE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ struct Vector3;
 struct Vector4;
 class Matrix3;
 class Matrix;
+struct Extents;
 
 /**
  * @brief A value-type representing a property value.
@@ -175,6 +176,14 @@ public:
    * @param[in] mapValue An array
    */
   Value( Property::Map& mapValue );
+
+  /**
+   * @brief Creates an extents property value.
+   *
+   * @SINCE_1_2.62
+   * @param[in] extentsValue A collection of 4 uint16_t values
+   */
+  Value( const Extents& extentsValue );
 
   /**
    * @brief Explicitly sets a type and initialize it.
@@ -388,6 +397,16 @@ public:
    * @return The Map API of the Property::Value or NULL if not a Property::Map
    */
   Property::Map* GetMap() const;
+
+  /**
+   * @brief Retrieves an extents.
+   *
+   * @SINCE_1_2.62
+   * @param[out] extentsValue Extents, a collection of 4 uint16_t
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
+   * @pre GetType() is a type convertible to Extents.
+   */
+  bool Get( Extents& extentsValue ) const;
 
   /**
    * @brief Output to stream.

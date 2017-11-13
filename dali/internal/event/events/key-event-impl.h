@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/key-event.h>
-#include <dali/devel-api/events/key-event-devel.h>
 
 namespace Dali
 {
@@ -52,7 +51,6 @@ public:
   /**
    * @brief Get the device name the key event originated from
    *
-   * @param[in] keyEvent The KeyEvent to retrieve the device name from
    * @return The device name
    */
    std::string GetDeviceName() const;
@@ -60,7 +58,6 @@ public:
   /**
    * @brief Set the device name to the KeyEvent
    *
-   * @param[in] keyEvent The KeyEvent to set the device name on
    * @param[in] deviceName Device name string to set
    */
   void SetDeviceName( const std::string& deviceName );
@@ -68,18 +65,30 @@ public:
   /**
    * @brief Get the device class the key event originated from
    *
-   * @param[in] keyEvent The KeyEvent to retrieve the device class from
    * @return The device class
    */
-  DevelKeyEvent::DeviceClass::Type GetDeviceClass() const;
+  Device::Class::Type GetDeviceClass() const;
 
   /**
    * @brief Set the device class to the KeyEvent
    *
-   * @param[in] keyEvent The KeyEvent to set the device class on
    * @param[in] deviceClass Device class to set
    */
-  void SetDeviceClass( const DevelKeyEvent::DeviceClass::Type& deviceClass );
+  void SetDeviceClass( Device::Class::Type deviceClass );
+
+  /**
+   * @brief Get the device subclass the key event originated from
+   *
+   * @return The device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass() const;
+
+  /**
+   * @brief Set the device subclass to the KeyEvent
+   *
+   * @param[in] deviceClass Device subclass to set
+   */
+  void SetDeviceSubclass( Device::Subclass::Type deviceSubclass );
 
 private:
 
@@ -92,7 +101,8 @@ private:
 private:
 
   std::string mDeviceName;
-  DevelKeyEvent::DeviceClass::Type mDeviceClass;
+  Device::Class::Type mDeviceClass;
+  Device::Subclass::Type mDeviceSubclass;
 };
 
 } // namespace Internal

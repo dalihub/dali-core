@@ -151,7 +151,7 @@ public:
    * Change the data providers of the renderer
    * @param[in] dataProviders The data providers
    */
-  void SetRenderDataProvider( SceneGraph::RenderDataProvider* dataProviders );
+  void SetRenderDataProvider( OwnerPointer<SceneGraph::RenderDataProvider>& dataProviders );
 
   /**
    * Change the geometry used by the renderer

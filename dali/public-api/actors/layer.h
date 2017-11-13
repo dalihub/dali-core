@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,25 +48,28 @@ typedef Rect<int> ClippingBox;
 /**
  * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.
  *
- * When added to the stage, a layer can be ordered relative to other layers. The bottom
- * layer is at depth zero. The stage provides a default layer for it's children (see Stage::GetRootLayer()).
+ * When added to the stage, a layer can be ordered relative to other
+ * layers. The bottom layer is at depth zero. The stage provides a default
+ * layer for it's children (see Stage::GetRootLayer()).
  *
- * Layered actors inherit position etc. as normal, but are drawn in an order determined
- * by the layers. In case of LAYER_3D, the depth buffer is cleared before each layer is rendered unless depth
- * test is disabled or there's no need for it based on the layers contents;
- * actors in lower layers cannot obscure actors in higher layers.
+ * Layered actors inherit position etc. as normal, but are drawn in an order
+ * determined by the layers. In case of LAYER_3D, the depth buffer is cleared
+ * before each layer is rendered unless depth test is disabled or there's no
+ * need for it based on the layer's contents; actors in lower layers cannot
+ * obscure actors in higher layers.
  *
- * A layer has either LAYER_2D or LAYER_3D mode. LAYER_2D has better performance,
- * the depth test is disabled, and a child actor hides its parent actor.
- * LAYER_3D uses the depth test, thus a close actor hides a farther one.
- * LAYER_2D is the default mode and recommended for general cases.
- * See Layer::Behavior and SetBehavior() for more information.
+ * A layer has either LAYER_2D or LAYER_3D mode. LAYER_2D has better
+ * performance, the depth test is disabled, and a child actor hides its
+ * parent actor.  LAYER_3D uses the depth test, thus a close actor hides a
+ * farther one.  LAYER_2D is the default mode and recommended for general
+ * cases.  See Layer::Behavior and SetBehavior() for more information.
  *
- * Layer is a type of Actor, thus can have parent or children actors.
- * A layer influences rendering of its all descendant actors,
- * until another layer appears in the actor tree and manages its own subtree.
+ * Layer is a type of Actor, thus can have parent or children actors.  A
+ * layer influences rendering of its all descendant actors, until another
+ * layer appears in the actor tree and manages its own subtree.
  *
- * If depth test is disabled, there is no performance overhead from clearing the depth buffer.
+ * If depth test is disabled, there is no performance overhead from clearing
+ * the depth buffer.
  *
  * Actions
  * | %Action Name    | %Layer method called |
@@ -122,13 +125,14 @@ public:
     /**
      * @brief UI control rendering mode (default mode).
      *
-     * This mode is designed for UI controls. In this mode renderer order will be respective to tree hierarchy of Actors.
-     * This mode is expected to have better performance than LAYER_3D as renderers can be sorted more efficiently.
+     * This mode is designed for UI controls that can overlap. In this
+     * mode renderer order will be respective to the tree hierarchy of
+     * Actors.
      *
-     * For the following actor tree the rendering order will be A first, then B & C and finally D,E,F regardless of their
-     * Z positions.
-     * Rendering order between siblings, such as D, E & F or B & C, is determined based on the renderers depth index.
-     * In UI we don't normally expect overlap. If you have two overlapped actors, make them parent-child to guarantee order of all renderers.
+     * The rendering order is depth first, so for the following actor tree,
+     * A will be drawn first, then B, D, E, then C, F.  This ensures that
+     * overlapping actors are drawn as expected (whereas, with breadth first
+     * traversal, the actors would interleave).
      *
      * @code
      *
@@ -142,6 +146,10 @@ public:
      *
      * @endcode
      *
+     * To change the order of sibling actors, use the Actor::Raise and
+     * Actor::Lower APIs. Within an actor, the Renderer depth index dictates
+     * the order the renderers are drawn.
+     *
      * @SINCE_1_1.45
      */
     LAYER_UI = LAYER_2D,
@@ -149,16 +157,25 @@ public:
     /**
      * @brief Layer will use depth test.
      *
-     * When using this mode, depth test will be used. A depth clear will happen for each layer,
-     * which means actors in a layer "above" other layers will be rendered in front of actors in
-     * those layers regardless of their Z positions (see Layer::Raise() and Layer::Lower()).
-     * Opaque renderers are drawn first and write to the depth buffer.
-     * Then transparent renderers are drawn with depth test enabled but depth write switched off.
-     * Transparent renderers are drawn based on their distance from the camera.
-     * A renderers DEPTH_INDEX property is used to offset the distance to the camera when ordering transparent renderers.
-     * This is useful if you want to define the draw order of two or more transparent renderers that are
-     * equal distance from the camera.
-     * Unlike LAYER_UI, parent-child relationship does not affect rendering order at all.
+     * This mode is designed for a 3 dimensional scene where actors in front
+     * of other actors will obscure them, i.e. the actors are sorted by the
+     * distance from the camera.
+     *
+     * When using this mode, a depth test will be used. A depth clear will
+     * happen for each layer, which means actors in a layer "above" other
+     * layers will be rendered in front of actors in those layers regardless
+     * of their Z positions (see Layer::Raise() and Layer::Lower()).
+     *
+     * Opaque renderers are drawn first and write to the depth buffer.  Then
+     * transparent renderers are drawn with depth test enabled but depth
+     * write switched off.  Transparent renderers are drawn based on their
+     * distance from the camera.  A renderer's DEPTH_INDEX property is used to
+     * offset the distance to the camera when ordering transparent renderers.
+     *
+     * This is useful if you want to define the draw order of two or more
+     * transparent renderers that are equal distance from the camera.  Unlike
+     * LAYER_UI, parent-child relationship does not affect rendering order at
+     * all.
      *
      * @SINCE_1_0.0
      */

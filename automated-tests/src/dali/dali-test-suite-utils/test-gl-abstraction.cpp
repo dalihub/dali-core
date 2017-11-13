@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ void TestGlAbstraction::Initialize()
   mLastBlendFuncSrcAlpha  = 0;
   mLastBlendFuncDstAlpha  = 0;
   mLastAutoTextureIdUsed = 0;
+  mNumGeneratedTextures = 0;
   mLastShaderIdUsed = 0;
   mLastProgramIdUsed = 0;
   mLastUniformIdUsed = 0;
@@ -84,6 +85,7 @@ void TestGlAbstraction::Initialize()
   mEnableDisableTrace.Reset();
   mShaderTrace.Reset();
   mStencilFunctionTrace.Reset();
+  mScissorTrace.Reset();
   mTextureTrace.Reset();
   mTexParamaterTrace.Reset();
   mDrawTrace.Reset();
@@ -108,7 +110,7 @@ bool BlendEnabled(const Dali::TraceCallStack& callStack)
 {
   std::stringstream out;
   out << GL_BLEND;
-  bool blendEnabled = callStack.FindMethodAndParams("Enable", out.str());
+  bool blendEnabled = callStack.FindMethodAndParams( "Enable", out.str() );
   return blendEnabled;
 }
 
@@ -116,6 +118,6 @@ bool BlendDisabled(const Dali::TraceCallStack& callStack)
 {
   std::stringstream out;
   out << GL_BLEND;
-  bool blendEnabled = callStack.FindMethodAndParams("Disable", out.str());
+  bool blendEnabled = callStack.FindMethodAndParams( "Disable", out.str() );
   return blendEnabled;
 }

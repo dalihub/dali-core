@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,14 @@
 // CLASS HEADER
 #include <dali/internal/common/math.h>
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <cmath>
+
+// INTERNAL INCLUDES
+#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/matrix.h>
 
 void Dali::Internal::TransformVector3( Vec3 result, const Mat4 m, const Vec3 v )
 {
@@ -53,8 +59,24 @@ void Dali::Internal::TransformVector3( Vec3 result, const Mat4 m, const Vec3 v )
 #endif
 }
 
+Dali::Vector2 Dali::Internal::Transform2D( const Dali::Matrix& matrix, const float x, const float y )
+{
+  MATH_INCREASE_BY( PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4 );
+
+  const float* matrixArray( matrix.AsFloat() );
+
+  // The following optimizations are applied:
+  // Matrix[8 -> 11] are optimized out.
+  // Matrix[12 -> 15] are always multiplied by 1.
+  // z & w results (if we were doing a transformation to a Vector4) are unneeded and so not calculated.
+  // As we always multiply by component, we do not store the coordinates in a Vector2 to avoid creation.
+  // Note: For this reason the NEON SIMD version is no faster than the Dali::Matrix '*' Vector4 operator, and therefore not used.
+  return Dali::Vector2( x * matrixArray[0] + y * matrixArray[4] + matrixArray[12], x * matrixArray[1] + y * matrixArray[5] + matrixArray[13] );
+}
+
 float Dali::Internal::Length( const Vec3 v )
 {
   return sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
+
 

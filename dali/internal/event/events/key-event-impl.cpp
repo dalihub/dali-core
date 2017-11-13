@@ -19,18 +19,24 @@
 #include <dali/internal/event/events/key-event-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
 
 namespace
 {
-
-typedef std::map< const KeyEvent*, Internal::KeyEventImpl*> KeyEventMap;
-typedef KeyEventMap::iterator KeyEventMapIter;
-
-KeyEventMap keyEventImplMap;
+/**
+ * This container stores a mapping between public key event and impl as we cannot add data members in public one.
+ * In practice this keeps the impl "alive" in between KeyEvent constructor and destructor calls so that getter
+ * methods can be called to access the new data members. There is a 1:1 mapping between KeyEvent and KeyEventImpl.
+ */
+struct KeyImplMapping
+{
+  KeyEvent* keyEvent;
+  Internal::KeyEventImpl* impl;
+};
+Vector< KeyImplMapping > gKeyEventToImplMapping;
 
 }
 
@@ -39,19 +45,20 @@ namespace Internal
 
 KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
 : mDeviceName( "" ),
-  mDeviceClass( DevelKeyEvent::DeviceClass::NONE )
+  mDeviceClass( Device::Class::NONE ),
+  mDeviceSubclass( Device::Subclass::NONE )
 {
-  keyEventImplMap[keyEvent] = this;
+  gKeyEventToImplMapping.PushBack( { keyEvent, this } );
 }
 
 KeyEventImpl::~KeyEventImpl()
 {
-  for( KeyEventMapIter iter = keyEventImplMap.begin(); iter != keyEventImplMap.end(); ++iter )
+  for( auto&& iter : gKeyEventToImplMapping )
   {
-    if( this == iter->second )
+    if( this == iter.impl )
     {
-      keyEventImplMap.erase( iter );
-      break;
+      gKeyEventToImplMapping.Erase( &iter ); // iter is reference to KeyImplMapping, take address of it for Erase
+      return;
     }
   }
 }
@@ -62,6 +69,7 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
   {
     mDeviceName = rhs.mDeviceName;
     mDeviceClass = rhs.mDeviceClass;
+    mDeviceSubclass = rhs.mDeviceSubclass;
   }
 
   return *this;
@@ -77,26 +85,52 @@ void KeyEventImpl::SetDeviceName( const std::string& deviceName )
   mDeviceName = deviceName;
 }
 
-DevelKeyEvent::DeviceClass::Type KeyEventImpl::GetDeviceClass() const
+Device::Class::Type KeyEventImpl::GetDeviceClass() const
 {
   return mDeviceClass;
 }
 
-void KeyEventImpl::SetDeviceClass( const DevelKeyEvent::DeviceClass::Type& deviceClass )
+void KeyEventImpl::SetDeviceClass( Device::Class::Type deviceClass )
 {
   mDeviceClass = deviceClass;
+}
+
+Device::Subclass::Type KeyEventImpl::GetDeviceSubclass() const
+{
+  return mDeviceSubclass;
+}
+
+void KeyEventImpl::SetDeviceSubclass( Device::Subclass::Type deviceSubclass )
+{
+  mDeviceSubclass = deviceSubclass;
 }
 
 } // namsespace Internal
 
 Internal::KeyEventImpl* GetImplementation( KeyEvent* keyEvent )
 {
-  return keyEventImplMap[keyEvent];
+  Internal::KeyEventImpl* impl( NULL );
+  for( auto&& iter : gKeyEventToImplMapping )
+  {
+    if( iter.keyEvent == keyEvent )
+    {
+      impl = iter.impl;
+    }
+  }
+  return impl;
 }
 
 const Internal::KeyEventImpl* GetImplementation( const KeyEvent* keyEvent )
 {
-  return keyEventImplMap[keyEvent];
+  Internal::KeyEventImpl* impl( NULL );
+  for( auto&& iter : gKeyEventToImplMapping )
+  {
+    if( iter.keyEvent == keyEvent )
+    {
+      impl = iter.impl;
+    }
+  }
+  return impl;
 }
 
 } // namespace Dali

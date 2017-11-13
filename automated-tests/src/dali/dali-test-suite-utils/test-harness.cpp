@@ -52,7 +52,14 @@ int RunTestCase( struct ::testcase_s& testCase )
   {
     testCase.startup();
   }
-  result = testCase.function();
+  try
+  {
+    result = testCase.function();
+  }
+  catch( const char* )
+  {
+    // just catch test fail exception, return is already set to EXIT_STATUS_TESTCASE_FAILED
+  }
   if( testCase.cleanup )
   {
     testCase.cleanup();

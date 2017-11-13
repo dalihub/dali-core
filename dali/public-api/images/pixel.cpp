@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,8 @@ bool Pixel::HasAlpha(Format pixelformat)
     case COMPRESSED_SRGB8_ETC2:
     case COMPRESSED_RGB8_ETC1:
     case COMPRESSED_RGB_PVRTC_4BPPV1:
+    case RGB16F:
+    case RGB32F:
     case INVALID:
     {
       return false;
@@ -129,6 +131,16 @@ unsigned int Pixel::GetBytesPerPixel(Format pixelFormat)
     case BGRA8888:
     {
       return 4;
+    }
+
+    case RGB16F:
+    {
+      return 12;
+    }
+
+    case RGB32F:
+    {
+      return 24;
     }
 
     case COMPRESSED_R11_EAC:
@@ -274,6 +286,8 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
     case COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
     case COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
     case COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+    case RGB16F:
+    case RGB32F:
     case INVALID:
     {
       DALI_LOG_ERROR("Pixel formats for compressed images are not compatible with simple masking-out of per-pixel alpha.\n");

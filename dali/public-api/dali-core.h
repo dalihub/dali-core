@@ -2,7 +2,7 @@
 #define __DALI_CORE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/common/stage.h>
@@ -107,6 +108,7 @@
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/weak-handle.h>
 
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>

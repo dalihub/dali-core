@@ -854,7 +854,8 @@ void Renderer::Initialize()
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
   mSceneObject = SceneGraph::Renderer::New();
-  AddRendererMessage( updateManager, *mSceneObject );
+  OwnerPointer< SceneGraph::Renderer > transferOwnership( mSceneObject );
+  AddRendererMessage( updateManager, transferOwnership );
 
   eventThreadServices.RegisterObject( this );
 }

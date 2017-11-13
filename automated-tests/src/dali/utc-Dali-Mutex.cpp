@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <type_traits>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
@@ -133,7 +134,7 @@ int UtcDaliMutexNonCopyable(void)
 {
   // we want to make sure that mutex is not copyable (its copy constructor is not defined)
   // this test will stop compiling if Mutex has compiler generated copy constructor
-  DALI_COMPILE_TIME_ASSERT( !__has_trivial_copy( Mutex ) );
+  static_assert( !__has_trivial_copy( Mutex ), "Mutex should NOT be copyable" );
 
   DALI_TEST_CHECK( true );
   END_TEST;

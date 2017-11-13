@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ public:
    * @post The PropertyOwner takes ownership of the property.
    * @param[in] property A pointer to a newly allocated property.
    */
-  void InstallCustomProperty(PropertyBase* property);
+  void InstallCustomProperty( OwnerPointer<PropertyBase>& property );
 
   /**
    * Retrieve the custom properties owned by the object.
@@ -175,7 +175,7 @@ public:
    * Apply a constraint.
    * @param[in] constraint The constraint to apply.
    */
-  void ApplyConstraint( ConstraintBase* constraint );
+  void ApplyConstraint( OwnerPointer<ConstraintBase>& constraint );
 
   /**
    * Begin removal of constraints.
@@ -192,7 +192,7 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  virtual void AddUniformMapping( UniformPropertyMapping* map );
+  virtual void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
 
   /**
    * @copydoc UniformMap::Remove
