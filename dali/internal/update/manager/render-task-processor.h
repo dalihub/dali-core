@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_PROCESSOR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,17 +54,21 @@ public:
    * Process the list of render-tasks; the output is a series of render instructions.
    * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque renderers which are ready to render.
    * If there is only one default render-task, then no further processing is required.
-   * @param[in]  updateBufferIndex The current update buffer index.
-   * @param[in]  renderTasks       The list of render-tasks.
-   * @param[in]  rootNode          The root node of the scene-graph.
-   * @param[in]  sortedLayers      The layers containing lists of opaque / transparent renderables.
-   * @param[out] instructions      The instructions for rendering the next frame.
+   * @param[in]  updateBufferIndex  The current update buffer index.
+   * @param[in]  renderTasks        The list of render-tasks.
+   * @param[in]  rootNode           The root node of the scene-graph.
+   * @param[in]  sortedLayers       The layers containing lists of opaque / transparent renderables.
+   * @param[out] instructions       The instructions for rendering the next frame.
+   * @param[in]  renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
+   * @param[in]  isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
    */
   void Process( BufferIndex updateBufferIndex,
                 RenderTaskList& renderTasks,
                 Layer& rootNode,
                 SortedLayerPointers& sortedLayers,
-                RenderInstructionContainer& instructions );
+                RenderInstructionContainer& instructions,
+                bool renderToFboEnabled,
+                bool isRenderingToFbo );
 
 private:
 

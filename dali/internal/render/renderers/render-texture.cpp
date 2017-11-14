@@ -21,7 +21,6 @@
 #include <math.h>   //floor, log2
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/images/pixel-devel.h>
 #include <dali/devel-api/images/native-image-interface-extension.h>
 
 namespace Dali
@@ -130,7 +129,7 @@ GLint WrapModeToGL( WrapMode::Type wrapMode, GLint defaultWrapMode )
  * @param[out] glInternalFormat The gl internal format.
  * @param[out] pixelDataType The data type of the pixel data.
  */
-void PixelFormatToGl( DevelPixel::Format pixelFormat, GLenum& glFormat, GLint& glInternalFormat, GLenum& pixelDataType )
+void PixelFormatToGl( Pixel::Format pixelFormat, GLenum& glFormat, GLint& glInternalFormat, GLenum& pixelDataType )
 {
   // Compressed textures have no pixelDataType, so init to an invalid value:
   pixelDataType  = -1;
@@ -505,13 +504,13 @@ void PixelFormatToGl( DevelPixel::Format pixelFormat, GLenum& glFormat, GLint& g
     }
 
     // GLES 3.0 floating point formats.
-    case DevelPixel::RGB16F:
+    case Pixel::RGB16F:
     {
       glFormat = GL_RGB;
       pixelDataType = GL_HALF_FLOAT;
       break;
     }
-    case DevelPixel::RGB32F:
+    case Pixel::RGB32F:
     {
       glFormat = GL_RGB;
       pixelDataType = GL_FLOAT;
@@ -528,8 +527,8 @@ void PixelFormatToGl( DevelPixel::Format pixelFormat, GLenum& glFormat, GLint& g
 
   switch( pixelFormat )
   {
-    case DevelPixel::RGB16F:
-    case DevelPixel::RGB32F: // FALL THROUGH
+    case Pixel::RGB16F:
+    case Pixel::RGB32F: // FALL THROUGH
     {
       glInternalFormat = GL_R11F_G11F_B10F;
       break;
@@ -567,6 +566,8 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
     case Pixel::BGR8888:
     case Pixel::RGBA8888:
     case Pixel::BGRA8888:
+    case Pixel::RGB16F:
+    case Pixel::RGB32F:
     case Pixel::INVALID:
     {
       return false;
@@ -638,7 +639,7 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mHasAlpha( HasAlpha( format ) ),
   mIsCompressed( IsCompressedFormat( format ) )
 {
-  PixelFormatToGl( static_cast<DevelPixel::Format>( format ),
+  PixelFormatToGl( format,
                    mGlFormat,
                    mGlInternalFormat,
                    mPixelDataType );
@@ -772,7 +773,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   GLenum glFormat;
   GLint glInternalFormat;
   GLenum pixelDataElementType;
-  PixelFormatToGl( static_cast<DevelPixel::Format>( pixelData->GetPixelFormat() ), glFormat, glInternalFormat, pixelDataElementType );
+  PixelFormatToGl( pixelData->GetPixelFormat(), glFormat, glInternalFormat, pixelDataElementType );
 
   //Get the maximum mipmap level to set GL_TEXTURE_MAX_LEVEL parameter in GLES3x because is not
   //necessary to upload all the mipmap levels
@@ -859,8 +860,7 @@ bool Texture::Bind( Context& context, unsigned int textureUnit, Render::Sampler*
 
   if( mId != 0 )
   {
-    context.ActiveTexture( static_cast<TextureUnit>(textureUnit) );
-    context.BindTexture( mTarget, mId );
+    context.BindTextureForUnit( static_cast<TextureUnit>( textureUnit ), mTarget, mId );
     ApplySampler( context, sampler );
 
     if( mNativeImage )

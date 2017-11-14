@@ -139,6 +139,10 @@ void Animation::PlayFrom(float progress)
   GetImplementation(*this).PlayFrom(progress);
 }
 
+void Animation::PlayAfter( float delaySeconds )
+{
+  GetImplementation( *this ).PlayAfter( delaySeconds );
+}
 
 void Animation::Pause()
 {
@@ -158,6 +162,16 @@ void Animation::Stop()
 void Animation::Clear()
 {
   GetImplementation(*this).Clear();
+}
+
+void Animation::SetLoopingMode( LoopingMode loopingMode )
+{
+  GetImplementation( *this ).SetLoopingMode( loopingMode );
+}
+
+Animation::LoopingMode Animation::GetLoopingMode() const
+{
+  return GetImplementation( *this ).GetLoopingMode();
 }
 
 Animation::AnimationSignalType& Animation::FinishedSignal()

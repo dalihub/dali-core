@@ -186,12 +186,6 @@ private:
  *
  * 7) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
  *
- * Suspend/Resume behaviour:
- *
- * The Core has no knowledge of the application lifecycle, but can be suspended.
- * In the suspended state, input events will not be processed, and animations will not progress any further.
- * The Core can still render in the suspended state; the same frame will be produced each time.
- *
  * Multi-threading notes:
  *
  * The Dali API methods are not reentrant.  If you access the API from multiple threads simultaneously, then the results
@@ -222,14 +216,16 @@ public:
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController& renderController,
-                   PlatformAbstraction& platformAbstraction,
-                   GlAbstraction& glAbstraction,
-                   GlSyncAbstraction& glSyncAbstraction,
-                   GestureManager& gestureManager,
-                   ResourcePolicy::DataRetention policy);
+  static Core* New( RenderController& renderController,
+                    PlatformAbstraction& platformAbstraction,
+                    GlAbstraction& glAbstraction,
+                    GlSyncAbstraction& glSyncAbstraction,
+                    GestureManager& gestureManager,
+                    ResourcePolicy::DataRetention policy,
+                    bool renderToFboEnabled );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -304,25 +300,6 @@ public:
   // Core Lifecycle
 
   /**
-   * Put Core into the suspended state.
-   * Any ongoing event processing will be cancelled, for example multi-touch sequences.
-   * The core expects the system has suspended us. Animation time will continue during the suspended
-   * state.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is in the suspended state.
-   */
-  void Suspend();
-
-  /**
-   * Resume the Core from the suspended state.
-   * At the first update, the elapsed time passed to the animations will be equal to the time spent
-   * suspended.
-   * Multi-threading note: this method should be called from the main thread
-   * @post The Core is not in the suspended state.
-   */
-  void Resume();
-
-  /**
    * Notify Core that the scene has been created.
    */
   void SceneCreated();
@@ -364,8 +341,15 @@ public:
    * @param[in] nextVSyncTimeMilliseconds The time of the next predicted VSync in milliseconds
    * @param[out] status showing whether further updates are required. This also shows
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
+   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status );
+  void Update( float elapsedSeconds,
+               unsigned int lastVSyncTimeMilliseconds,
+               unsigned int nextVSyncTimeMilliseconds,
+               UpdateStatus& status,
+               bool renderToFboEnabled,
+               bool isRenderingToFbo );
 
   /**
    * Render the next frame. This method should be preceded by a call up Update.

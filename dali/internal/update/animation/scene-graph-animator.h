@@ -140,6 +140,10 @@ public:
         value = 2.0f * std::abs( progress - 0.5f );
       }
     }
+    else
+    {
+      value = progress;
+    }
 
     return value;
   }
@@ -509,7 +513,7 @@ public:
    */
   virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
   {
-    if( mLoopCount != 1 ) // Looping mode
+    if( mLoopCount >= 0 )
     {
       // Update the progress value
       progress = SetProgress( progress );
@@ -668,7 +672,7 @@ public:
    */
   virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
   {
-    if( mLoopCount != 1 ) // Looping mode
+    if( mLoopCount >= 0 )
     {
       // Update the progress value
       progress = SetProgress( progress );

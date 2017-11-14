@@ -91,6 +91,12 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBlendFuncSeparateDstAlpha(GL_ZERO),
   mBlendEquationSeparateModeRGB( GL_FUNC_ADD ),
   mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
+  mStencilFunc( GL_ALWAYS ),
+  mStencilFuncRef( 0 ),
+  mStencilFuncMask( 0xFFFFFFFF ),
+  mStencilOpFail( GL_KEEP ),
+  mStencilOpDepthFail( GL_KEEP ),
+  mStencilOpDepthPass( GL_KEEP ),
   mDepthFunction( GL_LESS ),
   mMaxTextureSize(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
@@ -241,7 +247,7 @@ void Context::InitializeGlState()
   memset( &mVertexAttributeCurrentState, 0, sizeof(mVertexAttributeCurrentState) );
 
   //Initialize bound 2d texture cache
-  memset( &mBound2dTextureId, 0, sizeof(mBound2dTextureId) );
+  memset( &mBoundTextureId, 0, sizeof(mBoundTextureId) );
 
   mFrameBufferStateCache.Reset();
 }

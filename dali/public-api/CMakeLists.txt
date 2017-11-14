@@ -18,6 +18,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/constants.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-common.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/extents.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-detector.cpp
@@ -119,6 +120,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/constants.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-common.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/dali-vector.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/extents.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/intrusive-ptr.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/loading-state.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage.h
@@ -126,6 +128,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/vector-wrapper.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/view-mode.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/device.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-detector.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hover-event.h
@@ -191,6 +194,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-info.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry.h
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry-helper.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-tasks/render-task-list.h

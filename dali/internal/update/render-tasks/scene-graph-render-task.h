@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
+#define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -107,19 +107,6 @@ public:
    * @param[in] camera to use.
    */
   void SetCamera( Node* cameraNode, Camera* camera );
-
-  /**
-   * Set the frame-buffer used as a render target.
-   * @param[in] resourceId The resource ID of the frame-buffer, or zero if not rendering off-screen.
-   * @param[in] isNativeFBO if this render task is targeting a native FBO
-   */
-  void SetFrameBufferId( unsigned int resourceId, bool isNativeFBO );
-
-  /**
-   * Retrieve the resource ID of the frame-buffer.
-   * @return The resource ID, or zero if not rendering off-screen.
-   */
-  unsigned int GetFrameBufferId() const;
 
   /**
    * Set the frame-buffer used as a render target.
@@ -528,4 +515,4 @@ inline void BakeViewportSizeMessage( EventThreadServices& eventThreadServices, c
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H

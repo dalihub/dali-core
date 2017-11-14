@@ -2,7 +2,7 @@
 #define __DALI_RANDOM_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,19 @@ inline float Range(float f0, float f1)
 {
   float min = std::min(f0, f1);
   float max = std::max(f0, f1);
-  return min + (rand() & 0xfff) * (max-min) * (1.0f/4095.0f);
+
+  // Ensure we initialize only once. As it's inlined, this static variable will exist in the code-block using it, thus,
+  // will be created and then initialized again when another code-block uses this.
+  static bool initialized( false );
+  if( !initialized )
+  {
+    auto seed = time( NULL );
+    srand( seed );
+    initialized = true;
+  }
+
+  auto randValue = rand();
+  return (randValue & 0xfff) * (1.0f/4095.0f) * (max-min) + min;
 }
 
 /**

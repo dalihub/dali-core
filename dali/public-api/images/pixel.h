@@ -2,7 +2,7 @@
 #define __DALI_PIXEL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,10 @@ enum Format
   COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x10 block-size. @SINCE_1_1.17
   COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,   ///< ASTC Non-linear (gamma-corrected) color space with a 12x12 block-size. @SINCE_1_1.17
 
+  // GLES 3.0 floating point formats.
+  RGB16F, ///< Color depth 48-bit, 16-16-16 half floating point. @SINCE_1_2.60
+  RGB32F, ///< Color depth 96-bit, 32-32-32 floating point. @SINCE_1_2.60
+
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
@@ -122,7 +126,7 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
  *
  * Sync it to the last value above.
  */
-const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+const Format LAST_VALID_PIXEL_FORMAT = RGB32F;
 
 /**
  * @brief Whether specified pixel format contains an alpha value.

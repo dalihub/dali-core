@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/integration-api/render-controller.h>
 
 namespace Dali
 {
@@ -151,6 +152,11 @@ bool Texture::Upload( PixelDataPtr pixelData,
                                     static_cast< uint16_t >( width ),
                                     static_cast< uint16_t >( height ) };
             UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+
+            // Request event processing and update forcely
+            mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );
+            mEventThreadServices.ForceNextUpdate();
+
             result = true;
           }
         }

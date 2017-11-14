@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,8 @@ public:
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
-        ResourcePolicy::DataRetention dataRetentionPolicy );
+        ResourcePolicy::DataRetention dataRetentionPolicy,
+        bool renderToFboEnabled );
 
   /**
    * Destructor
@@ -129,22 +130,12 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status );
+  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
 
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
   void Render( Integration::RenderStatus& status );
-
-  /**
-   * @copydoc Dali::Integration::Core::Suspend()
-   */
-  void Suspend();
-
-  /**
-   * @copydoc Dali::Integration::Core::Resume()
-   */
-  void Resume();
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()
@@ -265,7 +256,6 @@ private:
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-  bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
   OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks

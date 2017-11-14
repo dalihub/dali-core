@@ -377,6 +377,26 @@ int UtcDaliPropertyValueConstructorsMapTypeP(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueConstructorsExtentsTypeP(void)
+{
+  Property::Value value( Property::EXTENTS );
+
+  DALI_TEST_CHECK( value.GetType() == Property::EXTENTS );
+  DALI_TEST_CHECK( value.Get<Extents>() == Extents( 0u, 0u, 0u, 0u ) );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyValueConstructorsExtentsType2P(void)
+{
+  Property::Value value( Property::VECTOR4 );
+
+  DALI_TEST_CHECK( value.GetType() == Property::VECTOR4 );
+  DALI_TEST_CHECK( value.Get<Extents>() == Extents( 0u, 0u, 0u, 0u ) );
+
+  END_TEST;
+}
+
 int UtcDaliPropertyValueCopyConstructorP(void)
 {
   Property::Value value;
@@ -676,6 +696,19 @@ int UtcDaliPropertyValueAssignmentOperatorMapP(void)
   Property::Map map;
   copy.Get( map );
   DALI_TEST_CHECK( map.GetKey(0) == "key" );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueAssignmentOperatorExtentsP(void)
+{
+  Property::Value value;
+  value = Property::Value( Extents( 4, 3, 2, 1 ) ); // mismatch
+  DALI_TEST_CHECK( Extents( 4, 3, 2, 1 ) == value.Get<Extents>() );
+  Property::Value copy( Property::EXTENTS );
+  copy = value; // match
+  Extents copyExtents;
+  copy.Get(copyExtents);
+  DALI_TEST_CHECK( Extents( 4, 3, 2, 1 ) == copyExtents );
   END_TEST;
 }
 
@@ -1117,6 +1150,16 @@ int UtcDaliPropertyValueGetMapN(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueGetExtentsP(void)
+{
+  Property::Value value( Extents( 1u, 2u, 3u, 4u ) );
+  Extents result( 4u, 3u, 2u, 1u );
+  DALI_TEST_EQUALS( Extents( 1u, 2u, 3u, 4u ), value.Get<Extents>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Extents( 1u, 2u, 3u, 4u ), result, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueOutputStream(void)
 {
   TestApplication application;
@@ -1263,6 +1306,12 @@ int UtcDaliPropertyValueOutputStream(void)
     DALI_TEST_CHECK( !stream.str().compare("Map(3) = {color:[1, 0.5, 1, 1], timePeriod:Map(2) = {key:value, duration:10}, texCoords:Array(4) = [[1, 0], [0, 1], [1, 0], [0, 0.5]]}"));
   }
 
+  {
+    value = Property::Value( Extents( 1u, 2u, 3u, 4u ) );
+    std::ostringstream stream;
+    stream <<  value;
+    DALI_TEST_CHECK( stream.str() == "[1, 2, 3, 4]" );
+  }
 
   END_TEST;
 }

@@ -59,8 +59,9 @@ struct RenderManager::Impl
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     instructions(),
+    renderAlgorithms(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    frameCount( 0 ),
+    frameCount( 0u ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
@@ -104,6 +105,7 @@ struct RenderManager::Impl
   // Render instructions describe what should be rendered during RenderManager::Render()
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
   RenderInstructionContainer                instructions;
+  Render::RenderAlgorithms                  renderAlgorithms;        ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
   Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
@@ -392,7 +394,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
   DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
 
   // Increment the frame count at the beginning of each frame
-  ++(mImpl->frameCount);
+  ++mImpl->frameCount;
 
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
@@ -407,7 +409,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
     status.SetNeedsPostRender( true );
 
     // switch rendering to adaptor provided (default) buffer
-    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
 
     mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
                              mImpl->defaultSurfaceRect.y,
@@ -481,7 +483,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
   }
 
-  if( instruction.mFrameBuffer != 0 )
+  if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
     instruction.mFrameBuffer->Bind( mImpl->context );
     if ( instruction.mIsViewportSet )
@@ -530,9 +532,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->context.SetScissorTest( false );
   }
 
-  Render::ProcessRenderInstruction( instruction,
-                                    mImpl->context,
-                                    mImpl->renderBufferIndex );
+  mImpl->renderAlgorithms.ProcessRenderInstruction( instruction, mImpl->context, mImpl->renderBufferIndex );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

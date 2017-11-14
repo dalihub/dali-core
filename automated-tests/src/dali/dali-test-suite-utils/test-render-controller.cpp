@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ TestRenderController::~TestRenderController()
 {
 }
 
-void TestRenderController::RequestUpdate()
+void TestRenderController::RequestUpdate( bool forceUpdate )
 {
   mRequestUpdateCalled = true;
 }
 
-void TestRenderController::RequestProcessEventsOnIdle()
+void TestRenderController::RequestProcessEventsOnIdle( bool forceProcess )
 {
   mRequestProcessEventsOnIdleCalled = true;
 }
