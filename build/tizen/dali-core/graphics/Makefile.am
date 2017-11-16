@@ -62,8 +62,8 @@ cxx_warnings_to_preserve = \
 #cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Weffc++ -Wpedantic \
 #            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
 # vulkan.hpp doesn't pass all c++ checks
-cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Wpedantic \
-            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
+cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Wpedantic 
+#            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
 
 if VULKAN_SDK_SET
     vulkan_flags = -DVULKAN_HPP_NO_EXCEPTIONS
