@@ -21,7 +21,7 @@
 namespace Dali
 {
 
-class Vector2;
+struct Vector2;
 class Matrix;
 
 namespace Internal
