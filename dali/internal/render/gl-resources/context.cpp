@@ -241,7 +241,7 @@ void Context::InitializeGlState()
   memset( &mVertexAttributeCurrentState, 0, sizeof(mVertexAttributeCurrentState) );
 
   //Initialize bound 2d texture cache
-  memset( &mBound2dTextureId, 0, sizeof(mBound2dTextureId) );
+  memset( &mBoundTextureId, 0, sizeof(mBoundTextureId) );
 
   mFrameBufferStateCache.Reset();
 }
