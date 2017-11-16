@@ -13,8 +13,6 @@
 # limitations under the License.
 #
 
-SUBDIRS = graphics
-
 # Parse each file.list
 # These files define <module>_src_files & <module>_header_files,
 # where <module> is the subdirectory from core_src_dir
@@ -49,7 +47,7 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                          $(DALI_CFLAGS)
 
 
-DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
+DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS)
 
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
                       $(VULKAN_LIBS) \
@@ -64,7 +62,7 @@ lib_LTLIBRARIES = libdali-core.la
 
 libdali_core_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 else
 
@@ -72,7 +70,7 @@ lib_LTLIBRARIES = libdali-core-cxx11.la
 
 libdali_core_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 endif
 
@@ -146,48 +144,49 @@ packagedoxy_HEADERS = $(package_doxy_files)
 
 # linking test
 
-#noinst_PROGRAMS = linker.test
-#
-#linker_test_SOURCES = linker-test.cpp  \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
-#    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
-#
-#linker_test_CXXFLAGS = \
-#  $(cxx_flags) \
-#  -I../../../automated-tests/src/dali/dali-test-suite-utils \
-#  $(dali_core_includes)
-#
-#if ENABLE_CXX03_ABI
-#
-#linker_test_DEPENDENCIES = libdali-core.la
-#linker_test_LDADD = \
-#  libdali-core.la
-#
-#if ENABLE_RENAME_SO
+noinst_PROGRAMS = linker.test
+
+linker_test_SOURCES = linker-test.cpp  \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
+
+linker_test_CXXFLAGS = \
+  $(cxx_flags) \
+  -I../../../automated-tests/src/dali/dali-test-suite-utils \
+  $(dali_core_includes)
+
+if ENABLE_CXX03_ABI
+
+linker_test_DEPENDENCIES = libdali-core.la
+linker_test_LDADD = \
+  libdali-core.la
+
+if ENABLE_RENAME_SO
 #rename
-#install: install-am
-#	rm -rf $(libdir)/libdali-core.so
-#	rm -rf $(libdir)/libdali-core-cxx03.so
-#	ln -s $(libdir)/libdali-core.so.0.0.* $(libdir)/libdali-core-cxx03.so
-#endif
-#
-#else
-#
-#linker_test_DEPENDENCIES = libdali-core-cxx11.la
-#linker_test_LDADD = \
-#  libdali-core-cxx11.la
-#
-#if ENABLE_RENAME_SO
+install: install-am
+	rm -rf $(libdir)/libdali-core.so
+	rm -rf $(libdir)/libdali-core-cxx03.so
+	ln -s $(libdir)/libdali-core.so.0.0.* $(libdir)/libdali-core-cxx03.so
+endif
+
+else
+
+linker_test_DEPENDENCIES = libdali-core-cxx11.la
+linker_test_LDADD = \
+  libdali-core-cxx11.la
+
+if ENABLE_RENAME_SO
 #rename
-#install: install-am
-#	rm -rf $(libdir)/libdali-core-cxx11.so
-#	rm -rf $(libdir)/libdali-core.so
-#	ln -s $(libdir)/libdali-core-cxx11.so.0.0.* $(libdir)/libdali-core.so
-#endif
-#
-#endif
+install: install-am
+	rm -rf $(libdir)/libdali-core-cxx11.so
+	rm -rf $(libdir)/libdali-core.so
+	ln -s $(libdir)/libdali-core-cxx11.so.0.0.* $(libdir)/libdali-core.so
+endif
+
+endif
+
