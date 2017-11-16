@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-SUBDIRS = dali-core
+SUBDIRS = dali-core/graphics dali-core
 
 pkgconfigdir = $(libdir)/pkgconfig
 

@@ -75,14 +75,14 @@ void Graphics::CreateInstance()
       .setEnabledLayerCount(U32(validationLayers.size()))
       .setPpEnabledLayerNames(validationLayers.data());
 
-  mInstance = VkAssert(vk::createInstance(info, mAllocator));
+  mInstance = VkAssert(vk::createInstance(info, *mAllocator));
 }
 
 void Graphics::DestroyInstance()
 {
   if(mInstance)
   {
-    mInstance.destroy(mAllocator);
+    mInstance.destroy(*mAllocator);
     mInstance = nullptr;
   }
 }
@@ -151,7 +151,7 @@ FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
     return FBID{0u};
   }
 
-  auto surface = vkFactory->Create(mInstance, mAllocator, mPhysicalDevice);
+  auto surface = vkFactory->Create(mInstance, mAllocator.get(), mPhysicalDevice);
 
   // map surface to FBID
   auto fbid             = ++mBaseFBID;
@@ -271,7 +271,7 @@ void Graphics::CreateDevice()
         .setPQueueCreateInfos(queueInfos.data())
         .setQueueCreateInfoCount(U32(queueInfos.size()));
 
-    mDevice = VkAssert(mPhysicalDevice.createDevice(info, mAllocator));
+    mDevice = VkAssert(mPhysicalDevice.createDevice(info, *mAllocator));
   }
 
   // create Queue objects
@@ -320,9 +320,9 @@ vk::Instance Graphics::GetInstance() const
   return mInstance;
 }
 
-vk::AllocationCallbacks* Graphics::GetAllocator() const
+const vk::AllocationCallbacks& Graphics::GetAllocator() const
 {
-  return mAllocator;
+  return *mAllocator;
 }
 
 Queue& Graphics::GetGraphicsQueue(uint32_t index) const

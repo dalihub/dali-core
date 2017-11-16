@@ -66,7 +66,7 @@ public:
 
   vk::Instance GetInstance() const;
 
-  vk::AllocationCallbacks* GetAllocator() const;
+  const vk::AllocationCallbacks& GetAllocator() const;
 
   DeviceMemoryManager& GetDeviceMemoryManager() const
   {
@@ -97,7 +97,7 @@ private:
   std::unique_ptr<DeviceMemoryManager> mDeviceMemoryManager;
 
   vk::Instance             mInstance;
-  vk::AllocationCallbacks* mAllocator{nullptr};
+  std::unique_ptr<vk::AllocationCallbacks> mAllocator{nullptr};
 
   // physical device
   vk::PhysicalDevice mPhysicalDevice;
