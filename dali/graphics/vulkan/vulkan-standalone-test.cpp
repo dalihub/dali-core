@@ -12,7 +12,7 @@
 #define VK_USE_PLATFORM_XCB_KHR
 #endif
 
-#include <vulkan/vulkan.hpp>
+#include <dali/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
 #include <dali/integration-api/graphics/graphics.h>

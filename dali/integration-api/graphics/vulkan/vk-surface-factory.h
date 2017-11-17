@@ -18,16 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-hpp-wrapper.h>
 
+// INTERNAL INCLUDES
 #include <dali/integration-api/graphics/surface-factory.h>
 
-// EXTERNAL INCLUDES
-// Vulkan
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#include <vulkan/vulkan.hpp>
-#pragma GCC diagnostic pop
 
 namespace Dali
 {
