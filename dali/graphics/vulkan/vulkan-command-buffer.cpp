@@ -110,6 +110,7 @@ void CommandBuffer::ImageLayoutTransition(vk::Image            image,
     srcStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
     srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
   }
+  break;
   case vk::ImageLayout::eColorAttachmentOptimal:
   {
     srcStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eColorAttachmentOutput;
@@ -123,7 +124,7 @@ void CommandBuffer::ImageLayoutTransition(vk::Image            image,
   case vk::ImageLayout::eTransferSrcOptimal:
   case vk::ImageLayout::eTransferDstOptimal:
   case vk::ImageLayout::ePreinitialized:
-  default:
+  case vk::ImageLayout::eSharedPresentKHR:
   {
   }
   }
@@ -154,6 +155,7 @@ void CommandBuffer::ImageLayoutTransition(vk::Image            image,
   case vk::ImageLayout::eTransferDstOptimal:
   case vk::ImageLayout::ePreinitialized:
   case vk::ImageLayout::eUndefined:
+  case vk::ImageLayout::eSharedPresentKHR:
   default:
   {
   }

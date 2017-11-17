@@ -19,21 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-
-// Vulkan
-#ifndef VULKAN_HPP_NO_EXCEPTIONS
-#define VULKAN_HPP_NO_EXCEPTIONS
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#include <vulkan/vulkan.hpp>
-#pragma GCC diagnostic pop
-
-// StdC++
 #include <atomic>
 #include <unordered_map>
 #include <memory>
+
+#include <dali/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 namespace Dali
 {
