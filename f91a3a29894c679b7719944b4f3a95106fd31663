@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9110f8a5_21824ad8",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2017-11-17T11:32:56Z",
+      "side": 1,
+      "message": "assert(mAllocator);",
+      "revId": "f91a3a29894c679b7719944b4f3a95106fd31663",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
