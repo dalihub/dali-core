@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/graphics/vulkan/vulkan-hpp-wrapper.h>
+#include <dali/integration-api/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/graphics/surface-factory.h>

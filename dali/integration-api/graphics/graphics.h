@@ -85,7 +85,7 @@ private:
 /**
  * fixme: dummy function to make sure the static library won't be discarded entirely during linking
  */
-void IncludeThisLibrary();
+EXPORT_API void IncludeThisLibrary();
 
 } // Namespace Graphics
 } // Namespace Integration

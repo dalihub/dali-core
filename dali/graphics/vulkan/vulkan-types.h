@@ -23,7 +23,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <dali/graphics/vulkan/vulkan-hpp-wrapper.h>
+#include <dali/integration-api/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 namespace Dali
 {

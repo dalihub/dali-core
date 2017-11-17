@@ -26,6 +26,7 @@
 #include "test-render-controller.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/integration-api/graphics/graphics.h>
 
 namespace Dali
 {
@@ -88,11 +89,12 @@ private:
   void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );
 
 protected:
-  TestPlatformAbstraction   mPlatformAbstraction;
-  TestRenderController      mRenderController;
-  TestGlAbstraction         mGlAbstraction;
-  TestGlSyncAbstraction     mGlSyncAbstraction;
-  TestGestureManager        mGestureManager;
+  TestPlatformAbstraction             mPlatformAbstraction;
+  Integration::Graphics::Graphics     mGraphics;
+  TestRenderController                mRenderController;
+  TestGlAbstraction                   mGlAbstraction;
+  TestGlSyncAbstraction               mGlSyncAbstraction;
+  TestGestureManager                  mGestureManager;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;

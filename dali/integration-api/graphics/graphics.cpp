@@ -20,8 +20,6 @@
 #include <dali/graphics/vulkan/vulkan-surface.h>
 
 #include <dali/integration-api/graphics/graphics.h>
-#include <dali/integration-api/graphics/surface-factory.h>
-
 
 namespace Dali
 {
@@ -46,7 +44,10 @@ Graphics::Graphics()
   mGraphicsImpl = std::move(impl);
 }
 
-Graphics::~Graphics() = default;
+Graphics::~Graphics()
+{
+
+}
 
 Dali::Graphics::FBID Graphics::Create(
   std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory)

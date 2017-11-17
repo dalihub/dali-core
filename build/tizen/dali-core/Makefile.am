@@ -47,7 +47,7 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                          $(DALI_CFLAGS)
 
 
-DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS)
+DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
 
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
                       $(VULKAN_LIBS) \
@@ -78,10 +78,12 @@ endif
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
 platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
+platformabstractiongraphicsvulkandir = $(includedir)/dali/integration-api/graphics/vulkan
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
 platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
+platformabstractiongraphicsvulkan_HEADERS = $(graphics_vulkan_integration_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
@@ -158,13 +160,15 @@ linker_test_SOURCES = linker-test.cpp  \
 linker_test_CXXFLAGS = \
   $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
-  $(dali_core_includes)
+  $(dali_core_includes) \
+  $(VULKAN_CFLAGS)
 
 if ENABLE_CXX03_ABI
 
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
-  libdali-core.la
+  libdali-core.la \
+  $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename
@@ -178,7 +182,8 @@ else
 
 linker_test_DEPENDENCIES = libdali-core-cxx11.la
 linker_test_LDADD = \
-  libdali-core-cxx11.la
+  libdali-core-cxx11.la \
+  $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename

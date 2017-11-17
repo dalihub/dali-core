@@ -64,6 +64,7 @@ void TestApplication::Initialize()
 
   mCore = Dali::Integration::Core::New( mRenderController,
                                         mPlatformAbstraction,
+                                        mGraphics,
                                         mGlAbstraction,
                                         mGlSyncAbstraction,
                                         mGestureManager,
