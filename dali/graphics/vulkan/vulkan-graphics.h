@@ -35,6 +35,14 @@ using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 namespace Vulkan
 {
 
+enum class Platform
+{
+  UNDEFINED,
+  XLIB,
+  XCB,
+  WAYLAND,
+};
+
 class Surface;
 class CommandPool;
 class DeviceMemoryManager;
@@ -83,14 +91,17 @@ public:
   Queue& GetComputeQueue(uint32_t index = 0u) const;
   Queue& GetPresentQueue() const;
 
+  Platform GetDefaultPlatform() const;
+
 private:
 
-  void                                     CreateInstance();
+  void                                     CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers );
   void                                     DestroyInstance();
   void                                     PreparePhysicalDevice();
   void                                     GetPhysicalDeviceProperties();
   void                                     GetQueueFamilyProperties();
   std::vector< vk::DeviceQueueCreateInfo > GetQueueCreateInfos();
+  std::vector<const char*>                 PrepareDefaultInstanceExtensions();
 
 private:
 
@@ -121,6 +132,8 @@ private:
   std::vector< std::unique_ptr<Queue> >  mTransferQueues;
   std::vector< std::unique_ptr<Queue> >  mComputeQueues;
   std::unique_ptr< Queue > mPresentQueue;
+
+  Platform                               mPlatform  { Platform::UNDEFINED };
 };
 
 } // namespace Vulkan

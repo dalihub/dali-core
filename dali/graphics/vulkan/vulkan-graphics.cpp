@@ -27,9 +27,15 @@
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
 #endif
 
+#ifndef VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+#define VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME "VK_KHR_wayland_surface"
+#endif
+
 #ifndef VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
+
+#include <iostream>
 
 namespace Dali
 {
@@ -39,36 +45,142 @@ using VkSurfaceFactory = Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 namespace Vulkan
 {
 
+const auto VALIDATION_LAYERS = std::vector< const char* >{
+
+  //"VK_LAYER_LUNARG_screenshot",           // screenshot
+  "VK_LAYER_LUNARG_parameter_validation", // parameter
+  //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+  "VK_LAYER_LUNARG_monitor",             // monitor
+  "VK_LAYER_LUNARG_swapchain",           // swapchain
+  "VK_LAYER_GOOGLE_threading",           // threading
+  "VK_LAYER_LUNARG_api_dump",            // api
+  "VK_LAYER_LUNARG_object_tracker",      // objects
+  "VK_LAYER_LUNARG_core_validation",     // core
+  "VK_LAYER_GOOGLE_unique_objects",      // unique objects
+  "VK_LAYER_LUNARG_standard_validation", // standard
+};
+
 Graphics::Graphics() = default;
 
 Graphics::~Graphics() = default;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+
+Platform Graphics::GetDefaultPlatform() const
+{
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+  mPlatform = Platform::WAYLAND;
+#elif VK_USE_PLATFORM_XCB_KHR
+  mPlatform = Platform::XCB;
+#elif VK_USE_PLATFORM_XLIB_KHR
+  mPlatform =  Platform::XLIB;
+#else
+  return mPlatform;
+#endif
+}
+
+std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
+{
+  auto extensions = vk::enumerateInstanceExtensionProperties();
+  std::string extensionName;
+
+  bool xlibAvailable    { false };
+  bool xcbAvailable     { false };
+  bool waylandAvailable { false };
+
+  for( auto&& ext : extensions.value )
+  {
+    extensionName = ext.extensionName;
+    if( extensionName == VK_KHR_XCB_SURFACE_EXTENSION_NAME )
+    {
+      xcbAvailable = true;
+    }
+    else if( extensionName == VK_KHR_XLIB_SURFACE_EXTENSION_NAME )
+    {
+      xlibAvailable = true;
+    }
+    else if( extensionName == VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME )
+    {
+      waylandAvailable = true;
+    }
+  }
+
+  std::vector<const char*> retval;
+
+  // depending on the platform validate extensions
+  auto platform = GetDefaultPlatform();
+
+  if( platform != Platform::UNDEFINED )
+  {
+    if (platform == Platform::XCB && xcbAvailable)
+    {
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::XLIB && xlibAvailable)
+    {
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::WAYLAND && waylandAvailable)
+    {
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
+  }
+  else // try to determine the platform based on available extensions
+  {
+    if (xcbAvailable)
+    {
+      mPlatform = Platform::XCB;
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (xlibAvailable)
+    {
+      mPlatform = Platform::XLIB;
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (waylandAvailable)
+    {
+      mPlatform = Platform::WAYLAND;
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
+    else
+    {
+      // can't determine the platform!
+      mPlatform = Platform::UNDEFINED;
+    }
+  }
+
+  // other essential extensions
+  retval.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
+  retval.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
+
+  return retval;
+}
 
 void Graphics::Create()
 {
-  CreateInstance();
+
+  auto extensions = PrepareDefaultInstanceExtensions();
+
+  auto layers = vk::enumerateInstanceLayerProperties();
+  std::vector<const char*> validationLayers;
+  for( auto&& reqLayer : VALIDATION_LAYERS )
+  {
+    for( auto&& prop : layers.value )
+    {
+      if( std::string(prop.layerName) == reqLayer )
+      {
+        validationLayers.push_back(reqLayer);
+      }
+    }
+  }
+
+  CreateInstance(extensions, validationLayers);
   PreparePhysicalDevice();
 }
 
-void Graphics::CreateInstance()
+void Graphics::CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers )
 {
   auto info = vk::InstanceCreateInfo{};
-  auto extensions =
-      std::vector< const char* >{VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-                                 VK_KHR_XLIB_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME };
-
-  const auto validationLayers = std::vector< const char* >{
-      //"VK_LAYER_LUNARG_screenshot",           // screenshot
-      "VK_LAYER_LUNARG_parameter_validation", // parameter
-      //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
-      "VK_LAYER_LUNARG_monitor",             // monitor
-      "VK_LAYER_LUNARG_swapchain",           // swapchain
-      "VK_LAYER_GOOGLE_threading",           // threading
-      "VK_LAYER_LUNARG_api_dump",            // api
-      "VK_LAYER_LUNARG_object_tracker",      // objects
-      "VK_LAYER_LUNARG_core_validation",     // core
-      "VK_LAYER_GOOGLE_unique_objects",      // unique objects
-      "VK_LAYER_LUNARG_standard_validation", // standard
-  };
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
@@ -87,8 +199,7 @@ void Graphics::DestroyInstance()
   }
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
+
 void Graphics::PreparePhysicalDevice()
 {
   auto devices = VkAssert(mInstance.enumeratePhysicalDevices());
