@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "81d73244_a2d3f8d4",
+        "filename": "build/scripts/dali_env",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2017-11-20T11:47:47Z",
+      "side": 1,
+      "message": "Could we print a message informing that the default version is 1.0.54.0 if not stated otherwise? Just to avoid confusion as somebody may expect to get an actual latest version.",
+      "revId": "44e80b3700fd3459cc51d0894024da1ef05206d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
