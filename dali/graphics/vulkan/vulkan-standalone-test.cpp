@@ -19,10 +19,19 @@
 #include <xcb/xcb.h>
 #include <unistd.h>
 
+// internals
+#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/vulkan-device-memory-manager.h>
+
 #define USE_XLIB 0
 
 using Dali::Integration::Graphics::Graphics;
 using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
+using Dali::Graphics::Vulkan::Buffer;
+using Dali::Graphics::Vulkan::DeviceMemoryManager;
+using Dali::Graphics::Vulkan::DeviceMemory;
+
 
 template< typename T, typename... Args >
 std::unique_ptr< T > MakeUnique(Args&&... args)
@@ -189,8 +198,21 @@ int RunTestMain()
          std::unique_ptr<VkSurfaceXcb>{new VkSurfaceXcb{window->connection, window->window}};
 #endif
 
+
+
+
   auto graphics = MakeUnique<Graphics>();
   auto fbid = graphics->Create( std::move(surfaceFactory) );
+
+  // access internal implementation
+  auto& impl = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
+
+  auto& memmgr = impl.GetDeviceMemoryManager();
+
+  auto vertexBuffer = Buffer::NewVertexBuffer(impl, 4*sizeof(float[3]));
+
+
+
 
   while(1)
   {
@@ -199,4 +221,9 @@ int RunTestMain()
   }
   return 0;
 }
+}
+
+int main()
+{
+  VulkanTest::RunTestMain();
 }

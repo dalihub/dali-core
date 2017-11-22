@@ -13,7 +13,10 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
+namespace Impl
+{
+class DeviceMemory;
+}
 class Graphics;
 class Image;
 class Buffer;
@@ -28,30 +31,31 @@ class DeviceMemoryManager;
 class DeviceMemory
 {
 public:
-  DeviceMemory(DeviceMemoryManager& manager, Graphics& graphics,
-               const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags properties);
+
+  DeviceMemory(DeviceMemoryManager& manager,
+               Graphics& graphics,
+               const vk::MemoryRequirements& requirements,
+               vk::MemoryPropertyFlags properties);
 
   void* Map(uint32_t offset, uint32_t size);
 
   void Unmap();
 
   void Bind( Image& image, uint32_t offset );
-  void Bind( Buffer& image, uint32_t offset );
+  void Bind( Buffer& buffer, uint32_t offset );
 
 private:
-  DeviceMemoryManager& mManager;
-  Graphics&            mGraphics;
 
-  vk::DeviceMemory        mDeviceMemory;
-  vk::MemoryPropertyFlags mProperties;
-  vk::MemoryRequirements  mRequirements;
-
-  std::atomic< uint32_t > mUserCount; // this is just a refcount
+  std::unique_ptr<Impl::DeviceMemory> mImpl;
 };
 
 /**
  * DeviceMemoryManager
  */
+namespace Impl
+{
+class DeviceMemoryManager;
+}
 class DeviceMemoryManager
 {
 public:
@@ -65,21 +69,21 @@ public:
   DeviceMemoryManager& operator=(DeviceMemoryManager&&) = default;
 
   /* Allocates memory for VkImage */
-  vk::DeviceMemory& Allocate(vk::Image image, vk::MemoryPropertyFlags memoryFlags);
+  vk::DeviceMemory& Allocate(Vulkan::Image& image, vk::MemoryPropertyFlags memoryFlags);
 
   /* Allocates memory for VkBuffer */
-  vk::DeviceMemory& Allocate(vk::Buffer image, vk::MemoryPropertyFlags memoryFlags);
+  const Vulkan::DeviceMemory& Allocate(Vulkan::Buffer& buffer, vk::MemoryPropertyFlags memoryFlags);
 
   std::unique_ptr< DeviceMemory > Allocate(vk::MemoryRequirements  requirements,
                                            vk::MemoryPropertyFlags flags);
 
-  Graphics& GetGraphics() const
-  {
-    return mGraphics;
-  }
+  Graphics& GetGraphics() const;
 
 private:
-  Graphics& mGraphics;
+
+  std::unique_ptr<Impl::DeviceMemoryManager> mImpl;
+
+
 };
 
 } // namespace Vulkan
