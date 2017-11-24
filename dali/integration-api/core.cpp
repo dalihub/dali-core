@@ -36,7 +36,9 @@ Core* Core::New( RenderController& renderController,
                  GlSyncAbstraction& glSyncAbstraction,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
-                 bool renderToFboEnabled )
+                 RenderToFrameBuffer renderToFboEnabled,
+                 DepthBufferAvailable depthBufferAvailable,
+                 StencilBufferAvailable stencilBufferAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -45,7 +47,9 @@ Core* Core::New( RenderController& renderController,
                                         glSyncAbstraction,
                                         gestureManager,
                                         policy,
-                                        renderToFboEnabled );
+                                        renderToFboEnabled,
+                                        depthBufferAvailable,
+                                        stencilBufferAvailable );
 
   return instance;
 }
