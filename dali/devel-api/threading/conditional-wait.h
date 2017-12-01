@@ -2,7 +2,7 @@
 #define __DALI_CONDITIONAL_WAIT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,15 +55,18 @@ public:
      * Getter for the ConditionalWait locked for this instance's lifetime.
      * @return the ConditionalWait object currently locked.
      */
-    ConditionalWait& GetLockedWait() const { return mWait; }
+    ConditionalWait& GetLockedWait() const;
+
+  public: // Data, public to allow nesting class to access
+
+    struct ScopedLockImpl;
+    ScopedLockImpl* mImpl;
 
   private:
 
     // Not implemented as ScopedLock cannot be copied:
     ScopedLock( const ScopedLock& );
     const ScopedLock& operator=( const ScopedLock& );
-
-    ConditionalWait& mWait;
   };
 
   /**
