@@ -130,6 +130,11 @@ DALI_IMPORT_API void UninstallLogFunction();
  */
 #define DALI_LOG_RENDER_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
+/**
+ * Provides unfiltered logging for release
+ */
+#define DALI_LOG_RELEASE_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
+
 #ifdef DEBUG_ENABLED
 
 /**
