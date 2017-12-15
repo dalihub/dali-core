@@ -814,10 +814,13 @@ const Vector3& Actor::GetCurrentWorldPosition() const
 
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
-  if( OnStage() && NULL != mNode )
+  StagePtr stage = Stage::GetCurrent();
+  if( stage && OnStage() && NULL != mNode )
   {
-    StagePtr stage = Stage::GetCurrent();
     Vector3 worldPosition =  mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    Vector3 cameraPosition = stage->GetDefaultCameraActor().mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    worldPosition -= cameraPosition;
+
     Vector3 actorSize = GetCurrentSize() * GetCurrentWorldScale();
     Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
     Vector3 halfActorSize( actorSize * 0.5f );
