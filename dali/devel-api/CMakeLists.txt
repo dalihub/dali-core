@@ -1,3 +1,4 @@
+
 SET( SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/actors/actor-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/actors/custom-actor-devel.cpp
@@ -12,7 +13,6 @@ SET( SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/images/nine-patch-image.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/pixel-data-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/object/handle-devel.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/object/csharp-type-registry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/scripting/scripting.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/signals/signal-delegate.cpp
