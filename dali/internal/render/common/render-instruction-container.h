@@ -76,6 +76,12 @@ public:
    */
   RenderInstruction& At( BufferIndex bufferIndex, size_t index );
 
+  /**
+   * Discard the current container index
+   * @param bufferIndex to reset
+   */
+  void DiscardCurrentInstruction( BufferIndex bufferIndex );
+
 private:
 
   unsigned int mIndex[ 2 ]; ///< count of the elements that have been added
