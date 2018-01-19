@@ -6,7 +6,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/internal-constants.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/math.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/message-buffer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/mutex-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/mutex-trace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/image-sampler.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/image-attributes.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/fixed-size-memory-pool.cpp
