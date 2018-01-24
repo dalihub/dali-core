@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,30 @@ public:
   typedef float (*AlphaFunc)(float progress); ///< Definition of an alpha function
 
   /**
+   * Observer to determine when the animator is no longer present
+   */
+  class LifecycleObserver
+  {
+  public:
+    /**
+     * Called shortly before the animator is destroyed.
+     */
+    virtual void ObjectDestroyed() = 0;
+
+  protected:
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~LifecycleObserver() = default;
+  };
+
+
+  /**
    * Constructor.
    */
   AnimatorBase()
-  : mDurationSeconds(1.0f),
+  : mLifecycleObserver(nullptr),
+    mDurationSeconds(1.0f),
     mIntervalDelaySeconds(0.0f),
     mSpeedFactor(1.0f),
     mLoopCount(1),
@@ -86,6 +106,20 @@ public:
    */
   virtual ~AnimatorBase()
   {
+    if( mLifecycleObserver != nullptr )
+    {
+      mLifecycleObserver->ObjectDestroyed();
+    }
+  }
+
+  void AddLifecycleObserver( LifecycleObserver& observer )
+  {
+    mLifecycleObserver = &observer;
+  }
+
+  void RemoveLifecycleObserver( LifecycleObserver& observer )
+  {
+    mLifecycleObserver = nullptr;
   }
 
   /**
@@ -403,6 +437,7 @@ protected:
     return 3.0f*(1.0f-t)*(1.0f-t)*t*p0 + 3.0f*(1.0f-t)*tSquare*p1 + tSquare*t;
   }
 
+  LifecycleObserver* mLifecycleObserver;
   float mDurationSeconds;
   float mIntervalDelaySeconds;
   float mSpeedFactor;
