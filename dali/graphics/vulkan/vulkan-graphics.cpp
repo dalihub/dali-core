@@ -82,6 +82,7 @@ Platform Graphics::GetDefaultPlatform() const
 std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
 {
   auto extensions = vk::enumerateInstanceExtensionProperties();
+
   std::string extensionName;
 
   bool xlibAvailable    { false };
@@ -202,6 +203,81 @@ void Graphics::DestroyInstance()
 
 void Graphics::PreparePhysicalDevice()
 {
+
+{
+const char *EXTENSION_NAMES[] =
+             {
+               VK_KHR_SURFACE_EXTENSION_NAME,
+               //VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+               VK_KHR_XCB_SURFACE_EXTENSION_NAME
+             };
+vk::Instance mInstance;
+mInstance = vk::createInstance( vk::InstanceCreateInfo()
+                                  .setEnabledExtensionCount( 2 )
+                                  .setPpEnabledExtensionNames( EXTENSION_NAMES ) ).value;
+
+// A helper function enumerate physical devices
+auto devices = mInstance.enumeratePhysicalDevices();
+
+// on success
+if( devices.result == vk::Result::eSuccess )
+{
+  for( auto&& physicalDevice : devices.value )
+  {
+    // item is a vk::PhysicalDevice type
+    auto features = physicalDevice.getFeatures();
+    auto memoryProperties = physicalDevice.getMemoryProperties();
+
+    // ... do something
+  }
+}
+}
+
+// old style
+{
+const char *EXTENSION_NAMES[] =
+             {
+               VK_KHR_SURFACE_EXTENSION_NAME,
+               VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+             };
+
+// create instance
+VkInstance vulkanInstance = VK_NULL_HANDLE;
+
+VkInstanceCreateInfo instanceInfo = {};
+memset( &instanceInfo, 0, sizeof(VkInstanceCreateInfo) );
+instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO; // <-- This isn't safe!
+instanceInfo.ppEnabledExtensionNames = EXTENSION_NAMES;
+instanceInfo.enabledExtensionCount = 2;
+
+if( VK_SUCCESS == vkCreateInstance( &instanceInfo, VK_NULL_HANDLE, &vulkanInstance ) )
+{
+  // ... success, enumerate physical devices
+  uint32_t count;
+  if( vkEnumeratePhysicalDevices( vulkanInstance, &count, VK_NULL_HANDLE ) == VK_SUCCESS )
+  {
+    std::vector<VkPhysicalDevice> devices;
+    devices.resize( count );
+    if( vkEnumeratePhysicalDevices( vulkanInstance, &count, devices.data() ) )
+    {
+      for( auto&& physicalDevice : devices )
+      {
+        VkPhysicalDeviceFeatures features;
+        VkPhysicalDeviceMemoryProperties memoryProperties;
+        vkGetPhysicalDeviceFeatures( physicalDevice, &features );
+        vkGetPhysicalDeviceMemoryProperties( physicalDevice, &memoryProperties );
+
+      }
+    }
+  }
+}
+else
+{
+  // ... not too much of success ;(
+}
+}
+
+
   auto devices = VkAssert(mInstance.enumeratePhysicalDevices());
   assert(devices.size() > 0 && "No Vulkan supported device found!");
 

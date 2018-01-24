@@ -23,6 +23,16 @@ class Buffer;
 class DeviceMemoryManager;
 
 /**
+ * Notes:
+ * 1. All allocated memory is owned by the DeviceMemoryManager
+ * 2. Each memory block is refcounted
+ * 3. Memory which is mapped to the client space increases refcount
+ * 4. Memory bound to an Image or Buffer increses refcount
+ * 5. Unused memory is placed in the discard queue
+ * 6. Flushing unused memory may be postponed
+ */
+
+/**
  * DeviceMemory represents continuous memory block with particular properties
  * like being mappable etc. The actual memory is being allocated from DeviceMemory,
  * however simplest use may assume use of whole DeviceMemory block for a single
@@ -32,36 +42,38 @@ class DeviceMemory
 {
 public:
 
-  DeviceMemory(DeviceMemoryManager& manager,
-               Graphics& graphics,
+  DeviceMemory();
+  DeviceMemory(Graphics& graphics,
                const vk::MemoryRequirements& requirements,
                vk::MemoryPropertyFlags properties);
 
+  ~DeviceMemory();
+
   void* Map(uint32_t offset, uint32_t size);
+
+  void* Map();
 
   void Unmap();
 
-  void Bind( Image& image, uint32_t offset );
-  void Bind( Buffer& buffer, uint32_t offset );
+  vk::DeviceMemory GetVkDeviceMemory() const;
+
+  operator bool() const;
 
 private:
 
-  std::unique_ptr<Impl::DeviceMemory> mImpl;
+  struct Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 /**
  * DeviceMemoryManager
  */
-namespace Impl
-{
-class DeviceMemoryManager;
-}
-class DeviceMemoryManager
+class DeviceMemoryManager final
 {
 public:
   DeviceMemoryManager() = delete;
   DeviceMemoryManager(Graphics& graphics);
-  ~DeviceMemoryManager()                          = default;
+  ~DeviceMemoryManager();
   DeviceMemoryManager(const DeviceMemoryManager&) = delete;
   DeviceMemoryManager(DeviceMemoryManager&&)      = default;
 
@@ -81,8 +93,8 @@ public:
 
 private:
 
-  std::unique_ptr<Impl::DeviceMemoryManager> mImpl;
-
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 
 };
 

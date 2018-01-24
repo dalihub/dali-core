@@ -26,13 +26,9 @@ namespace Graphics
 {
 namespace Vulkan
 {
-namespace Impl
-{
-struct Buffer;
-}
-
 class DeviceMemory;
 class Graphics;
+class GpuMemoryHandle;
 
 using VertexBuffer = Buffer;
 using UniformBuffer = Buffer;
@@ -41,41 +37,47 @@ using IndexBuffer = Buffer;
 class Buffer
 {
 public:
-  /**
-   * Creates new VkBuffer with given specification, it doesn't
-   * bind the memory.
-   * @param graphics
-   * @param createInfo
-   */
-  Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo);
+
+  enum class Type
+  {
+    VERTEX,
+    INDEX,
+    UNIFORM,
+    SHADER_STORAGE
+  };
 
   /**
    * Destructor
    */
   virtual ~Buffer();
 
-
   // single purpose constructors helpers
-  static std::unique_ptr<VertexBuffer> NewVertexBuffer( Graphics& graphics, size_t size  );
-
-  static std::unique_ptr<UniformBuffer> NewUniformBuffer( Graphics& graphics, size_t size );
-
-  static std::unique_ptr<IndexBuffer> NewIndexBuffer( Graphics& graphics, size_t size );
+  static std::unique_ptr<VertexBuffer> New( Graphics& graphics, size_t size, Type type );
 
   vk::BufferUsageFlags GetUsage() const;
 
-  DeviceMemory& GetDeviceMemory() const;
-
   size_t GetSize() const;
 
-  bool HasDeviceMemory() const;
+  vk::Buffer GetVkBuffer() const;
 
-  vk::Buffer GetVkObject() const;
+  const GpuMemoryHandle& GetMemoryHandle() const;
+
+  void BindMemory( const GpuMemoryHandle& handle );
 
 private:
 
-  std::unique_ptr<Impl::Buffer> mImpl;
+  /**
+ * Creates new VkBuffer with given specification, it doesn't
+ * bind the memory.
+ * @param graphics
+ * @param createInfo
+ */
+  Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo);
 
+private:
+
+  class Impl;
+  std::unique_ptr<Buffer::Impl> mImpl;
 
 };
 

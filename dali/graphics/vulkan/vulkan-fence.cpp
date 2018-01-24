@@ -26,49 +26,123 @@ namespace Graphics
 namespace Vulkan
 {
 
-Fence::Fence(Graphics& graphics) : mGraphics(graphics), mFence(nullptr)
+/**
+ * Class: Fence::Impl
+ *
+ */
+struct Fence::Impl
 {
-  mFence =
-      VkAssert(mGraphics.GetDevice().createFence(vk::FenceCreateInfo{}, mGraphics.GetAllocator()));
+  Impl( Vulkan::Graphics& graphics )
+  : mGraphics( graphics )
+  {
+  }
+
+  ~Impl()
+  {
+    if( mFence )
+    {
+      mGraphics.GetDevice().destroyFence( mFence, mGraphics.GetAllocator() );
+    }
+  }
+
+  vk::Result Initialise()
+  {
+    mFence = VkAssert( mGraphics.GetDevice().createFence( vk::FenceCreateInfo{}, mGraphics.GetAllocator() ) );
+    if( mFence )
+      return vk::Result::eSuccess;
+    return vk::Result::eErrorInitializationFailed;
+  }
+
+  /**
+   *
+   * @param timeout
+   * @return
+   */
+  bool Wait( uint32_t timeout = 0u )
+  {
+    if(mFence)
+    {
+      if(timeout)
+      {
+        return mGraphics.GetDevice().waitForFences(mFence, true, timeout) == vk::Result::eSuccess;
+      }
+      else
+      {
+        timeout = 16000000;
+        while(mGraphics.GetDevice().waitForFences(mFence, true, timeout) != vk::Result::eSuccess)
+        {
+          // fixme: busy wait, bit ugly
+        }
+        return true;
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  void Reset()
+  {
+    if(mFence)
+    {
+      mGraphics.GetDevice().resetFences(mFence);
+    }
+  }
+
+  vk::Fence GetVkFence() const
+  {
+    return mFence;
+  }
+
+  Vulkan::Graphics& mGraphics;
+  vk::Fence mFence;
+};
+
+/**
+ * Class: Fence
+ *
+ */
+std::unique_ptr<Fence> Fence::New( Graphics& graphics )
+{
+  auto retval = std::unique_ptr<Fence>( new Fence(graphics) );
+  if( vk::Result::eSuccess == retval->mImpl->Initialise() )
+    return retval;
+  return nullptr;
 }
 
-Fence::~Fence()
+Fence::Fence(Graphics& graphics)
 {
-  if(mFence)
-  {
-    mGraphics.GetDevice().destroyFence(mFence, mGraphics.GetAllocator());
-  }
+  mImpl = MakeUnique<Impl>(graphics);
 }
+
+const Fence& Fence::ConstRef() const
+{
+  return *this;
+}
+
+Fence& Fence::Ref()
+{
+  return *this;
+}
+
+Fence::~Fence() = default;
 
 bool Fence::Wait(uint32_t timeout)
 {
-  if(timeout)
-  {
-    return mGraphics.GetDevice().waitForFences(mFence, true, timeout) == vk::Result::eSuccess;
-  }
-  else
-  {
-    timeout = 16000000;
-    while(mGraphics.GetDevice().waitForFences(mFence, true, timeout) != vk::Result::eSuccess)
-    {
-      // fixme: busy wait, bit ugly
-    }
-    return true;
-  }
+  return mImpl->Wait( timeout );
 }
 
 void Fence::Reset()
 {
-  if(mFence)
-  {
-    mGraphics.GetDevice().resetFences(mFence);
-  }
+  mImpl->Reset();
 }
 
 vk::Fence Fence::GetFence() const
 {
-  return mFence;
+  return mImpl->GetVkFence();
 }
+
+
 
 } // namespace Vulkan
 } // namespace Graphics

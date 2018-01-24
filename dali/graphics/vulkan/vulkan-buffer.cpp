@@ -17,62 +17,100 @@
 
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/vulkan-device-memory-manager.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+
 namespace Dali
 {
 namespace Graphics
 {
 namespace Vulkan
 {
-namespace Impl
+namespace
 {
+static const Vulkan::DeviceMemory NULL_DEVICE_MEMORY{};
+}
 
-struct Buffer final
+struct Buffer::Impl final
 {
-  Graphics&                             mGraphics;
-  vk::BufferCreateInfo                  mInfo;
-  vk::Buffer                            mBuffer;
-  bool                                  mHasDeviceMemory;
-
-  Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
+  /**
+   *
+   * @param graphics
+   * @param createInfo
+   */
+  Impl(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
   : mGraphics(graphics),
-    mHasDeviceMemory(false)
+    mDeviceMemory(nullptr),
+    mInfo(createInfo)
   {
-    mBuffer = VkAssert(graphics.GetDevice().createBuffer( createInfo, graphics.GetAllocator()));
-    mInfo = createInfo;
   }
 
-  ~Buffer()
+  /**
+   *
+   */
+  ~Impl()
   {
     mGraphics.GetDevice().destroyBuffer( mBuffer, mGraphics.GetAllocator() );
   }
 
+  /**
+   * Initialises Buffer with memory, as host visible ( for write )
+   * @return
+   */
+  bool Initialise()
+  {
+    mBuffer = VkAssert(mGraphics.GetDevice().createBuffer( mInfo, mGraphics.GetAllocator()));
+    return true;
+  }
+
+  /**
+   *
+   * @return
+   */
   vk::BufferUsageFlags GetUsage() const
   {
     return mInfo.usage;
   }
 
-  DeviceMemory& GetDeviceMemory() const
+  /**
+   *
+   * @return
+   */
+  vk::ResultValue<Vulkan::DeviceMemory&> GetDeviceMemory() const
   {
 
   }
 
+  /**
+   *
+   * @return
+   */
   size_t GetSize() const
   {
     return static_cast<size_t>(mInfo.size);
   }
 
-  bool HasDeviceMemory() const
-  {
-    return mHasDeviceMemory;
-  }
-
-  vk::Buffer GetVkObject() const
+  /**
+   *
+   * @return
+   */
+  vk::Buffer GetVkBuffer() const
   {
     return mBuffer;
   }
 
+  void BindMemory( GpuMemoryHandle handle )
+  {
+    assert( mBuffer && "Buffer not initialised!");
+    VkAssert(mGraphics.GetDevice().bindBufferMemory( mBuffer, handle, 0 ));
+    mDeviceMemory = handle;
+  }
+
+  Vulkan::Graphics&                     mGraphics;
+  GpuMemoryHandle                       mDeviceMemory;
+  vk::BufferCreateInfo                  mInfo;
+  vk::Buffer                            mBuffer;
 };
-}
 
 /**
  *
@@ -80,48 +118,34 @@ struct Buffer final
  * @param size
  * @return
  */
-std::unique_ptr<VertexBuffer> Buffer::NewVertexBuffer(Graphics& graphics, size_t size)
+std::unique_ptr<VertexBuffer> Buffer::New(Graphics& graphics, size_t size, Type type)
 {
-  vk::BufferCreateInfo info = {};
-  info.setSharingMode( vk::SharingMode::eExclusive );
-  info.setSize( size );
-  info.setUsage( vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst );
-  return MakeUnique<VertexBuffer>( graphics, info );
-}
+  auto usageFlags = vk::BufferUsageFlags{};
 
-/**
- *
- * @param graphics
- * @param size
- * @return
- */
-std::unique_ptr<UniformBuffer> Buffer::NewUniformBuffer(Graphics& graphics, size_t size)
-{
-  vk::BufferCreateInfo info = {};
-  info.setSharingMode( vk::SharingMode::eExclusive );
-  info.setSize( size );
-  info.setUsage( vk::BufferUsageFlagBits::eUniformBuffer | vk::BufferUsageFlagBits::eTransferDst );
-  return MakeUnique<VertexBuffer>( graphics, info );
-}
+  switch( type )
+  {
+    case Type::VERTEX: { usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer; break; };
+    case Type::INDEX: { usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer; break; };
+    case Type::UNIFORM: { usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer; break; };
+    case Type::SHADER_STORAGE: { usageFlags |= vk::BufferUsageFlagBits::eStorageBuffer; break; };
+  }
 
-/**
- *
- * @param graphics
- * @param size
- * @return
- */
-std::unique_ptr<IndexBuffer> Buffer::NewIndexBuffer(Graphics& graphics, size_t size)
-{
-  vk::BufferCreateInfo info = {};
+  auto info = vk::BufferCreateInfo{};
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
-  info.setUsage( vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst );
-  return MakeUnique<VertexBuffer>( graphics, info );
+  info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst
+  );
+  auto retval = std::unique_ptr<Buffer>( new Buffer(graphics, info) );
+  if(retval && retval->mImpl->Initialise())
+  {
+    return retval;
+  }
+  return nullptr;
 }
 
 Buffer::Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
 {
-  mImpl = MakeUnique<Impl::Buffer>(graphics, createInfo);
+  mImpl = MakeUnique<Buffer::Impl>(graphics, createInfo);
 }
 
 Buffer::~Buffer() = default;
@@ -131,9 +155,9 @@ vk::BufferUsageFlags Buffer::GetUsage() const
   return mImpl->GetUsage();
 }
 
-DeviceMemory& Buffer::GetDeviceMemory() const
+const GpuMemoryHandle& Buffer::GetMemoryHandle() const
 {
-  return mImpl->GetDeviceMemory();
+  return mImpl->mDeviceMemory;
 }
 
 size_t Buffer::GetSize() const
@@ -141,16 +165,15 @@ size_t Buffer::GetSize() const
   return mImpl->GetSize();
 }
 
-bool Buffer::HasDeviceMemory() const
+vk::Buffer Buffer::GetVkBuffer() const
 {
-  return mImpl->HasDeviceMemory();
+  return mImpl->GetVkBuffer();
 }
 
-vk::Buffer Buffer::GetVkObject() const
+void Buffer::BindMemory( const GpuMemoryHandle& handle )
 {
-  return mImpl->GetVkObject();
+  mImpl->BindMemory( handle );
 }
-
 
 }
 

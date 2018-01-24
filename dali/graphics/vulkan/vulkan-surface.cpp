@@ -73,7 +73,7 @@ void Surface::AcquireNextImage()
 
   if(!mFrameFence)
   {
-    mFrameFence = MakeUnique< Fence >(mGraphics);
+    mFrameFence = Fence::New(mGraphics);
   }
 
   // acquire image, for simplicity using fence for acquiring as it is unknown what next command buffer will
@@ -410,8 +410,8 @@ void Surface::CreateCommandBuffers()
   // submit to the queue
   {
     auto& queue      = mGraphics.GetGraphicsQueue();
-    auto  fence      = Fence(mGraphics);
-    auto  submission = queue.Submit(cmdBuffers, fence);
+    auto  fence      = Fence::New(mGraphics);
+    auto  submission = queue.Submit(cmdBuffers, fence->Ref());
     submission->WaitForFence();
   }
 

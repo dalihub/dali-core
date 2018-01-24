@@ -51,71 +51,102 @@ uint32_t GetMemoryIndex(const vk::PhysicalDeviceMemoryProperties &memoryProperti
 }
 }
 
-namespace Impl
+class DeviceMemory::Impl
 {
-struct DeviceMemory
-{
-  DeviceMemoryManager& mManager;
-  Graphics&            mGraphics;
-
-  vk::DeviceMemory        mDeviceMemory;
-  vk::MemoryPropertyFlags mProperties;
-  vk::MemoryRequirements  mRequirements;
-
-  std::atomic< uint32_t > mUserCount; // this is just a refcount
-
-  DeviceMemory(DeviceMemoryManager &manager, Graphics &graphics,
-                             const vk::MemoryRequirements &requirements,
-                             vk::MemoryPropertyFlags       properties)
-    : mManager(manager),
-      mGraphics(graphics),
+public:
+  /**
+   *
+   * @param graphics
+   * @param requirements
+   * @param properties
+   */
+  Impl(Graphics &graphics,
+               const vk::MemoryRequirements &requirements,
+               vk::MemoryPropertyFlags       properties)
+    : mGraphics(graphics),
       mDeviceMemory{nullptr},
       mProperties{properties},
       mRequirements(requirements),
       mUserCount{0u}
   {
+
+  }
+
+  bool Initialise()
+  {
     auto info = vk::MemoryAllocateInfo{};
-    info.setAllocationSize(requirements.size)
+    info.setAllocationSize(mRequirements.size)
         .setMemoryTypeIndex(
-          GetMemoryIndex(mGraphics.GetMemoryProperties(), requirements.memoryTypeBits, properties));
+          GetMemoryIndex(mGraphics.GetMemoryProperties(), mRequirements.memoryTypeBits, mProperties));
 
     mDeviceMemory = VkAssert(mGraphics.GetDevice().allocateMemory(info));
+    return true;//mDeviceMemory != nullptr;
   }
-
+  /**
+   *
+   * @param offset
+   * @param size
+   * @return
+   */
   void* Map(uint32_t offset, uint32_t size)
   {
-    return nullptr;
+    assert( !mMappedPointer && "Memory is already mapped!" );
+    mMappedPointer = VkAssert(mGraphics.GetDevice().mapMemory(mDeviceMemory,offset, size));
+    if( mMappedPointer )
+      ++mUserCount;
+    return mMappedPointer;
   }
 
+  /**
+   *
+   */
   void Unmap()
   {
+    mGraphics.GetDevice().unmapMemory( mDeviceMemory );
+    mMappedPointer = nullptr;
+    --mUserCount;
   }
 
-  void Bind(Image &image, uint32_t offset)
+  vk::DeviceMemory GetVkDeviceMemory() const
   {
-    assert(image.GetImage() && "Image is nullptr!");
-    VkAssert(mGraphics.GetDevice().bindImageMemory(image.GetImage(), mDeviceMemory, offset));
-    ++mUserCount;
+    return mDeviceMemory;
   }
 
-  void Bind(Vulkan::Buffer &buffer, uint32_t offset)
-  {
-  }
+private:
+  //Vulkan::DeviceMemoryManager& mManager;
+  Graphics&                    mGraphics;
 
+  vk::DeviceMemory             mDeviceMemory;
+  vk::MemoryPropertyFlags      mProperties;
+  vk::MemoryRequirements       mRequirements;
 
+  void*                        mMappedPointer { nullptr };
+  std::atomic< uint32_t > mUserCount; // this is just a refcount
 };
-
-}
 
 /*
  * DeviceMemory
  */
+DeviceMemory::DeviceMemory()
+: mImpl(nullptr)
+{
+}
 
-DeviceMemory::DeviceMemory(DeviceMemoryManager &manager, Graphics &graphics,
+DeviceMemory::DeviceMemory(Graphics &graphics,
                            const vk::MemoryRequirements &requirements,
                            vk::MemoryPropertyFlags       properties)
 {
-  mImpl = MakeUnique<Impl::DeviceMemory>(manager, graphics, requirements, properties);
+  mImpl = MakeUnique<Impl>(graphics, requirements, properties);
+}
+
+DeviceMemory::~DeviceMemory()
+{
+
+}
+
+DeviceMemory::operator bool() const
+{
+  return mImpl == nullptr;
 }
 
 void* DeviceMemory::Map(uint32_t offset, uint32_t size)
@@ -123,76 +154,86 @@ void* DeviceMemory::Map(uint32_t offset, uint32_t size)
   return mImpl->Map( offset, size );
 }
 
+void* DeviceMemory::Map()
+{
+  return mImpl->Map( 0u, static_cast<uint32_t>(VK_WHOLE_SIZE) );
+}
+
 void DeviceMemory::Unmap()
 {
   mImpl->Unmap();
 }
 
-void DeviceMemory::Bind(Image& image, uint32_t offset)
+class DeviceMemoryManager::Impl final
 {
-  mImpl->Bind(image, offset);
-}
+public:
 
-void DeviceMemory::Bind(Vulkan::Buffer& buffer, uint32_t offset)
-{
-  mImpl->Bind(buffer, offset);
-}
-
-
-namespace Impl
-{
-struct DeviceMemoryManager
-{
-  Graphics& mGraphics;
-  std::vector<Vulkan::DeviceMemory> mAllocations;
-
-  DeviceMemoryManager(Graphics &graphics) : mGraphics(graphics)
+  /**
+   *
+   * @param graphics
+   */
+  Impl(Graphics &graphics) : mGraphics(graphics)
   {
   }
 
+  /**
+   *
+   * @param requirements
+   * @param flags
+   * @return
+   */
   std::unique_ptr<Vulkan::DeviceMemory> Allocate(vk::MemoryRequirements requirements,
-                                                              vk::MemoryPropertyFlags flags)
+                                                 vk::MemoryPropertyFlags flags)
   {
-    return MakeUnique<Vulkan::DeviceMemory>(*this, mGraphics, requirements, flags);
+    auto deviceMemory = MakeUnique<Vulkan::DeviceMemory>(mGraphics, requirements, flags);
+
   }
 
-/* Allocates memory for VkBuffer */
+  /* Allocates memory for VkBuffer */
   const Vulkan::DeviceMemory& Allocate(Vulkan::Buffer &buffer, vk::MemoryPropertyFlags memoryFlags)
   {
-    auto vkbuffer  = buffer.GetVkObject();
+    auto vkbuffer  = buffer.GetVkBuffer();
     auto vkdevice  = mGraphics.GetDevice();
     auto memoryReq = vkdevice.getBufferMemoryRequirements(vkbuffer);
 
-    mAllocations.emplace_back(*this, mGraphics, memoryReq, vk::MemoryPropertyFlagBits::eHostVisible);
+    mAllocations.emplace_back(
+      MakeUnique<Vulkan::DeviceMemory>(mGraphics, memoryReq, vk::MemoryPropertyFlagBits::eHostVisible)
+    );
 
-    return mAllocations.back();
+    return *mAllocations.back().get();
   }
+
+private:
+
+  Graphics& mGraphics;
+  std::vector<std::unique_ptr<Vulkan::DeviceMemory>> mAllocations;
+
 };
+
+DeviceMemoryManager::~DeviceMemoryManager() = default;
 
 DeviceMemoryManager::DeviceMemoryManager(Graphics &graphics)
 {
-  mImpl = MakeUnique<Impl::DeviceMemoryManager>(graphics);
+  mImpl = MakeUnique<Impl>(graphics);
 }
 
 std::unique_ptr<DeviceMemory> DeviceMemoryManager::Allocate(vk::MemoryRequirements requirements,
                                                             vk::MemoryPropertyFlags flags)
 {
-  return MakeUnique<DeviceMemory>(*this, mGraphics, requirements, flags);
+  return mImpl->Allocate( requirements, flags  );
 }
 
 /* Allocates memory for VkBuffer */
 const Vulkan::DeviceMemory &DeviceMemoryManager::Allocate(Vulkan::Buffer &buffer, vk::MemoryPropertyFlags memoryFlags)
 {
-  auto vkbuffer  = buffer.GetVkObject();
-  auto vkdevice  = mGraphics.GetDevice();
-  auto memoryReq = vkdevice.getBufferMemoryRequirements(vkbuffer);
-
-  mAllocations.emplace_back(*this, mGraphics, memoryReq, vk::MemoryPropertyFlagBits::eHostVisible);
-
-  return mAllocations.back();
+  return mImpl->Allocate( buffer, memoryFlags );
 }
 
+vk::DeviceMemory DeviceMemory::GetVkDeviceMemory() const
+{
+  return mImpl->GetVkDeviceMemory();
 }
+
 
 } // namespace Vulkan
 } // namespace Graphics
