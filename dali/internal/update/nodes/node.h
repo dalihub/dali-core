@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -768,6 +768,11 @@ public:
    */
   void CreateTransform( SceneGraph::TransformManager* transformManager );
 
+  /**
+   * Reset dirty flags
+   */
+  void ResetDirtyFlags( BufferIndex updateBufferIndex );
+
 protected:
 
   /**
@@ -831,11 +836,6 @@ private:
 
   // Undefined
   Node& operator=(const Node& rhs);
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
-   */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
   /**
    * Recursive helper to disconnect a Node and its children.

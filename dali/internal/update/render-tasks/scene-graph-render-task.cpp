@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,13 +451,6 @@ void RenderTask::SetSyncRequired( bool requiresSync )
   mRequiresSync = requiresSync;
 }
 
-void RenderTask::ResetDefaultProperties( BufferIndex updateBufferIndex )
-{
-  // Reset default properties
-  mViewportPosition.ResetToBaseValue( updateBufferIndex );
-  mViewportSize.ResetToBaseValue( updateBufferIndex );
-  mClearColor.ResetToBaseValue( updateBufferIndex );
-}
 
 RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),
