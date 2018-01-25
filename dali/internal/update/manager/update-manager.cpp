@@ -518,6 +518,7 @@ void UpdateManager::RemoveShader( Shader* shader )
 void UpdateManager::SetShaderProgram( Shader* shader,
                                       Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
+  return;
   if( shaderData )
   {
 
