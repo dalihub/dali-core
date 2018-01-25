@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULKAN_FENCE_H
-#define DALI_GRAPHICS_VULKAN_FENCE_H
+#ifndef DALI_VULKAN_161117_VULKAN_PIPELINE_H
+#define DALI_VULKAN_161117_VULKAN_PIPELINE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -27,49 +27,30 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
 class Graphics;
-class Fence final
+class Pipeline
 {
 public:
 
-  static std::unique_ptr<Fence> New( Graphics& graphics );
+  static std::unique_ptr<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
 
-  Fence( Fence&& ) = default;
-  ~Fence();
+  ~Pipeline();
 
 private:
 
-  Fence( Graphics& graphics );
+  Pipeline( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
 
 public:
 
-  const Fence& ConstRef() const;
-
-  Fence& Ref();
-
-  /**
-   *
-   * @param timeout
-   * @return
-   */
-  bool Wait( uint32_t timeout = 0u );
-
-  /**
-   *
-   */
-  void Reset();
-
-  vk::Fence GetFence() const;
+  vk::Pipeline GetVkPipeline() const;
 
 private:
-
   class Impl;
   std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace Vulkan
-} // namespace Graphics
-} // namespace Dali
+}
+}
+} // Namesp
 
-#endif // DALI_GRAPHICS_VULKAN_FENCE_H
+#endif //DALI_VULKAN_161117_VULKAN_PIPELINE_H

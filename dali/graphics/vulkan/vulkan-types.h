@@ -33,7 +33,7 @@ namespace Graphics
 template< typename T, typename... Args >
 std::unique_ptr< T > MakeUnique(Args&&... args)
 {
-  return std::unique_ptr< T >(new T(std::forward< Args >(args)...));
+  return std::unique_ptr< T  >(new T(std::forward< Args >(args)...));
 }
 
 namespace Vulkan
@@ -176,6 +176,165 @@ public:
 private:
 
   T* mObject;
+};
+
+/**
+ * Vulkan object handle
+ * @tparam T
+ */
+template<class T>
+class Handle
+{
+public:
+
+  Handle();
+  explicit Handle(T* object );
+  Handle( const Handle& handle);
+  Handle& operator=( const Handle& handle );
+  Handle& operator=( Handle&& handle );
+  Handle( Handle&& handle ) noexcept;
+  ~Handle();
+
+  operator bool() const;
+
+  T* operator->() const
+  {
+    return mObject;
+  }
+
+  uint32_t GetRefCount() const
+  {
+    return mObject->GetRefCount();
+  }
+
+  T& operator*() const
+  {
+    return *mObject;
+  }
+
+  void Reset()
+  {
+    if( mObject )
+    {
+      mObject->Release();
+      mObject = nullptr;
+    }
+  }
+
+private:
+
+  T* mObject { nullptr };
+};
+
+template<class T>
+Handle<T>::Handle(T* object)
+  : mObject( object )
+{
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+}
+
+template<class T>
+Handle<T>::Handle()
+  : mObject( nullptr )
+{
+}
+
+template<class T>
+Handle<T>::Handle(const Handle& handle)
+{
+  mObject = handle.mObject;
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+}
+
+template<class T>
+Handle<T>::Handle( Handle&& handle ) noexcept
+{
+  mObject = handle.mObject;
+  handle.mObject = nullptr;
+}
+
+template<class T>
+Handle<T>::operator bool() const
+{
+  return mObject != nullptr;
+}
+
+template<class T>
+Handle<T>& Handle<T>::operator=( Handle&& handle )
+{
+  mObject = handle.mObject;
+  handle.mObject = nullptr;
+  return *this;
+}
+
+template<class T>
+Handle<T>& Handle<T>::operator=( const Handle<T>& handle )
+{
+  mObject = handle.mObject;
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+  return *this;
+}
+
+template<class T>
+Handle<T>::~Handle()
+{
+  if(mObject)
+  {
+    mObject->Release();
+  }
+}
+
+
+class VkManaged
+{
+public:
+
+  VkManaged() = default;
+  virtual ~VkManaged() = default;
+
+  void Release()
+  {
+    OnRelease(--mRefCount);
+    if(mRefCount == 0)
+    {
+      // orphaned
+      Destroy();
+    }
+  }
+
+  void Retain()
+  {
+    OnRetain(++mRefCount);
+  }
+
+  uint32_t GetRefCount()
+  {
+    return mRefCount;
+  }
+
+  void Destroy()
+  {
+    OnDestroy();
+  }
+
+  virtual void OnRetain( uint32_t refcount ) = 0;
+
+  virtual void OnRelease( uint32_t refcount ) = 0;
+
+  virtual void OnDestroy() = 0;
+
+private:
+
+  std::atomic_uint mRefCount { 0u };
 };
 
 using FBID = uint32_t;

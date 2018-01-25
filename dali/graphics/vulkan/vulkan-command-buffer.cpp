@@ -156,9 +156,10 @@ void CommandBuffer::ImageLayoutTransition(vk::Image            image,
   case vk::ImageLayout::ePreinitialized:
   case vk::ImageLayout::eUndefined:
   case vk::ImageLayout::eSharedPresentKHR:
-  default:
   {
+    break;
   }
+
   }
 
   RecordImageLayoutTransition(image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask,

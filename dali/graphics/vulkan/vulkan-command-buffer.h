@@ -27,7 +27,6 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
 class Graphics;
 class CommandPool;
 class CommandBuffer

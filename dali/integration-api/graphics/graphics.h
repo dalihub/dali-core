@@ -77,10 +77,19 @@ public:
    */
   void PostRender( Dali::Graphics::FBID framebufferId = 0u );
 
+  // this function is used only by the standalone test
+  template <class T>
+  T& GetImplementation() const
+  {
+    return static_cast<T&>(*mGraphicsImpl.get());
+  }
+
 private:
 
   std::unique_ptr<Dali::Graphics::GraphicsImpl> mGraphicsImpl;
 };
+
+
 
 /**
  * fixme: dummy function to make sure the static library won't be discarded entirely during linking
