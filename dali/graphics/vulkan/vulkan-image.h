@@ -119,6 +119,7 @@ public:
   }
 
 private:
+
   Graphics&             mGraphics;
   ResourceRef<Image>    mImageRef;
 
