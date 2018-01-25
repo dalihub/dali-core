@@ -80,10 +80,6 @@ RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, size
   return *mInstructions[ bufferIndex ][ index ];
 }
 
-void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex bufferIndex )
-{
-  mIndex[ bufferIndex ]--;
-}
 
 } // namespace SceneGraph
 
