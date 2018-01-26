@@ -35,9 +35,10 @@ void GpuMemoryBlock::OnRetain( uint32_t refcount )
   mAllocator.Retain( *this );
 }
 
-void GpuMemoryBlock::OnDestroy()
+bool GpuMemoryBlock::OnDestroy()
 {
-  NotImplemented();
+  // don't use default delete
+  return true;
 }
 
 GpuMemoryBlock::operator vk::DeviceMemory()

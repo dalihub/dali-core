@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-types.h>
-
+#include <dali/graphics/vulkan/vulkan-shader.h>
 namespace Dali
 {
 namespace Graphics
@@ -28,13 +28,42 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
-class Pipeline
+class Pipeline : public VkManaged
 {
 public:
 
-  static std::unique_ptr<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
+  /**
+   * Creates immutable Pipeline object ( verified resources for tracking )
+   * @param graphics
+   * @param info
+   * @return
+   */
+  static Handle<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
 
-  ~Pipeline();
+  ~Pipeline() override;
+
+  /**
+   *
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   */
+  void SetViewport( float x, float y, float width, float height );
+
+  /**
+   *
+   * @param shader
+   * @param stage
+   * @return
+   */
+  bool SetShader( ShaderHandle shader, Shader::Type stage );
+
+  /**
+   *
+   * @return
+   */
+  bool Compile();
 
 private:
 
@@ -44,10 +73,14 @@ public:
 
   vk::Pipeline GetVkPipeline() const;
 
+  bool OnDestroy() override;
+
 private:
   class Impl;
   std::unique_ptr<Impl> mImpl;
 };
+
+using PipelineHandle = Handle<Pipeline>;
 
 }
 }

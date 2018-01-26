@@ -105,7 +105,7 @@ struct Buffer::Impl final
  * @param size
  * @return
  */
-std::unique_ptr<VertexBuffer> Buffer::New(Graphics& graphics, size_t size, Type type)
+BufferHandle Buffer::New(Graphics& graphics, size_t size, Type type)
 {
   auto usageFlags = vk::BufferUsageFlags{};
 
@@ -120,17 +120,20 @@ std::unique_ptr<VertexBuffer> Buffer::New(Graphics& graphics, size_t size, Type 
   auto info = vk::BufferCreateInfo{};
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
-  info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst
-  );
-  auto retval = std::unique_ptr<Buffer>( new Buffer(graphics, info) );
-  if(retval && retval->mImpl->Initialise())
+  info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
+  auto buffer = std::unique_ptr<Buffer>( new Buffer(graphics, info) );
+
+  if(buffer && buffer->mImpl->Initialise())
   {
-    return retval;
+    auto handle =  BufferHandle(buffer.get());
+    graphics.AddBuffer( std::move(buffer) );
+    return handle;
   }
-  return nullptr;
+  return BufferHandle();
 }
 
 Buffer::Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
+: VkManaged()
 {
   mImpl = MakeUnique<Buffer::Impl>(graphics, createInfo);
 }
@@ -161,6 +164,13 @@ void Buffer::BindMemory( const GpuMemoryBlockHandle& handle )
 {
   mImpl->BindMemory( handle );
 }
+
+bool Buffer::OnDestroy()
+{
+  mImpl->mGraphics.RemoveBuffer( *this );
+  return true;
+}
+
 
 }
 

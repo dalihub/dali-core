@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/vulkan-pipeline.h>
 
 #define USE_XLIB 0
 
@@ -39,6 +40,10 @@ using Dali::Graphics::Vulkan::Shader;
 using Dali::Graphics::Vulkan::DescriptorSetLayout;
 using Dali::Graphics::Vulkan::GpuMemoryManager;
 using Dali::Graphics::Vulkan::GpuMemoryAllocator;
+using Dali::Graphics::Vulkan::Shader;
+using Dali::Graphics::Vulkan::ShaderHandle;
+using Dali::Graphics::Vulkan::Pipeline;
+using Dali::Graphics::Vulkan::PipelineHandle;
 
 extern std::vector<uint32_t> VSH;
 extern std::vector<uint32_t> FSH;
@@ -239,6 +244,27 @@ void test_handle()
   handle.GetRefCount();*/
 }
 
+PipelineHandle
+create_pipeline( Dali::Graphics::Vulkan::Graphics& graphics,
+                      Dali::Graphics::Vulkan::ShaderHandle vertexShader,
+                      Dali::Graphics::Vulkan::ShaderHandle fragmentShader
+                      )
+{
+  using namespace Dali::Graphics::Vulkan;
+  auto pipelineInfo = vk::GraphicsPipelineCreateInfo{};
+  auto pipeline = Pipeline::New( graphics, pipelineInfo );
+
+  pipeline->SetShader( vertexShader, Shader::Type::VERTEX );
+  pipeline->SetShader( fragmentShader, Shader::Type::FRAGMENT );
+  pipeline->SetViewport( 0, 0, 640, 480 );
+
+  if( !pipeline->Compile() )
+  {
+    pipeline.Reset();
+  }
+  return pipeline;
+}
+
 int RunTestMain()
 {
 
@@ -271,6 +297,17 @@ int RunTestMain()
 
   // shaders
   auto vertexShader = Shader::New( gr, VSH.data(), VSH.size()*sizeof(VSH[0]) );
+  vertexShader->SetDescriptorSetLayout( 0, vk::DescriptorSetLayoutCreateInfo{}.
+    setBindingCount( 1 ).
+    setPBindings( std::vector<vk::DescriptorSetLayoutBinding>{
+                    vk::DescriptorSetLayoutBinding{}.
+                                                      setBinding( 0 ).
+                                                      setStageFlags( vk::ShaderStageFlagBits::eVertex ).
+                                                      setDescriptorType( vk::DescriptorType::eUniformBuffer ).
+                                                      setDescriptorCount( 1 )
+                  }.data()
+    ));
+
   auto fragmentShader = Shader::New( gr, FSH.data(), FSH.size()*sizeof(FSH[0]) );
 
   // buffer
@@ -285,13 +322,13 @@ int RunTestMain()
   std::copy( VERTICES, VERTICES+9, ptr);
   bufferMemory->Unmap();
 
-  auto handle2 = vertexBuffer->GetMemoryHandle();
+
+  auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
 
   vk::DescriptorSetLayoutBinding binding;
   binding.setDescriptorCount(1)
     .setDescriptorType( vk::DescriptorType::eUniformBuffer )
       .setBinding( 0 );
-
 
   vk::VertexInputAttributeDescription att;
   att.setBinding( 0 ).setLocation( 0 ).setOffset( 0 ).setFormat( vk::Format::eR32G32B32A32Sfloat );
