@@ -43,6 +43,11 @@ enum class Platform
   WAYLAND,
 };
 
+class Buffer;
+class Image;
+class Pipeline;
+class Shader;
+
 class Surface;
 class CommandPool;
 class GpuMemoryManager;
@@ -134,6 +139,25 @@ private:
   std::unique_ptr< Queue > mPresentQueue;
 
   Platform                               mPlatform  { Platform::UNDEFINED };
+
+  // AB: resource cache, should be moved somewhere else
+  //
+public:
+
+  void AddBuffer( std::unique_ptr<Buffer> buffer );
+  void AddImage( std::unique_ptr<Image> image );
+  void AddPipeline( std::unique_ptr<Pipeline> pipeline );
+  void AddShader( std::unique_ptr<Shader> shader );
+
+  Handle<Shader> FindShader( vk::ShaderModule shaderModule );
+
+  void RemoveBuffer( Buffer& buffer );
+  void RemoveShader( Shader& buffer );
+private:
+  std::vector<std::unique_ptr<Buffer>>      mBuffersCache;
+  std::vector<std::unique_ptr<Image>>       mImageCache;
+  std::vector<std::unique_ptr<Pipeline>>    mPipelineCache;
+  std::vector<std::unique_ptr<Shader>>      mShaderCache;
 };
 
 } // namespace Vulkan

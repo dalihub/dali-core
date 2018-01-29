@@ -29,16 +29,16 @@ namespace Vulkan
 {
 
 class Graphics;
-class Shader // can be overriden as ShaderGLSL for example
+class Shader : public VkManaged // can be overriden as ShaderGLSL for example
 {
 public:
 
-  enum Type
+  enum class Type
   {
-    VERTEX,
-    FRAGMENT,
-    COMPUTE,
-    GEOMETRY
+    VERTEX = static_cast<int>( vk::ShaderStageFlagBits::eVertex ),
+    FRAGMENT = static_cast<int>( vk::ShaderStageFlagBits::eFragment ),
+    COMPUTE = static_cast<int>( vk::ShaderStageFlagBits::eCompute ),
+    GEOMETRY = static_cast<int>( vk::ShaderStageFlagBits::eGeometry ),
   };
 
   /**
@@ -47,7 +47,7 @@ public:
    * @param info
    * @return
    */
-  static std::unique_ptr<Shader> New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
+  static Handle<Shader> New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
 
   /**
    * Creates new shader module from SPIRV code
@@ -56,7 +56,7 @@ public:
    * @param size
    * @return
    */
-  static std::unique_ptr<Shader> New( Graphics& graphics, const void* bytes, std::size_t size );
+  static Handle<Shader> New( Graphics& graphics, const void* bytes, std::size_t size );
 
   /**
    *
@@ -65,16 +65,31 @@ public:
 
   vk::ShaderModule GetVkShaderModule() const;
 
+  const std::vector<vk::DescriptorSetLayout>& GetDescriptorSetLayouts() const;
+
+  bool OnDestroy() override;
+
+  operator vk::ShaderModule() const
+  {
+    return GetVkShaderModule();
+  }
+
+public:
+
+  void SetDescriptorSetLayout( uint32_t set, vk::DescriptorSetLayoutCreateInfo info );
+
 private:
 
   Shader( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
-
 
 private:
 
   class Impl;
   std::unique_ptr<Impl> mImpl;
 };
+
+using ShaderHandle = Handle<Shader>;
+
 
 } // Namespace Vulkan
 

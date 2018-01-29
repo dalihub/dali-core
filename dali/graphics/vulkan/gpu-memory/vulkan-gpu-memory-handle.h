@@ -105,7 +105,7 @@ public:
   /**
    *
    */
-  void OnDestroy() override;
+  bool OnDestroy() override;
 
 private:
 

@@ -35,9 +35,10 @@ void GpuMemoryBlock::OnRetain( uint32_t refcount )
   mAllocator.Retain( *this );
 }
 
-void GpuMemoryBlock::OnDestroy()
+bool GpuMemoryBlock::OnDestroy()
 {
-  NotImplemented();
+  // don't use default delete
+  return true;
 }
 
 GpuMemoryBlock::operator vk::DeviceMemory()
@@ -47,7 +48,7 @@ GpuMemoryBlock::operator vk::DeviceMemory()
 
 void* GpuMemoryBlock::Map()
 {
-  return mAllocator.Map( *this, 0, static_cast<uint32_t>(VK_WHOLE_SIZE) );
+  return mAllocator.Map( *this, 0, 0 );
 }
 
 void* GpuMemoryBlock::Map( uint32_t offset, uint32_t size )

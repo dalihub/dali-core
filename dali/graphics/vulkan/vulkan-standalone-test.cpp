@@ -28,6 +28,9 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/vulkan-pipeline.h>
+
+#include "generated/spv-shaders-gen.h"
 
 #define USE_XLIB 0
 
@@ -39,9 +42,13 @@ using Dali::Graphics::Vulkan::Shader;
 using Dali::Graphics::Vulkan::DescriptorSetLayout;
 using Dali::Graphics::Vulkan::GpuMemoryManager;
 using Dali::Graphics::Vulkan::GpuMemoryAllocator;
+using Dali::Graphics::Vulkan::Shader;
+using Dali::Graphics::Vulkan::ShaderHandle;
+using Dali::Graphics::Vulkan::Pipeline;
+using Dali::Graphics::Vulkan::PipelineHandle;
 
-extern std::vector<uint32_t> VSH;
-extern std::vector<uint32_t> FSH;
+extern std::vector<uint8_t> VSH;
+extern std::vector<uint8_t> FSH;
 
 template< typename T, typename... Args >
 std::unique_ptr< T > MakeUnique(Args&&... args)
@@ -239,6 +246,38 @@ void test_handle()
   handle.GetRefCount();*/
 }
 
+PipelineHandle
+create_pipeline( Dali::Graphics::Vulkan::Graphics& graphics,
+                      Dali::Graphics::Vulkan::ShaderHandle vertexShader,
+                      Dali::Graphics::Vulkan::ShaderHandle fragmentShader
+                      )
+{
+  using namespace Dali::Graphics::Vulkan;
+  auto pipelineInfo = vk::GraphicsPipelineCreateInfo{};
+  auto pipeline = Pipeline::New( graphics, pipelineInfo );
+
+  pipeline->SetShader( vertexShader, Shader::Type::VERTEX );
+  pipeline->SetShader( fragmentShader, Shader::Type::FRAGMENT );
+  pipeline->SetViewport( 0, 0, 640, 480 );
+  pipeline->SetVertexInputState(
+    std::vector<vk::VertexInputAttributeDescription>{vk::VertexInputAttributeDescription{}.
+                                           setBinding( 0 ).
+                                           setOffset( 0 ).
+                                           setLocation( 0 ).
+                                           setFormat( vk::Format::eR32G32B32A32Sfloat )},
+    std::vector<vk::VertexInputBindingDescription>{vk::VertexInputBindingDescription{}.
+                                           setBinding( 0 ).
+                                           setStride( sizeof(float)*4 )}
+  );
+  pipeline->SetInputAssemblyState( vk::PrimitiveTopology::eTriangleList, false );
+
+  if( !pipeline->Compile() )
+  {
+    pipeline.Reset();
+  }
+  return pipeline;
+}
+
 int RunTestMain()
 {
 
@@ -264,17 +303,28 @@ int RunTestMain()
 
   const float VERTICES[] =
           {
-            0.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 0.0f, 1.0f,
+            -1.0f, 1.0f, 0.0f, 1.0f
           };
 
   // shaders
-  auto vertexShader = Shader::New( gr, VSH.data(), VSH.size()*sizeof(VSH[0]) );
-  auto fragmentShader = Shader::New( gr, FSH.data(), FSH.size()*sizeof(FSH[0]) );
+  auto vertexShader = Shader::New( gr, VSH_CODE.data(), VSH_CODE.size() );
+  vertexShader->SetDescriptorSetLayout( 0, vk::DescriptorSetLayoutCreateInfo{}.
+    setBindingCount( 1 ).
+    setPBindings( std::vector<vk::DescriptorSetLayoutBinding>{
+                    vk::DescriptorSetLayoutBinding{}.
+                                                      setBinding( 0 ).
+                                                      setStageFlags( vk::ShaderStageFlagBits::eVertex ).
+                                                      setDescriptorType( vk::DescriptorType::eUniformBuffer ).
+                                                      setDescriptorCount( 1 )
+                  }.data()
+    ));
+
+  auto fragmentShader = Shader::New( gr, FSH_CODE.data(), FSH_CODE.size() );
 
   // buffer
-  auto vertexBuffer = Buffer::New( gr, sizeof(float)*3*3, Buffer::Type::VERTEX );
+  auto vertexBuffer = Buffer::New( gr, sizeof(float)*4*3, Buffer::Type::VERTEX );
 
   auto gpuManager = GpuMemoryManager::New( gr );
 
@@ -282,64 +332,11 @@ int RunTestMain()
   vertexBuffer->BindMemory( bufferMemory );
 
   auto ptr = static_cast<float*>(bufferMemory->Map());
-  std::copy( VERTICES, VERTICES+9, ptr);
+  std::copy( VERTICES, VERTICES+12, ptr);
   bufferMemory->Unmap();
 
-  auto handle2 = vertexBuffer->GetMemoryHandle();
 
-  vk::DescriptorSetLayoutBinding binding;
-  binding.setDescriptorCount(1)
-    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-      .setBinding( 0 );
-
-
-  vk::VertexInputAttributeDescription att;
-  att.setBinding( 0 ).setLocation( 0 ).setOffset( 0 ).setFormat( vk::Format::eR32G32B32A32Sfloat );
-
-  vk::VertexInputBindingDescription desc;
-  desc.setBinding( 0 ).setInputRate( vk::VertexInputRate::eVertex ).setStride( 0 );
-
-  //vk::CommandBuffer buf;
-  //buf.bindVertexBuffers( 0, 1, nullptr, 0);
-
-  // descriptor set layouts
-  vk::DescriptorSetLayoutCreateInfo layoutInfo;
-  layoutInfo.setPBindings( nullptr )
-    .setBindingCount( 0 );
-
-
-
-
-  // PIPELINE LAYOUT -> descriptor set layouts
-  vk::PipelineLayoutCreateInfo pipelineLayout;
-  pipelineLayout.setSetLayoutCount( 0 )
-    .setPPushConstantRanges( nullptr )
-      .setPSetLayouts( nullptr )
-        .setPushConstantRangeCount( 0 );
-
-
-
-
-
-  // PIPELINE
-  vk::GraphicsPipelineCreateInfo info;
-  info.setLayout( nullptr );
-  info.setPColorBlendState( nullptr );
-  info.setPDepthStencilState( nullptr );
-  info.setPDynamicState( nullptr );
-  info.setPInputAssemblyState( nullptr );
-  info.setPMultisampleState( nullptr );
-  info.setPRasterizationState( nullptr );
-  info.setPStages( nullptr );
-  info.setPTessellationState( nullptr );
-  info.setPVertexInputState( nullptr );
-  info.setPViewportState( nullptr );
-  info.setStageCount( 0 );
-  info.setSubpass( 0 );
-
-  // pipeline
-  //vk::VertexInputAttributeDescription;
-  //vk::VertexInputBindingDescription;
+  auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
 
 
   while(1)
@@ -355,66 +352,3 @@ int main()
 {
   VulkanTest::RunTestMain();
 }
-
-std::vector<uint32_t> VSH = {
-  0x07230203,0x00010000,0x00080001,0x00000029,0x00000000,0x00020011,0x00000001,0x0006000b,
-  0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
-  0x0008000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x0000000d,0x00000020,0x00000025,
-  0x00030003,0x00000002,0x000001ae,0x00040005,0x00000004,0x6e69616d,0x00000000,0x00060005,
-  0x0000000b,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,0x0000000b,0x00000000,
-  0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000000b,0x00000001,0x505f6c67,0x746e696f,
-  0x657a6953,0x00000000,0x00070006,0x0000000b,0x00000002,0x435f6c67,0x4470696c,0x61747369,
-  0x0065636e,0x00030005,0x0000000d,0x00000000,0x00040005,0x00000011,0x6c726f77,0x00000064,
-  0x00060006,0x00000011,0x00000000,0x65646f6d,0x74614d6c,0x00000000,0x00050006,0x00000011,
-  0x00000001,0x77656976,0x0074614d,0x00050006,0x00000011,0x00000002,0x6a6f7270,0x0074614d,
-  0x00050006,0x00000011,0x00000003,0x6f6c6f63,0x00000072,0x00030005,0x00000013,0x00000000,
-  0x00050005,0x00000020,0x736f5061,0x6f697469,0x0000006e,0x00040005,0x00000025,0x6c6f4376,
-  0x0000726f,0x00050048,0x0000000b,0x00000000,0x0000000b,0x00000000,0x00050048,0x0000000b,
-  0x00000001,0x0000000b,0x00000001,0x00050048,0x0000000b,0x00000002,0x0000000b,0x00000003,
-  0x00030047,0x0000000b,0x00000002,0x00040048,0x00000011,0x00000000,0x00000005,0x00050048,
-  0x00000011,0x00000000,0x00000023,0x00000000,0x00050048,0x00000011,0x00000000,0x00000007,
-  0x00000010,0x00040048,0x00000011,0x00000001,0x00000005,0x00050048,0x00000011,0x00000001,
-  0x00000023,0x00000040,0x00050048,0x00000011,0x00000001,0x00000007,0x00000010,0x00040048,
-  0x00000011,0x00000002,0x00000005,0x00050048,0x00000011,0x00000002,0x00000023,0x00000080,
-  0x00050048,0x00000011,0x00000002,0x00000007,0x00000010,0x00050048,0x00000011,0x00000003,
-  0x00000023,0x000000c0,0x00030047,0x00000011,0x00000002,0x00040047,0x00000013,0x00000022,
-  0x00000000,0x00040047,0x00000013,0x00000021,0x00000000,0x00040047,0x00000020,0x0000001e,
-  0x00000000,0x00040047,0x00000025,0x0000001e,0x00000000,0x00020013,0x00000002,0x00030021,
-  0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,
-  0x00000004,0x00040015,0x00000008,0x00000020,0x00000000,0x0004002b,0x00000008,0x00000009,
-  0x00000001,0x0004001c,0x0000000a,0x00000006,0x00000009,0x0005001e,0x0000000b,0x00000007,
-  0x00000006,0x0000000a,0x00040020,0x0000000c,0x00000003,0x0000000b,0x0004003b,0x0000000c,
-  0x0000000d,0x00000003,0x00040015,0x0000000e,0x00000020,0x00000001,0x0004002b,0x0000000e,
-  0x0000000f,0x00000000,0x00040018,0x00000010,0x00000007,0x00000004,0x0006001e,0x00000011,
-  0x00000010,0x00000010,0x00000010,0x00000007,0x00040020,0x00000012,0x00000002,0x00000011,
-  0x0004003b,0x00000012,0x00000013,0x00000002,0x0004002b,0x0000000e,0x00000014,0x00000002,
-  0x00040020,0x00000015,0x00000002,0x00000010,0x0004002b,0x0000000e,0x00000018,0x00000001,
-  0x00040020,0x0000001f,0x00000001,0x00000007,0x0004003b,0x0000001f,0x00000020,0x00000001,
-  0x00040020,0x00000023,0x00000003,0x00000007,0x0004003b,0x00000023,0x00000025,0x00000003,
-  0x0004002b,0x00000006,0x00000026,0x3f800000,0x0004002b,0x00000006,0x00000027,0x00000000,
-  0x0007002c,0x00000007,0x00000028,0x00000026,0x00000027,0x00000027,0x00000026,0x00050036,
-  0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x00050041,0x00000015,
-  0x00000016,0x00000013,0x00000014,0x0004003d,0x00000010,0x00000017,0x00000016,0x00050041,
-  0x00000015,0x00000019,0x00000013,0x00000018,0x0004003d,0x00000010,0x0000001a,0x00000019,
-  0x00050092,0x00000010,0x0000001b,0x00000017,0x0000001a,0x00050041,0x00000015,0x0000001c,
-  0x00000013,0x0000000f,0x0004003d,0x00000010,0x0000001d,0x0000001c,0x00050092,0x00000010,
-  0x0000001e,0x0000001b,0x0000001d,0x0004003d,0x00000007,0x00000021,0x00000020,0x00050091,
-  0x00000007,0x00000022,0x0000001e,0x00000021,0x00050041,0x00000023,0x00000024,0x0000000d,
-  0x0000000f,0x0003003e,0x00000024,0x00000022,0x0003003e,0x00000025,0x00000028,0x000100fd,
-  0x00010038
-};
-
-std::vector<uint32_t> FSH = {
-  0x07230203,0x00010000,0x00080001,0x0000000d,0x00000000,0x00020011,0x00000001,0x0006000b,
-  0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
-  0x0007000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000009,0x0000000b,0x00030003,
-  0x00000002,0x000001ae,0x00040005,0x00000004,0x6e69616d,0x00000000,0x00050005,0x00000009,
-  0x4374756f,0x726f6c6f,0x00000000,0x00040005,0x0000000b,0x6c6f4376,0x0000726f,0x00040047,
-  0x00000009,0x0000001e,0x00000000,0x00040047,0x0000000b,0x0000001e,0x00000000,0x00020013,
-  0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,
-  0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,0x00000003,0x00000007,0x0004003b,
-  0x00000008,0x00000009,0x00000003,0x00040020,0x0000000a,0x00000001,0x00000007,0x0004003b,
-  0x0000000a,0x0000000b,0x00000001,0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,
-  0x000200f8,0x00000005,0x0004003d,0x00000007,0x0000000c,0x0000000b,0x0003003e,0x00000009,
-  0x0000000c,0x000100fd,0x00010038
-};
