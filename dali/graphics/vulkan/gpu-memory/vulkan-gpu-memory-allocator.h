@@ -85,13 +85,11 @@ public:
   /**
    *
    * @param allocationId
-   * @return
    */
   virtual uint32_t GetRefCount( GpuMemoryBlock& allocationId )
   {
     return 0u;
   }
-
 
   // Garbage collection
   /**
@@ -99,7 +97,6 @@ public:
    * @param userdata
    */
   virtual void GC( void* userdata ) = 0;
-
 
   // Retrieve Vulkan object for this allocation
   /**

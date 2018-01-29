@@ -213,7 +213,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
 
   void* Map( GpuMemoryBlock& block, uint32_t offset, uint32_t size ) override
   {
-    return VkAssert( mGraphics.GetDevice().mapMemory( block.GetData<MemoryBlock>()->memory, offset, size ) );
+    return VkAssert( mGraphics.GetDevice().mapMemory( block.GetData<MemoryBlock>()->memory,
+                                offset, size == 0u ? VK_WHOLE_SIZE : static_cast<VkDeviceSize>(size)));
   }
 
   void Unmap( GpuMemoryBlock& block ) override

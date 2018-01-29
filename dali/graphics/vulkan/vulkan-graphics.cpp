@@ -23,6 +23,11 @@
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 
+#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-shader.h>
+
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
 #endif
@@ -168,6 +173,7 @@ void Graphics::Create()
   {
     for( auto&& prop : layers.value )
     {
+      //std::cout << prop.layerName << std::endl;
       if( std::string(prop.layerName) == reqLayer )
       {
         validationLayers.push_back(reqLayer);
@@ -477,8 +483,76 @@ std::unique_ptr< CommandPool > Graphics::CreateCommandPool(const vk::CommandPool
 
 Surface& Graphics::GetSurface( FBID surfaceId )
 {
+  // TODO: FBID == 0 means default framebuffer, but there should be no
+  // such thing as default framebuffer.
+  if( surfaceId == 0 )
+  {
+    return *mSurfaceFBIDMap.begin()->second.get();
+  }
   return *mSurfaceFBIDMap[surfaceId].get();
 }
+
+void Graphics::AddBuffer( std::unique_ptr<Buffer> buffer )
+{
+  mBuffersCache.push_back( std::move(buffer) );
+}
+
+void Graphics::AddImage( std::unique_ptr<Image> image )
+{
+
+}
+
+void Graphics::AddPipeline( std::unique_ptr<Pipeline> pipeline )
+{
+  mPipelineCache.push_back( std::move(pipeline) );
+}
+
+void Graphics::AddShader( std::unique_ptr<Shader> shader )
+{
+  mShaderCache.push_back( std::move(shader) );
+}
+
+void Graphics::RemoveBuffer( Buffer& buffer )
+{
+  auto index = 0u;
+  for( auto&& iter : mBuffersCache )
+  {
+    if( iter.get() == &buffer )
+    {
+      iter.reset( nullptr );
+      mBuffersCache.erase( mBuffersCache.begin()+index );
+      return;
+    }
+  }
+}
+
+void Graphics::RemoveShader( Shader& shader )
+{
+  auto index = 0u;
+  for( auto&& iter : mShaderCache )
+  {
+    if( iter.get() == &shader )
+    {
+      iter.reset( nullptr );
+      mShaderCache.erase( mShaderCache.begin()+index );
+      return;
+    }
+    ++index;
+  }
+}
+
+Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
+{
+  for( auto&& iter : mShaderCache )
+  {
+    if( iter->GetVkShaderModule() == shaderModule )
+    {
+      return Handle<Shader>(iter.get());
+    }
+  }
+  return Handle<Shader>();
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics

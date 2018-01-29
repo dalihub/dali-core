@@ -34,8 +34,9 @@ using GpuMemoryBlockHandle = Handle<GpuMemoryBlock>;
 using VertexBuffer = Buffer;
 using UniformBuffer = Buffer;
 using IndexBuffer = Buffer;
+using BufferHandle = Handle<Buffer>;
 
-class Buffer
+class Buffer : public VkManaged
 {
 public:
 
@@ -53,7 +54,7 @@ public:
   virtual ~Buffer();
 
   // single purpose constructors helpers
-  static std::unique_ptr<VertexBuffer> New( Graphics& graphics, size_t size, Type type );
+  static BufferHandle New( Graphics& graphics, size_t size, Type type );
 
   vk::BufferUsageFlags GetUsage() const;
 
@@ -63,23 +64,24 @@ public:
 
   const GpuMemoryBlockHandle& GetMemoryHandle() const;
 
+  bool OnDestroy() override;
+
   void BindMemory( const GpuMemoryBlockHandle& handle );
 
 private:
 
   /**
- * Creates new VkBuffer with given specification, it doesn't
- * bind the memory.
- * @param graphics
- * @param createInfo
- */
+   * Creates new VkBuffer with given specification, it doesn't
+   * bind the memory.
+   * @param graphics
+   * @param createInfo
+   */
   Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo);
 
 private:
 
   class Impl;
   std::unique_ptr<Buffer::Impl> mImpl;
-
 };
 
 

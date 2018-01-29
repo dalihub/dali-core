@@ -115,8 +115,12 @@ public:
    */
   vk::SurfaceKHR GetSurfaceKHR() const;
 
-private:
+  /**
+   *
+   */
   void CreateSwapchain();
+
+private:
 
   void CreateVulkanSwapchain();
 

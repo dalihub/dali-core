@@ -307,7 +307,10 @@ public:
     if(mRefCount == 0)
     {
       // orphaned
-      Destroy();
+      if(!Destroy())
+      {
+        delete this;
+      }
     }
   }
 
@@ -321,16 +324,16 @@ public:
     return mRefCount;
   }
 
-  void Destroy()
+  bool Destroy()
   {
-    OnDestroy();
+    return OnDestroy();
   }
 
-  virtual void OnRetain( uint32_t refcount ) = 0;
+  virtual void OnRetain( uint32_t refcount ) {};
 
-  virtual void OnRelease( uint32_t refcount ) = 0;
+  virtual void OnRelease( uint32_t refcount ) {};
 
-  virtual void OnDestroy() = 0;
+  virtual bool OnDestroy() { return false; };
 
 private:
 
