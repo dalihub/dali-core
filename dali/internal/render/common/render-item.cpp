@@ -101,13 +101,16 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const int viewportWidth, con
   // So without doing min/max branching, we can fetch the min/max values of all the remaining X/Y coords from this one index.
   Vector4 aabb( corners[smallestX].x, corners[( smallestX + 3u ) % 4].y, corners[( smallestX + 2u ) % 4].x, corners[( smallestX + 1u ) % 4].y );
 
-  // Convert maximums to extents.
-  aabb.z -= aabb.x;
-  aabb.w -= aabb.y;
-
   // Return the AABB in screen-space pixels (x, y, width, height).
   // Note: This is a algebraic simplification of: ( viewport.x - aabb.width ) / 2 - ( ( aabb.width / 2 ) + aabb.x ) per axis.
-  return ClippingBox( ( viewportWidth / 2 ) - aabb.z - aabb.x, ( viewportHeight / 2 ) - aabb.w - aabb.y, aabb.z, aabb.w );
+  Vector4 aabbInScreen( ( viewportWidth / 2 ) - aabb.z, ( viewportHeight / 2 ) - aabb.w, ( viewportWidth / 2 ) - aabb.x, ( viewportHeight / 2 ) - aabb.y );
+
+  int x = static_cast< int >( round( aabbInScreen.x ) );
+  int y = static_cast< int >( round( aabbInScreen.y ) );
+  int z = static_cast< int >( round( aabbInScreen.z ) );
+  int w = static_cast< int >( round( aabbInScreen.w ) );
+
+  return ClippingBox( x, y, z - x, w - y );
 }
 
 void RenderItem::operator delete( void* ptr )
