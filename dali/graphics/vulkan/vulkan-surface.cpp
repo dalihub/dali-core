@@ -92,7 +92,7 @@ void Surface::AcquireNextImage()
   if(swapImage.layout != vk::ImageLayout::eColorAttachmentOptimal)
   {
     auto& queue = mGraphics.GetGraphicsQueue();
-    queue.Submit(*swapImage.layoutToColorCmdBuf.get(), *mFrameFence.get())->WaitForFence();
+    queue.Submit(*swapImage.layoutToColorCmdBuf, *mFrameFence.get())->WaitForFence();
   }
 
   mFrameFence->Reset();
@@ -112,7 +112,7 @@ void Surface::BeginRenderPass()
    * todo: automatically start main render pass -> this may have to be done manually in future
    * if more flexibility is needed
    */
-  auto vkCmdBuf = swapImage.mainCmdBuf->Get();
+  auto vkCmdBuf = swapImage.mainCmdBuf->GetVkCommandBuffer();
   {
     std::array< vk::ClearValue, 2 > clearValues;
 
@@ -140,7 +140,7 @@ void Surface::EndRenderPass()
 {
   // todo: use semaphores and do not create fences all over again
   auto& swapImage = mSwapImages[mCurrentBufferIndex];
-  auto  vkCmdBuf  = swapImage.mainCmdBuf->Get();
+  auto  vkCmdBuf  = swapImage.mainCmdBuf->GetVkCommandBuffer();
 
   // complete render pass
   vkCmdBuf.endRenderPass();
@@ -150,7 +150,7 @@ void Surface::EndRenderPass()
 
   // submit
   auto& queue = mGraphics.GetGraphicsQueue();
-  queue.Submit(*swapImage.mainCmdBuf.get(), *mFrameFence.get())->WaitForFence();
+  queue.Submit(*swapImage.mainCmdBuf, *mFrameFence.get())->WaitForFence();
 }
 
 void Surface::Present()
@@ -379,9 +379,7 @@ void Surface::CreateCommandBuffers()
 {
   if(!mCommandPool)
   {
-    auto info = vk::CommandPoolCreateInfo{}.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer);
-    info.setQueueFamilyIndex(0); // todo: get correct queue family index ( 0 works by default ;) )
-    mCommandPool = MakeUnique< CommandPool >(mGraphics, info);
+    mCommandPool = CommandPool::New( mGraphics, vk::CommandPoolCreateInfo{}.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer) );
   }
 
   // allocate command buffers
@@ -391,8 +389,8 @@ void Surface::CreateCommandBuffers()
 
   for(auto& swapImage : mSwapImages)
   {
-    swapImage.layoutToColorCmdBuf = mCommandPool->AllocateCommandBuffer(cmdInfo);
-    swapImage.mainCmdBuf          = mCommandPool->AllocateCommandBuffer(cmdInfo);
+    swapImage.layoutToColorCmdBuf = mCommandPool->NewCommandBuffer(cmdInfo);
+    swapImage.mainCmdBuf          = mCommandPool->NewCommandBuffer(cmdInfo);
 
     // Record layout transition for each image, after transition command buffers will be re-recorded
     // and will take in account only present -> color layout transition
@@ -404,7 +402,7 @@ void Surface::CreateCommandBuffers()
     swapImage.layoutToColorCmdBuf->End();
     swapImage.layout = vk::ImageLayout::eColorAttachmentOptimal;
 
-    cmdBuffers.push_back(std::ref(*swapImage.layoutToColorCmdBuf.get()));
+    cmdBuffers.push_back(std::ref(*swapImage.layoutToColorCmdBuf));
   }
 
   // submit to the queue

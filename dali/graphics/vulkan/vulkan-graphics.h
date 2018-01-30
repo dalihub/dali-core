@@ -71,7 +71,7 @@ public:
   void CreateDevice();
 
   /** Creates new command pool */
-  std::unique_ptr< CommandPool > CreateCommandPool(const vk::CommandPoolCreateInfo& info);
+  Handle< CommandPool > CreateCommandPool(const vk::CommandPoolCreateInfo& info);
 
   vk::Device GetDevice() const;
 
@@ -148,16 +148,20 @@ public:
   void AddImage( std::unique_ptr<Image> image );
   void AddPipeline( std::unique_ptr<Pipeline> pipeline );
   void AddShader( std::unique_ptr<Shader> shader );
+  void AddCommandPool( std::unique_ptr<CommandPool> pool );
 
   Handle<Shader> FindShader( vk::ShaderModule shaderModule );
 
   void RemoveBuffer( Buffer& buffer );
-  void RemoveShader( Shader& buffer );
+  void RemoveShader( Shader& shader );
+  void RemoveCommandPool( CommandPool& commandPool );
+
 private:
   std::vector<std::unique_ptr<Buffer>>      mBuffersCache;
   std::vector<std::unique_ptr<Image>>       mImageCache;
   std::vector<std::unique_ptr<Pipeline>>    mPipelineCache;
   std::vector<std::unique_ptr<Shader>>      mShaderCache;
+  std::vector<std::unique_ptr<CommandPool>> mCommandPoolCache;
 };
 
 } // namespace Vulkan

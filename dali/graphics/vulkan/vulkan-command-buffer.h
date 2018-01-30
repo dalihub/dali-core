@@ -28,17 +28,15 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
-class CommandPool;
-class CommandBuffer
+class CommandBuffer : public VkManaged
 {
+  friend class CommandPool;
+
 public:
+
   CommandBuffer() = delete;
 
-  CommandBuffer(Graphics& graphics, CommandPool& ownerPool, vk::CommandBuffer commandBuffer);
-  CommandBuffer(Graphics& graphics, CommandPool& ownerPool, const vk::CommandBufferAllocateInfo& allocateInfo);
-  CommandBuffer(Graphics& graphics, CommandPool& ownerPool);
-
-  ~CommandBuffer();
+  ~CommandBuffer() override;
 
   /** Begin recording */
   void Begin(vk::CommandBufferUsageFlags       usageFlags      = vk::CommandBufferUsageFlags{},
@@ -63,28 +61,45 @@ public:
   /** Push signal semaphores */
   void PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores);
 
-  const std::vector< vk::Semaphore >& GetSignalSemaphores() const
-  {
-    return mSignalSemaphores;
-  }
+  /**
+   *
+   * @return
+   */
+  const std::vector< vk::Semaphore >& GetSignalSemaphores() const;
 
-  const std::vector< vk::Semaphore >& GetSWaitSemaphores() const
-  {
-    return mWaitSemaphores;
-  }
+  /**
+   *
+   * @return
+   */
+  const std::vector< vk::Semaphore >& GetSWaitSemaphores() const;
 
-  const std::vector< vk::PipelineStageFlags >& GetWaitSemaphoreStages() const
-  {
-    return mWaitStages;
-  }
+  /**
+   *
+   * @return
+   */
+  const std::vector< vk::PipelineStageFlags >& GetWaitSemaphoreStages() const;
 
   /** Returns Vulkan object associated with the buffer */
-  inline const vk::CommandBuffer& Get() const
+  vk::CommandBuffer GetVkCommandBuffer() const;
+
+  operator vk::CommandBuffer() const
   {
-    return mCommandBuffer;
+    return GetVkCommandBuffer();
   }
 
 private:
+
+  /**
+   *
+   * @param image
+   * @param srcAccessMask
+   * @param dstAccessMask
+   * @param srcStageMask
+   * @param dstStageMask
+   * @param oldLayout
+   * @param newLayout
+   * @param aspectMask
+   */
   void RecordImageLayoutTransition(vk::Image             image,
                                    vk::AccessFlags        srcAccessMask,
                                    vk::AccessFlags        dstAccessMask,
@@ -95,18 +110,13 @@ private:
                                    vk::ImageAspectFlags   aspectMask);
 
 private:
-  Graphics& mGraphics;
 
-  CommandPool& mCommandPool;
+  // Constructor called by the CommandPool only
+  CommandBuffer( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer );
 
-  // semaphores per command buffer
-  std::vector< vk::Semaphore >          mSignalSemaphores;
-  std::vector< vk::Semaphore >          mWaitSemaphores;
-  std::vector< vk::PipelineStageFlags > mWaitStages;
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 
-  vk::CommandBuffer mCommandBuffer;
-
-  bool mRecording;
 };
 
 } // namespace Vulkan

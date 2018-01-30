@@ -30,23 +30,52 @@ namespace Vulkan
 
 class Graphics;
 class CommandBuffer;
-class CommandPool
+
+
+using CommandPoolHandle = Handle<class CommandPool>;
+
+class CommandPool : public VkManaged
 {
+
 public:
 
-  CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
-  ~CommandPool();
+  /**
+   *
+   * @param graphics
+   * @param createInfo
+   * @return
+   */
+  static CommandPoolHandle New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
 
-  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( const vk::CommandBufferAllocateInfo& info );
+  /**
+   *
+   * @param graphics
+   * @return
+   */
+  static CommandPoolHandle New( Graphics& graphics );
 
-  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( vk::CommandBufferLevel level );
+  ~CommandPool() override;
 
   vk::CommandPool GetPool() const;
 
+  Graphics& GetGraphics() const;
+
+  Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
+
+public:
+
+  bool OnDestroy() override;
+
 private:
-  Graphics&       mGraphics;
-  vk::CommandPool mPool;
+
+  CommandPool();
+  CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
+
 };
+
 
 } // namespace Vulkan
 } // namespace Graphics

@@ -27,60 +27,230 @@ namespace Graphics
 namespace Vulkan
 {
 
-CommandBuffer::CommandBuffer(Graphics& graphics, CommandPool& ownerPool)
-: CommandBuffer(graphics, ownerPool,
-                vk::CommandBufferAllocateInfo().setCommandBufferCount(1).setLevel(vk::CommandBufferLevel::ePrimary))
+struct CommandBuffer::Impl
 {
-}
+  Impl( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer commandBuffer )
+  : mGraphics( commandPool.GetGraphics() ),
+    mOwnerCommandPool( commandPool ),
+    mAllocateInfo( allocateInfo ),
+    mCommandBuffer( commandBuffer )
+  {
 
-CommandBuffer::CommandBuffer(Graphics& graphics, CommandPool& ownerPool,
-                             const vk::CommandBufferAllocateInfo& allocateInfo)
-: mGraphics(graphics), mCommandPool(ownerPool), mRecording(false)
+  }
+
+  ~Impl()
+  {
+  }
+
+  bool Initialise()
+  {
+    return true;
+  }
+
+  /**
+   *
+   */
+  void Begin(vk::CommandBufferUsageFlags usageFlags, vk::CommandBufferInheritanceInfo* inheritanceInfo)
+  {
+    assert(!mRecording && "CommandBuffer already is in the recording state");
+    auto info = vk::CommandBufferBeginInfo{};
+    info.setPInheritanceInfo(inheritanceInfo);
+    info.setFlags(usageFlags);
+    VkAssert(mCommandBuffer.begin(info));
+    mRecording = true;
+  }
+
+  void End()
+  {
+    assert(mRecording && "CommandBuffer is not in the recording state!");
+    VkAssert(mCommandBuffer.end());
+    mRecording = false;
+  }
+
+  void Reset()
+  {
+    assert(!mRecording && "Can't reset command buffer during recording!");
+    assert(mCommandBuffer && "Invalid command buffer!");
+    mCommandBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
+  }
+
+  void Free()
+  {
+    assert(mCommandBuffer && "Invalid command buffer!");
+    mGraphics.GetDevice().freeCommandBuffers(mOwnerCommandPool.GetPool(), mCommandBuffer);
+  }
+
+  void ImageLayoutTransition(vk::Image            image,
+                             vk::ImageLayout      oldLayout,
+                             vk::ImageLayout      newLayout,
+                             vk::ImageAspectFlags aspectMask)
+  {
+    // just push new image barrier until any command is being called or buffer recording ends.
+    // it will make sure we batch barriers together rather than calling cmdPipelineBarrier
+    // for each separately
+    vk::AccessFlags        srcAccessMask, dstAccessMask;
+    vk::PipelineStageFlags srcStageMask, dstStageMask;
+
+    // TODO: add other transitions
+    switch(oldLayout)
+    {
+      case vk::ImageLayout::eUndefined:
+      {
+        srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
+      }
+      break;
+      case vk::ImageLayout::ePresentSrcKHR:
+      {
+        srcStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
+        srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
+      }
+      break;
+      case vk::ImageLayout::eColorAttachmentOptimal:
+      {
+        srcStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eColorAttachmentOutput;
+        srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
+      }
+      break;
+      case vk::ImageLayout::eGeneral:
+      case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+      case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+      case vk::ImageLayout::eShaderReadOnlyOptimal:
+      case vk::ImageLayout::eTransferSrcOptimal:
+      case vk::ImageLayout::eTransferDstOptimal:
+      case vk::ImageLayout::ePreinitialized:
+      case vk::ImageLayout::eSharedPresentKHR:
+      {
+      }
+      }
+
+      switch(newLayout)
+      {
+      case vk::ImageLayout::eColorAttachmentOptimal:
+      {
+        dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
+        dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eHostWrite;
+        break;
+      }
+      case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+      {
+        dstStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eEarlyFragmentTests;
+        dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+        break;
+      }
+      case vk::ImageLayout::ePresentSrcKHR:
+      {
+        dstStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
+        dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eMemoryRead;
+      }
+      case vk::ImageLayout::eGeneral:
+      case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+      case vk::ImageLayout::eShaderReadOnlyOptimal:
+      case vk::ImageLayout::eTransferSrcOptimal:
+      case vk::ImageLayout::eTransferDstOptimal:
+      case vk::ImageLayout::ePreinitialized:
+      case vk::ImageLayout::eUndefined:
+      case vk::ImageLayout::eSharedPresentKHR:
+      {
+        break;
+      }
+
+    }
+
+    RecordImageLayoutTransition(image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask,
+                                oldLayout, newLayout, aspectMask);
+  }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+  void RecordImageLayoutTransition(vk::Image image, vk::AccessFlags srcAccessMask,
+                                   vk::AccessFlags dstAccessMask, vk::PipelineStageFlags srcStageMask,
+                                   vk::PipelineStageFlags dstStageMask, vk::ImageLayout oldLayout,
+                                   vk::ImageLayout newLayout, vk::ImageAspectFlags aspectMask)
+  {
+    vk::ImageSubresourceRange subres;
+    subres.setLayerCount(1).setBaseMipLevel(0).setBaseArrayLayer(0).setLevelCount(1).setAspectMask(aspectMask);
+
+
+    auto barrier = vk::ImageMemoryBarrier{};
+    barrier
+      .setImage(image)
+      .setSubresourceRange(subres)
+      .setSrcAccessMask(srcAccessMask)
+      .setDstAccessMask(dstAccessMask)
+      .setOldLayout(oldLayout)
+      .setNewLayout(newLayout);
+    ;
+    // todo: implement barriers batching
+    mCommandBuffer.pipelineBarrier(srcStageMask, dstStageMask, vk::DependencyFlags{}, nullptr, nullptr, barrier);
+  }
+#pragma GCC diagnostic pop
+
+  /** Push wait semaphores */
+  void PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
+                          const std::vector< vk::PipelineStageFlags >& stages)
+  {
+    mWaitSemaphores = semaphores;
+    mWaitStages     = stages;
+  }
+
+  /** Push signal semaphores */
+  void PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores)
+  {
+    mSignalSemaphores = semaphores;
+  }
+
+
+  Graphics&                       mGraphics;
+  CommandPool&                    mOwnerCommandPool;
+  vk::CommandBufferAllocateInfo   mAllocateInfo {};
+
+  vk::CommandBuffer     mCommandBuffer {};
+
+  // semaphores per command buffer
+  std::vector< vk::Semaphore >          mSignalSemaphores {};
+  std::vector< vk::Semaphore >          mWaitSemaphores {};
+  std::vector< vk::PipelineStageFlags > mWaitStages {};
+
+  bool mRecording { false };
+};
+
+/**
+ *
+ * Class: CommandBuffer
+ *
+ */
+
+CommandBuffer::CommandBuffer( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer )
 {
-  assert(allocateInfo.commandBufferCount == 1 && "Number of buffers to allocate must be equal 1!");
-  mCommandBuffer = VkAssert(mGraphics.GetDevice().allocateCommandBuffers(allocateInfo))[0];
+  mImpl = MakeUnique<Impl>( commandPool, allocateInfo, vkCommandBuffer );
 }
 
 CommandBuffer::~CommandBuffer()
 {
-  if(mCommandBuffer)
-  {
-    mGraphics.GetDevice().freeCommandBuffers(mCommandPool.GetPool(), mCommandBuffer);
-  }
 }
 
 /** Begin recording */
 void CommandBuffer::Begin(vk::CommandBufferUsageFlags usageFlags, vk::CommandBufferInheritanceInfo* inheritanceInfo)
 {
-  assert(!mRecording && "CommandBuffer already is in the recording state");
-  auto info = vk::CommandBufferBeginInfo{};
-  info.setPInheritanceInfo(inheritanceInfo);
-  info.setFlags(usageFlags);
-  VkAssert(mCommandBuffer.begin(info));
-  mRecording = true;
+  mImpl->Begin( usageFlags, inheritanceInfo );
 }
 
 /** Finish recording */
 void CommandBuffer::End()
 {
-  assert(mRecording && "CommandBuffer is not in the recording state!");
-  VkAssert(mCommandBuffer.end());
-  mRecording = false;
+  mImpl->End();
 }
 
 /** Reset command buffer */
 void CommandBuffer::Reset()
 {
-  assert(!mRecording && "Can't reset command buffer during recording!");
-  assert(mCommandBuffer && "Invalid command buffer!");
-  mCommandBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
+  mImpl->Reset();
 }
 
 /** Free command buffer */
 void CommandBuffer::Free()
 {
-  assert(mCommandBuffer && "Invalid command buffer!");
-  mGraphics.GetDevice().freeCommandBuffers(mCommandPool.GetPool(), mCommandBuffer);
+  mImpl->Free();
 }
 
 /** Records image layout transition barrier for one image */
@@ -89,121 +259,50 @@ void CommandBuffer::ImageLayoutTransition(vk::Image            image,
                                           vk::ImageLayout      newLayout,
                                           vk::ImageAspectFlags aspectMask)
 {
-  // must be in recording state
-
-  // just push new image barrier until any command is being called or buffer recording ends.
-  // it will make sure we batch barriers together rather than calling cmdPipelineBarrier
-  // for each separately
-  vk::AccessFlags        srcAccessMask, dstAccessMask;
-  vk::PipelineStageFlags srcStageMask, dstStageMask;
-
-  // TODO: add other transitions
-  switch(oldLayout)
-  {
-  case vk::ImageLayout::eUndefined:
-  {
-    srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
-  }
-  break;
-  case vk::ImageLayout::ePresentSrcKHR:
-  {
-    srcStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
-    srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
-  }
-  break;
-  case vk::ImageLayout::eColorAttachmentOptimal:
-  {
-    srcStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eColorAttachmentOutput;
-    srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
-  }
-  break;
-  case vk::ImageLayout::eGeneral:
-  case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-  case vk::ImageLayout::eShaderReadOnlyOptimal:
-  case vk::ImageLayout::eTransferSrcOptimal:
-  case vk::ImageLayout::eTransferDstOptimal:
-  case vk::ImageLayout::ePreinitialized:
-  case vk::ImageLayout::eSharedPresentKHR:
-  {
-  }
-  }
-
-  switch(newLayout)
-  {
-  case vk::ImageLayout::eColorAttachmentOptimal:
-  {
-    dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
-    dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eHostWrite;
-    break;
-  }
-  case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-  {
-    dstStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eEarlyFragmentTests;
-    dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-    break;
-  }
-  case vk::ImageLayout::ePresentSrcKHR:
-  {
-    dstStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
-    dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eMemoryRead;
-  }
-  case vk::ImageLayout::eGeneral:
-  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-  case vk::ImageLayout::eShaderReadOnlyOptimal:
-  case vk::ImageLayout::eTransferSrcOptimal:
-  case vk::ImageLayout::eTransferDstOptimal:
-  case vk::ImageLayout::ePreinitialized:
-  case vk::ImageLayout::eUndefined:
-  case vk::ImageLayout::eSharedPresentKHR:
-  {
-    break;
-  }
-
-  }
-
-  RecordImageLayoutTransition(image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask,
-                              oldLayout, newLayout, aspectMask);
+  mImpl->ImageLayoutTransition( image, oldLayout, newLayout, aspectMask );
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 void CommandBuffer::RecordImageLayoutTransition(vk::Image image, vk::AccessFlags srcAccessMask,
                                                 vk::AccessFlags dstAccessMask, vk::PipelineStageFlags srcStageMask,
                                                 vk::PipelineStageFlags dstStageMask, vk::ImageLayout oldLayout,
                                                 vk::ImageLayout newLayout, vk::ImageAspectFlags aspectMask)
 {
-  vk::ImageSubresourceRange subres;
-  subres.setLayerCount(1).setBaseMipLevel(0).setBaseArrayLayer(0).setLevelCount(1).setAspectMask(aspectMask);
-
-
-  auto barrier = vk::ImageMemoryBarrier{};
-  barrier
-                     .setImage(image)
-                     .setSubresourceRange(subres)
-                     .setSrcAccessMask(srcAccessMask)
-                     .setDstAccessMask(dstAccessMask)
-                     .setOldLayout(oldLayout)
-                     .setNewLayout(newLayout);
-  ;
-  // todo: implement barriers batching
-  mCommandBuffer.pipelineBarrier(srcStageMask, dstStageMask, vk::DependencyFlags{}, nullptr, nullptr, barrier);
+  mImpl->RecordImageLayoutTransition( image, srcAccessMask, dstAccessMask,srcStageMask, dstStageMask, oldLayout, newLayout, aspectMask );
 }
-#pragma GCC diagnostic pop
 
 /** Push wait semaphores */
 void CommandBuffer::PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
                                        const std::vector< vk::PipelineStageFlags >& stages)
 {
-  mWaitSemaphores = semaphores;
-  mWaitStages     = stages;
+  mImpl->PushWaitSemaphores( semaphores, stages );
 }
 
 /** Push signal semaphores */
 void CommandBuffer::PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores)
 {
-  mSignalSemaphores = semaphores;
+  mImpl->PushSignalSemaphores( semaphores );
 }
+
+const std::vector< vk::Semaphore >& CommandBuffer::GetSignalSemaphores() const
+{
+  return mImpl->mSignalSemaphores;
+}
+
+const std::vector< vk::Semaphore >& CommandBuffer::GetSWaitSemaphores() const
+{
+  return mImpl->mWaitSemaphores;
+}
+
+const std::vector< vk::PipelineStageFlags >& CommandBuffer::GetWaitSemaphoreStages() const
+{
+  return mImpl->mWaitStages;
+}
+
+vk::CommandBuffer CommandBuffer::GetVkCommandBuffer() const
+{
+  return mImpl->mCommandBuffer;
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics
