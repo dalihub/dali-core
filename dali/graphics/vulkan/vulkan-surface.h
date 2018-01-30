@@ -61,8 +61,8 @@ struct SwapchainImage
   vk::Semaphore   presentSem;
 
   // layout transitions, prerecorded command buffers
-  UniqueCommandBuffer layoutToColorCmdBuf;
-  UniqueCommandBuffer mainCmdBuf;
+  Handle<CommandBuffer> layoutToColorCmdBuf;
+  Handle<CommandBuffer> mainCmdBuf;
 };
 
 class Surface
@@ -155,7 +155,7 @@ private:
   vk::ImageView    mDepthStencilImageView;
   vk::DeviceMemory mDepthStencilMemory;
 
-  UniqueCommandPool mCommandPool;
+  Handle<CommandPool> mCommandPool;
 
   vk::Format        mFormat;
   vk::ColorSpaceKHR mColorSpace;

@@ -475,9 +475,11 @@ Queue& Graphics::GetPresentQueue() const
   return *mPresentQueue.get();
 }
 
-std::unique_ptr< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
+Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
 {
-  auto cmdpool = std::unique_ptr< CommandPool >(new CommandPool(*this, info));
+  auto cmdpool = CommandPool::New( *this, vk::CommandPoolCreateInfo{}.
+                                                                       setQueueFamilyIndex( 0u ).
+                                                                       setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ) );
   return cmdpool;
 }
 
@@ -499,7 +501,7 @@ void Graphics::AddBuffer( std::unique_ptr<Buffer> buffer )
 
 void Graphics::AddImage( std::unique_ptr<Image> image )
 {
-
+  mImageCache.push_back(std::move(image));
 }
 
 void Graphics::AddPipeline( std::unique_ptr<Pipeline> pipeline )
@@ -510,6 +512,11 @@ void Graphics::AddPipeline( std::unique_ptr<Pipeline> pipeline )
 void Graphics::AddShader( std::unique_ptr<Shader> shader )
 {
   mShaderCache.push_back( std::move(shader) );
+}
+
+void Graphics::AddCommandPool( std::unique_ptr<CommandPool> pool )
+{
+  mCommandPoolCache.push_back( std::move(pool) );
 }
 
 void Graphics::RemoveBuffer( Buffer& buffer )

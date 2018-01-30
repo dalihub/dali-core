@@ -134,7 +134,7 @@ std::vector< vk::CommandBuffer > Queue::PrepareBuffers(const std::vector< Comman
   std::vector< vk::CommandBuffer > retval(commandBuffers.size());
   for(uint32_t i = 0; i < commandBuffers.size(); ++i)
   {
-    retval[i] = commandBuffers[i].get().Get();
+    retval[i] = commandBuffers[i].get();
   }
   return retval;
 }
