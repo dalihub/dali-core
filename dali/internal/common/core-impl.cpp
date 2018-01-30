@@ -84,7 +84,9 @@ Core::Core( RenderController& renderController,
             GlSyncAbstraction& glSyncAbstraction,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
-            bool renderToFboEnabled )
+            Integration::RenderToFrameBuffer renderToFboEnabled,
+            Integration::DepthBufferAvailable depthBufferAvailable,
+            Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
   mProcessingEvent(false)
@@ -103,7 +105,7 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, depthBufferAvailable, stencilBufferAvailable );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
@@ -125,7 +127,7 @@ Core::Core( RenderController& renderController,
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
-  mStage->Initialize( renderToFboEnabled );
+  mStage->Initialize( renderToFboEnabled == Integration::RenderToFrameBuffer::TRUE );
 
   mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
   mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );

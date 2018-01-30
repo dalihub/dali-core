@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
-#include <pthread.h>
+#include <thread>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -28,43 +28,45 @@ namespace Dali
 
 struct Thread::ThreadImpl
 {
-  pthread_t thread;
-  bool isCreated;
+  ThreadImpl( Thread& aThis )
+  : thread( &Thread::InternalThreadEntryFunc, std::ref( aThis ) )
+  {
+    // std::thread starts execution immediately
+  }
+  ~ThreadImpl( )
+  {
+    thread.join();
+  }
+  std::thread thread;
 };
 
 Thread::Thread()
-: mImpl( new ThreadImpl )
+: mImpl( nullptr )
 {
-  mImpl->isCreated = false;
 }
 
 Thread::~Thread()
 {
-  delete mImpl;
+  Join();
 }
 
 void Thread::Start()
 {
-  DALI_ASSERT_DEBUG( !mImpl->isCreated );
-
-  int error = pthread_create( &(mImpl->thread), NULL, InternalThreadEntryFunc, this );
-  DALI_ASSERT_ALWAYS( !error && "Failed to create a new thread" );
-  mImpl->isCreated = true;
+  if( !mImpl )
+  {
+    mImpl = new Thread::ThreadImpl( *this );
+  }
 }
 
 void Thread::Join()
 {
-  if( mImpl->isCreated )
-  {
-    mImpl->isCreated = false;
-    pthread_join( mImpl->thread, NULL );
-  }
+  delete mImpl;
+  mImpl = nullptr;
 }
 
-void* Thread::InternalThreadEntryFunc( void* This )
+void Thread::InternalThreadEntryFunc( Thread& aThis )
 {
-  ( static_cast<Thread*>( This ) )->Run();
-  return NULL;
+  aThis.Run();
 }
 
 } // namespace Dali

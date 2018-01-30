@@ -1294,6 +1294,7 @@ public:
    * @brief Raises the actor above the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
@@ -1304,6 +1305,7 @@ public:
    * @brief Lower the actor to below the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.

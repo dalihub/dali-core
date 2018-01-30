@@ -482,7 +482,7 @@ public:
    */
   unsigned int GetRefreshRate() const;
 
-  /*
+  /**
    * @brief Gets viewport coordinates for given world position.
    *
    * @SINCE_1_1.13
@@ -493,7 +493,7 @@ public:
    */
   bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
 
-  /*
+  /**
    * @brief Gets actor local coordinates for given viewport coordinates.
    *
    * @SINCE_1_1.13

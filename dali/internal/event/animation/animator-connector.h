@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ANIMATOR_CONNECTOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
+#include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -33,7 +34,8 @@ namespace Internal
 {
 
 /**
- * AnimatorConnector is used to connect SceneGraph::Animators for newly created scene-graph objects.
+ * AnimatorConnector is used to connect SceneGraph::Animators and
+ * PropertyResetters for newly created scene-graph objects.
  *
  * SceneGraph::Animators weakly reference scene objects, and are automatically deleted when orphaned.
  * Therefore the AnimatorConnector is NOT responsible for disconnecting animators.
@@ -81,8 +83,8 @@ public:
       mObject->RemoveObserver( *this );
     }
 
-    //If there is not a SceneGraph::Animator, the AnimatorConnector is responsible for deleting the mAnimatorFunction
-    //otherwise, the animator function ownership is transferred to the SceneGraph::Animator
+    // If there is not a SceneGraph::Animator, the AnimatorConnector is responsible for deleting the mAnimatorFunction
+    // otherwise, the animator function ownership is transferred to the SceneGraph::Animator
     if( !mAnimator )
     {
       delete mAnimatorFunction;
@@ -141,7 +143,9 @@ private:
   }
 
    /**
-   * Helper function to create a Scenegraph::Animator and add it to its correspondent SceneGraph::Animation.
+   * Helper function to create a Scenegraph::Animator and PropertyResetter and add it to its correspondent
+   * SceneGraph::Animation.
+   *
    * @note This function will only be called the first time the object is added to the scene or at creation time if
    * the object was already in the scene
    */
@@ -154,10 +158,12 @@ private:
     //Get the PropertyOwner the animator is going to animate
     const SceneGraph::PropertyOwner* propertyOwner = mObject->GetSceneObject();
 
-    //Get SceneGraph::BaseProperty
+    // Get SceneGraph::BaseProperty
     const SceneGraph::PropertyBase* baseProperty = mObject->GetSceneObjectAnimatableProperty( mPropertyIndex );
 
-    //Check if property is a component of another property
+    OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
+
+    // Check if property is a component of another property
     const int componentIndex = mObject->GetPropertyComponentIndex( mPropertyIndex );
     if( componentIndex != Property::INVALID_COMPONENT_INDEX )
     {
@@ -166,9 +172,9 @@ private:
 
     if( mComponentIndex == Property::INVALID_COMPONENT_INDEX )
     {
-      ///Animating the whole property
+      // Animating the whole property
 
-      //Cast to AnimatableProperty
+      // Cast to AnimatableProperty
       const PropertyInterfaceType* animatableProperty = dynamic_cast< const PropertyInterfaceType* >( baseProperty );
 
       if( animatableProperty == NULL )
@@ -176,6 +182,7 @@ private:
         if( baseProperty->IsTransformManagerProperty() )
         {
           mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+          // Don't reset transform manager properties - TransformManager will do it more efficiently
         }
         else
         {
@@ -185,15 +192,16 @@ private:
       }
       else
       {
-        //Create the animator
-        mAnimator = AnimatorType::New( *propertyOwner, *animatableProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+        // Create the animator and resetter
+        mAnimator = AnimatorType::New( *propertyOwner, *animatableProperty, mAnimatorFunction,
+                                       mAlphaFunction, mTimePeriod );
+        resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
       }
-
     }
     else
     {
       {
-        ///Animating a component of the property
+        // Animating a component of the property
         if ( PropertyTypes::Get< Vector2 >() == baseProperty->GetType() )
         {
           // Animate float component of Vector2 property
@@ -227,6 +235,11 @@ private:
               break;
             }
           }
+
+          if( mAnimator != nullptr )
+          {
+            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+          }
         }
 
         else if ( PropertyTypes::Get< Vector3 >() == baseProperty->GetType() )
@@ -256,10 +269,11 @@ private:
             {
               DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
             }
+            // Don't manually reset transform property - TransformManager will do it more efficiently
           }
           else
           {
-            //Dynamic cast will fail if BaseProperty is not a Vector3 AnimatableProperty
+            // Dynamic cast will fail if BaseProperty is not a Vector3 AnimatableProperty
             DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
 
             switch( mComponentIndex )
@@ -295,6 +309,11 @@ private:
               {
                 break;
               }
+            }
+
+            if( mAnimator != nullptr )
+            {
+              resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
             }
           }
         }
@@ -352,6 +371,10 @@ private:
               break;
             }
           }
+          if( mAnimator != nullptr )
+          {
+            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+          }
         }
       }
     }
@@ -362,6 +385,12 @@ private:
     const SceneGraph::Animation* animation = mParent->GetSceneObject();
     DALI_ASSERT_DEBUG( NULL != animation );
     AddAnimatorMessage( mParent->GetEventThreadServices(), *animation, *mAnimator );
+
+    // Add the new SceneGraph::PropertyResetter to the update manager via message
+    if( resetter != nullptr )
+    {
+      AddResetterMessage( mParent->GetEventThreadServices().GetUpdateManager(), resetter );
+    }
   }
 
 protected:

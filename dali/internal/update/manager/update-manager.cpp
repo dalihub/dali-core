@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -285,9 +285,9 @@ struct UpdateManager::Impl
   OwnerContainer< Camera* >            cameras;                       ///< A container of cameras
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
 
+  OwnerContainer< PropertyResetterBase* > propertyResetters;          ///< A container of property resetters
   AnimationContainer                   animations;                    ///< A container of owned animations
   PropertyNotificationContainer        propertyNotifications;         ///< A container of owner property notifications.
-
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
   OwnerContainer< Shader* >            shaders;                       ///< A container of owned shaders
@@ -481,6 +481,12 @@ bool UpdateManager::IsAnimationRunning() const
   return false;
 }
 
+void UpdateManager::AddPropertyResetter( OwnerPointer<PropertyResetterBase>& propertyResetter )
+{
+  propertyResetter->Initialize();
+  mImpl->propertyResetters.PushBack( propertyResetter.Release() );
+}
+
 void UpdateManager::AddPropertyNotification( OwnerPointer< PropertyNotification >& propertyNotification )
 {
   mImpl->propertyNotifications.PushBack( propertyNotification.Release() );
@@ -606,40 +612,30 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
-  // Animated properties have to be reset to their original value each frame
-
-  // Reset root properties
-  if ( mImpl->root )
+  // Reset all animating / constrained properties
+  std::vector<PropertyResetterBase*>toDelete;
+  for( auto&& element : mImpl->propertyResetters )
   {
-    mImpl->root->ResetToBaseValues( bufferIndex );
-  }
-  if ( mImpl->systemLevelRoot )
-  {
-    mImpl->systemLevelRoot->ResetToBaseValues( bufferIndex );
+    element->ResetToBaseValue( bufferIndex );
+    if( element->IsFinished() )
+    {
+      toDelete.push_back( element );
+    }
   }
 
-  // Reset all the nodes
+  // If a resetter is no longer required (the animator or constraint has been removed), delete it.
+  for( auto&& elementPtr : toDelete )
+  {
+    mImpl->propertyResetters.EraseObject( elementPtr );
+  }
+
+  // Clear node dirty flags
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
   for( ;iter != endIter; ++iter )
   {
-    (*iter)->ResetToBaseValues( bufferIndex );
+    (*iter)->ResetDirtyFlags( bufferIndex );
   }
-
-  // Reset system-level render-task list properties to base values
-  ResetToBaseValues( mImpl->systemLevelTaskList.GetTasks(), bufferIndex );
-
-  // Reset render-task list properties to base values.
-  ResetToBaseValues( mImpl->taskList.GetTasks(), bufferIndex );
-
-  // Reset custom object properties to base values
-  ResetToBaseValues( mImpl->customObjects, bufferIndex );
-
-  // Reset animatable renderer properties to base values
-  ResetToBaseValues( mImpl->renderers, bufferIndex );
-
-  // Reset animatable shader properties to base values
-  ResetToBaseValues( mImpl->shaders, bufferIndex );
 }
 
 bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
@@ -875,7 +871,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
 
-    //Update the trnasformations of all the nodes
+    //Update the transformations of all the nodes
     mImpl->transformManager.Update();
 
     //Process Property Notifications

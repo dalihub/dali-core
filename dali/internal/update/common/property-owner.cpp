@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,18 +115,6 @@ void PropertyOwner::InstallCustomProperty( OwnerPointer<PropertyBase>& property 
   mCustomProperties.PushBack( property.Release() );
 }
 
-void PropertyOwner::ResetToBaseValues( BufferIndex updateBufferIndex )
-{
-  // Reset custom properties
-  const OwnedPropertyIter endIter = mCustomProperties.End();
-  for ( OwnedPropertyIter iter = mCustomProperties.Begin(); endIter != iter; ++iter )
-  {
-    (*iter)->ResetToBaseValue( updateBufferIndex );
-  }
-
-  // Notification for derived classes, to reset default properties
-  ResetDefaultProperties( updateBufferIndex );
-}
 
 ConstraintOwnerContainer& PropertyOwner::GetConstraints()
 {

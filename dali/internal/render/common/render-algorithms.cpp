@@ -296,7 +296,12 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
   }
 }
 
-inline void RenderAlgorithms::SetupClipping( const RenderItem& item, Context& context, bool& usedStencilBuffer, uint32_t& lastClippingDepth, uint32_t& lastClippingId )
+inline void RenderAlgorithms::SetupClipping( const RenderItem& item,
+                                             Context& context,
+                                             bool& usedStencilBuffer,
+                                             uint32_t& lastClippingDepth,
+                                             uint32_t& lastClippingId,
+                                             Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   const Renderer *renderer = item.mRenderer;
@@ -314,12 +319,16 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item, Context& co
       // Turn the color buffer on as we always want to render this renderer, regardless of clipping hierarchy.
       context.ColorMask( true );
 
-      // The automatic clipping feature will manage the scissor and stencil functions.
+      // The automatic clipping feature will manage the scissor and stencil functions, only if stencil buffer is available for the latter.
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
       SetupScissorClipping( item, context );
-      SetupStencilClipping( item, context, lastClippingDepth, lastClippingId );
+
+      if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
+      {
+        SetupStencilClipping( item, context, lastClippingDepth, lastClippingId );
+      }
       break;
     }
 
@@ -328,8 +337,11 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item, Context& co
     {
       // No clipping is performed for these modes.
       // Note: We do not turn off scissor clipping as it may be used for the whole layer.
-      // The stencil buffer will not be used at all.
-      context.EnableStencilBuffer( false );
+      // The stencil buffer will not be used at all, but we only need to disable it if it's available.
+      if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
+      {
+        context.EnableStencilBuffer( false );
+      }
 
       // Setup the color buffer based on the RenderMode.
       context.ColorMask( renderMode == RenderMode::COLOR );
@@ -339,29 +351,32 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item, Context& co
     case RenderMode::STENCIL:
     case RenderMode::COLOR_STENCIL:
     {
-      // We are using the low-level Renderer Stencil API.
-      // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
-      // Note: As the command state is cached, it is only sent when needed.
-      context.EnableStencilBuffer( true );
-
-      // Setup the color buffer based on the RenderMode.
-      context.ColorMask( renderMode == RenderMode::COLOR_STENCIL );
-
-      // If this is the first use of the stencil buffer within this RenderList, clear it (this avoids unnecessary clears).
-      if( !usedStencilBuffer )
+      if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
       {
-        context.Clear( GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
-        usedStencilBuffer = true;
-      }
+        // We are using the low-level Renderer Stencil API.
+        // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
+        // Note: As the command state is cached, it is only sent when needed.
+        context.EnableStencilBuffer( true );
 
-      // Setup the stencil buffer based on the renderers properties.
-      context.StencilFunc( DaliStencilFunctionToGL[ renderer->GetStencilFunction() ],
-          renderer->GetStencilFunctionReference(),
-          renderer->GetStencilFunctionMask() );
-      context.StencilOp( DaliStencilOperationToGL[ renderer->GetStencilOperationOnFail() ],
-          DaliStencilOperationToGL[ renderer->GetStencilOperationOnZFail() ],
-          DaliStencilOperationToGL[ renderer->GetStencilOperationOnZPass() ] );
-      context.StencilMask( renderer->GetStencilMask() );
+        // Setup the color buffer based on the RenderMode.
+        context.ColorMask( renderMode == RenderMode::COLOR_STENCIL );
+
+        // If this is the first use of the stencil buffer within this RenderList, clear it (this avoids unnecessary clears).
+        if( !usedStencilBuffer )
+        {
+          context.Clear( GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
+          usedStencilBuffer = true;
+        }
+
+        // Setup the stencil buffer based on the renderers properties.
+        context.StencilFunc( DaliStencilFunctionToGL[ renderer->GetStencilFunction() ],
+            renderer->GetStencilFunctionReference(),
+            renderer->GetStencilFunctionMask() );
+        context.StencilOp( DaliStencilOperationToGL[ renderer->GetStencilOperationOnFail() ],
+            DaliStencilOperationToGL[ renderer->GetStencilOperationOnZFail() ],
+            DaliStencilOperationToGL[ renderer->GetStencilOperationOnZPass() ] );
+        context.StencilMask( renderer->GetStencilMask() );
+      }
       break;
     }
   }
@@ -371,13 +386,17 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  Context& context,
                                                  BufferIndex bufferIndex,
                                                  const Matrix& viewMatrix,
-                                                 const Matrix& projectionMatrix )
+                                                 const Matrix& projectionMatrix,
+                                                 Integration::DepthBufferAvailable depthBufferAvailable,
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
   // Note: The depth buffer is enabled or disabled on a per-renderer basis.
   // Here we pre-calculate the value to use if these modes are set to AUTO.
-  const bool autoDepthTestMode( !( renderList.GetSourceLayer()->IsDepthTestDisabled() ) && renderList.HasColorRenderItems() );
+  const bool autoDepthTestMode(  ( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ) &&
+                                !( renderList.GetSourceLayer()->IsDepthTestDisabled() ) &&
+                                 renderList.HasColorRenderItems() );
   const std::size_t count = renderList.Count();
   uint32_t lastClippingDepth( 0u );
   uint32_t lastClippingId( 0u );
@@ -411,16 +430,19 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping( item, context, usedStencilBuffer, lastClippingDepth, lastClippingId );
+    SetupClipping( item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable );
 
     if( DALI_LIKELY( item.mRenderer ) )
     {
-      // Set up the depth buffer based on per-renderer flags.
+      // Set up the depth buffer based on per-renderer flags if depth buffer is available
       // If the per renderer flags are set to "ON" or "OFF", they will always override any Layer depth mode or
       // draw-mode state, such as Overlays.
       // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will always
       // disable depth testing and writing. Color Renderers will enable them if the Layer does.
-      SetupDepthBuffer( item, context, autoDepthTestMode, firstDepthBufferUse );
+      if( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
+      {
+        SetupDepthBuffer( item, context, autoDepthTestMode, firstDepthBufferUse );
+      }
 
       // Render the item.
       item.mRenderer->Render( context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
@@ -435,7 +457,11 @@ RenderAlgorithms::RenderAlgorithms()
 {
 }
 
-void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instruction, Context& context, BufferIndex bufferIndex )
+void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instruction,
+                                                 Context& context,
+                                                 BufferIndex bufferIndex,
+                                                 Integration::DepthBufferAvailable depthBufferAvailable,
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -457,7 +483,13 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
 
       if( renderList && !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, bufferIndex, *viewMatrix, *projectionMatrix );
+        ProcessRenderList( *renderList,
+                            context,
+                            bufferIndex,
+                           *viewMatrix,
+                           *projectionMatrix,
+                            depthBufferAvailable,
+                            stencilBufferAvailable );
       }
     }
   }

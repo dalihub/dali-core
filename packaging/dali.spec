@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    DALi 3D Engine
-Version:    1.2.65
+Version:    1.3.9
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -105,7 +105,7 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 %build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions "
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
