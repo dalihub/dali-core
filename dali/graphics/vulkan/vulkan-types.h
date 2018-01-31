@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_VULKAN_TYPES_H
-#define DALI_GRAPHICS_VULKAN_TYPES_H
+#ifndef DALI_GRAPHICS_VULKAN_TYPES
+#define DALI_GRAPHICS_VULKAN_TYPES
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Graphics
 template< typename T, typename... Args >
 std::unique_ptr< T > MakeUnique(Args&&... args)
 {
-  return std::unique_ptr< T >(new T(std::forward< Args >(args)...));
+  return std::unique_ptr< T  >(new T(std::forward< Args >(args)...));
 }
 
 namespace Vulkan
@@ -43,37 +43,20 @@ namespace Vulkan
  * Forward class declarations
  */
 class Graphics;
-class CommandBuffer;
-class CommandPool;
 class Surface;
 class Queue;
-class Fence;
-class DeviceMemory;
-class Image;
-class ImageView;
-class Buffer;
 
 /**
  * Unique pointers to Vulkan types
  */
 using UniqueSurface       = std::unique_ptr< Surface >;
-using UniqueCommandBuffer = std::unique_ptr< CommandBuffer >;
-using UniqueCommandPool   = std::unique_ptr< CommandPool >;
 using UniqueQueue         = std::unique_ptr< Queue >;
-using UniqueFence         = std::unique_ptr< Fence >;
-using UniqueDeviceMemory  = std::unique_ptr< DeviceMemory >;
-using UniqueBuffer        = std::unique_ptr< Buffer >;
-using UniqueImage         = std::unique_ptr< Image >;
-using UniqueImageView     = std::unique_ptr< ImageView >;
 
 /**
  * Reference wrappers
  */
-using CommandBufferRef = std::reference_wrapper< CommandBuffer >;
 using QueueRef         = std::reference_wrapper< Queue >;
-using FenceRef         = std::reference_wrapper< Fence >;
 using SurfaceRef       = std::reference_wrapper< Surface >;
-
 
 
 template< typename T >
@@ -127,55 +110,204 @@ private:
   std::atomic<uint32_t> mUserCount;
 };
 
-template< typename T>
-class ResourceRef
+/**
+ * Vulkan object handle
+ * @tparam T
+ */
+template<class T>
+class Handle
 {
 public:
 
-  ResourceRef( T& object )
-  : mObject( &object )
+  Handle();
+  explicit Handle(T* object );
+  Handle( const Handle& handle);
+  Handle& operator=( const Handle& handle );
+  Handle& operator=( Handle&& handle );
+  Handle( Handle&& handle ) noexcept;
+  ~Handle();
+
+  operator bool() const;
+
+  T* operator->() const
   {
-    mObject->IncreaseUserCount();
+    return mObject;
   }
 
-  ResourceRef( ResourceRef& object )
+  uint32_t GetRefCount() const
   {
-    if(mObject)
-    {
-      mObject->DecreaseUserCount();
-    }
-
-    mObject = object.mObject;
-    mObject->IncreaseUserCount();
+    return mObject->GetRefCount();
   }
 
-  ResourceRef operator=(ResourceRef& object )
-  {
-    if(mObject)
-    {
-      mObject->DecreaseUserCount();
-    }
-
-    mObject = object.mObject;
-    mObject->IncreaseUserCount();
-  }
-
-  ~ResourceRef()
-  {
-    if(mObject)
-    {
-      mObject->DecreaseUserCount();
-    }
-  }
-
-  T& GetResource() const
+  T& operator*() const
   {
     return *mObject;
   }
 
+  template <class K>
+  Handle<K> StaticCast()
+  {
+    return Handle<K>(static_cast<K*>(mObject));
+  }
+
+  template<class K>
+  bool operator==( const Handle<K>& object ) const
+  {
+    return mObject == &*object;
+  }
+
+  template <class K>
+  Handle<K> DynamicCast();
+
+  void Reset()
+  {
+    if( mObject )
+    {
+      mObject->Release();
+      mObject = nullptr;
+    }
+  }
+
 private:
 
-  T* mObject;
+  T* mObject { nullptr };
+};
+
+template <class K, class T>
+static Handle<K> VkTypeCast( const Handle<T>& inval )
+{
+  return Handle<K>(static_cast<K*>(&*inval));
+}
+
+template<class T>
+Handle<T>::Handle(T* object)
+  : mObject( object )
+{
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+}
+
+template<class T>
+Handle<T>::Handle()
+  : mObject( nullptr )
+{
+}
+
+template<class T>
+Handle<T>::Handle(const Handle& handle)
+{
+  mObject = handle.mObject;
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+}
+
+template<class T>
+Handle<T>::Handle( Handle&& handle ) noexcept
+{
+  mObject = handle.mObject;
+  handle.mObject = nullptr;
+}
+
+template<class T>
+Handle<T>::operator bool() const
+{
+  return mObject != nullptr;
+}
+
+template<class T>
+Handle<T>& Handle<T>::operator=( Handle&& handle )
+{
+  mObject = handle.mObject;
+  handle.mObject = nullptr;
+  return *this;
+}
+
+template<class T>
+Handle<T>& Handle<T>::operator=( const Handle<T>& handle )
+{
+  mObject = handle.mObject;
+  if(mObject)
+  {
+    mObject->Retain();
+  }
+  return *this;
+}
+
+template<class T>
+Handle<T>::~Handle()
+{
+  if(mObject)
+  {
+    mObject->Release();
+  }
+}
+
+template<class T>
+template<class K>
+Handle<K> Handle<T>::DynamicCast()
+{
+  auto val = dynamic_cast<K*>(mObject);
+  if(val)
+  {
+    return Handle<K>(val);
+  }
+  return Handle<K>();
+}
+
+template< typename T, typename... Args >
+Handle< T > MakeRef(Args&&... args)
+{
+  return Handle< T  >(new T(std::forward< Args >(args)...));
+}
+
+class VkManaged
+{
+public:
+
+  VkManaged() = default;
+  virtual ~VkManaged() = default;
+
+  void Release()
+  {
+    OnRelease(--mRefCount);
+    if(mRefCount == 0)
+    {
+      // orphaned
+      if(!Destroy())
+      {
+        delete this;
+      }
+    }
+  }
+
+  void Retain()
+  {
+    OnRetain(++mRefCount);
+  }
+
+  uint32_t GetRefCount()
+  {
+    return mRefCount;
+  }
+
+  bool Destroy()
+  {
+    return OnDestroy();
+  }
+
+  virtual void OnRetain( uint32_t refcount ) {};
+
+  virtual void OnRelease( uint32_t refcount ) {};
+
+  virtual bool OnDestroy() { return false; };
+
+private:
+
+  std::atomic_uint mRefCount { 0u };
 };
 
 using FBID = uint32_t;
@@ -187,6 +319,20 @@ assert( "Function no implemented" );\
 }
 
 /*
+ * Forward declarations of reference types
+ */
+using ShaderRef = Handle<class Shader>;
+using PipelineRef = Handle<class Pipeline>;
+using FenceRef = Handle<class Fence>;
+using BufferRef = Handle<class Buffer>;
+using FramebufferRef = Handle<class Framebuffer>;
+using ImageRef = Handle<class Image>;
+using ImageViewRef = Handle<class ImageView>;
+using DescriptorPoolRef = Handle<class DescriptorPool>;
+using CommandPoolRef = Handle<class CommandPool>;
+using CommandBufferRef = Handle<class CommandBuffer>;
+
+/*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
 #pragma GCC diagnostic pop
@@ -195,4 +341,4 @@ assert( "Function no implemented" );\
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_TYPES_H
+#endif // DALI_GRAPHICS_VULKAN_TYPES

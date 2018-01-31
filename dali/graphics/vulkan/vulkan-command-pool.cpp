@@ -16,9 +16,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
-#include <dali/graphics/vulkan/vulkan-graphics.h>
 
 namespace Dali
 {
@@ -27,40 +27,110 @@ namespace Graphics
 namespace Vulkan
 {
 
-CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo)
-: mGraphics(graphics)
-{
-  mPool = VkAssert(graphics.GetDevice().createCommandPool(createInfo, graphics.GetAllocator()));
-}
+/**
+ *
+ * Class: CommandPool::Impl
+ */
 
-CommandPool::~CommandPool()
+struct CommandPool::Impl
 {
-  if(mPool)
+  Impl( Graphics& graphics, CommandPool& interface, const vk::CommandPoolCreateInfo& createInfo )
+  : mGraphics( graphics ),
+    mInterface( interface ),
+    mCreateInfo( createInfo ),
+    mCommandPool( nullptr )
   {
-    mGraphics.GetDevice().destroyCommandPool(mPool, mGraphics.GetAllocator());
   }
+
+  ~Impl()
+  {
+    if(mCommandPool)
+    {
+      mGraphics.GetDevice().destroyCommandPool( mCommandPool, mGraphics.GetAllocator());
+    }
+  }
+
+  bool Initialise()
+  {
+    mCommandPool = VkAssert(mGraphics.GetDevice().createCommandPool(mCreateInfo, mGraphics.GetAllocator()));
+    return true;
+  }
+
+  Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+  {
+    vk::CommandBufferAllocateInfo info( allocateInfo );
+    info.setCommandPool( mCommandPool );
+    info.setCommandBufferCount(1);
+    auto retval = VkAssert( mGraphics.GetDevice().allocateCommandBuffers( info ) );
+    mAllocatedCommandBuffers.emplace_back( new CommandBuffer( mInterface, info, retval[0]) );
+    return mAllocatedCommandBuffers.back();
+  }
+
+  Graphics& mGraphics;
+  CommandPool& mInterface;
+  vk::CommandPoolCreateInfo mCreateInfo;
+  vk::CommandPool mCommandPool;
+
+  std::vector<Handle<CommandBuffer>> mAllocatedCommandBuffers;
+};
+
+/**
+ *
+ * Class: CommandPool
+ */
+CommandPoolHandle CommandPool::New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo )
+{
+  auto retval = Handle<CommandPool>( new CommandPool(graphics, createInfo) );
+
+  if(retval && retval->mImpl->Initialise())
+  {
+    graphics.AddCommandPool( retval );
+  }
+
+  return retval;
 }
 
-std::unique_ptr< CommandBuffer > CommandPool::AllocateCommandBuffer(
-    const vk::CommandBufferAllocateInfo& info)
+CommandPoolHandle CommandPool::New( Graphics& graphics )
 {
-  auto copyInfo = info;
-  copyInfo.setCommandPool(mPool);
-  return MakeUnique<CommandBuffer>(mGraphics, *this, copyInfo);
+  return New( graphics, vk::CommandPoolCreateInfo{});
 }
 
-std::unique_ptr< CommandBuffer > CommandPool::AllocateCommandBuffer(vk::CommandBufferLevel level)
+CommandPool::CommandPool() = default;
+
+CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo)
 {
-  auto info =
-      vk::CommandBufferAllocateInfo{}.setCommandBufferCount(1).setLevel(level).setCommandPool(
-          mPool);
-  return MakeUnique<CommandBuffer>(mGraphics, *this, info);
+  mImpl = MakeUnique<Impl>( graphics, *this, createInfo );
 }
+
+CommandPool::~CommandPool() = default;
 
 vk::CommandPool CommandPool::GetPool() const
 {
-  return mPool;
+  return mImpl->mCommandPool;
 }
+
+Graphics& CommandPool::GetGraphics() const
+{
+  return mImpl->mGraphics;
+}
+
+bool CommandPool::OnDestroy()
+{
+  return false;
+}
+
+Handle<CommandBuffer> CommandPool::NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+{
+  return mImpl->NewCommandBuffer( allocateInfo );
+}
+
+Handle<CommandBuffer> CommandPool::NewCommandBuffer( bool isPrimary )
+{
+  return mImpl->NewCommandBuffer( vk::CommandBufferAllocateInfo{}.setLevel(
+    isPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary
+  ) );
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics
