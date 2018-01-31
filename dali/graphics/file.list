@@ -15,6 +15,7 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/vulkan-pipeline.cpp \
     $(graphics_src_dir)/vulkan/vulkan-buffer.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
-    $(graphics_src_dir)/vulkan/vulkan-shader.cpp
+    $(graphics_src_dir)/vulkan/vulkan-shader.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-graphics-controller.cpp
 
 

@@ -42,22 +42,23 @@ public:
   {
     COLOR,
     DEPTH_STENCIL,
+    DEPTH,
     INPUT,
     RESOLVE,
     PRESERVE
   };
 
-  static Handle<Framebuffer> New( Graphics& graphics, uint32_t width, uint32_t height );
+  static FramebufferRef New( Graphics& graphics, uint32_t width, uint32_t height );
 
   uint32_t GetWidth() const;
 
   uint32_t GetHeight() const;
 
-  Handle<Image> GetAttachmentImage( AttachmentType type, uint32_t index ) const;
+  ImageViewRef GetAttachmentImageView( AttachmentType type, uint32_t index ) const;
 
-  Handle<ImageView> GetAttachmentImageView( AttachmentType type, uint32_t index ) const;
+  void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
 
-  void SetAttachment( Handle<Image> image, Framebuffer::AttachmentType type, uint32_t index );
+
 
 private:
 

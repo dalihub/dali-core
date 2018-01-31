@@ -78,6 +78,12 @@ void Graphics::PreRender(Dali::Graphics::FBID framebufferId)
   surface.AcquireNextImage();
 }
 
+Dali::Graphics::API::Controller& Graphics::GetController()
+{
+  auto ptr = this;
+  return *reinterpret_cast<Dali::Graphics::API::Controller*>(ptr);
+}
+
 /*
  * Postrender
  */

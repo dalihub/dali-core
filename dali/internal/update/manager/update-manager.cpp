@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,50 +18,50 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
 
+// EXTERNAL INCLUDES
+#include <dali/graphics/graphics-controller.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/threading/mutex.h>
 
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/render-controller.h>
-#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/graphics/graphics.h>
 
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/common/message.h>
-
+#include <dali/internal/common/shader-data.h>
+#include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/effects/shader-factory.h>
-#include <dali/internal/event/animation/animation-playlist.h>
-
-#include <dali/internal/update/animation/scene-graph-animator.h>
+#include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/render/common/render-manager.h>
+#include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/graphics/graphics-algorithms.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
-#include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-
-#include <dali/graphics/graphics-controller.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -173,7 +173,8 @@ struct UpdateManager::Impl
         RenderManager& renderManager,
         RenderQueue& renderQueue,
         SceneGraphBuffers& sceneGraphBuffers,
-        RenderTaskProcessor& renderTaskProcessor )
+        RenderTaskProcessor& renderTaskProcessor,
+        Integration::Graphics::Graphics& graphics )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
     transformManager(),
@@ -187,6 +188,7 @@ struct UpdateManager::Impl
     renderQueue( renderQueue ),
     renderInstructions( renderManager.GetRenderInstructionContainer() ),
     renderTaskProcessor( renderTaskProcessor ),
+    graphics( graphics ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     taskList( renderMessageDispatcher ),
     systemLevelTaskList( renderMessageDispatcher ),
@@ -270,6 +272,7 @@ struct UpdateManager::Impl
   RenderQueue&                         renderQueue;                   ///< Used to queue messages for the next render
   RenderInstructionContainer&          renderInstructions;            ///< Used to prepare the render instructions
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
+  Integration::Graphics::Graphics&     graphics;                      ///< Graphics
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -309,40 +312,40 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
 
+
 private:
 
   Impl( const Impl& ); ///< Undefined
   Impl& operator=( const Impl& ); ///< Undefined
 };
 
-UpdateManager::UpdateManager( NotificationManager& notificationManager,
-                              CompleteNotificationInterface& animationFinishedNotifier,
-                              PropertyNotifier& propertyNotifier,
-                              DiscardQueue& discardQueue,
-                              RenderController& controller,
-                              RenderManager& renderManager,
-                              RenderQueue& renderQueue,
-                              RenderTaskProcessor& renderTaskProcessor )
-  : mImpl(NULL)
+UpdateManager::UpdateManager( NotificationManager&             notificationManager,
+                              CompleteNotificationInterface&   animationFinishedNotifier,
+                              PropertyNotifier&                propertyNotifier,
+                              DiscardQueue&                    discardQueue,
+                              RenderController&                controller,
+                              RenderManager&                   renderManager,
+                              RenderQueue&                     renderQueue,
+                              RenderTaskProcessor&             renderTaskProcessor,
+                              Integration::Graphics::Graphics& graphics )
+: mImpl( new Impl( notificationManager,
+                   animationFinishedNotifier,
+                   propertyNotifier,
+                   discardQueue,
+                   controller,
+                   renderManager,
+                   renderQueue,
+                   mSceneGraphBuffers,
+                   renderTaskProcessor,
+                   graphics) )
 {
-  mImpl = new Impl( notificationManager,
-                    animationFinishedNotifier,
-                    propertyNotifier,
-                    discardQueue,
-                    controller,
-                    renderManager,
-                    renderQueue,
-                    mSceneGraphBuffers,
-                    renderTaskProcessor );
-
-
-  Dali::Graphics::Controller gfxController;
 }
 
 UpdateManager::~UpdateManager()
 {
-  delete mImpl;
+  // required due to unique_ptr to mImpl
 }
+
 
 void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel )
 {
@@ -895,8 +898,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //reset the update buffer index and make sure there is enough room in the instruction container
     if( mImpl->renderersAdded )
     {
-      mImpl->renderInstructions.ResetAndReserve( bufferIndex,
-                                                 mImpl->taskList.GetTasks().Count() + mImpl->systemLevelTaskList.GetTasks().Count() );
+      mImpl->renderInstructions.ResetAndReserve(bufferIndex,
+                                                mImpl->taskList.GetTasks().Count() +
+                                                    mImpl->systemLevelTaskList.GetTasks().Count());
 
       if ( NULL != mImpl->root )
       {
@@ -920,6 +924,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                                               isRenderingToFbo );
         }
       }
+      // generate graphics objects
+      SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
 

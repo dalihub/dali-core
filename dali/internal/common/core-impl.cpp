@@ -124,7 +124,8 @@ Core::Core( RenderController& renderController,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mRenderTaskProcessor );
+                                      *mRenderTaskProcessor,
+                                       graphics );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 

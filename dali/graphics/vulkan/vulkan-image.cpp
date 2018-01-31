@@ -194,6 +194,17 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCr
   return retval;
 }
 
+ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
+{
+  // create reference, image may be null
+  auto retval = ImageViewRef( new ImageView( graphics, image, vk::ImageViewCreateInfo{} ) );
+  if(image)
+  {
+
+  }
+  return retval;
+}
+
 ImageView::ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo )
 {
   mImpl = MakeUnique<Impl>( *this, graphics, image, createInfo );

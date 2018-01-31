@@ -28,7 +28,7 @@ namespace Vulkan
 struct Framebuffer::Impl
 {
   Impl( Framebuffer& owner, Graphics& graphics, uint32_t width, uint32_t height )
-  : mInterface( owner ), mGraphics( graphics )
+  : mInterface( owner ), mGraphics( graphics ), mColorImageViewAttachments{}, mDepthStencilImageViewAttachment()
   {
   }
 
@@ -152,25 +152,44 @@ struct Framebuffer::Impl
     mVkFramebuffer = VkAssert( mGraphics.GetDevice().createFramebuffer( info, mGraphics.GetAllocator() ) );
   }
 
-  void SetAttachment( Handle<Image> image, Framebuffer::AttachmentType type, uint32_t index )
+  void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
   {
-    std::vector<Handle<Image>>& attachments =
-      type == AttachmentType::COLOR ? mColorAttachments : mDepthStencilAttachments;
-
-    if( attachments.size() <= index )
+    // TODO: all array-type atyachments
+    if( type == AttachmentType::COLOR )
     {
-      attachments.resize( index + 1 );
+      auto& attachments = mColorImageViewAttachments;
+      if( attachments.size() <= index )
+      {
+        attachments.resize( index + 1 );
+      }
+      attachments[index] = imageViewRef;
     }
-    attachments[index] = image;
-  }
-
-  ImageRef GetAttachmentImage( AttachmentType type, uint32_t index ) const
-  {
-    return ImageRef();
+    else if( type == AttachmentType::DEPTH_STENCIL )
+    {
+      mDepthStencilImageViewAttachment = imageViewRef;
+    }
   }
 
   ImageViewRef GetAttachmentImageView( AttachmentType type, uint32_t index ) const
   {
+    switch( type )
+    {
+      case AttachmentType::COLOR:
+      {
+        return mColorImageViewAttachments[index];
+      }
+      case AttachmentType::DEPTH_STENCIL:
+      {
+        return mDepthStencilImageViewAttachment;
+      }
+      case AttachmentType::DEPTH:
+      case AttachmentType::INPUT:
+      case AttachmentType::RESOLVE:
+      case AttachmentType::PRESERVE:
+      {
+        return ImageViewRef();
+      }
+    }
     return ImageViewRef();
   }
 
@@ -199,26 +218,25 @@ struct Framebuffer::Impl
   Framebuffer& mInterface;
   Graphics&    mGraphics;
 
-  uint32_t                   mWidth;
-  uint32_t                   mHeight;
-  std::vector<Handle<Image>> mColorAttachments;
-  std::vector<Handle<Image>> mDepthStencilAttachments;
+  uint32_t mWidth;
+  uint32_t mHeight;
 
-  std::vector<ImageView> mImageViewAttachments;
-  vk::Framebuffer        mVkFramebuffer;
-  vk::RenderPass         mVkRenderPass;
+  std::vector<ImageViewRef> mColorImageViewAttachments;
+  ImageViewRef              mDepthStencilImageViewAttachment;
+  vk::Framebuffer           mVkFramebuffer;
+  vk::RenderPass            mVkRenderPass;
 
   bool mInitialised{false};
 };
 
-Handle<Framebuffer> Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
+FramebufferRef Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
 {
   return FramebufferRef();
 }
 
-void Framebuffer::SetAttachment( Handle<Image> image, Framebuffer::AttachmentType type, uint32_t index )
+void Framebuffer::SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
 {
-  mImpl->SetAttachment( image, type, index );
+  mImpl->SetAttachment( imageViewRef, type, index );
 }
 
 uint32_t Framebuffer::GetWidth() const
@@ -229,11 +247,6 @@ uint32_t Framebuffer::GetWidth() const
 uint32_t Framebuffer::GetHeight() const
 {
   return mImpl->mHeight;
-}
-
-Handle<Image> Framebuffer::GetAttachmentImage( AttachmentType type, uint32_t index ) const
-{
-  return mImpl->GetAttachmentImage( type, index );
 }
 
 Handle<ImageView> Framebuffer::GetAttachmentImageView( AttachmentType type, uint32_t index ) const

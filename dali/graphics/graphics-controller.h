@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace Graphics
 /**
  * @brief Controller implementation of the graphics API
  */
-class Controller final : public API::Controller
+class Controller : public API::Controller
 {
 public:
   virtual API::Accessor< API::Shader > CreateShader(
@@ -66,7 +66,8 @@ public:
 
   virtual ~Controller() = default;
 
-private:
+
+protected:
   ObjectOwner< API::Shader >        mShaders;
   ObjectOwner< API::Texture >       mTextures;
   ObjectOwner< API::TextureSet >    mTextureSets;

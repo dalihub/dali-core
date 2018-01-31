@@ -27,7 +27,10 @@ namespace Dali
 {
 namespace Graphics
 {
-
+namespace API
+{
+class Controller;
+}
 // frame buffer id
 using FBID = uint32_t;
 
@@ -76,6 +79,12 @@ public:
    * Postrender
    */
   void PostRender( Dali::Graphics::FBID framebufferId = 0u );
+
+  /**
+   * Returns controller object
+   * @return
+   */
+  Dali::Graphics::API::Controller& GetController();
 
   // this function is used only by the standalone test
   template <class T>

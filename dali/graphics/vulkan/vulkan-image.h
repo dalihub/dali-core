@@ -134,7 +134,24 @@ class ImageView : public VkManaged
 {
 public:
 
+  /**
+   * Creates ImageView according to the given spec
+   * @param graphics
+   * @param image
+   * @param info
+   * @return
+   */
   static ImageViewRef New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info );
+
+  /**
+   * Creates default image view which includes single layer and level, aspect
+   * based on image format, whole area, always 2D
+   * @param graphics
+   * @param image
+   * @return
+   */
+  static ImageViewRef New( Graphics& graphics, ImageRef image = ImageRef() );
+
 
   virtual ~ImageView() override;
 
@@ -149,6 +166,92 @@ public:
    * @return
    */
   ImageRef GetImage() const;
+
+  /**
+   *
+   * @param format
+   */
+  void SetFormat( vk::Format format );
+
+  /**
+   *
+   * @param componentMapping
+   */
+  void SetComponents( vk::ComponentMapping componentMapping );
+
+  /**
+   *
+   * @param viewType
+   */
+  void SetViewType( vk::ImageViewType viewType );
+
+  /**
+   *
+   * @param layerCount
+   */
+  void SetLayerCount( uint32_t layerCount );
+
+  /**
+   *
+   * @param layerCount
+   */
+  void SetLevelCount( uint32_t layerCount );
+
+  /**
+   *
+   * @param layerCount
+   */
+  void SetBaseMipmapLevel( uint32_t layerCount );
+
+  /**
+   *
+   * @param layer
+   */
+  void SetBaseArrayLayer( uint32_t layer );
+
+  /**
+   *
+   * @param aspectMask
+   */
+  void SetImageAspectMask( vk::ImageAspectFlags aspectMask );
+
+  /**
+   *
+   * @return
+   */
+  uint32_t GetLayerCount() const;
+
+  /**
+   *
+   * @return
+   */
+  uint32_t GetLevelCount() const;
+
+  /**
+   *
+   * @return
+   */
+  uint32_t GetBaseMipmapLevel() const;
+
+  /**
+   *
+   * @return
+   */
+  uint32_t GetBaseArrayLayer() const;
+
+  /**
+   *
+   * @return
+   */
+  vk::ImageAspectFlags GetImageAspectMask() const;
+
+  /**
+   * Creates immediately the image view. Otherwise implementation will
+   * pick the right time to create the object. All setters are disabled
+   * once the view has been created
+   * @return
+   */
+  bool Create();
 
 private:
 
