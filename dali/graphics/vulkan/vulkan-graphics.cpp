@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,28 @@
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
-#include <dali/graphics/vulkan/vulkan-device-memory-manager.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
+
+#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-shader.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
 #endif
 
+#ifndef VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+#define VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME "VK_KHR_wayland_surface"
+#endif
+
 #ifndef VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
+
+#include <iostream>
 
 namespace Dali
 {
@@ -39,36 +52,145 @@ using VkSurfaceFactory = Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 namespace Vulkan
 {
 
+const auto VALIDATION_LAYERS = std::vector< const char* >{
+
+  //"VK_LAYER_LUNARG_screenshot",           // screenshot
+  "VK_LAYER_RENDERDOC_Capture",
+  "VK_LAYER_LUNARG_parameter_validation", // parameter
+  //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+  "VK_LAYER_LUNARG_monitor",             // monitor
+  "VK_LAYER_LUNARG_swapchain",           // swapchain
+  "VK_LAYER_GOOGLE_threading",           // threading
+  "VK_LAYER_LUNARG_api_dump",            // api
+  "VK_LAYER_LUNARG_object_tracker",      // objects
+  "VK_LAYER_LUNARG_core_validation",     // core
+  "VK_LAYER_GOOGLE_unique_objects",      // unique objects
+  "VK_LAYER_LUNARG_standard_validation", // standard
+};
+
 Graphics::Graphics() = default;
 
 Graphics::~Graphics() = default;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+
+Platform Graphics::GetDefaultPlatform() const
+{
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+  mPlatform = Platform::WAYLAND;
+#elif VK_USE_PLATFORM_XCB_KHR
+  mPlatform = Platform::XCB;
+#elif VK_USE_PLATFORM_XLIB_KHR
+  mPlatform =  Platform::XLIB;
+#else
+  return mPlatform;
+#endif
+}
+
+std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
+{
+  auto extensions = vk::enumerateInstanceExtensionProperties();
+
+  std::string extensionName;
+
+  bool xlibAvailable    { false };
+  bool xcbAvailable     { false };
+  bool waylandAvailable { false };
+
+  for( auto&& ext : extensions.value )
+  {
+    extensionName = ext.extensionName;
+    if( extensionName == VK_KHR_XCB_SURFACE_EXTENSION_NAME )
+    {
+      xcbAvailable = true;
+    }
+    else if( extensionName == VK_KHR_XLIB_SURFACE_EXTENSION_NAME )
+    {
+      xlibAvailable = true;
+    }
+    else if( extensionName == VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME )
+    {
+      waylandAvailable = true;
+    }
+  }
+
+  std::vector<const char*> retval;
+
+  // depending on the platform validate extensions
+  auto platform = GetDefaultPlatform();
+
+  if( platform != Platform::UNDEFINED )
+  {
+    if (platform == Platform::XCB && xcbAvailable)
+    {
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::XLIB && xlibAvailable)
+    {
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::WAYLAND && waylandAvailable)
+    {
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
+  }
+  else // try to determine the platform based on available extensions
+  {
+    if (xcbAvailable)
+    {
+      mPlatform = Platform::XCB;
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (xlibAvailable)
+    {
+      mPlatform = Platform::XLIB;
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (waylandAvailable)
+    {
+      mPlatform = Platform::WAYLAND;
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
+    else
+    {
+      // can't determine the platform!
+      mPlatform = Platform::UNDEFINED;
+    }
+  }
+
+  // other essential extensions
+  retval.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
+  retval.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
+
+  return retval;
+}
 
 void Graphics::Create()
 {
-  CreateInstance();
+
+  auto extensions = PrepareDefaultInstanceExtensions();
+
+  auto layers = vk::enumerateInstanceLayerProperties();
+  std::vector<const char*> validationLayers;
+  for( auto&& reqLayer : VALIDATION_LAYERS )
+  {
+    for( auto&& prop : layers.value )
+    {
+      //std::cout << prop.layerName << std::endl;
+      if( std::string(prop.layerName) == reqLayer )
+      {
+        validationLayers.push_back(reqLayer);
+      }
+    }
+  }
+
+  CreateInstance(extensions, validationLayers);
   PreparePhysicalDevice();
 }
 
-void Graphics::CreateInstance()
+void Graphics::CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers )
 {
   auto info = vk::InstanceCreateInfo{};
-  auto extensions =
-      std::vector< const char* >{VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-                                 VK_KHR_XLIB_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME };
-
-  const auto validationLayers = std::vector< const char* >{
-      //"VK_LAYER_LUNARG_screenshot",           // screenshot
-      "VK_LAYER_LUNARG_parameter_validation", // parameter
-      //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
-      "VK_LAYER_LUNARG_monitor",             // monitor
-      "VK_LAYER_LUNARG_swapchain",           // swapchain
-      "VK_LAYER_GOOGLE_threading",           // threading
-      "VK_LAYER_LUNARG_api_dump",            // api
-      "VK_LAYER_LUNARG_object_tracker",      // objects
-      "VK_LAYER_LUNARG_core_validation",     // core
-      "VK_LAYER_GOOGLE_unique_objects",      // unique objects
-      "VK_LAYER_LUNARG_standard_validation", // standard
-  };
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
@@ -87,8 +209,7 @@ void Graphics::DestroyInstance()
   }
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
+
 void Graphics::PreparePhysicalDevice()
 {
   auto devices = VkAssert(mInstance.enumeratePhysicalDevices());
@@ -120,7 +241,7 @@ void Graphics::PreparePhysicalDevice()
 
   GetQueueFamilyProperties();
 
-  mDeviceMemoryManager = MakeUnique<DeviceMemoryManager>( *this );
+  mDeviceMemoryManager = GpuMemoryManager::New( *this );
 }
 #pragma GCC diagnostic pop
 
@@ -357,16 +478,113 @@ Queue& Graphics::GetPresentQueue() const
   return *mPresentQueue.get();
 }
 
-std::unique_ptr< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
+Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
 {
-  auto cmdpool = std::unique_ptr< CommandPool >(new CommandPool(*this, info));
+  auto cmdpool = CommandPool::New( *this, vk::CommandPoolCreateInfo{}.
+                                                                       setQueueFamilyIndex( 0u ).
+                                                                       setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ) );
   return cmdpool;
 }
 
 Surface& Graphics::GetSurface( FBID surfaceId )
 {
+  // TODO: FBID == 0 means default framebuffer, but there should be no
+  // such thing as default framebuffer.
+  if( surfaceId == 0 )
+  {
+    return *mSurfaceFBIDMap.begin()->second.get();
+  }
   return *mSurfaceFBIDMap[surfaceId].get();
 }
+
+// TODO: all this stuff should go into some vulkan cache
+
+void Graphics::AddBuffer( Handle<Buffer> buffer )
+{
+  mBuffersCache.push_back( buffer );
+}
+
+void Graphics::AddImage( Handle<Image> image )
+{
+  mImageCache.push_back( image );
+}
+
+void Graphics::AddPipeline( Handle<Pipeline> pipeline )
+{
+  mPipelineCache.push_back( pipeline );
+}
+
+void Graphics::AddShader( Handle<Shader> shader )
+{
+  mShaderCache.push_back( shader );
+}
+
+void Graphics::AddCommandPool( Handle<CommandPool> pool )
+{
+  mCommandPoolCache.push_back( pool );
+}
+
+void Graphics::AddDescriptorPool( Handle<DescriptorPool> pool )
+{
+  mDescriptorPoolCache.push_back( pool );
+}
+
+void Graphics::AddFramebuffer( Handle<Framebuffer> framebuffer )
+{
+  mFramebufferCache.push_back( framebuffer );
+}
+
+void Graphics::RemoveBuffer( Buffer& buffer )
+{
+  auto index = 0u;
+  for( auto&& iter : mBuffersCache )
+  {
+    if( &*iter == &buffer )
+    {
+      iter.Reset();
+      mBuffersCache.erase( mBuffersCache.begin()+index );
+      return;
+    }
+  }
+}
+
+void Graphics::RemoveShader( Shader& shader )
+{
+  auto index = 0u;
+  for( auto&& iter : mShaderCache )
+  {
+    if( &*iter == &shader )
+    {
+      iter.Reset();
+      mShaderCache.erase( mShaderCache.begin()+index );
+      return;
+    }
+    ++index;
+  }
+}
+
+void Graphics::RemoveCommandPool( CommandPool& commandPool )
+{
+  NotImplemented();
+}
+
+void Graphics::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool )
+{
+  NotImplemented();
+}
+
+Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
+{
+  for( auto&& iter : mShaderCache )
+  {
+    if( iter->GetVkShaderModule() == shaderModule )
+    {
+      return Handle<Shader>(&*iter);
+    }
+  }
+  return Handle<Shader>();
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics

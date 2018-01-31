@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULKAN_COMMANDPOOL_H
-#define DALI_GRAPHICS_VULKAN_COMMANDPOOL_H
+#ifndef DALI_GRAPHICS_VULKAN_COMMANDPOOL
+#define DALI_GRAPHICS_VULKAN_COMMANDPOOL
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -30,26 +30,75 @@ namespace Vulkan
 
 class Graphics;
 class CommandBuffer;
-class CommandPool
+
+using CommandPoolHandle = Handle<class CommandPool>;
+
+class CommandPool : public VkManaged
 {
+
 public:
 
-  CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
-  ~CommandPool();
+  /**
+   *
+   * @param graphics
+   * @param createInfo
+   * @return
+   */
+  static CommandPoolHandle New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
 
-  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( const vk::CommandBufferAllocateInfo& info );
+  /**
+   *
+   * @param graphics
+   * @return
+   */
+  static CommandPoolHandle New( Graphics& graphics );
 
-  std::unique_ptr<CommandBuffer> AllocateCommandBuffer( vk::CommandBufferLevel level );
+  ~CommandPool() override;
 
+  /**
+   *
+   * @return
+   */
   vk::CommandPool GetPool() const;
 
+  /**
+   *
+   * @return
+   */
+  Graphics& GetGraphics() const;
+
+  /**
+   *
+   * @param allocateInfo
+   * @return
+   */
+  Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
+
+  /**
+   *
+   * @param isPrimary
+   * @return
+   */
+  Handle<CommandBuffer> NewCommandBuffer( bool isPrimary = true );
+
+public:
+
+  bool OnDestroy() override;
+
 private:
-  Graphics&       mGraphics;
-  vk::CommandPool mPool;
+
+  CommandPool();
+
+  CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
+
 };
+
 
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_COMMANDPOOL_H
+#endif // DALI_GRAPHICS_VULKAN_COMMANDPOOL

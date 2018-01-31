@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_VULKAN_QUEUE_H
-#define DALI_GRAPHICS_VULKAN_QUEUE_H
+#ifndef DALI_GRAPHICS_VULKAN_QUEUE
+#define DALI_GRAPHICS_VULKAN_QUEUE
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ class Fence;
 class Submission
 {
 public:
-  Submission(Fence& fence);
+  Submission(Handle<Fence> fence);
 
   bool WaitForFence(uint32_t timeout = 0u);
 
 private:
   // todo: possibly resources locks stored here?
-  FenceRef mFences;
+  Handle<Fence> mFences;
 };
 
 class Queue
@@ -51,10 +51,10 @@ public:
 
   /** Submits command buffers */
   std::unique_ptr< Submission > Submit(const std::vector< CommandBufferRef >& commandBuffers,
-                                       Fence&                                 fence);
+                                       Handle<Fence>                                 fence);
 
   /** Helper function to submit single command buffer */
-  std::unique_ptr< Submission > Submit(CommandBuffer& commandBuffer, Fence& fence);
+  std::unique_ptr< Submission > Submit(CommandBufferRef commandBuffer, Handle<Fence> fence);
 
   void WaitIdle() const;
 
@@ -89,7 +89,9 @@ private:
 };
 
 } // namespace Vulkan
+
 } // namespace Graphics
+
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_QUEUE_H
+#endif // DALI_GRAPHICS_VULKAN_QUEUE

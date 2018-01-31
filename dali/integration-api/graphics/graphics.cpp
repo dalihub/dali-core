@@ -59,6 +59,9 @@ Dali::Graphics::FBID Graphics::Create(
   // create device
   mGraphicsImpl->CreateDevice();
 
+  // create swapchain
+  mGraphicsImpl->GetSurface( retval ).CreateSwapchain();
+
   return retval;
 }
 

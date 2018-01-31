@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_VULKAN_FENCE_H
-#define DALI_GRAPHICS_VULKAN_FENCE_H
+#ifndef DALI_GRAPHICS_VULKAN_FENCE
+#define DALI_GRAPHICS_VULKAN_FENCE
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,27 +29,47 @@ namespace Vulkan
 {
 
 class Graphics;
-class Fence final
+class Fence : public VkManaged
 {
 public:
 
-  Fence( Graphics& graphics );
+  static Handle<Fence> New( Graphics& graphics );
+
   Fence( Fence&& ) = default;
   ~Fence();
 
+private:
+
+  Fence( Graphics& graphics );
+
+public:
+
+  const Fence& ConstRef() const;
+
+  Fence& Ref();
+
+  /**
+   *
+   * @param timeout
+   * @return
+   */
   bool Wait( uint32_t timeout = 0u );
+
+  /**
+   *
+   */
   void Reset();
 
   vk::Fence GetFence() const;
 
 private:
 
-  Graphics& mGraphics;
-  vk::Fence mFence;
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_FENCE_H
+#endif // DALI_GRAPHICS_VULKAN_FENCE

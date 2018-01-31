@@ -56,20 +56,20 @@ inline PrepareSemaphoresData PrepareSemaphores(const std::vector< CommandBufferR
   PrepareSemaphoresData retval{};
   for(auto& cmdbufref : commandBuffers)
   {
-    auto& cmdbuf = cmdbufref.get();
+    auto& cmdbuf = cmdbufref;
     if(!retval.signalSemaphores.empty())
     {
       retval.signalSemaphores.insert(retval.signalSemaphores.end(),
-                                     cmdbuf.GetSignalSemaphores().begin(),
-                                     cmdbuf.GetSignalSemaphores().end());
+                                     cmdbuf->GetSignalSemaphores().begin(),
+                                     cmdbuf->GetSignalSemaphores().end());
     }
     if(!retval.waitSemaphores.empty())
     {
-      retval.waitSemaphores.insert(retval.waitSemaphores.end(), cmdbuf.GetSWaitSemaphores().begin(),
-                                   cmdbuf.GetSWaitSemaphores().end());
+      retval.waitSemaphores.insert(retval.waitSemaphores.end(), cmdbuf->GetSWaitSemaphores().begin(),
+                                   cmdbuf->GetSWaitSemaphores().end());
       retval.waitDstStageMasks.insert(retval.waitDstStageMasks.end(),
-                                      cmdbuf.GetWaitSemaphoreStages().begin(),
-                                      cmdbuf.GetWaitSemaphoreStages().end());
+                                      cmdbuf->GetWaitSemaphoreStages().begin(),
+                                      cmdbuf->GetWaitSemaphoreStages().end());
     }
   }
   return std::move(retval);
@@ -77,13 +77,13 @@ inline PrepareSemaphoresData PrepareSemaphores(const std::vector< CommandBufferR
 }
 
 // submission
-Submission::Submission(Fence& fence) : mFences(fence)
+Submission::Submission(Handle<Fence> fence) : mFences(fence)
 {
 }
 
 bool Submission::WaitForFence(uint32_t timeout)
 {
-  return mFences.get().Wait(timeout);
+  return mFences->Wait(timeout);
 }
 
 // queue
@@ -97,7 +97,7 @@ Queue::~Queue() // queues are non-destructible
 {
 }
 
-std::unique_ptr< Submission > Queue::Submit(CommandBuffer& commandBuffer, Fence& fence)
+std::unique_ptr< Submission > Queue::Submit( CommandBufferRef commandBuffer, Handle<Fence> fence)
 {
   auto buffers = std::vector< CommandBufferRef >({commandBuffer});
   return Submit(buffers, fence);
@@ -105,7 +105,7 @@ std::unique_ptr< Submission > Queue::Submit(CommandBuffer& commandBuffer, Fence&
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
-std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef >& commandBuffers, Fence& fence)
+std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef >& commandBuffers, Handle<Fence> fence)
 {
   // Prepare command buffers for submission
   auto buffers = PrepareBuffers(commandBuffers);
@@ -123,7 +123,7 @@ std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef 
   info.setPWaitSemaphores(semaphores.waitSemaphores.data());
   info.setPWaitDstStageMask(semaphores.waitDstStageMasks.data());
 
-  VkAssert(mQueue.submit(1, &info, fence.GetFence()));
+  VkAssert(mQueue.submit(1, &info, fence->GetFence()));
 
   return MakeUnique< Submission >(fence);
 }
@@ -134,7 +134,7 @@ std::vector< vk::CommandBuffer > Queue::PrepareBuffers(const std::vector< Comman
   std::vector< vk::CommandBuffer > retval(commandBuffers.size());
   for(uint32_t i = 0; i < commandBuffers.size(); ++i)
   {
-    retval[i] = commandBuffers[i].get().Get();
+    retval[i] = commandBuffers[i]->GetVkCommandBuffer();
   }
   return retval;
 }
