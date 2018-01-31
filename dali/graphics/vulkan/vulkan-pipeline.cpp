@@ -359,6 +359,10 @@ bool Pipeline::Compile()
   return mImpl->Compile();
 }
 
+vk::PipelineLayout Pipeline::GetVkPipelineLayout() const
+{
+  return mImpl->mPipelineLayout;
+}
 
 } // namespace Vulkan
 
