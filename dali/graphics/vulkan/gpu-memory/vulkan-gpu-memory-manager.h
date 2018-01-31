@@ -76,18 +76,10 @@ private:
    */
   GpuMemoryManager( Graphics& graphics );
 
-
-public:
-
-  class Impl;
-  GpuMemoryManager( Impl& impl );
-
-  static GpuMemoryManager&& GetInterface( Impl& impl );
-
 private:
 
-  Impl* mImpl { nullptr };
-  bool mWeak  { false };
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 }

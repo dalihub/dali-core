@@ -65,64 +65,24 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   {
     MemoryBlock() = default;
     ~MemoryBlock() = default;
-    /*
-    MemoryBlock& operator =( MemoryBlock&& ) = delete;
 
-    MemoryBlock(const MemoryBlock& obj)
-    {
-      Copy(std::move(obj));
-    }
-
-    MemoryBlock(MemoryBlock&& obj)
-    {
-      Copy(std::move(obj));
-    }
-
-    void Copy(const MemoryBlock&& obj)
-    {
-      requirements = obj.requirements;
-      offset = obj.offset;
-      size = obj.size;
-      alignment = obj.alignment;
-      refcount.store( obj.refcount );
-      memory = obj.memory;
-    }
-
-    MemoryBlock& operator=(const MemoryBlock& obj)
-    {
-      requirements = obj.requirements;
-      offset = obj.offset;
-      size = obj.size;
-      alignment = obj.alignment;
-      return *this;
-    }
-  */
     vk::MemoryRequirements  requirements {};
     vk::DeviceSize          offset { 0u };
     vk::DeviceSize          size { 0u };
     vk::DeviceSize          alignment { 0u };
     vk::DeviceMemory        memory { nullptr };
-//    std::atomic_uint        refcount { 0u };
   };
 
-  GpuMemoryDefaultAllocator( GpuMemoryManager::Impl& managerImpl )
-  : GpuMemoryAllocator(), mManagerImpl( managerImpl ),
-    mGraphics(GpuMemoryManager::GetInterface(managerImpl).GetGraphics())
+  GpuMemoryDefaultAllocator( GpuMemoryManager& manager )
+    : GpuMemoryAllocator(), mGpuManager( manager ),
+      mGraphics(manager.GetGraphics())
   {
 
   }
 
-  /**
-   *
-   */
   ~GpuMemoryDefaultAllocator() override = default;
 
-  /**
-   *
-   * @param requirements
-   * @param memoryProperties
-   * @return
-   */
+
   GpuMemoryBlockHandle Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
   {
 
@@ -155,10 +115,10 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  GpuMemoryBlockHandle Allocate( Buffer& buffer, vk::MemoryPropertyFlags memoryProperties ) override
+  virtual GpuMemoryBlockHandle Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return std::move(Allocate( mGraphics.GetDevice().getBufferMemoryRequirements( buffer.GetVkBuffer() ),
-                     memoryProperties ));
+    return Allocate( mGraphics.GetDevice().getBufferMemoryRequirements( buffer->GetVkBuffer() ),
+                     memoryProperties );
   }
 
   /**
@@ -169,8 +129,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    */
   GpuMemoryBlockHandle Allocate( Image& image, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return std::move(Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image.GetImage() ),
-                               memoryProperties ));
+    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image.GetImage() ),
+                               memoryProperties );
   }
 
   /**
@@ -227,7 +187,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
     NotImplemented();
   }
 
-  GpuMemoryManager::Impl& mManagerImpl;
+  GpuMemoryManager& mGpuManager;
   Graphics& mGraphics;
 
   std::vector<std::unique_ptr<GpuMemoryBlockHandle>> mUniqueBlocks;
@@ -235,15 +195,15 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
 
 struct GpuMemoryManager::Impl
 {
-  Impl( Graphics& graphics ) :
-    mGraphics( graphics )
+  Impl( Graphics& graphics, GpuMemoryManager& interface ) :
+    mGraphics( graphics ),
+    mMemoryManager( interface )
   {
 
   }
 
   ~Impl()
   {
-
   }
 
   bool Initialise()
@@ -259,19 +219,12 @@ struct GpuMemoryManager::Impl
 
   void CreateDefaultAllocator()
   {
-    mDefaultAllocator = MakeUnique<GpuMemoryDefaultAllocator>( *this );
-  }
-
-  uint32_t GenerateUID()
-  {
-    return ++mUID;
+    mDefaultAllocator = MakeUnique<GpuMemoryDefaultAllocator>( mMemoryManager );
   }
 
   Graphics& mGraphics;
-
+  GpuMemoryManager& mMemoryManager; // interface to this implementation
   std::unique_ptr<GpuMemoryAllocator> mDefaultAllocator; // default allocator, brute force allocation
-
-  uint32_t mUID { 0u };
 };
 
 /**
@@ -285,30 +238,16 @@ std::unique_ptr<GpuMemoryManager> GpuMemoryManager::New(Graphics& graphics)
   {
     return retval;
   }
-
   return nullptr;
 }
 
 GpuMemoryManager::GpuMemoryManager() = default;
 
-GpuMemoryManager::GpuMemoryManager(Impl& impl)
-{
-  mWeak = true;
-  mImpl = &impl;
-}
-
-GpuMemoryManager::~GpuMemoryManager()
-{
-  if( !mWeak && mImpl )
-  {
-    delete mImpl;
-  }
-}
+GpuMemoryManager::~GpuMemoryManager() = default;
 
 GpuMemoryManager::GpuMemoryManager(Graphics& graphics)
 {
-  //mImpl = std::unique_ptr<Impl, std::default_delete<GpuMemoryManager::Impl>>( new Impl(graphics) );
-  mImpl = new Impl(graphics);
+  mImpl = std::unique_ptr<Impl, std::default_delete<GpuMemoryManager::Impl>>( new Impl(graphics, *this) );
 }
 
 GpuMemoryAllocator& GpuMemoryManager::GetDefaultAllocator() const
@@ -332,11 +271,6 @@ bool GpuMemoryManager::UnregisterAllocator( GpuMemoryAllocatorUID allocatorHandl
 Graphics& GpuMemoryManager::GetGraphics() const
 {
   return mImpl->mGraphics;
-}
-
-GpuMemoryManager&& GpuMemoryManager::GetInterface( Impl& impl )
-{
-  return std::move(GpuMemoryManager(impl));
 }
 
 }
