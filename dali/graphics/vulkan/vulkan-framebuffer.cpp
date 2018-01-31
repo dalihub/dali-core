@@ -25,25 +25,22 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
 struct Framebuffer::Impl
 {
-  Impl( Framebuffer& owner, Graphics& graphics, uint32_t width, uint32_t height ) :
-    mInterface( owner ),
-    mGraphics( graphics )
+  Impl( Framebuffer& owner, Graphics& graphics, uint32_t width, uint32_t height )
+  : mInterface( owner ), mGraphics( graphics )
   {
-
   }
 
   // Framebuffer creation may be deferred
   bool Initialise()
   {
-    if(mInitialised)
+    if( mInitialised )
     {
       return true;
     }
 
-    if(!Validate())
+    if( !Validate() )
     {
       return false;
     }
@@ -83,6 +80,77 @@ struct Framebuffer::Impl
     mInitialised = true;
   }
 
+  // creating render pass may happen either as deferred or
+  // when framebuffer is initialised into immutable state
+  void CreateRenderPass()
+  {
+    // for each attachment...
+#if 0
+    auto attRef = vk::AttachmentReference{};
+
+    // 1. Need to know layout during render pass ( Image::GetLayout() )
+    // 2. Usually it's going to be:
+    //    - color_attachment_optimal
+    //    - depth_stencil_attachment_optimal
+    //attRef.setLayout();
+    //attRef.setAttachment();
+
+    // Single subpass support, all attachments used
+    // TODO: input, preserve, resolve
+    // TODO: create subpasses
+
+    // creating single subpass per framebuffer
+    auto subpassDesc = vk::SubpassDescription{};
+    subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
+    subpassDesc.setColorAttachmentCount( 0 );
+    subpassDesc.setInputAttachmentCount( 0 );
+    subpassDesc.setPDepthStencilAttachment( nullptr );
+    subpassDesc.setPColorAttachments( nullptr );
+    subpassDesc.setPInputAttachments( nullptr );
+    subpassDesc.setPPreserveAttachments( nullptr );
+    subpassDesc.setPResolveAttachments( nullptr );
+
+    // create compatible render pass
+    auto rpInfo = vk::RenderPassCreateInfo{};
+    //rpInfo.setAttachmentCount( mAttachments.size() );
+    //rpInfo.setPAttachments( )
+    rpInfo.setDependencyCount( 0 );
+    rpInfo.setPDependencies( nullptr );
+    rpInfo.setPSubpasses( &subpassDesc );
+    rpInfo.setSubpassCount( 1 );
+#endif
+  }
+
+  void InitialiseAttachments()
+  {
+    ImageRef                attachment;
+    vk::ImageViewCreateInfo info;
+    info.setViewType( vk::ImageViewType::e2D );
+    info.setSubresourceRange( //get layercount, get level count
+      vk::ImageSubresourceRange{}.setLevelCount( 1 ).setLayerCount( 1 ).setBaseMipLevel( 0 ).setBaseArrayLayer( 0 ) );
+    info.setImage( attachment->GetVkImage() ); //
+    info.setComponents( vk::ComponentMapping(
+      vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA ) );
+    info.setFormat( vk::Format::eD16Unorm ); // get format
+
+    //ImageViewRef ref = ImageView::New( attachment );
+  }
+
+  void CreateFramebuffer()
+  {
+    // assert if framebuffer is already created
+    InitialiseAttachments();
+
+    vk::FramebufferCreateInfo info;
+    info.setRenderPass( mVkRenderPass )
+      .setPAttachments( nullptr ) // attach imageviews, imageviews are created from supplied images
+      .setLayers( 1 )
+      .setWidth( mWidth )
+      .setHeight( mHeight )
+      .setAttachmentCount( 1 );
+
+    mVkFramebuffer = VkAssert( mGraphics.GetDevice().createFramebuffer( info, mGraphics.GetAllocator() ) );
+  }
 
   void SetAttachment( Handle<Image> image, Framebuffer::AttachmentType type, uint32_t index )
   {
@@ -91,7 +159,7 @@ struct Framebuffer::Impl
 
     if( attachments.size() <= index )
     {
-      attachments.resize( index+1 );
+      attachments.resize( index + 1 );
     }
     attachments[index] = image;
   }
@@ -108,7 +176,7 @@ struct Framebuffer::Impl
 
   bool Validate()
   {
-    if( mWidth == 0u || mHeight == 0  )
+    if( mWidth == 0u || mHeight == 0 )
     {
       return false;
     }
@@ -116,7 +184,6 @@ struct Framebuffer::Impl
 
   ~Impl()
   {
-
   }
 
   vk::RenderPass GetVkRenderPass() const
@@ -129,21 +196,20 @@ struct Framebuffer::Impl
     return mVkFramebuffer;
   }
 
-  Framebuffer&            mInterface;
-  Graphics&               mGraphics;
+  Framebuffer& mInterface;
+  Graphics&    mGraphics;
 
-  uint32_t mWidth;
-  uint32_t mHeight;
-  std::vector<Handle<Image>>      mColorAttachments;
-  std::vector<Handle<Image>>      mDepthStencilAttachments;
+  uint32_t                   mWidth;
+  uint32_t                   mHeight;
+  std::vector<Handle<Image>> mColorAttachments;
+  std::vector<Handle<Image>> mDepthStencilAttachments;
 
-  std::vector<ImageView>  mImageViewAttachments;
-  vk::Framebuffer         mVkFramebuffer;
-  vk::RenderPass          mVkRenderPass;
+  std::vector<ImageView> mImageViewAttachments;
+  vk::Framebuffer        mVkFramebuffer;
+  vk::RenderPass         mVkRenderPass;
 
-  bool mInitialised { false };
+  bool mInitialised{false};
 };
-
 
 Handle<Framebuffer> Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
 {

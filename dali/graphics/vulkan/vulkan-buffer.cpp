@@ -87,7 +87,7 @@ struct Buffer::Impl final
     return mBuffer;
   }
 
-  void BindMemory( GpuMemoryBlockHandle handle )
+  void BindMemory( GpuMemoryBlockRef handle )
   {
     assert( mBuffer && "Buffer not initialised!");
     VkAssert(mGraphics.GetDevice().bindBufferMemory( mBuffer, (*handle), 0 ));
@@ -96,7 +96,7 @@ struct Buffer::Impl final
 
   Vulkan::Graphics&                     mGraphics;
   Vulkan::Buffer&                       mInterface;
-  GpuMemoryBlockHandle                  mDeviceMemory;
+  GpuMemoryBlockRef                  mDeviceMemory;
   vk::BufferCreateInfo                  mInfo;
   vk::Buffer                            mBuffer;
 };
@@ -107,7 +107,7 @@ struct Buffer::Impl final
  * @param size
  * @return
  */
-BufferHandle Buffer::New(Graphics& graphics, size_t size, Type type)
+BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
 {
   auto usageFlags = vk::BufferUsageFlags{};
 
@@ -145,7 +145,7 @@ vk::BufferUsageFlags Buffer::GetUsage() const
   return mImpl->GetUsage();
 }
 
-const GpuMemoryBlockHandle& Buffer::GetMemoryHandle() const
+const GpuMemoryBlockRef& Buffer::GetMemoryHandle() const
 {
   return mImpl->mDeviceMemory;
 }
@@ -160,7 +160,7 @@ vk::Buffer Buffer::GetVkBuffer() const
   return mImpl->GetVkBuffer();
 }
 
-void Buffer::BindMemory( const GpuMemoryBlockHandle& handle )
+void Buffer::BindMemory( const GpuMemoryBlockRef& handle )
 {
   mImpl->BindMemory( handle );
 }

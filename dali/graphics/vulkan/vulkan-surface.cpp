@@ -295,7 +295,7 @@ void Surface::InitialiseSwapchain()
 void Surface::AddSwapchainImage(vk::Image image, std::vector< SwapchainImage >& swapchainImages)
 {
   auto swapImage  = std::move(SwapchainImage{});
-  swapImage.image = MakeRef<Image>( mGraphics, image );
+  swapImage.image = NewRef<Image>( mGraphics, vk::ImageCreateInfo{}, image );
 
   // create ImageView
   CreateImageView(swapImage);
@@ -318,7 +318,7 @@ void Surface::CreateImageView(SwapchainImage& swapImage)
   auto ivInfo = vk::ImageViewCreateInfo{};
   ivInfo.setFormat(mFormat)
       .setComponents(VK_COMPONENT_MAPPING_RGBA)
-      .setImage(swapImage.image->GetImage())
+      .setImage(swapImage.image->GetVkImage())
       .setSubresourceRange(vk::ImageSubresourceRange()
                                .setAspectMask(vk::ImageAspectFlagBits::eColor)
                                .setBaseArrayLayer(0)
@@ -327,14 +327,14 @@ void Surface::CreateImageView(SwapchainImage& swapImage)
                                .setLevelCount(1))
       .setViewType(vk::ImageViewType::e2D);
 
-  swapImage.imageView = swapImage.image->CreateView( ivInfo );
+  swapImage.imageView = ImageView::New( mGraphics, swapImage.image, ivInfo );
 }
 
 void Surface::CreateFramebuffer(SwapchainImage& swapImage)
 {
   vk::FramebufferCreateInfo fbInfo;
   fbInfo.setAttachmentCount(mHasDepthStencil ? 2 : 1)
-      .setPAttachments(&swapImage.imageView->GetImageView()) // todo: add depth/stencil attachment
+      .setPAttachments(&swapImage.imageView->GetVkImageView()) // todo: add depth/stencil attachment
       .setHeight(mExtent.height)
       .setWidth(mExtent.width)
       .setLayers(1)
@@ -430,7 +430,7 @@ void Surface::CreateCommandBuffers()
     // Record layout transition for each image, after transition command buffers will be re-recorded
     // and will take in account only present -> color layout transition
     swapImage.layoutToColorCmdBuf->Begin();
-    swapImage.layoutToColorCmdBuf->ImageLayoutTransition(swapImage.image->GetImage(),
+    swapImage.layoutToColorCmdBuf->ImageLayoutTransition(swapImage.image->GetVkImage(),
                                                          swapImage.layout,
                                                          vk::ImageLayout::eColorAttachmentOptimal,
                                                          vk::ImageAspectFlagBits::eColor);
@@ -453,7 +453,7 @@ void Surface::CreateCommandBuffers()
   {
     swapImage.layoutToColorCmdBuf->Reset();
     swapImage.layoutToColorCmdBuf->Begin();
-    swapImage.layoutToColorCmdBuf->ImageLayoutTransition(swapImage.image->GetImage(),
+    swapImage.layoutToColorCmdBuf->ImageLayoutTransition(swapImage.image->GetVkImage(),
                                                          vk::ImageLayout::ePresentSrcKHR,
                                                          vk::ImageLayout::eColorAttachmentOptimal,
                                                          vk::ImageAspectFlagBits::eColor);

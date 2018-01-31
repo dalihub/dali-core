@@ -26,15 +26,8 @@ namespace Graphics
 {
 namespace Vulkan
 {
-class DeviceMemory;
 class Graphics;
 class GpuMemoryBlock;
-using GpuMemoryBlockHandle = Handle<GpuMemoryBlock>;
-
-using VertexBuffer = Buffer;
-using UniformBuffer = Buffer;
-using IndexBuffer = Buffer;
-using BufferHandle = Handle<Buffer>;
 
 class Buffer : public VkManaged
 {
@@ -63,7 +56,7 @@ public:
    * @param type
    * @return
    */
-  static BufferHandle New( Graphics& graphics, size_t size, Type type );
+  static BufferRef New( Graphics& graphics, size_t size, Type type );
 
   /**
    * Returns buffer usage flags
@@ -87,13 +80,13 @@ public:
    * Returns handle to the allocated memory
    * @return
    */
-  const GpuMemoryBlockHandle& GetMemoryHandle() const;
+  const GpuMemoryBlockRef& GetMemoryHandle() const;
 
   /**
    * Binds buffer memory
    * @param handle
    */
-  void BindMemory( const GpuMemoryBlockHandle& handle );
+  void BindMemory( const GpuMemoryBlockRef& handle );
 
 public:
 

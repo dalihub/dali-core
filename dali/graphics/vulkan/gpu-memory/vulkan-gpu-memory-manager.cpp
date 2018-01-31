@@ -83,7 +83,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   ~GpuMemoryDefaultAllocator() override = default;
 
 
-  GpuMemoryBlockHandle Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
+  GpuMemoryBlockRef Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
   {
 
     auto memoryTypeIndex = GetMemoryIndex(mGraphics.GetMemoryProperties(), requirements.memoryTypeBits,
@@ -96,7 +96,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
                                  .setAllocationSize(requirements.size), mGraphics.GetAllocator()));
 
     // add allocated memory to the heap of memories as a base handle
-    auto handle = GpuMemoryBlockHandle( new GpuMemoryBlock( *this, MakeUnique<MemoryBlock>() ) );
+    auto handle = GpuMemoryBlockRef( new GpuMemoryBlock( *this, MakeUnique<MemoryBlock>() ) );
 
     auto &block = *handle->GetData<MemoryBlock>();
     block.requirements = requirements;
@@ -105,7 +105,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
     block.alignment    = requirements.alignment;
     block.memory       = memory;
 
-    mUniqueBlocks.emplace_back( MakeUnique<GpuMemoryBlockHandle>(handle) );
+    mUniqueBlocks.emplace_back( MakeUnique<GpuMemoryBlockRef>(handle) );
     return handle;
   }
 
@@ -115,7 +115,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  virtual GpuMemoryBlockHandle Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) override
+  virtual GpuMemoryBlockRef Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) override
   {
     return Allocate( mGraphics.GetDevice().getBufferMemoryRequirements( buffer->GetVkBuffer() ),
                      memoryProperties );
@@ -127,9 +127,9 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  GpuMemoryBlockHandle Allocate( Image& image, vk::MemoryPropertyFlags memoryProperties ) override
+  GpuMemoryBlockRef Allocate( Image& image, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image.GetImage() ),
+    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image.GetVkImage() ),
                                memoryProperties );
   }
 
@@ -190,7 +190,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   GpuMemoryManager& mGpuManager;
   Graphics& mGraphics;
 
-  std::vector<std::unique_ptr<GpuMemoryBlockHandle>> mUniqueBlocks;
+  std::vector<std::unique_ptr<GpuMemoryBlockRef>> mUniqueBlocks;
 };
 
 struct GpuMemoryManager::Impl

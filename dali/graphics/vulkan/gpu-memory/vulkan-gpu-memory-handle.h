@@ -113,8 +113,6 @@ private:
   std::unique_ptr<Any>        mAllocationData; // may be any POD object pointer, depends on allocator
 };
 
-using GpuMemoryBlockHandle = Handle<GpuMemoryBlock>;
-
 }
 }
 }

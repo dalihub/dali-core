@@ -26,74 +26,104 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
 class ImageView;
-enum class ResourceOwnershipType
-{
-  OWNED,
-  EXTERNAL
-};
-
 class Image : public VkManaged
 {
 public:
+  /**
+   * Creates new managed Image object
+   * @param graphics
+   * @param createInfo
+   * @return
+   */
+  static ImageRef New( Graphics& graphics, vk::ImageCreateInfo createInfo );
+
+  /**
+   * Creates new managed object from external image, lifecycle must be managed
+   * explicitly, as well as any data
+   * @param graphics
+   * @param createInfo
+   * @param image
+   * @return
+   */
+  static ImageRef New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
+
+  /**
+   * Destructor
+   */
+  ~Image() override;
+
+  /**
+   * Returns underlying Vulkan object
+   * @return
+   */
+  vk::Image GetVkImage() const;
+
+  /**
+   * Returns VkImageLayout associated with the image
+   * @return
+   */
+  vk::ImageLayout GetVkImageLayout() const;
+
+  /**
+   * Returns width in pixels
+   * @return
+   */
+  uint32_t GetWidth() const;
+
+  /**
+   * Returns height in pixels
+   * @return
+   */
+  uint32_t GetHeight() const;
+
+  /**
+   * Returns number of layers
+   * @return
+   */
+  uint32_t GetLayerCount() const;
+
+  /**
+   * Returns number of mipmap levels
+   * @return
+   */
+  uint32_t GetLevelCount() const;
+
+  /**
+   * Returns pixel format
+   * @return
+   */
+  vk::Format GetVkFormat() const;
+
+  /**
+   * returns image type ( VkImageType)
+   * @return
+   */
+  vk::ImageType GetVkImageType() const;
+
+  /**
+   * Returns used image tiling mode
+   * @return
+   */
+  vk::ImageTiling GetVkImageTiling() const;
+
+  /**
+   * Binds image memory
+   * @param handle
+   */
+  void BindMemory( GpuMemoryBlockRef& handle );
+
   /**
    * Creates new VkImage with given specification, it doesn't
    * bind the memory.
    * @param graphics
    * @param createInfo
    */
-  Image(Graphics& graphics, const vk::ImageCreateInfo& createInfo);
-
-  /**
-   * Constructor creates wrapper on the VkImage coming from external
-   * source. It doesn't take over ownership so it's still owner's
-   * responsibility to destroy it and maintain the usage.
-   *
-   * @param graphics
-   * @param externalImage
-   */
-  Image(Graphics& graphics, vk::Image externalImage);
-
-  /**
-   * Destructor
-   */
-  virtual ~Image() = default;
-
-  /**
-   * Creates UNMANAGED VkImageView from the current image.
-   * Usage requires external lifecycle management and synchronization
-   * Memory MUST be bound for this function to work!
-   * @param info
-   * @return
-   */
-  vk::ImageView CreateUnmanagedView(const vk::ImageViewCreateInfo& info);
-
-  /**
-   * Creates MANAGED ImageView from the current image
-   * Memory MUST be bound for this function to work!
-   * @param info
-   * @return
-   */
-  ImageViewRef CreateView(const vk::ImageViewCreateInfo& info);
-
-  /**
-   * Returns underlying Vulkan object
-   * @return
-   */
-  vk::Image GetImage() const
-  {
-    return mImage;
-  }
+  Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage );
 
 private:
-
-  Graphics& mGraphics;
-
-  vk::Image       mImage;
-  vk::ImageLayout mLayout;
-
-  ResourceOwnershipType mOwnershipType;
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 /*
@@ -103,27 +133,29 @@ private:
 class ImageView : public VkManaged
 {
 public:
-  ImageView(Graphics& graphics, Image& image);
-  ImageView(Graphics& graphics, Image& image, const VkImageViewCreateInfo& createInfo);
+
+  static ImageViewRef New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info );
 
   virtual ~ImageView() override;
 
-  const vk::ImageView& GetImageView() const
-  {
-    return mImageView;
-  }
+  /**
+   *
+   * @return
+   */
+  const vk::ImageView& GetVkImageView() const;
 
-  Image& GetImage() const
-  {
-    return *mImageRef;
-  }
+  /**
+   * Returns bound ImageRef
+   * @return
+   */
+  ImageRef GetImage() const;
 
 private:
 
-  Graphics&             mGraphics;
-  Handle<Image>         mImageRef;
+  ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo );
 
-  vk::ImageView mImageView;
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 } // namespace Vulkan

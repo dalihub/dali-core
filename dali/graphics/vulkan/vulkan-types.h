@@ -261,7 +261,20 @@ Handle<K> Handle<T>::DynamicCast()
 template< typename T, typename... Args >
 Handle< T > MakeRef(Args&&... args)
 {
-  return Handle< T  >(new T(std::forward< Args >(args)...));
+  return Handle< T >(new T(std::forward< Args >(args)...));
+}
+
+template< typename T, typename... Args >
+Handle< T > NewRef(Args&&... args)
+{
+  return Handle< T >(T::New(std::forward< Args >(args)...));
+}
+
+
+template<class T>
+typename T::Impl& GetImpl( Handle<T>& object )
+{
+  return static_cast<typename T::Impl&>(*object->mImpl);
 }
 
 class VkManaged
@@ -331,7 +344,7 @@ using ImageViewRef = Handle<class ImageView>;
 using DescriptorPoolRef = Handle<class DescriptorPool>;
 using CommandPoolRef = Handle<class CommandPool>;
 using CommandBufferRef = Handle<class CommandBuffer>;
-
+using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="

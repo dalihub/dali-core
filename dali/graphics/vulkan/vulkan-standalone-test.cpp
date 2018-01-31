@@ -49,7 +49,6 @@ using namespace glm;
 using Dali::Integration::Graphics::Graphics;
 using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 using Dali::Graphics::Vulkan::Buffer;
-using Dali::Graphics::Vulkan::DeviceMemory;
 using Dali::Graphics::Vulkan::Shader;
 using Dali::Graphics::Vulkan::DescriptorSetLayout;
 using Dali::Graphics::Vulkan::GpuMemoryManager;
@@ -218,7 +217,7 @@ std::unique_ptr< Test::xcb_window_t > create_xcb_window(int width, int height)
 namespace VulkanTest
 {
 
-Dali::Graphics::Vulkan::GpuMemoryBlockHandle test_gpu_memory_manager( Dali::Graphics::Vulkan::Graphics& graphics,
+Dali::Graphics::Vulkan::GpuMemoryBlockRef test_gpu_memory_manager( Dali::Graphics::Vulkan::Graphics& graphics,
                                          GpuMemoryManager& gpuManager,
                                          const Dali::Graphics::Vulkan::Handle<Buffer>& buffer )
 {
@@ -244,14 +243,14 @@ mat4 MVP;
 
 
 template <class T>
-void update_buffer( Dali::Graphics::Vulkan::BufferHandle buffer, T& value )
+void update_buffer( Dali::Graphics::Vulkan::BufferRef buffer, T& value )
 {
   auto ptr = reinterpret_cast<T*>(buffer->GetMemoryHandle()->Map());
   *ptr = value;
   buffer->GetMemoryHandle()->Unmap();
 }
 
-void update_translation( Dali::Graphics::Vulkan::BufferHandle buffer )
+void update_translation( Dali::Graphics::Vulkan::BufferRef buffer )
 {
   static float x = 0.0f;
   x += 0.5f;
@@ -274,7 +273,7 @@ void update_translation( Dali::Graphics::Vulkan::BufferHandle buffer )
   update_buffer( buffer, ub );
 }
 
-Dali::Graphics::Vulkan::BufferHandle create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+Dali::Graphics::Vulkan::BufferRef create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
 {
   // create uniform buffer
   auto uniformBuffer = Buffer::New( gr, sizeof(UniformData), Buffer::Type::UNIFORM );
@@ -328,7 +327,7 @@ void test_handle()
 {
   /*
   using namespace Dali::Graphics::Vulkan;
-  GpuMemoryBlockHandle handle( new GpuMemoryBlock() );
+  GpuMemoryBlockRef handle( new GpuMemoryBlock() );
 
   decltype(handle) handle2 = handle;
   handle.GetRefCount();*/
