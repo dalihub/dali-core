@@ -1,8 +1,8 @@
-#ifndef DALI_GRAPHICS_VULKAN_SURFACE_H
-#define DALI_GRAPHICS_VULKAN_SURFACE_H
+#ifndef DALI_GRAPHICS_VULKAN_SURFACE
+#define DALI_GRAPHICS_VULKAN_SURFACE
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,16 +53,16 @@ struct SwapchainImage
   SwapchainImage& operator=(const SwapchainImage&) = delete;
   SwapchainImage& operator=(SwapchainImage&&) = default;
 
-  UniqueImage     image;
-  UniqueImageView imageView;
+  ImageRef        image;
+  ImageViewRef    imageView;
   vk::Framebuffer framebuffer;
   vk::ImageLayout layout;
   vk::Semaphore   acqSem;
   vk::Semaphore   presentSem;
 
   // layout transitions, prerecorded command buffers
-  UniqueCommandBuffer layoutToColorCmdBuf;
-  UniqueCommandBuffer mainCmdBuf;
+  Handle<CommandBuffer> layoutToColorCmdBuf;
+  Handle<CommandBuffer> mainCmdBuf;
 };
 
 class Surface
@@ -115,8 +115,37 @@ public:
    */
   vk::SurfaceKHR GetSurfaceKHR() const;
 
-private:
+  /**
+   * returns set of clear values for this surface
+   * @return
+   */
+  std::vector<vk::ClearValue> GetClearValues() const;
+
+  /**
+   * Returns size of surface
+   * @return
+   */
+  vk::Extent2D GetSize() const;
+
+  /**
+   * Returns primary command buffer associated with specific buffer
+   * @param index
+   * @return
+   */
+  Handle<CommandBuffer> GetCommandBuffer( uint32_t index );
+
+  /**
+   * Returns primary command buffer associated with current buffer
+   * @return
+   */
+  Handle<CommandBuffer> GetCurrentCommandBuffer();
+
+/**
+   *
+   */
   void CreateSwapchain();
+
+private:
 
   void CreateVulkanSwapchain();
 
@@ -151,7 +180,7 @@ private:
   vk::ImageView    mDepthStencilImageView;
   vk::DeviceMemory mDepthStencilMemory;
 
-  UniqueCommandPool mCommandPool;
+  Handle<CommandPool> mCommandPool;
 
   vk::Format        mFormat;
   vk::ColorSpaceKHR mColorSpace;
@@ -160,7 +189,7 @@ private:
   std::vector< SwapchainImage >                 mSwapImages;
   std::unique_ptr< vk::SurfaceCapabilitiesKHR > mCapabilities;
 
-  UniqueFence mFrameFence;
+  Handle<Fence>   mFrameFence;
 
   vk::RenderPass mDefaultRenderPass;
   uint32_t       mBufferCount;
@@ -172,4 +201,4 @@ private:
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_SURFACE_H
+#endif // DALI_GRAPHICS_VULKAN_SURFACE

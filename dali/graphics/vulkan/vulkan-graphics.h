@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULKAN_GRAPHICS_H
-#define DALI_GRAPHICS_VULKAN_GRAPHICS_H
+#ifndef DALI_GRAPHICS_VULKAN_GRAPHICS
+#define DALI_GRAPHICS_VULKAN_GRAPHICS
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -35,9 +35,23 @@ using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 namespace Vulkan
 {
 
+enum class Platform
+{
+  UNDEFINED,
+  XLIB,
+  XCB,
+  WAYLAND,
+};
+
+class Buffer;
+class Image;
+class Pipeline;
+class Shader;
+class Framebuffer;
 class Surface;
 class CommandPool;
-class DeviceMemoryManager;
+class DescriptorPool;
+class GpuMemoryManager;
 class Graphics
 {
 
@@ -58,7 +72,7 @@ public:
   void CreateDevice();
 
   /** Creates new command pool */
-  std::unique_ptr< CommandPool > CreateCommandPool(const vk::CommandPoolCreateInfo& info);
+  CommandPoolRef CreateCommandPool(const vk::CommandPoolCreateInfo& info);
 
   vk::Device GetDevice() const;
 
@@ -68,7 +82,7 @@ public:
 
   const vk::AllocationCallbacks& GetAllocator() const;
 
-  DeviceMemoryManager& GetDeviceMemoryManager() const
+  GpuMemoryManager& GetDeviceMemoryManager() const
   {
     return *mDeviceMemoryManager;
   }
@@ -83,18 +97,21 @@ public:
   Queue& GetComputeQueue(uint32_t index = 0u) const;
   Queue& GetPresentQueue() const;
 
+  Platform GetDefaultPlatform() const;
+
 private:
 
-  void                                     CreateInstance();
+  void                                     CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers );
   void                                     DestroyInstance();
   void                                     PreparePhysicalDevice();
   void                                     GetPhysicalDeviceProperties();
   void                                     GetQueueFamilyProperties();
   std::vector< vk::DeviceQueueCreateInfo > GetQueueCreateInfos();
+  std::vector<const char*>                 PrepareDefaultInstanceExtensions();
 
 private:
 
-  std::unique_ptr<DeviceMemoryManager> mDeviceMemoryManager;
+  std::unique_ptr<GpuMemoryManager> mDeviceMemoryManager;
 
   vk::Instance             mInstance;
   std::unique_ptr<vk::AllocationCallbacks> mAllocator{nullptr};
@@ -121,10 +138,39 @@ private:
   std::vector< std::unique_ptr<Queue> >  mTransferQueues;
   std::vector< std::unique_ptr<Queue> >  mComputeQueues;
   std::unique_ptr< Queue > mPresentQueue;
+
+  Platform                               mPlatform  { Platform::UNDEFINED };
+
+public:
+  // TODO: all this stuff should go into some vulkan cache
+
+  void AddBuffer( Handle<Buffer> buffer );
+  void AddImage( Handle<Image> image );
+  void AddPipeline( Handle<Pipeline> pipeline );
+  void AddShader( Handle<Shader> shader );
+  void AddCommandPool( Handle<CommandPool> pool );
+  void AddDescriptorPool( Handle<DescriptorPool> pool );
+  void AddFramebuffer( Handle<Framebuffer> framebuffer );
+
+  ShaderRef FindShader( vk::ShaderModule shaderModule );
+
+  void RemoveBuffer( Buffer& buffer );
+  void RemoveShader( Shader& shader );
+  void RemoveCommandPool( CommandPool& commandPool );
+  void RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool );
+
+private:
+  std::vector<BufferRef>                mBuffersCache;
+  std::vector<ImageRef>                 mImageCache;
+  std::vector<PipelineRef>              mPipelineCache;
+  std::vector<ShaderRef>                mShaderCache;
+  std::vector<CommandPoolRef>           mCommandPoolCache;
+  std::vector<DescriptorPoolRef>        mDescriptorPoolCache;
+  std::vector<FramebufferRef>           mFramebufferCache;
 };
 
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_GRAPHICS_H
+#endif // DALI_GRAPHICS_VULKAN_GRAPHICS

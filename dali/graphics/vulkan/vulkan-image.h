@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULKAN_IMAGE_H
-#define DALI_GRAPHICS_VULKAN_IMAGE_H
+#ifndef DALI_GRAPHICS_VULKAN_IMAGE
+#define DALI_GRAPHICS_VULKAN_IMAGE
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -34,7 +34,7 @@ enum class ResourceOwnershipType
   EXTERNAL
 };
 
-class Image : public Resource
+class Image : public VkManaged
 {
 public:
   /**
@@ -75,7 +75,7 @@ public:
    * @param info
    * @return
    */
-  UniqueImageView CreateView(const vk::ImageViewCreateInfo& info);
+  ImageViewRef CreateView(const vk::ImageViewCreateInfo& info);
 
   /**
    * Returns underlying Vulkan object
@@ -100,7 +100,7 @@ private:
  * ImageView
  * todo: move it to its own file
  */
-class ImageView : public Resource
+class ImageView : public VkManaged
 {
 public:
   ImageView(Graphics& graphics, Image& image);
@@ -115,12 +115,13 @@ public:
 
   Image& GetImage() const
   {
-    return mImageRef.GetResource();
+    return *mImageRef;
   }
 
 private:
+
   Graphics&             mGraphics;
-  ResourceRef<Image>    mImageRef;
+  Handle<Image>         mImageRef;
 
   vk::ImageView mImageView;
 };
@@ -131,4 +132,4 @@ private:
 
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULKAN_IMAGE_H
+#endif // DALI_GRAPHICS_VULKAN_IMAGE

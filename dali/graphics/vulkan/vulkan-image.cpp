@@ -40,17 +40,17 @@ vk::ImageView Image::CreateUnmanagedView(const vk::ImageViewCreateInfo& info)
   return nullptr;
 }
 
-UniqueImageView Image::CreateView(const vk::ImageViewCreateInfo& info)
+ImageViewRef Image::CreateView(const vk::ImageViewCreateInfo& info)
 {
-  return MakeUnique< ImageView >(mGraphics, *this, info);
+  return MakeRef< ImageView >(mGraphics, *this, info);
 }
 
-ImageView::ImageView(Graphics& graphics, Image& image) : mGraphics(graphics), mImageRef(image)
+ImageView::ImageView(Graphics& graphics, Image& image) : mGraphics(graphics), mImageRef(&image)
 {
 }
 
 ImageView::ImageView(Graphics& graphics, Image& image, const VkImageViewCreateInfo& createInfo)
-: mGraphics(graphics), mImageRef(image)
+: mGraphics(graphics), mImageRef(&image)
 {
   mImageView =
       VkAssert(mGraphics.GetDevice().createImageView(createInfo, mGraphics.GetAllocator()));

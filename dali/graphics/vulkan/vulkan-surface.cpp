@@ -73,7 +73,7 @@ void Surface::AcquireNextImage()
 
   if(!mFrameFence)
   {
-    mFrameFence = MakeUnique< Fence >(mGraphics);
+    mFrameFence = Fence::New(mGraphics);
   }
 
   // acquire image, for simplicity using fence for acquiring as it is unknown what next command buffer will
@@ -92,7 +92,7 @@ void Surface::AcquireNextImage()
   if(swapImage.layout != vk::ImageLayout::eColorAttachmentOptimal)
   {
     auto& queue = mGraphics.GetGraphicsQueue();
-    queue.Submit(*swapImage.layoutToColorCmdBuf.get(), *mFrameFence.get())->WaitForFence();
+    queue.Submit(swapImage.layoutToColorCmdBuf, mFrameFence)->WaitForFence();
   }
 
   mFrameFence->Reset();
@@ -112,16 +112,16 @@ void Surface::BeginRenderPass()
    * todo: automatically start main render pass -> this may have to be done manually in future
    * if more flexibility is needed
    */
-  auto vkCmdBuf = swapImage.mainCmdBuf->Get();
+  auto vkCmdBuf = swapImage.mainCmdBuf->GetVkCommandBuffer();
   {
     std::array< vk::ClearValue, 2 > clearValues;
 
-    static float r = 0.0f;
-    r += 0.01f;
+    static float r = 1.0f;
+    //r += 0.01f;
     if(r > 1.0f)
       r -= 1.0f;
 
-    clearValues[0].color.setFloat32({r, 0.0f, 0.0f, 1.0f});
+    clearValues[0].color.setFloat32({0.0f, 1.0f, 0.0f, 1.0f});
     clearValues[1].depthStencil.setDepth(1.0f).setStencil(0.0f);
 
     auto rpInfo = vk::RenderPassBeginInfo{};
@@ -131,16 +131,51 @@ void Surface::BeginRenderPass()
         .setClearValueCount(mHasDepthStencil ? 2 : 1)
         .setPClearValues(clearValues.data());
 
-    auto subpassContents = vk::SubpassContents{vk::SubpassContents::eInline};
+    auto subpassContents = vk::SubpassContents{vk::SubpassContents::eSecondaryCommandBuffers};
     vkCmdBuf.beginRenderPass(rpInfo, subpassContents);
   }
+}
+
+std::vector<vk::ClearValue> Surface::GetClearValues() const
+{
+  static float r = 0.0f;
+  r += 0.01f;
+  if(r > 1.0f)
+    r -= 1.0f;
+
+  std::array< vk::ClearValue, 2 > clearValues;
+  clearValues[0].color.setFloat32({r, 0.0f, 0.0f, 1.0f});
+  clearValues[1].depthStencil.setDepth(1.0f).setStencil(0.0f);
+
+  auto retval = std::vector<vk::ClearValue>{};
+  retval.emplace_back( clearValues[0] );
+  if( mHasDepthStencil )
+  {
+    retval.emplace_back( clearValues[1] );
+  }
+  return retval;
+}
+
+vk::Extent2D Surface::GetSize() const
+{
+  return mCapabilities->currentExtent;
+}
+
+Handle<CommandBuffer> Surface::GetCommandBuffer( uint32_t index )
+{
+  return mSwapImages[index].mainCmdBuf;
+}
+
+Handle<CommandBuffer> Surface::GetCurrentCommandBuffer()
+{
+  return mSwapImages[mCurrentBufferIndex].mainCmdBuf;
 }
 
 void Surface::EndRenderPass()
 {
   // todo: use semaphores and do not create fences all over again
   auto& swapImage = mSwapImages[mCurrentBufferIndex];
-  auto  vkCmdBuf  = swapImage.mainCmdBuf->Get();
+  auto  vkCmdBuf  = swapImage.mainCmdBuf->GetVkCommandBuffer();
 
   // complete render pass
   vkCmdBuf.endRenderPass();
@@ -150,7 +185,7 @@ void Surface::EndRenderPass()
 
   // submit
   auto& queue = mGraphics.GetGraphicsQueue();
-  queue.Submit(*swapImage.mainCmdBuf.get(), *mFrameFence.get())->WaitForFence();
+  queue.Submit(swapImage.mainCmdBuf, mFrameFence)->WaitForFence();
 }
 
 void Surface::Present()
@@ -260,7 +295,7 @@ void Surface::InitialiseSwapchain()
 void Surface::AddSwapchainImage(vk::Image image, std::vector< SwapchainImage >& swapchainImages)
 {
   auto swapImage  = std::move(SwapchainImage{});
-  swapImage.image = MakeUnique<Image>( mGraphics, image );
+  swapImage.image = MakeRef<Image>( mGraphics, image );
 
   // create ImageView
   CreateImageView(swapImage);
@@ -379,9 +414,7 @@ void Surface::CreateCommandBuffers()
 {
   if(!mCommandPool)
   {
-    auto info = vk::CommandPoolCreateInfo{}.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer);
-    info.setQueueFamilyIndex(0); // todo: get correct queue family index ( 0 works by default ;) )
-    mCommandPool = MakeUnique< CommandPool >(mGraphics, info);
+    mCommandPool = CommandPool::New( mGraphics, vk::CommandPoolCreateInfo{}.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer) );
   }
 
   // allocate command buffers
@@ -391,8 +424,8 @@ void Surface::CreateCommandBuffers()
 
   for(auto& swapImage : mSwapImages)
   {
-    swapImage.layoutToColorCmdBuf = mCommandPool->AllocateCommandBuffer(cmdInfo);
-    swapImage.mainCmdBuf          = mCommandPool->AllocateCommandBuffer(cmdInfo);
+    swapImage.layoutToColorCmdBuf = mCommandPool->NewCommandBuffer(cmdInfo);
+    swapImage.mainCmdBuf          = mCommandPool->NewCommandBuffer(cmdInfo);
 
     // Record layout transition for each image, after transition command buffers will be re-recorded
     // and will take in account only present -> color layout transition
@@ -404,13 +437,13 @@ void Surface::CreateCommandBuffers()
     swapImage.layoutToColorCmdBuf->End();
     swapImage.layout = vk::ImageLayout::eColorAttachmentOptimal;
 
-    cmdBuffers.push_back(std::ref(*swapImage.layoutToColorCmdBuf.get()));
+    cmdBuffers.push_back(swapImage.layoutToColorCmdBuf);
   }
 
   // submit to the queue
   {
     auto& queue      = mGraphics.GetGraphicsQueue();
-    auto  fence      = Fence(mGraphics);
+    auto  fence      = Fence::New(mGraphics);
     auto  submission = queue.Submit(cmdBuffers, fence);
     submission->WaitForFence();
   }

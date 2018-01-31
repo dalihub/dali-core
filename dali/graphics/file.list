@@ -1,15 +1,20 @@
 # Add graphics source files here
 
 graphics_src_files = \
-  $(graphics_src_dir)/graphics-controller.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-fence.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-queue.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-surface.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-command-buffer.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-command-pool.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-image.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-buffer.cpp \
-  $(graphics_src_dir)/vulkan/vulkan-device-memory-manager.cpp
+    $(graphics_src_dir)/vulkan/vulkan-command-pool.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-surface.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-fence.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-descriptor-set.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-queue.cpp \
+    $(graphics_src_dir)/vulkan/generated/spv-shaders-gen.cpp \
+    $(graphics_src_dir)/vulkan/gpu-memory/vulkan-gpu-memory-handle.cpp \
+    $(graphics_src_dir)/vulkan/gpu-memory/vulkan-gpu-memory-manager.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-image.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-resource.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-command-buffer.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-pipeline.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-buffer.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-shader.cpp
 
 
