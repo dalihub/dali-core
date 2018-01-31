@@ -472,14 +472,14 @@ void RenderManager::Render( Integration::RenderStatus& status )
     GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
-    mImpl->UpdateTrackers();
-
     //Notify RenderGeometries that rendering has finished
     for ( auto&& iter : mImpl->geometryContainer )
     {
       iter->OnRenderFinished();
     }
   }
+
+  mImpl->UpdateTrackers();
 
   // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
   mImpl->lastFrameWasRendered = haveInstructions;
