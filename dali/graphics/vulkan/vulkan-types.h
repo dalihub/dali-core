@@ -212,6 +212,21 @@ public:
     return *mObject;
   }
 
+  template <class K>
+  Handle<K> StaticCast()
+  {
+    return Handle<K>(static_cast<K*>(mObject));
+  }
+
+  template<class K>
+  bool operator==( const Handle<K>& object ) const
+  {
+    return mObject == &*object;
+  }
+
+  template <class K>
+  Handle<K> DynamicCast();
+
   void Reset()
   {
     if( mObject )
@@ -224,6 +239,12 @@ public:
 private:
 
   T* mObject { nullptr };
+};
+
+template <class K, class T>
+static Handle<K> VkTypeCast( const Handle<T>& inval )
+{
+  return Handle<K>(static_cast<K*>(&*inval));
 };
 
 template<class T>
@@ -291,6 +312,27 @@ Handle<T>::~Handle()
   {
     mObject->Release();
   }
+}
+
+/*
+template<class T>
+template<class K>
+Handle<K> Handle<T>::StaticCast()
+{
+  return Handle<K>(static_cast<K*>(mObject));
+}
+*/
+
+template<class T>
+template<class K>
+Handle<K> Handle<T>::DynamicCast()
+{
+  auto val = dynamic_cast<K*>(mObject);
+  if(val)
+  {
+    return Handle<K>(val);
+  }
+  return Handle<K>();
 }
 
 

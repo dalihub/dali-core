@@ -9,7 +9,7 @@ extern std::vector<uint8_t> VSH_CODE;
 /*
 #version 430
 
-layout( location = 0 ) in vec4 aPosition;
+layout( location = 0 ) in vec3 aPosition;
 
 layout( set = 0, binding = 0, std140 ) uniform world
 {
@@ -21,7 +21,7 @@ layout( set = 0, binding = 0, std140 ) uniform world
 
 void main()
 {
-    gl_Position = projMat * viewMat * modelMat * aPosition;
+    gl_Position = projMat * viewMat * modelMat * vec4( aPosition, 1.0 );
 }*/
 
 
@@ -33,7 +33,7 @@ layout( location = 0 ) out vec4 outColor;
 
 void main()
 {
-    outColor = vec4(1.0, 1.0, 1.0, 1.0);
+    outColor = vec4(0.0, 1.0, 0.0, 1.0);
 }*/
 
 

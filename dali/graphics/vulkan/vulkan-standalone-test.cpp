@@ -12,6 +12,13 @@
 #define VK_USE_PLATFORM_XCB_KHR
 #endif
 
+#include <glm/glm.hpp>
+#include <glm/matrix.hpp>
+#include <glm/vector_relational.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+using namespace glm;
+
 #include <dali/integration-api/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
@@ -29,10 +36,15 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 
 #include "generated/spv-shaders-gen.h"
 
 #define USE_XLIB 0
+#include <iostream>
 
 using Dali::Integration::Graphics::Graphics;
 using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
@@ -46,6 +58,9 @@ using Dali::Graphics::Vulkan::Shader;
 using Dali::Graphics::Vulkan::ShaderHandle;
 using Dali::Graphics::Vulkan::Pipeline;
 using Dali::Graphics::Vulkan::PipelineHandle;
+using Dali::Graphics::Vulkan::CommandPool;
+using Dali::Graphics::Vulkan::CommandBuffer;
+using Dali::Graphics::Vulkan::DescriptorPool;
 
 extern std::vector<uint8_t> VSH;
 extern std::vector<uint8_t> FSH;
@@ -205,35 +220,67 @@ namespace VulkanTest
 
 Dali::Graphics::Vulkan::GpuMemoryBlockHandle test_gpu_memory_manager( Dali::Graphics::Vulkan::Graphics& graphics,
                                          GpuMemoryManager& gpuManager,
-                                         Buffer& buffer )
+                                         const Dali::Graphics::Vulkan::Handle<Buffer>& buffer )
 {
   auto device = graphics.GetDevice();
   auto& allocator = graphics.GetAllocator();
 
-  vk::Buffer vertexBuffer = device.createBuffer( vk::BufferCreateInfo{}
-  .setUsage( vk::BufferUsageFlagBits::eVertexBuffer )
-  .setSize( sizeof(float) * 9 )
-  .setSharingMode( vk::SharingMode::eExclusive)
-  .setQueueFamilyIndexCount( 0 )
-  , allocator ).value;
-
   auto& gpuAllocator = gpuManager.GetDefaultAllocator();
-  auto handle2 = gpuAllocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible );
-  {
-    auto handle = gpuAllocator.Allocate(device.getBufferMemoryRequirements(vertexBuffer),
-                                        vk::MemoryPropertyFlagBits::eHostVisible);
+  return gpuAllocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible );
+}
+
+struct UniformData
+{
+  mat4 modelMat;
+  mat4 viewMat;
+  mat4 projMat;
+  vec4 color;
+} __attribute__((aligned(16)));
 
 
+mat4 MVP;
 
-    int count = handle.GetRefCount();
+Dali::Graphics::Vulkan::BufferHandle create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+{
+  // create uniform buffer
+  auto uniformBuffer = Buffer::New( gr, sizeof(UniformData), Buffer::Type::UNIFORM );
 
-    {
-      auto newHandle = handle;
-      count = newHandle.GetRefCount();
-    }
-    count     = handle.GetRefCount();
-  }
-  return std::move(handle2);
+  // allocate memory
+  auto memory = gr.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( uniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible );
+
+  // bind memory
+  uniformBuffer->BindMemory( memory );
+
+  auto ub = reinterpret_cast<UniformData*>(memory->Map());
+
+  ub->modelMat = mat4{1.0f};
+  //ub->modelMat = glm::translate( ub->modelMat, vec3( 0.0f, 0.0f, 0.0f ));
+  ub->viewMat = lookAt( vec3( 0.0f, 0.0f, 0.5f ),
+                        vec3( 0.0f, 0.0f, 0.0f ),
+                        vec3( 0.0f, 1.0f, 0.0f ) );
+  ub->projMat = ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f );
+  ub->color = vec4( 0.0f, 1.0f, 1.0f, 1.0f );
+
+
+  MVP = ub->projMat * ub->viewMat * ub->modelMat;
+
+  memory->Unmap();
+
+  return uniformBuffer;
+}
+
+Dali::Graphics::Vulkan::Handle<DescriptorPool>
+create_descriptor_pool( Dali::Graphics::Vulkan::Graphics& gr )
+{
+  vk::DescriptorPoolSize size;
+  size.setDescriptorCount( 1024 ).setType( vk::DescriptorType::eUniformBuffer );
+
+  // TODO: how to organize this???
+  auto pool = DescriptorPool::New( gr,
+    vk::DescriptorPoolCreateInfo{}.
+      setMaxSets( 1024 ).
+      setPoolSizeCount(1).setPPoolSizes(&size));
+  return pool;
 }
 
 void test_handle()
@@ -264,10 +311,11 @@ create_pipeline( Dali::Graphics::Vulkan::Graphics& graphics,
                                            setBinding( 0 ).
                                            setOffset( 0 ).
                                            setLocation( 0 ).
-                                           setFormat( vk::Format::eR32G32B32A32Sfloat )},
+                                           setFormat( vk::Format::eR32G32B32Sfloat )},
     std::vector<vk::VertexInputBindingDescription>{vk::VertexInputBindingDescription{}.
                                            setBinding( 0 ).
-                                           setStride( sizeof(float)*4 )}
+                                           setStride( sizeof(float)*3  ).
+                                           setInputRate( vk::VertexInputRate::eVertex)}
   );
   pipeline->SetInputAssemblyState( vk::PrimitiveTopology::eTriangleList, false );
 
@@ -301,12 +349,15 @@ int RunTestMain()
   // GPU memory manager
   auto& memmgr = gr.GetDeviceMemoryManager();
 
-  const float VERTICES[] =
+  const vec3 VERTICES[] =
           {
-            0.0f, 0.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 0.0f, 1.0f,
-            -1.0f, 1.0f, 0.0f, 1.0f
+            {0.0f, 0.0f, 0.0f},
+            {320.0f, 0.0f, 0.0f},
+            {0.0f, 160.0f, 0.0f},
           };
+
+
+
 
   // shaders
   auto vertexShader = Shader::New( gr, VSH_CODE.data(), VSH_CODE.size() );
@@ -324,24 +375,78 @@ int RunTestMain()
   auto fragmentShader = Shader::New( gr, FSH_CODE.data(), FSH_CODE.size() );
 
   // buffer
-  auto vertexBuffer = Buffer::New( gr, sizeof(float)*4*3, Buffer::Type::VERTEX );
+  auto vertexBuffer = Buffer::New( gr, sizeof(float)*3*3, Buffer::Type::VERTEX );
 
-  auto gpuManager = GpuMemoryManager::New( gr );
+  auto descriptorPool = create_descriptor_pool( gr );
+  auto descriptorSet = descriptorPool->AllocateDescriptorSets( vk::DescriptorSetAllocateInfo{}
+  .setPSetLayouts( vertexShader->GetDescriptorSetLayouts().data() )
+  .setDescriptorSetCount( static_cast<uint32_t>(vertexShader->GetDescriptorSetLayouts().size())));
 
-  auto bufferMemory = test_gpu_memory_manager( gr, *gpuManager, *vertexBuffer );
+
+
+  auto& gpuManager = gr.GetDeviceMemoryManager();
+
+  auto bufferMemory = test_gpu_memory_manager( gr, gpuManager, vertexBuffer );
   vertexBuffer->BindMemory( bufferMemory );
 
-  auto ptr = static_cast<float*>(bufferMemory->Map());
-  std::copy( VERTICES, VERTICES+12, ptr);
+  auto ptr = static_cast<uint8_t*>(bufferMemory->Map());
+  std::copy( reinterpret_cast<const uint8_t*>(VERTICES), reinterpret_cast<const uint8_t*>(VERTICES)+(sizeof(float)*9), ptr);
   bufferMemory->Unmap();
-
 
   auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
 
+  auto commandPool = CommandPool::New( gr );
 
-  while(1)
+  auto uniformBuffer = create_uniform_buffer( gr );
+
+  descriptorSet[0]->WriteUniformBuffer( 0, uniformBuffer, 0, uniformBuffer->GetSize() );
+
+
+  for( auto i = 0u; i < 3; ++i )
+  {
+    auto result = MVP * vec4( VERTICES[i], 1.0f);
+
+    auto m = result;
+
+  }
+  // get new buffer
+  auto cmdDraw = commandPool->NewCommandBuffer( false );
+
+  // begin recording
+  cmdDraw->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue);
+
+  // render pass
+  //cmdDraw->BeginRenderPass( fbid, 0 );
+
+  // vertex buffer
+  cmdDraw->BindVertexBuffer( 0, vertexBuffer, 0 );
+
+  // pipeline
+  cmdDraw->BindGraphicsPipeline( pipeline );
+
+  // descriptor sets
+  cmdDraw->BindDescriptorSets( descriptorSet, 0 );
+
+  // do draw
+  cmdDraw->Draw( 3, 1, 0, 0 );
+
+  // finish
+  //cmdDraw->EndRenderPass();
+  cmdDraw->End();
+
+
+
+  bool running = true;
+
+  while( running )
   {
     graphics->PreRender( fbid );
+    // queue submit draw
+
+    auto cmdbuf = gr.GetSurface( fbid ).GetCurrentCommandBuffer();
+
+    cmdbuf->ExecuteCommands( { cmdDraw } );
+
     graphics->PostRender( fbid );
   }
   return 0;

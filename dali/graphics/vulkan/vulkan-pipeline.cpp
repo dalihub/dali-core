@@ -84,6 +84,8 @@ struct Pipeline::Impl
 
     SetMultisampleState();
 
+    SetColorBlendState();
+
     mInfo.setFlags( vk::PipelineCreateFlagBits::eAllowDerivatives );
     // create pipeline
     mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( nullptr, mInfo, mGraphics.GetAllocator() ) );
@@ -143,11 +145,15 @@ struct Pipeline::Impl
     // AB: add scissor, read data from graphics for fullscreen viewport
     // simplified mode for the demo purposes
     mViewports.emplace_back( x, y, width, height );
+    mViewports[0].setMinDepth( 0.0f );
+    mViewports[0].setMaxDepth( 1.0f );
+    mScissors = vk::Rect2D( { static_cast<int32_t>(x), static_cast<int32_t>(y) },
+                            { U32(width), U32(height) });
     mViewportState = vk::PipelineViewportStateCreateInfo{}.
            setViewportCount( U32(mViewports.size()) ).
            setPViewports( mViewports.data() ).
-           setPScissors( nullptr ).
-           setScissorCount( 0 );
+           setPScissors( &mScissors ).
+           setScissorCount( 1 );
 
     // replace viewport state
     mInfo.setPViewportState( &mViewportState );
@@ -175,9 +181,25 @@ struct Pipeline::Impl
     mRasterizationState.setDepthClampEnable( false );
     mRasterizationState.setFrontFace( vk::FrontFace::eClockwise );
     mRasterizationState.setPolygonMode( vk::PolygonMode::eFill );
-    mRasterizationState.setRasterizerDiscardEnable( true );
+    mRasterizationState.setRasterizerDiscardEnable( false );
     mRasterizationState.setLineWidth( 1.0f );
     mInfo.setPRasterizationState( & mRasterizationState );
+  }
+
+  void SetColorBlendState()
+  {
+    mAttachementNoBlendState = vk::PipelineColorBlendAttachmentState{};
+    //mAttachementNoBlendState.setBlendEnable( true );
+    mAttachementNoBlendState.setColorWriteMask( vk::ColorComponentFlagBits::eR |
+                                                  vk::ColorComponentFlagBits::eG |
+                                                  vk::ColorComponentFlagBits::eB |
+                                                  vk::ColorComponentFlagBits::eA );
+
+    mColorBlendState = vk::PipelineColorBlendStateCreateInfo{};
+    mColorBlendState.setAttachmentCount( 1 );
+    mColorBlendState.setPAttachments( &mAttachementNoBlendState );
+    //mColorBlendState.setLogicOpEnable( false );
+    mInfo.setPColorBlendState(&mColorBlendState);
   }
 
   /**
@@ -281,6 +303,7 @@ struct Pipeline::Impl
 
   vk::PipelineViewportStateCreateInfo mViewportState {};
   std::vector<vk::Viewport> mViewports {};
+  vk::Rect2D mScissors {};
 
   std::vector<vk::PipelineShaderStageCreateInfo> mShaderStageCreateInfo;
   vk::PipelineLayout mPipelineLayout{};
@@ -301,6 +324,10 @@ struct Pipeline::Impl
 
   // Multisample state
   vk::PipelineMultisampleStateCreateInfo            mMultisampleState {};
+
+  // Color blend
+  vk::PipelineColorBlendStateCreateInfo             mColorBlendState {};
+  vk::PipelineColorBlendAttachmentState             mAttachementNoBlendState {};
 };
 
 /*********************************************************************
@@ -359,6 +386,10 @@ bool Pipeline::Compile()
   return mImpl->Compile();
 }
 
+vk::PipelineLayout Pipeline::GetVkPipelineLayout() const
+{
+  return mImpl->mPipelineLayout;
+}
 
 } // namespace Vulkan
 

@@ -116,6 +116,31 @@ public:
   vk::SurfaceKHR GetSurfaceKHR() const;
 
   /**
+   * returns set of clear values for this surface
+   * @return
+   */
+  std::vector<vk::ClearValue> GetClearValues() const;
+
+  /**
+   * Returns size of surface
+   * @return
+   */
+  vk::Extent2D GetSize() const;
+
+  /**
+   * Returns primary command buffer associated with specific buffer
+   * @param index
+   * @return
+   */
+  Handle<CommandBuffer> GetCommandBuffer( uint32_t index );
+
+  /**
+   * Returns primary command buffer associated with current buffer
+   * @return
+   */
+  Handle<CommandBuffer> GetCurrentCommandBuffer();
+
+/**
    *
    */
   void CreateSwapchain();

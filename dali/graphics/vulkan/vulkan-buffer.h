@@ -51,14 +51,14 @@ public:
   /**
    * Destructor
    */
-  virtual ~Buffer();
+  ~Buffer() override;
 
   // single purpose constructors helpers
   static BufferHandle New( Graphics& graphics, size_t size, Type type );
 
   vk::BufferUsageFlags GetUsage() const;
 
-  size_t GetSize() const;
+  uint32_t GetSize() const;
 
   vk::Buffer GetVkBuffer() const;
 

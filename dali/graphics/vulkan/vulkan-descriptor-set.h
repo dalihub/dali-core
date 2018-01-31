@@ -29,26 +29,89 @@ namespace Vulkan
 class Graphics;
 class Buffer;
 class Image;
+class DescriptorPool;
 
-class DescriptorPool
+class DescriptorSet : public VkManaged
+{
+  friend class DescriptorPool;
+
+public:
+
+  ~DescriptorSet() override;
+
+  /**
+   *
+   * @param buffer
+   * @param offset
+   * @param size
+   */
+  void WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer, uint32_t offset, uint32_t size );
+
+  /**
+   *
+   * @param buffer
+   * @param offset
+   * @param size
+   */
+  void WriteStorageBuffer( Handle<Buffer> buffer, uint32_t offset, uint32_t size );
+
+  /**
+   *
+   */
+  void WriteImage( Handle<Image> );
+
+  /**
+   *
+   * @param writeDescriptorSet
+   */
+  void Write( vk::WriteDescriptorSet writeDescriptorSet );
+
+  /**
+   * Returns VkDescriptorSet associated with this object
+   * @return Descriptor set
+   */
+  vk::DescriptorSet GetVkDescriptorSet() const;
+
+private:
+
+  DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet, vk::DescriptorSetAllocateInfo allocateInfo );
+
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
+};
+
+using DescriptorSetHandle = Handle<DescriptorSet>;
+
+class DescriptorPool : public VkManaged
 {
 public:
 
-  static std::unique_ptr<DescriptorPool> New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
+  static Handle<DescriptorPool> New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
 
+  ~DescriptorPool() override;
+
+  vk::DescriptorPool GetVkDescriptorPool() const;
+
+  std::vector<DescriptorSetHandle> AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
+
+private:
+
+  DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
+
+  class Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
-class DescriptorSet
-{
 
-};
+
+
+
 
 class DescriptorSetLayout
 {
 public:
 
   static std::unique_ptr<DescriptorSetLayout> New( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo );
-
 
 private:
 

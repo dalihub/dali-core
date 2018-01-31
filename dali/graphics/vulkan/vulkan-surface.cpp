@@ -116,8 +116,8 @@ void Surface::BeginRenderPass()
   {
     std::array< vk::ClearValue, 2 > clearValues;
 
-    static float r = 0.0f;
-    r += 0.01f;
+    static float r = 1.0f;
+    //r += 0.01f;
     if(r > 1.0f)
       r -= 1.0f;
 
@@ -131,9 +131,44 @@ void Surface::BeginRenderPass()
         .setClearValueCount(mHasDepthStencil ? 2 : 1)
         .setPClearValues(clearValues.data());
 
-    auto subpassContents = vk::SubpassContents{vk::SubpassContents::eInline};
+    auto subpassContents = vk::SubpassContents{vk::SubpassContents::eSecondaryCommandBuffers};
     vkCmdBuf.beginRenderPass(rpInfo, subpassContents);
   }
+}
+
+std::vector<vk::ClearValue> Surface::GetClearValues() const
+{
+  static float r = 0.0f;
+  r += 0.01f;
+  if(r > 1.0f)
+    r -= 1.0f;
+
+  std::array< vk::ClearValue, 2 > clearValues;
+  clearValues[0].color.setFloat32({r, 0.0f, 0.0f, 1.0f});
+  clearValues[1].depthStencil.setDepth(1.0f).setStencil(0.0f);
+
+  auto retval = std::vector<vk::ClearValue>{};
+  retval.emplace_back( clearValues[0] );
+  if( mHasDepthStencil )
+  {
+    retval.emplace_back( clearValues[1] );
+  }
+  return retval;
+}
+
+vk::Extent2D Surface::GetSize() const
+{
+  return mCapabilities->currentExtent;
+}
+
+Handle<CommandBuffer> Surface::GetCommandBuffer( uint32_t index )
+{
+  return mSwapImages[index].mainCmdBuf;
+}
+
+Handle<CommandBuffer> Surface::GetCurrentCommandBuffer()
+{
+  return mSwapImages[mCurrentBufferIndex].mainCmdBuf;
 }
 
 void Surface::EndRenderPass()

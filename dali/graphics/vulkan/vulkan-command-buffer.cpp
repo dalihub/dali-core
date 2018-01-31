@@ -16,9 +16,15 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/vulkan-surface.h>
 
 namespace Dali
 {
@@ -47,6 +53,30 @@ struct CommandBuffer::Impl
     return true;
   }
 
+  template <class T>
+  bool IsResourceAdded( Handle<T> resourceHandle )
+  {
+    for( auto&& res : mResources )
+    {
+      if( res == resourceHandle )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  template <class T>
+  bool PushResource( Handle<T> resourceHandle )
+  {
+    if(!IsResourceAdded( resourceHandle ))
+    {
+      mResources.push_back(VkTypeCast<VkManaged>( resourceHandle ));
+      return true;
+    }
+    return false;
+  }
+
   /**
    *
    */
@@ -56,6 +86,18 @@ struct CommandBuffer::Impl
     auto info = vk::CommandBufferBeginInfo{};
     info.setPInheritanceInfo(inheritanceInfo);
     info.setFlags(usageFlags);
+
+    // set the inheritance option
+    auto inheritance = vk::CommandBufferInheritanceInfo{}.setSubpass( 0 );
+
+    if( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary )
+    {
+      // todo: sets render pass from 'default' surface, should be supplied from primary command buffer
+      // which has render pass associated within execution context
+      inheritance.setRenderPass( mGraphics.GetSurface(0).GetRenderPass() );
+      info.setPInheritanceInfo( &inheritance );
+    }
+
     VkAssert(mCommandBuffer.begin(info));
     mRecording = true;
   }
@@ -199,6 +241,100 @@ struct CommandBuffer::Impl
     mSignalSemaphores = semaphores;
   }
 
+  // TODO: handles should be synchronized
+  void BindVertexBuffers(uint32_t firstBinding, uint32_t bindingCount, std::vector<Handle<Buffer>> buffers,
+                                        const vk::DeviceSize *pOffsets)
+  {
+    // update list of used resources and create an array of VkBuffers
+    std::vector<vk::Buffer> vkBuffers;
+    vkBuffers.reserve( buffers.size() );
+    for( auto&& buffer : buffers )
+    {
+      vkBuffers.emplace_back( buffer->GetVkBuffer() );
+      PushResource(buffer);
+    }
+
+    mCommandBuffer.bindVertexBuffers( firstBinding, bindingCount, vkBuffers.data(), pOffsets);
+  }
+
+  void BindGraphicsPipeline( Handle<Pipeline> pipeline )
+  {
+    PushResource( pipeline );
+    mCurrentPipeline = pipeline;
+    mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkPipeline() );
+  }
+
+  void BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets,
+                                          Handle<Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount )
+  {
+    // update resources
+    PushResource( pipeline );
+    std::vector<vk::DescriptorSet> vkSets;
+    vkSets.reserve( descriptorSets.size() );
+    for( auto&& set : descriptorSets )
+    {
+      vkSets.emplace_back( set->GetVkDescriptorSet() );
+      PushResource( set );
+    }
+
+    // TODO: support dynamic offsets
+    mCommandBuffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, pipeline->GetVkPipelineLayout(),
+    firstSet, descriptorSetCount, vkSets.data(), 0, nullptr );
+  }
+
+  void Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
+  {
+    mCommandBuffer.draw( vertexCount, instanceCount, firstVertex, firstInstance );
+  }
+
+  const std::vector< Handle<VkManaged>> GetResources() const
+  {
+    return mResources;
+  }
+
+  // RENDER PASS
+  void BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
+  {
+    auto& surface = mGraphics.GetSurface( framebufferId );
+    auto renderPass = surface.GetRenderPass();
+    auto frameBuffer = surface.GetFramebuffer( bufferIndex );
+    auto clearValues = surface.GetClearValues();
+
+    auto info = vk::RenderPassBeginInfo{};
+    info.setFramebuffer( frameBuffer );
+    info.setRenderPass( renderPass );
+    info.setClearValueCount( U32(clearValues.size()) );
+    info.setPClearValues( clearValues.data() );
+    info.setRenderArea( vk::Rect2D( { 0,0 }, surface.GetSize() ) );
+
+    mCurrentRenderPass = renderPass;
+    mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );
+  }
+
+  void BeginRenderPass( vk::RenderPassBeginInfo renderPassBeginInfo, vk::SubpassContents subpassContents )
+  {
+    mCurrentRenderPass = renderPassBeginInfo.renderPass;
+    mCommandBuffer.beginRenderPass( renderPassBeginInfo, subpassContents );
+  }
+
+  void EndRenderPass()
+  {
+    mCurrentRenderPass = nullptr;
+    mCommandBuffer.endRenderPass();
+  }
+
+  void ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers )
+  {
+    auto vkBuffers = std::vector<vk::CommandBuffer>{};
+    vkBuffers.reserve( commandBuffers.size() );
+    for( auto&& buf : commandBuffers )
+    {
+      vkBuffers.emplace_back( buf->GetVkCommandBuffer() );
+      PushResource( buf );
+    }
+
+    mCommandBuffer.executeCommands( vkBuffers );
+  }
 
   Graphics&                       mGraphics;
   CommandPool&                    mOwnerCommandPool;
@@ -210,6 +346,12 @@ struct CommandBuffer::Impl
   std::vector< vk::Semaphore >          mSignalSemaphores {};
   std::vector< vk::Semaphore >          mWaitSemaphores {};
   std::vector< vk::PipelineStageFlags > mWaitStages {};
+
+  std::vector< Handle<VkManaged>> mResources; // used resources
+
+  Handle<Pipeline> mCurrentPipeline;
+
+  vk::RenderPass mCurrentRenderPass;
 
   bool mRecording { false };
 };
@@ -303,6 +445,62 @@ vk::CommandBuffer CommandBuffer::GetVkCommandBuffer() const
   return mImpl->mCommandBuffer;
 }
 
+bool CommandBuffer::IsPrimary() const
+{
+  return mImpl->mAllocateInfo.level == vk::CommandBufferLevel::ePrimary;
+}
+
+void CommandBuffer::BindVertexBuffers(uint32_t firstBinding, uint32_t bindingCount, std::vector<Handle<Buffer>> buffers,
+                       const vk::DeviceSize *pOffsets)
+{
+  mImpl->BindVertexBuffers( firstBinding, bindingCount, buffers, pOffsets );
+}
+
+void CommandBuffer::BindVertexBuffer(uint32_t binding, Dali::Graphics::Vulkan::Handle<Buffer> buffer, vk::DeviceSize offset )
+{
+  mImpl->BindVertexBuffers( binding, 1, std::vector<Handle<Buffer>>({ buffer }), &offset );
+}
+
+void CommandBuffer::BindGraphicsPipeline( Handle<Pipeline> pipeline )
+{
+  mImpl->BindGraphicsPipeline( pipeline );
+}
+
+void CommandBuffer::BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets,
+                         Handle<Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount )
+{
+  mImpl->BindDescriptorSets( descriptorSets, pipeline, firstSet, descriptorSetCount );
+}
+
+void CommandBuffer::BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets, uint32_t firstSet )
+{
+  mImpl->BindDescriptorSets( descriptorSets, mImpl->mCurrentPipeline, 0, descriptorSets.size() );
+}
+
+void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
+{
+  mImpl->Draw( vertexCount, instanceCount, firstVertex, firstInstance );
+}
+
+void CommandBuffer::BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
+{
+  mImpl->BeginRenderPass( framebufferId, bufferIndex );
+}
+
+void CommandBuffer::BeginRenderPass( vk::RenderPassBeginInfo renderPassBeginInfo, vk::SubpassContents subpassContents )
+{
+  mImpl->BeginRenderPass( renderPassBeginInfo, subpassContents );
+}
+
+void CommandBuffer::EndRenderPass()
+{
+  mImpl->EndRenderPass();
+}
+
+void CommandBuffer::ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers )
+{
+  mImpl->ExecuteCommands( commandBuffers );
+}
 
 } // namespace Vulkan
 } // namespace Graphics
