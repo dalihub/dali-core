@@ -40,10 +40,13 @@ public:
    */
   static Handle<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
 
+  /**
+   * Destructor
+   */
   ~Pipeline() override;
 
   /**
-   *
+   * Sets the viewport
    * @param x
    * @param y
    * @param width
@@ -52,7 +55,7 @@ public:
   void SetViewport( float x, float y, float width, float height );
 
   /**
-   *
+   * Attaches A shader module to the particular stage of pipeline
    * @param shader
    * @param stage
    * @return
@@ -85,7 +88,17 @@ private:
 
 public:
 
+  /**
+   * Returns Vulkan VkPipeline object associated with Pipeline
+   * @return
+   */
   vk::Pipeline GetVkPipeline() const;
+
+  /**
+   * Returns Vulkan VkPipelineLayout object associated with Pipeline
+   * @return
+   */
+  vk::PipelineLayout GetVkPipelineLayout() const;
 
   bool OnDestroy() override;
 

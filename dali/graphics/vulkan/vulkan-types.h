@@ -212,6 +212,12 @@ public:
     return *mObject;
   }
 
+  template <class K>
+  Handle<K> StaticCast();
+
+  template <class K>
+  Handle<K> DynamicCast();
+
   void Reset()
   {
     if( mObject )
@@ -291,6 +297,25 @@ Handle<T>::~Handle()
   {
     mObject->Release();
   }
+}
+
+template<class T>
+template<class K>
+Handle<K> Handle<T>::StaticCast()
+{
+  return Handle<K>(static_cast<K*>(mObject));
+}
+
+template<class T>
+template<class K>
+Handle<K> Handle<T>::DynamicCast()
+{
+  auto val = dynamic_cast<K*>(mObject);
+  if(val)
+  {
+    return Handle<K>(val);
+  }
+  return Handle<K>();
 }
 
 

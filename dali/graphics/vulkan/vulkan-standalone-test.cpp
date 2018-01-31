@@ -12,6 +12,13 @@
 #define VK_USE_PLATFORM_XCB_KHR
 #endif
 
+#include <glm/glm.hpp>
+#include <glm/matrix.hpp>
+#include <glm/vector_relational.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+using namespace glm;
+
 #include <dali/integration-api/graphics/vulkan/vulkan-hpp-wrapper.h>
 
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
@@ -29,6 +36,9 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 
 #include "generated/spv-shaders-gen.h"
 
@@ -46,6 +56,9 @@ using Dali::Graphics::Vulkan::Shader;
 using Dali::Graphics::Vulkan::ShaderHandle;
 using Dali::Graphics::Vulkan::Pipeline;
 using Dali::Graphics::Vulkan::PipelineHandle;
+using Dali::Graphics::Vulkan::CommandPool;
+using Dali::Graphics::Vulkan::CommandBuffer;
+using Dali::Graphics::Vulkan::DescriptorPool;
 
 extern std::vector<uint8_t> VSH;
 extern std::vector<uint8_t> FSH;
@@ -205,7 +218,7 @@ namespace VulkanTest
 
 Dali::Graphics::Vulkan::GpuMemoryBlockHandle test_gpu_memory_manager( Dali::Graphics::Vulkan::Graphics& graphics,
                                          GpuMemoryManager& gpuManager,
-                                         Buffer& buffer )
+                                         const Dali::Graphics::Vulkan::Handle<Buffer>& buffer )
 {
   auto device = graphics.GetDevice();
   auto& allocator = graphics.GetAllocator();
@@ -234,6 +247,52 @@ Dali::Graphics::Vulkan::GpuMemoryBlockHandle test_gpu_memory_manager( Dali::Grap
     count     = handle.GetRefCount();
   }
   return std::move(handle2);
+}
+
+struct UniformData
+{
+  mat4 modelMat;
+  mat4 viewMat;
+  mat4 projMat;
+  vec4 color;
+};
+
+
+Dali::Graphics::Vulkan::BufferHandle create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+{
+  // create uniform buffer
+  auto uniformBuffer = Buffer::New( gr, sizeof(UniformData), Buffer::Type::UNIFORM );
+
+  // allocate memory
+  auto memory = gr.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( uniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible );
+
+  // bind memory
+  uniformBuffer->BindMemory( memory );
+
+  auto ub = reinterpret_cast<UniformData*>(memory->Map());
+
+  ub->modelMat = mat4{};
+  ub->viewMat = lookAt( vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 0.0f, 1.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
+  ub->projMat = ortho( -1.0f, 1.0f, -1.0f, 1.0f );
+  ub->color = vec4( 1.0f, 0.0f, 0.0f, 1.0f );
+
+  memory->Unmap();
+
+  return uniformBuffer;
+}
+
+Dali::Graphics::Vulkan::Handle<DescriptorPool>
+create_descriptor_pool( Dali::Graphics::Vulkan::Graphics& gr )
+{
+  vk::DescriptorPoolSize size;
+  size.setDescriptorCount( 1024 ).setType( vk::DescriptorType::eUniformBuffer );
+
+  // TODO: how to organize this???
+  auto pool = DescriptorPool::New( gr,
+    vk::DescriptorPoolCreateInfo{}.
+      setMaxSets( 1024 ).
+      setPoolSizeCount(1).setPPoolSizes(&size));
+  return pool;
 }
 
 void test_handle()
@@ -326,22 +385,52 @@ int RunTestMain()
   // buffer
   auto vertexBuffer = Buffer::New( gr, sizeof(float)*4*3, Buffer::Type::VERTEX );
 
-  auto gpuManager = GpuMemoryManager::New( gr );
+  auto descriptorPool = create_descriptor_pool( gr );
+  auto descriptorSet = descriptorPool->AllocateDescriptorSets( vk::DescriptorSetAllocateInfo{}
+  .setPSetLayouts( vertexShader->GetDescriptorSetLayouts().data() )
+  .setDescriptorSetCount( static_cast<uint32_t>(vertexShader->GetDescriptorSetLayouts().size())));
 
-  auto bufferMemory = test_gpu_memory_manager( gr, *gpuManager, *vertexBuffer );
+
+
+  auto& gpuManager = gr.GetDeviceMemoryManager();
+
+  auto bufferMemory = test_gpu_memory_manager( gr, gpuManager, vertexBuffer );
   vertexBuffer->BindMemory( bufferMemory );
 
   auto ptr = static_cast<float*>(bufferMemory->Map());
   std::copy( VERTICES, VERTICES+12, ptr);
   bufferMemory->Unmap();
 
-
   auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
 
+  auto commandPool = CommandPool::New( gr );
 
-  while(1)
+  auto uniformBuffer = create_uniform_buffer( gr );
+
+
+  descriptorSet[0]->WriteUniformBuffer( 0, uniformBuffer, 0, uniformBuffer->GetSize() );
+
+
+
+  auto cmdDraw = commandPool->NewCommandBuffer();
+  cmdDraw->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+  std::vector<vk::Buffer> buffers{ vertexBuffer->GetVkBuffer() };
+  std::vector<vk::DeviceSize> sizes{ 0u };
+  auto cmdbuf = cmdDraw->GetVkCommandBuffer();
+  cmdbuf.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->GetVkPipeline());
+  cmdbuf.bindVertexBuffers( 0, 1, buffers.data(), sizes.data() );
+  cmdbuf.bindDescriptorSets( vk::PipelineBindPoint::eGraphics,
+                           pipeline->GetVkPipelineLayout(),
+                             0, 0, nullptr, 0, nullptr );
+  cmdbuf.draw( 3, 1, 0, 0 );
+  cmdDraw->End();
+
+  bool running = true;
+
+  while( running )
   {
     graphics->PreRender( fbid );
+    // queue submit draw
     graphics->PostRender( fbid );
   }
   return 0;

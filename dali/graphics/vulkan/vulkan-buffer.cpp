@@ -150,9 +150,9 @@ const GpuMemoryBlockHandle& Buffer::GetMemoryHandle() const
   return mImpl->mDeviceMemory;
 }
 
-size_t Buffer::GetSize() const
+uint32_t Buffer::GetSize() const
 {
-  return mImpl->GetSize();
+  return U32(mImpl->GetSize());
 }
 
 vk::Buffer Buffer::GetVkBuffer() const

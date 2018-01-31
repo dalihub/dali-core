@@ -27,6 +27,7 @@
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -494,6 +495,8 @@ Surface& Graphics::GetSurface( FBID surfaceId )
   return *mSurfaceFBIDMap[surfaceId].get();
 }
 
+// TODO: all this stuff should go into some vulkan cache
+
 void Graphics::AddBuffer( std::unique_ptr<Buffer> buffer )
 {
   mBuffersCache.push_back( std::move(buffer) );
@@ -517,6 +520,11 @@ void Graphics::AddShader( std::unique_ptr<Shader> shader )
 void Graphics::AddCommandPool( std::unique_ptr<CommandPool> pool )
 {
   mCommandPoolCache.push_back( std::move(pool) );
+}
+
+void Graphics::AddDescriptorPool( std::unique_ptr<DescriptorPool> pool )
+{
+  mDescriptorPoolCache.push_back( std::move(pool) );
 }
 
 void Graphics::RemoveBuffer( Buffer& buffer )
@@ -546,6 +554,16 @@ void Graphics::RemoveShader( Shader& shader )
     }
     ++index;
   }
+}
+
+void Graphics::RemoveCommandPool( CommandPool& commandPool )
+{
+  NotImplemented();
+}
+
+void Graphics::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool )
+{
+  NotImplemented();
 }
 
 Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
