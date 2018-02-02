@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  * Constrain the local properties of the PropertyOwner.
  * @param propertyOwner to constrain
  * @param updateBufferIndex buffer index to use
- * @return The number of constraints that are still being applied
  */
 void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
 {
@@ -109,7 +108,7 @@ inline int UpdateNodes( Node& node,
                         Layer& currentLayer,
                         int inheritedDrawMode )
 {
-  //Apply constraints to the node
+  // Apply constraints to the node
   ConstrainPropertyOwner( node, updateBufferIndex );
 
   // Short-circuit for invisible nodes
