@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_CONTROLLER_H
-#define DALI_GRAPHICS_API_CONTROLLER_H
+#ifndef DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#define DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -19,31 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-accessor.h>
-#include <dali/graphics-api/graphics-api-base-factory.h>
-#include <dali/graphics-api/graphics-api-dynamic-buffer.h>
-#include <dali/graphics-api/graphics-api-frame.h>
-#include <dali/graphics-api/graphics-api-framebuffer.h>
-#include <dali/graphics-api/graphics-api-generic-buffer.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-sampler.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-static-buffer.h>
-#include <dali/graphics-api/graphics-api-texture-factory.h>
-#include <dali/graphics-api/graphics-api-texture-set.h>
-#include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics-api/utility/utility-builder.h>
+#include <dali/graphics/graphics-controller.h>
 
 namespace Dali
 {
 namespace Graphics
 {
-namespace API
+namespace Vulkan
 {
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
-class Controller
+class Controller : Graphics::Controller
 {
 public:
   /**
@@ -87,25 +74,14 @@ public:
   virtual void GetRenderItemList() = 0;
 
   /**
-   * @brief Create a buffer
+   * @brief Returns a pipeline builder
    */
-  template<typename T>
-  GenericBuffer<T> CreateBuffer( size_t numberOfElements );
+  Utility::Builder<std::unique_ptr<Pipeline>, PrimitiveCount, BufferList> GetPipelineBuilder() noexcept;
 
-  /**
-   * @brief Submit a render command
-   */
-  virtual void SubmitCommand( API::RenderCommand command ) = 0;
+  virtual void SubmitCommand(API::RenderCommand command) override;
 
-  /**
-   * @brief Mark the beginning of a frame
-   */
-  virtual void BeginFrame() = 0;
-
-  /**
-   * @brief Mark the end of a frame
-   */
-  virtual void EndFrame() = 0;
+  virtual void BeginFrame() override;
+  virtual void EndFrame() override;
 
 public:
   // not copyable
@@ -124,22 +100,11 @@ protected:
    */
   Controller() = default;
 
-  /**
-   * @brief create an element for the given number of elements and element size
-   */
-  virtual std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) = 0;
-
 private:
 };
 
-template<typename T>
-GenericBuffer<T> Controller::CreateBuffer( size_t numberOfElements )
-{
-    return GenericBuffer<T>(numberOfElements, std::move(CreateBuffer( numberOfElements, sizeof( T ) )));
-}
-
-} // namespace API
+} // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_CONTROLLER_H
+#endif // DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H

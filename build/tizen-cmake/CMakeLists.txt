@@ -70,8 +70,8 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 ENDIF()
 
 # Set up compiler flags and warnings
-#ADD_COMPILE_OPTIONS( -std=c++11 -ggdb )
-ADD_COMPILE_OPTIONS( -std=c++11 -gdwarf-4 )
+#ADD_COMPILE_OPTIONS( -std=c++14 -ggdb )
+ADD_COMPILE_OPTIONS( -std=c++14 -gdwarf-4 )
 ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 ADD_COMPILE_OPTIONS( -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
 
