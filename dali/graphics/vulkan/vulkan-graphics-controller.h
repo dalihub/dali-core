@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_CONTROLLER_H
-#define DALI_GRAPHICS_API_CONTROLLER_H
+#ifndef DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#define DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -19,68 +19,54 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-accessor.h>
-#include <dali/graphics-api/graphics-api-base-factory.h>
-#include <dali/graphics-api/graphics-api-dynamic-buffer.h>
-#include <dali/graphics-api/graphics-api-framebuffer.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
-#include <dali/graphics-api/graphics-api-sampler.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-static-buffer.h>
-#include <dali/graphics-api/graphics-api-texture-factory.h>
-#include <dali/graphics-api/graphics-api-texture-set.h>
-#include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics-api/utility/utility-builder.h>
+#include <dali/graphics/graphics-controller.h>
 
 namespace Dali
 {
 namespace Graphics
 {
-namespace API
+namespace Vulkan
 {
-
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
-class Controller
+class Controller : Graphics::Controller
 {
 public:
   /**
    * @brief Create a new object
    */
-  virtual Accessor< Shader > CreateShader(const BaseFactory< Shader >& factory) = 0;
+  virtual Accessor<Shader> CreateShader( const BaseFactory<Shader>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< Texture > CreateTexture(const BaseFactory< Texture >& factory) = 0;
+  virtual Accessor<Texture> CreateTexture( const BaseFactory<Texture>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< TextureSet > CreateTextureSet(const BaseFactory< TextureSet >& factory) = 0;
+  virtual Accessor<TextureSet> CreateTextureSet( const BaseFactory<TextureSet>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< DynamicBuffer > CreateDynamicBuffer(
-      const BaseFactory< DynamicBuffer >& factory) = 0;
+  virtual Accessor<DynamicBuffer> CreateDynamicBuffer( const BaseFactory<DynamicBuffer>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< StaticBuffer > CreateStaticBuffer(
-      const BaseFactory< StaticBuffer >& factory) = 0;
+  virtual Accessor<StaticBuffer> CreateStaticBuffer( const BaseFactory<StaticBuffer>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< Sampler > CreateSampler(const BaseFactory< Sampler >& factory) = 0;
+  virtual Accessor<Sampler> CreateSampler( const BaseFactory<Sampler>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor< Framebuffer > CreateFramebuffer(const BaseFactory< Framebuffer >& factory) = 0;
+  virtual Accessor<Framebuffer> CreateFramebuffer( const BaseFactory<Framebuffer>& factory ) = 0;
 
   /**
    * @brief Get a render list
@@ -92,12 +78,9 @@ public:
    */
   Utility::Builder<std::unique_ptr<Pipeline>, PrimitiveCount, BufferList> GetPipelineBuilder() noexcept;
 
-  /**
-   * @brief Submit a frame!
-   */
-  virtual void SubmitCmd(API::RemderCommand command) = 0;
-  virtual void BeginFrame() = 0;
-  virtual void EndFrame() = 0;
+  virtual void SubmitCmd(API::RemderCommand command) override;
+  virtual void BeginFrame() override;
+  virtual void EndFrame() override;
 
 public:
   // not copyable
@@ -119,8 +102,8 @@ protected:
 private:
 };
 
-} // namespace API
+} // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_CONTROLLER_H
+#endif // DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H

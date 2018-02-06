@@ -126,6 +126,7 @@ internal_src_files = \
   $(internal_src_dir)/update/controllers/scene-controller-impl.cpp \
   $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
+  $(internal_src_dir)/update/graphics/graphics-algorithms.cpp \
   $(internal_src_dir)/update/queue/update-message-queue.cpp \
   $(internal_src_dir)/update/manager/render-instruction-processor.cpp \
   $(internal_src_dir)/update/manager/render-task-processor.cpp \
