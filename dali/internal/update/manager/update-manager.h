@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,30 @@
  *
  */
 
+//EXTERNAL INCLUDES
+#include <iostream>
+#include <memory>
+
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/common/shader-saver.h>
+#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>  // for OwnerPointer< Renderer >
-#include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
-#include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>   // for OwnerPointer< Shader >
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
+#include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 
 namespace Dali
 {
@@ -673,7 +677,7 @@ private:
   SceneGraphBuffers mSceneGraphBuffers;
 
   struct Impl;
-  Impl* mImpl;
+  std::unique_ptr<Impl> mImpl;
 
 };
 
