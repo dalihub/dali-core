@@ -44,9 +44,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                            Matrix                               viewProjection,
                            const RenderList&                    renderItemList )
 {
-  // TODO: @todo: share pipelines accross render lists
-  auto pipelineBuilder = graphics.GetPipelineBuilder();
-  commandBuilder.Set( pipelineBuilder.Build() );
+  // TODO: @todo Set shaders and other properties
+  //commandBuilder.Set( );
 
   // TODO: @todo Clipping...
 
@@ -57,20 +56,24 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     Matrix  world;
     Vector4 color;
     Vector3 size;
-  } __attribute__((aligned(16));
-  // TODO: @todo
-  //auto uniformBuffer = graphics.CreateBuffer<DataT>( numberOfRenderItems );
-  auto uniformBuffer = std::vector<DataT>( numberOfRenderItems );
+  } __attribute__((aligned(16)));
+
+  auto uniformBuffer = graphics.CreateBuffer<DataT>( numberOfRenderItems );
+  auto data = uniformBuffer.GetData();
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
-    Matrix::Multiply( uniformBuffer[i].world, item.mModelMatrix, viewProjection );
-    uniformBuffer[i].color = item.mNode->GetWorldColor( bufferIndex );
-    uniformBuffer[i].size  = item.mSize;
+    Matrix::Multiply( data[i].world, item.mModelMatrix, viewProjection );
+    data[i].color = item.mNode->GetWorldColor( bufferIndex );
+    data[i].size  = item.mSize;
   }
   commandBuilder.Set( Graphics::API::PrimitiveCount{numberOfRenderItems} );
-  commandBuilder.Set( Graphics::API::BufferList{std::move( uniformBuffer )} );
-  frame.AddCommand( commandBuilder );
+
+  auto buffers = std::vector<Graphics::API::BufferInfo>{};
+  buffers.emplace_back(std::move(uniformBuffer));
+
+  commandBuilder.Set( Graphics::API::BufferList{std::move(buffers)} );
+  graphics.SubmitCommand( commandBuilder );
 }
 
 void SubmitInstruction( Graphics::API::Controller& graphics,
@@ -92,7 +95,7 @@ void SubmitInstruction( Graphics::API::Controller& graphics,
   const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
   const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
   Matrix        viewProjection;
-  Matrix::Multiply( viewProjection.viewMatrix, projectionMatrix );
+  Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
   auto commandBuilder = RenderCommandBuilder{};
 
@@ -109,9 +112,10 @@ void SubmitRenderInstructions( Graphics::API::Controller&  graphics,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex                 bufferIndex )
 {
-  auto frame = graphics.CreateFrame();
+  auto frame = Graphics::API::Frame{};
+  graphics.BeginFrame();
 
-  auto numberOfInstructions = renderInstructions.Count();
+  auto numberOfInstructions = renderInstructions.Count( bufferIndex );
   for( size_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
@@ -119,7 +123,7 @@ void SubmitRenderInstructions( Graphics::API::Controller&  graphics,
     SubmitInstruction( graphics, frame, bufferIndex, instruction );
   }
 
-  graphics.SubmitFrame( frame );
+  graphics.EndFrame( );
 }
 
 } // namespace SceneGraph

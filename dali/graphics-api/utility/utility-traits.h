@@ -30,7 +30,7 @@ namespace Utility
 {
 
 template<typename T>
-struct BasicType<T>
+struct BasicType
 {
   using StorageT = T;
   using AccessT  = T;
@@ -45,44 +45,45 @@ struct ComplexType
   using ValueT   = T;
 };
 
-template<typename T, template<typename> class Ptr>
-struct PointerType<> final
+template<typename T, template<typename...> class Ptr, typename...Ts>
+struct SmartPointerType
 {
-  using StorageT = Ptr<T>;
+  using StorageT = Ptr<T, Ts...>;
   using AccessT  = T&;
   using ValueT   = T;
 };
 
+// Default types
+template<typename T> struct TraitsType : ComplexType<T> {};
 
 // Pointer types
-template<typename T> struct PointerType final : public FalseValue {};
-template<typename T> struct PointerType<T*> final : public TrueValue {};
-template<typename T> struct PointerType<const T*> final : public TrueValue {};
-template<typename T> struct PointerType<std::unique_ptr<T>> final : public TrueValue {};
-template<typename T> struct PointerType<std::shared_ptr<T>> final : public TrueValue {};
+template<typename T, typename D>
+struct TraitsType<std::unique_ptr<T, D>> : SmartPointerType<T, std::unique_ptr, D>
+{
+};
+template<typename T>
+struct TraitsType<std::shared_ptr<T>> : SmartPointerType<T, std::shared_ptr>
+{
+};
 
 // Basic types
-template<typename T> struct BasicType final : public FalseValue {};
-template<> struct BasicType<signed char> final : public TrueValue {};
-template<> struct BasicType<unsigned char> final : public TrueValue {};
-template<> struct BasicType<signed short> final : public TrueValue {};
-template<> struct BasicType<unsigned short> final : public TrueValue {};
-template<> struct BasicType<signed long> final : public TrueValue {};
-template<> struct BasicType<unsigned long> final : public TrueValue {};
-template<> struct BasicType<signed long long> final : public TrueValue {};
-template<> struct BasicType<unsigned long long> final : public TrueValue {};
-template<> struct BasicType<float> final : public TrueValue {};
-template<> struct BasicType<double> final : public TrueValue {};
+template<> struct TraitsType<signed char> : BasicType<signed char> { };
+template<> struct TraitsType<unsigned char> : BasicType<unsigned char> { };
+template<> struct TraitsType<signed short> : BasicType<signed short> { };
+template<> struct TraitsType<unsigned short> : BasicType<unsigned short> { };
+template<> struct TraitsType<signed long> : BasicType<signed long> { };
+template<> struct TraitsType<unsigned long> : BasicType<unsigned long> { };
+template<> struct TraitsType<signed long long> : BasicType<signed long long> { };
+template<> struct TraitsType<unsigned long long> : BasicType<unsigned long long> { };
+template<> struct TraitsType<float> : BasicType<float> { };
+template<> struct TraitsType<double> : BasicType<double> { };
 
+// Invalid tyoes
 
-// Type Traits
-template<typename T, template<typename> class Ptr, std::enable_if_t<PointerType<Ptr<T>>::value>>
-struct Traits<Ptr<T>> final
-{
-  using StorageT = Ptr<T>;
-  using AccessT  = T&;
-  using ValueT   = T;
-};
+template<typename T> struct TraitsType<T*> {};
+template<typename T> struct TraitsType<const T*> {};
+template<typename T> struct TraitsType<T&> {};
+template<typename T> struct TraitsType<const T&> {};
 
 } // namespace Utility
 } // namespace Graphics

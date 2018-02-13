@@ -6,15 +6,15 @@ namespace Graphics
 {
 namespace Vulkan
 {
-void SubmitCmd( API::RemderCommand command )
+void SubmitCommand( API::RenderCommand command )
 {
   // do something
 }
-void BeginFrame(API::Frame frame)
+void BeginFrame()
 {
   // do something
 }
-void EndFrame(API::Frame frame)
+void EndFrame()
 {
   // do something
 }

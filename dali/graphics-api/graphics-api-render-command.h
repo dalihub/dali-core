@@ -24,9 +24,9 @@
 #include <vector>
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/graphics-api/utility/utility-strong-type.h>
+#include <dali/graphics-api/graphics-api-generic-buffer.h>
 #include <dali/graphics-api/utility/utility-builder.h>
+#include <dali/graphics-api/utility/utility-strong-type.h>
 
 namespace Dali
 {
@@ -34,35 +34,37 @@ namespace Graphics
 {
 namespace API
 {
-
-using BufferInfo = std::tuple<Buffer::UsageHint, Buffer>;
-using BufferList = Utility::StrongType<std::vector<BufferInfo>, struct BufferListTag>;
+using PrimitiveCount = Utility::StrongType<size_t, struct PrimitiveCountTag>;
+using BufferInfo     = std::unique_ptr<GenericBufferBase>;
+using BufferList     = Utility::StrongType<std::vector<BufferInfo>, struct BufferListTag>;
 
 /**
  * @brief Interface class for RenderCommand types in the graphics API.
  */
-class RenderCommand
+class RenderCommand final
 {
 public:
-  // not copyable
-  RenderCommand(const RenderCommand&) = delete;
-  RenderCommand& operator=(const RenderCommand&) = delete;
+  RenderCommand( PrimitiveCount primitiveCount, BufferList bufferList )
+  : mPrimitiveCount{primitiveCount}, mBufferList{std::move( bufferList )}
+  {
+  }
 
-  virtual ~RenderCommand() = default;
-
-protected:
   // derived types should not be moved direcly to prevent slicing
-  RenderCommand(RenderCommand&&) = default;
-  RenderCommand& operator=(RenderCommand&&) = default;
+  RenderCommand( RenderCommand&& ) = default;
+  RenderCommand& operator=( RenderCommand&& ) = default;
+
+  // not copyable
+  RenderCommand( const RenderCommand& ) = delete;
+  RenderCommand& operator=( const RenderCommand& ) = delete;
+
+  ~RenderCommand() = default;
 
 private:
-  /**
-   * Objects of this type should not directly.
-   */
-  RenderCommand() = default;
+  PrimitiveCount mPrimitiveCount;
+  BufferList     mBufferList;
 };
 
-using RenderCommandBuilder = Utility::Builder<RenderCommand, BufferList>;
+using RenderCommandBuilder = Utility::Builder<RenderCommand, PrimitiveCount, BufferList>;
 
 } // namespace API
 } // namespace Graphics

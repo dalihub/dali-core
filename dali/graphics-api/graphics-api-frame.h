@@ -32,13 +32,16 @@ namespace API
 class Frame
 {
 public:
+
   // not copyable
   Frame(const Frame&) = delete;
   Frame& operator=(const Frame&) = delete;
 
   virtual ~Frame() = default;
 
-protected:
+//TODO: @todo this should be protected
+
+
   // derived types should not be moved direcly to prevent slicing
   Frame(Frame&&) = default;
   Frame& operator=(Frame&&) = default;

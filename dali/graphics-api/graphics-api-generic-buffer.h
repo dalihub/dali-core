@@ -1,7 +1,7 @@
 #ifndef DALI_GRAPHICS_API_GENERIC_BUFFER_H
 #define DALI_GRAPHICS_API_GENERIC_BUFFER_H
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
  *
  */
 
-#include <vector>
+#include <cstddef>
+#include <memory>
 
 namespace Dali
 {
@@ -25,30 +26,71 @@ namespace Graphics
 {
 namespace API
 {
+class GenericBufferBase
+{
+public:
+  enum class UsageHint
+  {
+    FRAME_CONSTANTS,
+    PRIMITIVE_UNIFORMS,
+    ATTRIBUTES,
+    INSTANCE,
+    INDEX_BUFFER,
+  };
+
+  GenericBufferBase( size_t size, std::unique_ptr<char>&& data ) : mSize{size}, mData( std::move( data ) )
+  {
+  }
+
+  size_t GetSize() const
+  {
+    return mSize;
+  }
+
+  virtual ~GenericBufferBase() = default;
+
+protected:
+  char* GetDataBase()
+  {
+    return mData.get();
+  }
+
+  // derived types should not be moved direcly to prevent slicing
+  GenericBufferBase( GenericBufferBase&& ) = default;
+  GenericBufferBase& operator=( GenericBufferBase&& ) = default;
+
+  // not copyable
+  GenericBufferBase( const GenericBufferBase& ) = delete;
+  GenericBufferBase& operator=( const GenericBufferBase& ) = delete;
+
+private:
+  size_t                mSize;
+  std::unique_ptr<char> mData;
+};
 
 /**
  * @brief Interface class for GenericBuffer types in the graphics API.
  */
-template< typename Base, typename Structure >
-class GenericBuffer final : public Base
+template<typename T>
+class GenericBuffer final : public GenericBufferBase
 {
 public:
-  GenericBuffer(size_t size) = default;
-
-  // not copyable
-  GenericBuffer(const GenericBuffer&) = delete;
-  GenericBuffer& operator=(const GenericBuffer&) = delete;
+  GenericBuffer( size_t numberOfElements, std::unique_ptr<char>&& data )
+  : GenericBufferBase( numberOfElements * sizeof( T ), std::move( data ) ){};
 
   virtual ~GenericBuffer() = default;
 
-protected:
-  // derived types should not be moved direcly to prevent slicing
-  GenericBuffer(GenericBuffer&&) = default;
-  GenericBuffer& operator=(GenericBuffer&&) = default;
+  GenericBuffer( GenericBuffer&& ) = default;
+  GenericBuffer& operator=( GenericBuffer&& ) = default;
 
-private:
+  // not copyable
+  GenericBuffer( const GenericBuffer& ) = delete;
+  GenericBuffer& operator=( const GenericBuffer& ) = delete;
 
-  std::vector< Structure > mData;
+  T* GetData()
+  {
+    return reinterpret_cast<T*>( GenericBufferBase::GetDataBase() );
+  }
 };
 
 } // namespace API

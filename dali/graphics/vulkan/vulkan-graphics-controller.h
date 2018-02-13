@@ -78,7 +78,8 @@ public:
    */
   Utility::Builder<std::unique_ptr<Pipeline>, PrimitiveCount, BufferList> GetPipelineBuilder() noexcept;
 
-  virtual void SubmitCmd(API::RemderCommand command) override;
+  virtual void SubmitCommand(API::RenderCommand command) override;
+
   virtual void BeginFrame() override;
   virtual void EndFrame() override;
 
