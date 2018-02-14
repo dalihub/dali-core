@@ -244,9 +244,9 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
   // So we know if we are at depth 4 and the stackDepth is 5, that we have gone up.
   // If the depth is the same then we are effectively part of a different sub-tree from the parent, we must also remove the current clip.
   // Note: Stack depth must always be at least 1, as we will have the layer or stage size as the root value.
-  if( ( childStackDepth > 0u ) && ( scissorDepth < childStackDepth ) )
+  if( ( childStackDepth > 0u ) && ( scissorDepth <= childStackDepth ) )
   {
-    while( scissorDepth < childStackDepth )
+    while( scissorDepth <= childStackDepth )  // Pop until sibling
     {
       mScissorStack.pop_back();
       --childStackDepth;

@@ -4374,7 +4374,7 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   END_TEST;
 }
 
-int UtcDaliActorPropertyScissorClippingActorNested(void)
+int UtcDaliActorPropertyScissorClippingActorNested01(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
@@ -4447,6 +4447,87 @@ int UtcDaliActorPropertyScissorClippingActorNested(void)
     compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
     DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with the expected result
   }
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActorNested02(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  /* Create a nest of 2 scissors and siblings of the parent.
+
+            stage
+              |
+        ┌─────┐─────┐
+        A     C     D
+        |
+        B
+  */
+
+  const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
+  const Vector2 sizeA{ stageSize.width, stageSize.height * 0.25f };
+  const Vector2 sizeB{ stageSize.width, stageSize.height * 0.05f };
+  const Vector2 sizeC{ stageSize.width, stageSize.height * 0.25f };
+  const Vector2 sizeD{ stageSize.width, stageSize.height * 0.25f };
+
+  // Create a clipping actors.
+  Actor clippingActorA = CreateActorWithContent( sizeA.width, sizeA.height );
+  Actor clippingActorB = CreateActorWithContent( sizeB.width, sizeB.height );
+  Actor clippingActorC = CreateActorWithContent( sizeC.width, sizeC.height );
+  Actor clippingActorD = CreateActorWithContent( sizeD.width, sizeD.height );
+
+  clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorB.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorC.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorC.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorC.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorD.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorD.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorD.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
+
+  clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
+  clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
+  clippingActorC.SetPosition( 0.0f, 100.0f, 0.0f );
+  clippingActorD.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  Stage::GetCurrent().Add( clippingActorA );
+  clippingActorA.Add( clippingActorB );
+  Stage::GetCurrent().Add( clippingActorC );
+  Stage::GetCurrent().Add( clippingActorD );
+
+  // Gather the call trace.
+  GenerateTrace( application, enabledDisableTrace, scissorTrace );
+
+  // Check we are writing to the color buffer.
+  CheckColorMask( glAbstraction, true );
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );                                   // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::string clipA( "0, 500, 480, 200" );
+  std::string clipB( "0, 580, 480, 40" );
+  std::string clipC( "0, 200, 480, 200" );
+  std::string clipD( "0, 300, 480, 200" );
+
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipA ) );
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipB ) );
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipC ) );
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipD ) );
 
   END_TEST;
 }
