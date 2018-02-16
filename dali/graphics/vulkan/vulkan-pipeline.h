@@ -39,7 +39,7 @@ public:
    * @param info
    * @return
    */
-  static Handle<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info );
+  static Handle<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
 
   /**
    * Destructor

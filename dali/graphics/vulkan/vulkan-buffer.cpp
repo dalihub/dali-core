@@ -167,8 +167,8 @@ void Buffer::BindMemory( const GpuMemoryBlockRef& handle )
 
 bool Buffer::OnDestroy()
 {
-  mImpl->mGraphics.RemoveBuffer( *this );
-  return true;
+  //mImpl->mGraphics.RemoveBuffer( *this );
+  return false;
 }
 
 

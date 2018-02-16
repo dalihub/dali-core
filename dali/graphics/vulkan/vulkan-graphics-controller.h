@@ -27,12 +27,24 @@ namespace Graphics
 {
 namespace Vulkan
 {
+class Graphics;
+
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
-class Controller : public Graphics::Controller
+class Controller : public Dali::Graphics::Controller
 {
 public:
+
+  explicit Controller( Vulkan::Graphics& vulkanGraphics );
+
+  /**
+   * Must be created from VulkanGraphics
+   * @param vulkanGraphics
+   * @return
+   */
+  static std::unique_ptr<Controller> New( Vulkan::Graphics& vulkanGraphics );
+
   /**
    * @brief Create a new object
    */
@@ -68,12 +80,14 @@ public:
    */
   API::Accessor<API::Framebuffer> CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory ) override;
 
+  std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
+
   /**
    * @brief Get a render list
    */
   void GetRenderItemList() override;
 
-  void SubmitCommand(API::RenderCommand&& command) override;
+  void SubmitCommand( API::RenderCommand&& command ) override;
 
   void BeginFrame() override;
 
@@ -84,23 +98,21 @@ public:
   Controller( const Controller& ) = delete;
   Controller& operator=( const Controller& ) = delete;
 
-  virtual ~Controller() = default;
+  ~Controller() override;
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Controller( Controller&& ) = default;
-  Controller& operator=( Controller&& ) = default;
+  Controller( Controller&& );
+  Controller& operator=( Controller&& );
 
   /**
    * Objects of this type should not directly.
    */
-  Controller() = default;
+  Controller();
 
 private:
-
   struct Impl;
   std::unique_ptr<Impl> mImpl;
-
 };
 
 } // namespace Vulkan

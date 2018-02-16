@@ -244,10 +244,14 @@ Dali::Graphics::Vulkan::GpuMemoryBlockRef test_gpu_memory_manager(
 
 struct UniformData
 {
-  mat4 modelMat;
-  mat4 viewMat;
-  mat4 projMat;
+  mat4 mvp;
   vec4 color;
+  vec3 size;
+} __attribute__( ( aligned( 16 ) ) );
+
+struct UniformClipData
+{
+  mat4 clip;
 } __attribute__( ( aligned( 16 ) ) );
 
 mat4 MVP;
@@ -265,17 +269,17 @@ void update_translation( Dali::Graphics::Vulkan::BufferRef buffer )
   static float x = 0.0f;
   x += 0.5f;
 
+  /*
   UniformData ub;
-  ub.modelMat = mat4{1.0f};
-  ub.modelMat = glm::translate( ub.modelMat, vec3( x, x, 0.0f ) );
-  ub.modelMat = glm::rotate( ub.modelMat, glm::radians( x ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
-  ub.viewMat  = lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
 
-  glm::mat4 clip( 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
+  auto modelMat = glm::translate( mat4{1}, vec3( x, x, 0.0f ) );
+  modelMat      = glm::rotate( modelMat, glm::radians( x ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
-  ub.projMat = clip * ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f );
-  ub.color   = vec4( x / 640.0f, x / 480.0f, 1.0f, 1.0f );
+  ub.mvp = ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f ) *
+           lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) ) * modelMat;
+
   update_buffer( buffer, ub );
+   */
 }
 
 Dali::Graphics::Vulkan::BufferRef create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
@@ -292,20 +296,32 @@ Dali::Graphics::Vulkan::BufferRef create_uniform_buffer( Dali::Graphics::Vulkan:
 
   auto ub = reinterpret_cast<UniformData*>( memory->Map() );
 
-  ub->modelMat = mat4{1.0f};
-  //ub->modelMat = glm::translate( ub->modelMat, vec3( 0.0f, 0.0f, 0.0f ));
-
-  ub->viewMat = lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
-
-  glm::mat4 clip( 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
-
-  ub->projMat = clip * ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f );
-  ub->color   = vec4( 0.0f, 1.0f, 1.0f, 1.0f );
-
-  MVP = ub->projMat * ub->viewMat * ub->modelMat;
+  ub->mvp = mat4{1.0f} * ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f ) *
+            lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
+  ub->color = vec4( 0.0f, 1.0f, 1.0f, 1.0f );
+  ub->size  = vec3( 1.0f, 1.0f, 1.0f );
 
   memory->Unmap();
 
+  return uniformBuffer;
+}
+
+Dali::Graphics::Vulkan::BufferRef create_clip_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+{
+  const glm::mat4 clip(
+    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
+
+  // create uniform buffer
+  auto uniformBuffer = Buffer::New( gr, sizeof( UniformClipData ), Buffer::Type::UNIFORM );
+
+  // allocate memory
+  auto memory = gr.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( uniformBuffer,
+                                                                            vk::MemoryPropertyFlagBits::eHostVisible );
+  // bind memory
+  uniformBuffer->BindMemory( memory );
+  auto dst = memory->MapTyped<mat4>();
+  std::copy( &clip, &clip + 1, dst );
+  memory->Unmap();
   return uniformBuffer;
 }
 
@@ -430,9 +446,14 @@ int RunTestMain()
   auto vertexShader = Shader::New( gr, VSH_CODE.data(), VSH_CODE.size() );
   vertexShader->SetDescriptorSetLayout(
     0,
-    vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 1 ).setPBindings(
+    vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 2 ).setPBindings(
       std::vector<vk::DescriptorSetLayoutBinding>{vk::DescriptorSetLayoutBinding{}
                                                     .setBinding( 0 )
+                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
+                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
+                                                    .setDescriptorCount( 1 ),
+                                                  vk::DescriptorSetLayoutBinding{}
+                                                    .setBinding( 1 )
                                                     .setStageFlags( vk::ShaderStageFlagBits::eVertex )
                                                     .setDescriptorType( vk::DescriptorType::eUniformBuffer )
                                                     .setDescriptorCount( 1 )}
@@ -466,7 +487,10 @@ int RunTestMain()
 
   auto uniformBuffer = create_uniform_buffer( gr );
 
+  auto clipBuffer = create_clip_buffer( gr );
+
   descriptorSet[0]->WriteUniformBuffer( 0, uniformBuffer, 0, uniformBuffer->GetSize() );
+  descriptorSet[0]->WriteUniformBuffer( 1, clipBuffer, 0, clipBuffer->GetSize() );
 
   // get new buffer
   auto cmdDraw = commandPool->NewCommandBuffer( false );

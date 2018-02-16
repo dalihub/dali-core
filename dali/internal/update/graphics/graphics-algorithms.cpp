@@ -73,8 +73,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   buffers.emplace_back(std::move(uniformBuffer));
 
   commandBuilder.Set( Graphics::API::BufferList{std::move(buffers)} );
- // auto cmd = commandBuilder.Build();
- // graphics.SubmitCommand( std::move(cmd) );
+  auto cmd = commandBuilder.Build();
+  graphics.SubmitCommand( std::move(cmd) );
 }
 
 void SubmitInstruction( Graphics::API::Controller& graphics,

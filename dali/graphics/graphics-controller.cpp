@@ -75,5 +75,9 @@ void Controller::GetRenderItemList()
 {
 }
 
+Controller::Controller() = default;
+Controller::Controller(Controller&&) = default;
+Controller::~Controller() = default;
+
 } // namespace Graphics
 } // namespace Dali

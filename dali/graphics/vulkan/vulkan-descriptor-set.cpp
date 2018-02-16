@@ -64,6 +64,12 @@ struct DescriptorPool::Impl
     return retval;
   }
 
+  void Reset()
+  {
+    mGraphics.GetDevice().resetDescriptorPool( mVkDescriptorPool );
+    mDescriptorSetCache.clear();
+  }
+
   bool Initialise()
   {
     mVkDescriptorPool = VkAssert( mGraphics.GetDevice().createDescriptorPool( mCreateInfo, mGraphics.GetAllocator() ) );
@@ -107,6 +113,11 @@ std::vector<DescriptorSetHandle> DescriptorPool::AllocateDescriptorSets( vk::Des
   return mImpl->AllocateDescriptorSets( allocateInfo );
 }
 
+void DescriptorPool::Reset()
+{
+  mImpl->Reset();
+}
+
 /****************************************************************************************
  * Class DescriptorSet::Impl
  */
@@ -126,7 +137,8 @@ struct DescriptorSet::Impl
   {
     if(mVkDescriptorSet)
     {
-      mGraphics.GetDevice().freeDescriptorSets( mPool.GetVkDescriptorPool(), 1, &mVkDescriptorSet );
+      // TODO: @todo non freeable!!!
+      //mGraphics.GetDevice().freeDescriptorSets( mPool.GetVkDescriptorPool(), 1, &mVkDescriptorSet );
     }
   }
 
