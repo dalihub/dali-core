@@ -44,12 +44,12 @@ public:
   }
 
   template<typename Return>
-  operator Return() const
+  operator Return()
   {
     return Build( std::index_sequence_for<Params...>{} );
   }
 
-  auto Build() const
+  auto Build()
   {
     return Build( std::index_sequence_for<Params...>{} );
   }
@@ -77,9 +77,9 @@ private:
   }
 
   template<size_t... Is>
-  T Build( std::index_sequence<Is...> ) const
+  T Build( std::index_sequence<Is...> )
   {
-    return T(std::forward<Params>(std::get<Is>(std::forward<std::tuple<Params...>>( mParameters ) ))...);
+    return T(std::move(std::get<Is>( mParameters ) )...);
   }
 
 private: // data
