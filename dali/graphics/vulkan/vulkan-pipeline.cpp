@@ -178,7 +178,7 @@ struct Pipeline::Impl
     mRasterizationState.setDepthBiasClamp( 0.0f );
     mRasterizationState.setDepthBiasEnable( false );
     mRasterizationState.setDepthClampEnable( false );
-    mRasterizationState.setFrontFace( vk::FrontFace::eClockwise );
+    mRasterizationState.setFrontFace( vk::FrontFace::eCounterClockwise );
     mRasterizationState.setPolygonMode( vk::PolygonMode::eFill );
     mRasterizationState.setRasterizerDiscardEnable( false );
     mRasterizationState.setLineWidth( 1.0f );

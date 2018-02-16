@@ -121,7 +121,7 @@ void Surface::BeginRenderPass()
     if(r > 1.0f)
       r -= 1.0f;
 
-    clearValues[0].color.setFloat32({0.0f, 1.0f, 0.0f, 1.0f});
+    clearValues[0].color.setFloat32({0.0f, 0.0f, 0.0f, 1.0f});
     clearValues[1].depthStencil.setDepth(1.0f).setStencil(0.0f);
 
     auto rpInfo = vk::RenderPassBeginInfo{};

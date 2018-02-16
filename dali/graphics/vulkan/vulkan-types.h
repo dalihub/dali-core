@@ -345,6 +345,7 @@ using DescriptorPoolRef = Handle<class DescriptorPool>;
 using CommandPoolRef = Handle<class CommandPool>;
 using CommandBufferRef = Handle<class CommandBuffer>;
 using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
+using DescriptorSetRef = Handle<class DescriptorSet>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="

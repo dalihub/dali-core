@@ -29,6 +29,9 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+
+#include <dali/graphics-api/graphics-api-controller.h>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -85,6 +88,16 @@ Platform Graphics::GetDefaultPlatform() const
 #else
   return mPlatform;
 #endif
+}
+
+Dali::Graphics::API::Controller& Graphics::GetController()
+{
+  if(!mGfxController)
+  {
+    mGfxController = Dali::Graphics::Vulkan::Controller::New(*this);
+  }
+
+  return *mGfxController.get();
 }
 
 std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
@@ -194,7 +207,8 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
-      .setEnabledLayerCount(U32(validationLayers.size()))
+      //.setEnabledLayerCount(U32(validationLayers.size()))
+      .setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));

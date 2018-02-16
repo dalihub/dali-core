@@ -94,6 +94,11 @@ public:
 
   std::vector<DescriptorSetHandle> AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
 
+  /**
+   * Resets descriptor pool
+   */
+  void Reset();
+
 private:
 
   DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );

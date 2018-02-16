@@ -45,6 +45,17 @@ public:
   void* Map();
 
   /**
+   * Returns mapped memory to specified type
+   * @tparam T
+   * @return
+   */
+  template<class T>
+  T* MapTyped()
+  {
+    return reinterpret_cast<T*>(Map());
+  }
+
+  /**
    *
    * @param offset
    * @param size
