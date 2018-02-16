@@ -59,6 +59,16 @@ public:
 
   ~RenderCommand() = default;
 
+  PrimitiveCount GetPrimitiveCount() const
+  {
+    return mPrimitiveCount;
+  }
+
+  const BufferList& GetBufferList() const
+  {
+    return mBufferList;
+  }
+
 private:
   PrimitiveCount mPrimitiveCount;
   BufferList     mBufferList;

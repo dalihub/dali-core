@@ -18,7 +18,7 @@
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
-
+#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/integration-api/graphics/graphics.h>
 
 namespace Dali
@@ -80,8 +80,7 @@ void Graphics::PreRender(Dali::Graphics::FBID framebufferId)
 
 Dali::Graphics::API::Controller& Graphics::GetController()
 {
-  auto ptr = this;
-  return *reinterpret_cast<Dali::Graphics::API::Controller*>(ptr);
+  return mGraphicsImpl->GetController();
 }
 
 /*

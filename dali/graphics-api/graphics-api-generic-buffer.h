@@ -49,12 +49,12 @@ public:
 
   virtual ~GenericBufferBase() = default;
 
-protected:
   char* GetDataBase()
   {
     return mData.get();
   }
 
+protected:
   // derived types should not be moved direcly to prevent slicing
   GenericBufferBase( GenericBufferBase&& ) = default;
   GenericBufferBase& operator=( GenericBufferBase&& ) = default;

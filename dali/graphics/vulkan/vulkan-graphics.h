@@ -30,6 +30,10 @@ namespace Dali
 {
 namespace Graphics
 {
+namespace API
+{
+class Controller;
+}
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 
 namespace Vulkan
@@ -52,6 +56,8 @@ class Surface;
 class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
+class Controller;
+
 class Graphics
 {
 
@@ -98,6 +104,8 @@ public:
   Queue& GetPresentQueue() const;
 
   Platform GetDefaultPlatform() const;
+
+  Dali::Graphics::API::Controller& GetController();
 
 private:
 
@@ -167,6 +175,9 @@ private:
   std::vector<CommandPoolRef>           mCommandPoolCache;
   std::vector<DescriptorPoolRef>        mDescriptorPoolCache;
   std::vector<FramebufferRef>           mFramebufferCache;
+
+private:
+  std::unique_ptr<Dali::Graphics::Vulkan::Controller>           mGfxController;
 };
 
 } // namespace Vulkan

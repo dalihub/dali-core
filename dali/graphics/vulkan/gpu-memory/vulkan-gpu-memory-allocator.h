@@ -58,7 +58,7 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual GpuMemoryBlockRef Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual GpuMemoryBlockRef Allocate( const BufferRef& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   /**
    *

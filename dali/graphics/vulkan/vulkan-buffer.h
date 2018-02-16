@@ -107,6 +107,9 @@ private:
    */
   Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo);
 
+  Buffer( const Buffer& ) = delete;
+  Buffer& operator =( const Buffer& ) = delete;
+
 private:
 
   class Impl;

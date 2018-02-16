@@ -97,6 +97,9 @@ struct CommandBuffer::Impl
     }
 
     VkAssert( mCommandBuffer.begin( info ) );
+
+    mResources.clear();
+
     mRecording = true;
   }
 
@@ -112,6 +115,8 @@ struct CommandBuffer::Impl
     assert( !mRecording && "Can't reset command buffer during recording!" );
     assert( mCommandBuffer && "Invalid command buffer!" );
     mCommandBuffer.reset( vk::CommandBufferResetFlagBits::eReleaseResources );
+
+    mResources.clear();
   }
 
   void Free()

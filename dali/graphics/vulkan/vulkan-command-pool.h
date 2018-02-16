@@ -68,18 +68,23 @@ public:
   Graphics& GetGraphics() const;
 
   /**
+   * Resets command pool
+   */
+  void Reset( bool releaseResources );
+
+  /**
    *
    * @param allocateInfo
    * @return
    */
-  Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
+  CommandBufferRef NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
 
   /**
    *
    * @param isPrimary
    * @return
    */
-  Handle<CommandBuffer> NewCommandBuffer( bool isPrimary = true );
+  CommandBufferRef NewCommandBuffer( bool isPrimary = true );
 
 public:
 

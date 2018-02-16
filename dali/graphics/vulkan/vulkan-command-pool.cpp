@@ -56,6 +56,13 @@ struct CommandPool::Impl
     return true;
   }
 
+
+  void Reset( bool releaseResources )
+  {
+    mGraphics.GetDevice().resetCommandPool( mCommandPool, releaseResources ? vk::CommandPoolResetFlagBits::eReleaseResources : vk::CommandPoolResetFlags{} );
+    mAllocatedCommandBuffers.clear();
+  }
+
   Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
   {
     vk::CommandBufferAllocateInfo info( allocateInfo );
@@ -119,18 +126,22 @@ bool CommandPool::OnDestroy()
   return false;
 }
 
-Handle<CommandBuffer> CommandPool::NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+CommandBufferRef CommandPool::NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
 {
   return mImpl->NewCommandBuffer( allocateInfo );
 }
 
-Handle<CommandBuffer> CommandPool::NewCommandBuffer( bool isPrimary )
+CommandBufferRef CommandPool::NewCommandBuffer( bool isPrimary )
 {
   return mImpl->NewCommandBuffer( vk::CommandBufferAllocateInfo{}.setLevel(
     isPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary
   ) );
 }
 
+void CommandPool::Reset( bool releaseResources )
+{
+  mImpl->Reset( releaseResources );
+}
 
 } // namespace Vulkan
 } // namespace Graphics

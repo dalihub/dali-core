@@ -46,6 +46,9 @@ namespace API
 class Controller
 {
 public:
+
+  virtual ~Controller() = default;
+
   /**
    * @brief Create a new object
    */
@@ -112,8 +115,6 @@ public:
   Controller( const Controller& ) = delete;
   Controller& operator=( const Controller& ) = delete;
 
-  virtual ~Controller() = default;
-
 protected:
   // derived types should not be moved direcly to prevent slicing
   Controller( Controller&& ) = default;
@@ -123,6 +124,8 @@ protected:
    * Objects of this type should not directly.
    */
   Controller() = default;
+
+
 
   /**
    * @brief create an element for the given number of elements and element size

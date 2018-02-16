@@ -56,15 +56,15 @@ public:
   virtual void GetRenderItemList() override;
 
 public:
-  Controller() = default;
+  Controller();
 
   Controller(const Controller&) = delete;
   Controller& operator=(const Controller&) = delete;
 
-  Controller(Controller&&) = default;
+  Controller(Controller&&);
   Controller& operator=(Controller&&) = default;
 
-  virtual ~Controller() = default;
+  ~Controller() override;
 
 
 protected:
