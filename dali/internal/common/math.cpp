@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector2.h>
+
+#include <dali/internal/common/performance-monitor.h>
 
 void Dali::Internal::TransformVector3( Vec3 result, const Mat4 m, const Vec3 v )
 {

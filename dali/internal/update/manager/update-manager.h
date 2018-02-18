@@ -31,8 +31,6 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>

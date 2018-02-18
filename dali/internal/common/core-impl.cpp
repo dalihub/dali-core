@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,15 @@
 
 // CLASS HEADER
 #include <dali/internal/common/core-impl.h>
-#include <dali/integration-api/graphics/graphics.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/graphics/graphics.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/system-overlay.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -41,19 +39,12 @@
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
-
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/render-task-processor.h>
-
-#include <dali/internal/render/common/performance-monitor.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
-using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
-using Dali::Internal::SceneGraph::RenderQueue;
 
 namespace
 {
@@ -72,9 +63,7 @@ namespace Internal
 
 using Integration::RenderController;
 using Integration::PlatformAbstraction;
-using Integration::GlSyncAbstraction;
 using Integration::GestureManager;
-using Integration::GlAbstraction;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
@@ -84,8 +73,6 @@ using Integration::Graphics::Graphics;
 Core::Core( RenderController& renderController,
             PlatformAbstraction& platform,
             Graphics& graphics,
-            GlAbstraction& glAbstraction,
-            GlSyncAbstraction& glSyncAbstraction,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             bool renderToFboEnabled )
@@ -111,23 +98,16 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction );
-
-  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-
-  mDiscardQueue = new DiscardQueue( renderQueue );
-
   mUpdateManager = new UpdateManager( *mNotificationManager,
                                       *mAnimationPlaylist,
                                       *mPropertyNotificationManager,
                                       *mDiscardQueue,
                                        renderController,
-                                      *mRenderManager,
-                                       renderQueue,
                                       *mRenderTaskProcessor,
                                        graphics );
 
-  mRenderManager->SetShaderSaver( *mUpdateManager );
+
+  DALI_LOG_ERROR(" mRenderManager->SetShaderSaver( *mUpdateManager ) ");
 
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager, mRenderController ) );
 
@@ -186,12 +166,14 @@ void Core::RecoverFromContextLoss()
 
 void Core::ContextCreated()
 {
-  mRenderManager->ContextCreated();
+  // TODO:
+  DALI_LOG_ERROR("TODO: NOTIFY CONTEXT CREATED\n");
 }
 
 void Core::ContextDestroyed()
 {
-  mRenderManager->ContextDestroyed();
+  // TODO:
+  DALI_LOG_ERROR("TODO: NOTIFY CONTEXT DESTROYED\n");
 }
 
 void Core::SurfaceResized( unsigned int width, unsigned int height )
@@ -240,7 +222,8 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
 void Core::Render( RenderStatus& status )
 {
-  mRenderManager->Render( status );
+  DALI_LOG_ERROR("Render()!");
+  (void)status;
 }
 
 void Core::SceneCreated()
@@ -347,11 +330,6 @@ PlatformAbstraction& Core::GetPlatform()
 UpdateManager& Core::GetUpdateManager()
 {
   return *(mUpdateManager);
-}
-
-RenderManager& Core::GetRenderManager()
-{
-  return *(mRenderManager);
 }
 
 NotificationManager& Core::GetNotificationManager()

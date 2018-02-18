@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_EXTENSION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,8 @@ public:
    *
    * @return Texture target.
    */
-  virtual int GetEglImageTextureTarget() = 0;
+   //TODO: Graphics
+  virtual int GetExternalImageTextureTarget() = 0;
 
   /**
    * @brief Retrieve the extension for the interface.

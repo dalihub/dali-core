@@ -22,7 +22,7 @@
 #include <dali/graphics-api/graphics-api-controller.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/common/buffer-index.h>
 
 namespace Dali

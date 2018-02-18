@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -35,15 +34,8 @@ FrameBufferPtr FrameBuffer::New( unsigned int width, unsigned int height, unsign
   return frameBuffer;
 }
 
-
-Render::FrameBuffer* FrameBuffer::GetRenderObject() const
-{
-  return mRenderObject;
-}
-
 FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
 : mEventThreadServices( *Stage::GetCurrent() ),
-  mRenderObject( NULL ),
   mColor( NULL ),
   mWidth( width ),
   mHeight( height ),
@@ -53,8 +45,7 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 
 void FrameBuffer::Initialize()
 {
-  mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mAttachments );
-  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  DALI_LOG_ERROR(" AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject ); ");
 }
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer )

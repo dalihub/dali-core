@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
 {
@@ -89,7 +88,6 @@ private: // unimplemented methods
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Render::PropertyBuffer* mRenderObject;        ///<Render side object
   unsigned int mBufferFormatSize;
   unsigned int mSize; ///< Number of elements in the buffer
 };

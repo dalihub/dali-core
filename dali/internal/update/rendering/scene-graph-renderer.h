@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/rendering/data-providers/render-data-provider.h>
 
 namespace Dali
 {

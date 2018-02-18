@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/render/renderers/render-sampler.h>
 
 namespace Dali
 {
@@ -51,12 +50,6 @@ void Sampler::SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWra
   }
 }
 
-Render::Sampler* Sampler::GetSamplerRenderObject()
-{
-  return mRenderObject;
-}
-
-
 Sampler::Sampler()
 :mEventThreadServices( *Stage::GetCurrent() ),
  mRenderObject( NULL )
@@ -67,8 +60,9 @@ void Sampler::Initialize()
 {
   SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
 
-  mRenderObject = new Render::Sampler();
-  OwnerPointer< Render::Sampler > transferOwnership( mRenderObject );
+  DALI_ASSERT_ALWAYS(false && "TODO");
+  // mRenderObject = new Render::Sampler();
+  // OwnerPointer< Render::Sampler > transferOwnership( mRenderObject );
   AddSamplerMessage( updateManager, transferOwnership );
 }
 

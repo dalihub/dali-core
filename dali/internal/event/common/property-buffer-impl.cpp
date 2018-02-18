@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,8 @@ void PropertyBuffer::SetData( const void* data, std::size_t size )
   std::copy( source, source + bufferSize, destination );
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
-  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
+  // TODO: now probably needs data conversion
+  DALI_LOG_ERROR(" SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize ); ");
 }
 
 std::size_t PropertyBuffer::GetSize() const
@@ -156,22 +157,16 @@ std::size_t PropertyBuffer::GetSize() const
   return mSize;
 }
 
-const Render::PropertyBuffer* PropertyBuffer::GetRenderObject() const
-{
-  return mRenderObject;
-}
-
 PropertyBuffer::~PropertyBuffer()
 {
-  if( EventThreadServices::IsCoreRunning() && mRenderObject)
+  if( EventThreadServices::IsCoreRunning())
   {
-    SceneGraph::RemovePropertyBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+   DALI_LOG_ERROR(" SceneGraph::RemovePropertyBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject ); ");
   }
 }
 
 PropertyBuffer::PropertyBuffer()
 : mEventThreadServices( *Stage::GetCurrent() ),
-  mRenderObject( NULL ),
   mBufferFormatSize( 0 ),
   mSize( 0 )
 {
@@ -179,10 +174,6 @@ PropertyBuffer::PropertyBuffer()
 
 void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
-  mRenderObject = new Render::PropertyBuffer();
-  OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
-  SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
-
   size_t numComponents = formatMap.Count();
 
   // Create the format
@@ -255,7 +246,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 
   mBufferFormatSize = format->size;
 
-  SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
+  DALI_LOG_ERROR( " SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format ); " );
 }
 
 unsigned int GetPropertyImplementationSize( Property::Type& propertyType )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/common/render-tracker.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/renderint/render-tracker.h>
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 

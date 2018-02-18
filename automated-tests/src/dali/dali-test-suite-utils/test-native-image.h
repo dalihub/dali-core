@@ -2,7 +2,7 @@
 #define __TEST_NATIVE_IMAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,7 @@ typedef IntrusivePtr<TestNativeImageNoExt> TestNativeImageNoExtPointer;
 class DALI_IMPORT_API TestNativeImageExtension: public Dali::NativeImageInterface::Extension
 {
 public:
-  inline const char* GetCustomFragmentPreFix(){return "#extension GL_OES_EGL_image_external:require\n";}
-  inline const char* GetCustomSamplerTypename(){return "samplerExternalOES";}
 
-  inline int GetEglImageTextureTarget(){return GL_TEXTURE_EXTERNAL_OES;}
 
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ int UtcDaliNativeImageDownCast(void)
 int UtcDaliNativeImageExtensionP(void)
 {
   TestApplication application;
-  tet_infoline( "Testing Dali::NativeImage::GenerateGlTexture()" );
+  tet_infoline( "Testing Dali::NativeImage::GenerateTexture()" );
 
   TestNativeImagePointer testNativeImage = TestNativeImage::New( 16, 16 );
   DALI_TEST_CHECK( testNativeImage );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,7 @@
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/rendering/data-providers/node-data-provider.h>
 
 namespace // unnamed namespace
 {

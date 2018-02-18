@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/common/render-item.h>
-#include <dali/internal/render/common/render-tracker.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/rendering/render-item.h>
+#include <dali/internal/update/rendering/render-tracker.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/integration-api/debug.h>
 
 #if defined(DEBUG_ENABLED)

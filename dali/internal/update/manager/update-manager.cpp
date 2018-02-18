@@ -39,10 +39,8 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/effects/shader-factory.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
+#include <dali/internal/update/rendering/render-manager.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/common/discard-queue.h>
@@ -1061,6 +1059,7 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
   SortSiblingNodesRecursively( *( mImpl->root ) );
 }
 
+//TODO: Change these types
 void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
 {
   // Message has ownership of Sampler while in transit from update to render

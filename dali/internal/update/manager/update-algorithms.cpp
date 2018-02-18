@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/renderers/render-renderer.h>
 
 #include <dali/integration-api/debug.h>
 

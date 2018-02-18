@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,10 @@
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/common/render-item.h>
-#include <dali/internal/render/common/render-tracker.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/update/rendering/render-item.h>
+#include <dali/internal/update/rendering/render-tracker.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 namespace
@@ -262,7 +259,8 @@ inline bool TryReuseCachedRenderers( Layer& layer,
     size_t checkSumOld = 0;
     for( size_t index = 0; index < renderableCount; ++index )
     {
-      const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
+      DALI_ASSERT_ALWAYS(false && "TODO");
+      // TODO: const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
       checkSumNew += size_t( &renderer );
       checkSumOld += size_t( &renderList.GetRenderer( index ) );
     }

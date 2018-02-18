@@ -26,8 +26,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/common/render-instruction-container.h>
+#include <dali/internal/common/render-instruction.h>
 
 namespace Dali
 {
