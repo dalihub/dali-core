@@ -4526,8 +4526,8 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
               |
         ┌─────┐─────┐
         A     C     D
-        |
-        B
+        |           |
+        B           E
   */
 
   const Vector2 stageSize( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT );
@@ -4535,12 +4535,14 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   const Vector2 sizeB{ stageSize.width, stageSize.height * 0.05f };
   const Vector2 sizeC{ stageSize.width, stageSize.height * 0.25f };
   const Vector2 sizeD{ stageSize.width, stageSize.height * 0.25f };
+  const Vector2 sizeE{ stageSize.width, stageSize.height * 0.05f };
 
   // Create a clipping actors.
   Actor clippingActorA = CreateActorWithContent( sizeA.width, sizeA.height );
   Actor clippingActorB = CreateActorWithContent( sizeB.width, sizeB.height );
   Actor clippingActorC = CreateActorWithContent( sizeC.width, sizeC.height );
   Actor clippingActorD = CreateActorWithContent( sizeD.width, sizeD.height );
+  Actor clippingActorE = CreateActorWithContent( sizeE.width, sizeE.height );
 
   clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
@@ -4558,15 +4560,20 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   clippingActorD.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   clippingActorD.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
+  clippingActorE.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  clippingActorE.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+
   clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
   clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
   clippingActorC.SetPosition( 0.0f, 100.0f, 0.0f );
   clippingActorD.SetPosition( 0.0f, 0.0f, 0.0f );
+  clippingActorE.SetPosition( 0.0f, 0.0f, 0.0f );
 
   Stage::GetCurrent().Add( clippingActorA );
   clippingActorA.Add( clippingActorB );
   Stage::GetCurrent().Add( clippingActorC );
   Stage::GetCurrent().Add( clippingActorD );
+  clippingActorD.Add( clippingActorE );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, scissorTrace );
@@ -4587,6 +4594,7 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipB ) );
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipC ) );
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipD ) );
+  DALI_TEST_CHECK( scissorTrace.CountMethod( "Scissor" ) == 4 );    // Scissor rect should not be changed in clippingActorE case. So count should be 4.
 
   END_TEST;
 }
