@@ -18,10 +18,13 @@
  *
  */
 
+#include <typeinfo>
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -100,6 +103,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)();
   }
 
@@ -154,6 +160,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1 );
   }
 
@@ -215,6 +224,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1, param2 );
   }
 
@@ -280,6 +292,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1, param2, param3 );
   }
 
@@ -350,6 +365,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1, param2, param3, param4 );
   }
 
@@ -425,6 +443,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1, param2, param3, param4, param5 );
 
   }
@@ -506,6 +527,9 @@ public:
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
 
   }
@@ -561,6 +585,9 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( bufferIndex );
   }
 
@@ -618,6 +645,9 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( bufferIndex,  param );
   }
 
@@ -679,6 +709,9 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)(
         bufferIndex, param2, param3 );
   }
@@ -747,6 +780,9 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( bufferIndex, param2, param3, param4 );
   }
 
@@ -818,6 +854,9 @@ public:
   virtual void Process( BufferIndex bufferIndex )
   {
     DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+
+    DALI_LOG_ERROR("Message::Process: object: %s, function pointer: %p\n", typeid(object).name(), memberFunction);
+
     (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
   }
 

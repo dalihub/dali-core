@@ -24,7 +24,7 @@
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/common/image-sampler.h>
-
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -75,7 +75,11 @@ void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observ
 
 void Shader::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
+  DALI_LOG_ERROR("+++ Scene Graph Shader::RemoveConnectionObserver\n");
+
   mConnectionObservers.Remove(observer);
+
+  DALI_LOG_ERROR("--- Scene Graph Shader::RemoveConnectionObserver\n");
 }
 
 void Shader::UniformMappingsChanged( const UniformMap& mappings )

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/render/common/performance-monitor.h>
@@ -251,6 +252,14 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
   MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
   const MessageBufferIter processQueueEndIter = mImpl->processQueue.end();
+
+  bool enableLog = ( mImpl->processQueue.begin() != processQueueEndIter );
+
+  if ( enableLog )
+  {
+    DALI_LOG_ERROR("+++ MessageQueue::ProcessMessages: Mutex locked\n");
+  }
+
   for ( MessageBufferIter iter = mImpl->processQueue.begin(); iter != processQueueEndIter ; ++iter )
   {
     MessageBuffer* buffer = *iter;
@@ -259,7 +268,17 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
     {
       MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
 
+      if ( enableLog )
+      {
+        DALI_LOG_ERROR("Before message->Process\n");
+      }
+
       message->Process( updateBufferIndex  );
+
+      if ( enableLog )
+      {
+        DALI_LOG_ERROR("After message->Process\n");
+      }
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
@@ -270,6 +289,11 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
     mImpl->recycleQueue.push_back( buffer );
   }
 
+  if ( enableLog )
+  {
+    DALI_LOG_ERROR("Outside message queue process\n");
+  }
+
   mImpl->sceneUpdate >>= 1;
 
   mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
@@ -277,6 +301,11 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
   mImpl->processQueue.clear();
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
+
+  if ( enableLog )
+  {
+    DALI_LOG_ERROR("--- MessageQueue::ProcessMessages: Mutex unlocked\n");
+  }
 
   return ( mImpl->sceneUpdate & 0x01 ); // if it was previously 2, scene graph was updated.
 }
