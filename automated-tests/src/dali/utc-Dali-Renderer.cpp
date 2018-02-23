@@ -956,7 +956,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
   DALI_TEST_EQUALS( (int)BlendFactor::ONE,                 srcFactorRgb,    TEST_LOCATION );
   DALI_TEST_EQUALS( (int)BlendFactor::ONE_MINUS_SRC_ALPHA, destFactorRgb,   TEST_LOCATION );
   DALI_TEST_EQUALS( (int)BlendFactor::ONE,                 srcFactorAlpha,  TEST_LOCATION );
-  DALI_TEST_EQUALS( (int)BlendFactor::ONE,                 destFactorAlpha, TEST_LOCATION );
+  DALI_TEST_EQUALS( (int)BlendFactor::ONE_MINUS_SRC_ALPHA, destFactorAlpha, TEST_LOCATION );
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Vector4(0.5f, 0.0f, 0.5f, 0.5f), TEST_LOCATION );

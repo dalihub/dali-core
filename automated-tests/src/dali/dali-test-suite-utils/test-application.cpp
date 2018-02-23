@@ -183,7 +183,7 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
 bool TestApplication::Render( unsigned int intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 
@@ -209,7 +209,7 @@ bool TestApplication::GetRenderNeedsUpdate()
 bool TestApplication::RenderOnly( )
 {
   // Update Time values
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 
