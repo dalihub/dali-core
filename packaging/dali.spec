@@ -149,6 +149,9 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
+%if 0%{?enable_trace}
+      --enable-trace \
+%endif
       --infodir=%{_infodir} \
       --enable-rename-so=no
 
@@ -184,6 +187,9 @@ make clean
       --enable-gles=%{target_gles_version} \
 %if 0%{?enable_debug}
       --enable-debug \
+%endif
+%if 0%{?enable_trace}
+      --enable-trace \
 %endif
       --infodir=%{_infodir} \
       --enable-rename-so=no
