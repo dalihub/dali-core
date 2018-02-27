@@ -118,6 +118,11 @@ bool KeyEvent::IsAltModifier() const
   return false;
 }
 
+std::string KeyEvent::GetCompose() const
+{
+  return GetImplementation( this )->GetCompose();
+}
+
 std::string KeyEvent::GetDeviceName() const
 {
   return GetImplementation( this )->GetDeviceName();
