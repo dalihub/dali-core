@@ -170,4 +170,7 @@ Configuration
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
   Vulkan Support:                   $enable_vulkan
+  OpenGL ES version:                $enable_gles
+  C++03 ABI:                        $enable_cxx03_abi
+  Rename so file:                   $enable_rename_so
 "

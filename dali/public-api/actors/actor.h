@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1294,6 +1294,7 @@ public:
    * @brief Raises the actor above the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
@@ -1304,6 +1305,7 @@ public:
    * @brief Lower the actor to below the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.

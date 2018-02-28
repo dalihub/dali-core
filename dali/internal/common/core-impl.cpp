@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,9 @@ Core::Core( RenderController& renderController,
             GlSyncAbstraction& glSyncAbstraction,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
-            bool renderToFboEnabled )
+            Integration::RenderToFrameBuffer renderToFboEnabled,
+            Integration::DepthBufferAvailable depthBufferAvailable,
+            Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
   mProcessingEvent(false),
@@ -111,7 +113,7 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, depthBufferAvailable, stencilBufferAvailable );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
@@ -134,7 +136,7 @@ Core::Core( RenderController& renderController,
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
-  mStage->Initialize( renderToFboEnabled );
+  mStage->Initialize( renderToFboEnabled == Integration::RenderToFrameBuffer::TRUE );
 
   mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
   mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
@@ -238,9 +240,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Any message to update will wake it up anyways
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  mRenderManager->Render( status );
+  mRenderManager->Render( status, forceClear );
 }
 
 void Core::SceneCreated()

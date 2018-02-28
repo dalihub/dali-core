@@ -24,6 +24,7 @@ platform_abstraction_src_files = \
 
 platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/core.h \
+   $(platform_abstraction_src_dir)/core-enumerations.h \
    $(platform_abstraction_src_dir)/context-notifier.h \
    $(platform_abstraction_src_dir)/debug.h \
    $(platform_abstraction_src_dir)/profiling.h \

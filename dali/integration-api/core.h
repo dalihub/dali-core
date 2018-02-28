@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
@@ -220,6 +221,8 @@ public:
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] depthBufferAvailable Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -229,7 +232,9 @@ public:
                     GlSyncAbstraction& glSyncAbstraction,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
-                    bool renderToFboEnabled );
+                    RenderToFrameBuffer renderToFboEnabled,
+                    DepthBufferAvailable depthBufferAvailable,
+                    StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -360,8 +365,9 @@ public:
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    * @param[out] status showing whether update is required to run.
+   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
-  void Render( RenderStatus& status );
+  void Render( RenderStatus& status, bool forceClear );
 
   // System-level overlay
 

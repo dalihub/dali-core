@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,7 +174,11 @@ void Renderer::operator delete( void* ptr )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
+  if( mRegenerateUniformMap == UNIFORM_MAP_READY )
+  {
+    mUniformMapChanged[updateBufferIndex] = false;
+  }
+  else
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
@@ -632,6 +636,7 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 
 void Renderer::TextureSetChanged()
 {
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
@@ -639,6 +644,7 @@ void Renderer::TextureSetDeleted()
 {
   mTextureSet = NULL;
 
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 void Renderer::ConnectionsChanged( PropertyOwner& object )

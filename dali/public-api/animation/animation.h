@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,7 @@ public:
    * @brief Enables looping for 'count' repeats.
    *
    * A zero is the same as SetLooping(true) i.e. repeat forever.
-   * If Play() Stop() or 'count' loops is reached, the loop counter will reset.
+   * This function resets the looping value and should not be used with SetLooping(bool).
    * Setting this parameter does not cause the animation to Play().
    *
    * @SINCE_1_1.20

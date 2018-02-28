@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -85,7 +86,9 @@ public:
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
-        bool renderToFboEnabled );
+        Integration::RenderToFrameBuffer renderToFboEnabled,
+        Integration::DepthBufferAvailable depthBufferAvailable,
+        Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Destructor
@@ -140,7 +143,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status, bool forceClear );
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()

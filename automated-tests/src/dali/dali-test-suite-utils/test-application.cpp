@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,9 @@ void TestApplication::Initialize()
                                         mGlSyncAbstraction,
                                         mGestureManager,
                                         mDataRetentionPolicy,
-                                        false );
+                                        Integration::RenderToFrameBuffer::FALSE,
+                                        Integration::DepthBufferAvailable::TRUE,
+                                        Integration::StencilBufferAvailable::TRUE );
 
   mCore->ContextCreated();
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
@@ -182,7 +184,7 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
 bool TestApplication::Render( unsigned int intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 
@@ -208,7 +210,7 @@ bool TestApplication::GetRenderNeedsUpdate()
 bool TestApplication::RenderOnly( )
 {
   // Update Time values
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 

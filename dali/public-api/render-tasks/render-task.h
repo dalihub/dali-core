@@ -2,7 +2,7 @@
 #define __DALI_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -482,7 +482,7 @@ public:
    */
   unsigned int GetRefreshRate() const;
 
-  /*
+  /**
    * @brief Gets viewport coordinates for given world position.
    *
    * @SINCE_1_1.13
@@ -493,7 +493,7 @@ public:
    */
   bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
 
-  /*
+  /**
    * @brief Gets actor local coordinates for given viewport coordinates.
    *
    * @SINCE_1_1.13

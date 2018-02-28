@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -339,9 +339,6 @@ private:
   // Undefined
   RenderTask& operator=(const RenderTask&);
 
-private: // PropertyOwner
-
-  virtual void ResetDefaultProperties( BufferIndex currentBufferIndex );
 
 public: // Animatable Properties
   AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewportPosition

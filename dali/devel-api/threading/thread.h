@@ -2,7 +2,7 @@
 #define __DALI_THREAD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-
 
 /**
  * The top level DALi namespace
@@ -66,9 +65,9 @@ private:
 
   /**
    * Helper for the thread calling the entry function.
-   * @param[in] This A pointer to the current RenderThread object
+   * @param[in] This A pointer to the current thread object
    */
-  static void* InternalThreadEntryFunc( void* This );
+  static void InternalThreadEntryFunc( Thread& This );
 
   // Undefined
   Thread( const Thread& );
@@ -79,6 +78,7 @@ private:
 
   struct ThreadImpl;
   ThreadImpl* mImpl;
+
 };
 
 }

@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_MUTEX_H__
-#define __DALI_INTERNAL_MUTEX_H__
+#ifndef DALI_INTERNAL_MUTEX_TRACE_H
+#define DALI_INTERNAL_MUTEX_TRACE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <pthread.h>
-
 namespace Dali
 {
 
@@ -35,33 +32,25 @@ namespace Internal
  *
  * @note lock backtrace needs to be enabled to see the warnings.
  */
-namespace Mutex
+namespace MutexTrace
 {
 
 /**
- * @brief Locks the given mutex.
- *
- * Increments a thread-local storage counter.
- *
- * @param A pointer to the mutex that should be locked.
+ * @brief Increments a thread-local storage counter.
  *
  * @note If the counter is > 1 and lock backtrace is enabled, then the backtrace for all locks will be shown as a warning.
  */
-void Lock( pthread_mutex_t* mutex );
+void Lock();
 
 /**
- * @brief Unlocks the given mutex.
- *
- * @param A pointer to the mutex that should be unlocked.
- *
- * Decrements a thread-local storage counter.
+ * @brief Decrements a thread-local storage counter
  */
-void Unlock( pthread_mutex_t* mutex );
+void Unlock();
 
-} // namespace Mutex
+} // namespace MutexTrace
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_MUTEX_H__
+#endif // DALI_INTERNAL_MUTEX_TRACE_H

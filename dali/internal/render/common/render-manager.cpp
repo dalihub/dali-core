@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,9 @@ namespace SceneGraph
 struct RenderManager::Impl
 {
   Impl( Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction )
+        Integration::GlSyncAbstraction& glSyncAbstraction,
+        Integration::DepthBufferAvailable depthBufferAvailableParam,
+        Integration::StencilBufferAvailable stencilBufferAvailableParam )
   : context( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
@@ -69,7 +71,9 @@ struct RenderManager::Impl
     textureContainer(),
     frameBufferContainer(),
     lastFrameWasRendered( false ),
-    programController( glAbstraction )
+    programController( glAbstraction ),
+    depthBufferAvailable( depthBufferAvailableParam ),
+    stencilBufferAvailable( stencilBufferAvailableParam )
   {
   }
 
@@ -127,14 +131,21 @@ struct RenderManager::Impl
 
   ProgramController                         programController;        ///< Owner of the GL programs
 
+  Integration::DepthBufferAvailable         depthBufferAvailable;     ///< Whether the depth buffer is available
+  Integration::StencilBufferAvailable       stencilBufferAvailable;   ///< Whether the stencil buffer is available
+
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
-                                   Integration::GlSyncAbstraction& glSyncAbstraction )
+                                   Integration::GlSyncAbstraction& glSyncAbstraction,
+                                   Integration::DepthBufferAvailable depthBufferAvailable,
+                                   Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   RenderManager* manager = new RenderManager;
   manager->mImpl = new Impl( glAbstraction,
-                             glSyncAbstraction );
+                             glSyncAbstraction,
+                             depthBufferAvailable,
+                             stencilBufferAvailable );
   return manager;
 }
 
@@ -386,7 +397,7 @@ ProgramCache* RenderManager::GetProgramCache()
   return &(mImpl->programController);
 }
 
-void RenderManager::Render( Integration::RenderStatus& status )
+void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -403,7 +414,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
   const bool haveInstructions = count > 0u;
 
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
-  if( haveInstructions || mImpl->lastFrameWasRendered )
+  if( haveInstructions || mImpl->lastFrameWasRendered || forceClear )
   {
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender( true );
@@ -421,17 +432,31 @@ void RenderManager::Render( Integration::RenderStatus& status )
                                mImpl->backgroundColor.b,
                                mImpl->backgroundColor.a );
 
-    mImpl->context.ClearStencil( 0 );
-
-    // Clear the entire color, depth and stencil buffers for the default framebuffer.
-    // It is important to clear all 3 buffers, for performance on deferred renderers like Mali
+    // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
+    // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
     // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
     // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+
     mImpl->context.SetScissorTest( false );
+
+    GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
+
     mImpl->context.ColorMask( true );
-    mImpl->context.DepthMask( true );
-    mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, Context::FORCE_CLEAR );
+
+    if( mImpl->depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
+    {
+      mImpl->context.DepthMask( true );
+      clearMask |= GL_DEPTH_BUFFER_BIT;
+    }
+
+    if( mImpl->stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+    {
+      mImpl->context.ClearStencil( 0 );
+      mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+      clearMask |= GL_STENCIL_BUFFER_BIT;
+    }
+
+    mImpl->context.Clear( clearMask, Context::FORCE_CLEAR );
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
@@ -447,14 +472,14 @@ void RenderManager::Render( Integration::RenderStatus& status )
     GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
-    mImpl->UpdateTrackers();
-
     //Notify RenderGeometries that rendering has finished
     for ( auto&& iter : mImpl->geometryContainer )
     {
       iter->OnRenderFinished();
     }
   }
+
+  mImpl->UpdateTrackers();
 
   // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
   mImpl->lastFrameWasRendered = haveInstructions;
@@ -532,7 +557,12 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->context.SetScissorTest( false );
   }
 
-  mImpl->renderAlgorithms.ProcessRenderInstruction( instruction, mImpl->context, mImpl->renderBufferIndex );
+  mImpl->renderAlgorithms.ProcessRenderInstruction(
+      instruction,
+      mImpl->context,
+      mImpl->renderBufferIndex,
+      mImpl->depthBufferAvailable,
+      mImpl->stencilBufferAvailable );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_CONTAINER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,12 @@ public:
    * @param index to use
    */
   RenderInstruction& At( BufferIndex bufferIndex, size_t index );
+
+  /**
+   * Discard the current container index
+   * @param bufferIndex to reset
+   */
+  void DiscardCurrentInstruction( BufferIndex bufferIndex );
 
 private:
 

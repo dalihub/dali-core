@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ Core* Core::New( RenderController& renderController,
                  GlSyncAbstraction& glSyncAbstraction,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
-                 bool renderToFboEnabled )
+                 RenderToFrameBuffer renderToFboEnabled,
+                 DepthBufferAvailable depthBufferAvailable,
+                 StencilBufferAvailable stencilBufferAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -48,7 +50,9 @@ Core* Core::New( RenderController& renderController,
                                         glSyncAbstraction,
                                         gestureManager,
                                         policy,
-                                        renderToFboEnabled );
+                                        renderToFboEnabled,
+                                        depthBufferAvailable,
+                                        stencilBufferAvailable );
 
   return instance;
 }
@@ -113,14 +117,14 @@ unsigned int Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-  void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  mImpl->Render( status );
+  mImpl->Render( status, forceClear );
 }
 
 SystemOverlay& Core::GetSystemOverlay()
