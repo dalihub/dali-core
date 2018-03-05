@@ -1432,7 +1432,7 @@ public:
    * @brief Returns the minimum relayout size.
    *
    * @SINCE_1_0.0
-   * @return Return the mininmum size
+   * @return Return the minimum size
    */
   Vector2 GetMinimumSize();
 
@@ -1636,7 +1636,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
    * @endcode
-   * actor: The actor, or child of actor, whose laytou direction has changed
+   * actor: The actor, or child of actor, whose layout direction has changed
    * type: Whether the actor's layout direction property has changed or a parent's.
    *
    * @SINCE_1_2.60

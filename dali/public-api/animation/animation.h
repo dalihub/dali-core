@@ -635,7 +635,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] target The target object property to animate
    * @param[in] keyFrames The set of time/value pairs between which to animate
-   * @param[in] period The effect will occur duing this time period
+   * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation);
@@ -658,7 +658,7 @@ public:
    * @param[in] target The target object property to animate
    * @param[in] keyFrames The set of time/value pairs between which to animate
    * @param[in] alpha The alpha function to apply to the overall progress
-   * @param[in] period The effect will occur duing this time period
+   * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
