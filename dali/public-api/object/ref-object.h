@@ -34,7 +34,7 @@ class Value;
 /**
  * @brief Base class for reference counted objects.
  *
- * Typically this should be used with an instrusive pointer,
+ * Typically this should be used with an intrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
  * @SINCE_1_0.0
  */

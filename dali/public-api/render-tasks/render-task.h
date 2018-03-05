@@ -53,7 +53,7 @@ class RenderTask;
  * RenderTasks may optionally target a frame-buffer, otherwise the default GL surface is used;
  * typically this is a window provided by the native system.
  *
- * By default Dali provides a single RenderTask, which renders the entire actor hierachy using
+ * By default Dali provides a single RenderTask, which renders the entire actor hierarchy using
  * a default camera actor and GL surface. If stereoscopic rendering is enabled, Dali will create
  * two additional render tasks, on for each eye. Each render task will have its own camera parented
  * to the default camera actor.
@@ -301,7 +301,7 @@ public:
   /**
    * @brief Sets the frame-buffer used as a render target.
    * @SINCE_1_1.38
-   * @param[in] frameBuffer er A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it
+   * @param[in] frameBuffer A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it
    */
   void SetFrameBuffer( FrameBuffer frameBuffer );
 
