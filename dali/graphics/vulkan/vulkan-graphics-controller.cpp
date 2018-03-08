@@ -65,24 +65,7 @@ struct Controller::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
-    // create shaders
-    auto bindings =
-      std::vector<vk::DescriptorSetLayoutBinding>{// francisco buffer
-                                                  vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 0 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 ),
-                                                  // clip matrix
-                                                  vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 1 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 )};
-
     mDebugPipelineState.vertexShader = Shader::New( mGraphics, VSH_CODE.data(), VSH_CODE.size() );
-    mDebugPipelineState.vertexShader->SetDescriptorSetLayout(
-      0, vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 2 ).setPBindings( bindings.data() ) );
 
     mDebugPipelineState.fragmentShader = Shader::New( mGraphics, FSH_CODE.data(), FSH_CODE.size() );
 
@@ -223,7 +206,7 @@ struct Controller::Impl
 
         auto descriptorSets = state.descriptorPool->AllocateDescriptorSets(
           vk::DescriptorSetAllocateInfo{}.setDescriptorSetCount( 1 ).setPSetLayouts(
-            state.vertexShader->GetDescriptorSetLayouts().data() ) );
+            state.pipeline->GetVkDescriptorSetLayouts().data() ) );
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );

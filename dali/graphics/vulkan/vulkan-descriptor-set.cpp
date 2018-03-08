@@ -198,23 +198,7 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#if 0
 struct DescriptorSetLayout::Impl
 {
   Impl( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo ) :
@@ -264,7 +248,7 @@ DescriptorSetLayout::DescriptorSetLayout( Graphics& graphics, const vk::Descript
 {
   mImpl = MakeUnique<DescriptorSetLayout::Impl>( graphics, createInfo );
 }
-
+#endif
 } // Namespace Vulkan
 
 } // Namespace Graphics

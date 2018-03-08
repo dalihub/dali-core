@@ -189,7 +189,7 @@ void Graphics::Create()
   {
     for( auto&& prop : layers.value )
     {
-      //std::cout << prop.layerName << std::endl;
+      std::cout << prop.layerName << std::endl;
       if( std::string(prop.layerName) == reqLayer )
       {
         validationLayers.push_back(reqLayer);
@@ -207,8 +207,8 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
-      //.setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      .setEnabledLayerCount(U32(validationLayers.size()))
+      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
