@@ -19,6 +19,5 @@ layout( location = 0 ) out vec4 triColor;
 void main()
 {
     gl_Position = clip * mvp * vec4( aPosition* size, 1.0 );
-    //gl_Position = vec4( aPosition, 1.0 );
     triColor = color;
 }

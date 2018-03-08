@@ -42,6 +42,7 @@ using namespace glm;
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
 #define USE_XLIB 0
 #include <iostream>
@@ -50,7 +51,6 @@ using Dali::Graphics::Vulkan::Buffer;
 using Dali::Graphics::Vulkan::CommandBuffer;
 using Dali::Graphics::Vulkan::CommandPool;
 using Dali::Graphics::Vulkan::DescriptorPool;
-using Dali::Graphics::Vulkan::DescriptorSetLayout;
 using Dali::Graphics::Vulkan::GpuMemoryAllocator;
 using Dali::Graphics::Vulkan::GpuMemoryManager;
 using Dali::Graphics::Vulkan::Pipeline;
@@ -444,20 +444,6 @@ int RunTestMain()
 
   // shaders
   auto vertexShader = Shader::New( gr, VSH_CODE.data(), VSH_CODE.size() );
-  vertexShader->SetDescriptorSetLayout(
-    0,
-    vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 2 ).setPBindings(
-      std::vector<vk::DescriptorSetLayoutBinding>{vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 0 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 ),
-                                                  vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 1 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 )}
-        .data() ) );
 
   auto fragmentShader = Shader::New( gr, FSH_CODE.data(), FSH_CODE.size() );
 
@@ -465,10 +451,6 @@ int RunTestMain()
   auto vertexBuffer = Buffer::New( gr, sizeof( float ) * 3 * 3, Buffer::Type::VERTEX );
 
   auto descriptorPool = create_descriptor_pool( gr );
-  auto descriptorSet  = descriptorPool->AllocateDescriptorSets(
-    vk::DescriptorSetAllocateInfo{}
-      .setPSetLayouts( vertexShader->GetDescriptorSetLayouts().data() )
-      .setDescriptorSetCount( static_cast<uint32_t>( vertexShader->GetDescriptorSetLayouts().size() ) ) );
 
   auto& gpuManager = gr.GetDeviceMemoryManager();
 
@@ -482,6 +464,12 @@ int RunTestMain()
   bufferMemory->Unmap();
 
   auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
+
+  auto descriptorSet = descriptorPool->AllocateDescriptorSets(
+    vk::DescriptorSetAllocateInfo{}
+      .setPSetLayouts( pipeline->GetVkDescriptorSetLayouts().data() )
+      .setDescriptorSetCount( pipeline->GetVkDescriptorSetLayouts().size() ) );
+
 
   auto commandPool = CommandPool::New( gr );
 
@@ -531,9 +519,35 @@ int RunTestMain()
   }
   return 0;
 }
+
+
+using namespace Dali::Graphics::Vulkan::SpirV;
+void spirv_test0( std::vector<SPIRVWord> code )
+{
+  auto shader = SPIRVUtils::Parse( code, vk::ShaderStageFlagBits::eVertex );
+  auto opcodeCount = shader->GetOpCodeCount();
+  std::cout << "opcodecount" << opcodeCount << std::endl;
+
+  auto layoutCreateInfo = shader->GenerateDescriptorSetLayoutCreateInfo();
+
+  std::cout<< "yay!" <<std::endl;
+
+}
+
+void RunSPIRVTest()
+{
+  std::vector<SPIRVWord> data;
+  data.resize( VSH_CODE.size()/4 );
+  std::copy( VSH_CODE.begin(), VSH_CODE.end(), reinterpret_cast<decltype(VSH_CODE.data())>(data.data()) );
+  spirv_test0( data );
+}
+
+
 } // namespace VulkanTest
 
 int main()
 {
   VulkanTest::RunTestMain();
+
+  //VulkanTest::RunSPIRVTest();
 }

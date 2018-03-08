@@ -107,7 +107,7 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-
+#if 0
 class DescriptorSetLayout
 {
 public:
@@ -123,7 +123,7 @@ private:
   class Impl;
   std::unique_ptr<Impl> mImpl;
 };
-
+#endif
 } // Namespace Vulkan
 
 } // Namespace Graphics
