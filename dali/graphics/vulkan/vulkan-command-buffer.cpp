@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,8 +146,8 @@ struct CommandBuffer::Impl
       break;
       case vk::ImageLayout::ePresentSrcKHR:
       {
-        srcStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
-        srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
+        srcStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+        srcAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eColorAttachmentRead;
       }
       break;
       case vk::ImageLayout::eColorAttachmentOptimal:
@@ -172,8 +172,8 @@ struct CommandBuffer::Impl
     {
       case vk::ImageLayout::eColorAttachmentOptimal:
       {
-        dstStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
-        dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eHostWrite;
+        dstStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;// | */vk::PipelineStageFlagBits::eFragmentShader;
+        dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eMemoryWrite;
         break;
       }
       case vk::ImageLayout::eDepthStencilAttachmentOptimal:
@@ -438,6 +438,7 @@ void CommandBuffer::ImageLayoutTransition( vk::Image            image,
   mImpl->ImageLayoutTransition( image, oldLayout, newLayout, aspectMask );
 }
 
+/*
 void CommandBuffer::RecordImageLayoutTransition( vk::Image              image,
                                                  vk::AccessFlags        srcAccessMask,
                                                  vk::AccessFlags        dstAccessMask,
@@ -450,7 +451,7 @@ void CommandBuffer::RecordImageLayoutTransition( vk::Image              image,
   mImpl->RecordImageLayoutTransition(
     image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask, oldLayout, newLayout, aspectMask );
 }
-
+*/
 /** Push wait semaphores */
 void CommandBuffer::PushWaitSemaphores( const std::vector<vk::Semaphore>&          semaphores,
                                         const std::vector<vk::PipelineStageFlags>& stages )

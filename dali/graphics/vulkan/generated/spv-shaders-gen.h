@@ -28,7 +28,6 @@ layout( location = 0 ) out vec4 triColor;
 void main()
 {
     gl_Position = clip * mvp * vec4( aPosition* size, 1.0 );
-    //gl_Position = vec4( aPosition, 1.0 );
     triColor = color;
 }*/
 
@@ -40,9 +39,11 @@ extern std::vector<uint8_t> FSH_CODE;
 layout( location = 0 ) in vec4 triColor;
 layout( location = 0 ) out vec4 outColor;
 
+layout( binding = 2 ) uniform sampler2D uTexture;
+
 void main()
 {
-    outColor = triColor;
+    outColor = triColor + texture( uTexture, vec2(0.5, 0.5));
 }*/
 
 

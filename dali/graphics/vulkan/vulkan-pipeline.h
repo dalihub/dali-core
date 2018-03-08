@@ -77,11 +77,25 @@ public:
    * @param restartEnable
    */
   void SetInputAssemblyState( vk::PrimitiveTopology topology, bool restartEnable );
+
   /**
    *
    * @return
    */
   bool Compile();
+
+  /**
+   *
+   * @return
+   */
+  const std::vector<vk::DescriptorSetLayoutCreateInfo>& GetVkDescriptorSetLayoutCreateInfo() const;
+
+  /**
+   *
+   * @return
+   */
+  const std::vector<vk::DescriptorSetLayout>& GetVkDescriptorSetLayouts() const;
+
 
 private:
 
