@@ -42,6 +42,7 @@ using namespace glm;
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
 #define USE_XLIB 0
 #include <iostream>
@@ -531,9 +532,30 @@ int RunTestMain()
   }
   return 0;
 }
+
+
+using namespace Dali::Graphics::Vulkan::SpirV;
+void spirv_test0( std::vector<SPIRVWord> code )
+{
+  auto shader = SPIRVUtils::Parse( code );
+  auto opcodeCount = shader.GetOpCodeCount();
+  std::cout << "opcodecount" << opcodeCount << std::endl;
+}
+
+void RunSPIRVTest()
+{
+  std::vector<SPIRVWord> data;
+  data.resize( VSH_CODE.size()/4 );
+  std::copy( VSH_CODE.begin(), VSH_CODE.end(), reinterpret_cast<decltype(VSH_CODE.data())>(data.data()) );
+  spirv_test0( data );
+}
+
+
 } // namespace VulkanTest
 
 int main()
 {
-  VulkanTest::RunTestMain();
+  //VulkanTest::RunTestMain();
+
+  VulkanTest::RunSPIRVTest();
 }
