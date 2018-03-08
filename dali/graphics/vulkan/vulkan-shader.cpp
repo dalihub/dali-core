@@ -17,7 +17,8 @@
 
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
+#include <iostream>
 namespace Dali
 {
 namespace Graphics
@@ -35,6 +36,9 @@ struct Shader::Impl
     mGraphics( graphics ),
     mCreateInfo( info )
   {
+    mSPIRVShader = SpirV::SPIRVUtils::Parse( info.pCode, info.codeSize, vk::ShaderStageFlagBits::eVertex );
+    auto layuts = mSPIRVShader->GenerateDescriptorSetLayoutCreateInfo();
+    std::cout << "yay\n";
   }
 
   ~Impl()
@@ -66,7 +70,6 @@ struct Shader::Impl
     return mShaderModule;
   }
 
-
   // creates new descriptor set layout
   // TODO: should be read from the shader and any manual setting should not
   // take place after we have proper reflection!
@@ -89,12 +92,13 @@ struct Shader::Impl
     return mDSLayouts;
   }
 
-
   Shader& mOwner;
   Graphics& mGraphics;
   vk::ShaderModuleCreateInfo mCreateInfo;
   vk::ShaderModule mShaderModule;
   std::vector<vk::DescriptorSetLayout> mDSLayouts; // descriptorset layouts
+
+  std::unique_ptr<SpirV::SPIRVShader> mSPIRVShader;
 };
 
 /*
