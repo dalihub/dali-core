@@ -27,6 +27,11 @@ namespace Graphics
 {
 namespace Vulkan
 {
+namespace SpirV
+{
+class SPIRVShader;
+}
+
 class Graphics;
 class Shader : public VkManaged // can be overriden as ShaderGLSL for example
 {
@@ -64,7 +69,7 @@ public:
 
   vk::ShaderModule GetVkShaderModule() const;
 
-  const std::vector<vk::DescriptorSetLayout>& GetDescriptorSetLayouts() const;
+  const SpirV::SPIRVShader& GetSPIRVReflection() const;
 
   bool OnDestroy() override;
 

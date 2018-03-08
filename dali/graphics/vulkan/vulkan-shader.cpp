@@ -17,7 +17,8 @@
 
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
+#include <iostream>
 namespace Dali
 {
 namespace Graphics
@@ -35,17 +36,11 @@ struct Shader::Impl
     mGraphics( graphics ),
     mCreateInfo( info )
   {
+    mSPIRVShader = SpirV::SPIRVUtils::Parse( info.pCode, info.codeSize, vk::ShaderStageFlagBits::eVertex );
   }
 
   ~Impl()
   {
-    if(mDSLayouts.size())
-    {
-      for(auto&& ds : mDSLayouts )
-      {
-        mGraphics.GetDevice().destroyDescriptorSetLayout( ds, mGraphics.GetAllocator() );
-      }
-    }
     if(mShaderModule)
     {
       mGraphics.GetDevice().destroyShaderModule( mShaderModule, mGraphics.GetAllocator() );
@@ -66,35 +61,11 @@ struct Shader::Impl
     return mShaderModule;
   }
 
-
-  // creates new descriptor set layout
-  // TODO: should be read from the shader and any manual setting should not
-  // take place after we have proper reflection!
-  void SetDescriptorSetLayout( uint32_t set, vk::DescriptorSetLayoutCreateInfo info )
-  {
-    auto layout = VkAssert( mGraphics.GetDevice().createDescriptorSetLayout( info, mGraphics.GetAllocator() ) );
-    if( mDSLayouts.size() >= set )
-    {
-      mDSLayouts.resize( set+1 );
-    }
-    else if ( mDSLayouts[set] ) // already existing set ( this is error but for now handle it )
-    {
-      mGraphics.GetDevice().destroyDescriptorSetLayout( mDSLayouts[set], mGraphics.GetAllocator() );
-    }
-    mDSLayouts[set] = layout;
-  }
-
-  const std::vector<vk::DescriptorSetLayout>& GetDescriptorSetLayouts() const
-  {
-    return mDSLayouts;
-  }
-
-
   Shader& mOwner;
   Graphics& mGraphics;
   vk::ShaderModuleCreateInfo mCreateInfo;
   vk::ShaderModule mShaderModule;
-  std::vector<vk::DescriptorSetLayout> mDSLayouts; // descriptorset layouts
+  std::unique_ptr<SpirV::SPIRVShader> mSPIRVShader;
 };
 
 /*
@@ -138,15 +109,11 @@ bool Shader::OnDestroy()
   return true;
 }
 
-void Shader::SetDescriptorSetLayout( uint32_t set, vk::DescriptorSetLayoutCreateInfo info )
+const SpirV::SPIRVShader& Shader::GetSPIRVReflection() const
 {
-  mImpl->SetDescriptorSetLayout( set, info );
+  return *mImpl->mSPIRVShader;
 }
 
-const std::vector<vk::DescriptorSetLayout>& Shader::GetDescriptorSetLayouts() const
-{
-  return mImpl->GetDescriptorSetLayouts();
-}
 }
 }
 }
