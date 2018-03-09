@@ -30,14 +30,12 @@ Debug::Filter* gRenderTaskLogFilter = Debug::Filter::New(Debug::NoLogging, false
 
 #define TASK_LOG(level)                                              \
   DALI_LOG_INFO(gRenderTaskLogFilter, level, "SceneGraph::RenderTask::%s: this:%p\n", __FUNCTION__, this)
-#define TASK_LOG_FMT(level, format, args...) \
-  DALI_LOG_INFO(gRenderTaskLogFilter, level, "SceneGraph::RenderTask::%s: this:%p " format, __FUNCTION__, this, ## args)
-
+#define TASK_LOG_FMT(level, format, ...) \
+  DALI_LOG_INFO(gRenderTaskLogFilter, level, "SceneGraph::RenderTask::%s: this:%p " format, __FUNCTION__, this, ## __VA_ARGS__)
 #else
 
 #define TASK_LOG(level)
-#define TASK_LOG_FMT(level, format, args...)
-
+#define TASK_LOG_FMT(level, format, ...)
 #endif
 
 #endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_DEBUG_H__

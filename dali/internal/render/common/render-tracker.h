@@ -21,6 +21,8 @@
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/internal/common/message.h>
 
+#include <atomic>
+
 namespace Dali
 {
 namespace Internal
@@ -77,7 +79,7 @@ private:
 
   Integration::GlSyncAbstraction* mGlSyncAbstraction;      // The sync abstraction
   Integration::GlSyncAbstraction::SyncObject* mSyncObject; // Associated sync object
-  volatile int mSyncTrigger;                               // Trigger that update thread can read
+  volatile std::atomic<int> mSyncTrigger;                  // Trigger that update thread can read
 
 };
 

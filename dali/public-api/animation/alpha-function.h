@@ -161,8 +161,8 @@ private:
 
   Vector4                 mBezierControlPoints;   //< Control points for the bezier alpha function
   AlphaFunctionPrototype  mCustom;                //< Pointer to an alpha function
-  BuiltinFunction         mBuiltin : Log<COUNT>::value+1; //< Enum indicating the built-in alpha function
-  Mode                    mMode    : 2;                   //< Enum indicating the functioning mode of the AlphaFunction
+  BuiltinFunction         mBuiltin : Log<COUNT>::value+2; //< Enum indicating the built-in alpha function
+  Mode                    mMode    : 3;                   //< Enum indicating the functioning mode of the AlphaFunction
 };
 
 /**

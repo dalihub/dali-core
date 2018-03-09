@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <ctime>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector4.h>

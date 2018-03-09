@@ -82,21 +82,24 @@ void RenderTracker::PollSyncObject()
 
 bool RenderTracker::IsSynced()
 {
-  int x = __sync_val_compare_and_swap(&mSyncTrigger, 0xFF, 0x0);
+  int flag = 0xFF;
+  bool ret = mSyncTrigger.compare_exchange_strong( flag, 0 );
 
-  TRACKER_LOG_FMT(Debug::General, " = %s\n", x!=0?"T":"F");
-  return x != 0;
+  TRACKER_LOG_FMT( Debug::General, " = %s\n", true == ret ? "T" : "F" );
+  return ret;
 }
 
 void RenderTracker::ResetSyncFlag()
 {
   TRACKER_LOG(Debug::General);
-  (void)__sync_lock_test_and_set(&mSyncTrigger, 0x0);
+  int flag = 0xFF;
+  mSyncTrigger.compare_exchange_strong( flag, 0 );
 }
 
 void RenderTracker::SetSyncFlag()
 {
-  (void)__sync_lock_test_and_set(&mSyncTrigger, 0xFF);
+  int flag = 0;
+  mSyncTrigger.compare_exchange_strong( flag, 0xFF );
 }
 
 } // Render

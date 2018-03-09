@@ -46,7 +46,7 @@ class DALI_CORE_API Matrix
 {
 public:
 
-  friend std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
+  friend DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
 
   /**
    * @brief Constructor.

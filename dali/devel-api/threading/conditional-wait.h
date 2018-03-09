@@ -35,7 +35,7 @@ public:
    * @brief Allows client code to synchronize updates to its own state with the
    * internal state of a ConditionalWait object.
    */
-  class ScopedLock
+  class DALI_CORE_API ScopedLock
   {
   public:
     /**

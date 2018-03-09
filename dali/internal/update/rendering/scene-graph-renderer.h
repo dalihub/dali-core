@@ -451,11 +451,11 @@ private:
   unsigned int                 mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned int                 mResendFlag;                       ///< Indicate whether data should be resent to the renderer
 
-  DepthFunction::Type          mDepthFunction:3;                  ///< Local copy of the depth function
-  FaceCullingMode::Type        mFaceCullingMode:2;                ///< Local copy of the mode of face culling
-  BlendMode::Type              mBlendMode:2;                      ///< Local copy of the mode of blending
-  DepthWriteMode::Type         mDepthWriteMode:2;                 ///< Local copy of the depth write mode
-  DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
+  DepthFunction::Type          mDepthFunction:4;                  ///< Local copy of the depth function
+  FaceCullingMode::Type        mFaceCullingMode:3;                ///< Local copy of the mode of face culling
+  BlendMode::Type              mBlendMode:3;                      ///< Local copy of the mode of blending
+  DepthWriteMode::Type         mDepthWriteMode:3;                 ///< Local copy of the depth write mode
+  DepthTestMode::Type          mDepthTestMode:3;                  ///< Local copy of the depth test mode
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required

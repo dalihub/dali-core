@@ -86,7 +86,6 @@ internal_src_files = \
   $(internal_src_dir)/event/rendering/shader-impl.cpp \
   $(internal_src_dir)/event/size-negotiation/memory-pool-relayout-container.cpp \
   $(internal_src_dir)/event/size-negotiation/relayout-controller-impl.cpp \
-  \
   $(internal_src_dir)/render/common/render-algorithms.cpp \
   $(internal_src_dir)/render/common/render-debug.cpp \
   $(internal_src_dir)/render/common/render-instruction.cpp \

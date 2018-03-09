@@ -2017,11 +2017,11 @@ protected:
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
-  LayoutDirection::Type mLayoutDirection  : 1; ///< Layout direction, Left to Right or Right to Left.
-  DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
-  ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
-  ClippingMode::Type mClippingMode                 : 2; ///< Cached: Determines which clipping mode (if any) to use.
+  LayoutDirection::Type mLayoutDirection           : 2; ///< Layout direction, Left to Right or Right to Left.
+  DrawMode::Type mDrawMode                         : 3; ///< Cached: How the actor and its children should be drawn
+  PositionInheritanceMode mPositionInheritanceMode : 3; ///< Cached: Determines how position is inherited
+  ColorMode mColorMode                             : 3; ///< Cached: Determines whether mWorldColor is inherited
+  ClippingMode::Type mClippingMode                 : 3; ///< Cached: Determines which clipping mode (if any) to use.
 
 private:
 

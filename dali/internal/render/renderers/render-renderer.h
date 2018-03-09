@@ -82,11 +82,11 @@ public:
     int stencilFunctionMask;                          ///< The stencil function mask
     int stencilFunctionReference;                     ///< The stencil function reference
     int stencilMask;                                  ///< The stencil mask
-    RenderMode::Type       renderMode:3;              ///< The render mode
-    StencilFunction::Type  stencilFunction:3;         ///< The stencil function
-    StencilOperation::Type stencilOperationOnFail:3;  ///< The stencil operation for stencil test fail
-    StencilOperation::Type stencilOperationOnZFail:3; ///< The stencil operation for depth test fail
-    StencilOperation::Type stencilOperationOnZPass:3; ///< The stencil operation for depth test pass
+    RenderMode::Type       renderMode:4;              ///< The render mode
+    StencilFunction::Type  stencilFunction:4;         ///< The stencil function
+    StencilOperation::Type stencilOperationOnFail:4;  ///< The stencil operation for stencil test fail
+    StencilOperation::Type stencilOperationOnZFail:4; ///< The stencil operation for depth test fail
+    StencilOperation::Type stencilOperationOnZPass:4; ///< The stencil operation for depth test pass
   };
 
   /**
@@ -429,10 +429,10 @@ private:
   size_t                       mIndexedDrawFirstElement;    ///< Offset of first element to draw
   size_t                       mIndexedDrawElementsCount;   ///< Number of elements to draw
 
-  DepthFunction::Type          mDepthFunction:3;            ///< The depth function
-  FaceCullingMode::Type        mFaceCullingMode:2;          ///< The mode of face culling
-  DepthWriteMode::Type         mDepthWriteMode:2;           ///< The depth write mode
-  DepthTestMode::Type          mDepthTestMode:2;            ///< The depth test mode
+  DepthFunction::Type          mDepthFunction:4;            ///< The depth function
+  FaceCullingMode::Type        mFaceCullingMode:3;          ///< The mode of face culling
+  DepthWriteMode::Type         mDepthWriteMode:3;           ///< The depth write mode
+  DepthTestMode::Type          mDepthTestMode:3;            ///< The depth test mode
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 

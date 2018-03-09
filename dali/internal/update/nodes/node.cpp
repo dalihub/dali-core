@@ -357,22 +357,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 
 } // namespace SceneGraph
 
-template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
-{
-  if( mObject != NULL )
-  {
-    Dali::Internal::SceneGraph::Node::Delete( mObject );
-    mObject = NULL;
-  }
-}
-
 } // namespace Internal
-
-template <>
-void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete(Dali::Internal::SceneGraph::Node* pointer)
-{
-  Dali::Internal::SceneGraph::Node::Delete( pointer );
-}
 
 } // namespace Dali

@@ -200,7 +200,7 @@ public:
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
-  friend std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
+  friend DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
 
 private:
   struct DALI_INTERNAL Impl; ///< Private data
