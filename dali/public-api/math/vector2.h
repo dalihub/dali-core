@@ -312,7 +312,7 @@ public:
    * @brief Unary negation operator.
    *
    * @SINCE_1_0.0
-   * @return A vector containg the negation
+   * @return A vector containing the negation
    */
   Vector2 operator-() const
   {
