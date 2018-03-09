@@ -52,8 +52,8 @@ extern Debug::Filter* gGlLogFilter;
 #endif // DEBUG_ENABLED
 
 // Don't put guards around here (LOG_INFO has it's own guards)
-#define LOG_GL(format, args...) \
-  DALI_LOG_INFO(gGlLogFilter, Debug::General, format, ## args)
+#define LOG_GL(format, ...) \
+  DALI_LOG_INFO(gGlLogFilter, Debug::General, format, ## __VA_ARGS__)
 
 }
 
