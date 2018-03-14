@@ -27,6 +27,7 @@ namespace Graphics
 namespace Vulkan
 {
 class ImageView;
+using InternalVkImage = vk::Image;
 class Image : public VkManaged
 {
 public:
@@ -108,10 +109,16 @@ public:
   vk::ImageTiling GetVkImageTiling() const;
 
   /**
+   *
+   * @return
+   */
+  vk::ImageUsageFlags  GetVkImageUsageFlags() const;
+
+  /**
    * Binds image memory
    * @param handle
    */
-  void BindMemory( GpuMemoryBlockRef& handle );
+  void BindMemory( const GpuMemoryBlockRef& handle );
 
   /**
    * Creates new VkImage with given specification, it doesn't
@@ -120,6 +127,11 @@ public:
    * @param createInfo
    */
   Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage );
+
+  operator InternalVkImage() const
+  {
+    return GetVkImage();
+  }
 
 private:
   class Impl;

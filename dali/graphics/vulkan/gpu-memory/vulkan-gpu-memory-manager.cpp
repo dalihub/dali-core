@@ -127,9 +127,9 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  GpuMemoryBlockRef Allocate( Image& image, vk::MemoryPropertyFlags memoryProperties ) override
+  GpuMemoryBlockRef Allocate( const ImageRef& image, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image.GetVkImage() ),
+    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image->GetVkImage() ),
                                memoryProperties );
   }
 
