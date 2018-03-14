@@ -2,7 +2,7 @@
 #define __DALI_TYPE_INFO_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,6 +214,36 @@ public:
    *
    */
   const std::string& GetPropertyName( Property::Index index ) const;
+
+
+  /**
+   * @brief Given a child property name, retrieve the property index associated with it,
+   *
+   * @SINCE_1_3.20
+   * @param[in] name The name of the property at the given index,
+   * @return The property index or Property::INVALID_INDEX
+   */
+  Property::Index GetChildPropertyIndex( const std::string& name ) const;
+
+  /**
+   * @brief Given a child property index, retrieve the property name associated with it.
+   *
+   * @SINCE_1_3.20
+   * @param[in] index The property index
+   * @return The name of the property at the given index, or empty string if it does not exist
+   */
+  const std::string& GetChildPropertyName( Property::Index index ) const;
+
+  /**
+   * @brief Given a child property index, retrieve the property name associated with it.
+   *
+   * @SINCE_1_3.20
+   * @param[in] index The property index
+   * @return The name of the property at the given index, or empty string if it does not exist
+   */
+  Property::Type GetChildPropertyType( Property::Index index ) const;
+
+
 
 public: // Not intended for application developers
 

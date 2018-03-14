@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,5 +162,13 @@ ChildPropertyRegistration::ChildPropertyRegistration( TypeRegistration& register
 
   Internal::TypeRegistry::Get()->RegisterChildProperty( registered, name, index, type );
 }
+
+ChildPropertyRegistration::ChildPropertyRegistration( const std::string& registered, const std::string& name, Property::Index index, Property::Type type )
+{
+  DALI_ASSERT_ALWAYS( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) );
+
+  Internal::TypeRegistry::Get()->RegisterChildProperty( registered, name, index, type );
+}
+
 
 } // namespace Dali
