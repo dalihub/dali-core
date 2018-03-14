@@ -145,22 +145,23 @@ private:
   std::vector< std::unique_ptr<Queue> >  mGraphicsQueues;
   std::vector< std::unique_ptr<Queue> >  mTransferQueues;
   std::vector< std::unique_ptr<Queue> >  mComputeQueues;
-  std::unique_ptr< Queue > mPresentQueue;
+  //std::unique_ptr< Queue > mPresentQueue;
 
   Platform                               mPlatform  { Platform::UNDEFINED };
 
 public:
   // TODO: all this stuff should go into some vulkan cache
 
-  void AddBuffer( Handle<Buffer> buffer );
-  void AddImage( Handle<Image> image );
-  void AddPipeline( Handle<Pipeline> pipeline );
-  void AddShader( Handle<Shader> shader );
-  void AddCommandPool( Handle<CommandPool> pool );
-  void AddDescriptorPool( Handle<DescriptorPool> pool );
-  void AddFramebuffer( Handle<Framebuffer> framebuffer );
+  void AddBuffer( BufferRef buffer );
+  void AddImage( ImageRef image );
+  void AddPipeline( PipelineRef pipeline );
+  void AddShader( ShaderRef shader );
+  void AddCommandPool( CommandPoolRef pool );
+  void AddDescriptorPool( DescriptorPoolRef pool );
+  void AddFramebuffer( FramebufferRef framebuffer );
 
   ShaderRef FindShader( vk::ShaderModule shaderModule );
+  ImageRef FindImage( vk::Image image );
 
   void RemoveBuffer( Buffer& buffer );
   void RemoveShader( Shader& shader );

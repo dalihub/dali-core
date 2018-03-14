@@ -54,15 +54,21 @@ public:
 
   uint32_t GetHeight() const;
 
-  ImageViewRef GetAttachmentImageView( AttachmentType type, uint32_t index ) const;
+  ImageViewRef GetAttachment( AttachmentType type, uint32_t index ) const;
+
+  std::vector<ImageViewRef> GetAttachments( AttachmentType type ) const;
+
+  uint32_t GetAttachmentCount( AttachmentType type ) const;
 
   void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
 
-
+  void Commit();
 
 private:
 
-  class Impl;
+  Framebuffer( Graphics& graphics, uint32_t width, uint32_t height );
+
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 
 };

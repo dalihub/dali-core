@@ -44,6 +44,9 @@ struct CommandBuffer::Impl
 
   ~Impl()
   {
+    mResources.clear();
+    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
+                                              1, &mCommandBuffer );
   }
 
   bool Initialise()
@@ -368,6 +371,32 @@ struct CommandBuffer::Impl
     mCommandBuffer.executeCommands( vkBuffers );
   }
 
+  void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                        vk::PipelineStageFlags dstStageMask,
+                        vk::DependencyFlags dependencyFlags,
+                        std::vector<vk::MemoryBarrier> memoryBarriers,
+                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                        std::vector<vk::ImageMemoryBarrier> imageBarriers )
+  {
+    /*
+     * Track resources
+     */
+    if( !imageBarriers.empty() )
+    {
+      for( auto&& imageBarrier : imageBarriers )
+      {
+        ImageRef imageResource{};
+        if( imageResource = mGraphics.FindImage( imageBarrier.image ) )
+        {
+          PushResource( imageResource );
+        }
+      }
+    }
+    //@ todo other resource tracking
+
+    mCommandBuffer.pipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
+  }
+
   Graphics&                     mGraphics;
   CommandPool&                  mOwnerCommandPool;
   vk::CommandBufferAllocateInfo mAllocateInfo{};
@@ -437,6 +466,17 @@ void CommandBuffer::ImageLayoutTransition( vk::Image            image,
 {
   mImpl->ImageLayoutTransition( image, oldLayout, newLayout, aspectMask );
 }
+
+void CommandBuffer::OnRelease( uint32_t refcount )
+{
+  // only pool owns the object, let pool decide what next
+  if(refcount == 1u)
+  {
+    //mImpl->mOwnerCommandPool
+
+  }
+}
+
 
 /*
 void CommandBuffer::RecordImageLayoutTransition( vk::Image              image,
@@ -559,6 +599,16 @@ void CommandBuffer::EndRenderPass()
 void CommandBuffer::ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers )
 {
   mImpl->ExecuteCommands( commandBuffers );
+}
+
+void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                      vk::PipelineStageFlags dstStageMask,
+                      vk::DependencyFlags dependencyFlags,
+                      std::vector<vk::MemoryBarrier> memoryBarriers,
+                      std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                      std::vector<vk::ImageMemoryBarrier> imageBarriers )
+{
+  mImpl->PipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
 }
 
 } // namespace Vulkan

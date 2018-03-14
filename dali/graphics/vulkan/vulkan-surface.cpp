@@ -23,6 +23,7 @@
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-swapchain.h>
 
 namespace Dali
 {
@@ -225,6 +226,8 @@ void Surface::CreateSwapchain()
       VkAssert(mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR(mSurface))));
 
   mExtent = mCapabilities->currentExtent;
+
+  auto newSwapchain = Swapchain::New( mGraphics, mGraphics.GetGraphicsQueue(), *this, 2, 0u );
 
   CreateVulkanSwapchain();
 

@@ -346,6 +346,7 @@ using CommandPoolRef = Handle<class CommandPool>;
 using CommandBufferRef = Handle<class CommandBuffer>;
 using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
 using DescriptorSetRef = Handle<class DescriptorSet>;
+using SwapchainRef = Handle<class Swapchain>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="

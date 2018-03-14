@@ -108,10 +108,16 @@ public:
   vk::ImageTiling GetVkImageTiling() const;
 
   /**
+   *
+   * @return
+   */
+  vk::ImageUsageFlags  GetVkImageUsageFlags() const;
+
+  /**
    * Binds image memory
    * @param handle
    */
-  void BindMemory( GpuMemoryBlockRef& handle );
+  void BindMemory( const GpuMemoryBlockRef& handle );
 
   /**
    * Creates new VkImage with given specification, it doesn't

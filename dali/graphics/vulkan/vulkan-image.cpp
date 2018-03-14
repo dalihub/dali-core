@@ -17,6 +17,7 @@
 
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 
 namespace Dali
 {
@@ -56,12 +57,19 @@ struct Image::Impl
     return true;
   }
 
+  void BindMemory( const GpuMemoryBlockRef& handle )
+  {
+    mGraphics.GetDevice().bindImageMemory( mVkImage, *handle, 0 );
+    mDeviceMemory = handle;
+  }
+
   Image&              mOwner;
   Graphics&           mGraphics;
   vk::Image           mVkImage;
   vk::ImageLayout     mVkImageLayout;
   vk::ImageCreateInfo mCreateInfo;
 
+  GpuMemoryBlockRef   mDeviceMemory;
   bool mIsExternal;
 };
 
@@ -145,8 +153,14 @@ vk::ImageTiling Image::GetVkImageTiling() const
   return mImpl->mCreateInfo.tiling;
 }
 
-void Image::BindMemory( GpuMemoryBlockRef& handle )
+void Image::BindMemory( const GpuMemoryBlockRef& handle )
 {
+  mImpl->BindMemory( handle );
+}
+
+vk::ImageUsageFlags Image::GetVkImageUsageFlags() const
+{
+  return mImpl->mCreateInfo.usage;
 }
 
 /***************************************************************************
@@ -187,7 +201,7 @@ struct ImageView::Impl
 ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info )
 {
   auto retval = ImageViewRef( new ImageView( graphics, image, info ) );
-  if(!retval->mImpl->Initialise())
+  if( !retval->mImpl->Initialise() )
   {
     return ImageViewRef();
   }
@@ -196,12 +210,37 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCr
 
 ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
 {
-  // create reference, image may be null
-  auto retval = ImageViewRef( new ImageView( graphics, image, vk::ImageViewCreateInfo{} ) );
-  if(image)
+  vk::ImageAspectFlags aspectFlags{};
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
   {
-
+    aspectFlags |= vk::ImageAspectFlagBits::eColor;
   }
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  {
+    aspectFlags |= (vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil);
+  }
+
+  auto subresourceRange = vk::ImageSubresourceRange{}
+    .setAspectMask( aspectFlags )
+    .setBaseArrayLayer( 0 )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( image->GetLevelCount() )
+    .setLayerCount( image->GetLayerCount() );
+
+  // create reference, image may be null
+  auto retval = ImageViewRef( new ImageView( graphics,
+                                             image,
+                                             vk::ImageViewCreateInfo{}
+                                               .setViewType( vk::ImageViewType::e2D )
+                                               .setFormat( image->GetVkFormat() )
+                                               .setSubresourceRange(subresourceRange)
+                                               .setComponents( { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA } )
+                                                .setImage( image->GetVkImage() )));
+  if(!retval->mImpl->Initialise())
+  {
+    return ImageViewRef();
+  }
+
   return retval;
 }
 

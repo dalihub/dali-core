@@ -489,7 +489,7 @@ Queue& Graphics::GetComputeQueue(uint32_t index) const
 
 Queue& Graphics::GetPresentQueue() const
 {
-  return *mPresentQueue.get();
+  //return *mPresentQueue.get();
 }
 
 Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
@@ -587,7 +587,7 @@ void Graphics::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool )
   NotImplemented();
 }
 
-Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
+ShaderRef Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   for( auto&& iter : mShaderCache )
   {
@@ -598,6 +598,19 @@ Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
   }
   return Handle<Shader>();
 }
+
+ImageRef Graphics::FindImage( vk::Image image )
+{
+  for( auto&& iter : mImageCache )
+  {
+    if( iter->GetVkImage() == image )
+    {
+      return ImageRef(&*iter);
+    }
+  }
+  return ImageRef();
+}
+
 
 
 } // namespace Vulkan
