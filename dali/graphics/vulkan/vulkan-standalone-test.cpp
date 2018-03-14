@@ -279,7 +279,7 @@ void update_translation( Dali::Graphics::Vulkan::BufferRef buffer )
            lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) ) * modelMat;
 
   update_buffer( buffer, ub );
-   */
+  */
 }
 
 Dali::Graphics::Vulkan::BufferRef create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
@@ -417,6 +417,26 @@ PipelineRef create_pipeline( Dali::Graphics::Vulkan::Graphics& graphics,
   return pipeline;
 }
 
+int RunTestMain2()
+{
+#if USE_XLIB == 1
+  auto window         = Test::create_xlib_window( 640, 480 );
+  auto surfaceFactory = std::unique_ptr<VkSurfaceXlib>{new VkSurfaceXlib{window->display, window->window}};
+#else
+  auto window         = Test::create_xcb_window( 640, 480 );
+  auto surfaceFactory = std::unique_ptr<VkSurfaceXcb>{new VkSurfaceXcb{window->connection, window->window}};
+#endif
+
+  auto graphics = MakeUnique<Graphics>();
+  auto fbid     = graphics->Create( std::move( surfaceFactory ) );
+
+  // access internal implementation
+  auto& gr = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
+
+  // GPU memory manager
+  auto& memmgr = gr.GetDeviceMemoryManager();
+}
+
 int RunTestMain()
 {
 #if USE_XLIB == 1
@@ -508,7 +528,7 @@ int RunTestMain()
     graphics->PreRender( fbid );
     // queue submit draw
 
-    auto cmdbuf = gr.GetSurface( fbid ).GetCurrentCommandBuffer();
+    auto cmdbuf = gr.GetSwapchainForFBID( fbid )->GetPrimaryCommandBuffer();
 
     // get command buffer for current frame and execute the draw call
     cmdbuf->ExecuteCommands( {cmdDraw} );

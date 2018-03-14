@@ -187,10 +187,28 @@ public:
   void EndRenderPass();
 
   /**
+   * Records pipeline barrier
+   * @param srcStageMask
+   * @param dstStageMask
+   * @param dependencyFlags
+   * @param memoryBarriers
+   * @param bufferBarriers
+   * @param imageBarriers
+   */
+  void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                        vk::PipelineStageFlags dstStageMask,
+                        vk::DependencyFlags dependencyFlags,
+                        std::vector<vk::MemoryBarrier> memoryBarriers,
+                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                        std::vector<vk::ImageMemoryBarrier> imageBarriers );
+
+  /**
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
   void ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers );
+
+  void OnRelease( uint32_t refcount ) override;
 
 private:
 

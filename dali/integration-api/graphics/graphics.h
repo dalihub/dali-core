@@ -32,7 +32,7 @@ namespace API
 class Controller;
 }
 // frame buffer id
-using FBID = uint32_t;
+using FBID = int32_t;
 
 namespace Vulkan
 {

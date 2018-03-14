@@ -16,6 +16,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 
 using namespace glm;
@@ -71,16 +72,15 @@ struct Controller::Impl
 
     mDebugPipelineState.descriptorPool = CreateDescriptorPool();
 
-    const float halfWidth = 0.5f;
+    const float halfWidth  = 0.5f;
     const float halfHeight = 0.5f;
-//#if 0
-    const vec3 VERTICES[4] =
-                  {
-                    { halfWidth,  halfHeight, 0.0f },
-                    { halfWidth, -halfHeight, 0.0f },
-                    { -halfWidth,  halfHeight, 0.0f },
-                    { -halfWidth, -halfHeight, 0.0f },
-                  };
+    //#if 0
+    const vec3 VERTICES[4] = {
+      {halfWidth, halfHeight, 0.0f},
+      {halfWidth, -halfHeight, 0.0f},
+      {-halfWidth, halfHeight, 0.0f},
+      {-halfWidth, -halfHeight, 0.0f},
+    };
 //#endif
 #if 0
     const vec3 VERTICES[4] = {
@@ -127,7 +127,7 @@ struct Controller::Impl
     pipeline->SetShader( state.vertexShader, Shader::Type::VERTEX );
     pipeline->SetShader( state.fragmentShader, Shader::Type::FRAGMENT );
 
-    auto size = mGraphics.GetSurface( 0u ).GetSize();
+    auto size = mGraphics.GetSurface( 0u )->GetSize();
     pipeline->SetViewport( 0, 0, static_cast<float>( size.width ), static_cast<float>( size.height ) );
 
     pipeline->SetVertexInputState(
@@ -170,9 +170,9 @@ struct Controller::Impl
     for( auto&& buf : bufferList.Get() )
     {
       // TODO: @todo implement minimum offset!
-      const uint32_t sizeOfUniformBuffer = U32((buf->GetSize() / drawcalls.Get()));
-      const uint32_t uniformBlockOffsetStride = ((sizeOfUniformBuffer / 256)+1)*256;
-      const uint32_t uniformBlockMemoryNeeded = U32(uniformBlockOffsetStride*drawcalls.Get());
+      const uint32_t sizeOfUniformBuffer      = U32( ( buf->GetSize() / drawcalls.Get() ) );
+      const uint32_t uniformBlockOffsetStride = ( ( sizeOfUniformBuffer / 256 ) + 1 ) * 256;
+      const uint32_t uniformBlockMemoryNeeded = U32( uniformBlockOffsetStride * drawcalls.Get() );
 
       // create buffer if doesn't exist
       if( !state.uniformBuffer0 )
@@ -193,16 +193,16 @@ struct Controller::Impl
         mat4 mvp;
         vec4 color;
         vec3 size;
-      } __attribute__((aligned(16)));
+      } __attribute__( ( aligned( 16 ) ) );
 
       auto memory = state.uniformBuffer0->GetMemoryHandle();
       auto outPtr = memory->MapTyped<char>();
       for( auto i = 0u; i < drawcalls.Get(); ++i )
       {
         // copy chunk of data
-        UB* inputData = (reinterpret_cast<UB*>(buf->GetDataBase())) + i;
-        UB* outputData = (reinterpret_cast<UB*>(outPtr + (i*uniformBlockOffsetStride)));
-        *outputData = *inputData;
+        UB* inputData  = ( reinterpret_cast<UB*>( buf->GetDataBase() ) ) + i;
+        UB* outputData = ( reinterpret_cast<UB*>( outPtr + ( i * uniformBlockOffsetStride ) ) );
+        *outputData    = *inputData;
 
         auto descriptorSets = state.descriptorPool->AllocateDescriptorSets(
           vk::DescriptorSetAllocateInfo{}.setDescriptorSetCount( 1 ).setPSetLayouts(
@@ -226,7 +226,7 @@ struct Controller::Impl
       memory->Unmap();
 
       // execute buffer
-      mGraphics.GetSurface( 0u ).GetCurrentCommandBuffer()->ExecuteCommands( executeCommands );
+      mGraphics.GetSwapchainForFBID( 0u )->GetPrimaryCommandBuffer()->ExecuteCommands( executeCommands );
 
       // break, one pass only
       break;
@@ -235,8 +235,10 @@ struct Controller::Impl
 #pragma GCC diagnostic pop
   void BeginFrame()
   {
-    auto& surface = mGraphics.GetSurface( 0u );
-    surface.AcquireNextImage();
+    auto surface = mGraphics.GetSurface( 0u );
+
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    swapchain->AcquireNextFramebuffer();
 
     // rewind pools
     mDebugPipelineState.drawPoolIndex = 0u;
@@ -246,8 +248,8 @@ struct Controller::Impl
 
   void EndFrame()
   {
-    auto& surface = mGraphics.GetSurface( 0u );
-    surface.Present();
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    swapchain->Present();
   }
 
   DescriptorPoolRef CreateDescriptorPool()

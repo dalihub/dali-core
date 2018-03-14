@@ -18,8 +18,10 @@
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/integration-api/graphics/graphics.h>
+
 
 namespace Dali
 {
@@ -33,6 +35,8 @@ namespace Integration
 {
 namespace Graphics
 {
+using Swapchain = Dali::Graphics::Vulkan::Swapchain;
+using SwapchainRef = Dali::Graphics::Vulkan::SwapchainRef;
 
 Graphics::Graphics()
 {
@@ -52,6 +56,7 @@ Graphics::~Graphics()
 Dali::Graphics::FBID Graphics::Create(
   std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory)
 {
+  //@todo do we really need to have a surface that early???
 
   // create surface
   auto retval = mGraphicsImpl->CreateSurface(std::move(surfaceFactory));
@@ -59,8 +64,11 @@ Dali::Graphics::FBID Graphics::Create(
   // create device
   mGraphicsImpl->CreateDevice();
 
+  // create swapchain from surface
+  auto surface = mGraphicsImpl->GetSurface( retval );
+
   // create swapchain
-  mGraphicsImpl->GetSurface( retval ).CreateSwapchain();
+  mGraphicsImpl->CreateSwapchainForSurface( surface );
 
   return retval;
 }
@@ -73,9 +81,9 @@ Dali::Graphics::FBID Graphics::CreateSurface(
 
 void Graphics::PreRender(Dali::Graphics::FBID framebufferId)
 {
-  assert(framebufferId != 0u && "Invalid FBID!");
-  auto &surface = mGraphicsImpl->GetSurface(framebufferId);
-  surface.AcquireNextImage();
+  assert(framebufferId != 0 && "Invalid FBID!");
+  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
+  swapchain->AcquireNextFramebuffer();
 }
 
 Dali::Graphics::API::Controller& Graphics::GetController()
@@ -88,9 +96,8 @@ Dali::Graphics::API::Controller& Graphics::GetController()
  */
 void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
 {
-  assert(framebufferId != 0u && "Invalid FBID!");
-  auto &surface = mGraphicsImpl->GetSurface(framebufferId);
-  surface.Present();
+  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
+  swapchain->Present();
 }
 
 void IncludeThisLibrary()

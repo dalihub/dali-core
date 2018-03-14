@@ -16,6 +16,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
@@ -24,7 +25,7 @@
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
-#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 
 namespace Dali
 {
@@ -44,6 +45,9 @@ struct CommandBuffer::Impl
 
   ~Impl()
   {
+    mResources.clear();
+    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
+                                              1, &mCommandBuffer );
   }
 
   bool Initialise()
@@ -90,9 +94,10 @@ struct CommandBuffer::Impl
 
     if( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary )
     {
-      // todo: sets render pass from 'default' surface, should be supplied from primary command buffer
-      // which has render pass associated within execution context
-      inheritance.setRenderPass( mGraphics.GetSurface( 0 ).GetRenderPass() );
+      // Render pass is obtained from the default framebuffer
+      // it's a legacy but little nicer
+      auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+      inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetVkRenderPass() );
       info.setPInheritanceInfo( &inheritance );
     }
 
@@ -327,17 +332,18 @@ struct CommandBuffer::Impl
   // RENDER PASS
   void BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   {
-    auto& surface     = mGraphics.GetSurface( framebufferId );
-    auto  renderPass  = surface.GetRenderPass();
-    auto  frameBuffer = surface.GetFramebuffer( bufferIndex );
-    auto  clearValues = surface.GetClearValues();
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    auto surface = mGraphics.GetSurface( 0u );
+    auto frameBuffer = swapchain->GetCurrentFramebuffer();
+    auto renderPass = frameBuffer->GetVkRenderPass();
+    auto clearValues = frameBuffer->GetDefaultClearValues();
 
     auto info = vk::RenderPassBeginInfo{};
-    info.setFramebuffer( frameBuffer );
+    info.setFramebuffer( frameBuffer->GetVkFramebuffer() );
     info.setRenderPass( renderPass );
     info.setClearValueCount( U32( clearValues.size() ) );
     info.setPClearValues( clearValues.data() );
-    info.setRenderArea( vk::Rect2D( {0, 0}, surface.GetSize() ) );
+    info.setRenderArea( vk::Rect2D( {0, 0}, surface->GetSize() ) );
 
     mCurrentRenderPass = renderPass;
     mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );
@@ -366,6 +372,32 @@ struct CommandBuffer::Impl
     }
 
     mCommandBuffer.executeCommands( vkBuffers );
+  }
+
+  void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                        vk::PipelineStageFlags dstStageMask,
+                        vk::DependencyFlags dependencyFlags,
+                        std::vector<vk::MemoryBarrier> memoryBarriers,
+                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                        std::vector<vk::ImageMemoryBarrier> imageBarriers )
+  {
+    /*
+     * Track resources
+     */
+    if( !imageBarriers.empty() )
+    {
+      for( auto&& imageBarrier : imageBarriers )
+      {
+        ImageRef imageResource{};
+        if( imageResource = mGraphics.FindImage( imageBarrier.image ) )
+        {
+          PushResource( imageResource );
+        }
+      }
+    }
+    //@ todo other resource tracking
+
+    mCommandBuffer.pipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
   }
 
   Graphics&                     mGraphics;
@@ -437,6 +469,12 @@ void CommandBuffer::ImageLayoutTransition( vk::Image            image,
 {
   mImpl->ImageLayoutTransition( image, oldLayout, newLayout, aspectMask );
 }
+
+void CommandBuffer::OnRelease( uint32_t refcount )
+{
+  VkManaged::OnRelease( refcount );
+}
+
 
 /*
 void CommandBuffer::RecordImageLayoutTransition( vk::Image              image,
@@ -559,6 +597,16 @@ void CommandBuffer::EndRenderPass()
 void CommandBuffer::ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers )
 {
   mImpl->ExecuteCommands( commandBuffers );
+}
+
+void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                      vk::PipelineStageFlags dstStageMask,
+                      vk::DependencyFlags dependencyFlags,
+                      std::vector<vk::MemoryBarrier> memoryBarriers,
+                      std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                      std::vector<vk::ImageMemoryBarrier> imageBarriers )
+{
+  mImpl->PipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
 }
 
 } // namespace Vulkan
