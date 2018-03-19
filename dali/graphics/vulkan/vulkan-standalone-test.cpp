@@ -231,15 +231,15 @@ std::unique_ptr<Test::xcb_window_t> create_xcb_window( int width, int height )
 namespace VulkanTest
 {
 Dali::Graphics::Vulkan::GpuMemoryBlockRef test_gpu_memory_manager(
-  Dali::Graphics::Vulkan::Graphics&             graphics,
-  GpuMemoryManager&                             gpuManager,
-  const Dali::Graphics::Vulkan::Handle<Buffer>& buffer )
+  Dali::Graphics::Vulkan::Graphics &graphics,
+  GpuMemoryManager &gpuManager,
+  const Dali::Graphics::Vulkan::Handle<Buffer> &buffer)
 {
-  auto  device    = graphics.GetDevice();
-  auto& allocator = graphics.GetAllocator();
+  auto device = graphics.GetDevice();
+  auto &allocator = graphics.GetAllocator();
 
-  auto& gpuAllocator = gpuManager.GetDefaultAllocator();
-  return gpuAllocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible );
+  auto &gpuAllocator = gpuManager.GetDefaultAllocator();
+  return gpuAllocator.Allocate(buffer, vk::MemoryPropertyFlagBits::eHostVisible);
 }
 
 struct UniformData
@@ -247,24 +247,26 @@ struct UniformData
   mat4 mvp;
   vec4 color;
   vec3 size;
-} __attribute__( ( aligned( 16 ) ) );
+} __attribute__(( aligned( 16 )));
 
 struct UniformClipData
 {
   mat4 clip;
-} __attribute__( ( aligned( 16 ) ) );
+} __attribute__(( aligned( 16 )));
 
 mat4 MVP;
 
 template<class T>
-void update_buffer( Dali::Graphics::Vulkan::BufferRef buffer, T& value )
+void update_buffer(Dali::Graphics::Vulkan::BufferRef buffer, T &value)
 {
-  auto ptr = reinterpret_cast<T*>( buffer->GetMemoryHandle()->Map() );
-  *ptr     = value;
-  buffer->GetMemoryHandle()->Unmap();
+  auto ptr = reinterpret_cast<T *>( buffer->GetMemoryHandle()
+                                          ->Map());
+  *ptr = value;
+  buffer->GetMemoryHandle()
+        ->Unmap();
 }
 
-void update_translation( Dali::Graphics::Vulkan::BufferRef buffer )
+void update_translation(Dali::Graphics::Vulkan::BufferRef buffer)
 {
   static float x = 0.0f;
   x += 0.5f;
@@ -282,97 +284,104 @@ void update_translation( Dali::Graphics::Vulkan::BufferRef buffer )
   */
 }
 
-Dali::Graphics::Vulkan::BufferRef create_uniform_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+Dali::Graphics::Vulkan::BufferRef create_uniform_buffer(Dali::Graphics::Vulkan::Graphics &gr)
 {
   // create uniform buffer
-  auto uniformBuffer = Buffer::New( gr, sizeof( UniformData ), Buffer::Type::UNIFORM );
+  auto uniformBuffer = Buffer::New(gr, sizeof(UniformData), Buffer::Type::UNIFORM);
 
   // allocate memory
-  auto memory = gr.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( uniformBuffer,
-                                                                            vk::MemoryPropertyFlagBits::eHostVisible );
+  auto memory = gr.GetDeviceMemoryManager()
+                  .GetDefaultAllocator()
+                  .Allocate(uniformBuffer,
+                            vk::MemoryPropertyFlagBits::eHostVisible);
 
   // bind memory
-  uniformBuffer->BindMemory( memory );
+  uniformBuffer->BindMemory(memory);
 
-  auto ub = reinterpret_cast<UniformData*>( memory->Map() );
+  auto ub = reinterpret_cast<UniformData *>( memory->Map());
 
-  ub->mvp = mat4{1.0f} * ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f ) *
-            lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
-  ub->color = vec4( 0.0f, 1.0f, 1.0f, 1.0f );
-  ub->size  = vec3( 1.0f, 1.0f, 1.0f );
+  ub->mvp   = mat4{1.0f} * ortho(0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f) *
+              lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+  ub->color = vec4(0.0f, 1.0f, 1.0f, 1.0f);
+  ub->size  = vec3(1.0f, 1.0f, 1.0f);
 
   memory->Unmap();
 
   return uniformBuffer;
 }
 
-Dali::Graphics::Vulkan::BufferRef create_clip_buffer( Dali::Graphics::Vulkan::Graphics& gr )
+Dali::Graphics::Vulkan::BufferRef create_clip_buffer(Dali::Graphics::Vulkan::Graphics &gr)
 {
   const glm::mat4 clip(
-    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
+    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f);
 
   // create uniform buffer
-  auto uniformBuffer = Buffer::New( gr, sizeof( UniformClipData ), Buffer::Type::UNIFORM );
+  auto uniformBuffer = Buffer::New(gr, sizeof(UniformClipData), Buffer::Type::UNIFORM);
 
   // allocate memory
-  auto memory = gr.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( uniformBuffer,
-                                                                            vk::MemoryPropertyFlagBits::eHostVisible );
+  auto memory = gr.GetDeviceMemoryManager()
+                  .GetDefaultAllocator()
+                  .Allocate(uniformBuffer,
+                            vk::MemoryPropertyFlagBits::eHostVisible);
   // bind memory
-  uniformBuffer->BindMemory( memory );
+  uniformBuffer->BindMemory(memory);
   auto dst = memory->MapTyped<mat4>();
-  std::copy( &clip, &clip + 1, dst );
+  std::copy(&clip, &clip + 1, dst);
   memory->Unmap();
   return uniformBuffer;
 }
 
-Dali::Graphics::Vulkan::Handle<DescriptorPool> create_descriptor_pool( Dali::Graphics::Vulkan::Graphics& gr )
+Dali::Graphics::Vulkan::Handle<DescriptorPool> create_descriptor_pool(Dali::Graphics::Vulkan::Graphics &gr)
 {
   vk::DescriptorPoolSize size;
-  size.setDescriptorCount( 1024 ).setType( vk::DescriptorType::eUniformBuffer );
+  size.setDescriptorCount(1024)
+      .setType(vk::DescriptorType::eUniformBuffer);
 
   // TODO: how to organize this???
   auto pool = DescriptorPool::New(
-    gr, vk::DescriptorPoolCreateInfo{}.setMaxSets( 1024 ).setPoolSizeCount( 1 ).setPPoolSizes( &size ) );
+    gr, vk::DescriptorPoolCreateInfo{}.setMaxSets(1024)
+                                      .setPoolSizeCount(1)
+                                      .setPPoolSizes(&size));
   return pool;
 }
 
-void test_framebuffer( Dali::Graphics::Vulkan::Graphics& graphics )
+void test_framebuffer(Dali::Graphics::Vulkan::Graphics &graphics)
 {
   using namespace Dali::Graphics::Vulkan;
   // framebuffer
-  auto fb = NewRef<Framebuffer>( graphics, 640, 480 );
+  auto fb = NewRef<Framebuffer>(graphics, 640, 480);
 
   // attachment
-  auto image = NewRef<Image>( graphics,
-                              vk::ImageCreateInfo{}
-                                .setFormat( vk::Format::eR32G32B32A32Sfloat )
-                                .setTiling( vk::ImageTiling::eOptimal )
-                                .setMipLevels( 1 )
-                                .setImageType( vk::ImageType::e2D )
-                                .setExtent( vk::Extent3D( 640, 480, 1 ) )
-                                .setArrayLayers( 1 )
-                                .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment )
-                                .setSharingMode( vk::SharingMode::eExclusive )
-                                .setInitialLayout( vk::ImageLayout::eUndefined )
-                                .setSamples( vk::SampleCountFlagBits::e1 ) );
+  auto image = NewRef<Image>(graphics,
+                             vk::ImageCreateInfo{}
+                               .setFormat(vk::Format::eR32G32B32A32Sfloat)
+                               .setTiling(vk::ImageTiling::eOptimal)
+                               .setMipLevels(1)
+                               .setImageType(vk::ImageType::e2D)
+                               .setExtent(vk::Extent3D(640, 480, 1))
+                               .setArrayLayers(1)
+                               .setUsage(vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment)
+                               .setSharingMode(vk::SharingMode::eExclusive)
+                               .setInitialLayout(vk::ImageLayout::eUndefined)
+                               .setSamples(vk::SampleCountFlagBits::e1));
 
   auto imageView = NewRef<ImageView>(
     graphics,
     image,
     vk::ImageViewCreateInfo{}
-      .setFormat( vk::Format::eR32G32B32A32Sfloat )
-      .setComponents( vk::ComponentMapping(
-        vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA ) )
-      .setImage( image->GetVkImage() )
-      .setSubresourceRange( vk::ImageSubresourceRange{}
-                              .setLayerCount( 1 )
-                              .setLevelCount( 1 )
-                              .setBaseMipLevel( 0 )
-                              .setBaseArrayLayer( 0 )
-                              .setAspectMask( vk::ImageAspectFlagBits::eColor ) )
-      .setViewType( vk::ImageViewType::e2D ) );
+      .setFormat(vk::Format::eR32G32B32A32Sfloat)
+      .setComponents(vk::ComponentMapping(
+        vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA))
+      .setImage(image->GetVkImage())
+      .setSubresourceRange(vk::ImageSubresourceRange{}
+                             .setLayerCount(1)
+                             .setLevelCount(1)
+                             .setBaseMipLevel(0)
+                             .setBaseArrayLayer(0)
+                             .setAspectMask(vk::ImageAspectFlagBits::eColor))
+      .setViewType(vk::ImageViewType::e2D));
 
-  fb->SetAttachment( imageView, Framebuffer::AttachmentType::COLOR, 0u );
+  fb->SetAttachment(imageView, Framebuffer::AttachmentType::COLOR, 0u);
 
   //fb->GetRenderPass();
 
@@ -389,33 +398,38 @@ void test_handle()
   handle.GetRefCount();*/
 }
 
-PipelineRef create_pipeline( Dali::Graphics::Vulkan::Graphics& graphics,
-                             Dali::Graphics::Vulkan::ShaderRef vertexShader,
-                             Dali::Graphics::Vulkan::ShaderRef fragmentShader )
+PipelineRef create_pipeline(Dali::Graphics::Vulkan::Graphics &graphics,
+                            Dali::Graphics::Vulkan::ShaderRef vertexShader,
+                            Dali::Graphics::Vulkan::ShaderRef fragmentShader)
 {
   using namespace Dali::Graphics::Vulkan;
   auto pipelineInfo = vk::GraphicsPipelineCreateInfo{};
-  auto pipeline     = Pipeline::New( graphics, pipelineInfo );
+  auto pipeline     = Pipeline::New(graphics, pipelineInfo);
 
-  pipeline->SetShader( vertexShader, Shader::Type::VERTEX );
-  pipeline->SetShader( fragmentShader, Shader::Type::FRAGMENT );
-  pipeline->SetViewport( 0, 0, 640, 480 );
+  pipeline->SetShader(vertexShader, Shader::Type::VERTEX);
+  pipeline->SetShader(fragmentShader, Shader::Type::FRAGMENT);
+  pipeline->SetViewport(0, 0, 640, 480);
   pipeline->SetVertexInputState(
     std::vector<vk::VertexInputAttributeDescription>{
-      vk::VertexInputAttributeDescription{}.setBinding( 0 ).setOffset( 0 ).setLocation( 0 ).setFormat(
-        vk::Format::eR32G32B32Sfloat )},
+      vk::VertexInputAttributeDescription{}.setBinding(0)
+                                           .setOffset(0)
+                                           .setLocation(0)
+                                           .setFormat(
+                                             vk::Format::eR32G32B32Sfloat)},
     std::vector<vk::VertexInputBindingDescription>{vk::VertexInputBindingDescription{}
-                                                     .setBinding( 0 )
-                                                     .setStride( sizeof( float ) * 3 )
-                                                     .setInputRate( vk::VertexInputRate::eVertex )} );
-  pipeline->SetInputAssemblyState( vk::PrimitiveTopology::eTriangleList, false );
+      .setBinding(0)
+      .setStride(sizeof(float) * 3)
+      .setInputRate(vk::VertexInputRate::eVertex)});
+  pipeline->SetInputAssemblyState(vk::PrimitiveTopology::eTriangleList, false);
 
-  if( !pipeline->Compile() )
+  if (!pipeline->Compile())
   {
     pipeline.Reset();
   }
   return pipeline;
 }
+
+int TextureTestMain( Dali::Graphics::Vulkan::Graphics& );
 
 int RunTestMain2()
 {
@@ -423,18 +437,20 @@ int RunTestMain2()
   auto window         = Test::create_xlib_window( 640, 480 );
   auto surfaceFactory = std::unique_ptr<VkSurfaceXlib>{new VkSurfaceXlib{window->display, window->window}};
 #else
-  auto window         = Test::create_xcb_window( 640, 480 );
+  auto window         = Test::create_xcb_window(640, 480);
   auto surfaceFactory = std::unique_ptr<VkSurfaceXcb>{new VkSurfaceXcb{window->connection, window->window}};
 #endif
 
   auto graphics = MakeUnique<Graphics>();
-  auto fbid     = graphics->Create( std::move( surfaceFactory ) );
+  auto fbid     = graphics->Create(std::move(surfaceFactory));
 
   // access internal implementation
-  auto& gr = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
+  auto &gr = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
 
   // GPU memory manager
-  auto& memmgr = gr.GetDeviceMemoryManager();
+  auto &memmgr = gr.GetDeviceMemoryManager();
+
+  return TextureTestMain( gr );
 }
 
 int RunTestMain()
@@ -443,103 +459,110 @@ int RunTestMain()
   auto window         = Test::create_xlib_window( 640, 480 );
   auto surfaceFactory = std::unique_ptr<VkSurfaceXlib>{new VkSurfaceXlib{window->display, window->window}};
 #else
-  auto window         = Test::create_xcb_window( 640, 480 );
+  auto window         = Test::create_xcb_window(640, 480);
   auto surfaceFactory = std::unique_ptr<VkSurfaceXcb>{new VkSurfaceXcb{window->connection, window->window}};
 #endif
 
   auto graphics = MakeUnique<Graphics>();
-  auto fbid     = graphics->Create( std::move( surfaceFactory ) );
+  auto fbid     = graphics->Create(std::move(surfaceFactory));
 
   // access internal implementation
-  auto& gr = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
+  auto &gr = graphics->GetImplementation<Dali::Graphics::Vulkan::Graphics>();
 
   // GPU memory manager
-  auto& memmgr = gr.GetDeviceMemoryManager();
+  auto &memmgr = gr.GetDeviceMemoryManager();
 
   const vec3 VERTICES[] = {
-    {0.0f, 0.0f, 0.0f},
-    {320.0f, 0.0f, 0.0f},
-    {0.0f, 160.0f, 0.0f},
+    {0.0f,   0.0f,   0.0f},
+    {320.0f, 0.0f,   0.0f},
+    {0.0f,   160.0f, 0.0f},
   };
 
   // shaders
-  auto vertexShader = Shader::New( gr, VSH_CODE.data(), VSH_CODE.size() );
+  auto vertexShader = Shader::New(gr, VSH_CODE.data(), VSH_CODE.size());
 
-  auto fragmentShader = Shader::New( gr, FSH_CODE.data(), FSH_CODE.size() );
+  auto fragmentShader = Shader::New(gr, FSH_CODE.data(), FSH_CODE.size());
 
   // buffer
-  auto vertexBuffer = Buffer::New( gr, sizeof( float ) * 3 * 3, Buffer::Type::VERTEX );
+  auto vertexBuffer = Buffer::New(gr, sizeof(float) * 3 * 3, Buffer::Type::VERTEX);
 
-  auto descriptorPool = create_descriptor_pool( gr );
+  auto descriptorPool = create_descriptor_pool(gr);
 
-  auto& gpuManager = gr.GetDeviceMemoryManager();
+  auto &gpuManager = gr.GetDeviceMemoryManager();
 
-  auto bufferMemory = test_gpu_memory_manager( gr, gpuManager, vertexBuffer );
-  vertexBuffer->BindMemory( bufferMemory );
+  auto bufferMemory = test_gpu_memory_manager(gr, gpuManager, vertexBuffer);
+  vertexBuffer->BindMemory(bufferMemory);
 
-  auto ptr = static_cast<uint8_t*>( bufferMemory->Map() );
-  std::copy( reinterpret_cast<const uint8_t*>( VERTICES ),
-             reinterpret_cast<const uint8_t*>( VERTICES ) + ( sizeof( float ) * 9 ),
-             ptr );
+  auto ptr = static_cast<uint8_t *>( bufferMemory->Map());
+  std::copy(reinterpret_cast<const uint8_t *>( VERTICES ),
+            reinterpret_cast<const uint8_t *>( VERTICES ) + (sizeof(float) * 9),
+            ptr);
   bufferMemory->Unmap();
 
-  auto pipeline = create_pipeline( gr, vertexShader, fragmentShader );
+  auto pipeline = create_pipeline(gr, vertexShader, fragmentShader);
 
   auto descriptorSet = descriptorPool->AllocateDescriptorSets(
     vk::DescriptorSetAllocateInfo{}
-      .setPSetLayouts( pipeline->GetVkDescriptorSetLayouts().data() )
-      .setDescriptorSetCount( pipeline->GetVkDescriptorSetLayouts().size() ) );
+      .setPSetLayouts(pipeline->GetVkDescriptorSetLayouts()
+                              .data())
+      .setDescriptorSetCount(pipeline->GetVkDescriptorSetLayouts()
+                                     .size()));
 
 
-  auto commandPool = CommandPool::New( gr );
+  auto commandPool = CommandPool::New(gr);
 
-  auto uniformBuffer = create_uniform_buffer( gr );
+  auto uniformBuffer = create_uniform_buffer(gr);
 
-  auto clipBuffer = create_clip_buffer( gr );
+  auto clipBuffer = create_clip_buffer(gr);
 
-  descriptorSet[0]->WriteUniformBuffer( 0, uniformBuffer, 0, uniformBuffer->GetSize() );
-  descriptorSet[0]->WriteUniformBuffer( 1, clipBuffer, 0, clipBuffer->GetSize() );
+  descriptorSet[0]->WriteUniformBuffer(0, uniformBuffer, 0, uniformBuffer->GetSize());
+  descriptorSet[0]->WriteUniformBuffer(1, clipBuffer, 0, clipBuffer->GetSize());
 
   // get new buffer
-  auto cmdDraw = commandPool->NewCommandBuffer( false );
+  auto cmdDraw = commandPool->NewCommandBuffer(false);
 
   // begin recording
-  cmdDraw->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
+  cmdDraw->Begin(vk::CommandBufferUsageFlagBits::eRenderPassContinue);
 
   // vertex buffer
-  cmdDraw->BindVertexBuffer( 0, vertexBuffer, 0 );
+  cmdDraw->BindVertexBuffer(0, vertexBuffer, 0);
 
   // pipeline
-  cmdDraw->BindGraphicsPipeline( pipeline );
+  cmdDraw->BindGraphicsPipeline(pipeline);
 
   // descriptor sets
-  cmdDraw->BindDescriptorSets( descriptorSet, 0 );
+  cmdDraw->BindDescriptorSets(descriptorSet, 0);
 
   // do draw
-  cmdDraw->Draw( 3, 1, 0, 0 );
+  cmdDraw->Draw(3, 1, 0, 0);
 
   // finish
   cmdDraw->End();
 
   bool running = true;
 
-  while( running )
+  while (running)
   {
-    graphics->PreRender( fbid );
+    graphics->PreRender(fbid);
     // queue submit draw
 
-    auto cmdbuf = gr.GetSwapchainForFBID( fbid )->GetPrimaryCommandBuffer();
+    auto cmdbuf = gr.GetSwapchainForFBID(fbid)
+                    ->GetPrimaryCommandBuffer();
 
     // get command buffer for current frame and execute the draw call
-    cmdbuf->ExecuteCommands( {cmdDraw} );
+    cmdbuf->ExecuteCommands({cmdDraw});
 
-    graphics->PostRender( fbid );
+    graphics->PostRender(fbid);
 
-    update_translation( uniformBuffer );
+    update_translation(uniformBuffer);
   }
   return 0;
 }
 
+void texture_test(void *data, size_t size)
+{
+
+}
 
 using namespace Dali::Graphics::Vulkan::SpirV;
 void spirv_test0( std::vector<SPIRVWord> code )
@@ -563,11 +586,12 @@ void RunSPIRVTest()
 }
 
 
+
 } // namespace VulkanTest
 
 int main()
 {
-  VulkanTest::RunTestMain();
+  VulkanTest::RunTestMain2();
 
   //VulkanTest::RunSPIRVTest();
 }
