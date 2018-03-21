@@ -13,6 +13,8 @@
 #include <dali/graphics/vulkan/vulkan-fence.h>
 #include <dali/graphics/vulkan/vulkan-queue.h>
 
+#include <dali/graphics/vulkan/vulkan-graphics-texture.h>
+
 
 namespace VulkanTest
 {
@@ -47,7 +49,7 @@ struct Pixel
 struct Pixmap
 {
   explicit Pixmap( std::vector<Pixel> _data, uint32_t _width, uint32_t _height ) :
-  data(_data), width(_width), height(_height), bytesPerPixel(4), pixelFormat( vk::Format::eR32G32B32A32Uint )
+  data(_data), width(_width), height(_height), bytesPerPixel(4), pixelFormat( vk::Format::eR8G8B8A8Unorm )
   {
   }
   std::vector<Pixel> data;
@@ -84,11 +86,12 @@ struct Texture
     mImage->BindMemory( allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ) );
 
     // create transient buffer to copy data
+    auto size = mPixmap.data.size()*sizeof(mPixmap.data[0]);
     auto buffer = Buffer::New( mGraphics,
                                vk::BufferCreateInfo{}
                                  .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
                                  .setSharingMode( vk::SharingMode::eExclusive )
-                                 .setSize( mPixmap.data.size()*sizeof(mPixmap.data[0]) ) );
+                                 .setSize( size ) );
 
     buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
@@ -101,8 +104,7 @@ struct Texture
     auto copy = vk::BufferImageCopy{}.setImageExtent( { mPixmap.width, mPixmap.height, 1 } )
                          .setBufferImageHeight( mPixmap.height )
                          .setBufferOffset( 0 )
-                         .setBufferRowLength( mPixmap.width * mPixmap.bytesPerPixel )
-                         .setImageExtent( { mPixmap.width, mPixmap.height, 1 } )
+                         .setBufferRowLength( mPixmap.width )
                          .setImageOffset( { 0, 0, 0 } )
                          .setImageSubresource(
                            vk::ImageSubresourceLayers{}
@@ -125,7 +127,7 @@ struct Texture
                                      {}, {}, {}, { barrier } );
 
     // copy image
-    mCommandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::ePreinitialized, { copy } );
+    mCommandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, { copy } );
 
     // change layout to shader read-only optimal
     mCommandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eVertexShader, vk::PipelineStageFlagBits::eVertexShader,
@@ -203,8 +205,8 @@ Texture CreateTexture( Graphics& graphics, Pixmap pixmap )
 int TextureTestMain( Dali::Graphics::Vulkan::Graphics& graphics )
 {
   auto pixmap = GenerateTexture32BPPRGBA( 1024, 1024 );
-  auto texture = Texture( graphics, pixmap );
-  texture.Initialise();
+  auto texture = Dali::Graphics::Vulkan::Texture::New( graphics, 1024, 1024, vk::Format::eR8G8B8A8Unorm);
+
   return 0;
 }
 

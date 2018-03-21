@@ -345,7 +345,7 @@ using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
 using DescriptorSetRef = Handle<class DescriptorSet>;
 using SwapchainRef = Handle<class Swapchain>;
 using SurfaceRef = Handle<class Surface>;
-
+using SamplerRef = Handle<class Sampler>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
