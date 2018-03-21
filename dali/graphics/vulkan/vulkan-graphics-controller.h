@@ -82,6 +82,8 @@ public:
 
   std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
 
+  void* CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height ) override;
+
   /**
    * @brief Get a render list
    */

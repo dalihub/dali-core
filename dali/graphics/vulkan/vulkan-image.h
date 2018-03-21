@@ -265,6 +265,8 @@ public:
    */
   bool Create();
 
+
+
 private:
 
   ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo );

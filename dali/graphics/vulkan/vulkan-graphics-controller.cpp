@@ -18,6 +18,9 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-sampler.h>
+#include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-graphics-texture.h>
 
 using namespace glm;
 
@@ -140,6 +143,8 @@ struct Controller::Impl
                                                        .setInputRate( vk::VertexInputRate::eVertex )} );
     pipeline->SetInputAssemblyState( vk::PrimitiveTopology::eTriangleStrip, false );
 
+
+
     if( !pipeline->Compile() )
     {
       pipeline.Reset();
@@ -193,6 +198,7 @@ struct Controller::Impl
         mat4 mvp;
         vec4 color;
         vec3 size;
+        uint samplerId;
       } __attribute__( ( aligned( 16 ) ) );
 
       auto memory = state.uniformBuffer0->GetMemoryHandle();
@@ -210,6 +216,11 @@ struct Controller::Impl
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );
+        if(inputData->samplerId > 0)
+        {
+          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId - 1]->GetSampler(),
+                                                       mTextures[inputData->samplerId - 1]->GetImageView());
+        }
 
         // record draw call
         auto cmdbuf = state.commandPool->NewCommandBuffer( false );
@@ -263,6 +274,45 @@ struct Controller::Impl
     return pool;
   }
 
+  void* CreateTexture( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+  {
+    // AB: yup, yet another hack
+    auto texture = Dali::Graphics::Vulkan::Texture::New( mGraphics, width, height, vk::Format::eR8G8B8A8Unorm );
+
+    // check bpp, if 24bpp convert
+    if( sizeInBytes == width*height*3 )
+    {
+      uint8_t* inData = reinterpret_cast<uint8_t*>(data);
+      uint8_t* outData = new uint8_t[width*height*4];
+
+      auto outIdx = 0u;
+      for( auto i = 0u; i < sizeInBytes; i+= 3 )
+      {
+        outData[outIdx] = inData[i];
+        outData[outIdx+1] = inData[i+1];
+        outData[outIdx+2] = inData[i+2];
+        outData[outIdx+3] = 0xff;
+        outIdx += 4;
+      }
+
+      data = outData;
+      sizeInBytes = width*height*4;
+    }
+
+    // Upload data immediately. Will stall the queue :(
+    texture->UploadData( data, sizeInBytes, TextureUploadMode::eImmediate );
+
+    // push texture to the stack, return the buffer
+    mTextures.push_back( texture );
+
+    // return index for quick lookup
+    auto index = mTextures.size();
+    return *reinterpret_cast<void**>(&index);
+  }
+
+  // resources
+  std::vector<TextureRef> mTextures;
+
   Graphics&           mGraphics;
   Controller&         mOwner;
   GpuMemoryAllocator& mDefaultAllocator;
@@ -299,6 +349,11 @@ API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<AP
 
 API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
 {
+}
+
+void* Controller::CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+{
+  return mImpl->CreateTexture( data, sizeInBytes, width, height );
 }
 
 std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
