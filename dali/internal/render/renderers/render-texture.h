@@ -136,6 +136,11 @@ public:
     return mNativeImage;
   }
 
+  void SetId( void* textureId )
+  {
+    mId = *reinterpret_cast<GLuint*>(&textureId);
+  }
+
 private:
 
   /**

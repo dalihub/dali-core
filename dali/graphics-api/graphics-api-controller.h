@@ -90,6 +90,17 @@ public:
   virtual void GetRenderItemList() = 0;
 
   /**
+   * Temporary way of instantiating new texture through controller
+   * @param width
+   * @param height
+   * @return
+   */
+  virtual void* CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+  {
+    return 0;
+  }
+
+  /**
    * @brief Create a buffer
    */
   template<typename T>

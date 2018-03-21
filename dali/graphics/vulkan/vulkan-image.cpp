@@ -34,6 +34,7 @@ struct Image::Impl
     mCreateInfo( std::move( createInfo ) ),
     mIsExternal( static_cast<bool>( externalImage ) )
   {
+    mVkImageLayout = mCreateInfo.initialLayout;
   }
 
   ~Impl()
@@ -212,16 +213,22 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCr
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
 ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
 {
+  vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   vk::ImageAspectFlags aspectFlags{};
   if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
   {
     aspectFlags |= vk::ImageAspectFlagBits::eColor;
+    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   }
   if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
   {
     aspectFlags |= (vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil);
   }
-
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eSampled )
+  {
+    aspectFlags |= (vk::ImageAspectFlagBits::eColor);
+    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eR,vk::ComponentSwizzle::eA };
+  }
   auto subresourceRange = vk::ImageSubresourceRange{}
     .setAspectMask( aspectFlags )
     .setBaseArrayLayer( 0 )
@@ -236,7 +243,7 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
                                                .setViewType( vk::ImageViewType::e2D )
                                                .setFormat( image->GetVkFormat() )
                                                .setSubresourceRange(subresourceRange)
-                                               .setComponents( { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA } )
+                                               .setComponents( componentsMapping )
                                                 .setImage( image->GetVkImage() )));
   if(!retval->mImpl->Initialise())
   {
