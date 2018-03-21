@@ -237,6 +237,7 @@ public:
    * @return
    */
   vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+                                                       vk::ImageLayout        olsLayout,
                                                        vk::ImageLayout        newLayout,
                                                        vk::ImageAspectFlags   aspectMask
   ) const;

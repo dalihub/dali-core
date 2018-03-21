@@ -529,6 +529,7 @@ vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef ima
 }
 
 vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef image,
+                                                     vk::ImageLayout        oldLayout,
                                                      vk::ImageLayout        newLayout,
                                                      vk::ImageAspectFlags   aspectMask
 ) const
@@ -536,8 +537,6 @@ vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef ima
 
   vk::AccessFlags  srcAccessMask, dstAccessMask;
   vk::PipelineStageFlags srcStageMask, dstStageMask;
-
-  auto oldLayout = image->GetVkImageLayout();
 
   switch( oldLayout )
   {
