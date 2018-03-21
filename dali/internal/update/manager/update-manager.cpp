@@ -926,6 +926,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
         }
       }
       // generate graphics objects
+      (*mImpl);
       SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
@@ -1252,6 +1253,22 @@ void UpdateManager::UploadTexture( Render::Texture* texture, PixelDataPtr pixelD
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::UploadTexture, texture, pixelData, params );
+}
+
+void UpdateManager::UploadTextureV2( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
+{
+  //fixme: AB: This is temporary solution to create a texture object on the Graphics API side
+  //fixme:     using controller directly in the update thread
+  auto& controller = mImpl->graphics.GetController();
+
+  // function returns an opaque object which has to be stored in the texture implementation
+  auto textureId = controller.CreateTextureRGBA32( pixelData->GetBuffer(), pixelData->GetBufferSize(),
+  pixelData->GetWidth(), pixelData->GetHeight());
+
+  // AB: workaround, assigning instantly texture Id to the render object
+  texture->SetId( textureId );
+
+  std::cout << textureId << std::endl;
 }
 
 void UpdateManager::GenerateMipmaps( Render::Texture* texture )

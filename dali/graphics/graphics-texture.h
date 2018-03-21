@@ -49,7 +49,7 @@ public:
   /**
    * @brief Creates a new texture
    */
-  Texture CreateTeture();
+  API::Texture CreateTeture();
 };
 
 } // namespace Graphics

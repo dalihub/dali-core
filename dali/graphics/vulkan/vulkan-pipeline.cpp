@@ -199,11 +199,17 @@ struct Pipeline::Impl
   void SetColorBlendState()
   {
     mAttachementNoBlendState = vk::PipelineColorBlendAttachmentState{};
-    //mAttachementNoBlendState.setBlendEnable( true );
+    mAttachementNoBlendState.setBlendEnable( true );
     mAttachementNoBlendState.setColorWriteMask( vk::ColorComponentFlagBits::eR |
                                                   vk::ColorComponentFlagBits::eG |
                                                   vk::ColorComponentFlagBits::eB |
                                                   vk::ColorComponentFlagBits::eA );
+    mAttachementNoBlendState.setSrcColorBlendFactor( vk::BlendFactor::eSrcAlpha );
+    mAttachementNoBlendState.setDstColorBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha );
+    mAttachementNoBlendState.setSrcAlphaBlendFactor( vk::BlendFactor::eOne );
+    mAttachementNoBlendState.setDstAlphaBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha );
+    mAttachementNoBlendState.setColorBlendOp( vk::BlendOp::eAdd );
+    mAttachementNoBlendState.setAlphaBlendOp( vk::BlendOp::eAdd );
 
     mColorBlendState.setBlendConstants( { 1.0f, 1.0f, 1.0f, 1.0f });
     mColorBlendState = vk::PipelineColorBlendStateCreateInfo{};

@@ -16,6 +16,7 @@ layout( set = 0, binding = 0, std140 ) uniform world
     mat4 mvp;
     vec4 color;
     vec3 size;
+    uint samplerIndex;
 };
 
 layout( set = 0, binding = 1, std140 ) uniform clipUniform
@@ -25,9 +26,12 @@ layout( set = 0, binding = 1, std140 ) uniform clipUniform
 
 layout( location = 0 ) out vec4 triColor;
 
+layout( location = 1 ) out vec2 uvCoords;
+
 void main()
 {
     gl_Position = clip * mvp * vec4( aPosition* size, 1.0 );
+    uvCoords = aPosition.xy + vec2( 0.5, 0.5 );
     triColor = color;
 }*/
 
@@ -37,11 +41,14 @@ extern std::vector<uint8_t> FSH_CODE;
 #version 430
 
 layout( location = 0 ) in vec4 triColor;
+layout( location = 1 ) in vec2 uvCoords;
 layout( location = 0 ) out vec4 outColor;
+
+layout( set = 0, binding = 2 ) uniform sampler2D uTexture;
 
 void main()
 {
-    outColor = triColor;
+    outColor = texture( uTexture, uvCoords) * triColor;
 }*/
 
 
