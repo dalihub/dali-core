@@ -34,6 +34,7 @@ struct Image::Impl
     mCreateInfo( std::move( createInfo ) ),
     mIsExternal( static_cast<bool>( externalImage ) )
   {
+    mVkImageLayout = mCreateInfo.initialLayout;
   }
 
   ~Impl()
