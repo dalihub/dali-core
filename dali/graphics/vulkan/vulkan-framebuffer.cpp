@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
 
+
 namespace Dali
 {
 namespace Graphics
@@ -30,126 +31,130 @@ struct Framebuffer::Impl
   Impl( Framebuffer& owner, Graphics& graphics, uint32_t width, uint32_t height )
   : mInterface( owner ), mGraphics( graphics ), mColorImageViewAttachments{}, mDepthStencilImageViewAttachment()
   {
-  }
-
-  // Framebuffer creation may be deferred
-  bool Initialise()
-  {
-    if( mInitialised )
-    {
-      return true;
-    }
-
-    if( !Validate() )
-    {
-      return false;
-    }
-
-    /*
-    auto attRef = vk::AttachmentReference{};
-    attRef.setLayout();
-    attRef.setAttachment();
-
-    // creating single subpass per framebuffer
-    auto subpassDesc = vk::SubpassDescription{};
-    subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
-    subpassDesc.setColorAttachmentCount(0);
-    subpassDesc.setInputAttachmentCount(0);
-    subpassDesc.setPDepthStencilAttachment(nullptr);
-    subpassDesc.setPColorAttachments( nullptr );
-    subpassDesc.setPInputAttachments( nullptr );
-    subpassDesc.setPPreserveAttachments( nullptr );
-    subpassDesc.setPResolveAttachments( nullptr );
-
-
-    auto rpInfo = vk::RenderPassCreateInfo{};
-    rpInfo.setAttachmentCount( mAttachments.size() );
-    //rpInfo.setPAttachments( )
-    rpInfo.setDependencyCount( 0 );
-    rpInfo.setPDependencies( nullptr );
-    rpInfo.setPSubpasses( &subpassDesc );
-    rpInfo.setSubpassCount( 1 );
-
-    auto fbInfo = vk::FramebufferCreateInfo{};
-    fbInfo.setWidth( mWidth );
-    fbInfo.setHeight( mHeight );
-    //fbInfo.setRenderPass( )
-    //fbInfo.setAttachmentCount( 0 );
-    //fbInfo.setPAttachments( ImageViews );
-    */
-    mInitialised = true;
+    mWidth = width;
+    mHeight = height;
   }
 
   // creating render pass may happen either as deferred or
   // when framebuffer is initialised into immutable state
-  void CreateRenderPass()
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+  bool Initialise()
   {
-    // for each attachment...
-#if 0
-    auto attRef = vk::AttachmentReference{};
+    mAttachmentReference.clear();
+    mAttachmentDescription.clear();
+    mDefaultClearValues.clear();
+    /*
+     * COLOR ATTACHMENTS
+     */
+    auto attachments         = std::vector<vk::ImageView>{};
+    auto colorAttachmentSize = 0u;
+    for( auto&& colorAttachment : mColorImageViewAttachments )
+    {
+      auto attRef = vk::AttachmentReference{};
+      attRef.setLayout( vk::ImageLayout::eColorAttachmentOptimal );
+      attRef.setAttachment( colorAttachmentSize++ );
+      mAttachmentReference.emplace_back( attRef );
+      attachments.emplace_back( colorAttachment->GetVkImageView() );
 
-    // 1. Need to know layout during render pass ( Image::GetLayout() )
-    // 2. Usually it's going to be:
-    //    - color_attachment_optimal
-    //    - depth_stencil_attachment_optimal
-    //attRef.setLayout();
-    //attRef.setAttachment();
+      vk::AttachmentDescription attDesc{};
+      attDesc.setSamples( vk::SampleCountFlagBits::e1 )
+        .setInitialLayout( vk::ImageLayout::eColorAttachmentOptimal )
+        .setFormat( colorAttachment->GetImage()->GetVkFormat() )
+        .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
+        .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
+        .setLoadOp( vk::AttachmentLoadOp::eClear )
+        .setStoreOp( vk::AttachmentStoreOp::eStore )
+        .setFinalLayout( vk::ImageLayout::ePresentSrcKHR );
 
-    // Single subpass support, all attachments used
-    // TODO: input, preserve, resolve
-    // TODO: create subpasses
+      mAttachmentDescription.emplace_back( attDesc );
 
+      // update clear color values
+      vk::ClearColorValue clear;
+      clear.setFloat32( {0.0f, 0.0f, 0.0f, 1.0f} );
+      mDefaultClearValues.emplace_back( clear );
+    }
+
+    /*
+     * DEPTH-STENCIL ATTACHMENT
+     */
+    if( mDepthStencilImageViewAttachment )
+    {
+      auto attRef = vk::AttachmentReference{};
+      attRef.setLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
+      attRef.setAttachment( colorAttachmentSize );
+      mAttachmentReference.emplace_back( attRef );
+      attachments.emplace_back( mDepthStencilImageViewAttachment->GetVkImageView() );
+
+      vk::AttachmentDescription attDesc{};
+      attDesc.setSamples( vk::SampleCountFlagBits::e1 )
+             .setInitialLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal )
+             .setFormat( mDepthStencilImageViewAttachment->GetImage()->GetVkFormat() )
+             .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
+             .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
+             .setLoadOp( vk::AttachmentLoadOp::eClear )
+             .setStoreOp( vk::AttachmentStoreOp::eDontCare )
+             .setFinalLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
+      mAttachmentDescription.emplace_back( attDesc );
+
+      // update clear depth/stencil values
+      vk::ClearDepthStencilValue clear;
+      clear.setDepth( 0.0f ).setStencil( 1.0f );
+      mDefaultClearValues.emplace_back( clear );
+    }
+
+    /*
+     * SUBPASS
+     */
     // creating single subpass per framebuffer
     auto subpassDesc = vk::SubpassDescription{};
     subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
-    subpassDesc.setColorAttachmentCount( 0 );
-    subpassDesc.setInputAttachmentCount( 0 );
-    subpassDesc.setPDepthStencilAttachment( nullptr );
-    subpassDesc.setPColorAttachments( nullptr );
-    subpassDesc.setPInputAttachments( nullptr );
-    subpassDesc.setPPreserveAttachments( nullptr );
-    subpassDesc.setPResolveAttachments( nullptr );
+    subpassDesc.setColorAttachmentCount( colorAttachmentSize );
+    if( mDepthStencilImageViewAttachment )
+    {
+      subpassDesc.setPDepthStencilAttachment( &mAttachmentReference[colorAttachmentSize] );
+    }
+    subpassDesc.setPColorAttachments( &mAttachmentReference[0] );
 
+    /*
+     * RENDERPASS
+     */
     // create compatible render pass
     auto rpInfo = vk::RenderPassCreateInfo{};
-    //rpInfo.setAttachmentCount( mAttachments.size() );
-    //rpInfo.setPAttachments( )
-    rpInfo.setDependencyCount( 0 );
-    rpInfo.setPDependencies( nullptr );
+    rpInfo.setAttachmentCount( U32(mAttachmentDescription.size()) );
+    rpInfo.setPAttachments( mAttachmentDescription.data() );
     rpInfo.setPSubpasses( &subpassDesc );
     rpInfo.setSubpassCount( 1 );
-#endif
-  }
+    mVkRenderPass = VkAssert( mGraphics.GetDevice().createRenderPass( rpInfo, mGraphics.GetAllocator() ));
 
-  void InitialiseAttachments()
-  {
-    ImageRef                attachment;
-    vk::ImageViewCreateInfo info;
-    info.setViewType( vk::ImageViewType::e2D );
-    info.setSubresourceRange( //get layercount, get level count
-      vk::ImageSubresourceRange{}.setLevelCount( 1 ).setLayerCount( 1 ).setBaseMipLevel( 0 ).setBaseArrayLayer( 0 ) );
-    info.setImage( attachment->GetVkImage() ); //
-    info.setComponents( vk::ComponentMapping(
-      vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA ) );
-    info.setFormat( vk::Format::eD16Unorm ); // get format
-
-    //ImageViewRef ref = ImageView::New( attachment );
-  }
-
-  void CreateFramebuffer()
-  {
-    // assert if framebuffer is already created
-    InitialiseAttachments();
-
+    /*
+     * FRAMEBUFFER
+     */
     vk::FramebufferCreateInfo info;
     info.setRenderPass( mVkRenderPass )
-      .setPAttachments( nullptr ) // attach imageviews, imageviews are created from supplied images
-      .setLayers( 1 )
-      .setWidth( mWidth )
-      .setHeight( mHeight )
-      .setAttachmentCount( 1 );
+        .setPAttachments( attachments.data() )
+        .setLayers( 1 )
+        .setWidth( mWidth )
+        .setHeight( mHeight )
+        .setAttachmentCount( U32(attachments.size()) );
 
     mVkFramebuffer = VkAssert( mGraphics.GetDevice().createFramebuffer( info, mGraphics.GetAllocator() ) );
+
+    return true;
+  }
+#pragma GCC diagnostic pop
+
+  /**
+   * Creates immutable framebuffer object
+   */
+  bool Commit()
+  {
+    if(!mInitialised)
+    {
+      mInitialised = Initialise();
+      return mInitialised;
+    }
+    return false;
   }
 
   void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
@@ -170,7 +175,7 @@ struct Framebuffer::Impl
     }
   }
 
-  ImageViewRef GetAttachmentImageView( AttachmentType type, uint32_t index ) const
+  ImageViewRef GetAttachment( AttachmentType type, uint32_t index ) const
   {
     switch( type )
     {
@@ -193,17 +198,62 @@ struct Framebuffer::Impl
     return ImageViewRef();
   }
 
-  bool Validate()
+  std::vector<ImageViewRef> GetAttachments( AttachmentType type ) const
   {
-    if( mWidth == 0u || mHeight == 0 )
+    std::vector<ImageViewRef> retval{};
+    switch( type )
     {
-      return false;
+      case AttachmentType::COLOR:
+      {
+        retval.insert( retval.end(), mColorImageViewAttachments.begin(), mColorImageViewAttachments.end() );
+        return retval;
+      }
+      case AttachmentType::DEPTH_STENCIL:
+      {
+        retval.push_back( mDepthStencilImageViewAttachment );
+        return retval;
+      }
+      case AttachmentType::DEPTH:
+      case AttachmentType::INPUT:
+      case AttachmentType::RESOLVE:
+      case AttachmentType::PRESERVE:
+      {
+        return retval;
+      }
     }
+    return retval;
   }
 
-  ~Impl()
+  uint32_t GetAttachmentCount( AttachmentType type ) const
   {
+    std::vector<ImageViewRef> retval{};
+    switch( type )
+    {
+      case AttachmentType::COLOR:
+      {
+        return U32(mColorImageViewAttachments.size());
+      }
+      case AttachmentType::DEPTH_STENCIL:
+      {
+        return mDepthStencilImageViewAttachment ? 1u : 0u;
+      }
+      case AttachmentType::DEPTH:
+      case AttachmentType::INPUT:
+      case AttachmentType::RESOLVE:
+      case AttachmentType::PRESERVE:
+      {
+        return 0u;
+      }
+    }
+    return 0u;
   }
+
+  const std::vector<vk::ClearValue>& GetDefaultClearValues() const
+  {
+    return mDefaultClearValues;
+  }
+
+  ~Impl() = default;
 
   vk::RenderPass GetVkRenderPass() const
   {
@@ -226,12 +276,23 @@ struct Framebuffer::Impl
   vk::Framebuffer           mVkFramebuffer;
   vk::RenderPass            mVkRenderPass;
 
+  // attachment references for the main subpass
+  std::vector<vk::AttachmentReference>   mAttachmentReference;
+  std::vector<vk::AttachmentDescription> mAttachmentDescription;
+
+  std::vector<vk::ClearValue> mDefaultClearValues;
   bool mInitialised{false};
 };
 
 FramebufferRef Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
 {
-  return FramebufferRef();
+  FramebufferRef ref( new Framebuffer( graphics, width, height ) );
+  return ref;
+}
+
+Framebuffer::Framebuffer( Graphics& graphics, uint32_t width, uint32_t height )
+{
+  mImpl = std::make_unique<Impl>( *this, graphics, width, height );
 }
 
 void Framebuffer::SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
@@ -249,9 +310,39 @@ uint32_t Framebuffer::GetHeight() const
   return mImpl->mHeight;
 }
 
-Handle<ImageView> Framebuffer::GetAttachmentImageView( AttachmentType type, uint32_t index ) const
+ImageViewRef Framebuffer::GetAttachment( AttachmentType type, uint32_t index ) const
 {
-  return mImpl->GetAttachmentImageView( type, index );
+  return mImpl->GetAttachment( type, index );
+}
+
+std::vector<ImageViewRef> Framebuffer::GetAttachments( AttachmentType type ) const
+{
+  return mImpl->GetAttachments( type );
+}
+
+uint32_t Framebuffer::GetAttachmentCount( AttachmentType type ) const
+{
+  return mImpl->GetAttachmentCount( type );
+}
+
+void Framebuffer::Commit()
+{
+  mImpl->Commit();
+}
+
+vk::RenderPass Framebuffer::GetVkRenderPass() const
+{
+  return mImpl->mVkRenderPass;
+}
+
+vk::Framebuffer Framebuffer::GetVkFramebuffer() const
+{
+  return mImpl->mVkFramebuffer;
+}
+
+const std::vector<vk::ClearValue>& Framebuffer::GetDefaultClearValues() const
+{
+  return mImpl->GetDefaultClearValues();
 }
 
 } // Namespace Vulkan

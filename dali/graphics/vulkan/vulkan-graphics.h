@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/integration-api/graphics/surface-factory.h>
-
+#include <dali/graphics/vulkan/vulkan-swapchain.h>
 namespace Dali
 {
 namespace Graphics
@@ -58,6 +58,12 @@ class DescriptorPool;
 class GpuMemoryManager;
 class Controller;
 
+struct SwapchainSurfacePair
+{
+  SwapchainRef swapchain;
+  SurfaceRef surface;
+};
+
 class Graphics
 {
 
@@ -73,7 +79,13 @@ public:
   // new way
   FBID CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory);
 
-  Surface& GetSurface( FBID surfaceId );
+  SwapchainRef CreateSwapchainForSurface( SurfaceRef surface );
+
+  SurfaceRef GetSurface( FBID surfaceId );
+
+  SwapchainRef GetSwapchainForSurface( SurfaceRef surface );
+
+  SwapchainRef GetSwapchainForFBID( FBID surfaceId );
 
   void CreateDevice();
 
@@ -138,29 +150,30 @@ private:
   // queue family properties
   std::vector< vk::QueueFamilyProperties > mQueueFamilyProperties;
 
-  std::unordered_map< FBID, UniqueSurface > mSurfaceFBIDMap;
+  std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
   FBID mBaseFBID{0u};
 
   // Sets of queues
   std::vector< std::unique_ptr<Queue> >  mGraphicsQueues;
   std::vector< std::unique_ptr<Queue> >  mTransferQueues;
   std::vector< std::unique_ptr<Queue> >  mComputeQueues;
-  std::unique_ptr< Queue > mPresentQueue;
+  //std::unique_ptr< Queue > mPresentQueue;
 
   Platform                               mPlatform  { Platform::UNDEFINED };
 
 public:
   // TODO: all this stuff should go into some vulkan cache
 
-  void AddBuffer( Handle<Buffer> buffer );
-  void AddImage( Handle<Image> image );
-  void AddPipeline( Handle<Pipeline> pipeline );
-  void AddShader( Handle<Shader> shader );
-  void AddCommandPool( Handle<CommandPool> pool );
-  void AddDescriptorPool( Handle<DescriptorPool> pool );
-  void AddFramebuffer( Handle<Framebuffer> framebuffer );
+  void AddBuffer( BufferRef buffer );
+  void AddImage( ImageRef image );
+  void AddPipeline( PipelineRef pipeline );
+  void AddShader( ShaderRef shader );
+  void AddCommandPool( CommandPoolRef pool );
+  void AddDescriptorPool( DescriptorPoolRef pool );
+  void AddFramebuffer( FramebufferRef framebuffer );
 
   ShaderRef FindShader( vk::ShaderModule shaderModule );
+  ImageRef FindImage( vk::Image image );
 
   void RemoveBuffer( Buffer& buffer );
   void RemoveShader( Shader& shader );

@@ -66,7 +66,7 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual GpuMemoryBlockRef Allocate( Image& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual GpuMemoryBlockRef Allocate( const ImageRef& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   // refcounting managed via allocator which ownes all the blocks, allocator may
   // implement this feature any way ( or simply ignore it )

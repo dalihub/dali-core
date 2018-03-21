@@ -101,12 +101,6 @@ struct Buffer::Impl final
   vk::Buffer                            mBuffer;
 };
 
-/**
- *
- * @param graphics
- * @param size
- * @return
- */
 BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
 {
   auto usageFlags = vk::BufferUsageFlags{};
@@ -123,13 +117,24 @@ BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
   info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
-  auto buffer = Handle<Buffer>( new Buffer(graphics, info) );
+  auto buffer = BufferRef( new Buffer(graphics, info) );
 
   if(buffer && buffer->mImpl->Initialise())
   {
     graphics.AddBuffer( buffer );
   }
   return buffer;
+}
+
+BufferRef Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
+{
+  auto buffer = BufferRef( new Buffer(graphics, info) );
+  if( buffer && buffer->mImpl->Initialise() )
+  {
+    graphics.AddBuffer( buffer );
+    return buffer;
+  }
+  return BufferRef();
 }
 
 Buffer::Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)

@@ -63,7 +63,7 @@ struct CommandPool::Impl
     mAllocatedCommandBuffers.clear();
   }
 
-  Handle<CommandBuffer> NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+  CommandBufferRef NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
   {
     vk::CommandBufferAllocateInfo info( allocateInfo );
     info.setCommandPool( mCommandPool );
@@ -73,12 +73,30 @@ struct CommandPool::Impl
     return mAllocatedCommandBuffers.back();
   }
 
+  bool ReleaseCommandBuffer( const CommandBufferRef& buffer, bool forceRelease )
+  {
+    if( buffer.GetRefCount() == 2 )
+    {
+      for(auto&& cmdBuf : mAllocatedCommandBuffers )
+      {
+        if(cmdBuf == buffer )
+        {
+          // fixme: should remove from list but in future the cache of command buffer will work
+          // different
+          cmdBuf.Reset();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   Graphics& mGraphics;
   CommandPool& mInterface;
   vk::CommandPoolCreateInfo mCreateInfo;
   vk::CommandPool mCommandPool;
 
-  std::vector<Handle<CommandBuffer>> mAllocatedCommandBuffers;
+  std::vector<CommandBufferRef> mAllocatedCommandBuffers;
 };
 
 /**
@@ -141,6 +159,11 @@ CommandBufferRef CommandPool::NewCommandBuffer( bool isPrimary )
 void CommandPool::Reset( bool releaseResources )
 {
   mImpl->Reset( releaseResources );
+}
+
+bool CommandPool::ReleaseCommandBuffer( CommandBufferRef buffer, bool forceRelease )
+{
+  return mImpl->ReleaseCommandBuffer( buffer, forceRelease );
 }
 
 } // namespace Vulkan
