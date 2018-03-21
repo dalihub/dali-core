@@ -151,7 +151,8 @@ bool Texture::Upload( PixelDataPtr pixelData,
                                     static_cast< uint16_t >( yOffset ),
                                     static_cast< uint16_t >( width ),
                                     static_cast< uint16_t >( height ) };
-            UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+            //UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+            UploadTextureMessageV2( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
 
             // Request event processing and update forcely
             mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );

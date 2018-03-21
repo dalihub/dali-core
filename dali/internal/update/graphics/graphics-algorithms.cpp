@@ -17,7 +17,8 @@
 
 // CLASS HEADER
 #include <dali/internal/update/graphics/graphics-algorithms.h>
-
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include <glm/glm.hpp>
 // EXTERNAL INCLUDES
 
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -48,7 +49,7 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   //commandBuilder.Set( );
 
   // TODO: @todo Clipping...
-
+  using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
   auto numberOfRenderItems = renderItemList.Count();
 
   using DataT = struct
@@ -56,16 +57,39 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     Matrix  world;
     Vector4 color;
     Vector3 size;
+    uint32_t samplerId;
   } __attribute__((aligned(16)));
 
   auto uniformBuffer = graphics.CreateBuffer<DataT>( numberOfRenderItems );
   auto data = uniformBuffer->GetData();
+
+  // TODO: for now texture id is passed through the buffer however
+  // it isn't used by shader but only used to extract which texture
+  // should be used during rendering an item.
+  uint32_t opaqueTextureId = 0;
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
+    if(item.mTextureSet)
+    {
+
+      InternalTextureSet* textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
+
+      auto textureId = textureSet->GetTexture(0)->GetId();
+
+      std::cout << "TextureCount: " << textureSet->GetTextureCount() <<
+                ", texture id: " << textureId <<
+      std::endl;
+      opaqueTextureId = textureId;
+    }
+    else
+    {
+      std::cout << "TextureCount: 0";
+    }
     Matrix::Multiply( data[i].world, item.mModelMatrix, viewProjection );
     data[i].color = item.mNode->GetWorldColor( bufferIndex );
     data[i].size  = item.mSize;
+    data[i].samplerId = opaqueTextureId;
   }
   commandBuilder.Set( Graphics::API::PrimitiveCount{numberOfRenderItems} );
 

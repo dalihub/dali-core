@@ -49,6 +49,13 @@ public:
 
   /**
    *
+   * @param binding
+   * @param sampler
+   * @param imageView
+   */
+  void WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView );
+  /**
+   *
    * @param buffer
    * @param offset
    * @param size

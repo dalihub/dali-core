@@ -193,6 +193,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       else
       {
         item.mRenderer = nullptr;
+        item.mTextureSet = nullptr;
       }
 
       // Save ModelView matrix onto the item.

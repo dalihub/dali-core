@@ -34,6 +34,7 @@ struct Image::Impl
     mCreateInfo( std::move( createInfo ) ),
     mIsExternal( static_cast<bool>( externalImage ) )
   {
+    mVkImageLayout = mCreateInfo.initialLayout;
   }
 
   ~Impl()
@@ -221,7 +222,10 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
   {
     aspectFlags |= (vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil);
   }
-
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eSampled )
+  {
+    aspectFlags |= (vk::ImageAspectFlagBits::eColor);
+  }
   auto subresourceRange = vk::ImageSubresourceRange{}
     .setAspectMask( aspectFlags )
     .setBaseArrayLayer( 0 )
