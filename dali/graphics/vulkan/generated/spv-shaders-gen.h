@@ -39,11 +39,9 @@ extern std::vector<uint8_t> FSH_CODE;
 layout( location = 0 ) in vec4 triColor;
 layout( location = 0 ) out vec4 outColor;
 
-layout( binding = 2 ) uniform sampler2D uTexture;
-
 void main()
 {
-    outColor = triColor + texture( uTexture, vec2(0.5, 0.5));
+    outColor = triColor;
 }*/
 
 

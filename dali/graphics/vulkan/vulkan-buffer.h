@@ -59,6 +59,14 @@ public:
   static BufferRef New( Graphics& graphics, size_t size, Type type );
 
   /**
+   *
+   * @param graphics
+   * @param info
+   * @return
+   */
+  static BufferRef New( Graphics& graphics, vk::BufferCreateInfo info );
+
+  /**
    * Returns buffer usage flags
    * @return
    */

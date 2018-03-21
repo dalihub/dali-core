@@ -18,6 +18,7 @@
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
@@ -83,7 +84,8 @@ struct Pipeline::Impl
     // in place of swapchain structures!
     if( !mInfo.renderPass )
     {
-      SetRenderPass( mGraphics.GetSurface( 0 ).GetRenderPass() );
+      SetRenderPass( mGraphics.GetSwapchainForFBID(0u)->
+                                GetCurrentFramebuffer()->GetVkRenderPass());
     }
 
     SetRasterizationState();

@@ -123,7 +123,7 @@ std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef 
   info.setPWaitSemaphores(semaphores.waitSemaphores.data());
   info.setPWaitDstStageMask(semaphores.waitDstStageMasks.data());
 
-  VkAssert(mQueue.submit(1, &info, fence->GetFence()));
+  VkAssert(mQueue.submit(1, &info, fence ? fence->GetFence() : nullptr ));
 
   return MakeUnique< Submission >(fence);
 }

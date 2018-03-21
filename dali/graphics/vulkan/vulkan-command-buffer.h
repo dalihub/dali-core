@@ -55,9 +55,6 @@ public:
   /** Free command buffer */
   void Free();
 
-  /** Records image layout transition barrier for one image */
-  void ImageLayoutTransition(vk::Image image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout, vk::ImageAspectFlags aspectMask);
-
   /** Push wait semaphores */
   void PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
                           const std::vector< vk::PipelineStageFlags >& stages);
@@ -187,32 +184,62 @@ public:
   void EndRenderPass();
 
   /**
+   * Records pipeline barrier
+   * @param srcStageMask
+   * @param dstStageMask
+   * @param dependencyFlags
+   * @param memoryBarriers
+   * @param bufferBarriers
+   * @param imageBarriers
+   */
+  void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                        vk::PipelineStageFlags dstStageMask,
+                        vk::DependencyFlags dependencyFlags,
+                        std::vector<vk::MemoryBarrier> memoryBarriers,
+                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                        std::vector<vk::ImageMemoryBarrier> imageBarriers );
+
+  /**
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
   void ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers );
 
-private:
+  /**
+   * Copies buffer into the specified image
+   * @param srcBuffer
+   * @param dstImage
+   * @param dtsLayout
+   * @param regions
+   */
+  void CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage, vk::ImageLayout dstLayout,
+                          std::vector<vk::BufferImageCopy> regions );
+
+  void OnRelease( uint32_t refcount ) override;
 
   /**
-   *
+   * Creates layout transition barrier
+   * @return
+   */
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+                                                  vk::AccessFlags        srcAccessMask,
+                                                  vk::AccessFlags        dstAccessMask,
+                                                  vk::ImageLayout        oldLayout,
+                                                  vk::ImageLayout        newLayout,
+                                                  vk::ImageAspectFlags   aspectMask
+  ) const;
+
+  /**
+   * Simplified version of memory barrier generation based on data stored inside the Image
    * @param image
-   * @param srcAccessMask
-   * @param dstAccessMask
-   * @param srcStageMask
-   * @param dstStageMask
-   * @param oldLayout
    * @param newLayout
    * @param aspectMask
+   * @return
    */
-  void RecordImageLayoutTransition(vk::Image             image,
-                                   vk::AccessFlags        srcAccessMask,
-                                   vk::AccessFlags        dstAccessMask,
-                                   vk::PipelineStageFlags srcStageMask,
-                                   vk::PipelineStageFlags dstStageMask,
-                                   vk::ImageLayout        oldLayout,
-                                   vk::ImageLayout        newLayout,
-                                   vk::ImageAspectFlags   aspectMask);
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+                                                       vk::ImageLayout        newLayout,
+                                                       vk::ImageAspectFlags   aspectMask
+  ) const;
 
 private:
 

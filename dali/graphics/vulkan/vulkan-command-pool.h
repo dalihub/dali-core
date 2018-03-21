@@ -86,6 +86,13 @@ public:
    */
   CommandBufferRef NewCommandBuffer( bool isPrimary = true );
 
+  /**
+   * Releases command buffer
+   * @param buffer
+   * @return
+   */
+  bool ReleaseCommandBuffer( CommandBufferRef buffer, bool forceRelease );
+
 public:
 
   bool OnDestroy() override;
