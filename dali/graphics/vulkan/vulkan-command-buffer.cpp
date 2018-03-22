@@ -36,19 +36,25 @@ namespace Vulkan
 {
 struct CommandBuffer::Impl
 {
-  Impl( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer commandBuffer )
-  : mGraphics( commandPool.GetGraphics() ),
+  Impl( CommandBuffer& owner, CommandPool& commandPool, uint32_t poolIndex, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer commandBuffer )
+  : mOwner( owner ),
+    mGraphics( commandPool.GetGraphics() ),
     mOwnerCommandPool( commandPool ),
+    mPoolAllocationIndex( poolIndex ),
     mAllocateInfo( allocateInfo ),
-    mCommandBuffer( commandBuffer )
+    mCommandBuffer( commandBuffer ),
+    mAlive( false )
   {
   }
 
   ~Impl()
   {
     mResources.clear();
-    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
-                                              1, &mCommandBuffer );
+    //mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
+    //                                          1, &mCommandBuffer );
+
+    // tell pool the buffer is not in use anymore
+    mOwnerCommandPool.ReleaseCommandBuffer( mOwner, false );
   }
 
   bool Initialise()
@@ -320,9 +326,10 @@ struct CommandBuffer::Impl
          .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask, 0, image->GetLevelCount(), 0, image->GetLayerCount() } );
   }
 
-
+  CommandBuffer&                mOwner;
   Graphics&                     mGraphics;
   CommandPool&                  mOwnerCommandPool;
+  uint32_t                      mPoolAllocationIndex;
   vk::CommandBufferAllocateInfo mAllocateInfo{};
 
   vk::CommandBuffer mCommandBuffer{};
@@ -341,6 +348,7 @@ struct CommandBuffer::Impl
   FenceRef       mFinishedFence;
 
   bool mRecording{false};
+  bool mAlive{false};
 };
 
 /**
@@ -350,10 +358,11 @@ struct CommandBuffer::Impl
  */
 
 CommandBuffer::CommandBuffer( CommandPool&                         commandPool,
+                              uint32_t                             poolIndex,
                               const vk::CommandBufferAllocateInfo& allocateInfo,
                               vk::CommandBuffer                    vkCommandBuffer )
 {
-  mImpl = MakeUnique<Impl>( commandPool, allocateInfo, vkCommandBuffer );
+  mImpl = MakeUnique<Impl>( *this, commandPool, poolIndex, allocateInfo, vkCommandBuffer );
 }
 
 CommandBuffer::~CommandBuffer()
@@ -382,11 +391,6 @@ void CommandBuffer::Reset()
 void CommandBuffer::Free()
 {
   mImpl->Free();
-}
-
-void CommandBuffer::OnRelease( uint32_t refcount )
-{
-  VkManaged::OnRelease( refcount );
 }
 
 /** Push wait semaphores */
@@ -620,6 +624,12 @@ vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef ima
                                               oldLayout, newLayout,
                                               aspectMask  );
 }
+
+uint32_t CommandBuffer::GetPoolAllocationIndex() const
+{
+  return mImpl->mPoolAllocationIndex;
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics
