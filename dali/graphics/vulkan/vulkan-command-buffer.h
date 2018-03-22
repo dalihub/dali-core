@@ -35,6 +35,7 @@ class DescriptorSet;
 class CommandBuffer : public VkManaged
 {
   friend class CommandPool;
+  friend class CommandBufferPool;
 
 public:
 
@@ -215,8 +216,6 @@ public:
   void CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage, vk::ImageLayout dstLayout,
                           std::vector<vk::BufferImageCopy> regions );
 
-  void OnRelease( uint32_t refcount ) override;
-
   /**
    * Creates layout transition barrier
    * @return
@@ -243,9 +242,16 @@ public:
 
 private:
 
-  // Constructor called by the CommandPool only
-  CommandBuffer( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer );
+  /**
+   * Returns allocation index
+   * @return
+   */
+  uint32_t GetPoolAllocationIndex() const;
 
+private:
+
+  // Constructor called by the CommandPool only
+  CommandBuffer( CommandPool& commandPool, uint32_t poolIndex, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer );
   class Impl;
   std::unique_ptr<Impl> mImpl;
 
