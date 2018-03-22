@@ -91,7 +91,26 @@ public:
    * @param buffer
    * @return
    */
-  bool ReleaseCommandBuffer( CommandBufferRef buffer, bool forceRelease );
+  bool ReleaseCommandBuffer( CommandBuffer& buffer, bool forceRelease );
+
+  /**
+   * Returns current pool capacity ( 0 if nothing allocated )
+   * @return
+   */
+  uint32_t GetCapacity() const;
+
+  /**
+   * Returns number of allocated command buffers
+   * @return
+   */
+  uint32_t GetAllocationCount() const;
+
+  /**
+   * Returns number of allocated command buffers by level
+   * @param level
+   * @return
+   */
+  uint32_t GetAllocationCount( vk::CommandBufferLevel level ) const;
 
 public:
 
