@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_IMPL_HELPER_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ template<int DEFAULT_PROPERTY_COUNT>
 struct ObjectImplHelper
 {
   const PropertyDetails* DEFAULT_PROPERTY_DETAILS;
+  const int DEFAULT_PROPERTY_START_INDEX;
 
   unsigned int GetDefaultPropertyCount() const
   {
@@ -79,7 +80,7 @@ struct ObjectImplHelper
 
     for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {
-      indices.PushBack( DEFAULT_OBJECT_PROPERTY_START_INDEX + i );
+      indices.PushBack( DEFAULT_PROPERTY_START_INDEX + i );
     }
   }
 
@@ -87,9 +88,9 @@ struct ObjectImplHelper
   {
     const char* name = NULL;
 
-    if( index >= DEFAULT_OBJECT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_COUNT )
+    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
     {
-      name = DEFAULT_PROPERTY_DETAILS[index].name;
+      name = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].name;
     }
 
     return name;
@@ -117,9 +118,9 @@ struct ObjectImplHelper
   {
     bool isWritable = false;
 
-    if( index >= DEFAULT_OBJECT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_COUNT )
+    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
     {
-      isWritable = DEFAULT_PROPERTY_DETAILS[index].writable;
+      isWritable = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].writable;
     }
 
     return isWritable;
@@ -129,9 +130,9 @@ struct ObjectImplHelper
   {
     bool isAnimatable = false;
 
-    if( index >= DEFAULT_OBJECT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_COUNT )
+    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
     {
-      isAnimatable =  DEFAULT_PROPERTY_DETAILS[index].animatable;
+      isAnimatable =  DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].animatable;
     }
 
     return isAnimatable;
@@ -141,9 +142,9 @@ struct ObjectImplHelper
   {
     bool isConstraintInput = false;
 
-    if( index >= DEFAULT_OBJECT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_COUNT )
+    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
     {
-      isConstraintInput = DEFAULT_PROPERTY_DETAILS[index].constraintInput;
+      isConstraintInput = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].constraintInput;
     }
 
     return isConstraintInput;
@@ -153,9 +154,9 @@ struct ObjectImplHelper
   {
     Property::Type type = Property::NONE;
 
-    if( index >= DEFAULT_OBJECT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_COUNT )
+    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
     {
-      type =  DEFAULT_PROPERTY_DETAILS[index].type;
+      type =  DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].type;
     }
 
     return type;

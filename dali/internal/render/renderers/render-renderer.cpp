@@ -164,22 +164,6 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::SetRenderDataProvider( OwnerPointer<SceneGraph::RenderDataProvider>& dataProvider )
-{
-  mRenderDataProvider = dataProvider;
-  mUpdateAttributesLocation = true;
-
-  // Check that the number of textures match the number of samplers in the shader
-  size_t textureCount =  mRenderDataProvider->GetTextures().size();
-  Program* program = mRenderDataProvider->GetShader().GetProgram();
-  if( program && program->GetActiveSamplerCount() != textureCount )
-  {
-    DALI_LOG_WARNING("The number of active samplers in the shader(%lu) does not match the number of textures in the TextureSet(%lu)\n",
-                   program->GetActiveSamplerCount(),
-                   textureCount );
-  }
-}
-
 void Renderer::SetGeometry( Render::Geometry* geometry )
 {
   mGeometry = geometry;
@@ -563,11 +547,12 @@ void Renderer::Render( Context& context,
       const Vector4& color = node.GetRenderColor( bufferIndex );
       if( mPremultipledAlphaEnabled )
       {
-        program->SetUniform4f( loc, color.r*color.a, color.g*color.a, color.b*color.a, color.a );
+        float alpha = color.a * mRenderDataProvider->GetOpacity( bufferIndex );
+        program->SetUniform4f( loc, color.r * alpha, color.g * alpha, color.b * alpha, alpha );
       }
       else
       {
-        program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
+        program->SetUniform4f( loc, color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity( bufferIndex ) );
       }
     }
 
