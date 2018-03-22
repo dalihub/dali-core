@@ -81,32 +81,6 @@ inline uint32_t U32(T value)
   return static_cast< uint32_t >(value);
 }
 
-class Resource
-{
-public:
-  Resource() : mUserCount{0u} {}
-  virtual ~Resource() = default;
-
-  void IncreaseUserCount()
-  {
-    ++mUserCount;
-  }
-
-  void DecreaseUserCount()
-  {
-    --mUserCount;
-  }
-
-  uint32_t GetUserCount() const
-  {
-    return mUserCount;
-  }
-
-private:
-
-  std::atomic<uint32_t> mUserCount;
-};
-
 /**
  * Vulkan object handle
  * @tparam T
