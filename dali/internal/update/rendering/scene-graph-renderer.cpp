@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,26 +88,25 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
 // Flags for re-sending data to renderer.
 enum Flags
 {
-  RESEND_DATA_PROVIDER               = 1 << 0,
-  RESEND_GEOMETRY                    = 1 << 1,
-  RESEND_FACE_CULLING_MODE           = 1 << 2,
-  RESEND_BLEND_COLOR                 = 1 << 3,
-  RESEND_BLEND_BIT_MASK              = 1 << 4,
-  RESEND_PREMULTIPLIED_ALPHA         = 1 << 5,
-  RESEND_INDEXED_DRAW_FIRST_ELEMENT  = 1 << 6,
-  RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 7,
-  RESEND_DEPTH_WRITE_MODE            = 1 << 8,
-  RESEND_DEPTH_TEST_MODE             = 1 << 9,
-  RESEND_DEPTH_FUNCTION              = 1 << 10,
-  RESEND_RENDER_MODE                 = 1 << 11,
-  RESEND_STENCIL_FUNCTION            = 1 << 12,
-  RESEND_STENCIL_FUNCTION_MASK       = 1 << 13,
-  RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 14,
-  RESEND_STENCIL_MASK                = 1 << 15,
-  RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 16,
-  RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 17,
-  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18,
-  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 19,
+  RESEND_GEOMETRY                    = 1 << 0,
+  RESEND_FACE_CULLING_MODE           = 1 << 1,
+  RESEND_BLEND_COLOR                 = 1 << 2,
+  RESEND_BLEND_BIT_MASK              = 1 << 3,
+  RESEND_PREMULTIPLIED_ALPHA         = 1 << 4,
+  RESEND_INDEXED_DRAW_FIRST_ELEMENT  = 1 << 5,
+  RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 6,
+  RESEND_DEPTH_WRITE_MODE            = 1 << 7,
+  RESEND_DEPTH_TEST_MODE             = 1 << 8,
+  RESEND_DEPTH_FUNCTION              = 1 << 9,
+  RESEND_RENDER_MODE                 = 1 << 10,
+  RESEND_STENCIL_FUNCTION            = 1 << 11,
+  RESEND_STENCIL_FUNCTION_MASK       = 1 << 12,
+  RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 13,
+  RESEND_STENCIL_MASK                = 1 << 14,
+  RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 15,
+  RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 16,
+  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 17,
+  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18
 };
 
 } // Anonymous namespace
@@ -130,6 +129,7 @@ Renderer::Renderer()
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
+  mRenderDataProvider( NULL ),
   mBlendColor( NULL ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
@@ -143,6 +143,7 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
+  mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -214,15 +215,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendFlag != 0 )
   {
-    if( mResendFlag & RESEND_DATA_PROVIDER )
-    {
-      OwnerPointer<RenderDataProvider> dataProvider = NewRenderDataProvider();
-
-      typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
-    }
-
     if( mResendFlag & RESEND_GEOMETRY )
     {
       typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
@@ -365,7 +357,8 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
+
+  UpdateTextureSet();
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -380,7 +373,11 @@ void Renderer::SetShader( Shader* shader )
   mShader = shader;
   mShader->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
+
+  if( mRenderDataProvider )
+  {
+    mRenderDataProvider->mShader = mShader;
+  }
 }
 
 void Renderer::SetGeometry( Render::Geometry* geometry )
@@ -405,9 +402,19 @@ void Renderer::SetFaceCullingMode( FaceCullingMode::Type faceCullingMode )
   mResendFlag |= RESEND_FACE_CULLING_MODE;
 }
 
+FaceCullingMode::Type Renderer::GetFaceCullingMode() const
+{
+  return mFaceCullingMode;
+}
+
 void Renderer::SetBlendMode( BlendMode::Type blendingMode )
 {
   mBlendMode = blendingMode;
+}
+
+BlendMode::Type Renderer::GetBlendMode() const
+{
+  return mBlendMode;
 }
 
 void Renderer::SetBlendingOptions( unsigned int options )
@@ -417,6 +424,11 @@ void Renderer::SetBlendingOptions( unsigned int options )
     mBlendBitmask = options;
     mResendFlag |= RESEND_BLEND_BIT_MASK;
   }
+}
+
+unsigned int Renderer::GetBlendingOptions() const
+{
+  return mBlendBitmask;
 }
 
 void Renderer::SetBlendColor( const Vector4& blendColor )
@@ -440,10 +452,24 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
   mResendFlag |= RESEND_BLEND_COLOR;
 }
 
+Vector4 Renderer::GetBlendColor() const
+{
+  if( mBlendColor )
+  {
+    return *mBlendColor;
+  }
+  return Color::TRANSPARENT;
+}
+
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
   mResendFlag |= RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+}
+
+size_t Renderer::GetIndexedDrawFirstElement() const
+{
+  return mIndexedDrawFirstElement;
 }
 
 void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
@@ -452,10 +478,20 @@ void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
   mResendFlag |= RESEND_INDEXED_DRAW_ELEMENTS_COUNT;
 }
 
+size_t Renderer::GetIndexedDrawElementsCount() const
+{
+  return mIndexedDrawElementsCount;
+}
+
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
   mPremultipledAlphaEnabled = preMultipled;
   mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
+}
+
+bool Renderer::IsPreMultipliedAlphaEnabled() const
+{
+  return mPremultipledAlphaEnabled;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
@@ -464,16 +500,31 @@ void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
   mResendFlag |= RESEND_DEPTH_WRITE_MODE;
 }
 
+DepthWriteMode::Type Renderer::GetDepthWriteMode() const
+{
+  return mDepthWriteMode;
+}
+
 void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
 {
   mDepthTestMode = depthTestMode;
   mResendFlag |= RESEND_DEPTH_TEST_MODE;
 }
 
+DepthTestMode::Type Renderer::GetDepthTestMode() const
+{
+  return mDepthTestMode;
+}
+
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
   mResendFlag |= RESEND_DEPTH_FUNCTION;
+}
+
+DepthFunction::Type Renderer::GetDepthFunction() const
+{
+  return mDepthFunction;
 }
 
 void Renderer::SetRenderMode( RenderMode::Type mode )
@@ -524,14 +575,31 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
 }
 
+const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
+{
+  return mStencilParameters;
+}
+
+void Renderer::BakeOpacity( BufferIndex updateBufferIndex, float opacity )
+{
+  mOpacity.Bake( updateBufferIndex, opacity );
+}
+
+float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
+{
+  return mOpacity[updateBufferIndex];
+}
+
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
 {
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mSceneController = &sceneController;
-  RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-  mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
+  mRenderDataProvider = new RenderDataProvider( mOpacity );
+  mRenderDataProvider->mUniformMapDataProvider = this;
+
+  mRenderer = Render::Renderer::New( mRenderDataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                          mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
 
   OwnerPointer< Render::Renderer > transferOwnership( mRenderer );
@@ -548,37 +616,30 @@ void Renderer::DisconnectFromSceneGraph( SceneController& sceneController, Buffe
     mRenderer = NULL;
   }
   mSceneController = NULL;
+  mRenderDataProvider = NULL;
 }
 
-RenderDataProvider* Renderer::NewRenderDataProvider()
+void Renderer::UpdateTextureSet()
 {
-  RenderDataProvider* dataProvider = new RenderDataProvider();
-
-  dataProvider->mUniformMapDataProvider = this;
-  dataProvider->mShader = mShader;
-
-  if( mTextureSet )
+  if( mRenderDataProvider )
   {
-    size_t textureCount = mTextureSet->GetTextureCount();
-    dataProvider->mTextures.resize( textureCount );
-    dataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
+    if( mTextureSet )
     {
-      dataProvider->mTextures[i] = mTextureSet->GetTexture(i);
-      dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
+      size_t textureCount = mTextureSet->GetTextureCount();
+      mRenderDataProvider->mTextures.resize( textureCount );
+      mRenderDataProvider->mSamplers.resize( textureCount );
+      for( unsigned int i(0); i<textureCount; ++i )
+      {
+        mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
+        mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
+      }
+    }
+    else
+    {
+      mRenderDataProvider->mTextures.clear();
+      mRenderDataProvider->mSamplers.clear();
     }
   }
-
-  return dataProvider;
-}
-
-const Vector4& Renderer::GetBlendColor() const
-{
-  if( mBlendColor )
-  {
-    return *mBlendColor;
-  }
-  return Color::TRANSPARENT;
 }
 
 Render::Renderer& Renderer::GetRenderer()
@@ -591,15 +652,23 @@ const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) co
   return mCollectedUniformMap[bufferIndex];
 }
 
-Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const
+Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const
 {
-  Renderer::Opacity opacity = Renderer::OPAQUE;
+  Renderer::OpacityType opacityType = Renderer::OPAQUE;
 
   switch( mBlendMode )
   {
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      opacity = Renderer::TRANSLUCENT;
+      float alpha = node.GetWorldColor( updateBufferIndex ).a * mOpacity[updateBufferIndex];
+      if( alpha <= FULLY_TRANSPARENT )
+      {
+        opacityType = Renderer::TRANSPARENT;
+      }
+      else
+      {
+        opacityType = Renderer::TRANSLUCENT;
+      }
       break;
     }
     case BlendMode::AUTO:
@@ -607,37 +676,37 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
       bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
-        opacity = Renderer::TRANSLUCENT;
+        opacityType = Renderer::TRANSLUCENT;
       }
-      else // renderer should determine opacity using the actor color
+
+      // renderer should determine opacity using the actor color
+      float alpha = node.GetWorldColor( updateBufferIndex ).a * mOpacity[updateBufferIndex];
+      if( alpha <= FULLY_TRANSPARENT )
       {
-        float alpha = node.GetWorldColor( updateBufferIndex ).a;
-        if( alpha <= FULLY_TRANSPARENT )
-        {
-          opacity = TRANSPARENT;
-        }
-        else if( alpha <= FULLY_OPAQUE )
-        {
-          opacity = TRANSLUCENT;
-        }
+        opacityType = Renderer::TRANSPARENT;
+      }
+      else if( alpha <= FULLY_OPAQUE )
+      {
+        opacityType = Renderer::TRANSLUCENT;
       }
       break;
     }
     case BlendMode::OFF: // the renderer should never use blending
     default:
     {
-      opacity = Renderer::OPAQUE;
+      opacityType = Renderer::OPAQUE;
       break;
     }
   }
 
-  return opacity;
+  return opacityType;
 }
 
 void Renderer::TextureSetChanged()
 {
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
+
+  UpdateTextureSet();
 }
 
 void Renderer::TextureSetDeleted()
@@ -645,16 +714,15 @@ void Renderer::TextureSetDeleted()
   mTextureSet = NULL;
 
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
+
+  UpdateTextureSet();
 }
+
 void Renderer::ConnectionsChanged( PropertyOwner& object )
 {
   // One of our child objects has changed it's connections. Ensure the uniform
   // map gets regenerated during PrepareRender
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  // Ensure the child object pointers get re-sent to the renderer
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::ConnectedUniformMapChanged()

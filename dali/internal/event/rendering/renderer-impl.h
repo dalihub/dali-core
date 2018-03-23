@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,11 @@ public: // Default property extensions from Object
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
+   /**
+    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+    */
+   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+
   /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
    */
@@ -278,6 +283,22 @@ private: // implementation
    */
   const Vector4& GetBlendColor() const;
 
+  /**
+   * @brief Retrieves the cached event side value of a default property.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the cached value of the property if found.
+   * @return True if value set, false otherwise.
+   */
+  bool GetCachedPropertyValue( Property::Index index, Property::Value& value ) const;
+
+  /**
+   * @brief Retrieves the current value of a default property from the scene-graph.
+   * @param[in]  index  The index of the property
+   * @param[out] value  Is set with the current scene-graph value of the property
+   * @return True if value set, false otherwise.
+   */
+  bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
+
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -301,6 +322,8 @@ private: // data
 
   Render::Renderer::StencilParameters mStencilParameters;            ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask
+
+  float                               mOpacity;                      ///< Local copy of the opacity
 
   DepthFunction::Type                 mDepthFunction:3;              ///< Local copy of the depth function
   FaceCullingMode::Type               mFaceCullingMode:2;            ///< Local copy of the mode of face culling

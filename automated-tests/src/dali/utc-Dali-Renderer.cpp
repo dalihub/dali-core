@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
@@ -259,15 +260,21 @@ int UtcDaliRendererSetGetDepthIndex(void)
 
   renderer.SetProperty( Renderer::Property::DEPTH_INDEX, 1 );
 
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty<int>(Renderer::Property::DEPTH_INDEX), 0, TEST_LOCATION );
+
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
 
   renderer.SetProperty( Renderer::Property::DEPTH_INDEX, 10 );
 
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
+
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty<int>(Renderer::Property::DEPTH_INDEX), 10, TEST_LOCATION );
 
   END_TEST;
 }
@@ -546,6 +553,41 @@ int UtcDaliRendererSetBlendMode01(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetBlendMode01b(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to on with an transparent color renders with blending enabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.SetOpacity( 0.0f );
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+  glAbstraction.EnableDrawCallTrace( true );
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( !glEnableStack.FindMethod( "Enable" ) );
+
+  DALI_TEST_CHECK( !glAbstraction.GetDrawTrace().FindMethod( "DrawElements" ) );
 
   END_TEST;
 }
@@ -856,13 +898,23 @@ int UtcDaliRendererSetBlendColor(void)
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
 
   renderer.SetProperty( Renderer::Property::BLEND_COLOR, Color::TRANSPARENT );
+
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS( renderer.GetProperty< Vector4 >(Renderer::Property::BLEND_COLOR), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >(Renderer::Property::BLEND_COLOR), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( glAbstraction.GetLastBlendColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   renderer.SetProperty( Renderer::Property::BLEND_COLOR, Color::MAGENTA );
+
+  DALI_TEST_EQUALS( renderer.GetProperty< Vector4 >(Renderer::Property::BLEND_COLOR), Color::MAGENTA, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >(Renderer::Property::BLEND_COLOR), Color::TRANSPARENT, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector4 >(Renderer::Property::BLEND_COLOR), Color::MAGENTA, TEST_LOCATION );
   DALI_TEST_EQUALS( glAbstraction.GetLastBlendColor(), Color::MAGENTA, TEST_LOCATION );
 
   Vector4 color( 0.1f, 0.2f, 0.3f, 0.4f );
@@ -945,6 +997,10 @@ int UtcDaliRendererPreMultipledAlpha(void)
   application.Render();
 
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( preMultipliedAlpha ) );
+  DALI_TEST_CHECK( preMultipliedAlpha );
+
+  value = renderer.GetCurrentProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( preMultipliedAlpha ) );
   DALI_TEST_CHECK( preMultipliedAlpha );
 
@@ -1836,6 +1892,24 @@ int UtcDaliRendererSetIndexRange(void)
     renderer.SetIndexRange( 0, 5 );
     application.SendNotification();
     application.Render();
+
+    Property::Value value = renderer.GetProperty( Renderer::Property::INDEX_RANGE_FIRST );
+    int convertedValue;
+    DALI_TEST_CHECK( value.Get( convertedValue ) );
+    DALI_TEST_CHECK( convertedValue == 0 );
+
+    value = renderer.GetCurrentProperty( Renderer::Property::INDEX_RANGE_FIRST );
+    DALI_TEST_CHECK( value.Get( convertedValue ) );
+    DALI_TEST_CHECK( convertedValue == 0 );
+
+    value = renderer.GetProperty( Renderer::Property::INDEX_RANGE_COUNT );
+    DALI_TEST_CHECK( value.Get( convertedValue ) );
+    DALI_TEST_CHECK( convertedValue == 5 );
+
+    value = renderer.GetCurrentProperty( Renderer::Property::INDEX_RANGE_COUNT );
+    DALI_TEST_CHECK( value.Get( convertedValue ) );
+    DALI_TEST_CHECK( convertedValue == 5 );
+
     sprintf( buffer, "%u, 5, %u, indices", GL_LINE_LOOP, GL_UNSIGNED_SHORT );
     bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
     DALI_TEST_CHECK( result );
@@ -2034,14 +2108,30 @@ int UtcDaliRendererSetDepthFunction(void)
  *  - Check it was set.
  */
 template< typename T >
-void CheckEnumerationProperty( Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
+void CheckEnumerationProperty( TestApplication& application, Renderer& renderer, Property::Index propertyIndex, T initialValue, T firstCheckEnumeration, T secondCheckEnumeration, std::string secondCheckString )
 {
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( initialValue ) );
   DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( initialValue ) );
   renderer.SetProperty( propertyIndex, firstCheckEnumeration );
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) != static_cast<int>( firstCheckEnumeration ) );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
   DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( firstCheckEnumeration ) );
+
   renderer.SetProperty( propertyIndex, secondCheckString );
+  DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
+  DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) != static_cast<int>( secondCheckEnumeration ) );
+
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_CHECK( renderer.GetProperty<int>( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
   DALI_TEST_CHECK( renderer.GetCurrentProperty< int >( propertyIndex ) == static_cast<int>( secondCheckEnumeration ) );
 }
@@ -2055,27 +2145,32 @@ int UtcDaliRendererEnumProperties(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
 
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
   /*
    * Here we use a templatized function to perform several checks on each enumeration property.
    * @see CheckEnumerationProperty for details of the checks performed.
    */
 
-  CheckEnumerationProperty< FaceCullingMode::Type >( renderer, Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::NONE, FaceCullingMode::FRONT, FaceCullingMode::BACK, "BACK" );
-  CheckEnumerationProperty< BlendMode::Type >( renderer, Renderer::Property::BLEND_MODE, BlendMode::AUTO, BlendMode::OFF, BlendMode::ON, "ON" );
-  CheckEnumerationProperty< BlendEquation::Type >( renderer, Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
-  CheckEnumerationProperty< BlendEquation::Type >( renderer, Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
-  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
-  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
-  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::SRC_COLOR, "SRC_COLOR" );
-  CheckEnumerationProperty< BlendFactor::Type >( renderer, Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
-  CheckEnumerationProperty< DepthWriteMode::Type >( renderer, Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::AUTO, DepthWriteMode::OFF, DepthWriteMode::ON, "ON" );
-  CheckEnumerationProperty< DepthFunction::Type >( renderer, Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS, DepthFunction::ALWAYS, DepthFunction::GREATER, "GREATER" );
-  CheckEnumerationProperty< DepthTestMode::Type >( renderer, Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO, DepthTestMode::OFF, DepthTestMode::ON, "ON" );
-  CheckEnumerationProperty< StencilFunction::Type >( renderer, Renderer::Property::STENCIL_FUNCTION, StencilFunction::ALWAYS, StencilFunction::LESS, StencilFunction::EQUAL, "EQUAL" );
-  CheckEnumerationProperty< RenderMode::Type >( renderer, Renderer::Property::RENDER_MODE, RenderMode::AUTO, RenderMode::NONE, RenderMode::STENCIL, "STENCIL" );
-  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
-  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
-  CheckEnumerationProperty< StencilOperation::Type >( renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+  CheckEnumerationProperty< FaceCullingMode::Type >( application, renderer, Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::NONE, FaceCullingMode::FRONT, FaceCullingMode::BACK, "BACK" );
+  CheckEnumerationProperty< BlendMode::Type >( application, renderer, Renderer::Property::BLEND_MODE, BlendMode::AUTO, BlendMode::OFF, BlendMode::ON, "ON" );
+  CheckEnumerationProperty< BlendEquation::Type >( application, renderer, Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
+  CheckEnumerationProperty< BlendEquation::Type >( application, renderer, Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::ADD, BlendEquation::SUBTRACT, BlendEquation::REVERSE_SUBTRACT, "REVERSE_SUBTRACT" );
+  CheckEnumerationProperty< BlendFactor::Type >( application, renderer, Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( application, renderer, Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( application, renderer, Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< BlendFactor::Type >( application, renderer, Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::SRC_COLOR, "SRC_COLOR" );
+  CheckEnumerationProperty< DepthWriteMode::Type >( application, renderer, Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::AUTO, DepthWriteMode::OFF, DepthWriteMode::ON, "ON" );
+  CheckEnumerationProperty< DepthFunction::Type >( application, renderer, Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS, DepthFunction::ALWAYS, DepthFunction::GREATER, "GREATER" );
+  CheckEnumerationProperty< DepthTestMode::Type >( application, renderer, Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO, DepthTestMode::OFF, DepthTestMode::ON, "ON" );
+  CheckEnumerationProperty< StencilFunction::Type >( application, renderer, Renderer::Property::STENCIL_FUNCTION, StencilFunction::ALWAYS, StencilFunction::LESS, StencilFunction::EQUAL, "EQUAL" );
+  CheckEnumerationProperty< RenderMode::Type >( application, renderer, Renderer::Property::RENDER_MODE, RenderMode::AUTO, RenderMode::NONE, RenderMode::STENCIL, "STENCIL" );
+  CheckEnumerationProperty< StencilOperation::Type >( application, renderer, Renderer::Property::STENCIL_OPERATION_ON_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+  CheckEnumerationProperty< StencilOperation::Type >( application, renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
+  CheckEnumerationProperty< StencilOperation::Type >( application, renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT" );
 
   END_TEST;
 }
@@ -2390,6 +2485,8 @@ int UtcDaliRendererSetStencilFunction(void)
 
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetCurrentProperty( Renderer::Property::STENCIL_FUNCTION_REFERENCE ).Get<int>() ), testValueReference, TEST_LOCATION );
+
   std::stringstream parameterStream;
   parameterStream << StencilFunctionLookupTable[ StencilOperation::DECREMENT_WRAP ] << ", " << testValueReference << ", 255";
 
@@ -2404,6 +2501,8 @@ int UtcDaliRendererSetStencilFunction(void)
   DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_FUNCTION_MASK ).Get<int>() ), testValueMask, TEST_LOCATION );
 
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetCurrentProperty( Renderer::Property::STENCIL_FUNCTION_MASK ).Get<int>() ), testValueMask, TEST_LOCATION );
 
   // Clear the stringstream.
   parameterStream.str( std::string() );
@@ -2532,6 +2631,8 @@ int UtcDaliRendererSetStencilMask(void)
 
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
 
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetCurrentProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0x00, TEST_LOCATION );
+
   std::string methodString( "StencilMask" );
   std::string parameterString = "0";
 
@@ -2545,6 +2646,8 @@ int UtcDaliRendererSetStencilMask(void)
   DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0xFF, TEST_LOCATION );
 
   ResetDebugAndFlush( application, glEnableDisableStack, glStencilFunctionStack );
+
+  DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetCurrentProperty( Renderer::Property::STENCIL_MASK ).Get<int>() ), 0xFF, TEST_LOCATION );
 
   parameterString = "255";
 
@@ -2600,6 +2703,132 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 
   //Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererOpacity(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Test OPACITY property" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  actor.SetColor( Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
+  Stage::GetCurrent().Add( actor );
+
+  Property::Value value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
+  float opacity;
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 actualValue;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  DALI_TEST_CHECK( gl.GetUniformValue< Vector4 >( "uColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue.a, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  renderer.SetProperty( DevelRenderer::Property::OPACITY, 0.5f );
+
+  application.SendNotification();
+  application.Render();
+
+  value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  value = renderer.GetCurrentProperty( DevelRenderer::Property::OPACITY );
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  DALI_TEST_CHECK( gl.GetUniformValue< Vector4 >( "uColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue.a, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererOpacityAnimation(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Test OPACITY property animation" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  actor.SetColor( Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
+  float opacity;
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( renderer, DevelRenderer::Property::OPACITY ), 0.0f );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 );
+
+  value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 0.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  renderer.SetProperty( DevelRenderer::Property::OPACITY, 0.1f );
+
+  animation.Clear();
+  animation.AnimateBy( Property( renderer, DevelRenderer::Property::OPACITY ), 0.5f );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 );
+
+  value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
+  DALI_TEST_CHECK( value.Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, 0.6f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererInvalidProperty(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Test invalid property" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value = renderer.GetProperty( Renderer::Property::DEPTH_INDEX + 100 );
+  DALI_TEST_CHECK( value.GetType() == Property::Type::NONE );
+
+  value = renderer.GetCurrentProperty( Renderer::Property::DEPTH_INDEX + 100 );
+  DALI_TEST_CHECK( value.GetType() == Property::Type::NONE );
 
   END_TEST;
 }

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/update/common/animatable-property.h>
 
 namespace Dali
 {
@@ -56,7 +57,7 @@ public:
    * The RendererAttachment that creates this object will initialize the members
    * directly.
    */
-  RenderDataProvider();
+  RenderDataProvider( AnimatableProperty< float >& opacity );
 
   /**
    * Destructor
@@ -100,12 +101,19 @@ public:
    */
   std::vector<Render::Texture*>& GetTextures();
 
+  /**
+   * Get the opacity
+   * @return The opacity
+   */
+  float GetOpacity( BufferIndex bufferIndex );
+
 private:
 
-  const UniformMapDataProvider*       mUniformMapDataProvider;
-  Shader*                             mShader;
+  const UniformMapDataProvider*    mUniformMapDataProvider;
+  Shader*                          mShader;
   std::vector<Render::Texture*>    mTextures;
-  Samplers                            mSamplers;
+  Samplers                         mSamplers;
+  AnimatableProperty< float >&     mOpacity;
 
   // Give Renderer access to our private data to reduce copying vectors on construction.
   friend class Renderer;
