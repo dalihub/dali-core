@@ -205,6 +205,15 @@ public:
   void GetPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
+   * @brief Retrieves all the child property indices for this type.
+   *
+   * @SINCE_1_3.20
+   * @param[out] indices Container of property indices
+   * @note The container will be cleared
+   */
+  void GetChildPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * @brief Given a property index, retrieve the property name associated with it.
    *
    * @SINCE_1_0.0

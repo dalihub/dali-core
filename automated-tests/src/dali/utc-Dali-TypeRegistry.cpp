@@ -2878,3 +2878,39 @@ int UtcDaliTypeInfoRegisterChildProperties02(void)
 
   END_TEST;
 }
+
+
+int UtcDaliTypeInfoRegisterChildProperties03(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Check registered child properties can be retrieved" );
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(CustomActor) );
+  auto myCustomTypeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( customActorTypeInfo );
+  DALI_TEST_CHECK( myCustomTypeInfo );
+
+  const Property::Index WIDTH_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const Property::Index HEIGHT_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1);
+  const Property::Index MARGIN_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 100);
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS );
+
+  Property::IndexContainer indices;
+  myCustomTypeInfo.GetChildPropertyIndices( indices );
+
+  auto result = std::find( indices.Begin(), indices.End(), WIDTH_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
+
+  result = std::find( indices.Begin(), indices.End(), HEIGHT_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
+
+  result = std::find( indices.Begin(), indices.End(), MARGIN_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
+
+  END_TEST;
+}

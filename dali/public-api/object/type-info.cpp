@@ -116,6 +116,12 @@ Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
   return GetImplementation(*this).GetChildPropertyType( index );
 }
 
+void TypeInfo::GetChildPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.Clear(); // We do not want to clear the container if called internally, so only clear here
+  GetImplementation(*this).GetChildPropertyIndices( indices );
+}
+
 TypeInfo::TypeInfo(Internal::TypeInfo* internal)
 : BaseHandle(internal)
 {
