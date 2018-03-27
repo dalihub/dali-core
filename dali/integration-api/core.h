@@ -361,8 +361,9 @@ public:
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    * @param[out] status showing whether update is required to run.
+   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
-  void Render( RenderStatus& status );
+  void Render( RenderStatus& status, bool forceClear );
 
   // System-level overlay
 

@@ -138,7 +138,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status, bool forceClear );
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()

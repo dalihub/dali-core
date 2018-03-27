@@ -114,14 +114,14 @@ unsigned int Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-  void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  mImpl->Render( status );
+  mImpl->Render( status, forceClear );
 }
 
 SystemOverlay& Core::GetSystemOverlay()

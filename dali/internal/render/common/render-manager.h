@@ -324,8 +324,9 @@ public:
   /**
    * Renders the results of the previous "update" traversal.
    * @param[out] status contains the rendering flags.
+   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
-  void Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status, bool forceClear );
 
 private:
 

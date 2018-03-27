@@ -546,20 +546,20 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
       Property::Map timeMap = value.Get< Property::Map >();
       for( unsigned int i = 0; i < timeMap.Count(); ++i )
       {
-        const KeyValuePair pair( timeMap.GetKeyValue( i ) );
-        if( pair.first.type == Property::Key::INDEX )
+        const KeyValuePair timePair( timeMap.GetKeyValue( i ) );
+        if( timePair.first.type == Property::Key::INDEX )
         {
           continue;
         }
-        const std::string& key( pair.first.stringKey );
+        const std::string& key( timePair.first.stringKey );
 
         if( key == "delay" )
         {
-          element->timePeriodDelay = pair.second.Get< float >();
+          element->timePeriodDelay = timePair.second.Get< float >();
         }
         else if( key == "duration" )
         {
-          element->timePeriodDuration = pair.second.Get< float >();
+          element->timePeriodDuration = timePair.second.Get< float >();
         }
       }
     }

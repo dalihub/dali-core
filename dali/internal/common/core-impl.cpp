@@ -231,9 +231,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Any message to update will wake it up anyways
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  mRenderManager->Render( status );
+  mRenderManager->Render( status, forceClear );
 }
 
 void Core::SceneCreated()

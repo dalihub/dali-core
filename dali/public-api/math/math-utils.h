@@ -233,7 +233,7 @@ inline float Round(float value, int pos)
  * @endcode
  *
  * The value x will be confined to this domain.
- * If x is below 2 e.g. 0, then it is wraped to 6.
+ * If x is below 2 e.g. 0, then it is wrapped to 6.
  * If x is above or equal to 8 e.g. 8.1 then it is
  * wrapped to 2.1.
  *

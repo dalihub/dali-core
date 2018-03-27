@@ -255,7 +255,7 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
     // We traversed up the tree, we need to apply a new scissor rectangle (unless we are at the root).
     traversedUpTree = true;
   }
-  else if( clippingNode && childStackDepth > 0u && childStackDepth == scissorDepth ) // case of sibling clip area
+  if( clippingNode && childStackDepth > 0u && childStackDepth == scissorDepth ) // case of sibling clip area
   {
     mScissorStack.pop_back();
     --childStackDepth;

@@ -190,7 +190,7 @@ public:
   /**
    * @brief Resets the handle.
    *
-   * If no other handle copies exist, the internal Dali resouce will be deleted.
+   * If no other handle copies exist, the internal Dali resource will be deleted.
    * Calling this is not required i.e. it will happen automatically when a Dali::BaseHandle is destroyed.
    * @SINCE_1_0.0
    */

@@ -171,11 +171,11 @@ namespace RenderMode
  */
 enum Type
 {
-  NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2_5
-  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                      @SINCE_1_2_5
-  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                       @SINCE_1_2_5
-  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                @SINCE_1_2_5
-  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                    @SINCE_1_2_5
+  NONE,         ///< Do not write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2_5
+  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                       @SINCE_1_2_5
+  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                        @SINCE_1_2_5
+  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                 @SINCE_1_2_5
+  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                     @SINCE_1_2_5
 };
 
 } // namespace RenderMode

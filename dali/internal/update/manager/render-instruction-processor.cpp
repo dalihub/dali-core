@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,14 +171,14 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if( inside )
   {
-    Renderer::Opacity opacity = renderable.mRenderer ? renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
-    if( opacity != Renderer::TRANSPARENT )
+    Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
+    if( opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN )
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
       item.mNode = renderable.mNode;
-      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
+      item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
       if( !isLayer3d )
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();

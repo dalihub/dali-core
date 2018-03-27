@@ -397,7 +397,7 @@ ProgramCache* RenderManager::GetProgramCache()
   return &(mImpl->programController);
 }
 
-void RenderManager::Render( Integration::RenderStatus& status )
+void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -414,7 +414,7 @@ void RenderManager::Render( Integration::RenderStatus& status )
   const bool haveInstructions = count > 0u;
 
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
-  if( haveInstructions || mImpl->lastFrameWasRendered )
+  if( haveInstructions || mImpl->lastFrameWasRendered || forceClear )
   {
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender( true );
