@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
 namespace Dali
 {
@@ -26,12 +29,19 @@ namespace Graphics
 namespace Vulkan
 {
 
+namespace
+{
+static const vk::ShaderStageFlags DEFAULT_SHADER_STAGES{ vk::ShaderStageFlagBits::eVertex|vk::ShaderStageFlagBits::eFragment };
+}
+
 /**
  * Class Pipeline::Impl
  * Internal implementation of the pipeline
  */
 struct Pipeline::Impl
 {
+
+
   Impl( Vulkan::Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info ) :
     mInfo( info ),
     mGraphics( graphics )
@@ -74,7 +84,8 @@ struct Pipeline::Impl
     // in place of swapchain structures!
     if( !mInfo.renderPass )
     {
-      SetRenderPass( mGraphics.GetSurface( 0 ).GetRenderPass() );
+      SetRenderPass( mGraphics.GetSwapchainForFBID(0u)->
+                                GetCurrentFramebuffer()->GetVkRenderPass());
     }
 
     SetRasterizationState();
@@ -188,11 +199,17 @@ struct Pipeline::Impl
   void SetColorBlendState()
   {
     mAttachementNoBlendState = vk::PipelineColorBlendAttachmentState{};
-    //mAttachementNoBlendState.setBlendEnable( true );
+    mAttachementNoBlendState.setBlendEnable( true );
     mAttachementNoBlendState.setColorWriteMask( vk::ColorComponentFlagBits::eR |
                                                   vk::ColorComponentFlagBits::eG |
                                                   vk::ColorComponentFlagBits::eB |
                                                   vk::ColorComponentFlagBits::eA );
+    mAttachementNoBlendState.setSrcColorBlendFactor( vk::BlendFactor::eSrcAlpha );
+    mAttachementNoBlendState.setDstColorBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha );
+    mAttachementNoBlendState.setSrcAlphaBlendFactor( vk::BlendFactor::eOne );
+    mAttachementNoBlendState.setDstAlphaBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha );
+    mAttachementNoBlendState.setColorBlendOp( vk::BlendOp::eAdd );
+    mAttachementNoBlendState.setAlphaBlendOp( vk::BlendOp::eAdd );
 
     mColorBlendState.setBlendConstants( { 1.0f, 1.0f, 1.0f, 1.0f });
     mColorBlendState = vk::PipelineColorBlendStateCreateInfo{};
@@ -222,7 +239,6 @@ struct Pipeline::Impl
                                                      setModule( *shader ).
                                                      setStage( static_cast<vk::ShaderStageFlagBits>( stage ) ).
                                                      setPName( "main" );
-
     mShaderStageCreateInfo.push_back( info );
     mShaderResources.push_back( shader );
 
@@ -233,40 +249,84 @@ struct Pipeline::Impl
   }
 
   /**
+   * Creates deferred pipeline layout. Since not all the shader modules
+   * are supplied in one go the layout creation first must instantiate
+   * correct descriptor set layouts.
    *
+   * @todo: Store SPIRV data of shader modules in the cache rather than
+   * parsing every time
    */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
   void CreatePipelineLayout()
   {
     // pull desciptor set layouts from shaders
     auto layoutInfo = vk::PipelineLayoutCreateInfo{};
 
-    //info.setPSetLayouts( vk::DescriptorSetLayout )
+    using DSLayoutBindingArray = std::vector<vk::DescriptorSetLayoutBinding>;
 
-    std::vector<vk::DescriptorSetLayout> allLayouts{};
+    std::vector<DSLayoutBindingArray> allDescriptorSetLayouts;
+
+    // concatenate all bindings
+    // TODO: @todo validate if there are weird overlaps!
     for( auto&& shader : mShaderResources )
     {
-      auto& layouts = shader->GetDescriptorSetLayouts();
-      if( layouts.size() )
+      const auto& reflection = shader->GetSPIRVReflection();
+      auto layouts = reflection.GenerateDescriptorSetLayoutCreateInfo();
+
+      if(allDescriptorSetLayouts.size() < layouts.size())
       {
-        allLayouts.resize(layouts.size());
-        for (auto i = 0u; i < layouts.size(); ++i)
+        allDescriptorSetLayouts.resize(layouts.size());
+      }
+
+      for( auto i = 0u; i < layouts.size(); ++i )
+      {
+        auto currIndex = allDescriptorSetLayouts[i].size();
+        allDescriptorSetLayouts[i].insert( allDescriptorSetLayouts[i].end(),
+        layouts[i].pBindings, layouts[i].pBindings + layouts[i].bindingCount );
+        for( auto j = 0u; j < layouts[i].bindingCount; ++j )
         {
-          if (layouts[i])
-          {
-            allLayouts[i] = layouts[i];
-          }
+          allDescriptorSetLayouts[i][j+currIndex].setStageFlags( GetShaderStage( shader ) );
         }
       }
     }
 
-    layoutInfo.setPSetLayouts( allLayouts.data() );
-    layoutInfo.setSetLayoutCount( static_cast<uint32_t>(allLayouts.size()) );
+    // create descriptor set layouts for the pipeline
+    std::vector<vk::DescriptorSetLayout> dsLayouts{};
+    dsLayouts.resize( allDescriptorSetLayouts.size() );
+    mDSCreateInfoArray.clear();
+    for( auto i = 0u; i < allDescriptorSetLayouts.size(); ++i )
+    {
+      auto info = vk::DescriptorSetLayoutCreateInfo{}.
+                    setBindingCount( static_cast<uint32_t>(allDescriptorSetLayouts[i].size()) ).
+                    setPBindings( allDescriptorSetLayouts[i].data() );
+
+      mDSCreateInfoArray.push_back( info );
+      dsLayouts[i] = VkAssert( mGraphics.GetDevice().createDescriptorSetLayout( info, mGraphics.GetAllocator() ) );
+    }
+
+    // create pipeline layout
+    layoutInfo.setPSetLayouts( dsLayouts.data() );
+    layoutInfo.setSetLayoutCount( static_cast<uint32_t>(dsLayouts.size()) );
 
     mPipelineLayout = VkAssert( mGraphics.GetDevice().createPipelineLayout( layoutInfo, mGraphics.GetAllocator() ) );
 
+    mDSLayoutArray = dsLayouts;
     mInfo.setLayout( mPipelineLayout );
   }
+#pragma GCC diagnostic pop
 
+  vk::ShaderStageFlagBits GetShaderStage( ShaderRef shader )
+  {
+    for( auto&& stage : mShaderStageCreateInfo )
+    {
+      if( stage.module == *shader )
+      {
+        return stage.stage;
+      }
+    }
+    return vk::ShaderStageFlagBits{};
+  }
 
   bool Compile()
   {
@@ -281,7 +341,18 @@ struct Pipeline::Impl
       auto shaderHandle = mGraphics.FindShader( stage.module );
       if( shaderHandle )
       {
-        mShaderResources.push_back( shaderHandle );
+        bool tracked { false };
+        for(auto&& sh : mShaderResources )
+        {
+          if( sh == shaderHandle )
+          {
+            tracked = true;
+          }
+        }
+        if(!tracked)
+        {
+          mShaderResources.push_back(shaderHandle);
+        }
       }
       else
       {
@@ -298,7 +369,7 @@ struct Pipeline::Impl
   Graphics&                       mGraphics;
 
   // resources
-  std::vector<Handle<Shader>>     mShaderResources;
+  std::vector<ShaderRef>     mShaderResources;
 
   vk::PipelineViewportStateCreateInfo mViewportState {};
   std::vector<vk::Viewport> mViewports {};
@@ -306,6 +377,8 @@ struct Pipeline::Impl
 
   std::vector<vk::PipelineShaderStageCreateInfo> mShaderStageCreateInfo;
   vk::PipelineLayout mPipelineLayout{};
+  std::vector<vk::DescriptorSetLayoutCreateInfo>    mDSCreateInfoArray{};
+  std::vector<vk::DescriptorSetLayout>              mDSLayoutArray{};
 
   // vertex input state
   vk::PipelineVertexInputStateCreateInfo            mVertexInputState {};
@@ -387,6 +460,16 @@ bool Pipeline::Compile()
 vk::PipelineLayout Pipeline::GetVkPipelineLayout() const
 {
   return mImpl->mPipelineLayout;
+}
+
+const std::vector<vk::DescriptorSetLayoutCreateInfo>& Pipeline::GetVkDescriptorSetLayoutCreateInfo() const
+{
+  return mImpl->mDSCreateInfoArray;
+}
+
+const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
+{
+  return mImpl->mDSLayoutArray;
 }
 
 } // namespace Vulkan

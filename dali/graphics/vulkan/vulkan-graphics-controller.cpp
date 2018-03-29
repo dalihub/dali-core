@@ -16,7 +16,11 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/vulkan-sampler.h>
+#include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-graphics-texture.h>
 
 using namespace glm;
 
@@ -65,39 +69,21 @@ struct Controller::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
-    // create shaders
-    auto bindings =
-      std::vector<vk::DescriptorSetLayoutBinding>{// francisco buffer
-                                                  vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 0 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 ),
-                                                  // clip matrix
-                                                  vk::DescriptorSetLayoutBinding{}
-                                                    .setBinding( 1 )
-                                                    .setStageFlags( vk::ShaderStageFlagBits::eVertex )
-                                                    .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                                    .setDescriptorCount( 1 )};
-
     mDebugPipelineState.vertexShader = Shader::New( mGraphics, VSH_CODE.data(), VSH_CODE.size() );
-    mDebugPipelineState.vertexShader->SetDescriptorSetLayout(
-      0, vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 2 ).setPBindings( bindings.data() ) );
 
     mDebugPipelineState.fragmentShader = Shader::New( mGraphics, FSH_CODE.data(), FSH_CODE.size() );
 
     mDebugPipelineState.descriptorPool = CreateDescriptorPool();
 
-    const float halfWidth = 0.5f;
+    const float halfWidth  = 0.5f;
     const float halfHeight = 0.5f;
-//#if 0
-    const vec3 VERTICES[4] =
-                  {
-                    { halfWidth,  halfHeight, 0.0f },
-                    { halfWidth, -halfHeight, 0.0f },
-                    { -halfWidth,  halfHeight, 0.0f },
-                    { -halfWidth, -halfHeight, 0.0f },
-                  };
+    //#if 0
+    const vec3 VERTICES[4] = {
+      {halfWidth, halfHeight, 0.0f},
+      {halfWidth, -halfHeight, 0.0f},
+      {-halfWidth, halfHeight, 0.0f},
+      {-halfWidth, -halfHeight, 0.0f},
+    };
 //#endif
 #if 0
     const vec3 VERTICES[4] = {
@@ -144,7 +130,7 @@ struct Controller::Impl
     pipeline->SetShader( state.vertexShader, Shader::Type::VERTEX );
     pipeline->SetShader( state.fragmentShader, Shader::Type::FRAGMENT );
 
-    auto size = mGraphics.GetSurface( 0u ).GetSize();
+    auto size = mGraphics.GetSurface( 0u )->GetSize();
     pipeline->SetViewport( 0, 0, static_cast<float>( size.width ), static_cast<float>( size.height ) );
 
     pipeline->SetVertexInputState(
@@ -156,6 +142,8 @@ struct Controller::Impl
                                                        .setStride( sizeof( vec3 ) )
                                                        .setInputRate( vk::VertexInputRate::eVertex )} );
     pipeline->SetInputAssemblyState( vk::PrimitiveTopology::eTriangleStrip, false );
+
+
 
     if( !pipeline->Compile() )
     {
@@ -187,9 +175,9 @@ struct Controller::Impl
     for( auto&& buf : bufferList.Get() )
     {
       // TODO: @todo implement minimum offset!
-      const uint32_t sizeOfUniformBuffer = U32((buf->GetSize() / drawcalls.Get()));
-      const uint32_t uniformBlockOffsetStride = ((sizeOfUniformBuffer / 256)+1)*256;
-      const uint32_t uniformBlockMemoryNeeded = U32(uniformBlockOffsetStride*drawcalls.Get());
+      const uint32_t sizeOfUniformBuffer      = U32( ( buf->GetSize() / drawcalls.Get() ) );
+      const uint32_t uniformBlockOffsetStride = ( ( sizeOfUniformBuffer / 256 ) + 1 ) * 256;
+      const uint32_t uniformBlockMemoryNeeded = U32( uniformBlockOffsetStride * drawcalls.Get() );
 
       // create buffer if doesn't exist
       if( !state.uniformBuffer0 )
@@ -210,23 +198,29 @@ struct Controller::Impl
         mat4 mvp;
         vec4 color;
         vec3 size;
-      } __attribute__((aligned(16)));
+        uint samplerId;
+      } __attribute__( ( aligned( 16 ) ) );
 
       auto memory = state.uniformBuffer0->GetMemoryHandle();
       auto outPtr = memory->MapTyped<char>();
       for( auto i = 0u; i < drawcalls.Get(); ++i )
       {
         // copy chunk of data
-        UB* inputData = (reinterpret_cast<UB*>(buf->GetDataBase())) + i;
-        UB* outputData = (reinterpret_cast<UB*>(outPtr + (i*uniformBlockOffsetStride)));
-        *outputData = *inputData;
+        UB* inputData  = ( reinterpret_cast<UB*>( buf->GetDataBase() ) ) + i;
+        UB* outputData = ( reinterpret_cast<UB*>( outPtr + ( i * uniformBlockOffsetStride ) ) );
+        *outputData    = *inputData;
 
         auto descriptorSets = state.descriptorPool->AllocateDescriptorSets(
           vk::DescriptorSetAllocateInfo{}.setDescriptorSetCount( 1 ).setPSetLayouts(
-            state.vertexShader->GetDescriptorSetLayouts().data() ) );
+            state.pipeline->GetVkDescriptorSetLayouts().data() ) );
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );
+        if(inputData->samplerId > 0)
+        {
+          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId - 1]->GetSampler(),
+                                                       mTextures[inputData->samplerId - 1]->GetImageView());
+        }
 
         // record draw call
         auto cmdbuf = state.commandPool->NewCommandBuffer( false );
@@ -243,7 +237,7 @@ struct Controller::Impl
       memory->Unmap();
 
       // execute buffer
-      mGraphics.GetSurface( 0u ).GetCurrentCommandBuffer()->ExecuteCommands( executeCommands );
+      mGraphics.GetSwapchainForFBID( 0u )->GetPrimaryCommandBuffer()->ExecuteCommands( executeCommands );
 
       // break, one pass only
       break;
@@ -252,8 +246,10 @@ struct Controller::Impl
 #pragma GCC diagnostic pop
   void BeginFrame()
   {
-    auto& surface = mGraphics.GetSurface( 0u );
-    surface.AcquireNextImage();
+    auto surface = mGraphics.GetSurface( 0u );
+
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    swapchain->AcquireNextFramebuffer();
 
     // rewind pools
     mDebugPipelineState.drawPoolIndex = 0u;
@@ -263,8 +259,8 @@ struct Controller::Impl
 
   void EndFrame()
   {
-    auto& surface = mGraphics.GetSurface( 0u );
-    surface.Present();
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    swapchain->Present();
   }
 
   DescriptorPoolRef CreateDescriptorPool()
@@ -277,6 +273,45 @@ struct Controller::Impl
       mGraphics, vk::DescriptorPoolCreateInfo{}.setMaxSets( 1024 ).setPoolSizeCount( 1 ).setPPoolSizes( &size ) );
     return pool;
   }
+
+  void* CreateTexture( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+  {
+    // AB: yup, yet another hack
+    auto texture = Dali::Graphics::Vulkan::Texture::New( mGraphics, width, height, vk::Format::eR8G8B8A8Unorm );
+
+    // check bpp, if 24bpp convert
+    if( sizeInBytes == width*height*3 )
+    {
+      uint8_t* inData = reinterpret_cast<uint8_t*>(data);
+      uint8_t* outData = new uint8_t[width*height*4];
+
+      auto outIdx = 0u;
+      for( auto i = 0u; i < sizeInBytes; i+= 3 )
+      {
+        outData[outIdx] = inData[i];
+        outData[outIdx+1] = inData[i+1];
+        outData[outIdx+2] = inData[i+2];
+        outData[outIdx+3] = 0xff;
+        outIdx += 4;
+      }
+
+      data = outData;
+      sizeInBytes = width*height*4;
+    }
+
+    // Upload data immediately. Will stall the queue :(
+    texture->UploadData( data, sizeInBytes, TextureUploadMode::eImmediate );
+
+    // push texture to the stack, return the buffer
+    mTextures.push_back( texture );
+
+    // return index for quick lookup
+    auto index = mTextures.size();
+    return *reinterpret_cast<void**>(&index);
+  }
+
+  // resources
+  std::vector<TextureRef> mTextures;
 
   Graphics&           mGraphics;
   Controller&         mOwner;
@@ -314,6 +349,11 @@ API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<AP
 
 API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
 {
+}
+
+void* Controller::CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+{
+  return mImpl->CreateTexture( data, sizeInBytes, width, height );
 }
 
 std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )

@@ -58,15 +58,16 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
   //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  "VK_LAYER_RENDERDOC_Capture",
-  "VK_LAYER_LUNARG_parameter_validation", // parameter
+  //"VK_LAYER_RENDERDOC_Capture",
+  //"VK_LAYER_LUNARG_parameter_validation", // parameter
   //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
-  "VK_LAYER_LUNARG_monitor",             // monitor
+  //"VK_LAYER_LUNARG_monitor",             // monitor
   "VK_LAYER_LUNARG_swapchain",           // swapchain
   "VK_LAYER_GOOGLE_threading",           // threading
   "VK_LAYER_LUNARG_api_dump",            // api
   "VK_LAYER_LUNARG_object_tracker",      // objects
   "VK_LAYER_LUNARG_core_validation",     // core
+  "VK_LAYER_GOOGLE_unique_objects",      // unique objects
   "VK_LAYER_GOOGLE_unique_objects",      // unique objects
   "VK_LAYER_LUNARG_standard_validation", // standard
 };
@@ -189,7 +190,7 @@ void Graphics::Create()
   {
     for( auto&& prop : layers.value )
     {
-      //std::cout << prop.layerName << std::endl;
+      std::cout << prop.layerName << std::endl;
       if( std::string(prop.layerName) == reqLayer )
       {
         validationLayers.push_back(reqLayer);
@@ -207,8 +208,8 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
-      //.setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      .setEnabledLayerCount(U32(validationLayers.size()))
+      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -280,18 +281,59 @@ void Graphics::GetQueueFamilyProperties()
 
 FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
 {
-  const auto vkFactory = dynamic_cast< const VkSurfaceFactory* >(surfaceFactory.get());
-  if(!vkFactory)
+  // create surface from the factory
+  auto surfaceRef = Surface::New( *this, std::move(surfaceFactory) );
+
+  if( surfaceRef->Create() )
   {
-    return FBID{0u};
+
+    // map surface to FBID
+    auto fbid = ++mBaseFBID;
+    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ SwapchainRef{}, surfaceRef };
+    return fbid;
+  }
+  return -1;
+}
+
+SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
+{
+  auto swapchain = Swapchain::New( *this,
+                                   GetGraphicsQueue(0u),
+                                   surface, 2, 0 );
+
+  // store swapchain in the correct pair
+  for( auto&& val : mSurfaceFBIDMap )
+  {
+    if( val.second.surface == surface )
+    {
+      val.second.swapchain = swapchain;
+      break;
+    }
   }
 
-  auto surface = vkFactory->Create(mInstance, mAllocator.get(), mPhysicalDevice);
+  return swapchain;
+}
 
-  // map surface to FBID
-  auto fbid             = ++mBaseFBID;
-  mSurfaceFBIDMap[fbid] = MakeUnique<Surface>(*this, surface, 3u);
-  return fbid;
+SwapchainRef Graphics::GetSwapchainForSurface( SurfaceRef surface )
+{
+  for( auto&& val : mSurfaceFBIDMap )
+  {
+    if( val.second.surface == surface )
+    {
+      return val.second
+                .swapchain;
+    }
+  }
+  return SwapchainRef();
+}
+
+SwapchainRef Graphics::GetSwapchainForFBID( FBID surfaceId )
+{
+  if(surfaceId == 0)
+  {
+    return mSurfaceFBIDMap.begin()->second.swapchain;
+  }
+  return mSurfaceFBIDMap[surfaceId].swapchain;
 }
 
 #pragma GCC diagnostic push
@@ -330,7 +372,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
     {
       transferFamily = queueFamilyIndex;
     }
-    if(mPhysicalDevice.getSurfaceSupportKHR(queueFamilyIndex, mSurfaceFBIDMap.begin()->second.get()->GetSurfaceKHR())
+    if(mPhysicalDevice.getSurfaceSupportKHR(queueFamilyIndex, mSurfaceFBIDMap.begin()->second.surface->GetSurfaceKHR())
            .value &&
        presentFamily == -1u)
     {
@@ -489,7 +531,8 @@ Queue& Graphics::GetComputeQueue(uint32_t index) const
 
 Queue& Graphics::GetPresentQueue() const
 {
-  return *mPresentQueue.get();
+  // fixme: should be a dedicated presentation queue
+  return GetGraphicsQueue(0);
 }
 
 Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
@@ -500,15 +543,15 @@ Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInf
   return cmdpool;
 }
 
-Surface& Graphics::GetSurface( FBID surfaceId )
+SurfaceRef Graphics::GetSurface( FBID surfaceId )
 {
   // TODO: FBID == 0 means default framebuffer, but there should be no
   // such thing as default framebuffer.
   if( surfaceId == 0 )
   {
-    return *mSurfaceFBIDMap.begin()->second.get();
+    return mSurfaceFBIDMap.begin()->second.surface;
   }
-  return *mSurfaceFBIDMap[surfaceId].get();
+  return mSurfaceFBIDMap[surfaceId].surface;
 }
 
 // TODO: all this stuff should go into some vulkan cache
@@ -587,7 +630,7 @@ void Graphics::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool )
   NotImplemented();
 }
 
-Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
+ShaderRef Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   for( auto&& iter : mShaderCache )
   {
@@ -598,6 +641,19 @@ Handle<Shader> Graphics::FindShader( vk::ShaderModule shaderModule )
   }
   return Handle<Shader>();
 }
+
+ImageRef Graphics::FindImage( vk::Image image )
+{
+  for( auto&& iter : mImageCache )
+  {
+    if( iter->GetVkImage() == image )
+    {
+      return ImageRef(&*iter);
+    }
+  }
+  return ImageRef();
+}
+
 
 
 } // namespace Vulkan

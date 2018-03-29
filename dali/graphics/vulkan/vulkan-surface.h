@@ -23,91 +23,32 @@
 
 namespace Dali
 {
+namespace Integration
+{
+namespace Graphics
+{
+class SurfaceFactory;
+}
+}
 namespace Graphics
 {
 namespace Vulkan
 {
-
-/**
- * Vulkan surface is coupled with swapchain -> one swapchain per surface
- * Swapchain won't exist until surface is used in a such way
- *
- */
+using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 class Graphics;
-class CommandBuffer;
-class CommandPool;
-class Surface;
-
-using UniqueSurface       = std::unique_ptr< Surface >;
-using UniqueCommandBuffer = std::unique_ptr< CommandBuffer >;
-using UniqueCommandPool   = std::unique_ptr< CommandPool >;
-
-// simple structure describing single image of swapchain
-// non-copyable, only movable
-struct SwapchainImage
-{
-  SwapchainImage();
-  ~SwapchainImage();
-  SwapchainImage(const SwapchainImage&) = delete;
-  SwapchainImage(SwapchainImage&&)      = default;
-  SwapchainImage& operator=(const SwapchainImage&) = delete;
-  SwapchainImage& operator=(SwapchainImage&&) = default;
-
-  ImageRef        image;
-  ImageViewRef    imageView;
-  vk::Framebuffer framebuffer;
-  vk::ImageLayout layout;
-  vk::Semaphore   acqSem;
-  vk::Semaphore   presentSem;
-
-  // layout transitions, prerecorded command buffers
-  Handle<CommandBuffer> layoutToColorCmdBuf;
-  Handle<CommandBuffer> mainCmdBuf;
-};
-
-class Surface
+class Surface : public VkManaged
 {
 public:
-  Surface(Graphics& graphics, vk::SurfaceKHR surface, uint32_t bufferCount = 2,
-          bool hasDepthStencil = false);
-  ~Surface();
+
+  static SurfaceRef New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
+
+  Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
+  ~Surface() final;
 
   /**
-   * Prepares new swapchain image
+   * Creates surface from given factory
    */
-  void AcquireNextImage();
-
-  /**
-   * Presents image
-   */
-  void Present();
-
-  /**
-   *
-   * @return
-   */
-  vk::RenderPass GetRenderPass() const;
-
-  /**
-   *
-   * @param index
-   * @return
-   */
-  vk::Framebuffer GetFramebuffer(uint32_t index = -1u) const;
-
-  /**
-   *
-   * @param index
-   * @return
-   */
-  ImageView& GetImageView(uint32_t index = -1u) const;
-
-  /**
-   *
-   * @param index
-   * @return
-   */
-  Image& GetImage(uint32_t index = -1u) const;
+  bool Create();
 
   /**
    *
@@ -116,85 +57,15 @@ public:
   vk::SurfaceKHR GetSurfaceKHR() const;
 
   /**
-   * returns set of clear values for this surface
-   * @return
-   */
-  std::vector<vk::ClearValue> GetClearValues() const;
-
-  /**
    * Returns size of surface
    * @return
    */
   vk::Extent2D GetSize() const;
 
-  /**
-   * Returns primary command buffer associated with specific buffer
-   * @param index
-   * @return
-   */
-  Handle<CommandBuffer> GetCommandBuffer( uint32_t index );
-
-  /**
-   * Returns primary command buffer associated with current buffer
-   * @return
-   */
-  Handle<CommandBuffer> GetCurrentCommandBuffer();
-
-/**
-   *
-   */
-  void CreateSwapchain();
-
 private:
 
-  void CreateVulkanSwapchain();
-
-  void CreateImageView(SwapchainImage& swapImage);
-  void CreateFramebuffer(SwapchainImage& swapImage);
-  void CreateSemaphores(SwapchainImage& swapImage);
-
-  void DestroySwapchain();
-
-  void InitialiseSwapchain();
-
-  void InitialiseRenderPass();
-
-  void AddSwapchainImage(vk::Image image, std::vector< SwapchainImage >& swapchainImages);
-
-  void CreateCommandBuffers();
-
-  void CreateDepthStencil();
-
-  void DestroyDepthStencil();
-
-  void BeginRenderPass();
-
-  void EndRenderPass();
-
-  Graphics&        mGraphics;
-  vk::SurfaceKHR   mSurface;
-  vk::SwapchainKHR mSwapchain;
-
-  vk::Format       mDepthStencilFormat{vk::Format::eD16UnormS8Uint};
-  vk::Image        mDepthStencilImage;
-  vk::ImageView    mDepthStencilImageView;
-  vk::DeviceMemory mDepthStencilMemory;
-
-  Handle<CommandPool> mCommandPool;
-
-  vk::Format        mFormat;
-  vk::ColorSpaceKHR mColorSpace;
-  vk::Extent2D      mExtent;
-
-  std::vector< SwapchainImage >                 mSwapImages;
-  std::unique_ptr< vk::SurfaceCapabilitiesKHR > mCapabilities;
-
-  Handle<Fence>   mFrameFence;
-
-  vk::RenderPass mDefaultRenderPass;
-  uint32_t       mBufferCount;
-  uint32_t       mCurrentBufferIndex;
-  bool           mHasDepthStencil;
+  struct Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 } // namespace Vulkan

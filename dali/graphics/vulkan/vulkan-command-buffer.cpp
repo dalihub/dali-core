@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-fence.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
-#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/vulkan-framebuffer.h>
 
 namespace Dali
 {
@@ -34,9 +36,11 @@ namespace Vulkan
 {
 struct CommandBuffer::Impl
 {
-  Impl( CommandPool& commandPool, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer commandBuffer )
-  : mGraphics( commandPool.GetGraphics() ),
+  Impl( CommandBuffer& owner, CommandPool& commandPool, uint32_t poolIndex, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer commandBuffer )
+  : mOwner( owner ),
+    mGraphics( commandPool.GetGraphics() ),
     mOwnerCommandPool( commandPool ),
+    mPoolAllocationIndex( poolIndex ),
     mAllocateInfo( allocateInfo ),
     mCommandBuffer( commandBuffer )
   {
@@ -44,6 +48,16 @@ struct CommandBuffer::Impl
 
   ~Impl()
   {
+    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
+                                              1, &mCommandBuffer );
+  }
+
+  void ReleaseCommandBuffer()
+  {
+    mResources.clear();
+
+    // tell pool the buffer is not in use anymore
+    mOwnerCommandPool.ReleaseCommandBuffer(mOwner, false);
   }
 
   bool Initialise()
@@ -90,9 +104,10 @@ struct CommandBuffer::Impl
 
     if( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary )
     {
-      // todo: sets render pass from 'default' surface, should be supplied from primary command buffer
-      // which has render pass associated within execution context
-      inheritance.setRenderPass( mGraphics.GetSurface( 0 ).GetRenderPass() );
+      // Render pass is obtained from the default framebuffer
+      // it's a legacy but little nicer
+      auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+      inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetVkRenderPass() );
       info.setPInheritanceInfo( &inheritance );
     }
 
@@ -125,112 +140,6 @@ struct CommandBuffer::Impl
     mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(), mCommandBuffer );
   }
 
-  void ImageLayoutTransition( vk::Image            image,
-                              vk::ImageLayout      oldLayout,
-                              vk::ImageLayout      newLayout,
-                              vk::ImageAspectFlags aspectMask )
-  {
-    // just push new image barrier until any command is being called or buffer recording ends.
-    // it will make sure we batch barriers together rather than calling cmdPipelineBarrier
-    // for each separately
-    vk::AccessFlags        srcAccessMask, dstAccessMask;
-    vk::PipelineStageFlags srcStageMask, dstStageMask;
-
-    // TODO: add other transitions
-    switch( oldLayout )
-    {
-      case vk::ImageLayout::eUndefined:
-      {
-        srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
-      }
-      break;
-      case vk::ImageLayout::ePresentSrcKHR:
-      {
-        srcStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
-        srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
-      }
-      break;
-      case vk::ImageLayout::eColorAttachmentOptimal:
-      {
-        srcStageMask  = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eColorAttachmentOutput;
-        srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eColorAttachmentRead;
-      }
-      break;
-      case vk::ImageLayout::eGeneral:
-      case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-      case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-      case vk::ImageLayout::eShaderReadOnlyOptimal:
-      case vk::ImageLayout::eTransferSrcOptimal:
-      case vk::ImageLayout::eTransferDstOptimal:
-      case vk::ImageLayout::ePreinitialized:
-      case vk::ImageLayout::eSharedPresentKHR:
-      {
-      }
-    }
-
-    switch( newLayout )
-    {
-      case vk::ImageLayout::eColorAttachmentOptimal:
-      {
-        dstStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
-        dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eHostWrite;
-        break;
-      }
-      case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-      {
-        dstStageMask = vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eEarlyFragmentTests;
-        dstAccessMask =
-          vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-        break;
-      }
-      case vk::ImageLayout::ePresentSrcKHR:
-      {
-        dstStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
-        dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eMemoryRead;
-      }
-      case vk::ImageLayout::eGeneral:
-      case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-      case vk::ImageLayout::eShaderReadOnlyOptimal:
-      case vk::ImageLayout::eTransferSrcOptimal:
-      case vk::ImageLayout::eTransferDstOptimal:
-      case vk::ImageLayout::ePreinitialized:
-      case vk::ImageLayout::eUndefined:
-      case vk::ImageLayout::eSharedPresentKHR:
-      {
-        break;
-      }
-    }
-
-    RecordImageLayoutTransition(
-      image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask, oldLayout, newLayout, aspectMask );
-  }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-  void RecordImageLayoutTransition( vk::Image              image,
-                                    vk::AccessFlags        srcAccessMask,
-                                    vk::AccessFlags        dstAccessMask,
-                                    vk::PipelineStageFlags srcStageMask,
-                                    vk::PipelineStageFlags dstStageMask,
-                                    vk::ImageLayout        oldLayout,
-                                    vk::ImageLayout        newLayout,
-                                    vk::ImageAspectFlags   aspectMask )
-  {
-    vk::ImageSubresourceRange subres;
-    subres.setLayerCount( 1 ).setBaseMipLevel( 0 ).setBaseArrayLayer( 0 ).setLevelCount( 1 ).setAspectMask(
-      aspectMask );
-
-    auto barrier = vk::ImageMemoryBarrier{};
-    barrier.setImage( image )
-      .setSubresourceRange( subres )
-      .setSrcAccessMask( srcAccessMask )
-      .setDstAccessMask( dstAccessMask )
-      .setOldLayout( oldLayout )
-      .setNewLayout( newLayout );
-    ;
-    // todo: implement barriers batching
-    mCommandBuffer.pipelineBarrier( srcStageMask, dstStageMask, vk::DependencyFlags{}, nullptr, nullptr, barrier );
-  }
 #pragma GCC diagnostic pop
 
   /** Push wait semaphores */
@@ -327,17 +236,18 @@ struct CommandBuffer::Impl
   // RENDER PASS
   void BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   {
-    auto& surface     = mGraphics.GetSurface( framebufferId );
-    auto  renderPass  = surface.GetRenderPass();
-    auto  frameBuffer = surface.GetFramebuffer( bufferIndex );
-    auto  clearValues = surface.GetClearValues();
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    auto surface = mGraphics.GetSurface( 0u );
+    auto frameBuffer = swapchain->GetCurrentFramebuffer();
+    auto renderPass = frameBuffer->GetVkRenderPass();
+    auto clearValues = frameBuffer->GetDefaultClearValues();
 
     auto info = vk::RenderPassBeginInfo{};
-    info.setFramebuffer( frameBuffer );
+    info.setFramebuffer( frameBuffer->GetVkFramebuffer() );
     info.setRenderPass( renderPass );
     info.setClearValueCount( U32( clearValues.size() ) );
     info.setPClearValues( clearValues.data() );
-    info.setRenderArea( vk::Rect2D( {0, 0}, surface.GetSize() ) );
+    info.setRenderArea( vk::Rect2D( {0, 0}, surface->GetSize() ) );
 
     mCurrentRenderPass = renderPass;
     mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );
@@ -368,8 +278,61 @@ struct CommandBuffer::Impl
     mCommandBuffer.executeCommands( vkBuffers );
   }
 
+  void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                        vk::PipelineStageFlags dstStageMask,
+                        vk::DependencyFlags dependencyFlags,
+                        std::vector<vk::MemoryBarrier> memoryBarriers,
+                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                        std::vector<vk::ImageMemoryBarrier> imageBarriers )
+  {
+    /*
+     * Track resources
+     */
+    if( !imageBarriers.empty() )
+    {
+      for( auto&& imageBarrier : imageBarriers )
+      {
+        ImageRef imageResource{};
+        if( imageResource = mGraphics.FindImage( imageBarrier.image ) )
+        {
+          PushResource( imageResource );
+        }
+      }
+    }
+    //@ todo other resource tracking
+
+    mCommandBuffer.pipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
+  }
+
+  void CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage, vk::ImageLayout dstLayout, std::vector<vk::BufferImageCopy> regions )
+  {
+    PushResource( srcBuffer );
+    PushResource( dstImage );
+
+    mCommandBuffer.copyBufferToImage( srcBuffer->GetVkBuffer(), dstImage->GetVkImage(), dstLayout, regions );
+  }
+
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+                                                      const vk::AccessFlags&        srcAccessMask,
+                                                      const vk::AccessFlags&        dstAccessMask,
+                                                      vk::ImageLayout        oldLayout,
+                                                      vk::ImageLayout        newLayout,
+                                                      const vk::ImageAspectFlags&   aspectMask
+  ) const
+  {
+    return vk::ImageMemoryBarrier{}
+         .setNewLayout( newLayout )
+         .setImage( image->GetVkImage() )
+         .setOldLayout( oldLayout )
+         .setSrcAccessMask( srcAccessMask )
+         .setDstAccessMask( dstAccessMask )
+         .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask, 0, image->GetLevelCount(), 0, image->GetLayerCount() } );
+  }
+
+  CommandBuffer&                mOwner;
   Graphics&                     mGraphics;
   CommandPool&                  mOwnerCommandPool;
+  uint32_t                      mPoolAllocationIndex;
   vk::CommandBufferAllocateInfo mAllocateInfo{};
 
   vk::CommandBuffer mCommandBuffer{};
@@ -385,6 +348,8 @@ struct CommandBuffer::Impl
 
   vk::RenderPass mCurrentRenderPass;
 
+  FenceRef       mFinishedFence;
+
   bool mRecording{false};
 };
 
@@ -395,10 +360,11 @@ struct CommandBuffer::Impl
  */
 
 CommandBuffer::CommandBuffer( CommandPool&                         commandPool,
+                              uint32_t                             poolIndex,
                               const vk::CommandBufferAllocateInfo& allocateInfo,
                               vk::CommandBuffer                    vkCommandBuffer )
 {
-  mImpl = MakeUnique<Impl>( commandPool, allocateInfo, vkCommandBuffer );
+  mImpl = MakeUnique<Impl>( *this, commandPool, poolIndex, allocateInfo, vkCommandBuffer );
 }
 
 CommandBuffer::~CommandBuffer()
@@ -427,28 +393,6 @@ void CommandBuffer::Reset()
 void CommandBuffer::Free()
 {
   mImpl->Free();
-}
-
-/** Records image layout transition barrier for one image */
-void CommandBuffer::ImageLayoutTransition( vk::Image            image,
-                                           vk::ImageLayout      oldLayout,
-                                           vk::ImageLayout      newLayout,
-                                           vk::ImageAspectFlags aspectMask )
-{
-  mImpl->ImageLayoutTransition( image, oldLayout, newLayout, aspectMask );
-}
-
-void CommandBuffer::RecordImageLayoutTransition( vk::Image              image,
-                                                 vk::AccessFlags        srcAccessMask,
-                                                 vk::AccessFlags        dstAccessMask,
-                                                 vk::PipelineStageFlags srcStageMask,
-                                                 vk::PipelineStageFlags dstStageMask,
-                                                 vk::ImageLayout        oldLayout,
-                                                 vk::ImageLayout        newLayout,
-                                                 vk::ImageAspectFlags   aspectMask )
-{
-  mImpl->RecordImageLayoutTransition(
-    image, srcAccessMask, dstAccessMask, srcStageMask, dstStageMask, oldLayout, newLayout, aspectMask );
 }
 
 /** Push wait semaphores */
@@ -558,6 +502,139 @@ void CommandBuffer::EndRenderPass()
 void CommandBuffer::ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers )
 {
   mImpl->ExecuteCommands( commandBuffers );
+}
+
+void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
+                      vk::PipelineStageFlags dstStageMask,
+                      vk::DependencyFlags dependencyFlags,
+                      std::vector<vk::MemoryBarrier> memoryBarriers,
+                      std::vector<vk::BufferMemoryBarrier> bufferBarriers,
+                      std::vector<vk::ImageMemoryBarrier> imageBarriers )
+{
+  mImpl->PipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
+}
+
+void CommandBuffer::CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage,
+                                       vk::ImageLayout dstLayout, std::vector<vk::BufferImageCopy> regions )
+{
+  mImpl->CopyBufferToImage( srcBuffer, dstImage, dstLayout, regions );
+}
+
+vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef image,
+                                                     vk::AccessFlags        srcAccessMask,
+                                                     vk::AccessFlags        dstAccessMask,
+                                                     vk::ImageLayout        oldLayout,
+                                                     vk::ImageLayout        newLayout,
+                                                     vk::ImageAspectFlags   aspectMask
+) const
+{
+  return mImpl->ImageLayoutTransitionBarrier( image,
+                                              srcAccessMask, dstAccessMask,
+                                              oldLayout, newLayout,
+                                              aspectMask  );
+}
+
+vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef image,
+                                                     vk::ImageLayout        oldLayout,
+                                                     vk::ImageLayout        newLayout,
+                                                     vk::ImageAspectFlags   aspectMask
+) const
+{
+
+  vk::AccessFlags  srcAccessMask, dstAccessMask;
+  vk::PipelineStageFlags srcStageMask, dstStageMask;
+
+  switch( oldLayout )
+  {
+    case vk::ImageLayout::ePreinitialized:
+    case vk::ImageLayout::eUndefined:
+    {
+      srcAccessMask = {};
+      srcStageMask  = vk::PipelineStageFlagBits::eTopOfPipe;
+      break;
+    }
+    case vk::ImageLayout::ePresentSrcKHR:
+    {
+      srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead;
+      srcStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+      break;
+    }
+    case vk::ImageLayout::eTransferSrcOptimal:
+    {
+      srcAccessMask = vk::AccessFlagBits::eMemoryRead;
+      srcStageMask  = vk::PipelineStageFlagBits::eTransfer;
+      break;
+    }
+    case vk::ImageLayout::eTransferDstOptimal:
+    {
+      srcAccessMask = vk::AccessFlagBits::eMemoryWrite;
+      srcStageMask  = vk::PipelineStageFlagBits::eTransfer;
+      break;
+    }
+    case vk::ImageLayout::eGeneral:
+    case vk::ImageLayout::eColorAttachmentOptimal:
+    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+    case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+    case vk::ImageLayout::eShaderReadOnlyOptimal:
+    case vk::ImageLayout::eSharedPresentKHR:
+    {
+      break;
+    }
+  }
+
+  switch( newLayout )
+  {
+    case vk::ImageLayout::ePresentSrcKHR:
+    {
+      dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+      dstStageMask  = vk::PipelineStageFlagBits::eBottomOfPipe;
+      break;
+    }
+    case vk::ImageLayout::eTransferSrcOptimal:
+    {
+      dstAccessMask = vk::AccessFlagBits::eMemoryRead;
+      dstStageMask  = vk::PipelineStageFlagBits::eTransfer;
+      break;
+    }
+    case vk::ImageLayout::eTransferDstOptimal:
+    {
+      dstAccessMask = vk::AccessFlagBits::eMemoryWrite;
+      dstStageMask  = vk::PipelineStageFlagBits::eTransfer;
+      break;
+    }
+    case vk::ImageLayout::eShaderReadOnlyOptimal:
+    {
+      dstAccessMask = vk::AccessFlagBits::eMemoryRead;
+      dstStageMask = vk::PipelineStageFlagBits::eVertexShader;
+      break;
+    }
+    case vk::ImageLayout::eUndefined:
+    case vk::ImageLayout::eGeneral:
+    case vk::ImageLayout::eColorAttachmentOptimal:
+    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+    case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
+    case vk::ImageLayout::ePreinitialized:
+    case vk::ImageLayout::eSharedPresentKHR:
+    {
+      break;
+    }
+  }
+
+  return mImpl->ImageLayoutTransitionBarrier( image,
+                                              srcAccessMask, dstAccessMask,
+                                              oldLayout, newLayout,
+                                              aspectMask  );
+}
+
+uint32_t CommandBuffer::GetPoolAllocationIndex() const
+{
+  return mImpl->mPoolAllocationIndex;
+}
+
+bool CommandBuffer::OnDestroy()
+{
+  mImpl->ReleaseCommandBuffer();
+  return true;
 }
 
 } // namespace Vulkan

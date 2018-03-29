@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-sampler.h>
 
 namespace Dali
 {
@@ -163,6 +164,28 @@ struct DescriptorSet::Impl
     mGraphics.GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
   }
 
+  void WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView )
+  {
+    // add resource to the list
+    mResources.emplace_back( sampler.StaticCast<VkManaged>() );
+    mResources.emplace_back( imageView.StaticCast<VkManaged>() );
+
+    auto imageViewInfo = vk::DescriptorImageInfo{}
+         .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
+         .setImageView( imageView->GetVkImageView() )
+         .setSampler( sampler->GetVkSampler() );
+
+    auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
+                                         .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
+                                         .setDescriptorCount( 1 )
+                                         .setDstSet( mVkDescriptorSet )
+                                         .setDstBinding( binding )
+                                         .setDstArrayElement( 0 );
+
+    // write descriptor set
+    mGraphics.GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
+  }
+
   void WriteStorageBuffer( Handle<Buffer> buffer, uint32_t offset, uint32_t size )
   {
     mResources.emplace_back( buffer.StaticCast<VkManaged>() );
@@ -197,24 +220,12 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
   return mImpl->mVkDescriptorSet;
 }
 
+void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView )
+{
+  mImpl->WriteCombinedImageSampler( binding, sampler, imageView );
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#if 0
 struct DescriptorSetLayout::Impl
 {
   Impl( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo ) :
@@ -264,7 +275,7 @@ DescriptorSetLayout::DescriptorSetLayout( Graphics& graphics, const vk::Descript
 {
   mImpl = MakeUnique<DescriptorSetLayout::Impl>( graphics, createInfo );
 }
-
+#endif
 } // Namespace Vulkan
 
 } // Namespace Graphics

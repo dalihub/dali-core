@@ -17,6 +17,7 @@
 
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 
 namespace Dali
 {
@@ -33,6 +34,7 @@ struct Image::Impl
     mCreateInfo( std::move( createInfo ) ),
     mIsExternal( static_cast<bool>( externalImage ) )
   {
+    mVkImageLayout = mCreateInfo.initialLayout;
   }
 
   ~Impl()
@@ -56,12 +58,19 @@ struct Image::Impl
     return true;
   }
 
+  void BindMemory( const GpuMemoryBlockRef& handle )
+  {
+    mGraphics.GetDevice().bindImageMemory( mVkImage, *handle, 0 );
+    mDeviceMemory = handle;
+  }
+
   Image&              mOwner;
   Graphics&           mGraphics;
   vk::Image           mVkImage;
   vk::ImageLayout     mVkImageLayout;
   vk::ImageCreateInfo mCreateInfo;
 
+  GpuMemoryBlockRef   mDeviceMemory;
   bool mIsExternal;
 };
 
@@ -145,8 +154,14 @@ vk::ImageTiling Image::GetVkImageTiling() const
   return mImpl->mCreateInfo.tiling;
 }
 
-void Image::BindMemory( GpuMemoryBlockRef& handle )
+void Image::BindMemory( const GpuMemoryBlockRef& handle )
 {
+  mImpl->BindMemory( handle );
+}
+
+vk::ImageUsageFlags Image::GetVkImageUsageFlags() const
+{
+  return mImpl->mCreateInfo.usage;
 }
 
 /***************************************************************************
@@ -187,28 +202,63 @@ struct ImageView::Impl
 ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info )
 {
   auto retval = ImageViewRef( new ImageView( graphics, image, info ) );
-  if(!retval->mImpl->Initialise())
+  if( !retval->mImpl->Initialise() )
   {
     return ImageViewRef();
   }
   return retval;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
 ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
 {
-  // create reference, image may be null
-  auto retval = ImageViewRef( new ImageView( graphics, image, vk::ImageViewCreateInfo{} ) );
-  if(image)
+  vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
+  vk::ImageAspectFlags aspectFlags{};
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
   {
-
+    aspectFlags |= vk::ImageAspectFlagBits::eColor;
+    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   }
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  {
+    aspectFlags |= (vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil);
+  }
+  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eSampled )
+  {
+    aspectFlags |= (vk::ImageAspectFlagBits::eColor);
+    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eR,vk::ComponentSwizzle::eA };
+  }
+  auto subresourceRange = vk::ImageSubresourceRange{}
+    .setAspectMask( aspectFlags )
+    .setBaseArrayLayer( 0 )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( image->GetLevelCount() )
+    .setLayerCount( image->GetLayerCount() );
+
+  // create reference, image may be null
+  auto retval = ImageViewRef( new ImageView( graphics,
+                                             image,
+                                             vk::ImageViewCreateInfo{}
+                                               .setViewType( vk::ImageViewType::e2D )
+                                               .setFormat( image->GetVkFormat() )
+                                               .setSubresourceRange(subresourceRange)
+                                               .setComponents( componentsMapping )
+                                                .setImage( image->GetVkImage() )));
+  if(!retval->mImpl->Initialise())
+  {
+    return ImageViewRef();
+  }
+
   return retval;
 }
+#pragma GCC diagnostic pop
 
 ImageView::ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo )
 {
   mImpl = MakeUnique<Impl>( *this, graphics, image, createInfo );
 }
+
 
 ImageView::~ImageView() = default;
 

@@ -49,6 +49,13 @@ public:
 
   /**
    *
+   * @param binding
+   * @param sampler
+   * @param imageView
+   */
+  void WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView );
+  /**
+   *
    * @param buffer
    * @param offset
    * @param size
@@ -107,7 +114,7 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-
+#if 0
 class DescriptorSetLayout
 {
 public:
@@ -123,7 +130,7 @@ private:
   class Impl;
   std::unique_ptr<Impl> mImpl;
 };
-
+#endif
 } // Namespace Vulkan
 
 } // Namespace Graphics

@@ -16,7 +16,12 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/vulkan-buffer.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
     $(graphics_src_dir)/vulkan/vulkan-shader.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-swapchain.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-sampler.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics-controller.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-graphics-texture.cpp \
+    $(graphics_src_dir)/vulkan/spirv/vulkan-spirv.cpp \
     $(graphics_src_dir)/graphics-controller.cpp
+
 
 

@@ -49,15 +49,12 @@ class Queue;
 /**
  * Unique pointers to Vulkan types
  */
-using UniqueSurface       = std::unique_ptr< Surface >;
 using UniqueQueue         = std::unique_ptr< Queue >;
 
 /**
  * Reference wrappers
  */
 using QueueRef         = std::reference_wrapper< Queue >;
-using SurfaceRef       = std::reference_wrapper< Surface >;
-
 
 template< typename T >
 T VkAssert(const vk::ResultValue< T >& result, vk::Result expected = vk::Result::eSuccess)
@@ -83,32 +80,6 @@ inline uint32_t U32(T value)
 {
   return static_cast< uint32_t >(value);
 }
-
-class Resource
-{
-public:
-  Resource() : mUserCount{0u} {}
-  virtual ~Resource() = default;
-
-  void IncreaseUserCount()
-  {
-    ++mUserCount;
-  }
-
-  void DecreaseUserCount()
-  {
-    --mUserCount;
-  }
-
-  uint32_t GetUserCount() const
-  {
-    return mUserCount;
-  }
-
-private:
-
-  std::atomic<uint32_t> mUserCount;
-};
 
 /**
  * Vulkan object handle
@@ -323,7 +294,7 @@ private:
   std::atomic_uint mRefCount { 0u };
 };
 
-using FBID = uint32_t;
+using FBID = int32_t;
 
 #define NotImplemented() \
 {\
@@ -346,6 +317,9 @@ using CommandPoolRef = Handle<class CommandPool>;
 using CommandBufferRef = Handle<class CommandBuffer>;
 using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
 using DescriptorSetRef = Handle<class DescriptorSet>;
+using SwapchainRef = Handle<class Swapchain>;
+using SurfaceRef = Handle<class Surface>;
+using SamplerRef = Handle<class Sampler>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
