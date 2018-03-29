@@ -190,7 +190,8 @@ sub create_setenv
     my $vulkan_sdk_path = "";
     if( ( -d $vulkan_path ) )
     {
-        my $vulkan_version = readlink( "$vulkan_path/latest" );
+        # my $vulkan_version = readlink( "$vulkan_path/latest" );
+        my $vulkan_version = "1.0.54.0";
         $vulkan_library_path = "\${VULKAN_SDK}/lib:";
         $vulkan_sdk_path =
             "export VULKAN_VERSION=$vulkan_version\n" .
