@@ -145,18 +145,39 @@ my $opt_man=0;
 my $opt_vulkan=0;
 my $opt_vulkanVersion="";
 my $opt_vulkanList=0;
+my $opt_vulkanInstaller="";
 
 GetOptions("create"                 => \$opt_create,
     "setenv"                 => \$opt_setenv,
     "vulkan"                 => \$opt_vulkan,
     "vulkan-version=s"       => \$opt_vulkanVersion,
     "vulkan-version-list"    => \$opt_vulkanList,
+    "vulkan-installer=s"     => \$opt_vulkanInstaller,
     "help"                   => \$opt_help,
     "man"                    => \$opt_man) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
 
+if( $opt_vulkanVersion ne "" )
+{
+  $opt_vulkan=1;
+}
+else
+{
+  # Default Vulkan Version if version not specified, will only be installed if --vulkan is specified
+  $opt_vulkanVersion="1.0.54.0"
+}
+
+if( $opt_vulkanInstaller ne "" )
+{
+  $opt_vulkanInstaller=glob($opt_vulkanInstaller);
+  if(! -e $opt_vulkanInstaller )
+  {
+    die "Installer \"$opt_vulkanInstaller\" does not exist!\n";
+  }
+  $opt_vulkan=1;
+}
 
 ################################################################################
 
@@ -190,8 +211,7 @@ sub create_setenv
     my $vulkan_sdk_path = "";
     if( ( -d $vulkan_path ) )
     {
-        # my $vulkan_version = readlink( "$vulkan_path/latest" );
-        my $vulkan_version = "1.0.54.0";
+        my $vulkan_version = readlink( "$vulkan_path/latest" );
         $vulkan_library_path = "\${VULKAN_SDK}/lib:";
         $vulkan_sdk_path =
             "export VULKAN_VERSION=$vulkan_version\n" .
@@ -247,12 +267,6 @@ sub check_system_packages
 
     check_system_package(@system_packages);
 
-    my $gnome_v =`dpkg -l gnome-common| tail -1| sed "s/ \\+/ /g" | cut -d' ' -f 3`;
-    my @am = split(/\./, `automake --version | head -1 | cut -f4 -d' '`);
-    if($gnome_v =~ /$2.24/ && $am[1]>10)
-    {
-        die "Gnome common and automake are not compatible - automake is too new\n";
-    }
     my @gpp_v = (`g++ --version  | head -1` =~ /(\d+)\.(\d+)\.(\d+)/);
 
     if(! (($gpp_v[0] > 4)
@@ -626,22 +640,37 @@ sub install_vulkan {
             }
         }
 
-        # Download SDK
-        my $vulkan_download_url =
-            "https://vulkan.lunarg.com/sdk/download/$requestedVersion/linux/vulkansdk-linux-x86_64-$requestedVersion.run?Human=true";
-        print("* Downloading Vulkan SDK Version $requestedVersion...\n");
-        print("  -> URL: $vulkan_download_url\n");
-        system( 'wget', '-O', '/tmp/vulkan_installer.sh', "$vulkan_download_url");
-
-        if ($? == - 1)
+        my $vulkanInstaller=$opt_vulkanInstaller;
+        if($vulkanInstaller eq "")
         {
-            die "Failed to download Vulkan SDK, exiting!\n";
+          # Download SDK if installer not specified
+          my $vulkan_download_url =
+              "https://vulkan.lunarg.com/sdk/download/$requestedVersion/linux/vulkansdk-linux-x86_64-$requestedVersion.run?Human=true";
+          print("* Downloading Vulkan SDK Version $requestedVersion...\n");
+          print("  -> URL: $vulkan_download_url\n");
+          system( 'wget', '-O', '/tmp/vulkan_installer.sh', "$vulkan_download_url");
+
+          if ($? == - 1)
+          {
+              die "Failed to download Vulkan SDK, exiting!\n";
+          }
+          $vulkanInstaller="/tmp/vulkan_installer.sh";
+        }
+        else
+        {
+          my $vulkanInstallerVersion=`head -n 25 $vulkanInstaller | grep scriptargs | cut -d\\\" -f 2 | xargs echo -n`;
+          if($vulkanInstallerVersion eq "")
+          {
+            die "Cannot detect Vulkan version from specified file\n";
+          }
+          print("  -> Installing Vulkan Version: \"$vulkanInstallerVersion\"\n");
+          $requestedVersion=$vulkanInstallerVersion;
         }
 
         # Run installer
         print("  -> Installing VulkanSDK...\n");
-        system( 'chmod', 'a+x', "/tmp/vulkan_installer.sh");
-        system( "/tmp/vulkan_installer.sh --target /tmp/vulkan-$requestedVersion");
+        system( 'chmod', 'a+x', "$vulkanInstaller");
+        system( "$vulkanInstaller --target /tmp/vulkan-$requestedVersion");
         pathmk( "$vulkanInstallDir/$requestedVersion" );
         dircopy( "/tmp/vulkan-$requestedVersion/$requestedVersion", "$vulkanInstallDir/$requestedVersion" );
 
@@ -793,6 +822,10 @@ Forces installing requested VulkanSDK version (use with -c to install with Vulka
 =item B<--vulkan-version-list>
 
 Lists available VulkanSDK versions.
+
+=item B<--vulkan-installer=INSTALL_FILE>
+
+Installs Vulkan from the specified file.
 
 =back
 
