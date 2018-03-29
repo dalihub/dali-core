@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "328a366e_626a3841",
+        "filename": "dali/integration-api/graphics/surface-factory.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1010807
+      },
+      "writtenOn": "2018-03-29T16:19:32Z",
+      "side": 1,
+      "message": "should default move constructors",
+      "revId": "3ef0c3b44778ddd8559fbbaf3478cd742a79cd78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
