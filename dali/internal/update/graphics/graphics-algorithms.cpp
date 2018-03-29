@@ -49,7 +49,7 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   //commandBuilder.Set( );
 
   // TODO: @todo Clipping...
-  using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
+  //using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
   auto numberOfRenderItems = renderItemList.Count();
 
   using DataT = struct
@@ -74,14 +74,17 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     if(item.mTextureSet)
     {
 
-      InternalTextureSet* textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
+      //InternalTextureSet* textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
 
+      //auto texture = textureSet->GetTexture(0)->GetGfxObject();
+      /*
       auto textureId = textureSet->GetTexture(0)->GetId();
 
       std::cout << "TextureCount: " << textureSet->GetTextureCount() <<
                 ", texture id: " << textureId <<
       std::endl;
-      opaqueTextureId = textureId;
+       */
+      opaqueTextureId = 0; // TODO: AB: hack!!!
     }
     else
     {

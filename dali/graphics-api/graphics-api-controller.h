@@ -28,6 +28,8 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-sampler.h>
 #include <dali/graphics-api/graphics-api-shader.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-api-shader-factory.h>
 #include <dali/graphics-api/graphics-api-static-buffer.h>
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture-set.h>
@@ -40,6 +42,7 @@ namespace Graphics
 {
 namespace API
 {
+class ShaderFactory;
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
@@ -99,6 +102,18 @@ public:
   {
     return 0;
   }
+
+  /**
+   * @brief Returns texture factory
+   * @return
+   */
+  virtual TextureFactory& GetTextureFactory() const = 0;
+
+  /**
+   * @brief Returns shader factory
+   * @return
+   */
+  virtual ShaderFactory& GetShaderFactory() const = 0;
 
   /**
    * @brief Create a buffer

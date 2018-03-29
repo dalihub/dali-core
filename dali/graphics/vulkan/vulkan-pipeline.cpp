@@ -472,6 +472,41 @@ const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts(
   return mImpl->mDSLayoutArray;
 }
 
+const vk::PipelineInputAssemblyStateCreateInfo& Pipeline::GetInputAssemblyState() const
+{
+  return mImpl->mInputAssemblyState;
+}
+
+const vk::PipelineVertexInputStateCreateInfo& Pipeline::GetVertexInputState() const
+{
+  return mImpl->mVertexInputState;
+}
+
+const vk::PipelineViewportStateCreateInfo& Pipeline::GetViewportState() const
+{
+  return mImpl->mViewportState;
+}
+
+const vk::PipelineRasterizationStateCreateInfo& Pipeline::GetRasterizationState() const
+{
+  return mImpl->mRasterizationState;
+}
+
+const vk::PipelineMultisampleStateCreateInfo& Pipeline::GetMultisamplingState() const
+{
+  return mImpl->mMultisampleState;
+}
+
+const vk::PipelineDepthStencilStateCreateInfo& Pipeline::GetDepthStencilState() const
+{
+  return mImpl->mDepthStencilState;
+}
+
+const vk::PipelineColorBlendStateCreateInfo& Pipeline::GetColorBlendState() const
+{
+  return mImpl->mColorBlendState;
+}
+
 } // namespace Vulkan
 
 } // namespace Graphics

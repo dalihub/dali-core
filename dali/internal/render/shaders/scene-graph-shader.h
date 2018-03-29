@@ -22,7 +22,8 @@
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-
+#include <dali/graphics-api/graphics-api-accessor.h>
+#include <dali/graphics-api/graphics-api-shader.h>
 
 namespace Dali
 {
@@ -109,6 +110,10 @@ public:
                    ProgramCache* programCache,
                    bool modifiesGeometry );
 
+  void SetGfxObject( const Graphics::API::Accessor<Graphics::API::Shader>& shader );
+
+  const Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject() const;
+
   /**
    * Get the program built for this shader
    * @return The program built from the shader sources.
@@ -140,6 +145,8 @@ private: // Data
   Program*                       mProgram;
 
   ConnectionChangePropagator     mConnectionObservers;
+
+  Graphics::API::Accessor<Graphics::API::Shader> mGfxShader;
 };
 
 } // namespace SceneGraph

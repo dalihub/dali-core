@@ -111,7 +111,7 @@ struct Texture::Impl
   }
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
-  bool UploadData( void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
+  bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
   {
     // create buffer
     auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
@@ -126,8 +126,8 @@ struct Texture::Impl
 
     // copy pixels to the buffer
     auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
-    std::copy( reinterpret_cast<char*>(data),
-               reinterpret_cast<char*>(data) + sizeInBytes,
+    std::copy( reinterpret_cast<const char*>(data),
+               reinterpret_cast<const char*>(data) + sizeInBytes,
                ptr );
     buffer->GetMemoryHandle()->Unmap();
 
@@ -282,7 +282,7 @@ Texture::Texture( Graphics& graphics, uint32_t width, uint32_t height, vk::Forma
  * @param size
  * @param mode
  */
-void Texture::UploadData( void* data, size_t size, TextureUploadMode mode )
+void Texture::UploadData( const void* data, size_t size, TextureUploadMode mode )
 {
   mImpl->UploadData( data, 0, U32(size) );
 }

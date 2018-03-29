@@ -15,6 +15,11 @@
  *
  */
 
+#define DEBUG_OVERRIDE_VULKAN_SHADER
+#ifdef DEBUG_OVERRIDE_VULKAN_SHADER
+#include <dali/graphics/vulkan/generated/spv-shaders-gen.h>
+#endif
+
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -518,7 +523,37 @@ void UpdateManager::RemoveShader( Shader* shader )
 void UpdateManager::SetShaderProgram( Shader* shader,
                                       Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
-  return;
+  auto& controller = mImpl->graphics.GetController();
+
+  // TODO: for now we will use hardcoded binary SPIRV shaders which will replace anything
+  // that is passed by the caller
+
+
+#ifdef DEBUG_OVERRIDE_VULKAN_SHADER
+  auto shaderRef =
+         controller.CreateShader( controller.GetShaderFactory()
+        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
+                          Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                          Graphics::API::ShaderDetails::ShaderSource( VSH_CODE ))
+        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
+                          Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                          Graphics::API::ShaderDetails::ShaderSource( FSH_CODE ))
+         );
+
+#else
+  auto shaderRef =
+  controller.CreateShader( controller.GetShaderFactory()
+        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
+                        Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                        Graphics::API::ShaderDetails::ShaderSource( shaderData->GetVertexShader() ))
+        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
+                        Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                        Graphics::API::ShaderDetails::ShaderSource( shaderData->GetFragmentShader() ))
+  );
+#endif
+  shader->SetGfxObject( shaderRef );
+
+#if 0
   if( shaderData )
   {
 
@@ -530,6 +565,7 @@ void UpdateManager::SetShaderProgram( Shader* shader,
     // Construct message in the render queue memory; note that delete should not be called on the return value
     new (slot) DerivedType( shader, &Shader::SetProgram, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
   }
+#endif
 }
 
 void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
@@ -1261,14 +1297,18 @@ void UpdateManager::UploadTextureV2( Render::Texture* texture, PixelDataPtr pixe
   //fixme:     using controller directly in the update thread
   auto& controller = mImpl->graphics.GetController();
 
-  // function returns an opaque object which has to be stored in the texture implementation
-  auto textureId = controller.CreateTextureRGBA32( pixelData->GetBuffer(), pixelData->GetBufferSize(),
-  pixelData->GetWidth(), pixelData->GetHeight());
+  auto tex = controller.CreateTexture( controller.GetTextureFactory()
+    .SetFormat( Graphics::API::TextureDetails::Format::RGBA8 )
+    .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
+    .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
+    .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
+    .SetData( pixelData->GetBuffer() )
+    .SetDataSize( pixelData->GetBufferSize() )
+  );
 
-  // AB: workaround, assigning instantly texture Id to the render object
-  texture->SetId( textureId );
-
-  std::cout << textureId << std::endl;
+  // TODO: Render::Texture will be gone, however currently it's still in use
+  // so it carries the accessor to the texture object
+  texture->SetGfxObject( tex );
 }
 
 void UpdateManager::GenerateMipmaps( Render::Texture* texture )

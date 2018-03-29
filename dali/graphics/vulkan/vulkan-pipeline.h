@@ -39,7 +39,7 @@ public:
    * @param info
    * @return
    */
-  static Handle<Pipeline> New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
+  static PipelineRef New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
 
   /**
    * Destructor
@@ -96,6 +96,23 @@ public:
    */
   const std::vector<vk::DescriptorSetLayout>& GetVkDescriptorSetLayouts() const;
 
+  /**
+   * State getters from the pipeline
+   */
+
+  const vk::PipelineInputAssemblyStateCreateInfo& GetInputAssemblyState() const;
+
+  const vk::PipelineVertexInputStateCreateInfo& GetVertexInputState() const;
+
+  const vk::PipelineViewportStateCreateInfo& GetViewportState() const;
+
+  const vk::PipelineRasterizationStateCreateInfo& GetRasterizationState() const;
+
+  const vk::PipelineMultisampleStateCreateInfo& GetMultisamplingState() const;
+
+  const vk::PipelineDepthStencilStateCreateInfo& GetDepthStencilState() const;
+
+  const vk::PipelineColorBlendStateCreateInfo& GetColorBlendState() const;
 
 private:
 

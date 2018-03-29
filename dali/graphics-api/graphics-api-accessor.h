@@ -34,15 +34,22 @@ class Accessor
 {
 public:
   Accessor(ObjectOwner< T >& owner, typename ObjectOwner< T >::Handle handle)
-  : mOwner(owner),  // save owner to access object
+  : mOwner(&owner),  // save owner to access object
     mHandle(handle) // handle to the object
+  {
+  }
+
+  Accessor(std::nullptr_t)
+  : mOwner( nullptr ),
+    mHandle( 0u )
   {
   }
 
   bool Exists() const
   {
-    return mOwner.Contains(mHandle);
+    return GetOwner().Contains(mHandle);
   }
+
   operator bool() const
   {
     return Exists();
@@ -50,12 +57,12 @@ public:
 
   T& Get()
   {
-    return mOwner[mHandle];
+    return (GetOwner())[mHandle];
   }
 
   const T& Get() const
   {
-    return mOwner[mHandle];
+    return (GetOwner())[mHandle];
   }
 
   Accessor(const Accessor&) = default;
@@ -65,7 +72,14 @@ public:
   Accessor& operator=(Accessor&&) = default;
 
 private:
-  ObjectOwner< T >&                 mOwner;
+
+  ObjectOwner< T >& GetOwner() const
+  {
+    assert( mOwner );
+    return *mOwner;
+  }
+
+  ObjectOwner< T >*                 mOwner;
   typename ObjectOwner< T >::Handle mHandle;
 };
 

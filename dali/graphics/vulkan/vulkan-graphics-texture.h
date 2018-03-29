@@ -61,7 +61,7 @@ public:
    * @param size
    * @param mode
    */
-  void UploadData( void* data, size_t size, TextureUploadMode mode );
+  void UploadData( const void* data, size_t size, TextureUploadMode mode );
 
   /**
    *
