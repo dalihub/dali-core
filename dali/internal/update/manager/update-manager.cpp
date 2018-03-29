@@ -1261,14 +1261,18 @@ void UpdateManager::UploadTextureV2( Render::Texture* texture, PixelDataPtr pixe
   //fixme:     using controller directly in the update thread
   auto& controller = mImpl->graphics.GetController();
 
-  // function returns an opaque object which has to be stored in the texture implementation
-  auto textureId = controller.CreateTextureRGBA32( pixelData->GetBuffer(), pixelData->GetBufferSize(),
-  pixelData->GetWidth(), pixelData->GetHeight());
+  auto tex = controller.CreateTexture( controller.GetTextureFactory()
+    .SetFormat( Graphics::API::TextureDetails::Format::RGBA8 )
+    .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
+    .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
+    .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
+    .SetData( pixelData->GetBuffer() )
+    .SetDataSize( pixelData->GetBufferSize() )
+  );
 
-  // AB: workaround, assigning instantly texture Id to the render object
-  texture->SetId( textureId );
-
-  std::cout << textureId << std::endl;
+  // TODO: Render::Texture will be gone, however currently it's still in use
+  // so it carries the accessor to the texture object
+  texture->SetGfxObject( tex );
 }
 
 void UpdateManager::GenerateMipmaps( Render::Texture* texture )

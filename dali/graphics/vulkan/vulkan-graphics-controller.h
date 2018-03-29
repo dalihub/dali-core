@@ -96,6 +96,12 @@ public:
   void EndFrame() override;
 
 public:
+
+  API::TextureFactory& GetTextureFactory() const override;
+
+  const API::ShaderFactory& GetShaderFactory() const override;
+
+public:
   // not copyable
   Controller( const Controller& ) = delete;
   Controller& operator=( const Controller& ) = delete;
