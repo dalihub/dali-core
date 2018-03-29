@@ -1,8 +1,5 @@
-#ifndef DALI_GRAPHICS_API_SHADER_DETAILS_H
-#define DALI_GRAPHICS_API_SHADER_DETAILS_H
-
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,39 +15,29 @@
  *
  */
 
-#include <string>
+#include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 
 namespace Dali
 {
 namespace Graphics
 {
-namespace API
+namespace VulkanAPI
 {
-namespace ShaderDetails
+ShaderFactory::ShaderFactory( Vulkan::Graphics& graphics )
 {
+}
 
-using ShaderSource = std::string;
+void ShaderFactory::SetSource( Graphics::API::ShaderDetails::PipelineStage       pipelineStage,
+                               Graphics::API::ShaderDetails::Language            language,
+                               const Graphics::API::ShaderDetails::ShaderSource& source )
+{
+}
 
-enum class Language {
-  GLSL_1,
-  GLSL_3_1,
-  GLSL_3_2,
-  SPIRV_1_0,
-  SPIRV_1_1,
-};
+std::unique_ptr<Graphics::API::Shader> ShaderFactory::Create() const
+{
+  return nullptr;
+}
 
-enum class PipelineStage {
-  VERTEX,
-  GEOMETRY,
-  FRAGMENT,
-  COMPUTE,
-  TESSELATION_CONTROL,
-  TESSELATION_EVALUATION,
-};
-
-} // namespace TextureDetails
-} // namespace API
+} // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali
-
-#endif // DALI_GRAPHICS_API_SHADER_DETAILS_H

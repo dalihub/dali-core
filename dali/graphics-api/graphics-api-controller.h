@@ -40,6 +40,7 @@ namespace Graphics
 {
 namespace API
 {
+class ShaderFactory;
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
@@ -99,6 +100,18 @@ public:
   {
     return 0;
   }
+
+  /**
+   * @brief Returns texture factory
+   * @return
+   */
+  virtual TextureFactory& GetTextureFactory() const = 0;
+
+  /**
+   * @brief Returns shader factory
+   * @return
+   */
+  virtual const ShaderFactory& GetShaderFactory() const = 0;
 
   /**
    * @brief Create a buffer
