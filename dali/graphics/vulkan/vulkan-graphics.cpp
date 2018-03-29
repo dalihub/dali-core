@@ -299,7 +299,7 @@ SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
 {
   auto swapchain = Swapchain::New( *this,
                                    GetGraphicsQueue(0u),
-                                   surface, 2, 0 );
+                                   surface, 4, 0 );
 
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
