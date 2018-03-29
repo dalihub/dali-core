@@ -373,6 +373,7 @@ void Renderer::SetShader( Shader* shader )
   mShader = shader;
   mShader->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mResendFlag |= RESEND_GEOMETRY;
 
   if( mRenderDataProvider )
   {
