@@ -103,6 +103,10 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 
 std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
 {
+  //auto propertyCount = (static_cast <uint32_t> (0)) ;
+
+  //auto extensions = vk::enumerateInstanceExtensionProperties(NULL, &propertyCount, NULL);
+ 
   auto extensions = vk::enumerateInstanceExtensionProperties();
 
   std::string extensionName;
@@ -127,7 +131,7 @@ std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
       waylandAvailable = true;
     }
   }
-
+ 
   std::vector<const char*> retval;
 
   // depending on the platform validate extensions

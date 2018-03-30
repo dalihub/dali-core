@@ -44,26 +44,27 @@ gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods
             -Wstack-usage=256 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
 
 # -Wfloat-equal causes issues with vulkan.hpp, removed for now
-cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
-                    -Wshadow \
+# -Wcast-aligh, -Wsign-coversion cause build issues, removed for now (20180205)
+cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion \
                     -Wlarger-than=1024 -Wframe-larger-than=256 \
-                    -Wcast-qual -Wcast-align \
-                    -Wconversion -Wsign-conversion
+                    -Wcast-qual \
+                    -Wconversion
 
 # the following warnings should not be enforced
-cxx_warnings_to_remove = \
-                         -Wno-c++98-compat \
-                         -Wno-unused-parameter
+cxx_warnings_to_remove = -Wno-missing-field-initializers \
+                         -Wno-unused-parameter \
+                         -Wno-unused-but-set-variable \
+                         -fno-strict-aliasing
 
 #the following warnings should be added back when possible
-cxx_warnings_to_preserve = \
-                           -Wno-weak-vtables
+#cxx_warnings_to_preserve = \
+#                           -Wno-weak-vtables
 
 #cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Weffc++ -Wpedantic \
-#            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
+#            $(cxx_more_warnings) $(cxx_warnings_to_remove)
 # vulkan.hpp doesn't pass all c++ checks
 cxx_flags = -fPIC -std=c++14 -Werror -Wall -Wextra -Wpedantic \
-            $(cxx_more_warnings) $(cxx_warnings_to_remove) $(cxx_warnings_to_preserve)
+            $(cxx_more_warnings) $(cxx_warnings_to_remove)
 
 if VULKAN_SDK_SET
     vulkan_flags = -DVULKAN_HPP_NO_EXCEPTIONS
@@ -73,5 +74,4 @@ libdali_graphics_a_CXXFLAGS = $(cxx_flags) \
                               $(dali_core_includes) \
                               $(DALI_CFLAGS) \
                               $(vulkan_flags)
-
 
