@@ -11,6 +11,9 @@ Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
+BuildRequires:  Vulkan-LoaderAndValidationLayers
+BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
+
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -19,6 +22,8 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %if 0%{?tizen_version_major} < 4
 %define disable_cxx03_build 1
 %endif
+
+%define disable_cxx03_build 0
 
 %description
 DALi 3D Engine
@@ -104,7 +109,7 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+CXXFLAGS=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -std=c++14 -std=gnu++14 "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions "
 
 %ifarch %{arm}
@@ -149,6 +154,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
+      --enable-vulkan="1.0" \
       --infodir=%{_infodir} \
       --enable-rename-so=no
 
@@ -185,6 +191,7 @@ make clean
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
+      --enable-vulkan="1.0" \
       --infodir=%{_infodir} \
       --enable-rename-so=no
 

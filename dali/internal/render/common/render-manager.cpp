@@ -155,9 +155,11 @@ RenderQueue& RenderManager::GetRenderQueue()
 
 void RenderManager::ContextCreated()
 {
-  mImpl->context.GlContextCreated();
-  mImpl->programController.GlContextCreated();
 
+  // Need to clean regarding to 'GL'.
+  // Temporally, removed 'GlContextCreated()'.
+  // mImpl->context.GlContextCreated();
+  // mImpl->programController.GlContextCreated();
   // renderers, textures and gpu buffers cannot reinitialize themselves
   // so they rely on someone reloading the data for them
 }

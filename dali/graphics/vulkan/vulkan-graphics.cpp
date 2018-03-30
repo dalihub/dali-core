@@ -103,7 +103,9 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 
 std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
 {
-  auto extensions = vk::enumerateInstanceExtensionProperties();
+  auto propertyCount = (static_cast <uint32_t> (0)) ;
+
+  auto extensions = vk::enumerateInstanceExtensionProperties(NULL, &propertyCount, NULL);
 
   std::string extensionName;
 
