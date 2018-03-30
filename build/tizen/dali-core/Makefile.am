@@ -44,13 +44,15 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                         -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
                          $(cxx_flags) \
                          $(dali_core_includes) \
-                         $(DALI_CFLAGS)
-
+                         $(DALI_CFLAGS) \
+                         -Wno-unused-but-set-variable \
+		 	 -fno-strict-aliasing
 
 DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
 
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
-                      $(VULKAN_LIBS) \
+                      $(libdir)/libvulkan.so \
+                     # $(VULKAN_LIBS) \
                       -lpthread
 
 dali_core_includes = \
@@ -168,7 +170,8 @@ if ENABLE_CXX03_ABI
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
   libdali-core.la \
-  $(VULKAN_LIBS)
+  $(libdir)/libvulkan.so
+  #$(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename
@@ -183,7 +186,8 @@ else
 linker_test_DEPENDENCIES = libdali-core-cxx11.la
 linker_test_LDADD = \
   libdali-core-cxx11.la \
-  $(VULKAN_LIBS)
+  $(libdir)/libvulkan.so
+#  $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename

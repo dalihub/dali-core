@@ -33,7 +33,7 @@ AC_SUBST(DALI_VERSION)
 DALI_CFLAGS=-DPLATFORM_TIZEN
 
 # Use C++ 11
-DALI_CFLAGS="$DALI_CFLAGS -std=c++14 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal"
+DALI_CFLAGS="$DALI_CFLAGS -std=c++14 -std=gnu++14 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal"
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],
@@ -126,17 +126,20 @@ DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
 DALI_LDFLAGS="-L${libdir}"
 
 # forward VULKAN_SDK path to the graphics library if set correctly
-if test x"$enable_vulkan" != x"no"; then
+#if test x"$enable_vulkan" != x"no"; then
+if test x"$enable_vulkan" = "xyes"; then
   PKG_CHECK_MODULES(VULKAN, vulkan-${enable_vulkan}, AC_DEFINE(ENABLE_VULKAN, 1, [Vulkan available as package]),
                     [ AC_MSG_ERROR([Vulkan not available as a package!]) ]
                     )
-  DALI_LDFLAGS+=" ${VULKAN_LIBS}"
+#  DALI_LDFLAGS+=" ${VULKAN_LIBS}"
+  DALI_LDFLAGS+="$(libdir)/libvulkan.so"
   DALI_CFLAGS+=" ${VULKAN_CFLAGS}"
   AC_SUBST(VULKAN_SDK)
   AC_SUBST(VULKAN_LIBS)
   AC_SUBST(VULKAN_CFLAGS)
 fi
-AM_CONDITIONAL([VULKAN_SDK_SET], [test x"$enable_vulkan" != x"no"])
+#AM_CONDITIONAL([VULKAN_SDK_SET], [test x"$enable_vulkan" != x"no"])
+AM_CONDITIONAL([VULKAN_SDK_SET], [test x"$enable_vulkan" = xyes])
 
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
