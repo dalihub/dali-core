@@ -117,8 +117,9 @@ void Context::GlContextCreated()
 
   mGlContextCreated = true;
 
+  // Need to clean regarding to 'GL'.
+  // Temporally, removed 'InitializeGlState()'.
   // Set the initial GL state, and check it.
-  InitializeGlState();
 
 #ifdef DEBUG_ENABLED
   PrintCurrentState();
