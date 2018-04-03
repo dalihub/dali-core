@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -121,6 +122,14 @@ struct Swapchain::Impl
 
     Create();
 
+    mFences[0] = Fence::New( mGraphics, true );
+    mFences[1] = Fence::New( mGraphics, true );
+
+    mSemaphores[0] = VkAssert (mGraphics.GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics.GetAllocator() ));
+    mSemaphores[1] = VkAssert (mGraphics.GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics.GetAllocator() ));
+    mSemaphores[2] = VkAssert (mGraphics.GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics.GetAllocator() ));
+    mSemaphores[3] = VkAssert (mGraphics.GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics.GetAllocator() ));
+
     InitialiseSwapchainBuffers();
 
     PrepareFramebuffers();
@@ -142,7 +151,7 @@ struct Swapchain::Impl
       swapBuffer.index             = 0;
       swapBuffer.masterCmdBuffer   = masterCmd;
       swapBuffer.masterCommandPool = cmdPool;
-      swapBuffer.endOfFrameFence   = Fence::New( mGraphics );
+      // swapBuffer.endOfFrameFence   = Fence::New( mGraphics, true );
       swapBuffer.firstUse          = true;
       mSwapchainBuffer.emplace_back( swapBuffer );
     }
@@ -409,20 +418,16 @@ struct Swapchain::Impl
   {
     const auto& device    = mGraphics.GetDevice();
 
-    if( !mFrameFence )
-    {
-      mFrameFence = Fence::New( mGraphics );
-    }
+    mNumFrames = (mNumFrames + 1) % 2;
+
+    mFences[mNumFrames]->Wait( 0u );
+    mFences[mNumFrames]->Reset();
 
     mCurrentBufferIndex =
-      VkAssert( device.acquireNextImageKHR( mSwapchainKHR, 1000000, nullptr, mFrameFence->GetFence() ) );
-
-    mFrameFence->Wait();
-    mFrameFence->Reset();
-
-    auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
+      VkAssert( device.acquireNextImageKHR( mSwapchainKHR, UINT32_MAX, mSemaphores[mNumFrames], nullptr ) );
 
     // start recording
+    auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
     auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
       .setFramebuffer( swapBuffer.framebuffer->GetVkFramebuffer() )
       .setRenderPass(swapBuffer.framebuffer->GetVkRenderPass())
@@ -518,9 +523,7 @@ struct Swapchain::Impl
     swapBuffer.masterCmdBuffer->End();
 
     // submit
-    swapBuffer.endOfFrameFence->Reset();
-    mQueue.Submit( swapBuffer.masterCmdBuffer, swapBuffer.endOfFrameFence );
-    swapBuffer.endOfFrameFence->Wait( 0u );
+    mQueue.Submit( swapBuffer.masterCmdBuffer, mSemaphores[mNumFrames], mSemaphores[mNumFrames + 2], mFences[mNumFrames] );
 
     // fixme: use semaphores to synchronize all previously submitted command buffers!
     vk::PresentInfoKHR presentInfo{};
@@ -529,7 +532,7 @@ struct Swapchain::Impl
       .setPResults( &result )
       .setPSwapchains( &mSwapchainKHR )
       .setSwapchainCount( 1 )
-      .setPWaitSemaphores( nullptr )
+      .setPWaitSemaphores( &mSemaphores[mNumFrames + 2] )
       .setWaitSemaphoreCount( 0 );
     mQueue.Present( presentInfo );
 
@@ -565,6 +568,11 @@ struct Swapchain::Impl
   uint32_t mBufferCount;
   uint32_t mFlags;
   uint32_t mCurrentBufferIndex;
+
+  //dkdk
+  uint32_t mNumFrames;
+  FenceRef mFences[2];
+  vk::Semaphore mSemaphores[4];
 
   FenceRef mFrameFence;
 

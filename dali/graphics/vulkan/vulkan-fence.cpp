@@ -53,6 +53,18 @@ struct Fence::Impl
     return vk::Result::eErrorInitializationFailed;
   }
 
+  vk::Result Initialise(bool isSignaled)
+  {
+    vk::FenceCreateInfo info;
+    if (isSignaled)
+      info.setFlags(vk::FenceCreateFlagBits::eSignaled);
+
+    mFence = VkAssert( mGraphics.GetDevice().createFence( info, mGraphics.GetAllocator() ) );
+    if( mFence )
+      return vk::Result::eSuccess;
+    return vk::Result::eErrorInitializationFailed;
+  }
+
   /**
    *
    * @param timeout
@@ -107,6 +119,19 @@ Handle<Fence> Fence::New( Graphics& graphics )
 {
   auto retval = Handle<Fence>( new Fence(graphics) );
   if( vk::Result::eSuccess == retval->mImpl->Initialise() )
+  {
+    return retval;
+  }
+  return Handle<Fence>();
+}
+
+//Init value is signaled.
+Handle<Fence> Fence::New( Graphics& graphics, bool isSignaled )
+{
+  auto retval = Handle<Fence>( new Fence(graphics) );
+
+  //
+  if( vk::Result::eSuccess == retval->mImpl->Initialise(isSignaled) )
   {
     return retval;
   }
