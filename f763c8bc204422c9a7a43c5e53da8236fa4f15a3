@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a6d8a190_3e50f4b0",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "remove if not needed",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "499d41e6_c3c1af1a",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "does this still build on Ubuntu?",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f36e6f3_04d1022f",
+        "filename": "build/tizen/configure.ac",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "remove this line if not needed",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64849642_b99a0300",
+        "filename": "build/tizen/dali-core/Makefile.am",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "does this still build on Ubuntu?",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb631cd9_bcf5a975",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "this file doesn\u0027t seem to have any relevant changes, it shouldn\u0027t be a part of this commit",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "33aca1da_619fb9eb",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "all commented, remove",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2047a9ba_a137ce87",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "95ecd552_c1d25b2a",
+        "filename": "dali/internal/render/common/render-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-03T14:28:49Z",
+      "side": 1,
+      "message": "just delete these lines, don\u0027t leave commented code",
+      "revId": "f763c8bc204422c9a7a43c5e53da8236fa4f15a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
