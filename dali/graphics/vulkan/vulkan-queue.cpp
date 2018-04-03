@@ -103,6 +103,12 @@ std::unique_ptr< Submission > Queue::Submit( CommandBufferRef commandBuffer, Han
   return Submit(buffers, fence);
 }
 
+std::unique_ptr< Submission > Queue::Submit( CommandBufferRef commandBuffer, vk::Semaphore& waitSemaphore, vk::Semaphore& signalSemaphore, Handle<Fence> fence)
+{
+  auto buffers = std::vector< CommandBufferRef >({commandBuffer});
+  return Submit(buffers, waitSemaphore, signalSemaphore, fence);
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
 std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef >& commandBuffers, Handle<Fence> fence)
@@ -122,6 +128,31 @@ std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef 
   info.setWaitSemaphoreCount(u32(semaphores.waitSemaphores.size()));
   info.setPWaitSemaphores(semaphores.waitSemaphores.data());
   info.setPWaitDstStageMask(semaphores.waitDstStageMasks.data());
+
+  VkAssert(mQueue.submit(1, &info, fence ? fence->GetFence() : nullptr ));
+
+  return MakeUnique< Submission >(fence);
+}
+
+std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef >& commandBuffers, vk::Semaphore& waitSemaphore, 
+                                            vk::Semaphore& signalSemaphore, Handle<Fence> fence)
+{
+  // Prepare command buffers for submission
+  auto buffers = PrepareBuffers(commandBuffers);
+
+  // auto semaphores = PrepareSemaphores(commandBuffers);
+
+  auto info = vk::SubmitInfo{};
+  vk::PipelineStageFlags waitDstStageMasks = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+
+  /* semaphores per command buffer */
+  info.setCommandBufferCount(u32(commandBuffers.size()));
+  info.setPCommandBuffers(buffers.data());
+  info.setSignalSemaphoreCount(1);
+  info.setPSignalSemaphores(&signalSemaphore);
+  info.setWaitSemaphoreCount(1);
+  info.setPWaitSemaphores(&waitSemaphore);
+  info.setPWaitDstStageMask(&waitDstStageMasks);
 
   VkAssert(mQueue.submit(1, &info, fence ? fence->GetFence() : nullptr ));
 
