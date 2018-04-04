@@ -38,7 +38,8 @@ namespace SceneGraph
 Shader::Shader( Dali::Shader::Hint::Value& hints )
 : mHints( hints ),
   mProgram( NULL ),
-  mConnectionObservers()
+  mConnectionObservers(),
+  mGfxShader( nullptr )
 {
   AddUniformMapObserver( *this );
 }
@@ -61,6 +62,16 @@ void Shader::SetProgram( Internal::ShaderDataPtr shaderData,
   // The program cache owns the Program object so we don't need to worry about this raw allocation here.
 
   mConnectionObservers.ConnectionsChanged(*this);
+}
+
+void Shader::SetGfxObject( const Graphics::API::Accessor<Graphics::API::Shader>& shader )
+{
+  mGfxShader = shader;
+}
+
+const Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject() const
+{
+  return mGfxShader;
 }
 
 Program* Shader::GetProgram()

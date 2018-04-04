@@ -74,18 +74,12 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     if(item.mTextureSet)
     {
 
-      InternalTextureSet* textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
+      auto textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
 
-      auto textureId = textureSet->GetTexture(0)->GetId();
+      auto& texture = textureSet->GetTexture(0)->GetGfxObject();
+      auto textureId = texture.GetHandle();
 
-      std::cout << "TextureCount: " << textureSet->GetTextureCount() <<
-                ", texture id: " << textureId <<
-      std::endl;
-      opaqueTextureId = textureId;
-    }
-    else
-    {
-      std::cout << "TextureCount: 0";
+      opaqueTextureId = uint32_t(textureId); // TODO: AB: hack!!!
     }
     Matrix::Multiply( data[i].world, item.mModelMatrix, viewProjection );
     data[i].color = item.mNode->GetWorldColor( bufferIndex );

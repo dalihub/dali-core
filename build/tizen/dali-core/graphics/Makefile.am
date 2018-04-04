@@ -46,14 +46,15 @@ gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods
 # -Wfloat-equal causes issues with vulkan.hpp, removed for now
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
                     -Wshadow \
-                    -Wlarger-than=1024 -Wframe-larger-than=256 \
+                    -Wlarger-than=1024 \
                     -Wcast-qual -Wcast-align \
                     -Wconversion -Wsign-conversion
 
 # the following warnings should not be enforced
 cxx_warnings_to_remove = \
                          -Wno-c++98-compat \
-                         -Wno-unused-parameter
+                         -Wno-unused-parameter \
+                         -Wno-unknown-warning-option
 
 #the following warnings should be added back when possible
 cxx_warnings_to_preserve = \
