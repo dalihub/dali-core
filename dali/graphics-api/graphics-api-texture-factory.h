@@ -33,13 +33,15 @@ namespace API
 /**
  * @brief Interface class for TextureFactory types in the graphics API.
  */
-class TextureFactory : BaseFactory< Texture >
+class TextureFactory : public BaseFactory<Texture>
 {
 public:
-  virtual void SetType(TextureDetails::Type type)             = 0;
-  virtual void SetSize(const RectSize& size)                  = 0;
-  virtual void SetFormat(TextureDetails::Format format)       = 0;
-  virtual void SetMipMapFlag(TextureDetails::MipMapFlag mipMSapFlag) = 0;
+  virtual TextureFactory& SetType(TextureDetails::Type type)             = 0;
+  virtual TextureFactory& SetSize(const RectSize& size)                  = 0;
+  virtual TextureFactory& SetFormat(TextureDetails::Format format)       = 0;
+  virtual TextureFactory& SetMipMapFlag(TextureDetails::MipMapFlag mipMSapFlag) = 0;
+  virtual TextureFactory& SetData( void* pData )                         = 0;
+  virtual TextureFactory& SetDataSize( uint32_t dataSizeInBytes )        = 0;
 
   // not copyable
   TextureFactory(const TextureFactory&) = delete;

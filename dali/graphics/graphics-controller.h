@@ -66,7 +66,6 @@ public:
 
   ~Controller() override;
 
-
 protected:
   ObjectOwner< API::Shader >        mShaders;
   ObjectOwner< API::Texture >       mTextures;

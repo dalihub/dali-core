@@ -39,7 +39,7 @@ public:
   virtual ~Texture() = default;
 
 protected:
-  // derived types should not be moved direcly to prevent slicing
+  // derived types should not be moved directly to prevent slicing
   Texture(Texture&&) = default;
   Texture& operator=(Texture&&) = default;
 
