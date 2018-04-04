@@ -32,15 +32,15 @@ namespace API
 /**
  * @brief Interface class for ShaderFactory types in the graphics API.
  */
-class ShaderFactory : BaseFactory< Shader >
+class ShaderFactory : public BaseFactory<Shader>
 {
 public:
   /**
    * @brief Set the source for a pipeline stage
    */
-  virtual void SetSize(ShaderDetails::PipelineStage       pipelineStage,
-                       ShaderDetails::Language            language,
-                       const ShaderDetails::ShaderSource& source) = 0;
+  virtual ShaderFactory& SetShaderModule(ShaderDetails::PipelineStage       pipelineStage,
+                                         ShaderDetails::Language            language,
+                                         const ShaderDetails::ShaderSource& source) = 0;
 
   // not copyable
   ShaderFactory(const ShaderFactory&) = delete;

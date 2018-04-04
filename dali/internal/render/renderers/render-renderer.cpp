@@ -531,10 +531,14 @@ void Renderer::Render( Context& context,
                        const Vector3& size,
                        bool blend )
 {
+  // TODO: AB: no callig any GL now, to avoid asserts whole function commented out
+  return;
+#if 0
   // Get the program to use:
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
   {
+
     DALI_LOG_ERROR( "Failed to get program for shader at address %p.\n", reinterpret_cast< void* >( &mRenderDataProvider->GetShader() ) );
     return;
   }
@@ -584,6 +588,7 @@ void Renderer::Render( Context& context,
                               mIndexedDrawFirstElement,
                               mIndexedDrawElementsCount );
   }
+#endif
 }
 
 void Renderer::SetSortAttributes( BufferIndex bufferIndex,

@@ -28,6 +28,8 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-sampler.h>
 #include <dali/graphics-api/graphics-api-shader.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-api-shader-factory.h>
 #include <dali/graphics-api/graphics-api-static-buffer.h>
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture-set.h>
@@ -40,6 +42,7 @@ namespace Graphics
 {
 namespace API
 {
+class ShaderFactory;
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
@@ -90,15 +93,16 @@ public:
   virtual void GetRenderItemList() = 0;
 
   /**
-   * Temporary way of instantiating new texture through controller
-   * @param width
-   * @param height
+   * @brief Returns texture factory
    * @return
    */
-  virtual void* CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
-  {
-    return 0;
-  }
+  virtual TextureFactory& GetTextureFactory() const = 0;
+
+  /**
+   * @brief Returns shader factory
+   * @return
+   */
+  virtual ShaderFactory& GetShaderFactory() const = 0;
 
   /**
    * @brief Create a buffer
