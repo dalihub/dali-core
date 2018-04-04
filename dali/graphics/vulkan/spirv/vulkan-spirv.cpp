@@ -15,9 +15,10 @@
  *
  */
 
+#include <iostream>
+
 #include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 #include <dali/graphics/vulkan/spirv/vulkan-spirv-opcode.h>
-#include <iostream>
 
 #define debug( x ) std::cout << x << std::endl;
 
@@ -29,7 +30,6 @@ namespace Vulkan
 {
 namespace SpirV
 {
-
 SPIRVShader::Impl& SPIRVShader::GetImplementation() const
 {
   return *mImpl;
@@ -83,7 +83,7 @@ struct SPIRVShader::Impl
    */
   struct ResourceDescriptor
   {
-    Pointer*     pointer;
+    Pointer* pointer;
 
     uint32_t descriptorSet{0u};
     uint32_t binding{0u};
@@ -93,6 +93,20 @@ struct SPIRVShader::Impl
     vk::DescriptorType descriptorType{};
     std::string        name{};
   };
+
+  /**
+   * Structure describes each uniform block member
+   */
+  struct BlockMemberDescriptor
+  {
+    uint32_t    blockId{0u};
+    uint32_t    location{0u};
+    uint32_t    offset{0u};
+    uint32_t    size{0u};
+    std::string name{};
+  };
+
+  std::unordered_map<uint32_t, std::vector<BlockMemberDescriptor>> blockStructure;
 
   /**
    * Contains array of resources per storage type
@@ -107,6 +121,15 @@ struct SPIRVShader::Impl
   SPIRVOpCode& FindByResultId( uint32_t resultId ) const
   {
     return *( opResults[resultId] );
+  }
+
+  SPIRVOpCode* FindByResultPtrId( uint32_t resultId ) const
+  {
+    if( resultId < opResults.size() )
+    {
+      return opResults[resultId];
+    }
+    return nullptr;
   }
 
   /**
@@ -170,13 +193,25 @@ struct SPIRVShader::Impl
     return OP_CODE_NULL;
   }
 
-  auto FindDecorationsForId( uint32_t id ) const
+  auto FindDecorationsForId( uint32_t id )
   {
-    std::vector<const SPIRVOpCode*> retval{};
-
+    std::vector<SPIRVOpCode*> retval{};
     for( auto&& op : opCodes )
     {
       if( op.code == SpvOpDecorate && op.GetParameterU32( 0 ) == id )
+      {
+        retval.push_back( &op );
+      }
+    }
+    return retval;
+  }
+
+  auto FindMemberDecorationsForId( uint32_t id, uint32_t memberIndex )
+  {
+    std::vector<SPIRVOpCode*> retval{};
+    for( auto&& op : opCodes )
+    {
+      if( op.code == SpvOpMemberDecorate && op.GetParameterU32( 0 ) == id && op.GetParameterU32( 1 ) == memberIndex )
       {
         retval.push_back( &op );
       }
@@ -188,8 +223,6 @@ struct SPIRVShader::Impl
   {
     return FindByResultId( opCode.GetParameterU32( refIndex ) );
   }
-
-
 
   auto GetDecorationsOpId( const SPIRVOpCode& resultOp )
   {
@@ -223,14 +256,302 @@ struct SPIRVShader::Impl
     return false;
   }
 
-  bool Initialise()
+  struct OpVariableDecorationInfo
   {
+    OpVariableDecorationInfo() = default;
+    OpVariableDecorationInfo( const OpVariableDecorationInfo& ) = default;
+    OpVariableDecorationInfo& operator=( const OpVariableDecorationInfo& ) = default;
+    OpVariableDecorationInfo( OpVariableDecorationInfo&& ) = delete;
+    OpVariableDecorationInfo& operator=( OpVariableDecorationInfo&& ) = delete;
+
+    std::string                                     name{};
+    SPIRVOpCode*                                    op{nullptr};
+    SpvStorageClass                                 storage{SpvStorageClassMax};
+    std::unordered_map<SpvDecoration, SPIRVOpCode*> decorations{};
+    std::vector<OpVariableDecorationInfo>           members{}; // used by structs only
+    uint32_t                                        structSize{0u};
+  };
+
+
+  template<class V>
+  struct GetResult
+  {
+    GetResult( bool v, V& value)
+    : success(v), result(&value)
+    {
+    }
+
+    GetResult( bool v )
+      : success(v), result(nullptr)
+    {
+    }
+
+    operator V&()
+    {
+      return *result;
+    }
+
+    operator V*()
+    {
+      return result;
+    }
+
+    GetResult() : success( false ), result(nullptr){}
+    bool  success;
+    V*     result;
+  };
+  template<class K, class V>
+  GetResult<V> GetMapItem( std::unordered_map<K,V>& map, const K& key )
+  {
+    auto iter = map.find( key );
+    if( iter == map.end() )
+    {
+      return GetResult<V>( false );
+    }
+
+    return GetResult<V>( true, iter->second );
+  }
+
+  struct SPIRVTypeInfo
+  {
+    vk::Format  vkType;
+    uint32_t    sizeInBytes;
+    uint32_t    components;
+    uint32_t    componentSizeInBytes;
+  };
+
+  auto GetTypeInfo( SPIRVOpCode& typeOpCode )
+  {
+    SPIRVTypeInfo retval;
+
+    // note: always assumed:
+    // - not normalized
+    // - float
+    // - signed
+    if( typeOpCode == SpvOpTypeMatrix )
+    {
+      retval.components = typeOpCode.GetParameterU32( 2 );
+      retval.componentSizeInBytes = sizeof(float);
+      retval.sizeInBytes = (retval.components*retval.components)*retval.componentSizeInBytes;
+      retval.vkType = vk::Format::eUndefined; // no format for matrix
+    }
+    else if(typeOpCode == SpvOpTypeVector)
+    {
+      retval.components = typeOpCode.GetParameterU32( 2 );
+      retval.componentSizeInBytes = sizeof(float);
+      retval.sizeInBytes = retval.components*retval.componentSizeInBytes;
+
+      const vk::Format VEC[] =
+                         {
+                           vk::Format::eUndefined,
+                           vk::Format::eR32Sfloat,
+                           vk::Format::eR32G32Sfloat,
+                           vk::Format::eR32G32B32Sfloat,
+                           vk::Format::eR32G32B32A32Sfloat,
+                         };
+
+      retval.vkType = VEC[retval.components]; // no format for matrix
+    }
+    else if(typeOpCode == SpvOpTypeFloat)
+    {
+      retval.components = 1;
+      retval.componentSizeInBytes = sizeof(float);
+      retval.sizeInBytes = sizeof(float);
+      retval.vkType = vk::Format::eR32Sfloat;
+    }
+    else if(typeOpCode == SpvOpTypeInt)
+    {
+      retval.components = 1;
+      retval.componentSizeInBytes = sizeof(uint32_t);
+      retval.sizeInBytes = sizeof(uint32_t);
+      retval.vkType = vk::Format::eR32Sint;
+    }
+
+    return retval;
+  }
+
+  std::unordered_map<uint32_t, OpVariableDecorationInfo> reflectionData;
+
+  auto CollectVariables()
+  {
+    // collect variables
+    using MemberNameArray = std::vector<SPIRVOpCode*>;
+    auto vars = std::vector<SPIRVOpCode*>{};
+    auto opNames = std::unordered_map<uint32_t, SPIRVOpCode*>{};
+
+    // member names, key: struct id, value: ordered vector of OpMemberName ops
+    auto opMemberNames = std::unordered_map<uint32_t, MemberNameArray>{};
+    for( auto&& op : opCodes )
+    {
+      auto id = op.GetParameterU32(0);
+      if( op == SpvOpVariable )
+      {
+        vars.push_back( &op );
+      }
+      else if( op == SpvOpName )
+      {
+        opNames.emplace( id, &op );
+      }
+      else if( op == SpvOpMemberName )
+      {
+        GetResult<MemberNameArray> result{};
+        MemberNameArray* memberNames{ nullptr };
+        if( !(result = GetMapItem( opMemberNames, id )).success )
+        {
+          opMemberNames.emplace(id, MemberNameArray{} );
+          memberNames = &opMemberNames[id];
+        }
+        else
+        {
+          memberNames = result.result;
+        }
+
+        if(memberNames->size() <= op.GetParameterU32(1))
+          memberNames->resize( op.GetParameterU32(1)+1 );
+        (*memberNames)[op.GetParameterU32(1)] = &op;
+      }
+    }
+
+    // find uniforms and inputs
+    auto decorationVariables = std::unordered_map<uint32_t, OpVariableDecorationInfo>{};
+    auto uniformVariables = std::vector<SPIRVOpCode*>{};
+    auto inputVariables   = std::vector<SPIRVOpCode*>{};
+    auto outputVariables  = std::vector<SPIRVOpCode*>{};
+    for( auto&& op : vars )
+    {
+      auto storage = op->GetParameter<SpvStorageClass>( 2 );
+      bool varFound{false};
+      if( storage == SpvStorageClassUniform || storage == SpvStorageClassUniformConstant )
+      {
+        uniformVariables.emplace_back( op );
+        varFound = true;
+      }
+      else if( storage == SpvStorageClassInput )
+      {
+        inputVariables.emplace_back( op );
+        varFound = true;
+      }
+      else if( storage == SpvStorageClassOutput )
+      {
+        outputVariables.emplace_back( op );
+        varFound = true;
+      }
+
+      // find decorations if variable
+      if( varFound )
+      {
+        auto id = op->localData.resultId;
+        auto decorations = FindDecorationsForId( id );
+        OpVariableDecorationInfo decorationInfo;
+        decorationInfo.op = op;
+        decorationInfo.storage = storage;
+        for( auto&& decoration : decorations )
+        {
+          auto decorationQualifier = decoration->GetParameter<SpvDecoration>( 1 );
+          decorationInfo.decorations.emplace( decorationQualifier, decoration );
+          std::cout << decorationQualifier << std::endl;
+        }
+        decorationVariables.emplace( id, decorationInfo );
+
+        // store name if element is named
+        GetResult<SPIRVOpCode*> name{};
+
+        bool foundName = false;
+        if( (name = GetMapItem( opNames, id )).success )
+        {
+
+          // variable may not be named ( global scope of the shader )
+          if( !(*name.result)->GetParameterAsString( 1 ).empty() )
+          {
+            std::cout <<"Found name\n";
+            decorationVariables[id].name = (*name.result)->GetParameterAsString( 1 );
+            foundName = true;
+          }
+        }
+
+        // continue if name hasn't been found, this means the variable is an uniform
+        // in the global scope
+        if( !foundName )
+        {
+          auto pointerId = op->GetParameterU32(0);
+          auto pointer = FindByResultId( pointerId );
+          auto pointerToType = FindByResultId( pointer.GetParameterU32(2) );
+
+          // find name of the structure
+          GetResult<SPIRVOpCode*> retval{};
+          if( (retval = GetMapItem( opNames, pointerToType.localData.resultId )).success )
+          {
+            std::cout << "Found: " << (*retval.result)->GetParameterAsString(1) << std::endl;
+            decorationVariables[id].name = (*retval.result)->GetParameterAsString(1);
+          }
+
+          // depending on the type, we may need to extract members, member types as well
+          // as other relevant data
+          if( pointerToType == SpvOpTypeStruct )
+          {
+
+            auto memberCount = pointerToType.localData.count-2;
+            std::cout << "Found struct, look for member names and member decorations: "
+                      "member count: " << memberCount << std::endl;
+
+            // for each member resolve type and compute size of the structure
+            auto memberNames = opMemberNames[ pointerToType.localData.resultId ];
+            for( auto i = 0u; i < memberCount; ++i )
+            {
+              auto& memberName = memberNames[i];
+              OpVariableDecorationInfo memberOpInfo;
+              memberOpInfo.name = memberName->GetParameterAsString(2);
+              auto memberResultId = pointerToType.GetParameterU32( i+1 );
+              memberOpInfo.op = FindByResultPtrId( memberResultId );
+
+              // look for decoration for each member ( needed in order to build data structures )
+              auto memberDecorationOps = FindMemberDecorationsForId( pointerToType.localData.resultId, i );
+              for( auto&& mop : memberDecorationOps )
+              {
+                memberOpInfo.decorations.emplace( mop->GetParameter<SpvDecoration>( 2 ), mop );
+              }
+              decorationVariables[id].members.emplace_back(memberOpInfo);
+              std::cout << "memberName: " << memberName->GetParameterAsString(2);
+              std::cout << std::endl;
+            }
+
+            uint32_t structSize = 0u;
+            // for last member update size of the data structure ( for blocks only )
+            if(memberCount)
+            {
+              if( memberCount > 0 )
+              {
+                //auto& lastMember = decorationVariables[id].members.back();
+                //structSize += preLastMember.decorations[SpvDecorationOffset]->GetParameterU32(3);
+
+                // test last type
+
+              }
+              decorationVariables[id].structSize = structSize;
+            }
+            std::cout << "struct size: " << structSize << std::endl;
+
+          }
+        }
+      }
+    }
+
+    std::cout << "Found " << uniformVariables.size() << " variables\n";
+
+    return decorationVariables;
+  }
+
+
+  auto LoadOpCodes( const std::vector<SPIRVWord>& _data )
+  {
+    auto retval = std::vector<SPIRVOpCode>{};
+
     // test if we have valid SPIRV header
     auto iter = data.begin();
     if( !CheckHeader() )
     {
       debug( "Not SPIRV!" );
-      return false;
+      return retval;
     }
 
     debug( "SPIR-V detected" );
@@ -242,8 +563,6 @@ struct SPIRVShader::Impl
       auto wordCount = ( ( opword >> 16 ) & 0xFFFF );
       auto opCode    = ( (opword)&0xFFFF );
 
-      //debug( "wordCount: " << wordCount << " opcode: " << opCode );
-
       auto& op = FindOpCode( opCode );
 
       if( op != OP_CODE_NULL )
@@ -253,8 +572,8 @@ struct SPIRVShader::Impl
         int32_t  resultType{0u};
 
         // make a copy
-        opCodes.emplace_back( op );
-        auto& opcode           = opCodes.back();
+        retval.emplace_back( op );
+        auto& opcode           = retval.back();
         opcode.localData.start = &*iter;
         opcode.localData.count = wordCount;
 
@@ -267,22 +586,49 @@ struct SPIRVShader::Impl
         {
           if( op.hasResultType )
           {
-            resultType = static_cast<int32_t>(*( iter + 1 ) );
+            resultType = static_cast<int32_t>( *( iter + 1 ) );
           }
           resultIndex                 = *( iter + resultIndexOffset );
           opcode.localData.resultId   = resultIndex;
           opcode.localData.resultType = resultType;
-          if( opResults.size() <= opcode.localData.resultId )
-          {
-            opResults.resize( opcode.localData.resultId + 1 );
-          }
-          opResults[opcode.localData.resultId] = &opcode;
         }
       }
 
       // next instruction
       std::advance( iter, wordCount );
     }
+
+    return retval;
+  }
+
+  auto CreateOpResults( std::vector<SPIRVOpCode>& _opcodes )
+  {
+    auto retval = std::vector<SPIRVOpCode*>{};
+    for( auto i = 0u; i < _opcodes.size(); ++i )
+    {
+      const auto& op = _opcodes[i];
+      if( op.hasResult )
+      {
+        if( retval.size() <= op.localData.resultId )
+        {
+          retval.resize( op.localData.resultId + 1 );
+        }
+        retval[op.localData.resultId] = &_opcodes[i];
+      }
+    }
+    return retval;
+  }
+
+  bool Initialise()
+  {
+    // load opcodes
+    opCodes = std::move(LoadOpCodes( data ));
+
+    // create results lookup array
+    opResults = std::move(CreateOpResults( opCodes ));
+
+    // build reflection map
+    reflectionData = std::move(CollectVariables());
 
     for( auto&& opcode : opCodes )
     {
@@ -326,7 +672,6 @@ struct SPIRVShader::Impl
     {
       std::string strName( name.opName->GetParameterAsString( name.isMemberName ? 2 : 1 ) );
 
-      // ignore member names
       if( !strName.empty() && !name.isMemberName )
       {
         SpvStorageClass storageClass{SpvStorageClassMax};
@@ -343,10 +688,12 @@ struct SPIRVShader::Impl
         {
           for( auto&& ptr : pointers )
           {
+            storageClass = ptr.storageClass;
             if( ptr.opCode->localData.resultId == name.opRefId->GetParameterU32( 0u ) )
             {
-              storageClass = ptr.storageClass;
-              spvPointer   = &ptr;
+              //storageClass = ptr.storageClass;
+
+              spvPointer = &ptr;
 
               // look for all the decoration for the variable
               for( auto&& decor : decorate )
@@ -379,8 +726,8 @@ struct SPIRVShader::Impl
               //@todo: support input handling ( when vertex buffers work )
               if( storageClass == SpvStorageClassInput )
               {
-                auto format = vk::Format{ vk::Format::eUndefined };
-                auto location = U32(-1);
+                auto format   = vk::Format{vk::Format::eUndefined};
+                auto location = U32( -1 );
                 if( *ptr.pointerType == SpvOpTypeFloat )
                 {
                   format = vk::Format::eR32Sfloat;
@@ -392,36 +739,36 @@ struct SPIRVShader::Impl
                 else if( *ptr.pointerType == SpvOpTypeVector )
                 {
                   // always 32-bit float signed
-                  const vk::Format SUPPORTED_VECTOR_FORMATS[] =
-                                     {
-                                       vk::Format::eR32Sfloat,
-                                       vk::Format::eR32G32Sfloat,
-                                       vk::Format::eR32G32B32Sfloat,
-                                       vk::Format::eR32G32B32A32Sfloat,
-                                     };
+                  const vk::Format SUPPORTED_VECTOR_FORMATS[] = {
+                    vk::Format::eUndefined,
+                    vk::Format::eR32Sfloat,
+                    vk::Format::eR32G32Sfloat,
+                    vk::Format::eR32G32B32Sfloat,
+                    vk::Format::eR32G32B32A32Sfloat,
+                  };
 
-                  format = SUPPORTED_VECTOR_FORMATS[ptr.pointerType->GetParameterU32(2)];
+                  format = SUPPORTED_VECTOR_FORMATS[ptr.pointerType->GetParameterU32( 2 )];
                 }
 
                 // format is valid, find location
                 if( format != vk::Format::eUndefined )
                 {
-                  auto decorations = FindDecorationsForId( name.opName->GetParameterU32(0) );
+                  auto decorations = FindDecorationsForId( name.opName->GetParameterU32( 0 ) );
                   for( auto&& decor : decorations )
                   {
-                    if( decor->GetParameter<SpvDecoration>(1) == SpvDecorationLocation )
+                    if( decor->GetParameter<SpvDecoration>( 1 ) == SpvDecorationLocation )
                     {
-                      location = decor->GetParameterU32(2);
+                      location = decor->GetParameterU32( 2 );
                       break;
                     }
                   }
-                  if( location != U32(-1) )
+                  if( location != U32( -1 ) )
                   {
                     if( location >= inputAttributes.size() )
                     {
-                      inputAttributes.resize( location+1 );
+                      inputAttributes.resize( location + 1 );
                     }
-                    inputAttributes[location] = { location, name.opName->GetParameterAsString(1), format };
+                    inputAttributes[location] = {location, name.opName->GetParameterAsString( 1 ), format};
                   }
                 }
               }
@@ -434,9 +781,20 @@ struct SPIRVShader::Impl
         {
           for( auto&& ptr : pointers )
           {
-            if( ptr.pointerType->localData.resultId == name.opRefId->GetParameterU32( 0u ) )
+            storageClass     = ptr.storageClass;
+            auto ptrResultId = ptr.pointerType->localData.resultId;
+            if( ptrResultId == name.opRefId->GetParameterU32( 0u ) )
             {
-              const auto& instance = FindInstanceByType( ptr.opCode->localData.resultId );
+              auto memberDesc = BuildMemberDescriptorList( ptrResultId );
+
+              if( memberDesc.size() )
+              {
+                // push onto list of blocks
+                name.opName->GetParameterAsString( 0 );
+                blockStructureMap[name.opName] = memberDesc;
+              }
+
+              const auto& instance = FindInstanceByType( ptrResultId );
               if( instance != OP_CODE_NULL )
               {
                 auto decors = FindDecorationsForId( instance.localData.resultId );
@@ -495,7 +853,7 @@ struct SPIRVShader::Impl
 
     // Identify descriptor set types based on the usage within
     // the shader ( ref. vulkan spec 1.0.68 )
-    std::vector<ResourceDescriptor*> uniformResources;
+    uniformResources.clear();
     for( auto&& storage : storageContainer )
     {
       if( storage.storageClass == SpvStorageClassUniformConstant )
@@ -581,7 +939,91 @@ struct SPIRVShader::Impl
                  return false;
                } ) );
 
+    // TODO: store more details?
+    for( auto&& res : uniformResources )
+    {
+      auto tmp          = SPIRVUniformOpaque{};
+      tmp.name          = res->name;
+      tmp.binding       = res->binding;
+      tmp.descriptorSet = res->descriptorSet;
+      tmp.type          = res->descriptorType;
+      uniformOpaqueReflection.emplace_back( tmp );
+    }
+
     GenerateDescriptorSetLayoutCreateInfo( uniformResources );
+
+    // Generate uniform block reflection
+    uniformBlockReflection.clear();
+    auto blockIndex = 0u;
+    for( auto&& uboDesc : blockStructureMap )
+    {
+      auto block     = uboDesc.first;
+      auto blockName = block->GetParameterAsString( 1 );
+      uniformBlockReflection.emplace_back();
+      auto& ubo = uniformBlockReflection.back();
+      ubo.name  = blockName;
+
+      // find ubo last member size
+      // find block resource details
+      for( auto&& resource : uniformResources )
+      {
+        if( resource->name == blockName )
+        {
+          ubo.binding       = resource->binding;
+          ubo.descriptorSet = resource->descriptorSet;
+          auto& ptrType     = *resource->pointer->pointerType;
+
+          // calculate size of struct
+          // todo: support deep search
+
+          // ubo.size stores only last member size which will be added to the very last offset
+          ubo.size = 0;
+          if( ptrType == SpvOpTypeStruct )
+          {
+            auto  memberId   = ptrType.GetParameterU32( ptrType.localData.count - 2 );
+            auto& memberType = FindByResultId( memberId );
+
+            if( memberType == SpvOpTypeMatrix )
+            {
+              ubo.size = memberType.GetParameterU32( 2 ) * memberType.GetParameterU32( 2 ) * U32( sizeof( float ) );
+            }
+            else if( memberType == SpvOpTypeVector )
+            {
+              ubo.size = memberType.GetParameterU32( 2 ) * U32( sizeof( float ) );
+            }
+            else if( memberType.isTrivial )
+            {
+              ubo.size = 4;
+            }
+            else if( memberType == SpvOpTypeArray || memberType == SpvOpTypeStruct )
+            {
+              // todo: support recursive search through types!
+            }
+          }
+        }
+      }
+
+      // write members
+      debug( uboDesc.first->GetParameterAsString( 1 ) << ": " );
+      uint32_t maxMemberOffset{0u};
+      for( auto&& desc : uboDesc.second )
+      {
+        ubo.members.emplace_back();
+        auto& uboMember      = ubo.members.back();
+        uboMember.name       = desc.name;
+        uboMember.location   = desc.location;
+        uboMember.offset     = desc.offset;
+        uboMember.blockIndex = blockIndex;
+        if( maxMemberOffset < uboMember.offset )
+        {
+          maxMemberOffset = uboMember.offset;
+        }
+      }
+      ubo.size += maxMemberOffset;
+
+      blockIndex++;
+    }
+
     debug( "done" );
     return true;
   }
@@ -783,7 +1225,63 @@ struct SPIRVShader::Impl
     return false;
   }
 
-  void GenerateDescriptorSetLayoutCreateInfo( const std::vector<ResourceDescriptor*>& uniformResources )
+  /**
+   * Collects all the member decorations for particular block and field
+   * @param structId
+   * @param fieldLocation
+   * @return
+   */
+  std::vector<BlockMemberDescriptor> BuildMemberDescriptorList( uint32_t blockId )
+  {
+    // collect data:
+    // - block id
+    // - name
+    // - location
+    // - offset
+    // Skip built-ins
+    // there is no way to know size of single field
+    // size of the block remains unknown ( depends on the last type )
+    std::vector<BlockMemberDescriptor> retval;
+    for( auto&& op : opCodes )
+    {
+      if( op == SpvOpMemberName && op.GetParameterU32( 0 ) == blockId )
+      {
+        auto location = op.GetParameterU32( 1 );
+        if( retval.size() <= location )
+        {
+          retval.resize( location + 1 );
+        }
+        auto& desc    = retval[location];
+        desc.location = location;
+        desc.name     = op.GetParameterAsString( 2 );
+        desc.blockId  = blockId;
+      }
+      else if( op == SpvOpMemberDecorate && op.GetParameterU32( 0 ) == blockId )
+      {
+        auto location = op.GetParameterU32( 1 );
+        if( retval.size() <= location )
+        {
+          retval.resize( location + 1 );
+        }
+        auto& desc = retval[location];
+
+        auto decoration = op.GetParameter<SpvDecoration>( 2 );
+        if( decoration == SpvDecorationOffset )
+        {
+          desc.offset = op.GetParameterU32( 3 );
+        }
+        else if( decoration == SpvDecorationBuiltIn ) // skip builtins for now, return empty result
+        {
+          retval.clear();
+          break;
+        }
+      }
+    }
+
+    return retval;
+  }
+
+  void GenerateDescriptorSetLayoutCreateInfo( const std::vector<ResourceDescriptor*>& _uniformResources )
   {
     auto currentSet     = -1u;
     auto currentBinding = -1u;
@@ -803,9 +1301,10 @@ struct SPIRVShader::Impl
         currentSet = resource->descriptorSet;
         if( currentSet == -1u || layoutCreateInfoCache.size() <= currentSet )
         {
-          layoutCreateInfoCache.resize(currentSet+1);
+          layoutCreateInfoCache.resize( currentSet + 1 );
         }
-        layoutCreateInfoCache.back() = {vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 0u ).setPBindings( nullptr ), {}};
+        layoutCreateInfoCache.back() = {
+          vk::DescriptorSetLayoutCreateInfo{}.setBindingCount( 0u ).setPBindings( nullptr ), {}};
         currentBinding = -1u;
       }
 
@@ -831,7 +1330,7 @@ struct SPIRVShader::Impl
     {
       auto& layoutData = layoutCreateInfoCache.back();
       layoutData.createInfo.setPBindings( layoutData.bindings.data() )
-                .setBindingCount( U32( layoutData.bindings.size() ) );
+        .setBindingCount( U32( layoutData.bindings.size() ) );
     }
   }
 
@@ -876,8 +1375,7 @@ struct SPIRVShader::Impl
   }
 
 public:
-
-  std::vector<SPIRVOpCode>  opCodes; // contains all opcodes
+  std::vector<SPIRVOpCode>  opCodes;   // contains all opcodes
   std::vector<SPIRVOpCode*> opResults; // links to the resulting opcode or nullptr if opcode doesn't return
 
   /**
@@ -892,21 +1390,22 @@ public:
     std::vector<vk::DescriptorSetLayoutBinding> bindings;
   };
 
-  std::vector<LayoutAndBindings> layoutCreateInfoCache{};
+  std::vector<LayoutAndBindings>         layoutCreateInfoCache{};
   std::vector<SPIRVVertexInputAttribute> inputAttributes{};
 
   std::vector<SPIRVWord>    data;
   std::vector<PointerName>  names{};
   std::vector<SPIRVOpCode*> decorate{};
 
-  Header   header;
+  std::unordered_map<SPIRVOpCode*, std::vector<BlockMemberDescriptor>> blockStructureMap;
+  std::vector<SPIRVUniformBlock>                                       uniformBlockReflection;
+  std::vector<ResourceDescriptor*>                                     uniformResources;
+  std::vector<SPIRVUniformOpaque>                                      uniformOpaqueReflection;
+  Header                                                               header;
 
   vk::ShaderStageFlags shaderStages{};
-
-
 };
 #pragma GCC diagnostic pop
-
 
 /**************************************************************************************
  * SPIRVShader
@@ -968,6 +1467,32 @@ void SPIRVShader::GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribut
   mImpl->GetVertexInputAttributes( out );
 }
 
+const std::vector<SPIRVUniformBlock>& SPIRVShader::GetUniformBlocks() const
+{
+  return mImpl->uniformBlockReflection;
+}
+
+const std::vector<SPIRVUniformOpaque>& SPIRVShader::GetOpaqueUniforms() const
+{
+  return mImpl->uniformOpaqueReflection;
+}
+
+bool SPIRVShader::FindUniformMemberByName( const std::string& uniformName, SPIRVUniformBlockMember& out ) const
+{
+  for( auto&& ubo : mImpl->uniformBlockReflection )
+  {
+    for( auto&& member : ubo.members )
+    {
+      if( member.name == uniformName )
+      {
+        out = member;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**************************************************************************************
  * SPIRVUtils
  */
@@ -990,13 +1515,11 @@ std::unique_ptr<SPIRVShader> SPIRVUtils::Parse( std::vector<SPIRVWord> data, vk:
 std::unique_ptr<SPIRVShader> SPIRVUtils::Parse( const SPIRVWord* data, size_t sizeInBytes, vk::ShaderStageFlags stages )
 {
   std::vector<SPIRVWord> spirvCode{};
-  auto wordSize = sizeInBytes / sizeof(SPIRVWord);
+  auto                   wordSize = sizeInBytes / sizeof( SPIRVWord );
   spirvCode.resize( wordSize );
-  std::copy( data, data+wordSize, spirvCode.begin());
+  std::copy( data, data + wordSize, spirvCode.begin() );
   return Parse( spirvCode, stages );
 }
-
-
 
 } // namespace SpirV
 
