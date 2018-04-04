@@ -15,6 +15,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics-controller.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
@@ -24,11 +25,18 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics/graphics-object-owner.h>
 
+
 // API
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
+#include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
+
+#include <iostream>
+#include <dali/graphics-api/utility/utility-memory-pool.h>
 
 using namespace glm;
 
@@ -52,14 +60,27 @@ struct GraphicsPipelineState
    */
   struct Info
   {
+    Info()
+      : blendEnabled( VK_FALSE ),
+        srcColor( vk::BlendFactor::eOne ), srcAlpha( vk::BlendFactor::eOne ),
+        dstColor( vk::BlendFactor::eOne ), dstAlpha( vk::BlendFactor::eOne ),
+        vertexBufferAttributesBindings{},
+        viewport{},
+        topology{},
+        depthTestEnabled{ VK_FALSE },
+        stencilTestEnabled{ VK_FALSE },
+        vertexShader{ nullptr },
+        fragmentShader{ nullptr }
+    {
+    }
+
     // blending
     vk::Bool32      blendEnabled;
     vk::BlendFactor srcColor, srcAlpha;
     vk::BlendFactor dstColor, dstAlpha;
 
     // vertex input data
-    std::vector<vk::VertexInputAttributeDescription> vertexAttributeDescription;
-    std::vector<vk::VertexInputBindingDescription>   vertexInputBindingDescripton;
+    std::vector<Dali::Graphics::API::RenderCommand::VertexAttributeBufferBinding> vertexBufferAttributesBindings;
 
     // viewport size
     vk::Rect2D viewport;
@@ -79,12 +100,19 @@ struct GraphicsPipelineState
     {
       return false; // TODO
     }
+  };
 
-  } info;
-
-  GraphicsPipelineState( GraphicsPipelineState& src )
+  GraphicsPipelineState( const GraphicsPipelineState& src )
+  : stack( 256 )
   {
     info = src.info;
+    pipeline = src.pipeline;
+  }
+
+  explicit GraphicsPipelineState( GraphicsPipelineState::Info _info )
+  : info( _info ), stack( 256 )
+  {
+
   }
 
   bool operator==( const GraphicsPipelineState::Info& _info )
@@ -98,9 +126,17 @@ struct GraphicsPipelineState
     pipeline.Reset();
   }
 
-  void Initialise()
+  bool Initialise( Graphics& graphics )
   {
+    pipeline = Pipeline::New( graphics );
+    pipeline->SetShader( info.vertexShader, Shader::Type::VERTEX );
+    pipeline->SetShader( info.fragmentShader, Shader::Type::FRAGMENT );
+    pipeline->SetViewport( float(info.viewport.offset.x), float(info.viewport.offset.y),
+                           float(info.viewport.extent.width), float(info.viewport.extent.height) );
+    pipeline->SetInputAssemblyState( info.topology, true );
 
+    // TODO: support blending and other states
+    return pipeline->Compile();
   }
 
   // Compiles state
@@ -112,6 +148,9 @@ struct GraphicsPipelineState
   // state, created when compiled, immutable
   // renders particular set of objects
   PipelineRef pipeline;
+  Info info;
+
+  Utility::MemoryPool stack;
 };
 
 struct GraphicsDrawCommand
@@ -119,8 +158,8 @@ struct GraphicsDrawCommand
   GraphicsPipelineState& pipelineState;
 
   // command buffer/pool
-  CommandPoolRef commandPool;
-  CommandBufferRef commandBuffer;
+  CommandPoolRef    commandPool;
+  CommandBufferRef  commandBuffer;
   FenceRef fence;
 
   // resources
@@ -136,8 +175,6 @@ struct GraphicsDrawCommand
 
 struct Controller::Impl
 {
-
-
   struct State
   {
     ShaderRef                     vertexShader;
@@ -168,17 +205,18 @@ struct Controller::Impl
 
   // TODO: @todo this function initialises basic buffers, shaders and pipeline
   // for the prototype ONLY
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
     // Create factories
     mShaderFactory = std::make_unique<VulkanAPI::ShaderFactory>( mGraphics );
     mTextureFactory = std::make_unique<VulkanAPI::TextureFactory>( mGraphics );
+    mBufferFactory = std::make_unique<VulkanAPI::BufferFactory>( mOwner );
 
-    mDebugPipelineState.vertexShader = Shader::New( mGraphics, VSH_CODE.data(), VSH_CODE.size() );
+    //mDebugPipelineState.vertexShader = Shader::New( mGraphics, VSH_CODE.data(), VSH_CODE.size() );
 
-    mDebugPipelineState.fragmentShader = Shader::New( mGraphics, FSH_CODE.data(), FSH_CODE.size() );
+    //mDebugPipelineState.fragmentShader = Shader::New( mGraphics, FSH_CODE.data(), FSH_CODE.size() );
 
     mDebugPipelineState.descriptorPool = CreateDescriptorPool();
 
@@ -224,6 +262,7 @@ struct Controller::Impl
 
   PipelineRef CreatePipeline( State& state )
   {
+    return PipelineRef();
     auto pipeline = Pipeline::New( mGraphics );
 
     pipeline->SetShader( state.vertexShader, Shader::Type::VERTEX );
@@ -255,10 +294,13 @@ struct Controller::Impl
 
   void SubmitCommand( Dali::Graphics::API::RenderCommand&& command )
   {
+#if 0
     auto& state = mDebugPipelineState;
 
     const auto& bufferList = command.GetBufferList();
     auto        drawcalls  = command.GetPrimitiveCount();
+
+    auto textureList = command.GetTextures();
 
     // create pool of commands to be re-recorded
     if( state.drawCommandPool.empty() )
@@ -297,7 +339,6 @@ struct Controller::Impl
         mat4 mvp;
         vec4 color;
         vec3 size;
-        uint samplerId;
       } __attribute__( ( aligned( 16 ) ) );
 
       auto memory = state.uniformBuffer0->GetMemoryHandle();
@@ -315,10 +356,17 @@ struct Controller::Impl
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );
-        //if(inputData->samplerId >= 0)
+        if(!textureList.empty())
         {
-          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId]->GetSampler(),
-                                                       mTextures[inputData->samplerId]->GetImageView());
+          auto& texture = textureList[i];
+          auto ref = texture.GetHandle();
+          auto& vulkanTexture =static_cast<VulkanAPI::Texture&>(texture.Get());
+
+          std::cout << "ref: " << ref << std::endl;
+
+          descriptorSets[0]->WriteCombinedImageSampler(2, vulkanTexture.GetTextureRef()->GetSampler(),
+                                                       vulkanTexture.GetTextureRef()->GetImageView());
+          // TODO: AB: support more samplers, for now breaking after setting first
         }
 
         // record draw call
@@ -341,6 +389,7 @@ struct Controller::Impl
       // break, one pass only
       break;
     }
+#endif
   }
 #pragma GCC diagnostic pop
   void BeginFrame()
@@ -383,13 +432,140 @@ struct Controller::Impl
     return *(mShaderFactory.get());
   }
 
+  API::BufferFactory& GetBufferFactory() const
+  {
+    return *(mBufferFactory.get());
+  }
+
+  /**
+   * NEW IMPLEMENTACIONE
+   */
+
+  std::unique_ptr<API::RenderCommand> AllocateRenderCommand()
+  {
+    return std::make_unique<VulkanAPI::RenderCommand>( mGraphics, *(mPipelineCache.get()) );
+  }
+
+
+  /**
+   * Submits number of commands in one go ( simiar to vkCmdExecuteCommands )
+   * @param commands
+   */
+  void SubmitCommands( std::vector<Dali::Graphics::API::RenderCommand*> commands )
+  {
+    for( auto&& command : commands )
+    {
+      const auto& vertexBufferBindings = command->GetVertexBufferBindings();
+      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+
+      apiCommand->PreparePipeline();
+      //const auto& renderState = command->GetRenderState();
+
+      // update pipeline ( needed only shaders, render state and vertex buffer bindings )
+      BindPipeline( *command );
+
+      // start new command buffer
+      auto cmdbuf = mCommandPool->NewCommandBuffer( false );
+      cmdbuf->Reset();
+      cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
+
+      BindVertexAttributeBuffers( cmdbuf, vertexBufferBindings );
+
+    }
+  }
+
+  void BindPipeline( const Dali::Graphics::API::RenderCommand& renderCommand )
+  {
+
+    Utility::MemoryPool pool( 1024 );
+
+    const auto& renderState = renderCommand.GetRenderState();
+    const auto& shader = static_cast<const VulkanAPI::Shader&>( renderState.shader.Get() );
+
+    GraphicsPipelineState::Info info;
+    info.vertexShader = shader.GetShader( vk::ShaderStageFlagBits::eVertex );
+    info.fragmentShader = shader.GetShader( vk::ShaderStageFlagBits::eFragment );
+
+    // retrieve input attributes descriptions
+    std::vector<SpirV::SPIRVVertexInputAttribute> attribs{};
+    info.vertexShader->GetSPIRVReflection().GetVertexInputAttributes( attribs );
+    std::vector<vk::VertexInputAttributeDescription> attributeDescriptions{};
+
+    // prepare vertex buffer bindings
+    auto bindingIndex { 0u };
+    std::vector<vk::VertexInputBindingDescription> bindingDescriptions{};
+
+    uint32_t currentBuffer{ 0xffffffff };
+    for( auto&& vb : renderCommand.GetVertexBufferBindings() )
+    {
+      if( currentBuffer != vb.buffer.GetHandle() )
+      {
+        bindingDescriptions.emplace_back(vk::VertexInputBindingDescription{}
+                                           .setBinding(bindingIndex)
+                                           .setInputRate(
+                                             vb.rate == API::RenderCommand::InputAttributeRate::PER_VERTEX ?
+                                             vk::VertexInputRate::eVertex : vk::VertexInputRate::eInstance
+                                           )
+                                           .setStride(vb.stride));
+        bindingIndex++;
+        currentBuffer = U32(vb.buffer.GetHandle());
+      }
+
+      attributeDescriptions.emplace_back( vk::VertexInputAttributeDescription{}
+                                          .setBinding( bindingDescriptions.back().binding )
+                                          .setFormat( attribs[ vb.location ].format )
+                                          .setOffset( vb.offset ));
+
+
+    }
+
+
+
+    // VertexInputState
+    // todo: should be generated inside recorded command
+    // todo: recorded command should cache pipeline used for drawing
+    // todo: recorded command should reuse pipeline unless any part of the
+    //       state has changed
+    /*
+    auto viState = vk::PipelineVertexInputStateCreateInfo{}
+      .setPVertexAttributeDescriptions(attributeDescriptions.data())
+      .setVertexAttributeDescriptionCount(U32(attributeDescriptions.size()))
+      .setPVertexBindingDescriptions(bindingDescriptions.data())
+      .setVertexBindingDescriptionCount(U32(bindingDescriptions.size()));
+    */
+
+    // make a copy of vertex buffer and attribute bindings
+    info.vertexBufferAttributesBindings = Dali::Graphics::API::RenderCommand::NewVertexAttributeBufferBindings( renderCommand.GetVertexBufferBindings() );
+
+    // build pipeline based on state
+
+    // push pipeline
+
+
+
+  }
+
+  void BindVertexAttributeBuffers( const CommandBufferRef& cmdbuf, const std::vector<API::RenderCommand::VertexAttributeBufferBinding>& bindings )
+  {
+    // bind vertex buffers
+    uint32_t index;
+    for( auto&& binding : bindings )
+    {
+      const auto& buffer = static_cast<const VulkanAPI::Buffer&>(binding.buffer.Get());
+      cmdbuf->BindVertexBuffer( index, buffer.GetBufferRef(), binding.offset );
+      ++index;
+    }
+  }
+
   // resources
   std::vector<TextureRef> mTextures;
   std::vector<ShaderRef>  mShaders;
+  std::vector<BufferRef>  mBuffers;
 
   // owner objects
   ObjectOwner<API::Texture>   mTexturesOwner;
   ObjectOwner<API::Shader>    mShadersOwner;
+  ObjectOwner<API::Buffer>    mBuffersOwner;
 
 
   Graphics&           mGraphics;
@@ -400,59 +576,15 @@ struct Controller::Impl
 
   std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
   std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
-
-  /**
-   * NEW IMPLEMENTACIONE
-   */
-
-  void SubmitDraw( const Dali::Graphics::API::BufferInfo& buffer )
-  {
-    // find pipeline state for this batch
-    auto info = GraphicsPipelineState::Info{};
-
-    //info.vertexShader =
-  }
-
-  void SubmitCommandV2( Dali::Graphics::API::RenderCommand&& command )
-  {
-
-    auto vertexShader = command.GetShader( Dali::Graphics::API::ShaderDetails::PipelineStage::VERTEX );
-    auto fragmentShader = command.GetShader( Dali::Graphics::API::ShaderDetails::PipelineStage::FRAGMENT );
-
-    // get shaders from backend
-    ShaderRef vsh, fsh;
-    if(vertexShader)
-    {
-      vsh = VulkanAPI::Shader::DownCast( vertexShader.Get() ).GetShader( vk::ShaderStageFlagBits::eVertex );
-    }
-
-    if(fragmentShader)
-    {
-      fsh = VulkanAPI::Shader::DownCast( vertexShader.Get() ).GetShader( vk::ShaderStageFlagBits::eFragment );
-    }
-
-#if 0
-    const auto& bufferList = command.GetBufferList();
-    const auto& bufferVector = bufferList.Get();
-
-    for(const auto& bufferInfo : bufferVector )
-    {
-      /*
-      const auto ptr = bufferInfo->GetDataBase();
-      const auto size = bufferInfo->GetSize();
-
-      SubmitDraw( bufferInfo );
-      */
-      // new render state
-
-    }
-#endif
-  }
-
-
+  std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
 
   std::vector<GraphicsPipelineState> mStatePerBatchCache;
+  // todo: should be per thread
+  CommandPoolRef mCommandPool;
 
+  std::vector<std::unique_ptr<VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
+
+  std::unique_ptr<PipelineCache> mPipelineCache;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -479,10 +611,19 @@ API::Accessor<API::Texture> Controller::CreateTexture( const API::BaseFactory<AP
 
 API::Accessor<API::TextureSet> Controller::CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory )
 {
+
 }
 
 API::Accessor<API::DynamicBuffer> Controller::CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory )
 {
+}
+
+API::Accessor<API::Buffer> Controller::CreateBuffer( const API::BaseFactory<API::Buffer>& factory )
+{
+  auto handle = mImpl->mBuffersOwner.CreateObject( factory );
+  auto bufferRef = static_cast<VulkanAPI::Buffer&>(mImpl->mBuffersOwner[handle]).GetBufferRef();
+  mImpl->mBuffers.push_back( bufferRef );
+  return API::Accessor<API::Buffer>( mImpl->mBuffersOwner, handle);
 }
 
 API::Accessor<API::StaticBuffer> Controller::CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory )
@@ -547,6 +688,32 @@ API::ShaderFactory& Controller::GetShaderFactory() const
 {
   return mImpl->GetShaderFactory();
 }
+
+API::BufferFactory& Controller::GetBufferFactory() const
+{
+  return mImpl->GetBufferFactory();
+}
+
+Vulkan::Graphics& Controller::GetGraphics() const
+{
+  return mImpl->mGraphics;
+}
+
+void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr<VulkanAPI::BufferMemoryTransfer> transferRequest )
+{
+  mImpl->mBufferTransferRequests.emplace_back( std::move(transferRequest) );
+}
+
+void Controller::SubmitCommands( std::vector<API::RenderCommand*> commands )
+{
+  mImpl->SubmitCommands( std::move(commands) );
+}
+
+std::unique_ptr<API::RenderCommand> Controller::AllocateRenderCommand()
+{
+  return mImpl->AllocateRenderCommand();
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics
