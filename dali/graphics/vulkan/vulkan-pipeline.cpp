@@ -70,6 +70,8 @@ struct Pipeline::Impl
     return mPipeline;
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
   vk::Result Initialise()
   {
     if( !ValidateShaderModules() )
@@ -217,6 +219,7 @@ struct Pipeline::Impl
     mColorBlendState.setPAttachments( &mAttachementNoBlendState );
     mInfo.setPColorBlendState(&mColorBlendState);
   }
+#pragma GCC diagnostic pop
 
   /**
    * Sets the shader. Must be set before compiling the pipeline, compiled pipeline
@@ -470,6 +473,41 @@ const std::vector<vk::DescriptorSetLayoutCreateInfo>& Pipeline::GetVkDescriptorS
 const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mImpl->mDSLayoutArray;
+}
+
+const vk::PipelineInputAssemblyStateCreateInfo& Pipeline::GetInputAssemblyState() const
+{
+  return mImpl->mInputAssemblyState;
+}
+
+const vk::PipelineVertexInputStateCreateInfo& Pipeline::GetVertexInputState() const
+{
+  return mImpl->mVertexInputState;
+}
+
+const vk::PipelineViewportStateCreateInfo& Pipeline::GetViewportState() const
+{
+  return mImpl->mViewportState;
+}
+
+const vk::PipelineRasterizationStateCreateInfo& Pipeline::GetRasterizationState() const
+{
+  return mImpl->mRasterizationState;
+}
+
+const vk::PipelineMultisampleStateCreateInfo& Pipeline::GetMultisamplingState() const
+{
+  return mImpl->mMultisampleState;
+}
+
+const vk::PipelineDepthStencilStateCreateInfo& Pipeline::GetDepthStencilState() const
+{
+  return mImpl->mDepthStencilState;
+}
+
+const vk::PipelineColorBlendStateCreateInfo& Pipeline::GetColorBlendState() const
+{
+  return mImpl->mColorBlendState;
 }
 
 } // namespace Vulkan

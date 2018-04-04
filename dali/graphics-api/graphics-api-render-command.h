@@ -27,6 +27,8 @@
 #include <dali/graphics-api/graphics-api-generic-buffer.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 #include <dali/graphics-api/utility/utility-strong-type.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-api-accessor.h>
 
 namespace Dali
 {
@@ -34,9 +36,13 @@ namespace Graphics
 {
 namespace API
 {
+class Shader;
+class Texture;
 using PrimitiveCount = Utility::StrongType<size_t, struct PrimitiveCountTag>;
 using BufferInfo     = std::unique_ptr<GenericBufferBase>;
 using BufferList     = Utility::StrongType<std::vector<BufferInfo>, struct BufferListTag>;
+using ShaderList     = std::vector<Accessor<Shader>>;
+using TextureList    = std::vector<Accessor<Texture>>;
 
 /**
  * @brief Interface class for RenderCommand types in the graphics API.
@@ -69,9 +75,52 @@ public:
     return mBufferList;
   }
 
+  const auto& GetTextures() const
+  {
+    return mTextureList;
+  }
+
+  Accessor<Shader> GetShader( ShaderDetails::PipelineStage shaderStage ) const
+  {
+    using ShaderDetails::PipelineStage;
+
+    auto retval = Accessor<Shader>{nullptr};
+
+    size_t index = mShaders.size();
+    switch( shaderStage )
+    {
+      case PipelineStage::VERTEX:
+      {
+        index = 0;
+        break;
+      }
+      case PipelineStage::FRAGMENT:
+      {
+        index = 1;
+        break;
+      }
+      case PipelineStage::GEOMETRY:
+      case PipelineStage::COMPUTE:
+      case PipelineStage::TESSELATION_CONTROL:
+      case PipelineStage::TESSELATION_EVALUATION:
+      {
+        break;
+      }
+    }
+    if(index < mShaders.size())
+    {
+      retval = mShaders[index];
+    }
+    return retval;
+  }
+
+
+
 private:
   PrimitiveCount mPrimitiveCount;
   BufferList     mBufferList;
+  TextureList    mTextureList;
+  ShaderList     mShaders;
 };
 
 using RenderCommandBuilder = Utility::Builder<RenderCommand, PrimitiveCount, BufferList>;

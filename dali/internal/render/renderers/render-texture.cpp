@@ -637,7 +637,8 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mMaxMipMapLevel( 0 ),
   mType( type ),
   mHasAlpha( HasAlpha( format ) ),
-  mIsCompressed( IsCompressedFormat( format ) )
+  mIsCompressed( IsCompressedFormat( format ) ),
+  mGfxTexture( nullptr )
 {
   PixelFormatToGl( format,
                    mGlFormat,
@@ -658,7 +659,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
-  mIsCompressed( false )
+  mIsCompressed( false ),
+  mGfxTexture( nullptr )
 {
 }
 

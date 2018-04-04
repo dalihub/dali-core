@@ -28,6 +28,8 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/graphics-api/graphics-api-accessor.h>
+#include <dali/graphics-api/graphics-api-texture.h>
 
 namespace Dali
 {
@@ -136,9 +138,19 @@ public:
     return mNativeImage;
   }
 
-  void SetId( void* textureId )
+  void SetId( uint32_t textureId )
   {
-    mId = GLuint(size_t(textureId));
+    mId = textureId;
+  }
+
+  void SetGfxObject( Graphics::API::Accessor<Graphics::API::Texture> texture )
+  {
+    mGfxTexture = texture;
+  }
+
+  const Graphics::API::Accessor<Graphics::API::Texture>& GetGfxObject() const
+  {
+    return mGfxTexture;
   }
 
 private:
@@ -164,6 +176,7 @@ private:
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
 
+  Graphics::API::Accessor<Graphics::API::Texture> mGfxTexture; ///< TODO: find right place to store texture
 };
 
 

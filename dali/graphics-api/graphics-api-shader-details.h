@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_TEXTURE_DETAILS_H
-#define DALI_GRAPHICS_API_TEXTURE_DETAILS_H
+#ifndef DALI_GRAPHICS_API_SHADER_DETAILS_H
+#define DALI_GRAPHICS_API_SHADER_DETAILS_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -19,6 +19,7 @@
  */
 
 #include <string>
+#include <vector>
 
 namespace Dali
 {
@@ -29,7 +30,79 @@ namespace API
 namespace ShaderDetails
 {
 
-using ShaderSource = std::string;
+enum class ShaderSourceType
+{
+  STRING,
+  BINARY
+};
+
+struct ShaderSource
+{
+  /**
+   * Creates shader source object from source string
+   * @param sourceString
+   */
+  explicit ShaderSource( const std::string& sourceString )
+  {
+    source = sourceString;
+    type = ShaderSourceType::STRING;
+  }
+
+  /**
+   * Creates shader source object from vector
+   * @param sourceBinary
+   */
+  template<class T>
+  explicit ShaderSource( const std::vector<T>& sourceBinary )
+  {
+    code.resize( sourceBinary.size() * sizeof(T) );
+    auto begin = reinterpret_cast<const char*>(&*sourceBinary.begin());
+    auto end = reinterpret_cast<const char*>(&*sourceBinary.end());
+    std::copy( begin, end, code.begin() );
+    type = ShaderSourceType::BINARY;
+  }
+
+  template<char>
+  explicit ShaderSource( const std::vector<char>& sourceBinary )
+  {
+    code = sourceBinary;
+    type = ShaderSourceType::BINARY;
+  }
+
+  /**
+   * Creates shader source object from C-Style binary data
+   * @param pBinary
+   * @param size
+   */
+  explicit ShaderSource( const void* pBinary, uint32_t size )
+  {
+    code.resize( size );
+    auto begin = reinterpret_cast<const char*>(pBinary);
+    auto end = begin + size;
+    std::copy( begin, end, code.begin() );
+    type = ShaderSourceType::BINARY;
+  }
+
+  ShaderSource( const ShaderSource& shaderSource ) = default;
+
+  /**
+   * Tests whether the shader module has been set
+   * @return
+   */
+  bool IsSet() const
+  {
+    if( (type == ShaderSourceType::BINARY && code.empty()) ||
+        (type == ShaderSourceType::STRING && source.empty()) )
+    {
+      return false;
+    }
+    return true;
+  }
+
+  std::string       source;
+  std::vector<char> code;
+  ShaderSourceType type;
+};
 
 enum class Language {
   GLSL_1,
@@ -53,4 +126,4 @@ enum class PipelineStage {
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_TEXTURE_DETAILS_H
+#endif // DALI_GRAPHICS_API_SHADER_DETAILS_H

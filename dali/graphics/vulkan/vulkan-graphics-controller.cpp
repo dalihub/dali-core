@@ -21,6 +21,14 @@
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <dali/graphics/vulkan/vulkan-graphics-texture.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics/graphics-object-owner.h>
+
+// API
+#include <dali/graphics/vulkan/api/vulkan-api-shader.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 
 using namespace glm;
 
@@ -33,8 +41,103 @@ namespace Vulkan
 static const mat4 CLIP_MATRIX(
   1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
 
+/**
+ * Graphics pipeline state describes single batch-draw call state
+ */
+struct GraphicsPipelineState
+{
+  /**
+   * Internal Data structure collects only POD state
+   * details that are relevant to us
+   */
+  struct Info
+  {
+    // blending
+    vk::Bool32      blendEnabled;
+    vk::BlendFactor srcColor, srcAlpha;
+    vk::BlendFactor dstColor, dstAlpha;
+
+    // vertex input data
+    std::vector<vk::VertexInputAttributeDescription> vertexAttributeDescription;
+    std::vector<vk::VertexInputBindingDescription>   vertexInputBindingDescripton;
+
+    // viewport size
+    vk::Rect2D viewport;
+
+    // topology
+    vk::PrimitiveTopology topology;
+
+    // depth/stencil
+    vk::Bool32 depthTestEnabled;
+    vk::Bool32 stencilTestEnabled;
+
+    // shaders
+    ShaderRef vertexShader;
+    ShaderRef fragmentShader;
+
+    bool operator==( const Info& src ) const
+    {
+      return false; // TODO
+    }
+
+  } info;
+
+  GraphicsPipelineState( GraphicsPipelineState& src )
+  {
+    info = src.info;
+  }
+
+  bool operator==( const GraphicsPipelineState::Info& _info )
+  {
+    return (info == _info);
+  }
+
+  // Resets state
+  void Reset()
+  {
+    pipeline.Reset();
+  }
+
+  void Initialise()
+  {
+
+  }
+
+  // Compiles state
+  static std::unique_ptr<GraphicsPipelineState> Compile(const GraphicsPipelineState::Info& info)
+  {
+    return nullptr;
+  }
+
+  // state, created when compiled, immutable
+  // renders particular set of objects
+  PipelineRef pipeline;
+};
+
+struct GraphicsDrawCommand
+{
+  GraphicsPipelineState& pipelineState;
+
+  // command buffer/pool
+  CommandPoolRef commandPool;
+  CommandBufferRef commandBuffer;
+  FenceRef fence;
+
+  // resources
+  std::vector<BufferRef>    buffers;
+  std::vector<ImageRef>     images;
+  std::vector<SamplerRef>   samplers;
+  std::vector<ImageViewRef> imageViews;
+
+  // descriptor sets and pool
+  std::vector<DescriptorSetRef> descriptorSets;
+  DescriptorPoolRef             descriptorPool;
+};
+
 struct Controller::Impl
 {
+
+
   struct State
   {
     ShaderRef                     vertexShader;
@@ -69,6 +172,10 @@ struct Controller::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
+    // Create factories
+    mShaderFactory = std::make_unique<VulkanAPI::ShaderFactory>( mGraphics );
+    mTextureFactory = std::make_unique<VulkanAPI::TextureFactory>( mGraphics );
+
     mDebugPipelineState.vertexShader = Shader::New( mGraphics, VSH_CODE.data(), VSH_CODE.size() );
 
     mDebugPipelineState.fragmentShader = Shader::New( mGraphics, FSH_CODE.data(), FSH_CODE.size() );
@@ -84,15 +191,7 @@ struct Controller::Impl
       {-halfWidth, halfHeight, 0.0f},
       {-halfWidth, -halfHeight, 0.0f},
     };
-//#endif
-#if 0
-    const vec3 VERTICES[4] = {
-      {-halfWidth, -halfHeight, 0.0f},
-      {halfWidth,  -halfHeight, 0.0f},
-      {halfWidth,  halfHeight, 0.0f},
-      {-halfWidth, halfHeight, 0.0f}
-    };
-#endif
+
     mDebugPipelineState.vertexBuffer = Buffer::New( mGraphics, sizeof( VERTICES[0] ) * 4, Buffer::Type::VERTEX );
     auto& defaultAllocator           = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
     mDebugPipelineState.vertexBuffer->BindMemory(
@@ -154,7 +253,7 @@ struct Controller::Impl
     return pipeline;
   }
 
-  void SubmitCommand( API::RenderCommand&& command )
+  void SubmitCommand( Dali::Graphics::API::RenderCommand&& command )
   {
     auto& state = mDebugPipelineState;
 
@@ -216,10 +315,10 @@ struct Controller::Impl
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );
-        if(inputData->samplerId > 0)
+        //if(inputData->samplerId >= 0)
         {
-          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId - 1]->GetSampler(),
-                                                       mTextures[inputData->samplerId - 1]->GetImageView());
+          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId]->GetSampler(),
+                                                       mTextures[inputData->samplerId]->GetImageView());
         }
 
         // record draw call
@@ -274,50 +373,86 @@ struct Controller::Impl
     return pool;
   }
 
-  void* CreateTexture( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
+  API::TextureFactory& GetTextureFactory() const
   {
-    // AB: yup, yet another hack
-    auto texture = Dali::Graphics::Vulkan::Texture::New( mGraphics, width, height, vk::Format::eR8G8B8A8Unorm );
+    return *(mTextureFactory.get());
+  }
 
-    // check bpp, if 24bpp convert
-    if( sizeInBytes == width*height*3 )
-    {
-      uint8_t* inData = reinterpret_cast<uint8_t*>(data);
-      uint8_t* outData = new uint8_t[width*height*4];
-
-      auto outIdx = 0u;
-      for( auto i = 0u; i < sizeInBytes; i+= 3 )
-      {
-        outData[outIdx] = inData[i];
-        outData[outIdx+1] = inData[i+1];
-        outData[outIdx+2] = inData[i+2];
-        outData[outIdx+3] = 0xff;
-        outIdx += 4;
-      }
-
-      data = outData;
-      sizeInBytes = width*height*4;
-    }
-
-    // Upload data immediately. Will stall the queue :(
-    texture->UploadData( data, sizeInBytes, TextureUploadMode::eImmediate );
-
-    // push texture to the stack, return the buffer
-    mTextures.push_back( texture );
-
-    // return index for quick lookup
-    auto index = mTextures.size();
-    return reinterpret_cast<void*>(index);
+  API::ShaderFactory& GetShaderFactory() const
+  {
+    return *(mShaderFactory.get());
   }
 
   // resources
   std::vector<TextureRef> mTextures;
+  std::vector<ShaderRef>  mShaders;
+
+  // owner objects
+  ObjectOwner<API::Texture>   mTexturesOwner;
+  ObjectOwner<API::Shader>    mShadersOwner;
+
 
   Graphics&           mGraphics;
   Controller&         mOwner;
   GpuMemoryAllocator& mDefaultAllocator;
 
   State mDebugPipelineState;
+
+  std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
+  std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
+
+  /**
+   * NEW IMPLEMENTACIONE
+   */
+
+  void SubmitDraw( const Dali::Graphics::API::BufferInfo& buffer )
+  {
+    // find pipeline state for this batch
+    auto info = GraphicsPipelineState::Info{};
+
+    //info.vertexShader =
+  }
+
+  void SubmitCommandV2( Dali::Graphics::API::RenderCommand&& command )
+  {
+
+    auto vertexShader = command.GetShader( Dali::Graphics::API::ShaderDetails::PipelineStage::VERTEX );
+    auto fragmentShader = command.GetShader( Dali::Graphics::API::ShaderDetails::PipelineStage::FRAGMENT );
+
+    // get shaders from backend
+    ShaderRef vsh, fsh;
+    if(vertexShader)
+    {
+      vsh = VulkanAPI::Shader::DownCast( vertexShader.Get() ).GetShader( vk::ShaderStageFlagBits::eVertex );
+    }
+
+    if(fragmentShader)
+    {
+      fsh = VulkanAPI::Shader::DownCast( vertexShader.Get() ).GetShader( vk::ShaderStageFlagBits::eFragment );
+    }
+
+#if 0
+    const auto& bufferList = command.GetBufferList();
+    const auto& bufferVector = bufferList.Get();
+
+    for(const auto& bufferInfo : bufferVector )
+    {
+      /*
+      const auto ptr = bufferInfo->GetDataBase();
+      const auto size = bufferInfo->GetSize();
+
+      SubmitDraw( bufferInfo );
+      */
+      // new render state
+
+    }
+#endif
+  }
+
+
+
+  std::vector<GraphicsPipelineState> mStatePerBatchCache;
+
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -325,10 +460,21 @@ struct Controller::Impl
 #pragma GCC diagnostic     ignored "-Wreturn-type"
 API::Accessor<API::Shader> Controller::CreateShader( const API::BaseFactory<API::Shader>& factory )
 {
+  auto handle = mImpl->mShadersOwner.CreateObject( factory );
+  auto& apiShader = static_cast<VulkanAPI::Shader&>(mImpl->mShadersOwner[handle]);
+  auto vertexShaderRef = apiShader.GetShaderRef( vk::ShaderStageFlagBits::eVertex );
+  auto fragmentShaderRef = apiShader.GetShaderRef( vk::ShaderStageFlagBits::eFragment );
+  mImpl->mShaders.push_back( vertexShaderRef );
+  mImpl->mShaders.push_back( fragmentShaderRef );
+  return API::Accessor<API::Shader>( mImpl->mShadersOwner, handle);
 }
 
 API::Accessor<API::Texture> Controller::CreateTexture( const API::BaseFactory<API::Texture>& factory )
 {
+  auto handle = mImpl->mTexturesOwner.CreateObject( factory );
+  auto textureRef = static_cast<VulkanAPI::Texture&>(mImpl->mTexturesOwner[handle]).GetTextureRef();
+  mImpl->mTextures.push_back( textureRef );
+  return API::Accessor<API::Texture>( mImpl->mTexturesOwner, handle);
 }
 
 API::Accessor<API::TextureSet> Controller::CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory )
@@ -349,11 +495,6 @@ API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<AP
 
 API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
 {
-}
-
-void* Controller::CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
-{
-  return mImpl->CreateTexture( data, sizeInBytes, width, height );
 }
 
 std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
@@ -381,9 +522,10 @@ void Controller::GetRenderItemList()
 {
 }
 
-void Controller::SubmitCommand( API::RenderCommand&& command )
+void Controller::SubmitCommand( Dali::Graphics::API::RenderCommand&& command )
 {
   mImpl->SubmitCommand( std::move( command ) );
+  //SubmitCommandTest( std::move( command ) );
 }
 
 void Controller::BeginFrame()
@@ -394,6 +536,16 @@ void Controller::BeginFrame()
 void Controller::EndFrame()
 {
   mImpl->EndFrame();
+}
+
+API::TextureFactory& Controller::GetTextureFactory() const
+{
+  return mImpl->GetTextureFactory();
+}
+
+API::ShaderFactory& Controller::GetShaderFactory() const
+{
+  return mImpl->GetShaderFactory();
 }
 
 } // namespace Vulkan
