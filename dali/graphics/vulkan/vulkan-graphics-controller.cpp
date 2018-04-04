@@ -307,7 +307,7 @@ struct Controller::Impl
 
     // return index for quick lookup
     auto index = mTextures.size();
-    return *reinterpret_cast<void**>(&index);
+    return reinterpret_cast<void*>(index);
   }
 
   // resources

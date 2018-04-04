@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_VULKAN_IMAGE
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ public:
   }
 
 private:
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
 
@@ -271,7 +271,7 @@ private:
 
   ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo );
 
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
 

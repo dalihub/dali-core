@@ -140,7 +140,6 @@ struct CommandBuffer::Impl
     mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(), mCommandBuffer );
   }
 
-#pragma GCC diagnostic pop
 
   /** Push wait semaphores */
   void PushWaitSemaphores( const std::vector<vk::Semaphore>&          semaphores,
@@ -293,7 +292,7 @@ struct CommandBuffer::Impl
       for( auto&& imageBarrier : imageBarriers )
       {
         ImageRef imageResource{};
-        if( imageResource = mGraphics.FindImage( imageBarrier.image ) )
+        if( (imageResource = mGraphics.FindImage( imageBarrier.image )) )
         {
           PushResource( imageResource );
         }

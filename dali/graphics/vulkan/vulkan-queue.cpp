@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ inline PrepareSemaphoresData PrepareSemaphores(const std::vector< CommandBufferR
                                       cmdbuf->GetWaitSemaphoreStages().end());
     }
   }
-  return std::move(retval);
+  return retval;
 }
 }
 
@@ -89,7 +89,7 @@ bool Submission::WaitForFence(uint32_t timeout)
 // queue
 Queue::Queue(Graphics& graphics, vk::Queue queue, uint32_t queueFamilyIndex, uint32_t queueIndex,
              vk::QueueFlags queueFlags)
-: mGraphics(graphics), mQueue(queue), mFlags(queueFlags), mQueueFamilyIndex(queueFamilyIndex), mQueueIndex(queueIndex)
+: /*mGraphics(graphics),*/ mQueue(queue), mFlags(queueFlags) /*, mQueueFamilyIndex(queueFamilyIndex), mQueueIndex(queueIndex) */
 {
 }
 

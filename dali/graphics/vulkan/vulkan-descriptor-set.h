@@ -83,7 +83,7 @@ private:
 
   DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet, vk::DescriptorSetAllocateInfo allocateInfo );
 
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
 
@@ -110,7 +110,7 @@ private:
 
   DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
 
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
 

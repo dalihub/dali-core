@@ -42,10 +42,6 @@ struct Pixel
 {
   Pixel() = default;
 
-  explicit Pixel( uint32_t _color ) : color( _color )
-  {
-  }
-
   explicit Pixel( uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a )
   {
     components.r = _r;
@@ -54,14 +50,10 @@ struct Pixel
     components.a = _a;
   }
 
-  union
-  {
-    uint32_t color;
     struct
     {
       uint8_t r, g, b, a;
     } components;
-  };
 
   /*
   uint8_t& r = components.r;

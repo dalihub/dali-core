@@ -80,12 +80,12 @@ private:
 
 
 private:
-  Graphics&                mGraphics;
+  //Graphics&                mGraphics;
   vk::Queue                mQueue;
   vk::QueueFlags           mFlags;
   std::vector< vk::Fence > mFences;
-  uint32_t                 mQueueFamilyIndex;
-  uint32_t                 mQueueIndex;
+  //uint32_t                 mQueueFamilyIndex;
+  //uint32_t                 mQueueIndex;
 };
 
 } // namespace Vulkan

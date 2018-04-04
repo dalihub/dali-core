@@ -118,7 +118,7 @@ public:
   bool OnDestroy() override;
 
 private:
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
 

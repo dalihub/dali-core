@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_VULKAN_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class DescriptorSet;
 class CommandBuffer : public VkManaged
 {
   friend class CommandPool;
-  friend class CommandBufferPool;
+  friend struct CommandBufferPool;
 
 public:
 
@@ -259,7 +259,7 @@ private:
 
   // Constructor called by the CommandPool only
   CommandBuffer( CommandPool& commandPool, uint32_t poolIndex, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer );
-  class Impl;
+  struct Impl;
   std::unique_ptr<Impl> mImpl;
 
 };

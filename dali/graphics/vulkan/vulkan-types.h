@@ -299,7 +299,7 @@ using FBID = int32_t;
 #define NotImplemented() \
 {\
 printf("Function %s isn't implemented!\n", __FUNCTION__);\
-assert( "Function no implemented" );\
+assert( false && "Function no implemented" );\
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,7 +217,6 @@ struct CommandPool::Impl
 
   CommandBufferRef NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
   {
-    vk::CommandBufferAllocateInfo info( allocateInfo );
     auto& usedPool = allocateInfo.level == vk::CommandBufferLevel::ePrimary ? *mInternalPoolPrimary.get() : *mInternalPoolSecondary.get();
     auto retval = usedPool.AllocateCommandBuffer( false );
     return retval;

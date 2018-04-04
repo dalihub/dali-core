@@ -209,7 +209,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      //.setEnabledLayerCount(0)
+      .setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -276,7 +276,7 @@ void Graphics::GetPhysicalDeviceProperties()
 
 void Graphics::GetQueueFamilyProperties()
 {
-  mQueueFamilyProperties = std::move(mPhysicalDevice.getQueueFamilyProperties());
+  mQueueFamilyProperties = mPhysicalDevice.getQueueFamilyProperties();
 }
 
 FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
