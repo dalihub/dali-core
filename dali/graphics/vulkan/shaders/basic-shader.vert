@@ -7,7 +7,6 @@ layout( set = 0, binding = 0, std140 ) uniform world
     mat4 mvp;
     vec4 color;
     vec3 size;
-    uint samplerIndex;
 };
 
 layout( set = 0, binding = 1, std140 ) uniform clipUniform

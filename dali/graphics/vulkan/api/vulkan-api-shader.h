@@ -1,5 +1,5 @@
-#ifndef DALI_VULKAN_161117_VULKAN_API_SHADER_H
-#define DALI_VULKAN_161117_VULKAN_API_SHADER_H
+#ifndef DALI_GRAPHICS_VULKAN_API_SHADER_H
+#define DALI_GRAPHICS_VULKAN_API_SHADER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -71,4 +71,4 @@ private:
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
-#endif //DALI_VULKAN_161117_VULKAN_API_SHADER_H
+#endif //DALI_GRAPHICS_VULKAN_API_SHADER_H

@@ -30,6 +30,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 
+#include <iostream>
 using namespace glm;
 
 namespace Dali
@@ -168,8 +169,8 @@ struct Controller::Impl
 
   // TODO: @todo this function initialises basic buffers, shaders and pipeline
   // for the prototype ONLY
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
     // Create factories
@@ -260,6 +261,8 @@ struct Controller::Impl
     const auto& bufferList = command.GetBufferList();
     auto        drawcalls  = command.GetPrimitiveCount();
 
+    auto textureList = command.GetTextures();
+
     // create pool of commands to be re-recorded
     if( state.drawCommandPool.empty() )
     {
@@ -297,7 +300,6 @@ struct Controller::Impl
         mat4 mvp;
         vec4 color;
         vec3 size;
-        uint samplerId;
       } __attribute__( ( aligned( 16 ) ) );
 
       auto memory = state.uniformBuffer0->GetMemoryHandle();
@@ -315,10 +317,17 @@ struct Controller::Impl
 
         descriptorSets[0]->WriteUniformBuffer( 0, state.uniformBuffer0, i * uniformBlockOffsetStride, stride );
         descriptorSets[0]->WriteUniformBuffer( 1, state.uniformBuffer1, 0, state.uniformBuffer1->GetSize() );
-        //if(inputData->samplerId >= 0)
+        if(!textureList.empty())
         {
-          descriptorSets[0]->WriteCombinedImageSampler(2, mTextures[inputData->samplerId]->GetSampler(),
-                                                       mTextures[inputData->samplerId]->GetImageView());
+          auto& texture = textureList[i];
+          auto ref = texture.GetHandle();
+          auto& vulkanTexture =static_cast<VulkanAPI::Texture&>(texture.Get());
+
+          std::cout << "ref: " << ref << std::endl;
+
+          descriptorSets[0]->WriteCombinedImageSampler(2, vulkanTexture.GetTextureRef()->GetSampler(),
+                                                       vulkanTexture.GetTextureRef()->GetImageView());
+          // TODO: AB: support more samplers, for now breaking after setting first
         }
 
         // record draw call
