@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0cb20b4c_8c1406e4",
+        "filename": "dali/graphics-api/graphics-api-accessor.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-04T15:00:27Z",
+      "side": 1,
+      "message": "DALI_DEBUG_ASSERT?",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 21
+      },
+      "revId": "9e15dafef8ea06ffbb74ed39cd4353804641d273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1178449_773754ec",
+        "filename": "dali/graphics-api/graphics-api-texture-factory.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-04T15:00:27Z",
+      "side": 1,
+      "message": "Could we not have one function which took two parameters instead?\n\nOr if you need to do it separately in some instances, then I think it\u0027s still worth adding a third function which takes both parameters.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 77
+      },
+      "revId": "9e15dafef8ea06ffbb74ed39cd4353804641d273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
