@@ -58,7 +58,7 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
   //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  //"VK_LAYER_RENDERDOC_Capture",
+  "VK_LAYER_RENDERDOC_Capture",
   //"VK_LAYER_LUNARG_parameter_validation", // parameter
   //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
   //"VK_LAYER_LUNARG_monitor",             // monitor
@@ -208,7 +208,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
 
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
-      .setEnabledLayerCount(U32(validationLayers.size()))
+      //.setEnabledLayerCount(U32(validationLayers.size()))
       .setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
