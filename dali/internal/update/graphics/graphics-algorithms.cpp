@@ -57,7 +57,6 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     Matrix  world;
     Vector4 color;
     Vector3 size;
-    uint32_t samplerId;
   } __attribute__((aligned(16)));
 
   auto uniformBuffer = graphics.CreateBuffer<DataT>( numberOfRenderItems );
@@ -66,25 +65,33 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   // TODO: for now texture id is passed through the buffer however
   // it isn't used by shader but only used to extract which texture
   // should be used during rendering an item.
-  uint32_t opaqueTextureId = 0;
+  Graphics::API::TextureList textureList;
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
 
     if(item.mTextureSet)
     {
-
       auto textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
-
-      auto& texture = textureSet->GetTexture(0)->GetGfxObject();
-      auto textureId = texture.GetHandle();
-
-      opaqueTextureId = uint32_t(textureId); // TODO: AB: hack!!!
+      auto textureCount = textureSet->GetTextureCount();
+      if( textureCount == 0 )
+      {
+        textureList.emplace_back( nullptr );
+      }
+      else
+      {
+        for (auto i = 0u; i < textureCount; ++i)
+        {
+          auto &texture = textureSet->GetTexture(i)
+                                    ->GetGfxObject();
+          textureList.push_back(texture);
+          break;
+        }
+      }
     }
     Matrix::Multiply( data[i].world, item.mModelMatrix, viewProjection );
     data[i].color = item.mNode->GetWorldColor( bufferIndex );
     data[i].size  = item.mSize;
-    data[i].samplerId = opaqueTextureId;
   }
   commandBuilder.Set( Graphics::API::PrimitiveCount{numberOfRenderItems} );
 
@@ -92,6 +99,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   buffers.emplace_back(std::move(uniformBuffer));
 
   commandBuilder.Set( Graphics::API::BufferList{std::move(buffers)} );
+  commandBuilder.Set( Graphics::API::TextureList{std::move(textureList)} );
+
   auto cmd = commandBuilder.Build();
   graphics.SubmitCommand( std::move(cmd) );
 }
