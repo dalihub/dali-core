@@ -18,6 +18,11 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-shader-details.h>
+
+#include <cstdint>
+#include <string>
+
 namespace Dali
 {
 namespace Graphics
@@ -32,10 +37,57 @@ class Shader
 {
 public:
   // not copyable
-  Shader(const Shader&) = delete;
-  Shader& operator=(const Shader&) = delete;
+  Shader(const Shader &) = delete;
+  Shader &operator=(const Shader &) = delete;
 
   virtual ~Shader() = default;
+
+  // Reflection, optional, may be not supported
+  virtual bool IsReflectionSupported() const = 0;
+
+  virtual uint32_t GetVertexAttributeLocation(const std::string &name) const
+  {
+    return 0;
+  }
+
+  virtual ShaderDetails::VertexInputAttributeFormat GetVertexAttributeFormat( uint32_t location ) const
+  {
+    return ShaderDetails::VertexInputAttributeFormat::UNDEFINED;
+  }
+
+  virtual std::string GetVertexAttributeName(uint32_t location) const
+  {
+    return {};
+  }
+
+  virtual std::vector<uint32_t> GetVertexAttributeLocations() const
+  {
+    return {};
+  }
+
+  virtual std::vector<ShaderDetails::UniformInfo> GetSamplers() const
+  {
+    return {};
+  }
+
+  virtual bool GetNamedUniform( const std::string& name, ShaderDetails::UniformInfo& out ) const
+  {
+    return false;
+  }
+
+  /**
+   * Returns number of uniform blocks from all the shaders
+   * @return
+   */
+  virtual uint32_t GetUniformBlockCount() const
+  {
+    return 0u;
+  }
+
+  virtual bool GetUniformBlock( uint32_t index, ShaderDetails::UniformBlockInfo& out ) const
+  {
+    return false;
+  }
 
 protected:
   // derived types should not be moved direcly to prevent slicing

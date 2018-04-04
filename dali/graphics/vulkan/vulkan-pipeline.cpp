@@ -263,6 +263,7 @@ struct Pipeline::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   void CreatePipelineLayout()
   {
+
     // pull desciptor set layouts from shaders
     auto layoutInfo = vk::PipelineLayoutCreateInfo{};
 
@@ -403,6 +404,8 @@ struct Pipeline::Impl
   // Color blend
   vk::PipelineColorBlendStateCreateInfo             mColorBlendState {};
   vk::PipelineColorBlendAttachmentState             mAttachementNoBlendState {};
+
+
 };
 
 /*********************************************************************

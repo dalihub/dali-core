@@ -16,7 +16,6 @@ layout( set = 0, binding = 0, std140 ) uniform world
     mat4 mvp;
     vec4 color;
     vec3 size;
-    uint samplerIndex;
 };
 
 layout( set = 0, binding = 1, std140 ) uniform clipUniform
@@ -25,11 +24,11 @@ layout( set = 0, binding = 1, std140 ) uniform clipUniform
 };
 
 layout( location = 0 ) out vec4 triColor;
-
 layout( location = 1 ) out vec2 uvCoords;
 
 void main()
 {
+
     gl_Position = clip * mvp * vec4( aPosition* size, 1.0 );
     uvCoords = aPosition.xy + vec2( 0.5, 0.5 );
     triColor = color;
@@ -44,12 +43,85 @@ layout( location = 0 ) in vec4 triColor;
 layout( location = 1 ) in vec2 uvCoords;
 layout( location = 0 ) out vec4 outColor;
 
-layout( set = 0, binding = 2 ) uniform sampler2D uTexture;
+layout( set = 0, binding = 4 ) uniform sampler2D sTexture;
+layout( set = 0, binding = 2 ) uniform sampler2D sTexture2;
 
 void main()
 {
-    outColor = texture( uTexture, uvCoords) * triColor;
+    outColor = texture( sTexture, uvCoords) * triColor;
 }*/
+
+
+extern std::vector<uint8_t> VSH_IMAGE_VISUAL_CODE;
+/*
+#version 430
+
+layout( location = 0 ) in vec2 aPosition;
+
+layout( set = 0, binding = 0, std140 ) uniform vertData
+{
+    mat4 uModelMatrix;
+    mat4 uViewMatrix;
+    mat4 uProjection;
+    vec3 uSize;
+    vec4 pixelArea;
+    float uPixelAligned;
+
+    //Visual size and offset
+    vec2 offset;
+    vec2 size;
+    vec4 offsetSizeMode;
+    vec2 origin;
+    vec2 anchorPoint;
+};
+
+layout( location = 0 ) out vec2 vTexCoord;
+
+vec4 ComputeVertexPosition()
+{
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );
+}
+
+void main()
+{
+    vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();
+    vec4 alignedVertexPosition = vertexPosition;
+    alignedVertexPosition.xy = floor ( vertexPosition.xy ); // Pixel alignment
+    vertexPosition = uProjection * mix( vertexPosition, alignedVertexPosition, uPixelAligned );
+    vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );
+    gl_Position = vertexPosition;
+}*/
+
+
+extern std::vector<uint8_t> FSH_IMAGE_VISUAL_CODE;
+/*
+#version 430
+
+layout( location = 0 ) in vec2 vTexCoord;
+
+layout( set = 0, binding = 1, std140 ) uniform fragData
+{
+    vec4 uColor;
+    vec3 mixColor;
+    float opacity;
+    float preMultipliedAlpha;
+};
+
+layout( set = 0, binding = 2 ) uniform sampler2D sTexture;
+
+layout( location = 0 ) out vec4 fragColor;
+
+vec4 visualMixColor()
+{
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );
+}
+void main()
+{
+    fragColor = texture( sTexture, vTexCoord ) * uColor * visualMixColor();
+}
+*/
 
 
 #endif // SPV_GENERATED_HEADER
