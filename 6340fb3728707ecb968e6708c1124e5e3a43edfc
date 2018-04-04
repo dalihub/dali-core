@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09d67422_8c19ed8f",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-04T14:55:21Z",
+      "side": 1,
+      "message": "Worth adding a todo here in case we forget to change it back later.",
+      "revId": "6340fb3728707ecb968e6708c1124e5e3a43edfc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
