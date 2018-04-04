@@ -50,8 +50,9 @@ using TextureList    = std::vector<Accessor<Texture>>;
 class RenderCommand final
 {
 public:
-  RenderCommand( PrimitiveCount primitiveCount, BufferList&& bufferList )
-  : mPrimitiveCount{primitiveCount}, mBufferList{std::move( bufferList )}
+  RenderCommand( PrimitiveCount primitiveCount, BufferList&& bufferList,
+  TextureList&& textureList )
+  : mPrimitiveCount{primitiveCount}, mBufferList{std::move( bufferList )}, mTextureList{std::move( textureList )}
   {
   }
 
@@ -75,7 +76,7 @@ public:
     return mBufferList;
   }
 
-  const auto& GetTextures() const
+  const TextureList& GetTextures() const
   {
     return mTextureList;
   }
@@ -114,8 +115,6 @@ public:
     return retval;
   }
 
-
-
 private:
   PrimitiveCount mPrimitiveCount;
   BufferList     mBufferList;
@@ -123,7 +122,7 @@ private:
   ShaderList     mShaders;
 };
 
-using RenderCommandBuilder = Utility::Builder<RenderCommand, PrimitiveCount, BufferList>;
+using RenderCommandBuilder = Utility::Builder<RenderCommand, PrimitiveCount, BufferList, TextureList>;
 
 } // namespace API
 } // namespace Graphics

@@ -34,6 +34,8 @@
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture-set.h>
 #include <dali/graphics-api/graphics-api-texture.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
@@ -75,6 +77,11 @@ public:
   /**
    * @brief Create a new object
    */
+  virtual Accessor<Buffer> CreateBuffer( const BaseFactory<Buffer>& factory ) = 0;
+
+  /**
+   * @brief Create a new object
+   */
   virtual Accessor<StaticBuffer> CreateStaticBuffer( const BaseFactory<StaticBuffer>& factory ) = 0;
 
   /**
@@ -103,6 +110,12 @@ public:
    * @return
    */
   virtual ShaderFactory& GetShaderFactory() const = 0;
+
+  /**
+ * @brief Returns shader factory
+ * @return
+ */
+  virtual BufferFactory& GetBufferFactory() const = 0;
 
   /**
    * @brief Create a buffer

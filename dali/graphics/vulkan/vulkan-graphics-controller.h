@@ -25,6 +25,27 @@ namespace Dali
 {
 namespace Graphics
 {
+namespace VulkanAPI
+{
+/**
+ * Structure describes deferred memory transfer
+ * Source memory is owned by the buffer and will be discarded
+ * when transfer is completed
+ */
+struct BufferMemoryTransfer
+{
+  BufferMemoryTransfer() = default;
+  ~BufferMemoryTransfer() = default;
+
+  std::unique_ptr<char> srcPtr{ nullptr };
+  uint32_t srcSize{ 0u };
+
+  Vulkan::BufferRef dstBuffer {};
+  uint32_t          dstOffset { 0u };
+};
+
+}
+
 namespace Vulkan
 {
 class Graphics;
@@ -66,6 +87,11 @@ public:
   API::Accessor<API::DynamicBuffer> CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory ) override;
 
   /**
+ * @brief Create a new object
+ */
+  API::Accessor<API::Buffer> CreateBuffer( const API::BaseFactory<API::Buffer>& factory ) override;
+
+  /**
    * @brief Create a new object
    */
   API::Accessor<API::StaticBuffer> CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory ) override;
@@ -93,11 +119,22 @@ public:
 
   void EndFrame() override;
 
+
+  // VULKAN only
+
+public:
+
+  Vulkan::Graphics& GetGraphics() const;
+
+  void ScheduleBufferMemoryTransfer( std::unique_ptr<VulkanAPI::BufferMemoryTransfer> transferRequest );
+
 public:
 
   API::TextureFactory& GetTextureFactory() const override;
 
   API::ShaderFactory& GetShaderFactory() const override;
+
+  API::BufferFactory& GetBufferFactory() const override;
 
 public:
   // not copyable

@@ -68,6 +68,9 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
+#include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -1164,6 +1167,7 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
 }
 
+#if 0
 void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1175,7 +1179,21 @@ void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuf
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
 }
+#endif
 
+void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
+{
+  // todo: may not be needed yet
+  // Message has ownership of format while in transit from update -> render
+  //auto& controller = GetGraphicsController();
+  //controller.CreateBuffer( controller.GetBufferFactory()
+  //.SetSize( format->size * format->components ))
+
+  // set format directly, on the update thread
+  propertyBuffer->SetFormat( format.Release() );
+}
+
+#if 0
 void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1186,6 +1204,16 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
+}
+#endif
+
+void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
+{
+  auto& controller = GetGraphicsController();
+  auto buffer = controller.CreateBuffer( controller.GetBufferFactory()
+                  .SetSize( uint32_t(propertyBuffer->GetFormat()->size * size) )
+                  .SetUsage(Graphics::API::Buffer::UsageHint::ATTRIBUTES ));
+  propertyBuffer->SetGfxObject( buffer );
 }
 
 void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
@@ -1353,6 +1381,11 @@ void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
+}
+
+Graphics::API::Controller& UpdateManager::GetGraphicsController() const
+{
+  return mImpl->graphics.GetController();
 }
 
 } // namespace SceneGraph

@@ -1,5 +1,5 @@
-#ifndef DALI_VULKAN_161117_VULKAN_API_SHADER_H
-#define DALI_VULKAN_161117_VULKAN_API_SHADER_H
+#ifndef DALI_GRAPHICS_VULKAN_API_SHADER_H
+#define DALI_GRAPHICS_VULKAN_API_SHADER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -21,6 +21,7 @@
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
 namespace Dali
 {
@@ -52,6 +53,20 @@ public:
 
   Vulkan::ShaderRef GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const;
 
+
+  // REFLECTION
+
+  // Vertex attributes
+  bool IsReflectionSupported() const override;
+
+  uint32_t GetVertexAttributeLocation(const std::string &name) const override;
+
+  API::ShaderDetails::VertexInputAttributeFormat GetVertexAttributeFormat( uint32_t location ) const override;
+
+  std::string GetVertexAttributeName(uint32_t location) const override;
+
+  std::vector<uint32_t> GetVertexAttributeLocations() const override;
+
 protected:
   // derived types should not be moved direcly to prevent slicing
   Shader( Shader&& ) = default;
@@ -65,10 +80,11 @@ private:
   Vulkan::ShaderRef mVertexShader;
   Vulkan::ShaderRef mFragmentShader;
 
+  std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute> mVertexInputAttributes;
 
 };
 
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
-#endif //DALI_VULKAN_161117_VULKAN_API_SHADER_H
+#endif //DALI_GRAPHICS_VULKAN_API_SHADER_H

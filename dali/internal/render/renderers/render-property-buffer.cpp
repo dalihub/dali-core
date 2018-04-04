@@ -122,7 +122,8 @@ PropertyBuffer::PropertyBuffer()
  mData(NULL),
  mGpuBuffer(NULL),
  mSize(0),
- mDataChanged(true)
+ mDataChanged(true),
+ mGfxBuffer{ nullptr }
 {
 }
 

@@ -1,13 +1,14 @@
 #version 430
 
 layout( location = 0 ) in vec3 aPosition;
+layout( location = 1 ) in float aFloat;
+layout( location = 2 ) in int aInt;
 
 layout( set = 0, binding = 0, std140 ) uniform world
 {
     mat4 mvp;
     vec4 color;
     vec3 size;
-    uint samplerIndex;
 };
 
 layout( set = 0, binding = 1, std140 ) uniform clipUniform

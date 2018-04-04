@@ -22,6 +22,8 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/graphics-api/graphics-api-accessor.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
 
 namespace Dali
 {
@@ -182,6 +184,16 @@ public:
     return mFormat.Get();
   }
 
+  inline void SetGfxObject( Graphics::API::Accessor<Graphics::API::Buffer> gfxObject )
+  {
+    mGfxBuffer = gfxObject;
+  }
+
+  inline Graphics::API::Accessor<Graphics::API::Buffer> GetGfxObject() const
+  {
+    return mGfxBuffer;
+  }
+
 private:
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< char > >    mData;      ///< Data
@@ -189,6 +201,9 @@ private:
 
   size_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
+
+  // GRAPHICS
+  Graphics::API::Accessor<Graphics::API::Buffer> mGfxBuffer;
 };
 
 } // namespace Render

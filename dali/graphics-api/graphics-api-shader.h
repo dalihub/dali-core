@@ -18,6 +18,11 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-shader-details.h>
+
+#include <cstdint>
+#include <string>
+
 namespace Dali
 {
 namespace Graphics
@@ -32,10 +37,33 @@ class Shader
 {
 public:
   // not copyable
-  Shader(const Shader&) = delete;
-  Shader& operator=(const Shader&) = delete;
+  Shader(const Shader &) = delete;
+  Shader &operator=(const Shader &) = delete;
 
   virtual ~Shader() = default;
+
+  // Reflection, optional, may be not supported
+  virtual bool IsReflectionSupported() const = 0;
+
+  virtual uint32_t GetVertexAttributeLocation(const std::string &name) const
+  {
+    return 0;
+  }
+
+  virtual ShaderDetails::VertexInputAttributeFormat GetVertexAttributeFormat( uint32_t location ) const
+  {
+    return ShaderDetails::VertexInputAttributeFormat::UNDEFINED;
+  }
+
+  virtual std::string GetVertexAttributeName(uint32_t location) const
+  {
+    return {};
+  }
+
+  virtual std::vector<uint32_t> GetVertexAttributeLocations() const
+  {
+    return {};
+  }
 
 protected:
   // derived types should not be moved direcly to prevent slicing
