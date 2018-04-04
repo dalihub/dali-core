@@ -42,6 +42,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
@@ -551,6 +552,8 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int face );
+
+  Graphics::API::Controller& GetGraphicsController() const;
 
 public:
 
