@@ -379,6 +379,51 @@ struct SPIRVShader::Impl
               //@todo: support input handling ( when vertex buffers work )
               if( storageClass == SpvStorageClassInput )
               {
+                auto format = vk::Format{ vk::Format::eUndefined };
+                auto location = U32(-1);
+                if( *ptr.pointerType == SpvOpTypeFloat )
+                {
+                  format = vk::Format::eR32Sfloat;
+                }
+                else if( *ptr.pointerType == SpvOpTypeInt )
+                {
+                  format = vk::Format::eR32Sint;
+                }
+                else if( *ptr.pointerType == SpvOpTypeVector )
+                {
+                  // always 32-bit float signed
+                  const vk::Format SUPPORTED_VECTOR_FORMATS[] =
+                                     {
+                                       vk::Format::eR32Sfloat,
+                                       vk::Format::eR32G32Sfloat,
+                                       vk::Format::eR32G32B32Sfloat,
+                                       vk::Format::eR32G32B32A32Sfloat,
+                                     };
+
+                  format = SUPPORTED_VECTOR_FORMATS[ptr.pointerType->GetParameterU32(2)];
+                }
+
+                // format is valid, find location
+                if( format != vk::Format::eUndefined )
+                {
+                  auto decorations = FindDecorationsForId( name.opName->GetParameterU32(0) );
+                  for( auto&& decor : decorations )
+                  {
+                    if( decor->GetParameter<SpvDecoration>(1) == SpvDecorationLocation )
+                    {
+                      location = decor->GetParameterU32(2);
+                      break;
+                    }
+                  }
+                  if( location != U32(-1) )
+                  {
+                    if( location >= inputAttributes.size() )
+                    {
+                      inputAttributes.resize( location+1 );
+                    }
+                    inputAttributes[location] = { location, name.opName->GetParameterAsString(1), format };
+                  }
+                }
               }
               break;
             }
@@ -803,6 +848,23 @@ struct SPIRVShader::Impl
     return retval;
   }
 
+  bool GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out, bool canOverlap = false ) const
+  {
+    if( out.size() < inputAttributes.size() )
+    {
+      out.resize( inputAttributes.size() );
+    }
+    for( auto i = 0u; i < inputAttributes.size(); ++i )
+    {
+      if( !canOverlap && out[i].format != vk::Format::eUndefined )
+      {
+        return false;
+      }
+      out[i] = inputAttributes[i];
+    }
+    return true;
+  }
+
   /**
    * Tests if the header is valid for SPIR-V
    * @return
@@ -831,6 +893,7 @@ public:
   };
 
   std::vector<LayoutAndBindings> layoutCreateInfoCache{};
+  std::vector<SPIRVVertexInputAttribute> inputAttributes{};
 
   std::vector<SPIRVWord>    data;
   std::vector<PointerName>  names{};
@@ -839,6 +902,8 @@ public:
   Header   header;
 
   vk::ShaderStageFlags shaderStages{};
+
+
 };
 #pragma GCC diagnostic pop
 
@@ -898,6 +963,11 @@ const uint32_t* SPIRVShader::GetOpCodeParameterPtr( const SPIRVOpCode& opCode, u
   return ( opCode.localData.start + index + 1 );
 }
 
+void SPIRVShader::GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out ) const
+{
+  mImpl->GetVertexInputAttributes( out );
+}
+
 /**************************************************************************************
  * SPIRVUtils
  */
@@ -925,6 +995,8 @@ std::unique_ptr<SPIRVShader> SPIRVUtils::Parse( const SPIRVWord* data, size_t si
   std::copy( data, data+wordSize, spirvCode.begin());
   return Parse( spirvCode, stages );
 }
+
+
 
 } // namespace SpirV
 
