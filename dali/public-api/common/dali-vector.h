@@ -416,9 +416,13 @@ public: // API
   typedef const T* ConstIterator; ///< Const iterator @SINCE_1_0.0
   typedef T  ItemType; ///< Item type @SINCE_1_0.0
 
+  /**
+   * @brief Enumeration for BaseType.
+   * @SINCE_1_0.0
+   */
   enum
   {
-    BaseType = IsTrivialType
+    BaseType = IsTrivialType ///< @SINCE_1_0.0
   };
 
   /**

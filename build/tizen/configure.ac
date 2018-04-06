@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Samsung Electronics Co., Ltd.
+# Copyright (c) 2018 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,6 +88,10 @@ if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
 
+if test "x$enable_trace" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DTRACE_ENABLED"
+fi
+
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_CFLAGS="$DALI_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
@@ -143,6 +147,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  Trace Build:                      $enable_trace
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
   Backtrace:                        $enable_backtrace

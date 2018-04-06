@@ -4,6 +4,7 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/bitmap.cpp \
    $(platform_abstraction_src_dir)/core.cpp \
    $(platform_abstraction_src_dir)/debug.cpp \
+   $(platform_abstraction_src_dir)/trace.cpp \
    $(platform_abstraction_src_dir)/profiling.cpp \
    $(platform_abstraction_src_dir)/input-options.cpp \
    $(platform_abstraction_src_dir)/system-overlay.cpp \
@@ -27,6 +28,7 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/core-enumerations.h \
    $(platform_abstraction_src_dir)/context-notifier.h \
    $(platform_abstraction_src_dir)/debug.h \
+   $(platform_abstraction_src_dir)/trace.h \
    $(platform_abstraction_src_dir)/profiling.h \
    $(platform_abstraction_src_dir)/input-options.h \
    $(platform_abstraction_src_dir)/bitmap.h \
