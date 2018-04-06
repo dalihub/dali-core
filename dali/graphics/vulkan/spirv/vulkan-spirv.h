@@ -42,6 +42,14 @@ using SPIRVWord = uint32_t;
  */
 struct SPIRVOpCode;
 
+
+struct SPIRVVertexInputAttribute
+{
+  uint32_t     location;
+  std::string  name;
+  vk::Format   format;
+};
+
 /**
  * Defines SPIRVShader program
  */
@@ -61,6 +69,12 @@ public:
    * @return create info structure
    */
   std::vector<vk::DescriptorSetLayoutCreateInfo> GenerateDescriptorSetLayoutCreateInfo() const;
+
+  /**
+   * Retrieves vertex input attributes ( names and locations ) from the shader
+   * @return fills the given vector of attributes
+   */
+  void GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out ) const;
 
   /**
    * Returns total number of OpCodes
