@@ -2,7 +2,7 @@
 #define DALI_HANDLE_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,30 @@ DALI_IMPORT_API Property::Index RegisterProperty( Handle handle, Property::Index
  * @param[in] typeInfo The TypeInfo that creates the handle.
  */
 DALI_IMPORT_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
+
+
+/**
+ * @brief Determine if the custom property index exists on this object without throwing a Dali::Exception.
+ *
+ * @note This does not check default properties.
+ * @param[in] handle The handle to check
+ * @param[in] index The index of the property to test for
+ */
+DALI_IMPORT_API bool DoesCustomPropertyExist( Handle& handle, Property::Index index );
+
+/**
+ * @brief PropertySetSignal function prototype for signal handler. Called when a property is set on this object.
+ */
+using PropertySetSignalType = Signal< void( Handle& handle, Property::Index index, Property::Value value ) >;
+
+/**
+ * @brief Get a signal when a property is set on this object through the API (i.e. not when animating)
+ *
+ * @param[in] handle The handle of the object to listen to.
+ * @return The signal to attach a connection to.
+ */
+DALI_IMPORT_API PropertySetSignalType& PropertySetSignal( Handle handle );
+
 
 } // namespace DevelHandle
 

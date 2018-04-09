@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
+#include "dali-test-suite-utils/test-custom-actor.h"
+
 #include <mesh-builder.h>
 
 using namespace Dali;
@@ -1034,5 +1036,231 @@ int UtcDaliHandleGetCurrentProperty(void)
   DALI_TEST_EQUALS( actor.GetProperty< float >( index ), 2.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentProperty< float >( index ), 2.0f, TEST_LOCATION );
 
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistP1(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test if a registered custom property exists on object" );
+
+  Actor actor = Actor::New();
+  auto propertyIndex = actor.RegisterProperty("customProperty1", 1.0f);
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, propertyIndex ), true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistN1(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test if a registered custom property does not exist on object" );
+
+  Actor actor = Actor::New();
+  auto propertyIndex = actor.RegisterProperty("customProperty1", 1.0f);
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, propertyIndex+1 ), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistN2(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test that a default property does not show as a custom property on object" );
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, Actor::Property::POSITION ), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistN3(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test that a child property does not exist on actor after parenting to container" );
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(Test::TestCustomActor) );
+
+  const Property::Index CHILD_PROPERTY( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const char* CHILD_PROPERTY_NAME( "childProperty" );
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
+
+  auto container = Test::TestCustomActor::New();
+  Stage::GetCurrent().Add( container );
+  auto child = Actor::New();
+  container.Add( child ); // Resolve child properties (if any)
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistP2(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test that a child property exists after being set" );
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(Test::TestCustomActor) );
+
+  const Property::Index CHILD_PROPERTY( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const char* CHILD_PROPERTY_NAME( "childProperty" );
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
+
+  auto container = Test::TestCustomActor::New();
+  Stage::GetCurrent().Add( container );
+  auto child = Actor::New();
+  container.Add( child ); // Resolve child properties (if any)
+  child.SetProperty( CHILD_PROPERTY, 2 );
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 2, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandleDoesCustomPropertyExistP3(void)
+{
+  TestApplication application; // Needs type registry
+
+  tet_infoline( "Test that a child property is re-indexed after registration, and that it exists" );
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(Test::TestCustomActor) );
+
+  const Property::Index CHILD_PROPERTY( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const char* CHILD_PROPERTY_NAME( "childProperty" );
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
+
+  auto container = Test::TestCustomActor::New();
+  Stage::GetCurrent().Add( container );
+  auto child = Actor::New();
+  child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
+  container.Add( child ); // Resolve child properties (if any)
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 3, TEST_LOCATION );
+  END_TEST;
+}
+
+namespace
+{
+
+struct PropertySetSignalCheck
+{
+  PropertySetSignalCheck(bool& signalReceived, Property::Value& value)
+  : mSignalReceived(signalReceived),
+    mValue(value)
+  {
+  }
+
+  void operator()(Handle& handle, Property::Index index, Property::Value value)
+  {
+    mSignalReceived = true;
+    mValue = value;
+  }
+
+  void Reset()
+  {
+    mSignalReceived = false;
+  }
+
+  void CheckSignalReceived()
+  {
+    if (!mSignalReceived)
+    {
+      tet_printf("Expected Property Set signal was not received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  bool& mSignalReceived; // owned by individual tests
+  Property::Value& mValue;
+};
+
+} // anon namespace
+
+int UtcDaliHandlePropertySetSignal01(void)
+{
+  TestApplication app;
+
+  bool signalReceived(false);
+  Property::Value value;
+  PropertySetSignalCheck propertySetCheck(signalReceived, value);
+
+  tet_infoline( "Test that setting a default property triggers a signal" );
+
+  auto actor = Actor::New();
+  DevelHandle::PropertySetSignal(actor).Connect(&app, propertySetCheck);
+
+  actor.SetProperty( Actor::Property::POSITION, Vector3::XAXIS );
+  propertySetCheck.CheckSignalReceived();
+
+  END_TEST;
+}
+
+
+int UtcDaliHandlePropertySetSignal02(void)
+{
+  TestApplication app;
+
+  bool signalReceived(false);
+  Property::Value value;
+  PropertySetSignalCheck propertySetCheck(signalReceived, value);
+
+  tet_infoline( "Test that setting a custom property triggers a signal" );
+
+  auto actor = Actor::New();
+  DevelHandle::PropertySetSignal(actor).Connect(&app, propertySetCheck);
+
+  auto propertyIndex = actor.RegisterProperty("propName", 3.0f);
+  actor.SetProperty( propertyIndex, 5.0f );
+  propertySetCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( propertySetCheck.mValue, Property::Value( 5.0f ), 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandlePropertySetSignal03(void)
+{
+  TestApplication app;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  bool signalReceived(false);
+  Property::Value value;
+  PropertySetSignalCheck propertySetCheck(signalReceived, value);
+
+  tet_infoline( "Test that setting a child property triggers a signal" );
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(Test::TestCustomActor) );
+
+  const Property::Index CHILD_PROPERTY( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const char* CHILD_PROPERTY_NAME( "childProperty" );
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
+
+  auto container = Test::TestCustomActor::New();
+  Stage::GetCurrent().Add( container );
+  auto child = Actor::New();
+  child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
+  DevelHandle::PropertySetSignal(child).Connect(&app, propertySetCheck);
+  container.Add( child ); // Resolve child properties (if any)
+
+  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 3, TEST_LOCATION );
+
+  child.SetProperty( CHILD_PROPERTY, 29 );
+  propertySetCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( propertySetCheck.mValue, Property::Value( 29 ), TEST_LOCATION );
   END_TEST;
 }

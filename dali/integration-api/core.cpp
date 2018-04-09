@@ -149,6 +149,16 @@ float Core::GetStereoBase() const
   return mImpl->GetStereoBase();
 }
 
+void Core::RegisterProcessor( Processor& processor )
+{
+  mImpl->RegisterProcessor( processor );
+}
+
+void Core::UnregisterProcessor( Processor& processor )
+{
+  mImpl->UnregisterProcessor( processor );
+}
+
 Core::Core()
 : mImpl( NULL )
 {
