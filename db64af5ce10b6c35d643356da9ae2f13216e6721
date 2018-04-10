@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2bdb1eff_71eacb73",
+        "filename": "dali/graphics/vulkan/vulkan-fence.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "There is no reason to have two Initialise() functions. The old Initialise() should just use \"false\" as an argument. Keep this one, delete the other one.",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f0fb0e1_0ebfd495",
+        "filename": "dali/graphics/vulkan/vulkan-fence.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "Just call Initialise( false ) and delete old 0-args Initialise()",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b372efa1_6d8e190a",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure about this one. According to spec it says:\n\n\"initialLayout is the layout the attachment image subresource will be in when a render pass instance begins.\"\n\nWhen render pass begins we should be in ColorAttachmentOptimal layout already. If not, then the problem is layout transition that should occur before we begin the render pass. Otherwise, it\u0027s a bit against the Vulkan spec. The initial layout won\u0027t be Undefined when render pass begins ( the layout transition would have to occur later ). If it works, I\u0027ve no idea why ( driver? ).",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e5f9d91_0087becf",
+        "filename": "dali/graphics/vulkan/vulkan-queue.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "CommandBuffer has a method PushWaitSemaphores() where semaphores are specified per-commandbuffer ( both, semaphores and dststages ). Then semaphores are passed to the SubmitInfo structure.",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "121a0d38_b9f06e7b",
+        "filename": "dali/graphics/vulkan/vulkan-queue.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "stage mask should be passed as an argument. Not every submission will use this stage.",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ea88256_36f27952",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "Wouldn\u0027t be better to create a fence per swapchain image and group them in one place ( SwapchainBuffer )?",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c088b423_02fe8bc8",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "Could we use meaningful names that suggest what they are used for?",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f72006a7_70819a6a",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "At the moment the fence doesn\u0027t make a lot of sense as there is a queue.WaitIdle() called at the end. I\u0027d suggest having as many primitives as swapchain images. I encountered a problem before when trying to reuse fence the validation layer reported it\u0027s still in use.",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "155ed8ba_184986aa",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "Naming for semaphores to know which ones are waiting, which ones are signalled.",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9b7fd84_02e21414",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-10T15:35:26Z",
+      "side": 1,
+      "message": "if we pass any semaphores here, the count shouldn\u0027t be 0, otherwise we don\u0027t really wait for semaphore to be signalled",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
