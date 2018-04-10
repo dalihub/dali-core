@@ -34,6 +34,7 @@ class Fence : public VkManaged
 public:
 
   static Handle<Fence> New( Graphics& graphics );
+  static Handle<Fence> New( Graphics& graphics, bool isSignaled );
 
   Fence( Fence&& ) = default;
   ~Fence();

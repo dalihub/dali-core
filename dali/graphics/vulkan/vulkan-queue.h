@@ -53,8 +53,13 @@ public:
   std::unique_ptr< Submission > Submit(const std::vector< CommandBufferRef >& commandBuffers,
                                        Handle<Fence>                                 fence);
 
+  std::unique_ptr< Submission > Submit(const std::vector< CommandBufferRef >& commandBuffers, vk::Semaphore& waitSemaphore, 
+                                            vk::Semaphore& signalSemaphore, Handle<Fence> fence);
+
   /** Helper function to submit single command buffer */
   std::unique_ptr< Submission > Submit(CommandBufferRef commandBuffer, Handle<Fence> fence);
+
+  std::unique_ptr< Submission > Submit(CommandBufferRef commandBuffer, vk::Semaphore& waitSemaphore, vk::Semaphore& signalSemaphore, Handle<Fence> fence);
 
   void WaitIdle() const;
 

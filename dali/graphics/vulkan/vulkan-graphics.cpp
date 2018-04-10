@@ -209,7 +209,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      // .setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -299,7 +299,7 @@ SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
 {
   auto swapchain = Swapchain::New( *this,
                                    GetGraphicsQueue(0u),
-                                   surface, 2, 0 );
+                                   surface, 3, 0 );
 
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
