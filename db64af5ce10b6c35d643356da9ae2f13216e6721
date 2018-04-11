@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "bc5b6db2_45c21f4a",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-11T09:55:01Z",
+      "side": 1,
+      "message": "Alright, looks like it does work that way ( spec doesn\u0027t mention anything about the initialLayout set as undefined means \"don\u0027t care\", so that\u0027s where my concern came from as I base implementation mostly on the spec :) ). We can leave it that way ( and have one less layout transition, which I guess is a good thing :) ). Interestingly, this means that the layout transition that occurs before beginning the render pass on the 4th frame didn\u0027t seem to work ( it should change present to color attachment before ).",
+      "parentUuid": "06f9dcd2_f838b912",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e5f9d91_0087becf",
         "filename": "dali/graphics/vulkan/vulkan-queue.cpp",
         "patchSetId": 1
