@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f527216b_5bd33dc2",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-04-11T10:09:29Z",
+      "side": 1,
+      "message": "Ignore what I said about \"one less layout transition\" :) That doesn\u0027t even make sense :) Looks like \"UNDEFINED\" is a common way of doing it so this change looks good.",
+      "parentUuid": "bc5b6db2_45c21f4a",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e5f9d91_0087becf",
         "filename": "dali/graphics/vulkan/vulkan-queue.cpp",
         "patchSetId": 1
