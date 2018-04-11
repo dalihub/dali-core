@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "06f9dcd2_f838b912",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013929
+      },
+      "writtenOn": "2018-04-11T08:24:27Z",
+      "side": 1,
+      "message": "Cannot submit cmd buffer using image (0xffffffffaac92360) [sub-resource: aspectMask 0x1 array layer 0, mip level 0],with layout VK_IMAGE_LAYOUT_PRESENT_SRC_KHR when first use is VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL.\n\nThis log was printed at 4th frames. (The numbuer of swapchain images is 3.)\nI think 1th swapchain image layout is VK_IMAGE_LAYOUT_PRESENT_SRC_KHR after #1 frame.\nSo the log means that cannot submit cmd buffer because layout of color attachment image is PRESENT_SRC.\nWe already set COLOR_ATTACHMENT_OPTIMAL to initialLayout not PRESENT_SRC.\nI refered \nhttps://vulkan.lunarg.com/doc/sdk/1.1.70.1/windows/tutorial/html/15-draw_cube.html\nhttps://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Render_passes",
+      "parentUuid": "b372efa1_6d8e190a",
+      "revId": "db64af5ce10b6c35d643356da9ae2f13216e6721",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e5f9d91_0087becf",
         "filename": "dali/graphics/vulkan/vulkan-queue.cpp",
         "patchSetId": 1
