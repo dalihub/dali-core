@@ -25,8 +25,6 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/integration-api/debug.h>
-
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
@@ -153,12 +151,8 @@ void Animation::SetPlayRange( const Vector2& range )
 
 void Animation::Play()
 {
-  DALI_LOG_ERROR("Scene Graph Animation::Play: Before stable_sort\n");
-
   // Sort according to end time with earlier end times coming first, if the end time is the same, then the animators are not moved
   std::stable_sort( mAnimators.Begin(), mAnimators.End(), CompareAnimatorEndTimes );
-
-  DALI_LOG_ERROR("Scene Graph Animation::Play: After stable_sort\n");
 
   mState = Playing;
 
@@ -167,11 +161,7 @@ void Animation::Play()
     mElapsedSeconds = mPlayRange.y * mDurationSeconds;
   }
 
-  DALI_LOG_ERROR("Scene Graph Animation::Play: Before SetAnimatorsActive\n");
-
   SetAnimatorsActive( true );
-
-  DALI_LOG_ERROR("Scene Graph Animation::Play: After SetAnimatorsActive\n");
 
   mCurrentLoop = 0;
 }
