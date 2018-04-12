@@ -84,7 +84,8 @@ struct Swapchain::Impl
     mQueue( presentationQueue ),
     mSurface( surface ),
     mBufferCount( bufferCount ),
-    mFlags( flags )
+    mFlags( flags ),
+    mCurrentBufferIndex( 0u )
   {
     mSwapchainCreateInfoKHR.setSurface( mSurface->GetSurfaceKHR() )
       .setPreTransform( vk::SurfaceTransformFlagBitsKHR::eIdentity )
