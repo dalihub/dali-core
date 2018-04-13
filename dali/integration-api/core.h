@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,6 +166,23 @@ private:
   bool needsUpdate      :1;  ///< True if update is required to be run
   bool needsPostRender  :1;  ///< True if post-render is required to be run.
 };
+
+/**
+ * Interface to enable classes to be processed after the event loop. Classes are processed
+ * in the order they are registered.
+ */
+class DALI_IMPORT_API Processor
+{
+public:
+  /**
+   * @brief Run the processor
+   */
+  virtual void Process() = 0;
+
+protected:
+  virtual ~Processor() { }
+};
+
 
 /**
  * Integration::Core is used for integration with the native windowing system.
@@ -397,6 +414,20 @@ public:
    * @return The stereo base (eye seperation) for stereoscopic 3D (mm)
    */
   float GetStereoBase() const;
+
+  /**
+   * @brief Register a processor
+   *
+   * Note, Core does not take ownership of this processor.
+   * @param[in] processor The process to register
+   */
+  void RegisterProcessor( Processor& processor );
+
+  /**
+   * @brief Unregister a processor
+   * @param[in] processor The process to unregister
+   */
+  void UnregisterProcessor( Processor& processor );
 
 private:
 

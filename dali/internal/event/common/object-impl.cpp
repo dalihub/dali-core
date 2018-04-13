@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
@@ -423,6 +424,11 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   return Property::NONE;
 }
 
+DevelHandle::PropertySetSignalType& Object::PropertySetSignal()
+{
+  return mPropertySetSignal;
+}
+
 void Object::SetProperty( Property::Index index, const Property::Value& propertyValue )
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds" );
@@ -523,7 +529,9 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   // TODO: We should not call this for read-only properties, SetDefaultProperty() && TypeInfo::SetProperty() should return a bool, which would be true if the property is set
   if ( propertySet )
   {
-    OnPropertySet(index, propertyValue);
+    OnPropertySet( index, propertyValue );
+    Dali::Handle handle( this );
+    mPropertySetSignal.Emit( handle, index, propertyValue );
   }
 }
 
@@ -669,6 +677,12 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
       }
     }
   }
+}
+
+bool Object::DoesCustomPropertyExist( Property::Index index )
+{
+  auto metadata = FindCustomProperty( index );
+  return metadata != nullptr;
 }
 
 Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const

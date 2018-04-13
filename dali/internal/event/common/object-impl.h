@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
@@ -44,7 +45,6 @@ namespace Internal
 {
 class ConstraintBase;
 class EventThreadServices;
-class Handle;
 class PropertyCondition;
 class PropertyInputImpl;
 class Stage;
@@ -224,6 +224,19 @@ public:
   virtual Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
+   * @brief returns true if the custom property exists on this object.
+   *
+   * @note The property may be defined for a type within the type registry, but it isn't explicity
+   * defined in every consequent instantiation. It can be automatically added, e.g. parenting an actor
+   * automatically registers it's parent container's child properties.
+   *
+   * @param[in] handle The handle of the object to test
+   * @param[in] index The property index to look for.
+   * @return true if the property exists on the object, false otherwise.
+   */
+  bool DoesCustomPropertyExist( Property::Index index );
+
+  /**
    * @copydoc Dali::Handle::AddPropertyNotification()
    */
   virtual Dali::PropertyNotification AddPropertyNotification( Property::Index index,
@@ -330,6 +343,11 @@ public:
    * @return The index or Property::INVALID_COMPONENT_INDEX.
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
+
+  /**
+   * @copydoc Dali::Handle::PropertySetSignal()
+   */
+  DevelHandle::PropertySetSignalType& PropertySetSignal();
 
 protected:
 
@@ -597,6 +615,7 @@ private:
   typedef PropertyNotificationContainer::iterator       PropertyNotificationContainerIter;
   typedef PropertyNotificationContainer::const_iterator PropertyNotificationContainerConstIter;
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
+  DevelHandle::PropertySetSignalType mPropertySetSignal;
 };
 } // namespace Internal
 
