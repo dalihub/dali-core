@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,50 @@ typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChanged
  * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
  */
 DALI_IMPORT_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
+
+
+typedef Signal< void (Actor) > ChildChangedSignalType; ///< Called when the actor has a child added or removed
+
+/**
+ * @brief This signal is emitted when a child is added to this actor.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor child );
+ * @endcode
+ * child: The child that has been added.
+ *
+ * @note Use this signal with caution. Changing the parent of the actor
+ * within this callback is possible, but DALi will prevent further signals
+ * being sent.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_IMPORT_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
+
+/**
+ * @brief This signal is emitted when a child is removed from this actor.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor child );
+ * @endcode
+ * child: The child that has been removed.
+ *
+ * @note Use this signal with caution. Changing the parent of the actor
+ * within this callback is possible, but DALi will prevent further signals
+ * being sent.
+ *
+ * @note If the child actor is moved from one actor to another, then
+ * this signal will be emitted followed immediately by an
+ * ChildAddedSignal() on the new parent.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_IMPORT_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
+
 
 } // namespace DevelActor
 
