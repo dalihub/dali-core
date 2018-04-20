@@ -24,6 +24,12 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/common/extents.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/rect.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-array.h>
 
 namespace Dali
 {
@@ -53,19 +59,118 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
   switch ( GetType() )
   {
     case Property::NONE:
+    {
+      // NOOP
+      break;
+    }
+
     case Property::RECTANGLE:
+    {
+      Rect<int> convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::STRING:
+    {
+      std::string convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::ARRAY:
+    {
+      Property::Array* array = propertyValue.GetArray();
+      if( array )
+      {
+        value = *array;
+      }
+      break;
+    }
+
     case Property::MAP:
+    {
+      Property::Map* map = propertyValue.GetMap();
+      if( map )
+      {
+        value = *map;
+      }
+      break;
+    }
+
     case Property::EXTENTS:
+    {
+      Extents convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::BOOLEAN:
+    {
+      bool convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::INTEGER:
+    {
+      int convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::FLOAT:
+    {
+      float convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::ROTATION:
+    {
+      Quaternion convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::MATRIX:
+    {
+      Matrix convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
+      break;
+    }
+
     case Property::MATRIX3:
     {
-      value = propertyValue;
+      Matrix3 convertedValue;
+      if( propertyValue.Get( convertedValue ) )
+      {
+        value = convertedValue;
+      }
       break;
     }
 

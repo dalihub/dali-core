@@ -179,7 +179,9 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
       item.mNode = renderable.mNode;
       item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
-      if( !isLayer3d )
+      item.mDepthIndex = 0;
+
+      if(!isLayer3d)
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();
       }

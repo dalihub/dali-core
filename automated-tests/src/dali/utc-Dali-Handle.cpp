@@ -894,6 +894,409 @@ int UtcDaliHandleCustomProperty(void)
   END_TEST;
 }
 
+int UtcDaliHandleCustomPropertyNone(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Property::Value value( Property::NONE );
+  Property::Index index = handle.RegisterProperty( "testProperty", value, Property::READ_WRITE);
+
+  // Negative test i.e. setting a property of type NONE is meaningless
+  handle.SetProperty( index, 5.0f );
+
+  DALI_TEST_CHECK( true ); // got here without crashing
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyIntToFloat(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  float startValue(5.0f);
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  handle.SetProperty( index, int(1) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == 1.0f );
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyFloatToInt(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  int startValue(5);
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == startValue );
+
+  handle.SetProperty( index, float(1.5) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == 1 );
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToRect(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Rect<int> startValue(1,2,3,4);
+  Property::Index index = handle.RegisterProperty( "testProperty", startValue, Property::READ_WRITE);
+  DALI_TEST_EQUALS( handle.GetProperty< Rect<int> >( index ), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Rect<int> >( index ), startValue, TEST_LOCATION );
+
+  // Negative test i.e. there is no conversion from float to Rect
+  handle.SetProperty( index, float(1.5) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Rect<int> >( index ), startValue, TEST_LOCATION );
+
+  // Positive test (sanity check)
+  Rect<int> endValue(5,6,7,8);
+  handle.SetProperty( index, endValue );
+  DALI_TEST_EQUALS( handle.GetProperty< Rect<int> >( index ), endValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Rect<int> >( index ), endValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToString(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  std::string startValue( "Libraries gave us power" );
+  Property::Index index = handle.RegisterProperty( "testProperty", startValue, Property::READ_WRITE);
+  DALI_TEST_EQUALS( handle.GetProperty< std::string >( index ), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< std::string >( index ), startValue, TEST_LOCATION );
+
+  // No conversion from Vector3 to std::string, therefore this should be a NOOP
+  handle.SetProperty( index, Vector3(1,2,3) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< std::string >( index ), startValue, TEST_LOCATION );
+
+  // Positive test (sanity check)
+  std::string endValue( "Then work came and made us free" );
+  handle.SetProperty( index, endValue );
+  DALI_TEST_EQUALS( handle.GetProperty< std::string >( index ), endValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< std::string >( index ), endValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToArray(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Property::Value value( Property::ARRAY );
+  std::string startValue( "The future teaches you to be alone" );
+  value.GetArray()->PushBack( startValue );
+
+  Property::Index index = handle.RegisterProperty( "testProperty", value, Property::READ_WRITE);
+  Property::Array check1 = handle.GetProperty< Property::Array >( index );
+  DALI_TEST_EQUALS( check1.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  Property::Array check2 = handle.GetProperty< Property::Array >( index );
+  DALI_TEST_EQUALS( check2.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION );
+
+  // No conversion from int to ARRAY, therefore this should be a NOOP
+  handle.SetProperty( index, int(2) );
+
+  application.SendNotification();
+  application.Render(0);
+  Property::Array check3 = handle.GetProperty< Property::Array >( index );
+  DALI_TEST_EQUALS( check3.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION );
+
+  // Positive test (sanity check)
+  Property::Value value2(Property::ARRAY);
+  std::string endValue( "The present to be afraid and cold" );
+  value2.GetArray()->PushBack( endValue );
+  handle.SetProperty( index, value2 );
+
+  Property::Array check4 = handle.GetProperty< Property::Array >( index );
+  DALI_TEST_EQUALS( check4.GetElementAt(0).Get<std::string>(), endValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  Property::Array check5 = handle.GetProperty< Property::Array >( index );
+  DALI_TEST_EQUALS( check5.GetElementAt(0).Get<std::string>(), endValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToMap(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Property::Value value( Property::MAP );
+  std::string startValue( "Culture sucks down words" );
+  value.GetMap()->Insert( "1", startValue );
+
+  Property::Index index = handle.RegisterProperty( "testProperty", value, Property::READ_WRITE );
+  Property::Value* check1 = handle.GetProperty< Property::Map >( index ).Find("1");
+  DALI_TEST_CHECK( NULL != check1 );
+
+  // No conversion from float to MAP, therefore this should be a NOOP
+  handle.SetProperty( index, float(3.0) );
+
+  // Positive test (sanity check)
+  Property::Value value2( Property::MAP );
+  std::string endValue( "Itemise loathing and feed yourself smiles" );
+  value.GetMap()->Insert( "1", endValue );
+  handle.SetProperty( index, value2 );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToExtents(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Extents startValue(1,2,3,4);
+  Property::Index index = handle.RegisterProperty( "testProperty", startValue, Property::READ_WRITE);
+  DALI_TEST_EQUALS( handle.GetProperty< Extents >( index ), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Extents >( index ), startValue, TEST_LOCATION );
+
+  // Negative test i.e. there is no conversion from float to Extents
+  handle.SetProperty( index, float(1.5) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Extents >( index ), startValue, TEST_LOCATION );
+
+  // Positive test (sanity check)
+  Extents endValue(5,6,7,8);
+  handle.SetProperty( index, endValue );
+  DALI_TEST_EQUALS( handle.GetProperty< Extents >( index ), endValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< Extents >( index ), endValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToBool(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  bool startValue(true);
+  Property::Index index = handle.RegisterProperty( "testProperty", startValue, Property::READ_WRITE);
+  DALI_TEST_EQUALS( handle.GetProperty< bool >( index ), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< bool >( index ), startValue, TEST_LOCATION );
+
+  // Negative test i.e. there is no conversion from float to bool
+  handle.SetProperty( index, float(0.0) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< bool >( index ), startValue, TEST_LOCATION );
+
+  // Positive test (sanity check)
+  bool endValue(false);
+  handle.SetProperty( index, endValue );
+  DALI_TEST_EQUALS( handle.GetProperty< bool >( index ), endValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( handle.GetProperty< bool >( index ), endValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToInt(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  int startValue(5);
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == startValue );
+
+  // Negative test i.e. there is no conversion from Vector3 to int
+  handle.SetProperty( index, Vector3(1,2,3) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<int>(index) == startValue );
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToFloat(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  float startValue(5.0);
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  // Negative test i.e. there is no conversion from Vector3 to float
+  handle.SetProperty( index, Vector3(1,2,3) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToRotation(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Quaternion startValue( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<Quaternion>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Quaternion>(index) == startValue );
+
+  // Negative test i.e. there is no conversion from float to Quaternion
+  handle.SetProperty( index, float(7.0) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Quaternion>(index) == startValue );
+
+  // Positive test (sanity check)
+  Quaternion endValue( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
+  handle.SetProperty( index, endValue );
+  DALI_TEST_CHECK( handle.GetProperty<Quaternion>(index) == endValue );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToMatrix(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Quaternion rotation( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
+  Matrix startValue(rotation);
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<Matrix>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Matrix>(index) == startValue );
+
+  // Negative test i.e. there is no conversion from float to Matrix
+  handle.SetProperty( index, float(7.0) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Matrix>(index) == startValue );
+
+  // Positive test (sanity check)
+  Quaternion endRotation( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
+  Matrix endValue(endRotation);
+  handle.SetProperty( index, endValue );
+  DALI_TEST_CHECK( handle.GetProperty<Matrix>(index) == endValue );
+
+  END_TEST;
+}
+
+int UtcDaliHandleCustomPropertyInvalidToMatrix3(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  Matrix3 startValue(11,12,13,
+                     21,22,23,
+                     31,32,33);
+
+  Property::Index index = handle.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( handle.GetProperty<Matrix3>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Matrix3>(index) == startValue );
+
+  // Negative test i.e. there is no conversion from float to Matrix3
+  handle.SetProperty( index, float(7.0) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<Matrix3>(index) == startValue );
+
+  // Positive test (sanity check)
+  Matrix3 endValue(31,32,33,
+                   21,22,23,
+                   11,12,13);
+  handle.SetProperty( index, endValue );
+  DALI_TEST_CHECK( handle.GetProperty<Matrix3>(index) == endValue );
+
+  END_TEST;
+}
+
 int UtcDaliHandleWeightNew(void)
 {
   TestApplication application;
