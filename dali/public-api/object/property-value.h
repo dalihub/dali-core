@@ -20,12 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <iosfwd>
+#include <type_traits>
 #include <utility>
 #include <initializer_list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/math/rect.h>
+
 
 namespace Dali
 {
@@ -214,6 +216,17 @@ public:
   Value( const Extents& extentsValue );
 
   /**
+   * @brief Creates an enumeration property value.
+   *
+   * @SINCE_1_4.36
+   * @param[in] enumValue An enumeration value
+   */
+  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
+  Value( T enumValue ) : Value( static_cast< int32_t >( enumValue ) )
+  {
+  }
+
+  /**
    * @brief Explicitly sets a type and initialize it.
    *
    * @SINCE_1_0.0
@@ -275,17 +288,54 @@ public:
   /**
    * @brief Retrieves a specific value.
    *
-   * Works on a best-effort approach; if value type is not convertible returns a default value of the type.
+   * Works on a best-effort approach; if value type is different returns a default value of the type.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_4.36
    * @return A value of type T
    */
-  template <typename T>
+  template< typename T, typename std::enable_if< ! std::is_enum< T >::value >::type* = nullptr >
   T DALI_INTERNAL Get() const
   {
     T temp = T(); // value (zero) initialize
     Get( temp );
     return temp;
+  }
+
+  /**
+   * @brief Retrieves a specific value.
+   *
+   * Works on a best-effort approach; if value type is different returns a default value of the type.
+   * Specialization for enumeration values
+   *
+   * @SINCE_1_4.36
+   * @return A value of type T
+   */
+  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
+  T DALI_INTERNAL Get() const
+  {
+    int32_t temp = 0; // value (zero) initialize
+    Get( temp );
+    return static_cast< T >( temp );
+  }
+
+  /**
+   * @brief Retrieves an enumeration value.
+   *
+   * @SINCE_1_4.36
+   * @param[out] enumValue On return, an enumeration value
+   * @return @c true if the value is successfully retrieved, @c false if the type is different
+   * @pre GetType() is any enumeration
+   */
+  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
+  bool DALI_INTERNAL Get( T& enumValue ) const
+  {
+    int32_t temp = 0;
+    if( ! Get( temp ) )
+    {
+      return false;
+    }
+    enumValue = static_cast< T >( temp );
+    return true;
   }
 
   /**
