@@ -623,6 +623,75 @@ int UtcDaliActorGetParent02(void)
   END_TEST;
 }
 
+int UtcDaliActorCustomProperty(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  float startValue(1.0f);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == startValue );
+
+  actor.SetProperty( index, 5.0f );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == 5.0f );
+  END_TEST;
+}
+
+int UtcDaliActorCustomPropertyIntToFloat(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  float startValue(5.0f);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == startValue );
+
+  actor.SetProperty( index, int(1) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<float>(index) == 1.0f );
+  END_TEST;
+}
+
+int UtcDaliActorCustomPropertyFloatToInt(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  int startValue(5);
+  Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
+  DALI_TEST_CHECK( actor.GetProperty<int>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<int>(index) == startValue );
+
+  actor.SetProperty( index, float(1.5) );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetProperty<int>(index) == 1 );
+  END_TEST;
+}
+
 int UtcDaliActorSetParentOrigin(void)
 {
   TestApplication application;
