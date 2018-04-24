@@ -170,6 +170,8 @@ void BufferImage::UploadArea( const RectArea& area )
   }
   PixelDataPtr pixelData = PixelData::New( buffer, bufferSize, mBufferWidth, bufferHeight, mPixelFormat, Dali::PixelData::FREE );
   mTexture->Upload( pixelData, 0u, 0u, area.x, area.y, mBufferWidth, bufferHeight );
+
+  UploadedSignal().Emit( Dali::Image( this ) );
 }
 
 void BufferImage::UpdateBufferArea( PixelBuffer* src, PixelBuffer* dest, const RectArea& area )
