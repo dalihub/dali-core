@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,13 +65,10 @@ void TestApplication::Initialize()
   mCore = Dali::Integration::Core::New( mRenderController,
                                         mPlatformAbstraction,
                                         mGraphics,
-                                        mGlAbstraction,
-                                        mGlSyncAbstraction,
                                         mGestureManager,
                                         mDataRetentionPolicy,
                                         false );
 
-  mCore->ContextCreated();
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
   mCore->SetDpi( mDpi.x, mDpi.y );
 
@@ -119,16 +116,6 @@ TestPlatformAbstraction& TestApplication::GetPlatform()
 TestRenderController& TestApplication::GetRenderController()
 {
   return mRenderController;
-}
-
-TestGlAbstraction& TestApplication::GetGlAbstraction()
-{
-  return mGlAbstraction;
-}
-
-TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
-{
-  return mGlSyncAbstraction;
 }
 
 TestGestureManager& TestApplication::GetGestureManager()
@@ -213,13 +200,6 @@ bool TestApplication::RenderOnly( )
   mFrame++;
 
   return mRenderStatus.NeedsUpdate();
-}
-
-void TestApplication::ResetContext()
-{
-  mCore->ContextDestroyed();
-  mGlAbstraction.Initialize();
-  mCore->ContextCreated();
 }
 
 unsigned int TestApplication::Wait( unsigned int durationToWait )

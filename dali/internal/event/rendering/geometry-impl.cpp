@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
 
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
-  const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
+  const SceneGraph::PropertyBuffer& renderPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
   SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderPropertyBuffer );
 
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
@@ -83,7 +83,7 @@ Dali::Geometry::Type Geometry::GetType() const
   return mType;
 }
 
-const Render::Geometry* Geometry::GetRenderObject() const
+const SceneGraph::Geometry* Geometry::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -97,8 +97,8 @@ Geometry::Geometry()
 
 void Geometry::Initialize()
 {
-  mRenderObject = new Render::Geometry();
-  OwnerPointer< Render::Geometry > transferOwnership( mRenderObject );
+  mRenderObject = new SceneGraph::Geometry();
+  OwnerPointer< SceneGraph::Geometry > transferOwnership( mRenderObject );
   AddGeometry( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 

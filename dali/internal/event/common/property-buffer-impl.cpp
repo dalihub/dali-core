@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ void PropertyBuffer::SetData( const void* data, std::size_t size )
   unsigned int bufferSize = mBufferFormatSize * mSize;
 
   // create a new DALi vector to store the buffer data
-  // the heap allocated vector will end up being owned by Render::PropertyBuffer
+  // the heap allocated vector will end up being owned by SceneGraph::PropertyBuffer
   OwnerPointer< Vector<char> > bufferCopy = new Dali::Vector<char>();
   bufferCopy->Resize( bufferSize );
 
@@ -157,7 +157,7 @@ std::size_t PropertyBuffer::GetSize() const
   return mSize;
 }
 
-const Render::PropertyBuffer* PropertyBuffer::GetRenderObject() const
+const SceneGraph::PropertyBuffer* PropertyBuffer::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -182,14 +182,14 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
   // Old
 
-  mRenderObject = new Render::PropertyBuffer();
-  OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
+  mRenderObject = new SceneGraph::PropertyBuffer();
+  OwnerPointer< SceneGraph::PropertyBuffer > transferOwnership( mRenderObject );
   SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 
   size_t numComponents = formatMap.Count();
 
   // Create the format
-  OwnerPointer< Render::PropertyBuffer::Format> format = new Render::PropertyBuffer::Format();
+  OwnerPointer< SceneGraph::PropertyBuffer::Format> format = new SceneGraph::PropertyBuffer::Format();
   format->components.resize( numComponents );
 
   unsigned int currentAlignment = 0u;
