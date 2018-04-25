@@ -68,6 +68,9 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
+#include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -165,6 +168,54 @@ void SortSiblingNodesRecursively( Node& node )
 
 } // unnamed namespace
 
+//@todo: find better place for it
+// for now we don't want to spam with new shaders
+struct ShaderCache
+{
+  explicit ShaderCache( Dali::Graphics::API::Controller& _controller )
+  : controller( _controller )
+  {
+
+  }
+  struct Item
+  {
+    Item() = default;
+    ~Item() = default;
+    Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> shader{ nullptr };
+    Dali::Graphics::API::ShaderDetails::ShaderSource           vertexSource{""};
+    Dali::Graphics::API::ShaderDetails::ShaderSource           fragmentSource{""};
+  };
+
+  std::vector<Item> items;
+
+  Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> GetShader(
+    const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
+    const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh
+  )
+  {
+    for( auto&& item : items )
+    {
+      if( item.vertexSource == vsh && item.fragmentSource == fsh )
+      {
+        return item.shader;
+      }
+    }
+    auto shaderRef =
+           controller.CreateShader( controller.GetShaderFactory()
+                                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
+                                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                                                                vsh )
+                                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
+                                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                                                                fsh )
+           );
+    items.emplace_back( Item() = { shaderRef, vsh, fsh } );
+    return shaderRef;
+  }
+
+  Dali::Graphics::API::Controller& controller;
+};
+
 /**
  * Structure to contain UpdateManager internal data
  */
@@ -210,7 +261,8 @@ struct UpdateManager::Impl
     animationFinishedDuringUpdate( false ),
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
-    renderersAdded( false )
+    renderersAdded( false ),
+    shaderCache( graphics.GetController() )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -317,6 +369,7 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
 
+  ShaderCache                          shaderCache;
 
 private:
 
@@ -523,20 +576,12 @@ void UpdateManager::RemoveShader( Shader* shader )
 void UpdateManager::SetShaderProgram( Shader* shader,
                                       Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
-  auto& controller = mImpl->graphics.GetController();
-
   // TODO: for now we will use hardcoded binary SPIRV shaders which will replace anything
   // that is passed by the caller
 #ifdef DEBUG_OVERRIDE_VULKAN_SHADER
-  auto shaderRef =
-         controller.CreateShader( controller.GetShaderFactory()
-        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
-                          Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                          Graphics::API::ShaderDetails::ShaderSource( VSH_CODE ))
-        .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
-                          Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                          Graphics::API::ShaderDetails::ShaderSource( FSH_CODE ))
-         );
+
+  auto shaderRef = mImpl->shaderCache.GetShader( Graphics::API::ShaderDetails::ShaderSource( VSH_IMAGE_VISUAL_CODE ),
+                                                 Graphics::API::ShaderDetails::ShaderSource( FSH_IMAGE_VISUAL_CODE ));
 
 #else
   auto shaderRef =
@@ -819,7 +864,8 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
 
-    mImpl->renderers[i]->PrepareRender( bufferIndex );
+    //mImpl->renderers[i]->PrepareRender( bufferIndex );
+    mImpl->renderers[i]->PrepareRender( mImpl->graphics.GetController(), bufferIndex );
   }
 }
 
@@ -1164,6 +1210,7 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
 }
 
+#if 0
 void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1175,7 +1222,21 @@ void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuf
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
 }
+#endif
 
+void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
+{
+  // todo: may not be needed yet
+  // Message has ownership of format while in transit from update -> render
+  //auto& controller = GetGraphicsController();
+  //controller.CreateBuffer( controller.GetBufferFactory()
+  //.SetSize( format->size * format->components ))
+
+  // set format directly, on the update thread
+  propertyBuffer->SetFormat( format.Release() );
+}
+
+#if 0
 void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1187,9 +1248,21 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
 }
+#endif
+
+void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
+{
+  auto& controller = GetGraphicsController();
+  auto buffer = controller.CreateBuffer( controller.GetBufferFactory()
+                  .SetSize( uint32_t(propertyBuffer->GetFormat()->size * size) )
+                  .SetUsage(Graphics::API::Buffer::UsageHint::ATTRIBUTES ));
+  propertyBuffer->SetGfxObject( buffer );
+  propertyBuffer->SetData( data.Release(), size );
+}
 
 void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
 {
+
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
 
@@ -1235,6 +1308,7 @@ void UpdateManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uns
 
 void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
+  /*
   typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
@@ -1242,17 +1316,21 @@ void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
+   */
+  geometry->RemovePropertyBuffer( propertyBuffer );
 }
 
 void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
-  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+  //typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  //unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
+  //new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
+
+  geometry->AddPropertyBuffer( propertyBuffer );
 }
 
 void UpdateManager::AddTexture( OwnerPointer< Render::Texture >& texture )
@@ -1353,6 +1431,11 @@ void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
+}
+
+Graphics::API::Controller& UpdateManager::GetGraphicsController() const
+{
+  return mImpl->graphics.GetController();
 }
 
 } // namespace SceneGraph

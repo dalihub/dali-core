@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 // CLASS HEADER
 #include "scene-graph-renderer.h"
 
@@ -29,6 +34,37 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+
+#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-api-shader.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+
+#include <cstring>
+
+
+namespace
+{
+
+/**
+ * Helper to set view and projection matrices once per program
+ * @param program to set the matrices to
+ * @param modelMatrix to set
+ * @param viewMatrix to set
+ * @param projectionMatrix to set
+ * @param modelViewMatrix to set
+ * @param modelViewProjectionMatrix to set
+ */
+inline void SetMatrices(
+                         const Dali::Matrix& modelMatrix,
+                         const Dali::Matrix& viewMatrix,
+                         const Dali::Matrix& projectionMatrix,
+                         const Dali::Matrix& modelViewMatrix )
+{
+
+}
+
+}
 
 namespace // unnamed namespace
 {
@@ -143,6 +179,7 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
+  mGfxRenderCommand(),
   mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -172,8 +209,239 @@ void Renderer::operator delete( void* ptr )
 }
 
 
+void* AllocateUniformBufferMemory( size_t size )
+{
+  return nullptr;
+}
+
+
+
+void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex )
+{
+  // prepare all stuff
+  auto gfxShader = mShader->GetGfxObject();
+
+  if( !mGfxRenderCommand )
+  {
+    mGfxRenderCommand = controller.AllocateRenderCommand();
+  }
+
+  /**
+   * Prepare vertex attribute buffer bindings
+   */
+  uint32_t bindingIndex { 0u };
+  uint32_t locationIndex { 0u };
+  auto vertexAttributeBindings = Graphics::API::RenderCommand::NewVertexAttributeBufferBindings();
+  for( auto&& vertexBuffer : mGeometry->GetVertexBuffers() )
+  {
+    auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
+
+    // update vertex buffer if necessary
+    vertexBuffer->Update( controller );
+
+    for( auto i = 0u; i < attributeCountInForBuffer; ++i )
+    {
+      // create binding per attribute
+      auto binding = Graphics::API::RenderCommand::VertexAttributeBufferBinding{}
+        .SetOffset( (vertexBuffer->GetFormat()->components[i]).offset )
+        .SetBinding( bindingIndex )
+        .SetBuffer( vertexBuffer->GetGfxObject() )
+        .SetInputAttributeRate( Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX )
+        .SetLocation( locationIndex + i )
+        .SetStride( vertexBuffer->GetFormat()->size );
+      vertexAttributeBindings.emplace_back( binding );
+    }
+  }
+
+
+
+  /**
+   * REGENERATE UNIFORM MAP
+   */
+  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
+  {
+    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
+    {
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      localMap.Resize(0);
+
+      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+      AddMappings( localMap, rendererUniformMap );
+
+      if( mShader )
+      {
+        AddMappings( localMap, mShader->GetUniformMap() );
+      }
+    }
+    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
+    {
+      // Copy old map into current map
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
+
+      localMap.Resize( oldMap.Count() );
+
+      unsigned int index = 0;
+      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
+      {
+        localMap[index] = *iter;
+      }
+    }
+
+    mUniformMapChanged[updateBufferIndex] = true;
+    mRegenerateUniformMap--;
+  }
+
+
+
+
+  auto& shader = mShader->GetGfxObject().Get();
+  auto uboCount = shader.GetUniformBlockCount();
+
+  auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings( uboCount );
+
+  // allocate new command ( may be not necessary at all )
+ // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
+
+  // see if we need to reallocate memory for each UBO
+  // todo: do it only when shader has changed
+  if( mUboMemory.size() != uboCount )
+  {
+    mUboMemory.resize(uboCount);
+  }
+
+  for( auto i = 0u; i < uboCount; ++i )
+  {
+    Graphics::API::ShaderDetails::UniformBlockInfo ubInfo;
+
+    std::cout<<sizeof(ubInfo) << std::endl;
+
+    shader.GetUniformBlock( i, ubInfo );
+
+    if( mUboMemory[i].size() != ubInfo.size )
+    {
+      mUboMemory[i].resize( ubInfo.size );
+    }
+
+    // Set push constant bindings
+    auto &pushBinding = pushConstantsBindings[i];
+    pushBinding.data = mUboMemory[i].data();
+    pushBinding.size = uint32_t(mUboMemory[i].size());
+    pushBinding.binding = ubInfo.binding;
+  }
+
+  // add built-in uniforms
+
+  // write to memory
+  for( auto&& i : mCollectedUniformMap )
+  {
+    for( auto&& j : i )
+    {
+      auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+      if( shader.GetNamedUniform( j->uniformName, uniformInfo ) )
+      {
+        // write into correct uniform buffer
+        auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+        switch( j->propertyPtr->GetType() )
+        {
+          case Property::Type::FLOAT:
+          case Property::Type::INTEGER:
+          case Property::Type::BOOLEAN:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing 32bit offset: " << uniformInfo.offset << ", size: " << sizeof(float) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetFloat( updateBufferIndex ), sizeof(float) );
+            break;
+          }
+          case Property::Type::VECTOR2:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec2 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector2) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetVector2( updateBufferIndex ), sizeof(Vector2) );
+            break;
+          }
+          case Property::Type::VECTOR3:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " <<  "Writing vec3 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector3) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetVector3( updateBufferIndex ), sizeof(Vector3) );
+            break;
+          }
+          case Property::Type::VECTOR4:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec4 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector4) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetVector4( updateBufferIndex ), sizeof(Vector4) );
+            break;
+          }
+          case Property::Type::MATRIX:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat4 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetMatrix( updateBufferIndex ), sizeof(Matrix) );
+            break;
+          }
+          case Property::Type::MATRIX3:
+          {
+            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat3 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix3) << std::endl;
+            memcpy( dst, &j->propertyPtr->GetMatrix3( updateBufferIndex ), sizeof(Matrix3) );
+            break;
+          }
+          default:
+          {}
+        }
+      }
+    }
+  }
+
+  /**
+   * Prepare textures
+   */
+  auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
+  auto samplers = shader.GetSamplers();
+
+  for( auto i = 0u; i < mTextureSet->GetTextureCount(); ++i )
+  {
+    auto texture = mTextureSet->GetTexture( i );
+    auto gfxTexture = texture->GetGfxObject();
+    auto binding = Graphics::API::RenderCommand::TextureBinding{}
+        .SetBinding( samplers[i].binding )
+        .SetTexture( texture->GetGfxObject() )
+        .SetSampler( nullptr );
+
+    textureBindings.emplace_back( binding );
+  }
+
+  // Build render command
+  // todo: this may be deferred until all render items are sorted, otherwise
+  // certain optimisations cannot be done
+
+  const auto& vb = mGeometry->GetVertexBuffers()[0];
+  //vb->Update()
+  mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
+  mGfxRenderCommand->BindVertexBuffers( std::move(vertexAttributeBindings) );
+  mGfxRenderCommand->BindTextures( std::move(textureBindings) );
+  mGfxRenderCommand->BindRenderState( std::move( Graphics::API::RenderCommand::RenderState{}
+                                       .SetShader( mShader->GetGfxObject() ) ) );
+  mGfxRenderCommand->Draw( std::move(Graphics::API::RenderCommand::DrawCommand{}
+                   .SetFirstVertex(0u)
+                   .SetDrawType( Graphics::API::RenderCommand::DrawType::VERTEX_DRAW )
+                   .SetFirstInstance(0u)
+                   .SetVertexCount( vb->GetElementCount() )
+                   .SetInstanceCount( 1u )));
+
+  std::cout << "done\n";
+}
+
+void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t size )
+{
+  auto& gfxShader = mShader->GetGfxObject().Get();
+  auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+  if( gfxShader.GetNamedUniform( name, uniformInfo ) )
+  {
+    auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+    memcpy( dst, data, size );
+  }
+}
+
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
+
   if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
@@ -673,3 +941,5 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
+
+#pragma GCC diagnostic pop

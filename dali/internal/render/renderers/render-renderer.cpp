@@ -216,7 +216,6 @@ void Renderer::SetBlending( Context& context, bool blend )
 
 void Renderer::GlContextDestroyed()
 {
-  mGeometry->GlContextDestroyed();
 }
 
 void Renderer::GlCleanup()
@@ -226,7 +225,12 @@ void Renderer::GlCleanup()
 void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program )
 {
   // Check if the map has changed
+
+
+
+#if 0
   DALI_ASSERT_DEBUG( mRenderDataProvider && "No Uniform map data provider available" );
+
 
   const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
 
@@ -286,6 +290,8 @@ void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataP
   {
     program.SetSizeUniform3f( sizeLoc, size.x, size.y, size.z );
   }
+#endif
+
 }
 
 void Renderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map )
@@ -533,7 +539,7 @@ void Renderer::Render( Context& context,
 {
   // TODO: AB: no callig any GL now, to avoid asserts whole function commented out
   return;
-
+#if 0
   // Get the program to use:
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
@@ -586,6 +592,7 @@ void Renderer::Render( Context& context,
                               mIndexedDrawFirstElement,
                               mIndexedDrawElementsCount );
   }
+#endif
 }
 
 void Renderer::SetSortAttributes( BufferIndex bufferIndex,

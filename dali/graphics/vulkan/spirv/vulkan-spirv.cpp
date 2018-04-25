@@ -933,7 +933,7 @@ struct SPIRVShader::Impl
 
   bool GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out, bool canOverlap = false )
   {
-    for( auto& i :  reflectionData )
+    for( auto&& i : reflectionData )
     {
       if( i.second.storage == SpvStorageClassInput )
       {
@@ -941,7 +941,9 @@ struct SPIRVShader::Impl
         attr.name = i.second.name;
         attr.location = MapContains( i.second.decorations, SpvDecorationLocation ) ?
                         i.second.decorations[SpvDecorationLocation]->GetParameterU32(2) : 0u;
-        attr.format = GetTypeInfo( GetReferencedOpCode( *i.second.op, 0 ) ).vkFormat;
+        attr.format = GetTypeInfo(
+          GetReferencedOpCode( GetReferencedOpCode( *i.second.op, 0 ), 2)
+        ).vkFormat;
         out.emplace_back( attr );
       }
     }
