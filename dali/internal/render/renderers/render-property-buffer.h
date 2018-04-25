@@ -22,9 +22,19 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/graphics-api/graphics-api-accessor.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
 
 namespace Dali
 {
+namespace Graphics
+{
+namespace API
+{
+class Controller;
+} // API
+} // Graphics
+
 namespace Internal
 {
 namespace Render
@@ -91,11 +101,20 @@ public:
    */
   void BindBuffer(GpuBuffer::Target target);
 
+#if 0
   /**
    * Perform the upload of the buffer only when requiered
    * @param[in] context The GL context
    */
   bool Update( Context& context );
+#endif
+
+  /**
+   * Perform the upload of the buffer only when required
+   * @param controller
+   * @return
+   */
+  bool Update( Dali::Graphics::API::Controller& controller );
 
   /**
    * Enable the vertex attributes for each vertex buffer from the corresponding
@@ -182,6 +201,18 @@ public:
     return mFormat.Get();
   }
 
+  inline void SetGfxObject( Graphics::API::Accessor<Graphics::API::Buffer> gfxObject )
+  {
+    mGfxBuffer = gfxObject;
+  }
+
+  inline Graphics::API::Accessor<Graphics::API::Buffer> GetGfxObject() const
+  {
+    return mGfxBuffer;
+  }
+
+  void SetUsage( Graphics::API::Buffer::UsageHint usage );
+
 private:
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< char > >    mData;      ///< Data
@@ -189,6 +220,10 @@ private:
 
   size_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
+
+  // GRAPHICS
+  Graphics::API::Accessor<Graphics::API::Buffer> mGfxBuffer;
+  Graphics::API::Buffer::UsageHint mGfxBufferUsage;
 };
 
 } // namespace Render

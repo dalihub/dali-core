@@ -68,6 +68,9 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
+#include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -532,10 +535,10 @@ void UpdateManager::SetShaderProgram( Shader* shader,
          controller.CreateShader( controller.GetShaderFactory()
         .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
                           Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                          Graphics::API::ShaderDetails::ShaderSource( VSH_CODE ))
+                          Graphics::API::ShaderDetails::ShaderSource( VSH_IMAGE_VISUAL_CODE ))
         .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
                           Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                          Graphics::API::ShaderDetails::ShaderSource( FSH_CODE ))
+                          Graphics::API::ShaderDetails::ShaderSource( FSH_IMAGE_VISUAL_CODE ))
          );
 
 #else
@@ -819,7 +822,8 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
 
-    mImpl->renderers[i]->PrepareRender( bufferIndex );
+    //mImpl->renderers[i]->PrepareRender( bufferIndex );
+    mImpl->renderers[i]->PrepareRender( mImpl->graphics.GetController(), bufferIndex );
   }
 }
 
@@ -1164,6 +1168,7 @@ void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
 }
 
+#if 0
 void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1175,7 +1180,21 @@ void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuf
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
 }
+#endif
 
+void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
+{
+  // todo: may not be needed yet
+  // Message has ownership of format while in transit from update -> render
+  //auto& controller = GetGraphicsController();
+  //controller.CreateBuffer( controller.GetBufferFactory()
+  //.SetSize( format->size * format->components ))
+
+  // set format directly, on the update thread
+  propertyBuffer->SetFormat( format.Release() );
+}
+
+#if 0
 void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   // Message has ownership of format while in transit from update -> render
@@ -1187,9 +1206,20 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
 }
+#endif
+
+void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
+{
+  auto& controller = GetGraphicsController();
+  auto buffer = controller.CreateBuffer( controller.GetBufferFactory()
+                  .SetSize( uint32_t(propertyBuffer->GetFormat()->size * size) )
+                  .SetUsage(Graphics::API::Buffer::UsageHint::ATTRIBUTES ));
+  propertyBuffer->SetGfxObject( buffer );
+}
 
 void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
 {
+
   // Message has ownership of format while in transit from update -> render
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
 
@@ -1235,6 +1265,7 @@ void UpdateManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uns
 
 void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
+  /*
   typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
@@ -1242,17 +1273,21 @@ void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
+   */
+  geometry->RemovePropertyBuffer( propertyBuffer );
 }
 
 void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
-  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+  //typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  //unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
+  //new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
+
+  geometry->AddPropertyBuffer( propertyBuffer );
 }
 
 void UpdateManager::AddTexture( OwnerPointer< Render::Texture >& texture )
@@ -1353,6 +1388,11 @@ void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
+}
+
+Graphics::API::Controller& UpdateManager::GetGraphicsController() const
+{
+  return mImpl->graphics.GetController();
 }
 
 } // namespace SceneGraph
