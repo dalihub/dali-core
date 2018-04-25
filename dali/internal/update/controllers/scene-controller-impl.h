@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,9 @@ public:
 
   /**
    * Constructor
-   * @param[in] rendererDispatcher Used for passing ownership of renderers to the render-thread.
-   * @param[in] renderQueue  The renderQueue
    * @param[in] discardQueue The discardQueue
    */
-  SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
-                       RenderQueue& renderQueue,
-                       DiscardQueue& discardQueue );
+  SceneControllerImpl( DiscardQueue& discardQueue );
 
   /**
    * Destructor
@@ -56,32 +52,15 @@ public:
 public:  // from SceneController
 
   /**
-   * @copydoc SceneController::GetRenderMessageDispatcher()
-   */
-  virtual RenderMessageDispatcher& GetRenderMessageDispatcher() { return mRenderMessageDispatcher; }
-
-  /**
-   * @copydoc SceneController::GetRenderQueue()
-   */
-  virtual RenderQueue& GetRenderQueue() { return mRenderQueue; }
-
-  /**
    * @copydoc SceneController::GetDiscardQueue()
    */
   virtual DiscardQueue& GetDiscardQueue() { return mDiscardQueue; }
 
 private:
-
-  // Undefined copy constructor.
-  SceneControllerImpl( const SceneControllerImpl& );
-
-  // Undefined assignment operator.
-  SceneControllerImpl& operator=( const SceneControllerImpl& );
+  SceneControllerImpl( const SceneControllerImpl& ) = delete;
+  SceneControllerImpl& operator=( const SceneControllerImpl& ) = delete;
 
 private:
-
-  RenderMessageDispatcher& mRenderMessageDispatcher;    ///< Used for passing messages to the render-thread
-  RenderQueue&             mRenderQueue;           ///< render queue
   DiscardQueue&            mDiscardQueue;          ///< discard queue
 };
 

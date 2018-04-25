@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
 
 namespace Dali
 {
@@ -36,7 +36,7 @@ FrameBufferPtr FrameBuffer::New( unsigned int width, unsigned int height, unsign
 }
 
 
-Render::FrameBuffer* FrameBuffer::GetRenderObject() const
+SceneGraph::FrameBuffer* FrameBuffer::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -53,7 +53,7 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 
 void FrameBuffer::Initialize()
 {
-  mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mAttachments );
+  mRenderObject = new SceneGraph::FrameBuffer( mWidth, mHeight, mAttachments );
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 

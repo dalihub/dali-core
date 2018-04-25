@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,18 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
 
-namespace Render
-{
-class Geometry;
-}
-
 namespace SceneGraph
 {
-
+class Geometry;
 class RenderTracker;
 struct RenderItem;
-class Shader;
 struct RenderList;
 class RenderTask;
 class RenderInstructionContainer;
-
+class Shader;
 
 /**
  * @brief This class handles the sorting and preparation of Renderers for each layer.
@@ -80,7 +73,7 @@ public:
     RenderItem*             renderItem;        ///< The render item that is being sorted (includes depth index)
     const Shader*           shader;            ///< The shader instance
     const void*             textureSet;        ///< The textureSet instance
-    const Render::Geometry* geometry;          ///< The geometry instance
+    const SceneGraph::Geometry* geometry;          ///< The geometry instance
     float                   zValue;            ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
   };
 

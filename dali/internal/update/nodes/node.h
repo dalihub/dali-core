@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-vector3.h>
@@ -36,7 +35,10 @@
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/data-providers/node-data-provider.h>
+
+//#include <dali/internal/update/rendering/scene-graph-renderer.h>
+
 
 namespace Dali
 {
@@ -56,6 +58,10 @@ class DiscardQueue;
 class Layer;
 class RenderTask;
 class UpdateManager;
+class Renderer;
+
+using RendererContainer = Dali::Vector<Renderer*>;
+
 
 /**
  * Flag whether property has changed, during the Update phase.
