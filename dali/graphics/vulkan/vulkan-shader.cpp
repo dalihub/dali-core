@@ -34,7 +34,8 @@ struct Shader::Impl
   Impl( Shader& owner, Graphics& graphics, const vk::ShaderModuleCreateInfo& info ) :
     mOwner( owner ),
     mGraphics( graphics ),
-    mCreateInfo( info )
+    mCreateInfo( info ),
+    mPipelineShaderStage( vk::ShaderStageFlagBits::eAllGraphics )
   {
     mSPIRVShader = SpirV::SPIRVUtils::Parse( info.pCode, info.codeSize, vk::ShaderStageFlagBits::eVertex );
   }
@@ -66,6 +67,7 @@ struct Shader::Impl
   vk::ShaderModuleCreateInfo mCreateInfo;
   vk::ShaderModule mShaderModule;
   std::unique_ptr<SpirV::SPIRVShader> mSPIRVShader;
+  vk::ShaderStageFlagBits mPipelineShaderStage;
 };
 
 /*
@@ -113,6 +115,17 @@ const SpirV::SPIRVShader& Shader::GetSPIRVReflection() const
 {
   return *mImpl->mSPIRVShader;
 }
+
+void Shader::SetExplicitShaderStage( vk::ShaderStageFlagBits shaderStage )
+{
+  mImpl->mPipelineShaderStage = shaderStage;
+}
+
+vk::ShaderStageFlagBits Shader::GetExplicitShaderStage() const
+{
+  return mImpl->mPipelineShaderStage;
+}
+
 
 }
 }

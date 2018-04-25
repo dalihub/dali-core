@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/graphics/graphics-algorithms.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <glm/glm.hpp>
 // EXTERNAL INCLUDES
 
@@ -25,10 +28,16 @@
 #include <dali/graphics-api/graphics-api-frame.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 namespace Dali
 {
@@ -38,62 +47,117 @@ namespace SceneGraph
 {
 namespace
 {
+Graphics::API::RenderCommand& BuildRenderCommand(
+  Graphics::API::Controller&           graphics,
+  Graphics::API::Frame&                frame,
+  BufferIndex                          bufferIndex,
+
+  Matrix                               viewProjection,
+  const RenderList&                    renderItemList,
+  Graphics::API::RenderCommand&        command
+)
+{
+  /*
+  // per item/renderer
+  //const auto& renderer = renderItemList.GetRenderer(0);
+  const auto& item = renderItemList.GetItem(0);
+
+  // scenegraph renderer should have complete data
+  const auto sgRenderer = item.mNode->GetRendererAt(0);
+
+
+  const auto& renderer = *item.mRenderer;
+  const auto& dataProviderConst = renderer.GetRenderDataProvider();
+  auto& dataProvider = const_cast<RenderDataProvider&>( dataProviderConst );
+  const auto& uniformMap = dataProvider.GetUniformMap().GetUniformMap( bufferIndex );
+
+  // get resources
+  const auto& shader = sgRenderer->GetShader();
+  const auto& textures = sgRenderer->GetTextures();
+  // todo: samplers
+  //const auto& samplers = sgRenderer->Get;
+
+
+  // prepare vertex buffers
+  const auto& vertexBuffers = sgRenderer->GetGeometry()->GetVertexBuffers();
+  std::vector<Graphics::API::RenderCommand::VertexAttributeBufferBinding> vertexAttributeBindings;
+  auto attribLocation = 0u;
+  auto bindingIndex = 0u;
+
+  for( auto&& vertexBuffer : vertexBuffers )
+  {
+    auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
+
+    for( auto i = 0u; i < attributeCountInForBuffer; ++i )
+    {
+      // create binding per attribute
+      auto binding = Graphics::API::RenderCommand::VertexAttributeBufferBinding{}
+        .SetOffset( (vertexBuffer->GetFormat()->components[i]).offset )
+        .SetBinding( bindingIndex )
+        .SetBuffer( vertexBuffer->GetGfxObject() )
+        .SetInputAttributeRate( Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX )
+        .SetLocation( attribLocation + i )
+        .SetStride( vertexBuffer->GetFormat()->size );
+
+      vertexAttributeBindings.emplace_back( std::move(binding) );
+    }
+  }
+
+  // prepare uniforms
+  auto gfxShader = shader.GetGfxObject();
+
+  // find mapped uniforms
+*/
+  return command;
+}
+
+static constexpr float CLIP_MATRIX_DATA[] = {
+  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f
+};
+static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
+
+
 void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                            Graphics::API::Frame&                frame,
                            BufferIndex                          bufferIndex,
                            Graphics::API::RenderCommandBuilder& commandBuilder,
                            Matrix                               viewProjection,
+                           RenderInstruction&                   instruction,
                            const RenderList&                    renderItemList )
 {
   // TODO: @todo Set shaders and other properties
   //commandBuilder.Set( );
 
   // TODO: @todo Clipping...
-  using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
+  //using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
   auto numberOfRenderItems = renderItemList.Count();
 
-  using DataT = struct
-  {
-    Matrix  world;
-    Vector4 color;
-    Vector3 size;
-    uint32_t samplerId;
-  } __attribute__((aligned(16)));
+  const auto viewMatrix = instruction.GetViewMatrix( bufferIndex );
+  const auto projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
 
-  auto uniformBuffer = graphics.CreateBuffer<DataT>( numberOfRenderItems );
-  auto data = uniformBuffer->GetData();
+  Matrix vulkanProjectionMatrix;
+  Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
 
-  // TODO: for now texture id is passed through the buffer however
-  // it isn't used by shader but only used to extract which texture
-  // should be used during rendering an item.
-  uint32_t opaqueTextureId = 0;
+  std::vector<Graphics::API::RenderCommand*> commandList;
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
+    auto sgRenderer = item.mNode->GetRendererAt(0);
+    auto& cmd = sgRenderer->GetGfxRenderCommand();
 
-    if(item.mTextureSet)
-    {
-
-      auto textureSet = const_cast<InternalTextureSet*>(reinterpret_cast<const InternalTextureSet*>(item.mTextureSet));
-
-      auto& texture = textureSet->GetTexture(0)->GetGfxObject();
-      auto textureId = texture.GetHandle();
-
-      opaqueTextureId = uint32_t(textureId); // TODO: AB: hack!!!
-    }
-    Matrix::Multiply( data[i].world, item.mModelMatrix, viewProjection );
-    data[i].color = item.mNode->GetWorldColor( bufferIndex );
-    data[i].size  = item.mSize;
-    data[i].samplerId = opaqueTextureId;
+    Matrix mvp;
+    Matrix::Multiply( mvp, item.mModelMatrix, viewProjection );
+    sgRenderer->WriteUniform( "uModelMatrix", item.mModelMatrix );
+    sgRenderer->WriteUniform( "uMvpMatrix", mvp );
+    sgRenderer->WriteUniform( "uViewMatrix", *viewMatrix );
+    sgRenderer->WriteUniform( "uModelViewMatrix", item.mModelViewMatrix );
+    sgRenderer->WriteUniform( "uProjection", vulkanProjectionMatrix );
+    sgRenderer->WriteUniform( "uSize", item.mSize );
+    sgRenderer->WriteUniform( "uColor", item.mNode->GetWorldColor( bufferIndex ));
+    commandList.push_back( &cmd  );
   }
-  commandBuilder.Set( Graphics::API::PrimitiveCount{numberOfRenderItems} );
 
-  auto buffers = std::vector<Graphics::API::BufferInfo>{};
-  buffers.emplace_back(std::move(uniformBuffer));
-
-  commandBuilder.Set( Graphics::API::BufferList{std::move(buffers)} );
-  auto cmd = commandBuilder.Build();
-  graphics.SubmitCommand( std::move(cmd) );
+  graphics.SubmitCommands( std::move(commandList) );
 }
 
 void SubmitInstruction( Graphics::API::Controller& graphics,
@@ -103,7 +167,7 @@ void SubmitInstruction( Graphics::API::Controller& graphics,
 {
   using namespace Graphics::API;
 
-  // Create constant buffer with static uniforms: view matrix, progrjection matrix
+  // Create constant buffer with static uniforms: view matrix, projection matrix
 
   // TODO: @todo: buffer for constant uniforms
   /*
@@ -123,7 +187,7 @@ void SubmitInstruction( Graphics::API::Controller& graphics,
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
     SubmitRenderItemList(
-      graphics, frame, bufferIndex, commandBuilder, viewProjection, *instruction.GetRenderList( i ) );
+      graphics, frame, bufferIndex, commandBuilder, viewProjection, instruction, *instruction.GetRenderList( i ) );
   }
 }
 } // namespace
@@ -134,6 +198,7 @@ void SubmitRenderInstructions( Graphics::API::Controller&  graphics,
 {
   auto frame = Graphics::API::Frame{};
   graphics.BeginFrame();
+
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
   for( size_t i = 0; i < numberOfInstructions; ++i )
@@ -149,3 +214,5 @@ void SubmitRenderInstructions( Graphics::API::Controller&  graphics,
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
+
+#pragma GCC diagnostic pop

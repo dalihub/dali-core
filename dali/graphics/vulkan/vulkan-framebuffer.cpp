@@ -59,7 +59,7 @@ struct Framebuffer::Impl
 
       vk::AttachmentDescription attDesc{};
       attDesc.setSamples( vk::SampleCountFlagBits::e1 )
-        .setInitialLayout( vk::ImageLayout::eColorAttachmentOptimal )
+        .setInitialLayout( vk::ImageLayout::eUndefined )
         .setFormat( colorAttachment->GetImage()->GetVkFormat() )
         .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
         .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
@@ -88,7 +88,7 @@ struct Framebuffer::Impl
 
       vk::AttachmentDescription attDesc{};
       attDesc.setSamples( vk::SampleCountFlagBits::e1 )
-             .setInitialLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal )
+             .setInitialLayout( vk::ImageLayout::eUndefined )
              .setFormat( mDepthStencilImageViewAttachment->GetImage()->GetVkFormat() )
              .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
              .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
