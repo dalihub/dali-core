@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,18 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-namespace Render
-{
-class RenderTracker;
-}
-
 namespace SceneGraph
 {
 class Node;
 class Camera;
 class RenderInstruction;
-class RenderMessageDispatcher;
+
 
 /**
  * RenderTasks describe how the Dali scene should be rendered.
@@ -73,9 +66,8 @@ public:
 
   /**
    * Initialize the render task. Called in update thread
-   * @param[in] renderMessageDispatcher to send messages to render thread
    */
-  void Initialize( RenderMessageDispatcher& renderMessageDispatcher );
+  void Initialize();
 
   /**
    * Set the nodes to be rendered.
@@ -112,13 +104,13 @@ public:
    * Set the frame-buffer used as a render target.
    * @param[in] frameBuffer The framebuffer
    */
-  void SetFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void SetFrameBuffer( SceneGraph::FrameBuffer* frameBuffer );
 
   /**
    * Retrieve the resource ID of the frame-buffer.
    * @return The resource ID, or zero if not rendering off-screen.
    */
-  Render::FrameBuffer* GetFrameBuffer();
+  SceneGraph::FrameBuffer* GetFrameBuffer();
 
   /**
    * Set the value of property viewportPosition
@@ -349,12 +341,10 @@ public: // Animatable Properties
   AnimatableProperty< Vector4 >   mClearColor;          ///< clearColor
 
 private:
-  RenderMessageDispatcher* mRenderMessageDispatcher;
-  Render::RenderTracker* mRenderSyncTracker;
   Node* mSourceNode;
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;
-  Render::FrameBuffer* mFrameBuffer;
+  SceneGraph::FrameBuffer* mFrameBuffer;
 
   bool mWaitingToRender:1; ///< True when an render once to FBO is waiting
   bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering
@@ -372,9 +362,9 @@ private:
 };
 
 // Messages for RenderTask
-inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, RenderTask& task, Render::FrameBuffer* frameBuffer )
+inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, RenderTask& task, SceneGraph::FrameBuffer* frameBuffer )
 {
-  typedef MessageValue1< RenderTask, Render::FrameBuffer*> LocalType;
+  typedef MessageValue1< RenderTask, SceneGraph::FrameBuffer*> LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

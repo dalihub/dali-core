@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,7 +312,8 @@ void Shader::Initialize(
   mShaderData = shaderFactory.Load( vertexSource, fragmentSource, hints, shaderHash );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( updateManager, *mSceneObject, mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
+  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
+
   eventThreadServices.RegisterObject( this );
 }
 

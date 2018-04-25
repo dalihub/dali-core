@@ -49,7 +49,10 @@ namespace Graphics
 namespace Vulkan
 {
 static const mat4 CLIP_MATRIX(
-  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
+  1.0f,  0.0f, 0.0f, 0.0f,
+  0.0f, -1.0f, 0.0f, 0.0f,
+  0.0f,  0.0f, 0.5f, 0.0f,
+  0.0f,  0.0f, 0.5f, 1.0f );
 
 struct Controller::Impl
 {

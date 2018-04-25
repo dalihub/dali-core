@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
 // INTERNAL INCLUDES
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/integration-api/render-controller.h>
@@ -44,7 +45,7 @@ TexturePtr Texture::New( NativeImageInterface& nativeImageInterface )
   return texture;
 }
 
-Render::Texture* Texture::GetRenderObject() const
+SceneGraph::Texture* Texture::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -75,15 +76,15 @@ void Texture::Initialize()
   {
     if( mNativeImage )
     {
-      mRenderObject = new Render::Texture( mNativeImage );
+      mRenderObject = new SceneGraph::Texture( mNativeImage );
     }
     else
     {
-      mRenderObject = new Render::Texture( mType, mFormat, mSize );
+      mRenderObject = new SceneGraph::Texture( mType, mFormat, mSize );
     }
 
-    OwnerPointer< Render::Texture > transferOwnership( mRenderObject );
-    AddTexture( mEventThreadServices.GetUpdateManager(), transferOwnership );
+    OwnerPointer< SceneGraph::Texture > transferOwnership( mRenderObject );
+    AddTextureMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
   }
 }
 
@@ -91,7 +92,7 @@ Texture::~Texture()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    RemoveTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    RemoveTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 
@@ -151,8 +152,8 @@ bool Texture::Upload( PixelDataPtr pixelData,
                                     static_cast< uint16_t >( yOffset ),
                                     static_cast< uint16_t >( width ),
                                     static_cast< uint16_t >( height ) };
-            //UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
-            UploadTextureMessageV2( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+
+            UploadTextureMessage( mEventThreadServices, *mRenderObject, pixelData, params );
 
             // Request event processing and update forcely
             mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );
@@ -176,7 +177,7 @@ void Texture::GenerateMipmaps()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    GenerateMipmapsMessage( mEventThreadServices, *mRenderObject );
   }
 }
 

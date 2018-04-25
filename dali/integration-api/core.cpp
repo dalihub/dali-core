@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/core-impl.h>
 
@@ -34,8 +34,6 @@ namespace Integration
 Core* Core::New( RenderController& renderController,
                  PlatformAbstraction& platformAbstraction,
                  Graphics::Graphics& graphics,
-                 GlAbstraction& glAbstraction,
-                 GlSyncAbstraction& glSyncAbstraction,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
                  bool renderToFboEnabled )
@@ -44,8 +42,6 @@ Core* Core::New( RenderController& renderController,
   instance->mImpl = new Internal::Core( renderController,
                                         platformAbstraction,
                                         graphics,
-                                        glAbstraction,
-                                        glSyncAbstraction,
                                         gestureManager,
                                         policy,
                                         renderToFboEnabled );
@@ -58,27 +54,7 @@ Core::~Core()
   delete mImpl;
 }
 
-ContextNotifierInterface* Core::GetContextNotifier()
-{
-  return mImpl->GetContextNotifier();
-}
-
-void Core::ContextCreated()
-{
-  mImpl->ContextCreated();
-}
-
-void Core::ContextDestroyed()
-{
-  mImpl->ContextDestroyed();
-}
-
-void Core::RecoverFromContextLoss()
-{
-  mImpl->RecoverFromContextLoss();
-}
-
-void Core::SurfaceResized(unsigned int width, unsigned int height)
+void Core::SurfaceResized( unsigned int width, unsigned int height )
 {
   mImpl->SurfaceResized(width, height);
 }
@@ -88,7 +64,7 @@ void Core::SetTopMargin( unsigned int margin )
   mImpl->SetTopMargin(margin);
 }
 
-void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
+void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
 {
   mImpl->SetDpi(dpiHorizontal, dpiVertical);
 }
@@ -98,7 +74,7 @@ void Core::SceneCreated()
   mImpl->SceneCreated();
 }
 
-void Core::QueueEvent(const Event& event)
+void Core::QueueEvent( const Event& event )
 {
   mImpl->QueueEvent(event);
 }
@@ -113,14 +89,21 @@ unsigned int Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-  void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update(
+  float elapsedSeconds,
+  unsigned int lastVSyncTimeMilliseconds,
+  unsigned int nextVSyncTimeMilliseconds,
+  UpdateStatus& status,
+  bool renderToFboEnabled,
+  bool isRenderingToFbo )
 {
-  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
+  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status,
+                 renderToFboEnabled, isRenderingToFbo );
 }
 
 void Core::Render( RenderStatus& status )
 {
-  mImpl->Render( status );
+  DALI_LOG_ERROR("Core::Render() called in error");
 }
 
 SystemOverlay& Core::GetSystemOverlay()

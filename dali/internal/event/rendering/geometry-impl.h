@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GEOMETRY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h> // std::vector
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/geometry.h> // Dali::Geometry
-#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
-#include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
-#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/internal/event/common/connectable.h>
+#include <dali/internal/event/common/object-connector.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/property-buffer-impl.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
 
 namespace Dali
 {
@@ -92,7 +92,7 @@ public:
    *
    * @return the geometry scene object
    */
-  const Render::Geometry* GetRenderObject() const;
+  const SceneGraph::Geometry* GetRenderObject() const;
 
 private: // implementation
 
@@ -120,7 +120,7 @@ private: // unimplemented methods
 private: // data
 
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Render::Geometry* mRenderObject;
+  SceneGraph::Geometry* mRenderObject;
 
   std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
   Dali::Geometry::Type mType;      ///< Geometry type (cached)
