@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
@@ -41,8 +40,6 @@ class Graphics;
 
 class Core;
 class GestureManager;
-class GlAbstraction;
-class GlSyncAbstraction;
 class PlatformAbstraction;
 class RenderController;
 class SystemOverlay;
@@ -173,36 +170,34 @@ private:
  * Integration::Core is used for integration with the native windowing system.
  * The following integration tasks must be completed:
  *
- * 1) Handle GL context creation, and notify the Core when this occurs.
+ * 1) Handle Graphics API
  *
  * 2) Provide suspend/resume behaviour (see below for more details).
  *
  * 3) Run an event loop, for passing events to the Core e.g. multi-touch input events.
  * Notification events should be sent after a frame is updated (see UpdateStatus).
  *
- * 4) Run a rendering loop, instructing the Core to render each frame.
- * A separate rendering thread is recommended; see multi-threading options below.
+ * 4) Run an animation loop, instructing the Core to process scene graph, animation and constraints
+ * A separate update thread is recommended; see multi-threading options below.
  *
  * 5) Provide an implementation of the PlatformAbstraction interface, used to access platform specific services.
  *
- * 6) Provide an implementation of the GlAbstraction interface, used to access OpenGL services.
- *
- * 7) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
+ * 6) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
  *
  * Multi-threading notes:
  *
- * The Dali API methods are not reentrant.  If you access the API from multiple threads simultaneously, then the results
- * are undefined. This means that your application might segfault, or behave unpredictably.
+ * The Dali API methods are not reentrant.  If you access the API from multiple threads simultaneously, then
+ * the results are undefined. This means that your application might segfault, or behave unpredictably.
  *
  * Rendering strategies:
  *
- * 1) Single-threaded. Call every Core method from the same thread. Event handling and rendering will occur in the same thread.
- * This is not recommended, since processing input (slowly) can affect the smooth flow of animations.
+ * 1) Single-threaded. Call every Core method from the same thread. Event handling and animation will occur in
+ * the same thread.  This is not recommended, since processing input (slowly) can affect the smooth flow of
+ * animations.
  *
- * 2) Multi-threaded. The Core update & render operations can be processed in separate threads.
- * See the method descriptions in Core to see which thread they should be called from.
+ * 2) Multi-threaded. The Core update operation can be processed in a separate thread.
+ * See the method description in Core to see which thread it should be called from.
  * This is the recommended option, so that input processing will not affect the smoothness of animations.
- * Note that the rendering thread must be halted, before destroying the GL context.
  */
 class DALI_IMPORT_API Core
 {
@@ -213,8 +208,6 @@ public:
    * This object is used for integration with the native windowing system.
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
-   * @param[in] glAbstraction The interface providing OpenGL services.
-   * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
    * @param[in] gestureManager The interface providing gesture manager services.
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
@@ -225,8 +218,6 @@ public:
   static Core* New( RenderController& renderController,
                     PlatformAbstraction& platformAbstraction,
                     Graphics::Graphics& graphics,
-                    GlAbstraction& glAbstraction,
-                    GlSyncAbstraction& glSyncAbstraction,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
                     bool renderToFboEnabled );
@@ -236,44 +227,9 @@ public:
    */
   ~Core();
 
-  // GL Context Lifecycle
-
   /**
-   * Get the object that will notify the application/toolkit when context is lost/regained
-   */
-  ContextNotifierInterface* GetContextNotifier();
-
-  /**
-   * Notify the Core that the GL context has been created.
-   * The context must be created before the Core can render.
-   * Multi-threading note: this method should be called from the rendering thread only
-   * @post The Core is aware of the GL context.
-   */
-  void ContextCreated();
-
-  /**
-   * Notify the Core that that GL context is about to be destroyed.
-   * The Core will free any previously allocated GL resources.
-   * Multi-threading note: this method should be called from the rendering thread only
-   * @post The Core is unaware of any GL context.
-   */
-  void ContextDestroyed();
-
-  /**
-   * Notify the Core that the GL context has been re-created, e.g. after ReplaceSurface
-   * or Context loss.
-   *
-   * In the case of ReplaceSurface, both ContextToBeDestroyed() and ContextCreated() will have
-   * been called on the render thread before this is called on the event thread.
-   *
-   * Multi-threading note: this method should be called from the main thread
-   */
-  void RecoverFromContextLoss();
-
-  /**
-   * Notify the Core that the GL surface has been resized.
-   * This should be done at least once i.e. after the first call to ContextCreated().
-   * The Core will use the surface size for camera calculations, and to set the GL viewport.
+   * Notify the Core that the render surface has been resized.
+   * The Core will use the surface size for camera calculations, and to set the viewport.
    * Multi-threading note: this method should be called from the main thread
    * @param[in] width The new surface width.
    * @param[in] height The new surface height.
@@ -310,8 +266,8 @@ public:
 
   /**
    * Queue an event with Core.
-   * Pre-processing of events may be beneficial e.g. a series of motion events could be throttled, so that only the last event is queued.
-   * Multi-threading note: this method should be called from the main thread.
+   * Pre-processing of events may be beneficial e.g. a series of motion events could be throttled, so that
+   * only the last event is queued.  Multi-threading note: this method should be called from the main thread.
    * @param[in] event The new event.
    */
   void QueueEvent(const Event& event);
@@ -358,8 +314,8 @@ public:
   /**
    * Render the next frame. This method should be preceded by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
    * @param[out] status showing whether update is required to run.
+   * @todo GRAPHICS - REMOVE
    */
   void Render( RenderStatus& status );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ GeometryPtr Geometry::New()
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   mVertexBuffers.push_back( &vertexBuffer );
-  SceneGraph::AttachVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
+  SceneGraph::AttachVertexBufferMessage( mEventThreadServices, *mRenderObject, *vertexBuffer.GetRenderObject() );
   return mVertexBuffers.size() - 1u;
 }
 
@@ -50,8 +50,8 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
 
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
-  const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
-  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderPropertyBuffer );
+  const SceneGraph::PropertyBuffer& renderPropertyBuffer = static_cast<const SceneGraph::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
+  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices, *mRenderObject, renderPropertyBuffer );
 
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
@@ -65,14 +65,14 @@ void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
     std::copy( indices, indices + count, indexData.Begin() );
   }
 
-  SceneGraph::SetIndexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData );
+  SceneGraph::SetIndexBufferMessage( mEventThreadServices, *mRenderObject, indexData );
 }
 
 void Geometry::SetType( Dali::Geometry::Type geometryType )
 {
   if( geometryType != mType )
   {
-    SceneGraph::SetGeometryTypeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, geometryType );
+    SceneGraph::SetGeometryTypeMessage(mEventThreadServices, *mRenderObject, geometryType );
 
     mType = geometryType;
   }
@@ -83,7 +83,7 @@ Dali::Geometry::Type Geometry::GetType() const
   return mType;
 }
 
-const Render::Geometry* Geometry::GetRenderObject() const
+const SceneGraph::Geometry* Geometry::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -97,8 +97,8 @@ Geometry::Geometry()
 
 void Geometry::Initialize()
 {
-  mRenderObject = new Render::Geometry();
-  OwnerPointer< Render::Geometry > transferOwnership( mRenderObject );
+  mRenderObject = new SceneGraph::Geometry();
+  OwnerPointer< SceneGraph::Geometry > transferOwnership( mRenderObject );
   AddGeometry( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 

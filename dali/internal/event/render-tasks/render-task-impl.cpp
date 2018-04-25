@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
 void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
   mFrameBuffer = frameBuffer;
-  Render::FrameBuffer* renderFrameBufferPtr( NULL );
+  SceneGraph::FrameBuffer* renderFrameBufferPtr( NULL );
   if( frameBuffer )
   {
     renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
