@@ -17,7 +17,8 @@
 
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
-
+#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
 namespace
 {
 
@@ -122,12 +123,19 @@ PropertyBuffer::PropertyBuffer()
  mData(NULL),
  mGpuBuffer(NULL),
  mSize(0),
- mDataChanged(true)
+ mDataChanged(true),
+ mGfxBuffer{ nullptr },
+ mGfxBufferUsage{ Graphics::API::Buffer::UsageHint::ATTRIBUTES }
 {
 }
 
 PropertyBuffer::~PropertyBuffer()
 {
+}
+
+void PropertyBuffer::SetUsage( Graphics::API::Buffer::UsageHint usage )
+{
+  mGfxBufferUsage = usage;
 }
 
 void PropertyBuffer::SetFormat( PropertyBuffer::Format* format )
@@ -143,6 +151,32 @@ void PropertyBuffer::SetData( Dali::Vector<char>* data, size_t size )
   mDataChanged = true;
 }
 
+bool PropertyBuffer::Update( Dali::Graphics::API::Controller& controller )
+{
+  if( !mData || !mFormat || !mSize )
+  {
+    return false;
+  }
+
+  if( mDataChanged || !mGfxBuffer )
+  {
+    if( !mGfxBuffer )
+    {
+      mGfxBuffer = controller.CreateBuffer( controller.GetBufferFactory()
+                                                      .SetUsage( mGfxBufferUsage )
+                                                      .SetSize( GetDataSize() ) );
+    }
+
+    // schedule deferred write
+    mGfxBuffer.Get().Write( mData.Get()->begin(), GetDataSize(), 0u );
+
+    mDataChanged = false;
+  }
+
+  return true;
+}
+
+#if 0
 bool PropertyBuffer::Update( Context& context )
 {
   if( !mData || !mFormat || !mSize )
@@ -169,6 +203,7 @@ bool PropertyBuffer::Update( Context& context )
 
   return true;
 }
+#endif
 
 void PropertyBuffer::BindBuffer(GpuBuffer::Target target)
 {

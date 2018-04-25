@@ -209,7 +209,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));

@@ -112,7 +112,7 @@ public:
 
   void SetGfxObject( const Graphics::API::Accessor<Graphics::API::Shader>& shader );
 
-  const Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject() const;
+  Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject();
 
   /**
    * Get the program built for this shader

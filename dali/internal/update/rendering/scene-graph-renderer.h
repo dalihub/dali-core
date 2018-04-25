@@ -118,6 +118,11 @@ public:
    */
   void SetGeometry( Render::Geometry* geometry );
 
+  Render::Geometry* GetGeometry() const
+  {
+    return mGeometry;
+  }
+
   /**
    * Set the depth index
    * @param[in] depthIndex the new depth index to use
@@ -248,11 +253,24 @@ public:
    */
   void PrepareRender( BufferIndex updateBufferIndex );
 
+  /**
+   * AB: preparing the command data
+   * @param controller
+   * @param updateBufferIndex
+   */
+  void PrepareRender( class Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
+
   /*
    * Retrieve the Render thread renderer
    * @return The associated render thread renderer
    */
   Render::Renderer& GetRenderer();
+
+  Graphics::API::RenderCommand& GetGfxRenderCommand()
+  {
+    return *mGfxRenderCommand.get();
+  }
+
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -357,6 +375,7 @@ private:
    */
   const Vector4& GetBlendColor() const;
 
+
 private:
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
@@ -384,6 +403,8 @@ private:
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
+  std::vector<std::vector<char>> mUboMemory;                  ///< Transient memory allocated for each UBO
+  std::unique_ptr<Graphics::API::RenderCommand>   mGfxRenderCommand;
 public:
 
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
