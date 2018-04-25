@@ -69,7 +69,7 @@ void Shader::SetGfxObject( const Graphics::API::Accessor<Graphics::API::Shader>&
   mGfxShader = shader;
 }
 
-const Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject() const
+Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject()
 {
   return mGfxShader;
 }
