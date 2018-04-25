@@ -18,6 +18,8 @@
  *
  */
 
+#include <cstdint>
+
 namespace Dali
 {
 namespace Graphics
@@ -49,12 +51,15 @@ public:
 
   virtual ~Buffer() = default;
 
- // TODO: @todo GetHints
-  size_t GetSize() const;
-  void* GetData();
+
+  virtual void* Map() = 0;
+
+  virtual void Unmap() = 0;
+
+  virtual void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) = 0;
 
 protected:
-  // derived types should not be moved direcly to prevent slicing
+  // derived types should not be moved directly to prevent slicing
   Buffer(Buffer&&) = default;
   Buffer& operator=(Buffer&&) = default;
 

@@ -446,7 +446,7 @@ void CommandBuffer::BindIndexBuffer( BufferRef buffer, uint32_t offset, vk::Inde
 }
 
 void CommandBuffer::BindVertexBuffer( uint32_t                               binding,
-                                      Dali::Graphics::Vulkan::Handle<Buffer> buffer,
+                                      const Dali::Graphics::Vulkan::Handle<Buffer>& buffer,
                                       vk::DeviceSize                         offset )
 {
   mImpl->BindVertexBuffers( binding, 1, std::vector<Handle<Buffer>>( {buffer} ), &offset );
