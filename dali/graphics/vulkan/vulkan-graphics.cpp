@@ -30,6 +30,7 @@
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -479,6 +480,8 @@ void Graphics::CreateDevice()
       // todo: present queue
     }
   }
+
+  mPipelineDatabase = std::make_unique<PipelineCache>( *this );
 }
 #pragma GCC diagnostic pop
 

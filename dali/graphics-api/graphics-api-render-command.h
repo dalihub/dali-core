@@ -29,6 +29,8 @@
 #include <dali/graphics-api/utility/utility-strong-type.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics-api/graphics-api-accessor.h>
+#include <dali/graphics-api/graphics-api-framebuffer.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
 
 namespace Dali
 {
@@ -38,20 +40,334 @@ namespace API
 {
 class Shader;
 class Texture;
-using PrimitiveCount = Utility::StrongType<size_t, struct PrimitiveCountTag>;
-using BufferInfo     = std::unique_ptr<GenericBufferBase>;
-using BufferList     = Utility::StrongType<std::vector<BufferInfo>, struct BufferListTag>;
-using ShaderList     = std::vector<Accessor<Shader>>;
-using TextureList    = std::vector<Accessor<Texture>>;
+class Buffer;
+class Sampler;
 
 /**
  * @brief Interface class for RenderCommand types in the graphics API.
  */
-class RenderCommand final
+class RenderCommand
 {
 public:
-  RenderCommand( PrimitiveCount primitiveCount, BufferList&& bufferList )
-  : mPrimitiveCount{primitiveCount}, mBufferList{std::move( bufferList )}
+
+  static constexpr uint32_t BINDING_INDEX_DONT_CARE { 0xffffffff };
+
+  enum class InputAttributeRate
+  {
+    PER_VERTEX,
+    PER_INSTANCE
+  };
+
+  enum class IndexType
+  {
+    INDEX_TYPE_UINT16,
+    INDEX_TYPE_UINT32,
+  };
+
+  enum class DrawType
+  {
+    UNDEFINED_DRAW,
+    VERTEX_DRAW,
+    INDEXED_DRAW,
+  };
+
+  /**
+   * Describes buffer attribute binding
+   */
+  struct VertexAttributeBufferBinding
+  {
+    VertexAttributeBufferBinding() = default;
+
+    Accessor<Buffer> buffer{ nullptr };
+    uint32_t location { 0u };
+    uint32_t offset { 0u };
+    uint32_t stride { 0u };
+    InputAttributeRate rate { InputAttributeRate::PER_VERTEX };
+
+    uint32_t binding { 0u };
+    void*    pNext{ nullptr };
+
+    VertexAttributeBufferBinding& SetBuffer( Accessor<Buffer> value )
+    {
+      buffer = value;
+      return *this;
+    }
+    VertexAttributeBufferBinding& SetLocation( uint32_t value )
+    {
+      location = value;
+      return *this;
+    }
+    VertexAttributeBufferBinding& SetOffset( uint32_t value )
+    {
+      offset = value;
+      return *this;
+    }
+    VertexAttributeBufferBinding& SetStride( uint32_t value )
+    {
+      stride = value;
+      return *this;
+    }
+    VertexAttributeBufferBinding& SetBinding( uint32_t value )
+    {
+      binding = value;
+      return *this;
+    }
+    VertexAttributeBufferBinding& SetInputAttributeRate( InputAttributeRate value)
+    {
+      rate = value;
+      return *this;
+    }
+  };
+
+  /**
+   * Structure describes uniform buffer binding
+   */
+  struct UniformBufferBinding
+  {
+    UniformBufferBinding() :
+    buffer( nullptr ), offset( 0u ), dataSize( 0u ), binding( 0u ) {}
+    Accessor<Buffer> buffer;
+    uint32_t offset;
+    uint32_t dataSize;
+    uint32_t binding;
+    void*    pNext{ nullptr };
+
+    UniformBufferBinding& SetBuffer( Accessor<Buffer> value )
+    {
+      buffer = value;
+      return *this;
+    }
+    UniformBufferBinding& SetOffset( uint32_t value )
+    {
+      offset = value;
+      return *this;
+    }
+    UniformBufferBinding& SetDataSize( uint32_t value )
+    {
+      dataSize = value;
+      return *this;
+    }
+    UniformBufferBinding& SetBinding( uint32_t value )
+    {
+      binding = value;
+      return *this;
+    }
+  };
+
+  /**
+   *
+   */
+  struct TextureBinding
+  {
+    Accessor<Texture> texture;
+    Accessor<Sampler> sampler;
+    uint32_t binding;
+    void*    pNext{ nullptr };
+    TextureBinding() : texture(nullptr), sampler( nullptr ), binding( 0u ) {}
+
+    TextureBinding& SetTexture( Accessor<Texture> value )
+    {
+      texture = value;
+      return *this;
+    }
+    TextureBinding& SetSampler( Accessor<Sampler> value )
+    {
+      sampler = value;
+      return *this;
+    }
+    TextureBinding& SetBinding( uint32_t value )
+    {
+      binding = value;
+      return *this;
+    }
+  };
+
+  /**
+   *
+   */
+  struct SamplerBinding
+  {
+    Accessor<Sampler> sampler;
+    uint32_t binding;
+    void*    pNext{ nullptr };
+    SamplerBinding& SetSampler( Accessor<Sampler> value )
+    {
+      sampler = value;
+      return *this;
+    }
+    SamplerBinding& SetBinding( uint32_t value )
+    {
+      binding = value;
+      return *this;
+    }
+  };
+
+  /**
+   *
+   */
+  struct IndexBufferBinding
+  {
+    Accessor<Buffer> buffer { nullptr };
+    uint32_t offset { 0u };
+    IndexType type { IndexType::INDEX_TYPE_UINT16 };
+    void*    pNext{ nullptr };
+    IndexBufferBinding() = default;
+
+    IndexBufferBinding& SetBuffer( Accessor<Buffer> value )
+    {
+      buffer = value;
+      return *this;
+    }
+
+    IndexBufferBinding& SetOffset( uint32_t value )
+    {
+      offset = value;
+      return *this;
+    }
+
+    IndexBufferBinding& SetType( IndexType value )
+    {
+      type = value;
+      return *this;
+    }
+  };
+
+  struct RenderTargetBinding
+  {
+    Accessor<Framebuffer>                 framebuffer { nullptr };
+    std::vector<Framebuffer::ClearColor>  clearColors {};
+    Framebuffer::DepthStencilClearColor   dsClearColor {};
+    void*    pNext{ nullptr };
+    RenderTargetBinding() = default;
+
+    RenderTargetBinding& SetFramebuffer( Accessor<Framebuffer> value )
+    {
+      framebuffer = value;
+      return *this;
+    }
+
+    RenderTargetBinding& SetClearColors( std::vector<Framebuffer::ClearColor>&& value )
+    {
+      clearColors = value;
+      return *this;
+    }
+
+    RenderTargetBinding& SetFramebuffer( Framebuffer::DepthStencilClearColor value )
+    {
+      dsClearColor = value;
+      return *this;
+    }
+  };
+
+  struct DrawCommand
+  {
+    DrawCommand() :
+     drawType( DrawType::UNDEFINED_DRAW ){}
+    DrawType drawType;
+    union
+    {
+      uint32_t firstVertex;
+      uint32_t firstIndex;
+    };
+    union
+    {
+      uint32_t vertexCount;
+      uint32_t indicesCount;
+    };
+    uint32_t firstInstance;
+    uint32_t instanceCount;
+    void*    pNext{ nullptr };
+    DrawCommand& SetDrawType( DrawType value )
+    {
+      drawType = value;
+      return *this;
+    }
+    DrawCommand& SetFirstVertex( uint32_t value )
+    {
+      firstVertex = value;
+      return *this;
+    }
+    DrawCommand& SetFirstIndex( uint32_t value )
+    {
+      firstIndex = value;
+      return *this;
+    }
+    DrawCommand& SetVertexCount( uint32_t value )
+    {
+      vertexCount = value;
+      return *this;
+    }
+    DrawCommand& SetIndicesCount( uint32_t value )
+    {
+      indicesCount = value;
+      return *this;
+    }
+    DrawCommand& SetFirstInstance( uint32_t value )
+    {
+      firstInstance = value;
+      return *this;
+    }
+    DrawCommand& SetInstanceCount( uint32_t value )
+    {
+      instanceCount = value;
+      return *this;
+    }
+  };
+
+  /**
+   *
+   */
+  struct PushConstantsBinding
+  {
+    void*     data;
+    uint32_t  size;
+    uint32_t  binding;
+    void*    pNext{ nullptr };
+    PushConstantsBinding() = default;
+
+    PushConstantsBinding& SetData( void* value )
+    {
+      data = value;
+      return *this;
+    }
+    PushConstantsBinding& SetSize( uint32_t value )
+    {
+      size = value;
+      return *this;
+    }
+    PushConstantsBinding& SetBinding( uint32_t value )
+    {
+      binding = value;
+      return *this;
+    }
+  };
+
+  /**
+   *
+   */
+  struct RenderState
+  {
+    RenderState() = default;
+
+    Accessor<Shader> shader { nullptr };
+
+    RenderState& SetShader( Accessor<Shader> value )
+    {
+      shader = value;
+      return *this;
+    }
+    void*    pNext{ nullptr };
+  };
+
+  RenderCommand()
+  : mVertexBufferBindings(),
+    mUniformBufferBindings(),
+    mTextureBindings(),
+    mIndexBufferBinding(),
+    mRenderTargetBinding(),
+    mDrawCommand(),
+    mPushConstantsBindings(),
+    mRenderState()
   {
   }
 
@@ -63,67 +379,141 @@ public:
   RenderCommand( const RenderCommand& ) = delete;
   RenderCommand& operator=( const RenderCommand& ) = delete;
 
-  ~RenderCommand() = default;
+  virtual ~RenderCommand() = default;
 
-  PrimitiveCount GetPrimitiveCount() const
+  /**
+   * Resource binding API
+   */
+  RenderCommand& BindVertexBuffers( std::vector<VertexAttributeBufferBinding>&& bindings )
   {
-    return mPrimitiveCount;
+    mVertexBufferBindings = std::move( bindings );
+    return *this;
   }
 
-  const BufferList& GetBufferList() const
+  RenderCommand& BindUniformBuffers( std::vector<UniformBufferBinding>&& bindings )
   {
-    return mBufferList;
+    mUniformBufferBindings = std::move( bindings );
+    return *this;
   }
 
-  const auto& GetTextures() const
+  RenderCommand& BindTextures( std::vector<TextureBinding>&& bindings )
   {
-    return mTextureList;
+    mTextureBindings = std::move( bindings );
+    return *this;
   }
 
-  Accessor<Shader> GetShader( ShaderDetails::PipelineStage shaderStage ) const
+  RenderCommand& BindSamplers( std::vector<SamplerBinding>&& bindings )
   {
-    using ShaderDetails::PipelineStage;
+    mSamplerBindings = std::move( bindings );
+    return *this;
+  }
 
-    auto retval = Accessor<Shader>{nullptr};
+  RenderCommand& PushConstants( std::vector<PushConstantsBinding>&& bindings )
+  {
+    mPushConstantsBindings = bindings;
+    return *this;
+  }
 
-    size_t index = mShaders.size();
-    switch( shaderStage )
-    {
-      case PipelineStage::VERTEX:
-      {
-        index = 0;
-        break;
-      }
-      case PipelineStage::FRAGMENT:
-      {
-        index = 1;
-        break;
-      }
-      case PipelineStage::GEOMETRY:
-      case PipelineStage::COMPUTE:
-      case PipelineStage::TESSELATION_CONTROL:
-      case PipelineStage::TESSELATION_EVALUATION:
-      {
-        break;
-      }
-    }
-    if(index < mShaders.size())
-    {
-      retval = mShaders[index];
-    }
+  RenderCommand& BindRenderState( RenderState&& renderState )
+  {
+    mRenderState = renderState;
+    return *this;
+  }
+
+  RenderCommand& Draw( DrawCommand&& drawCommand )
+  {
+    mDrawCommand = drawCommand;
+    return *this;
+  }
+
+  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings()
+  {
+    return std::vector<VertexAttributeBufferBinding>{};
+  }
+
+  /**
+   * Makes a copy ( or moves ) all bindings from the source array
+   * @param bindings
+   * @return
+   */
+  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings( std::vector<VertexAttributeBufferBinding>&& bindings )
+  {
+    return std::vector<VertexAttributeBufferBinding>{ std::move(bindings) };
+  }
+
+  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings( const std::vector<VertexAttributeBufferBinding>& bindings )
+  {
+    return std::vector<VertexAttributeBufferBinding>{ bindings };
+  }
+
+  static std::vector<TextureBinding> NewTextureBindings()
+  {
+    return std::vector<TextureBinding>{};
+  }
+
+  static std::vector<PushConstantsBinding> NewPushConstantsBindings( uint32_t count )
+  {
+    auto retval = std::vector<PushConstantsBinding>{};
+    retval.resize( count );
     return retval;
   }
 
+  // Getters
+  const std::vector<VertexAttributeBufferBinding>& GetVertexBufferBindings() const
+  {
+    return mVertexBufferBindings;
+  }
 
+  const auto& GetUniformBufferBindings() const
+  {
+    return mUniformBufferBindings;
+  }
 
-private:
-  PrimitiveCount mPrimitiveCount;
-  BufferList     mBufferList;
-  TextureList    mTextureList;
-  ShaderList     mShaders;
+  const std::vector<TextureBinding>& GetTextureBindings() const
+  {
+    return mTextureBindings;
+  }
+
+  const auto& GetIndexBufferBinding() const
+  {
+    return mIndexBufferBinding;
+  }
+
+  const auto& GetRenderTargetBinding() const
+  {
+    return mRenderTargetBinding;
+  }
+
+  const DrawCommand& GetDrawCommand() const
+  {
+    return mDrawCommand;
+  }
+
+  const std::vector<PushConstantsBinding>& GetPushConstantsBindings() const
+  {
+    return mPushConstantsBindings;
+  }
+
+  const RenderState& GetRenderState() const
+  {
+    return mRenderState;
+  }
+
+protected:
+
+  std::vector<VertexAttributeBufferBinding> mVertexBufferBindings;
+  std::vector<UniformBufferBinding>         mUniformBufferBindings;
+  std::vector<TextureBinding>               mTextureBindings;
+  std::vector<SamplerBinding>               mSamplerBindings;
+  IndexBufferBinding                        mIndexBufferBinding;
+  RenderTargetBinding                       mRenderTargetBinding;
+  DrawCommand                               mDrawCommand;
+  std::vector<PushConstantsBinding>         mPushConstantsBindings;
+  RenderState                               mRenderState;
+
 };
 
-using RenderCommandBuilder = Utility::Builder<RenderCommand, PrimitiveCount, BufferList>;
+using RenderCommandBuilder = Utility::Builder<RenderCommand>;
 
 } // namespace API
 } // namespace Graphics

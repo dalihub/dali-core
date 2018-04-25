@@ -120,7 +120,7 @@ public:
    * @param buffer
    * @param offset
    */
-  void BindVertexBuffer(uint32_t binding, Dali::Graphics::Vulkan::Handle<Buffer> buffer, vk::DeviceSize offset );
+  void BindVertexBuffer(uint32_t binding, const Dali::Graphics::Vulkan::Handle<Buffer>& buffer, vk::DeviceSize offset );
 
   /**
    * Binds graphics pipeline

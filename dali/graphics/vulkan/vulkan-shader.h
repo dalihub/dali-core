@@ -65,7 +65,7 @@ public:
   /**
    *
    */
-  ~Shader();
+  ~Shader() override;
 
   vk::ShaderModule GetVkShaderModule() const;
 
@@ -78,9 +78,13 @@ public:
     return GetVkShaderModule();
   }
 
-public:
+  /**
+   * Sets a unique pipeline stage to be used with the shader
+   * @param shaderStage
+   */
+  void SetExplicitShaderStage( vk::ShaderStageFlagBits shaderStage );
 
-  void SetDescriptorSetLayout( uint32_t set, vk::DescriptorSetLayoutCreateInfo info );
+  vk::ShaderStageFlagBits GetExplicitShaderStage() const;
 
 private:
 
