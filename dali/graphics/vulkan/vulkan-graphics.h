@@ -57,6 +57,7 @@ class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
 class Controller;
+class PipelineCache;
 
 struct SwapchainSurfacePair
 {
@@ -191,6 +192,15 @@ private:
 
 private:
   std::unique_ptr<Dali::Graphics::Vulkan::Controller>           mGfxController;
+
+  // TODO: rename
+  std::unique_ptr<PipelineCache>        mPipelineDatabase;
+
+public:
+  PipelineCache& GetPipelineCache()
+  {
+    return *mPipelineDatabase.get();
+  }
 };
 
 } // namespace Vulkan

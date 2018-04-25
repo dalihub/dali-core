@@ -30,6 +30,8 @@ namespace API
 namespace ShaderDetails
 {
 
+constexpr uint32_t ERROR_VERTEX_INPUT_ATTRIBUTE_NOT_FOUND( -1u );
+
 enum class ShaderSourceType
 {
   STRING,
@@ -99,6 +101,19 @@ struct ShaderSource
     return true;
   }
 
+  bool operator==(const ShaderSource& rhs ) const
+  {
+    if( type == ShaderSourceType::BINARY )
+    {
+      return code == rhs.code;
+    }
+    else
+    {
+      return source == rhs.source;
+    }
+    return false;
+  }
+
   std::string       source;
   std::vector<char> code;
   ShaderSourceType type;
@@ -119,6 +134,44 @@ enum class PipelineStage {
   COMPUTE,
   TESSELATION_CONTROL,
   TESSELATION_EVALUATION,
+};
+
+enum class VertexInputAttributeFormat
+{
+  UNDEFINED,
+  FLOAT,
+  INTEGER,
+  VEC2,
+  VEC3,
+  VEC4
+};
+
+enum class UniformClass
+{
+  SAMPLER,
+  IMAGE,
+  COMBINED_IMAGE_SAMPLER,
+  UNIFORM_BUFFER,
+  UNDEFINED
+};
+
+struct UniformInfo
+{
+  std::string   name{""};
+  UniformClass  uniformClass{ UniformClass::UNDEFINED };
+  uint32_t      binding { 0u };
+  uint32_t      bufferIndex { 0u };
+  uint32_t      offset { 0u };
+  uint32_t      location { 0u };
+};
+
+struct UniformBlockInfo
+{
+  std::string name {""};
+  uint32_t    descriptorSet {0u};
+  uint32_t    binding {0u};
+  uint32_t    size {0u};
+  std::vector<UniformInfo> members {};
 };
 
 } // namespace TextureDetails
