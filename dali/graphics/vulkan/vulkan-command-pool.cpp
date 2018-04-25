@@ -204,6 +204,7 @@ struct CommandPool::Impl
 
   bool Initialise()
   {
+    mCreateInfo.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
     mCommandPool = VkAssert(mGraphics.GetDevice().createCommandPool(mCreateInfo, mGraphics.GetAllocator()));
     mInternalPoolPrimary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, 32, true );
     mInternalPoolSecondary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, 32, false );

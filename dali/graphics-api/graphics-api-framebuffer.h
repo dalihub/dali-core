@@ -31,6 +31,19 @@ namespace API
 class Framebuffer
 {
 public:
+
+  struct ClearColor
+  {
+    float r, g, b, a;
+  };
+
+  struct DepthStencilClearColor
+  {
+    uint32_t  stencil;
+    float     depth;
+  };
+
+public:
   // not copyable
   Framebuffer(const Framebuffer&) = delete;
   Framebuffer& operator=(const Framebuffer&) = delete;

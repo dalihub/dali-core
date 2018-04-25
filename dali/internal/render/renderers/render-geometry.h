@@ -25,6 +25,8 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/graphics-api/graphics-api-controller.h>
+
 
 namespace Dali
 {
@@ -55,15 +57,6 @@ public:
    */
   ~Geometry();
 
-  /**
-   * Called on Gl Context created
-   */
-  void GlContextCreated( Context& context );
-
-  /**
-   * Called on Gl Context destroyed.
-   */
-  void GlContextDestroyed();
 
   /**
    * Adds a property buffer to the geometry
@@ -123,11 +116,25 @@ public:
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
-  void UploadAndDraw(Context& context,
+  void UploadAndDraw(Graphics::API::Controller& controller,
                      BufferIndex bufferIndex,
                      Vector<GLint>& attributeLocation,
                      size_t elementBufferOffset,
                      size_t elementBufferCount );
+
+  /**
+   *
+   * @return
+   */
+  const Vector< Render::PropertyBuffer* >& GetVertexBuffers() const
+  {
+    return mVertexBuffers;
+  }
+
+  const Dali::Vector< unsigned short>& GetIndices() const
+  {
+    return mIndices;
+  }
 
 private:
 
