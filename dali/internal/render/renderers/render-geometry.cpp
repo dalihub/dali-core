@@ -42,14 +42,6 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::GlContextCreated( Context& context )
-{
-}
-
-void Geometry::GlContextDestroyed()
-{
-}
-
 void Geometry::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
   mVertexBuffers.PushBack( propertyBuffer );
@@ -76,6 +68,8 @@ void Geometry::RemovePropertyBuffer( const Render::PropertyBuffer* propertyBuffe
     }
   }
 }
+
+
 
 void Geometry::GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex ) const
 {
@@ -107,12 +101,13 @@ void Geometry::OnRenderFinished()
 }
 
 void Geometry::UploadAndDraw(
-    Context& context,
+    Graphics::API::Controller& controller,
     BufferIndex bufferIndex,
     Vector<GLint>& attributeLocation,
     size_t elementBufferOffset,
     size_t elementBufferCount )
 {
+#if 0
   if( !mHasBeenUpdated )
   {
     // Update buffers
@@ -140,7 +135,7 @@ void Geometry::UploadAndDraw(
     for( unsigned int i = 0; i < count; ++i )
     {
 
-      if( !mVertexBuffers[i]->Update( context ) )
+      if( !mVertexBuffers[i]->Update(  ) )
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
@@ -245,6 +240,7 @@ void Geometry::UploadAndDraw(
       context.DisableVertexAttributeArray( attributeLocation[i] );
     }
   }
+#endif
 }
 
 } // namespace SceneGraph
