@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
-#include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
-#include <dali/internal/render/renderers/render-renderer.h> // Dali::Render::Renderer::StencilParameters
+#include <dali/internal/event/common/object-connector.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/rendering/texture-set-impl.h>
+#include <dali/internal/event/rendering/geometry-impl.h>
+#include <dali/internal/update/rendering/stencil-parameters.h>
 
 namespace Dali
 {
@@ -299,7 +299,7 @@ private: // data
   size_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
   size_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
 
-  Render::Renderer::StencilParameters mStencilParameters;            ///< Struct containing all stencil related options
+  SceneGraph::StencilParameters       mStencilParameters;            ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask
 
   DepthFunction::Type                 mDepthFunction:3;              ///< Local copy of the depth function

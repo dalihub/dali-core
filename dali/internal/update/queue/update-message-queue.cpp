@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/message-buffer.h>
-#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/common/performance-monitor.h>
 
 using std::vector;
 

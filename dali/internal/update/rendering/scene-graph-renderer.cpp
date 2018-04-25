@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,12 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/rendering/data-providers/node-data-provider.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/rendering/scene-graph-shader.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
@@ -161,8 +158,7 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-: mSceneController( 0 ),
-  mRenderer( NULL ),
+: mRenderDataProvider(),
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
@@ -291,9 +287,6 @@ void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex
     mUniformMapChanged[updateBufferIndex] = true;
     mRegenerateUniformMap--;
   }
-
-
-
 
   auto& shader = mShader->GetGfxObject().Get();
   auto uboCount = shader.GetUniformBlockCount();
@@ -478,141 +471,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendFlag != 0 )
   {
-    if( mResendFlag & RESEND_DATA_PROVIDER )
-    {
-      OwnerPointer<RenderDataProvider> dataProvider = NewRenderDataProvider();
-
-      typedef MessageValue1< Render::Renderer, OwnerPointer<RenderDataProvider> > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderDataProvider, dataProvider );
-    }
-
-    if( mResendFlag & RESEND_GEOMETRY )
-    {
-      typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
-    }
-
-    if( mResendFlag & RESEND_FACE_CULLING_MODE )
-    {
-      typedef MessageValue1< Render::Renderer, FaceCullingMode::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
-    }
-
-    if( mResendFlag & RESEND_BLEND_BIT_MASK )
-    {
-      typedef MessageValue1< Render::Renderer, unsigned int > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask );
-    }
-
-    if( mResendFlag & RESEND_BLEND_COLOR )
-    {
-      typedef MessageValue1< Render::Renderer, Vector4 > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, GetBlendColor() );
-    }
-
-    if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
-    {
-      typedef MessageValue1< Render::Renderer, bool > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
-    }
-
-    if( mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT )
-    {
-      typedef MessageValue1< Render::Renderer, size_t > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement );
-    }
-
-    if( mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT )
-    {
-      typedef MessageValue1< Render::Renderer, size_t > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
-    }
-
-    if( mResendFlag & RESEND_DEPTH_WRITE_MODE )
-    {
-      typedef MessageValue1< Render::Renderer, DepthWriteMode::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode );
-    }
-
-    if( mResendFlag & RESEND_DEPTH_TEST_MODE )
-    {
-      typedef MessageValue1< Render::Renderer, DepthTestMode::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthTestMode, mDepthTestMode );
-    }
-
-    if( mResendFlag & RESEND_DEPTH_FUNCTION )
-    {
-      typedef MessageValue1< Render::Renderer, DepthFunction::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction );
-    }
-
-    if( mResendFlag & RESEND_RENDER_MODE )
-    {
-      typedef MessageValue1< Render::Renderer, RenderMode::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_FUNCTION )
-    {
-      typedef MessageValue1< Render::Renderer, StencilFunction::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_FUNCTION_MASK )
-    {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_FUNCTION_REFERENCE )
-    {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_MASK )
-    {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_FAIL )
-    {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_FAIL )
-    {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail );
-    }
-
-    if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_PASS )
-    {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
-      unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-      new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
-    }
-
+    // This used to send messages to obsolete Render::Renderer at this point
     mResendFlag = 0;
   }
 }
@@ -647,15 +506,10 @@ void Renderer::SetShader( Shader* shader )
   mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
-void Renderer::SetGeometry( Render::Geometry* geometry )
+void Renderer::SetGeometry( SceneGraph::Geometry* geometry )
 {
   DALI_ASSERT_DEBUG( geometry != NULL && "Geometry pointer is NULL");
   mGeometry = geometry;
-
-  if( mRenderer )
-  {
-    mResendFlag |= RESEND_GEOMETRY;
-  }
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
@@ -789,51 +643,31 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
 }
 
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
-void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+void Renderer::ConnectToSceneGraph( BufferIndex bufferIndex )
 {
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mSceneController = &sceneController;
-  RenderDataProvider* dataProvider = NewRenderDataProvider();
 
-  mRenderer = Render::Renderer::New( dataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
-                                         mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
+  mRenderDataProvider = std::make_unique< RenderDataProvider >();
 
-  OwnerPointer< Render::Renderer > transferOwnership( mRenderer );
-  mSceneController->GetRenderMessageDispatcher().AddRenderer( transferOwnership );
-}
-
-//Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
-void Renderer::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
-{
-  //Remove renderer from RenderManager
-  if( mRenderer )
-  {
-    mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
-    mRenderer = NULL;
-  }
-  mSceneController = NULL;
-}
-
-RenderDataProvider* Renderer::NewRenderDataProvider()
-{
-  RenderDataProvider* dataProvider = new RenderDataProvider();
-
-  dataProvider->mUniformMapDataProvider = this;
-  dataProvider->mShader = mShader;
+  mRenderDataProvider->mUniformMapDataProvider = this;
+  mRenderDataProvider->mShader = mShader;
 
   if( mTextureSet )
   {
     size_t textureCount = mTextureSet->GetTextureCount();
-    dataProvider->mTextures.resize( textureCount );
-    dataProvider->mSamplers.resize( textureCount );
+    mRenderDataProvider->mTextures.resize( textureCount );
+    mRenderDataProvider->mSamplers.resize( textureCount );
     for( unsigned int i(0); i<textureCount; ++i )
     {
-      dataProvider->mTextures[i] = mTextureSet->GetTexture(i);
-      dataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
+      mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
+      mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
     }
   }
+}
 
-  return dataProvider;
+//Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
+void Renderer::DisconnectFromSceneGraph(  BufferIndex bufferIndex )
+{
 }
 
 const Vector4& Renderer::GetBlendColor() const
@@ -843,11 +677,6 @@ const Vector4& Renderer::GetBlendColor() const
     return *mBlendColor;
   }
   return Color::TRANSPARENT;
-}
-
-Render::Renderer& Renderer::GetRenderer()
-{
-  return *mRenderer;
 }
 
 const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) const
