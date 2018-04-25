@@ -48,7 +48,7 @@ class Shader;
 class RenderDataProvider
 {
 public:
-  typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
+
   typedef std::vector< Render::Sampler* > Samplers;
 
   /**
@@ -86,7 +86,7 @@ public:
    * Returns the shader
    * @return The shader
    */
-  Shader& GetShader() const;
+  Dali::Internal::SceneGraph::Shader& GetShader() const;
 
   /**
    * Returns the list of samplers
@@ -103,8 +103,8 @@ public:
 private:
 
   const UniformMapDataProvider*       mUniformMapDataProvider;
-  Shader*                             mShader;
-  std::vector<Render::Texture*>    mTextures;
+  Dali::Internal::SceneGraph::Shader* mShader;
+  std::vector<Render::Texture*>       mTextures;
   Samplers                            mSamplers;
 
   // Give Renderer access to our private data to reduce copying vectors on construction.

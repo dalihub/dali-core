@@ -23,6 +23,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
+
 namespace Dali
 {
 namespace Internal
@@ -179,6 +180,8 @@ PropertyBuffer::PropertyBuffer()
 
 void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
+  // Old
+
   mRenderObject = new Render::PropertyBuffer();
   OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
   SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );

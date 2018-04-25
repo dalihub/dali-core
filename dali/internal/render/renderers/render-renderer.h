@@ -369,6 +369,16 @@ public:
    */
   void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const;
 
+  inline const SceneGraph::RenderDataProvider& GetRenderDataProvider() const
+  {
+    return *mRenderDataProvider.Get();
+  };
+
+  inline const Geometry* GetRenderGeometry() const
+  {
+    return mGeometry;
+  };
+
 private:
 
   struct UniformIndexMap;
