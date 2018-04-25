@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_BITMAP_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,6 @@ namespace Dali
 
 namespace Integration
 {
-
-/**
- * Returns GL data type and internal format for specified pixel format
- * @param[in]  pixelformat    pixel format (eg. Pixel::RGBA32)
- * @param[out] pixelDataType  pixel data type (eg. GL_UNSIGNED_BYTE)
- * @param[out] internalFormat pixel internal format (eg. GL_RGBA)
- */
-DALI_IMPORT_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
 
 class Bitmap;
 typedef IntrusivePtr<Bitmap>    BitmapPtr;
