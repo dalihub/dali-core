@@ -93,7 +93,7 @@ class DescriptorPool : public VkManaged
 {
 public:
 
-  static Handle<DescriptorPool> New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
+  static DescriptorPoolRef New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
 
   ~DescriptorPool() override;
 

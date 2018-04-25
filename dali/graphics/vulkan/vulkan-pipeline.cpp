@@ -79,7 +79,14 @@ struct Pipeline::Impl
       return vk::Result::eErrorInitializationFailed;
     }
 
-    CreatePipelineLayout();
+    if(!mInfo.layout)
+    {
+      CreatePipelineLayout();
+    }
+    else
+    {
+      mPipelineLayout = mInfo.layout;
+    }
 
     // use default render pass for default framebuffer
     // TODO: swapchain/surface should use vulkan-framebuffer object
@@ -90,15 +97,32 @@ struct Pipeline::Impl
                                 GetCurrentFramebuffer()->GetVkRenderPass());
     }
 
-    SetRasterizationState();
+    if(!mInfo.pRasterizationState)
+    {
+      SetRasterizationState();
+    }
+    else
+    {
+      mRasterizationState = *mInfo.pRasterizationState;
+    }
 
-    SetDepthStencilState();
+    if(!mInfo.pDepthStencilState)
+    {
+      SetDepthStencilState();
+    }
 
-    SetMultisampleState();
+    if(!mInfo.pMultisampleState)
+    {
+      SetMultisampleState();
+    }
 
-    SetColorBlendState();
+    if(!mInfo.pColorBlendState)
+    {
+      SetColorBlendState();
+    }
 
     mInfo.setFlags( vk::PipelineCreateFlagBits::eAllowDerivatives );
+
     // create pipeline
     mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( nullptr, mInfo, mGraphics.GetAllocator() ) );
     if(mPipeline)
@@ -263,6 +287,7 @@ struct Pipeline::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   void CreatePipelineLayout()
   {
+
     // pull desciptor set layouts from shaders
     auto layoutInfo = vk::PipelineLayoutCreateInfo{};
 
@@ -403,6 +428,8 @@ struct Pipeline::Impl
   // Color blend
   vk::PipelineColorBlendStateCreateInfo             mColorBlendState {};
   vk::PipelineColorBlendAttachmentState             mAttachementNoBlendState {};
+
+
 };
 
 /*********************************************************************
