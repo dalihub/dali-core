@@ -26,6 +26,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+
 ShaderFactory::ShaderFactory( Vulkan::Graphics& graphics ) :
 mGraphics( graphics )
 {
