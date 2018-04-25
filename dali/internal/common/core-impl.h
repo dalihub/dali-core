@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/view-mode.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/public-api/common/view-mode.h>
-#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -39,8 +39,7 @@ class Graphics;
 class RenderController;
 class PlatformAbstraction;
 class GestureManager;
-class GlAbstraction;
-class GlSyncAbstraction;
+
 class SystemOverlay;
 class UpdateStatus;
 class RenderStatus;
@@ -63,7 +62,6 @@ class RelayoutController;
 namespace SceneGraph
 {
 class UpdateManager;
-class RenderManager;
 class DiscardQueue;
 class RenderTaskProcessor;
 }
@@ -81,8 +79,6 @@ public:
   Core( Integration::RenderController& renderController,
         Integration::PlatformAbstraction& platform,
         Integration::Graphics::Graphics& graphics,
-        Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         bool renderToFboEnabled );
@@ -209,11 +205,6 @@ private:  // for use by ThreadLocalStorage
    */
   SceneGraph::UpdateManager& GetUpdateManager();
 
-  /**
-   * Returns the render manager.
-   * @return A reference to the render manager.
-   */
-  SceneGraph::RenderManager& GetRenderManager();
 
   /**
    * Returns the notification manager.
@@ -264,7 +255,6 @@ private:
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
   OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
-  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;               ///< Render manager
   OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;               ///< Update manager
   OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
   OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory

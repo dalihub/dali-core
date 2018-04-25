@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Samsung Electronics Co., Ltd.
+# Copyright (c) 2018 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,9 +152,7 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
 linker_test_CXXFLAGS = \
@@ -194,4 +192,3 @@ install: install-am
 endif
 
 endif
-

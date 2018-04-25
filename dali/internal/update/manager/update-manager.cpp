@@ -44,15 +44,11 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/effects/shader-factory.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/graphics/graphics-algorithms.h>
@@ -226,13 +222,10 @@ struct UpdateManager::Impl
         PropertyNotifier& propertyNotifier,
         DiscardQueue& discardQueue,
         RenderController& renderController,
-        RenderManager& renderManager,
-        RenderQueue& renderQueue,
         SceneGraphBuffers& sceneGraphBuffers,
         RenderTaskProcessor& renderTaskProcessor,
         Integration::Graphics::Graphics& graphics )
-  : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
-    notificationManager( notificationManager ),
+  : notificationManager( notificationManager ),
     transformManager(),
     animationPlaylist( animationPlaylist ),
     propertyNotifier( propertyNotifier ),
@@ -240,14 +233,12 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
-    renderManager( renderManager ),
-    renderQueue( renderQueue ),
-    renderInstructions( renderManager.GetRenderInstructionContainer() ),
+    renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphics( graphics ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    taskList( renderMessageDispatcher ),
-    systemLevelTaskList( renderMessageDispatcher ),
+    taskList( /*renderMessageDispatcher*/ ),
+    systemLevelTaskList( /*renderMessageDispatcher*/ ),
     root( NULL ),
     systemLevelRoot( NULL ),
     renderers(),
@@ -264,7 +255,7 @@ struct UpdateManager::Impl
     renderersAdded( false ),
     shaderCache( graphics.GetController() )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
+    sceneController = new SceneControllerImpl( discardQueue );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -316,7 +307,6 @@ struct UpdateManager::Impl
   }
 
   SceneGraphBuffers                    sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
-  RenderMessageDispatcher              renderMessageDispatcher;       ///< Used for passing messages to the render-thread
   NotificationManager&                 notificationManager;           ///< Queues notification messages for the event-thread.
   TransformManager                     transformManager;              ///< Used to update the transformation matrices of the nodes
   CompleteNotificationInterface&       animationPlaylist;             ///< Holds handles to all the animations
@@ -325,10 +315,9 @@ struct UpdateManager::Impl
   DiscardQueue&                        discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&                    renderController;              ///< render controller
   SceneControllerImpl*                 sceneController;               ///< scene controller
-  RenderManager&                       renderManager;                 ///< This is responsible for rendering the results of each "update"
-  RenderQueue&                         renderQueue;                   ///< Used to queue messages for the next render
-  RenderInstructionContainer&          renderInstructions;            ///< Used to prepare the render instructions
+  RenderInstructionContainer           renderInstructions;            ///< Used to prepare the render instructions @todo GRAPHICS Remove
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
+
   Integration::Graphics::Graphics&     graphics;                      ///< Graphics
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
@@ -353,6 +342,13 @@ struct UpdateManager::Impl
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
   OwnerContainer< Shader* >            shaders;                       ///< A container of owned shaders
+
+  OwnerContainer< SceneGraph::Sampler* >        samplerContainer;        ///< List of owned samplers
+  OwnerContainer< SceneGraph::Texture* >        textureContainer;        ///< List of owned textures
+  OwnerContainer< SceneGraph::FrameBuffer* >    frameBufferContainer;    ///< List of owned framebuffers
+  OwnerContainer< SceneGraph::PropertyBuffer* > propertyBufferContainer; ///< List of owned property buffers
+  OwnerContainer< SceneGraph::Geometry* >       geometryContainer;       ///< List of owned Geometries
+
   OwnerPointer< PanGesture >           panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                         messageQueue;                  ///< The messages queued from the event-thread
@@ -382,8 +378,6 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                               PropertyNotifier&                propertyNotifier,
                               DiscardQueue&                    discardQueue,
                               RenderController&                controller,
-                              RenderManager&                   renderManager,
-                              RenderQueue&                     renderQueue,
                               RenderTaskProcessor&             renderTaskProcessor,
                               Integration::Graphics::Graphics& graphics )
 : mImpl( new Impl( notificationManager,
@@ -391,8 +385,6 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                    propertyNotifier,
                    discardQueue,
                    controller,
-                   renderManager,
-                   renderQueue,
                    mSceneGraphBuffers,
                    renderTaskProcessor,
                    graphics) )
@@ -595,41 +587,11 @@ void UpdateManager::SetShaderProgram( Shader* shader,
   );
 #endif
   shader->SetGfxObject( shaderRef );
-
-#if 0
-  if( shaderData )
-  {
-
-    typedef MessageValue3< Shader, Internal::ShaderDataPtr, ProgramCache*, bool> DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
-  }
-#endif
-}
-
-void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
-{
-  DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
-  DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
-  {
-    // lock as update might be sending previously compiled shaders to event thread
-    Mutex::ScopedLock lock( mImpl->compiledShaderMutex );
-    mImpl->renderCompiledShaders.push_back( shaderData );
-  }
-}
-
-void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
-{
-  mImpl->shaderSaver = &upstream;
 }
 
 void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
-  renderer->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  renderer->ConnectToSceneGraph( mSceneGraphBuffers.GetUpdateBufferIndex() );
   mImpl->renderers.PushBack( renderer.Release() );
   mImpl->renderersAdded = true;
 }
@@ -637,9 +599,9 @@ void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 void UpdateManager::RemoveRenderer( Renderer* renderer )
 {
   // Find the renderer and destroy it
+  // @todo Don't need to use discard queue for SceneGraph::Renderer any more ( No dependency from Graphics::RenderCommand )
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  // Need to remove the render object as well
-  renderer->DisconnectFromSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  renderer->DisconnectFromSceneGraph( mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
@@ -864,8 +826,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
 
-    //mImpl->renderers[i]->PrepareRender( bufferIndex );
-    mImpl->renderers[i]->PrepareRender( mImpl->graphics.GetController(), bufferIndex );
+    mImpl->renderers[i]->PrepareRender( bufferIndex );
   }
 }
 
@@ -880,15 +841,11 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 
   // Prepare resources, update shaders, for each node
   // And add the renderers to the sorted layers. Start from root, which is also a layer
-  mImpl->nodeDirtyFlags = UpdateNodeTree( *( mImpl->root ),
-                                          bufferIndex,
-                                          mImpl->renderQueue );
+  mImpl->nodeDirtyFlags = UpdateNodeTree( *( mImpl->root ), bufferIndex );
 
   if ( mImpl->systemLevelRoot )
   {
-    mImpl->nodeDirtyFlags |= UpdateNodeTree( *( mImpl->systemLevelRoot ),
-                                             bufferIndex,
-                                             mImpl->renderQueue );
+    mImpl->nodeDirtyFlags |= UpdateNodeTree( *( mImpl->systemLevelRoot ), bufferIndex );
   }
 }
 
@@ -1091,24 +1048,12 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
 void UpdateManager::SetBackgroundColor( const Vector4& color )
 {
-  typedef MessageValue1< RenderManager, Vector4 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetBackgroundColor, color );
+  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
 }
 
 void UpdateManager::SetDefaultSurfaceRect( const Rect<int>& rect )
 {
-  typedef MessageValue1< RenderManager, Rect<int> > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetDefaultSurfaceRect, rect );
+  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
 }
 
 void UpdateManager::KeepRendering( float durationSeconds )
@@ -1142,89 +1087,40 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
   SortSiblingNodesRecursively( *( mImpl->root ) );
 }
 
-void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )
+void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )
 {
-  // Message has ownership of Sampler while in transit from update to render
-  typedef MessageValue1< RenderManager, OwnerPointer< Render::Sampler > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddSampler, sampler );
+  mImpl->samplerContainer.PushBack( sampler.Release() );
 }
 
-void UpdateManager::RemoveSampler( Render::Sampler* sampler )
+void UpdateManager::RemoveSampler( SceneGraph::Sampler* sampler )
 {
-  typedef MessageValue1< RenderManager, Render::Sampler* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveSampler, sampler );
+  mImpl->samplerContainer.EraseObject( sampler );
 }
 
-void UpdateManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+void UpdateManager::SetFilterMode( SceneGraph::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
 {
-  typedef MessageValue3< RenderManager, Render::Sampler*, unsigned int, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetFilterMode, sampler, minFilterMode, magFilterMode );
+  sampler->mMinificationFilter = static_cast<Dali::FilterMode::Type>(minFilterMode);
+  sampler->mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode );
 }
 
-void UpdateManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
+void UpdateManager::SetWrapMode( SceneGraph::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
 {
-  typedef MessageValue4< RenderManager, Render::Sampler*, unsigned int, unsigned int, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetWrapMode, sampler, rWrapMode, sWrapMode, tWrapMode );
+  sampler->mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
+  sampler->mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
+  sampler->mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
 }
 
-void UpdateManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
+void UpdateManager::AddPropertyBuffer( OwnerPointer< SceneGraph::PropertyBuffer >& propertyBuffer )
 {
-  // Message has ownership of format while in transit from update -> render
-  typedef MessageValue1< RenderManager, OwnerPointer< Render::PropertyBuffer > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddPropertyBuffer, propertyBuffer );
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );
 }
 
-void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::RemovePropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::PropertyBuffer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
+  mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
-#if 0
-void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
-{
-  // Message has ownership of format while in transit from update -> render
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
-}
-#endif
-
-void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
+void UpdateManager::SetPropertyBufferFormat( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< SceneGraph::PropertyBuffer::Format>& format )
 {
   // todo: may not be needed yet
   // Message has ownership of format while in transit from update -> render
@@ -1236,21 +1132,7 @@ void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuf
   propertyBuffer->SetFormat( format.Release() );
 }
 
-#if 0
-void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
-{
-  // Message has ownership of format while in transit from update -> render
-  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, OwnerPointer< Dali::Vector<char> >, size_t > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
-}
-#endif
-
-void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
+void UpdateManager::SetPropertyBufferData( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
 {
   auto& controller = GetGraphicsController();
   auto buffer = controller.CreateBuffer( controller.GetBufferFactory()
@@ -1259,114 +1141,60 @@ void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffe
   propertyBuffer->SetGfxObject( buffer );
 }
 
-void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
+void UpdateManager::AddGeometry( OwnerPointer< SceneGraph::Geometry >& geometry )
 {
-
-  // Message has ownership of format while in transit from update -> render
-  typedef MessageValue1< RenderManager, OwnerPointer< Render::Geometry > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddGeometry, geometry );
+  mImpl->geometryContainer.PushBack( geometry.Release() );
 }
 
-void UpdateManager::RemoveGeometry( Render::Geometry* geometry )
+void UpdateManager::RemoveGeometry( SceneGraph::Geometry* geometry )
 {
-  typedef MessageValue1< RenderManager, Render::Geometry* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveGeometry, geometry );
+  mImpl->geometryContainer.EraseObject( geometry );
 }
 
-void UpdateManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
+void UpdateManager::SetGeometryType( SceneGraph::Geometry* geometry, unsigned int geometryType )
 {
-  typedef MessageValue2< RenderManager, Render::Geometry*, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetGeometryType, geometry, geometryType );
+  geometry->SetType( SceneGraph::Geometry::Type(geometryType) );
 }
 
-void UpdateManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
+void UpdateManager::SetIndexBuffer( SceneGraph::Geometry* geometry, Dali::Vector<unsigned short>& indices )
 {
-  typedef IndexBufferMessage< RenderManager > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, geometry, indices );
+  geometry->SetIndexBuffer( indices );
 }
 
-void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::AttachVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer )
 {
-  /*
-  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
-   */
-  geometry->RemovePropertyBuffer( propertyBuffer );
-}
-
-void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
-{
-  //typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  //unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  //new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
-
   geometry->AddPropertyBuffer( propertyBuffer );
 }
 
-void UpdateManager::AddTexture( OwnerPointer< Render::Texture >& texture )
+void UpdateManager::RemoveVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer )
 {
-  // Message has ownership of Texture while in transit from update -> render
-  typedef MessageValue1< RenderManager, OwnerPointer< Render::Texture > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::AddTexture, texture );
+  geometry->RemovePropertyBuffer( propertyBuffer );
 }
 
-void UpdateManager::RemoveTexture( Render::Texture* texture)
+void UpdateManager::AddTexture( OwnerPointer< SceneGraph::Texture >& texture )
 {
-  typedef MessageValue1< RenderManager, Render::Texture* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveTexture, texture );
+  // texture->Initialize(); //@todo Do something in Gfx?
+  mImpl->textureContainer.PushBack( texture.Release() );
 }
 
-void UpdateManager::UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
+void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
 {
-  typedef MessageValue3< RenderManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > DerivedType;
+  DALI_ASSERT_DEBUG( NULL != texture );
 
-  // Reserve some memory inside the message queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::UploadTexture, texture, pixelData, params );
+  // Find the texture, use reference to pointer so we can do the erase safely
+  for ( auto&& iter : mImpl->textureContainer )
+  {
+    if ( iter == texture )
+    {
+      //texture->Destroy(); //@todo Do something in Gfx?
+      mImpl->textureContainer.Erase( &iter ); // Texture found; now destroy it
+      return;
+    }
+  }
 }
 
-void UpdateManager::UploadTextureV2( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
+void UpdateManager::UploadTexture( SceneGraph::Texture* texture, PixelDataPtr pixelData,
+                                   const Internal::Texture::UploadParams& params )
 {
   //fixme: AB: This is temporary solution to create a texture object on the Graphics API side
   //fixme:     using controller directly in the update thread
@@ -1381,55 +1209,44 @@ void UpdateManager::UploadTextureV2( Render::Texture* texture, PixelDataPtr pixe
     .SetDataSize( pixelData->GetBufferSize() )
   );
 
-  // TODO: Render::Texture will be gone, however currently it's still in use
-  // so it carries the accessor to the texture object
+  // TODO: SceneGraph::Texture its currently still in use so it
+  // carries the accessor to the texture object
   texture->SetGfxObject( tex );
 
   texture->SetId( static_cast<uint32_t>(tex.GetHandle()) );
 }
 
-void UpdateManager::GenerateMipmaps( Render::Texture* texture )
+void UpdateManager::GenerateMipmaps( SceneGraph::Texture* texture )
 {
-  typedef MessageValue1< RenderManager, Render::Texture* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::GenerateMipmaps, texture );
+  //texture->GenerateMipmaps( mImpl->context ); // @todo Rewrite for Gfx
 }
 
-void UpdateManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
+void UpdateManager::AddFrameBuffer( SceneGraph::FrameBuffer* frameBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::FrameBuffer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddFrameBuffer, frameBuffer );
+  mImpl->frameBufferContainer.PushBack( frameBuffer );
+  //frameBuffer->Initialize(); @todo Rewrite for Gfx
 }
 
-void UpdateManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer)
+void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
 {
-  typedef MessageValue1< RenderManager, Render::FrameBuffer* > DerivedType;
+  DALI_ASSERT_DEBUG( NULL != frameBuffer );
 
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveFrameBuffer, frameBuffer );
+  // Find the sampler, use reference so we can safely do the erase
+  for ( auto&& iter : mImpl->frameBufferContainer )
+  {
+    if ( iter == frameBuffer )
+    {
+      //frameBuffer->Destroy(); @todo Rewrite for Gfx
+      mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
+      break;
+    }
+  }
 }
 
-void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
+void UpdateManager::AttachColorTextureToFrameBuffer( SceneGraph::FrameBuffer* frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  typedef MessageValue4< RenderManager, Render::FrameBuffer*, Render::Texture*, unsigned int, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
+  //frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer ); @todo Rewrite for Gfx
+  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
 }
 
 Graphics::API::Controller& UpdateManager::GetGraphicsController() const
