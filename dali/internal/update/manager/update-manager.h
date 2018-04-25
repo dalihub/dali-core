@@ -27,20 +27,24 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/shader-saver.h>
+
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/node-depths.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
+#include <dali/internal/update/rendering/render-frame-buffer.h>
+#include <dali/internal/update/rendering/render-geometry.h>
+#include <dali/internal/update/rendering/render-property-buffer.h>
+#include <dali/internal/update/rendering/render-texture.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
+#include <dali/internal/update/rendering/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -59,17 +63,16 @@ class Graphics;
 
 namespace Internal
 {
+namespace Render
+{
+class FrameBuffer;
+}
 
 class PropertyNotifier;
 class NotificationManager;
 class CompleteNotificationInterface;
 class TouchResampler;
 
-namespace Render
-{
-struct Sampler;
-class FrameBuffer;
-}
 // value types used by messages
 template <> struct ParameterType< PropertyNotification::NotifyMode >
 : public BasicType< PropertyNotification::NotifyMode > {};
@@ -85,31 +88,6 @@ class RenderTaskProcessor;
 class RenderQueue;
 class PropertyBuffer;
 
-struct NodeDepthPair
-{
-  SceneGraph::Node* node;
-  uint32_t sortedDepth;
-  NodeDepthPair( SceneGraph::Node* node, uint32_t sortedDepth )
-  : node(node),
-    sortedDepth(sortedDepth)
-  {
-  }
-};
-
-struct NodeDepths
-{
-  NodeDepths()
-  {
-  }
-
-  void Add( SceneGraph::Node* node, uint32_t sortedDepth )
-  {
-    nodeDepths.push_back( NodeDepthPair( node, sortedDepth ) );
-  }
-
-  std::vector<NodeDepthPair> nodeDepths;
-};
-
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
@@ -119,7 +97,7 @@ struct NodeDepths
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager : public ShaderSaver
+class UpdateManager
 {
 public:
 
@@ -130,8 +108,6 @@ public:
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
-   * @param[in] renderManager This is responsible for rendering the results of each "update".
-   * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    */
   UpdateManager( NotificationManager& notificationManager,
@@ -139,8 +115,6 @@ public:
                  PropertyNotifier& propertyNotifier,
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
-                 RenderManager& renderManager,
-                 RenderQueue& renderQueue,
                  RenderTaskProcessor& renderTaskProcessor,
                  Dali::Integration::Graphics::Graphics& graphics);
 
@@ -294,18 +268,6 @@ public:
    */
   void SetShaderProgram( Shader* shader, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
-  /**
-   * @brief Accept compiled shaders passed back on render thread for saving.
-   * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
-   */
-  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
-
-  /**
-   * @brief Set the destination for compiled shader binaries to be passed on to.
-   * The dispatcher passed in will be called from the update thread.
-   * @param[in] upstream A sink for ShaderDatas to be passed into.
-   */
-  void SetShaderSaver( ShaderSaver& upstream );
 
   // Renderers
 

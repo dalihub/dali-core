@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,9 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
-
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/update/rendering/render-geometry.h>
+#include <dali/internal/update/rendering/render-property-buffer.h>
+#include <dali/internal/update/rendering/render-sampler.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 using Dali::Internal::GestureEventProcessor;
@@ -102,8 +100,7 @@ const int IMAGE_MEMORY_SIZE(
   sizeof( Integration::Bitmap ) );
 const int RENDERER_MEMORY_SIZE(
   sizeof( Internal::Renderer ) +
-  sizeof( Internal::SceneGraph::Renderer ) +
-  sizeof( Internal::Render::Renderer ) );
+  sizeof( Internal::SceneGraph::Renderer ) );
 const int GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::Geometry ) +
   sizeof( Internal::Render::Geometry) );

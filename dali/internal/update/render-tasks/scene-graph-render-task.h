@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/rendering/render-frame-buffer.h>
 
 namespace Dali
 {
@@ -34,17 +34,12 @@ namespace Dali
 namespace Internal
 {
 
-namespace Render
-{
-class RenderTracker;
-}
-
 namespace SceneGraph
 {
 class Node;
 class Camera;
 class RenderInstruction;
-class RenderMessageDispatcher;
+
 
 /**
  * RenderTasks describe how the Dali scene should be rendered.
@@ -73,9 +68,8 @@ public:
 
   /**
    * Initialize the render task. Called in update thread
-   * @param[in] renderMessageDispatcher to send messages to render thread
    */
-  void Initialize( RenderMessageDispatcher& renderMessageDispatcher );
+  void Initialize();
 
   /**
    * Set the nodes to be rendered.
@@ -349,8 +343,6 @@ public: // Animatable Properties
   AnimatableProperty< Vector4 >   mClearColor;          ///< clearColor
 
 private:
-  RenderMessageDispatcher* mRenderMessageDispatcher;
-  Render::RenderTracker* mRenderSyncTracker;
   Node* mSourceNode;
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;

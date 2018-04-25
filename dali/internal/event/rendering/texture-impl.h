@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,14 +144,12 @@ private: // unimplemented methods
 
 private: // data
 
-  Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Internal::Render::Texture* mRenderObject;            ///<The Render::Texture associated to this texture
-
+  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
+  Render::Texture* mRenderObject;            ///<The Render::Texture associated to this texture
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   ImageDimensions mSize;                ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
   Pixel::Format mFormat;                ///< Pixel format
-
 };
 
 } // namespace Internal

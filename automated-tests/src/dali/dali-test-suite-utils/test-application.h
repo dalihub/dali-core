@@ -2,7 +2,7 @@
 #define __DALI_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@
 // INTERNAL INCLUDES
 #include <test-platform-abstraction.h>
 #include "test-gesture-manager.h"
-#include "test-gl-sync-abstraction.h"
-#include "test-gl-abstraction.h"
 #include "test-render-controller.h"
 #include <dali/public-api/common/dali-common.h>
-#include <dali/integration-api/resource-policies.h>
+#include <dali/public-api/signals/connection-tracker.h>
+#include <dali/integration-api/core.h>
 #include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -70,8 +70,6 @@ public:
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController& GetRenderController();
-  TestGlAbstraction& GetGlAbstraction();
-  TestGlSyncAbstraction& GetGlSyncAbstraction();
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
@@ -92,8 +90,6 @@ protected:
   TestPlatformAbstraction             mPlatformAbstraction;
   Integration::Graphics::Graphics     mGraphics;
   TestRenderController                mRenderController;
-  TestGlAbstraction                   mGlAbstraction;
-  TestGlSyncAbstraction               mGlSyncAbstraction;
   TestGestureManager                  mGestureManager;
 
   Integration::UpdateStatus mStatus;

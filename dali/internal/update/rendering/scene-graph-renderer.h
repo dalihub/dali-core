@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/rendering/data-providers/render-data-provider.h>
+#include <dali/internal/update/rendering/stencil-parameters.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
@@ -36,7 +38,6 @@ namespace Internal
 
 namespace Render
 {
-class Renderer;
 class Geometry;
 }
 
@@ -118,6 +119,10 @@ public:
    */
   void SetGeometry( Render::Geometry* geometry );
 
+  /**
+   * Get the geometry for the renderer
+   * @return The geometry this renderer will use
+   */
   Render::Geometry* GetGeometry() const
   {
     return mGeometry;
@@ -258,13 +263,8 @@ public:
    * @param controller
    * @param updateBufferIndex
    */
-  void PrepareRender( class Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
+  void PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
 
-  /*
-   * Retrieve the Render thread renderer
-   * @return The associated render thread renderer
-   */
-  Render::Renderer& GetRenderer();
 
   Graphics::API::RenderCommand& GetGfxRenderCommand()
   {
@@ -292,17 +292,15 @@ public:
   /**
    * Connect the object to the scene graph
    *
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
-  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+  void ConnectToSceneGraph( BufferIndex bufferIndex );
 
   /**
    * Disconnect the object from the scene graph
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
-  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+  void DisconnectFromSceneGraph( BufferIndex bufferIndex );
 
 public: // Implementation of ConnectionChangePropagator
   /**
@@ -379,14 +377,13 @@ private:
 private:
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
-  SceneController*             mSceneController;                  ///< Used for initializing renderers
-  Render::Renderer*            mRenderer;                         ///< Raw pointer to the renderer (that's owned by RenderManager)
+  std::unique_ptr<RenderDataProvider> mRenderDataProvider;        ///< Contains data for graphics renderer @todo Refactor
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   Render::Geometry*            mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
-  Dali::Internal::Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
+  StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
 
   size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
   size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw

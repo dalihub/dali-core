@@ -17,22 +17,22 @@
 
 // CLASS HEADER
 #include <dali/internal/update/graphics/graphics-algorithms.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <glm/glm.hpp>
-// EXTERNAL INCLUDES
 
+// EXTERNAL INCLUDES
+#include <glm/glm.hpp>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-frame.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 
-
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/render-geometry.h>
+#include <dali/internal/update/rendering/render-property-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-shader.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"

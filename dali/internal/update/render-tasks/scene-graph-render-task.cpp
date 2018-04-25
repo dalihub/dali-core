@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
+
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/common/render-tracker.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/rendering/render-tracker.h>
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
@@ -50,15 +50,11 @@ RenderTask::~RenderTask()
       mSourceNode->SetExclusiveRenderTask( NULL );
     }
   }
-  if( mRenderSyncTracker )
-  {
-    mRenderMessageDispatcher->RemoveRenderTracker( *mRenderSyncTracker );
-  }
+  // @todo remove any hard sync object
 }
 
-void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher )
+void RenderTask::Initialize()
 {
-  mRenderMessageDispatcher = &renderMessageDispatcher;
 }
 
 void RenderTask::SetSourceNode( Node* node )
@@ -293,7 +289,7 @@ void RenderTask::UpdateState()
       mNotifyTrigger = false;
       if( mFrameBuffer )
       {
-        if( !mRenderSyncTracker || (mRenderSyncTracker && mRenderSyncTracker->IsSynced() ))
+        // @todo If hard sync exists, check if it has completed before cleaning up
         {
           mWaitingToRender = false;
           mNotifyTrigger = true;
@@ -378,18 +374,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
   if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
   {
-    // create tracker if one doesn't yet exist.
-    if( !mRenderSyncTracker )
-    {
-      mRenderSyncTracker = new Render::RenderTracker();
-      mRenderMessageDispatcher->AddRenderTracker( *mRenderSyncTracker );
-    }
-    instruction.mRenderTracker = mRenderSyncTracker;
-  }
-  else
-  {
-    // no sync needed, texture FBOs are "ready" the same frame they are rendered to
-    instruction.mRenderTracker = NULL;
+    // Perform a hard synchronization after render instruction has executed.
   }
 }
 
@@ -463,8 +448,7 @@ RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),
   mViewportSize( Vector2::ZERO),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
-  mRenderMessageDispatcher( NULL ),
-  mRenderSyncTracker( NULL ),
+  //mRenderSyncTracker( NULL ),
   mSourceNode( NULL ),
   mCameraNode( NULL ),
   mCamera( NULL ),

@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Samsung Electronics Co., Ltd.
+# Copyright (c) 2018 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,15 +46,20 @@ gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods
 # -Wfloat-equal causes issues with vulkan.hpp, removed for now
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \
                     -Wshadow \
-                    -Wlarger-than=1024 \
                     -Wcast-qual -Wcast-align \
                     -Wconversion -Wsign-conversion
+
+#-Wlarger-than=1024  # Conflicts with --coverage
 
 # the following warnings should not be enforced
 cxx_warnings_to_remove = \
                          -Wno-c++98-compat \
                          -Wno-unused-parameter \
-                         -Wno-unknown-warning-option
+                         -Wno-unknown-warning-option \
+                         -Wno-switch \
+                         -Wno-switch-enum \
+                         -Wno-error=switch \
+                         -Wno-error=switch-enum
 
 #the following warnings should be added back when possible
 cxx_warnings_to_preserve = \
@@ -74,5 +79,3 @@ libdali_graphics_a_CXXFLAGS = $(cxx_flags) \
                               $(dali_core_includes) \
                               $(DALI_CFLAGS) \
                               $(vulkan_flags)
-
-
