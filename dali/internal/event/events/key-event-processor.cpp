@@ -44,6 +44,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
   KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
 
+  GetImplementation( &keyEvent )->SetCompose( event.compose );
   GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
   GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
   GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );

@@ -309,11 +309,12 @@ int UtcDaliIntegrationKeyEvent(void)
     const int keyModifier(312);
     const unsigned long timeStamp(132);
     const Integration::KeyEvent::State keyState(Integration::KeyEvent::Up);
+    const std::string compose("compose");
     const std::string deviceName("hwKeyboard");
     const Device::Class::Type deviceClass = Device::Class::KEYBOARD;
     const Device::Subclass::Type deviceSubclass = Device::Subclass::NONE;
 
-    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState, deviceName, deviceClass, deviceSubclass );
+    Integration::KeyEvent keyEvent(keyName, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
     DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
     DALI_TEST_CHECK( keyEvent.keyName == keyName );
     DALI_TEST_CHECK( keyEvent.keyString == keyString );
@@ -321,6 +322,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_EQUALS( keyEvent.keyModifier, keyModifier, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.time, timeStamp, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.state, keyState, TEST_LOCATION);
+    DALI_TEST_EQUALS( keyEvent.compose, compose, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceName, deviceName, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceClass, deviceClass, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceSubclass, deviceSubclass, TEST_LOCATION);
@@ -343,9 +345,21 @@ int UtcDaliIntegrationKeyEventConvertor(void)
   DALI_TEST_EQUALS( keyEvent.keyModifier, SHIFT_MODIFIER, TEST_LOCATION );
   DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
   DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
+  DALI_TEST_EQUALS( keyEvent.compose, "", TEST_LOCATION);
   DALI_TEST_EQUALS( keyEvent.deviceName, "", TEST_LOCATION);
   DALI_TEST_EQUALS( keyEvent.deviceClass, Device::Class::NONE, TEST_LOCATION);
   DALI_TEST_EQUALS( keyEvent.deviceSubclass, Device::Subclass::NONE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventSetCompose(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
+
+  DALI_TEST_EQUALS( event.GetCompose(), "", TEST_LOCATION);
 
   END_TEST;
 }

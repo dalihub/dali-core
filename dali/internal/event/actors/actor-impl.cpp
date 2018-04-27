@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -224,6 +224,10 @@ const char* const SIGNAL_ON_STAGE = "onStage";
 const char* const SIGNAL_OFF_STAGE = "offStage";
 const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
 const char* const SIGNAL_TOUCH = "touch";
+const char* const SIGNAL_VISIBILITY_CHANGED = "visibilityChanged";
+const char* const SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
+const char* const SIGNAL_CHILD_ADDED = "childAdded";
+const char* const SIGNAL_CHILD_REMOVED = "childRemoved";
 
 // Actions
 
@@ -244,6 +248,10 @@ SignalConnectorType signalConnector4( mType, SIGNAL_ON_STAGE, &Actor::DoConnectS
 SignalConnectorType signalConnector5( mType, SIGNAL_OFF_STAGE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector7( mType, SIGNAL_TOUCH, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector8( mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector9( mType, SIGNAL_LAYOUT_DIRECTION_CHANGED, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector10( mType, SIGNAL_CHILD_ADDED, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector11( mType, SIGNAL_CHILD_REMOVED, &Actor::DoConnectSignal );
 
 TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
 TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
@@ -473,7 +481,7 @@ void Actor::Add( Actor& child )
     // if we already have parent, unparent us first
     if( oldParent )
     {
-      oldParent->Remove( child ); // This causes OnChildRemove callback
+      oldParent->Remove( child ); // This causes OnChildRemove callback & ChildRemoved signal
 
       // Old parent may need to readjust to missing child
       if( oldParent->RelayoutDependentOnChildren() )
@@ -493,6 +501,7 @@ void Actor::Add( Actor& child )
 
       // Notification for derived classes
       OnChildAdd( child );
+      EmitChildAddedSignal( child );
 
       InheritLayoutDirectionRecursively( ActorPtr( &child ), mLayoutDirection );
 
@@ -547,6 +556,7 @@ void Actor::Remove( Actor& child )
 
   // Notification for derived classes
   OnChildRemove( child );
+  EmitChildRemovedSignal( child );
 }
 
 void Actor::Unparent()
@@ -2005,6 +2015,24 @@ void Actor::EmitLayoutDirectionChangedSignal( LayoutDirection::Type type )
   }
 }
 
+void Actor::EmitChildAddedSignal( Actor& child )
+{
+  if( ! mChildAddedSignal.Empty() )
+  {
+    Dali::Actor handle( &child );
+    mChildAddedSignal.Emit( handle );
+  }
+}
+
+void Actor::EmitChildRemovedSignal( Actor& child )
+{
+  if( ! mChildRemovedSignal.Empty() )
+  {
+    Dali::Actor handle( &child );
+    mChildRemovedSignal.Emit( handle );
+  }
+}
+
 Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return mTouchedSignal;
@@ -2050,6 +2078,16 @@ Dali::Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSign
   return mLayoutDirectionChangedSignal;
 }
 
+DevelActor::ChildChangedSignalType& Actor::ChildAddedSignal()
+{
+  return mChildAddedSignal;
+}
+
+DevelActor::ChildChangedSignalType& Actor::ChildRemovedSignal()
+{
+  return mChildRemovedSignal;
+}
+
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
@@ -2083,6 +2121,22 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     actor->TouchSignal().Connect( tracker, functor );
   }
+  else if( 0 == signalName.compare( SIGNAL_VISIBILITY_CHANGED ) )
+  {
+    actor->VisibilityChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == signalName.compare( SIGNAL_LAYOUT_DIRECTION_CHANGED ) )
+  {
+    actor->LayoutDirectionChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == signalName.compare( SIGNAL_CHILD_ADDED ) )
+  {
+    actor->ChildAddedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == signalName.compare( SIGNAL_CHILD_REMOVED ) )
+  {
+    actor->ChildRemovedSignal().Connect( tracker, functor );
+  }
   else
   {
     // signalName does not match any signal
@@ -2110,6 +2164,8 @@ Actor::Actor( DerivedType derivedType )
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
+  mChildAddedSignal(),
+  mChildRemovedSignal(),
   mTargetOrientation( Quaternion::IDENTITY ),
   mTargetColor( Color::WHITE ),
   mTargetSize( Vector3::ZERO ),
