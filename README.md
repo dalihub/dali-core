@@ -21,6 +21,8 @@
 ### Minimum Requirements
 
  - Ubuntu 14.04 or later
+ - 
+
 
 ### Creating a DALi Environment
 
