@@ -15,6 +15,10 @@
  *
  */
 
+#define DEBUG_OVERRIDE_VULKAN_SHADER
+#ifdef DEBUG_OVERRIDE_VULKAN_SHADER
+#include <dali/graphics/vulkan/generated/builtin-shader-extern-gen.h>
+#endif
 
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>

@@ -50,11 +50,9 @@ ShaderFactory& ShaderFactory::SetShaderModule( Graphics::API::ShaderDetails::Pip
   return *this;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 std::unique_ptr<Graphics::API::Shader> ShaderFactory::Create() const
 {
-  if( !(mVertexShader.source.IsSet() && mFragmentShader.source.IsSet()) )
+  if( !mVertexShader.source.IsSet() || !mFragmentShader.source.IsSet() )
   {
     return nullptr;
   }
@@ -69,7 +67,7 @@ std::unique_ptr<Graphics::API::Shader> ShaderFactory::Create() const
 
   return std::move(retval);
 }
-#pragma GCC diagnostic pop
+
 } // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali

@@ -36,8 +36,6 @@ struct Framebuffer::Impl
 
   // creating render pass may happen either as deferred or
   // when framebuffer is initialised into immutable state
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
     mAttachmentReference.clear();

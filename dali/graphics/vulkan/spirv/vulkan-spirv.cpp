@@ -35,8 +35,6 @@ SPIRVShader::Impl& SPIRVShader::GetImplementation() const
   return *mImpl;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 struct SPIRVShader::Impl
 {
   /**

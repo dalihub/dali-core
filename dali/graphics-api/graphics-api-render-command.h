@@ -44,6 +44,143 @@ class Pipeline;
 
 /**
  * @brief Interface class for RenderCommand types in the graphics API.
+ *
+ * @startuml
+ *
+ * skinparam defaultFontName Ubuntu Mono
+ * class RenderCommand {
+ *  -- protected --
+ *  #VertexAttributeBufferBinding[]  mVertexBufferBindings
+ *  #UniformBufferBinding[]          mUniformBufferBindings
+ *  #TextureBinding[]                mTextureBindings
+ *  #SamplerBinding[]                mSamplerBindings
+ *  #IndexBufferBinding              mIndexBufferBinding
+ *  #RenderTargetBinding             mRenderTargetBinding
+ *  #DrawCommand                     mDrawCommand
+ *  #PushConstantsBinding[]          mPushConstantsBindings
+ *  #RenderState                     mRenderState
+ *
+ * -- public API --
+ *  +RenderCommand& BindVertextBuffers()
+ *  +RenderCommand& BindUniformBuffers()
+ *  +RenderCommand& BindTextures()
+ *  +RenderCommand& BindSamplers()
+ *  +RenderCommand& PushConstants()
+ *  +RenderCommand& BindRenderState()
+ *  +RenderCommand& Draw()
+ *  -- static API ( helper functions )--
+ *  {static} NewVertexAttributeBufferBindings()
+ *  {static} NewVertexAttributeBufferBindings()
+ *  {static} NewVertexAttributeBufferBindings()
+ *  {static} NewTextureBindings()
+ *  {static} NewPushConstantsBindings()
+ * }
+ *
+ * class VertexAttributeBufferBinding {
+ * Accessor<Buffer>   buffer
+ * uint32_t           location
+ * uint32_t           offset
+ * uint32_t           stride
+ * InputAttributeRate rate
+ * void*              pNext
+ * }
+ *
+ * class UniformBufferBinding {
+ *   #Accessor<Buffer> buffer
+ *   #uint32_t         offset
+ *   #uint32_t         dataSize
+ *   #uint32_t         binding
+ *   #void*            pNext
+ * }
+ *
+  class IndexBufferBinding {
+    #Accessor<Buffer> buffer
+    #uint32_t         offset
+    #IndexType        type
+    #void*            pNext
+  }
+
+  class RenderTargetBinding {
+    #Accessor<Framebuffer>                 framebuffer
+    #std::vector<Framebuffer::ClearColor>  clearColors
+    #Framebuffer::DepthStencilClearColor   dsClearColor
+    #void*                                 pNext
+  }
+
+  class DrawCommand {
+      #DrawType drawType;
+      #uint32_t firstVertex
+      #uint32_t firstIndex
+      #uint32_t vertexCount
+      #uint32_t indicesCount
+      #uint32_t firstInstance
+      #uint32_t instanceCount
+      #void*    pNext
+  }
+
+  class PushConstantsBinding {
+    #void*     data
+    #uint32_t  size
+    #uint32_t  binding
+    #void*    pNext
+  }
+
+  class RenderState {
+    #Accessor<Shader> shader
+    #void*    pNext
+  }
+
+  class TextureBinding {
+    #Accessor<Texture> texture
+    #Accessor<Sampler> sampler
+    #uint32_t          binding
+    #void*             pNext
+  }
+
+  class SamplerBinding {
+    #Accessor<Sampler> sampler
+    #uint32_t binding
+    #void*    pNext
+  }
+
+ note as RenderStateWIP
+ Other render states like
+ blending etc. should be added
+ as public fields of this structure.
+ end note
+
+ RenderStateWIP .. RenderState
+
+ * note as N1
+ * Each state is described as POD
+ * structure which is a Vulkan
+ * approach.
+ * end note
+ *
+ * note as N2
+ * Field pNext may be used by the
+ * implementation to pass additional
+ * data.
+ * end note
+ *
+ * N2 .. VertexAttributeBufferBinding::pNext
+ * N1 .. VertexAttributeBufferBinding
+ * N1 .. UniformBufferBinding
+ * N1 .. IndexBufferBinding
+ * N1 .. RenderTargetBinding
+ *
+
+ *
+ * RenderCommand *-right- VertexAttributeBufferBinding
+ * RenderCommand *-right- UniformBufferBinding
+ * RenderCommand *-left- IndexBufferBinding
+ * RenderCommand *-left- RenderTargetBinding
+ * RenderCommand *-up- RenderState
+ * RenderCommand *-up- DrawCommand
+ * RenderCommand *-down- PushConstantsBinding
+ * RenderCommand *-down- SamplerBinding
+ * RenderCommand *-down- TextureBinding
+ * @enduml
  */
 class RenderCommand
 {
@@ -72,6 +209,7 @@ public:
 
   /**
    * Describes buffer attribute binding
+   *
    */
   struct VertexAttributeBufferBinding
   {
@@ -553,6 +691,7 @@ protected:
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
+
 
 #endif // DALI_GRAPHICS_API_RENDER_COMMAND_H
 

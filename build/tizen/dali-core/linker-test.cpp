@@ -36,6 +36,10 @@ void tet_printf(const char* str, ...)
 
 
 #include "test-application.h"
+extern "C"
+{
+std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
+}
 
 /*****************************************************************************
  * Test to see if dali is linking correctly.
@@ -51,5 +55,7 @@ int main(int argc, char **argv)
 #ifndef _ARCH_ARM_
   Dali::TestApplication application;
 #endif
+
+    GraphicsGetBuiltinShader( "" );
   return 0;
 }

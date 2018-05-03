@@ -34,7 +34,7 @@
 
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 #include <iostream>
 #define debug( x ) std::cout << x << std::endl;
