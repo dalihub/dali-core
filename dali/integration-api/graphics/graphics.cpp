@@ -22,6 +22,7 @@
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/integration-api/graphics/graphics.h>
 
+extern "C" std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
 
 namespace Dali
 {
@@ -103,6 +104,7 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
 void IncludeThisLibrary()
 {
 // dummy function to create linker dependency
+  GraphicsGetBuiltinShader("");
 }
 
 } // Namespace Graphics

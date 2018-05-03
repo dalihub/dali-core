@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
-#define DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#ifndef DALI_GRAPHICS_VULKAN_API_CONTROLLER_H
+#define DALI_GRAPHICS_VULKAN_API_CONTROLLER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -19,15 +19,23 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics/graphics-controller.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
 namespace Graphics
 {
+
+namespace Vulkan
+{
+class Graphics;
+}
+
 namespace VulkanAPI
 {
+
 class UboManager;
+
 /**
  * Structure describes deferred memory transfer
  * Source memory is owned by the buffer and will be discarded
@@ -45,16 +53,11 @@ struct BufferMemoryTransfer
   uint32_t          dstOffset { 0u };
 };
 
-}
-
-namespace Vulkan
-{
-class Graphics;
 
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
-class Controller : public Dali::Graphics::Controller
+class Controller : public Dali::Graphics::API::Controller
 {
 public:
 
@@ -152,8 +155,8 @@ public:
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Controller( Controller&& );
-  Controller& operator=( Controller&& );
+  Controller( Controller&& ) noexcept = default;
+  Controller& operator=( Controller&& ) noexcept;
 
   /**
    * Objects of this type should not directly.
@@ -165,8 +168,8 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace Vulkan
+} // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#endif // DALI_GRAPHICS_VULKAN_API_CONTROLLER_H

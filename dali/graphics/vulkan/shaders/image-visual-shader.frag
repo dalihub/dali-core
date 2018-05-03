@@ -2,7 +2,7 @@
 
 layout( location = 0 ) in vec2 vTexCoord;
 
-layout( set = 0, binding = 1, std140 ) uniform fragData
+layout( set = 0, binding = 1, std140 ) uniform FragData
 {
     vec4 uColor;
     vec3 mixColor;

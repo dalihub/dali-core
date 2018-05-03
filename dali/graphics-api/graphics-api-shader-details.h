@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace Dali
 {
@@ -57,17 +58,23 @@ struct ShaderSource
   template<class T>
   explicit ShaderSource( const std::vector<T>& sourceBinary )
   {
-    code.resize( sourceBinary.size() * sizeof(T) );
-    auto begin = reinterpret_cast<const char*>(&*sourceBinary.begin());
-    auto end = reinterpret_cast<const char*>(&*sourceBinary.end());
-    std::copy( begin, end, code.begin() );
+    if(!sourceBinary.empty())
+    {
+      code.resize(sourceBinary.size() * sizeof(T));
+      auto begin = reinterpret_cast<const char *>(&*sourceBinary.begin());
+      auto end   = reinterpret_cast<const char *>(&*sourceBinary.end());
+      std::copy(begin, end, code.begin());
+    }
     type = ShaderSourceType::BINARY;
   }
 
   template<char>
   explicit ShaderSource( const std::vector<char>& sourceBinary )
   {
-    code = sourceBinary;
+    if( !sourceBinary.empty() )
+    {
+      code = sourceBinary;
+    }
     type = ShaderSourceType::BINARY;
   }
 
@@ -93,12 +100,12 @@ struct ShaderSource
    */
   bool IsSet() const
   {
-    if( (type == ShaderSourceType::BINARY && code.empty()) ||
-        (type == ShaderSourceType::STRING && source.empty()) )
+    if( type == ShaderSourceType::BINARY )
     {
-      return false;
+      return !code.empty();
     }
-    return true;
+
+    return !source.empty();
   }
 
   bool operator==(const ShaderSource& rhs ) const
@@ -111,7 +118,6 @@ struct ShaderSource
     {
       return source == rhs.source;
     }
-    return false;
   }
 
   std::string       source;

@@ -29,7 +29,7 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -74,10 +74,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
 };
 
 Graphics::Graphics() = default;
-
 Graphics::~Graphics() = default;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 
 Platform Graphics::GetDefaultPlatform() const
 {
@@ -96,7 +93,7 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 {
   if(!mGfxController)
   {
-    mGfxController = Dali::Graphics::Vulkan::Controller::New(*this);
+    mGfxController = Dali::Graphics::VulkanAPI::Controller::New(*this);
   }
 
   return *mGfxController.get();
@@ -210,7 +207,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));

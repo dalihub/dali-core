@@ -18,12 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/update/rendering/scene-graph-shader.h>
 
-// INTERNAL INCLUDES
-#define DEBUG_OVERRIDE_VULKAN_SHADER
-#ifdef DEBUG_OVERRIDE_VULKAN_SHADER
-#include <dali/graphics/vulkan/generated/spv-shaders-gen.h>
-#endif
-
 namespace Dali
 {
 
@@ -80,23 +74,9 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
 {
   // TODO: for now we will use hardcoded binary SPIRV shaders which will replace anything
   // that is passed by the caller
-#ifdef DEBUG_OVERRIDE_VULKAN_SHADER
+  mGraphicsShader = mShaderCache->GetShader( Graphics::API::ShaderDetails::ShaderSource( shaderData->GetShaderForStage( ShaderData::ShaderStage::VERTEX ) ),
+                                             Graphics::API::ShaderDetails::ShaderSource( shaderData->GetShaderForStage( ShaderData::ShaderStage::FRAGMENT) ) );
 
-  mGraphicsShader = mShaderCache->GetShader( Graphics::API::ShaderDetails::ShaderSource( VSH_IMAGE_VISUAL_CODE ),
-                                             Graphics::API::ShaderDetails::ShaderSource( FSH_IMAGE_VISUAL_CODE ));
-
-#else
-  auto& controller = mGraphics->GetController();
-
-  mGraphicsShader = controller.CreateShader(
-    controller.GetShaderFactory()
-    .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
-                      Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                      Graphics::API::ShaderDetails::ShaderSource( shaderData->GetVertexShader() ))
-    .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
-                      Graphics::API::ShaderDetails::Language::SPIRV_1_0,
-                      Graphics::API::ShaderDetails::ShaderSource( shaderData->GetFragmentShader() )) );
-#endif
 }
 
 
