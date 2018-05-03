@@ -70,6 +70,8 @@ struct Pipeline::Impl
     return mPipeline;
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
   vk::Result Initialise()
   {
     if( !ValidateShaderModules() )
@@ -77,7 +79,14 @@ struct Pipeline::Impl
       return vk::Result::eErrorInitializationFailed;
     }
 
-    CreatePipelineLayout();
+    if(!mInfo.layout)
+    {
+      CreatePipelineLayout();
+    }
+    else
+    {
+      mPipelineLayout = mInfo.layout;
+    }
 
     // use default render pass for default framebuffer
     // TODO: swapchain/surface should use vulkan-framebuffer object
@@ -88,15 +97,32 @@ struct Pipeline::Impl
                                 GetCurrentFramebuffer()->GetVkRenderPass());
     }
 
-    SetRasterizationState();
+    if(!mInfo.pRasterizationState)
+    {
+      SetRasterizationState();
+    }
+    else
+    {
+      mRasterizationState = *mInfo.pRasterizationState;
+    }
 
-    SetDepthStencilState();
+    if(!mInfo.pDepthStencilState)
+    {
+      SetDepthStencilState();
+    }
 
-    SetMultisampleState();
+    if(!mInfo.pMultisampleState)
+    {
+      SetMultisampleState();
+    }
 
-    SetColorBlendState();
+    if(!mInfo.pColorBlendState)
+    {
+      SetColorBlendState();
+    }
 
     mInfo.setFlags( vk::PipelineCreateFlagBits::eAllowDerivatives );
+
     // create pipeline
     mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( nullptr, mInfo, mGraphics.GetAllocator() ) );
     if(mPipeline)
@@ -217,6 +243,7 @@ struct Pipeline::Impl
     mColorBlendState.setPAttachments( &mAttachementNoBlendState );
     mInfo.setPColorBlendState(&mColorBlendState);
   }
+#pragma GCC diagnostic pop
 
   /**
    * Sets the shader. Must be set before compiling the pipeline, compiled pipeline
@@ -260,6 +287,7 @@ struct Pipeline::Impl
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
   void CreatePipelineLayout()
   {
+
     // pull desciptor set layouts from shaders
     auto layoutInfo = vk::PipelineLayoutCreateInfo{};
 
@@ -400,6 +428,8 @@ struct Pipeline::Impl
   // Color blend
   vk::PipelineColorBlendStateCreateInfo             mColorBlendState {};
   vk::PipelineColorBlendAttachmentState             mAttachementNoBlendState {};
+
+
 };
 
 /*********************************************************************
@@ -470,6 +500,41 @@ const std::vector<vk::DescriptorSetLayoutCreateInfo>& Pipeline::GetVkDescriptorS
 const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mImpl->mDSLayoutArray;
+}
+
+const vk::PipelineInputAssemblyStateCreateInfo& Pipeline::GetInputAssemblyState() const
+{
+  return mImpl->mInputAssemblyState;
+}
+
+const vk::PipelineVertexInputStateCreateInfo& Pipeline::GetVertexInputState() const
+{
+  return mImpl->mVertexInputState;
+}
+
+const vk::PipelineViewportStateCreateInfo& Pipeline::GetViewportState() const
+{
+  return mImpl->mViewportState;
+}
+
+const vk::PipelineRasterizationStateCreateInfo& Pipeline::GetRasterizationState() const
+{
+  return mImpl->mRasterizationState;
+}
+
+const vk::PipelineMultisampleStateCreateInfo& Pipeline::GetMultisamplingState() const
+{
+  return mImpl->mMultisampleState;
+}
+
+const vk::PipelineDepthStencilStateCreateInfo& Pipeline::GetDepthStencilState() const
+{
+  return mImpl->mDepthStencilState;
+}
+
+const vk::PipelineColorBlendStateCreateInfo& Pipeline::GetColorBlendState() const
+{
+  return mImpl->mColorBlendState;
 }
 
 } // namespace Vulkan

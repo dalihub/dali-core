@@ -42,6 +42,47 @@ using SPIRVWord = uint32_t;
  */
 struct SPIRVOpCode;
 
+struct SPIRVVertexInputAttribute
+{
+  uint32_t     location;
+  std::string  name;
+  vk::Format   format;
+};
+
+/**
+ * Describes a member of a buffer/uniform block
+ */
+struct SPIRVUniformBlockMember
+{
+  std::string               name;
+  uint32_t                  offset;
+  uint32_t                  location;
+  uint32_t                  blockIndex;
+};
+
+/**
+ * Describes single uniform block
+ */
+struct SPIRVUniformBlock
+{
+  std::string name;
+  uint32_t    descriptorSet;
+  uint32_t    binding;
+  uint32_t    size;
+  std::vector<SPIRVUniformBlockMember> members;
+};
+
+/**
+ * Describes non-buffer opaque types
+ */
+struct SPIRVUniformOpaque
+{
+  std::string         name;
+  uint32_t            descriptorSet;
+  uint32_t            binding;
+  vk::DescriptorType  type;
+};
+
 /**
  * Defines SPIRVShader program
  */
@@ -61,6 +102,32 @@ public:
    * @return create info structure
    */
   std::vector<vk::DescriptorSetLayoutCreateInfo> GenerateDescriptorSetLayoutCreateInfo() const;
+
+  /**
+   * Retrieves vertex input attributes ( names and locations ) from the shader
+   * @return fills the given vector of attributes
+   */
+  void GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out ) const;
+
+  /**
+   * Retrieves all uniform block data
+   */
+  const std::vector<SPIRVUniformBlock>& GetUniformBlocks() const;
+
+  /**
+   *
+   * @return
+   */
+  const std::vector<SPIRVUniformOpaque>& GetOpaqueUniforms() const;
+
+  /**
+   * Looks for uniform by name and retrieves location within
+   * uniform buffer
+   * @note Uniform member name must be unique, otherwise first found is returned
+   * @param uniformName
+   * @return
+   */
+  bool FindUniformMemberByName( const std::string& uniformName, SPIRVUniformBlockMember& out ) const;
 
   /**
    * Returns total number of OpCodes

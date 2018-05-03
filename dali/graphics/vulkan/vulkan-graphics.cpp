@@ -30,6 +30,7 @@
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -299,7 +300,7 @@ SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
 {
   auto swapchain = Swapchain::New( *this,
                                    GetGraphicsQueue(0u),
-                                   surface, 2, 0 );
+                                   surface, 4, 0 );
 
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
@@ -479,6 +480,8 @@ void Graphics::CreateDevice()
       // todo: present queue
     }
   }
+
+  mPipelineDatabase = std::make_unique<PipelineCache>( *this );
 }
 #pragma GCC diagnostic pop
 

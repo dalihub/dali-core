@@ -27,28 +27,32 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/shader-saver.h>
+
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/node-depths.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-property-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-texture.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
+#include <dali/internal/update/rendering/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
 
 namespace Integration
 {
-class GlSyncAbstraction;
 class RenderController;
 namespace Graphics
 {
@@ -58,17 +62,16 @@ class Graphics;
 
 namespace Internal
 {
+namespace SceneGraph
+{
+class FrameBuffer;
+}
 
 class PropertyNotifier;
 class NotificationManager;
 class CompleteNotificationInterface;
 class TouchResampler;
 
-namespace Render
-{
-struct Sampler;
-class FrameBuffer;
-}
 // value types used by messages
 template <> struct ParameterType< PropertyNotification::NotifyMode >
 : public BasicType< PropertyNotification::NotifyMode > {};
@@ -84,31 +87,6 @@ class RenderTaskProcessor;
 class RenderQueue;
 class PropertyBuffer;
 
-struct NodeDepthPair
-{
-  SceneGraph::Node* node;
-  uint32_t sortedDepth;
-  NodeDepthPair( SceneGraph::Node* node, uint32_t sortedDepth )
-  : node(node),
-    sortedDepth(sortedDepth)
-  {
-  }
-};
-
-struct NodeDepths
-{
-  NodeDepths()
-  {
-  }
-
-  void Add( SceneGraph::Node* node, uint32_t sortedDepth )
-  {
-    nodeDepths.push_back( NodeDepthPair( node, sortedDepth ) );
-  }
-
-  std::vector<NodeDepthPair> nodeDepths;
-};
-
 
 /**
  * UpdateManager maintains a scene graph i.e. a tree of nodes as well as
@@ -118,7 +96,7 @@ struct NodeDepths
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager : public ShaderSaver
+class UpdateManager
 {
 public:
 
@@ -129,8 +107,6 @@ public:
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
-   * @param[in] renderManager This is responsible for rendering the results of each "update".
-   * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    */
   UpdateManager( NotificationManager& notificationManager,
@@ -138,8 +114,6 @@ public:
                  PropertyNotifier& propertyNotifier,
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
-                 RenderManager& renderManager,
-                 RenderQueue& renderQueue,
                  RenderTaskProcessor& renderTaskProcessor,
                  Dali::Integration::Graphics::Graphics& graphics);
 
@@ -285,27 +259,6 @@ public:
    */
   void RemoveShader( Shader* shader );
 
-  /**
-   * Set the shader program for a Shader object
-   * @param[in] shader        The shader to modify
-   * @param[in] shaderData    Source code, hash over source, and optional compiled binary for the shader program
-   * @param[in] modifiesGeometry True if the vertex shader modifies geometry
-   */
-  void SetShaderProgram( Shader* shader, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
-
-  /**
-   * @brief Accept compiled shaders passed back on render thread for saving.
-   * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
-   */
-  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
-
-  /**
-   * @brief Set the destination for compiled shader binaries to be passed on to.
-   * The dispatcher passed in will be called from the update thread.
-   * @param[in] upstream A sink for ShaderDatas to be passed into.
-   */
-  void SetShaderSaver( ShaderSaver& upstream );
-
   // Renderers
 
   /**
@@ -398,31 +351,14 @@ public:
    * @post Sends a message to RenderManager to add the sampler.
    * The sampler will be owned by RenderManager
    */
-  void AddSampler( OwnerPointer< Render::Sampler >& sampler );
+  void AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler );
 
   /**
    * Removes an existing sampler from RenderManager
    * @param[in] sampler The sampler to remove
    * @post The sampler will be destroyed in the render thread
    */
-  void RemoveSampler( Render::Sampler* sampler );
-
-  /**
-   * Sets the filter modes for an existing sampler
-   * @param[in] sampler The sampler
-   * @param[in] minFilterMode The filter to use under minification
-   * @param[in] magFilterMode The filter to use under magnification
-   */
-  void SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode );
-
-  /**
-   * Sets the wrap mode for an existing sampler
-   * @param[in] sampler The sampler
-   * @param[in] rWrapMode Wrapping mode in z direction
-   * @param[in] sWrapMode Wrapping mode in x direction
-   * @param[in] tWrapMode Wrapping mode in y direction
-   */
-  void SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode );
+  void RemoveSampler( SceneGraph::Sampler* sampler );
 
   /**
    * Add a new property buffer to RenderManager
@@ -430,14 +366,14 @@ public:
    * @post Sends a message to RenderManager to add the property buffer.
    * The property buffer will be owned by RenderManager
    */
-  void AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertryBuffer );
+  void AddPropertyBuffer( OwnerPointer< SceneGraph::PropertyBuffer >& propertyBuffer );
 
   /**
    * Removes an existing PropertyBuffer from RenderManager
    * @param[in] propertryBuffer The property buffer to remove
    * @post The property buffer will be destroyed in the render thread
    */
-  void RemovePropertyBuffer( Render::PropertyBuffer* propertryBuffer );
+  void RemovePropertyBuffer( SceneGraph::PropertyBuffer* propertryBuffer );
 
   /**
    * Sets the format of an existing property buffer
@@ -445,7 +381,7 @@ public:
    * @param[in] format The new format of the buffer
    * @post Sends a message to RenderManager to set the new format to the property buffer.
    */
-  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format );
+  void SetPropertyBufferFormat( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< SceneGraph::PropertyBuffer::Format>& format );
 
   /**
    * Sets the data of an existing property buffer
@@ -454,7 +390,7 @@ public:
    * @param[in] size The new size of the buffer
    * @post Sends a message to RenderManager to set the new data to the property buffer.
    */
-  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
+  void SetPropertyBufferData( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
 
   /**
    * Adds a geometry to the RenderManager
@@ -462,86 +398,70 @@ public:
    * @post Sends a message to RenderManager to add the Geometry
    * The geometry will be owned by RenderManager
    */
-  void AddGeometry( OwnerPointer< Render::Geometry >& geometry );
+  void AddGeometry( OwnerPointer< SceneGraph::Geometry >& geometry );
 
   /**
    * Removes an existing Geometry from RenderManager
    * @param[in] geometry The geometry to remove
    * @post The geometry will be destroyed in the render thread
    */
-  void RemoveGeometry( Render::Geometry* geometry );
+  void RemoveGeometry( SceneGraph::Geometry* geometry );
 
   /**
    * Sets the geometry type of an existing Geometry
    * @param[in] geometry The geometry
    * @param[in] geometryType The type of the geometry
    */
-  void SetGeometryType( Render::Geometry* geometry, unsigned int geometryType );
+  void SetGeometryType( SceneGraph::Geometry* geometry, unsigned int geometryType );
 
   /**
    * Sets the index buffer to be used by a geometry
    * @param[in] geometry The geometry
    * @param[in] indices A vector containing the indices for the geometry
    */
-  void SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices );
+  void SetIndexBuffer( SceneGraph::Geometry* geometry, Dali::Vector<unsigned short>& indices );
 
   /**
    * Adds a vertex buffer to a geometry
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer
    */
-  void AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
+  void AttachVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer );
 
   /**
    * Removes a vertex buffer from a geometry
    * @param[in] geometry The geometry
    * @param[in] propertyBuffer The property buffer
    */
-  void RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
+  void RemoveVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer );
 
   /**
    * Adds a texture to the render manager
    * @param[in] texture The texture to add
    * The texture will be owned by RenderManager
    */
-  void AddTexture( OwnerPointer< Render::Texture >& texture );
+  void AddTexture( OwnerPointer< SceneGraph::Texture >& texture );
 
   /**
    * Removes a texture from the render manager
    * @param[in] texture The texture to remove
    * @post The texture will be destroyed in the render thread
    */
-  void RemoveTexture( Render::Texture* texture );
-
-  /**
-   * Uploads data to a texture owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] pixelData The pixel data object
-   * @param[in] params The parameters for the upload
-   */
-  void UploadTexture( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params );
-
-  void UploadTextureV2( Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params );
-
-  /**
-   * Generates mipmaps for a texture owned by the RenderManager
-   * @param[in] texture The texture
-   */
-  void GenerateMipmaps( Render::Texture* texture );
+  void RemoveTexture( SceneGraph::Texture* texture );
 
   /**
    * Adds a framebuffer to the render manager
    * @param[in] frameBuffer The framebuffer to add
    * The framebuffer will be owned by RenderManager
    */
-  void AddFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void AddFrameBuffer( SceneGraph::FrameBuffer* frameBuffer );
 
   /**
    * Removes a FrameBuffer from the render manager
    * @param[in] frameBuffer The FrameBuffer to remove
    * @post The FrameBuffer will be destroyed in the render thread
    */
-  void RemoveFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer );
 
   /**
    * Attach a texture as color output to an existing FrameBuffer
@@ -550,7 +470,9 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int face );
+  void AttachColorTextureToFrameBuffer( SceneGraph::FrameBuffer* frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int face );
+
+  Graphics::API::Controller& GetGraphicsController() const;
 
 public:
 
@@ -907,20 +829,6 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
   new (slot) LocalType( &manager, &UpdateManager::RemoveShader, &shader );
 }
 
-inline void SetShaderProgramMessage( UpdateManager& manager,
-                                     Shader& shader,
-                                     Internal::ShaderDataPtr shaderData,
-                                     bool modifiesGeometry )
-{
-  typedef MessageValue3< UpdateManager, Shader*, Internal::ShaderDataPtr, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, shaderData, modifiesGeometry );
-}
-
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
 {
   typedef MessageValue1< UpdateManager, Vector4 > LocalType;
@@ -1015,10 +923,10 @@ inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& texture
   new (slot) LocalType( &manager, &UpdateManager::RemoveTextureSet, &textureSet );
 }
 
-inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< Render::Sampler >& sampler )
+inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Sampler >& sampler )
 {
   // Message has ownership of Sampler while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Sampler > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Sampler > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1027,9 +935,9 @@ inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< Render::Sam
   new (slot) LocalType( &manager, &UpdateManager::AddSampler, sampler );
 }
 
-inline void RemoveSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )
+inline void RemoveSamplerMessage( UpdateManager& manager, SceneGraph::Sampler& sampler )
 {
-  typedef MessageValue1< UpdateManager, Render::Sampler* > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1038,32 +946,10 @@ inline void RemoveSamplerMessage( UpdateManager& manager, Render::Sampler& sampl
   new (slot) LocalType( &manager, &UpdateManager::RemoveSampler, &sampler );
 }
 
-inline void SetFilterModeMessage( UpdateManager& manager, Render::Sampler& sampler, unsigned int minFilterMode, unsigned int magFilterMode )
-{
-  typedef MessageValue3< UpdateManager, Render::Sampler*, unsigned int, unsigned int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetFilterMode, &sampler, minFilterMode, magFilterMode );
-}
-
-inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
-{
-  typedef MessageValue4< UpdateManager, Render::Sampler*, unsigned int, unsigned int, unsigned int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, rWrapMode, sWrapMode, tWrapMode );
-}
-
-inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
+inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< SceneGraph::PropertyBuffer >& propertyBuffer )
 {
   // Message has ownership of propertyBuffer while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::PropertyBuffer > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::PropertyBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1072,9 +958,9 @@ inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< Render::Pro
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, propertyBuffer );
 }
 
-inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
+inline void RemovePropertyBuffer( UpdateManager& manager, SceneGraph::PropertyBuffer& propertyBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::PropertyBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::PropertyBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1083,34 +969,10 @@ inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer
   new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
 }
 
-inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
-{
-  // Message has ownership of PropertyBuffer::Format while in transit from event -> update
-  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format> > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferFormat, &propertyBuffer, format );
-}
-
-inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
-{
-  // Message has ownership of PropertyBuffer data while in transit from event -> update
-  typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Vector<char> >, size_t  > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data, size );
-}
-
-inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry >& geometry )
+inline void AddGeometry( UpdateManager& manager, OwnerPointer< SceneGraph::Geometry >& geometry )
 {
   // Message has ownership of Geometry while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Geometry > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Geometry > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1119,9 +981,9 @@ inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry 
   new (slot) LocalType( &manager, &UpdateManager::AddGeometry, geometry );
 }
 
-inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
+inline void RemoveGeometry( UpdateManager& manager, SceneGraph::Geometry& geometry )
 {
-  typedef MessageValue1< UpdateManager, Render::Geometry*  > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::Geometry*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1130,94 +992,10 @@ inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
   new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
 }
 
-inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
-{
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::PropertyBuffer* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AttachVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
-}
-
-inline void RemoveVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
-{
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::PropertyBuffer* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
-}
-
-// Custom message type for SetIndexBuffer() used to move data with Vector::Swap()
-template< typename T >
-class IndexBufferMessage : public MessageBase
-{
-public:
-
-  /**
-   * Constructor which does a Vector::Swap()
-   */
-  IndexBufferMessage( T* manager, Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
-  : MessageBase(),
-    mManager( manager ),
-    mRenderGeometry( geometry )
-  {
-    mIndices.Swap( indices );
-  }
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~IndexBufferMessage()
-  {
-  }
-
-  /**
-   * @copydoc MessageBase::Process
-   */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
-  {
-    DALI_ASSERT_DEBUG( mManager && "Message does not have an object" );
-    mManager->SetIndexBuffer( mRenderGeometry, mIndices );
-  }
-
-private:
-
-  T* mManager;
-  Render::Geometry* mRenderGeometry;
-  Dali::Vector<unsigned short> mIndices;
-};
-
-inline void SetIndexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, Dali::Vector<unsigned short>& indices )
-{
-  typedef IndexBufferMessage< UpdateManager > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &geometry, indices );
-}
-
-inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& geometry, unsigned int geometryType )
-{
-  typedef MessageValue2< UpdateManager, Render::Geometry*, unsigned int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetGeometryType, &geometry, geometryType );
-}
-
-inline void AddTexture( UpdateManager& manager, OwnerPointer< Render::Texture >& texture )
+inline void AddTextureMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Texture >& texture )
 {
   // Message has ownership of Texture while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Texture > > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Texture > > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1226,9 +1004,9 @@ inline void AddTexture( UpdateManager& manager, OwnerPointer< Render::Texture >&
   new (slot) LocalType( &manager, &UpdateManager::AddTexture, texture );
 }
 
-inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
+inline void RemoveTextureMessage( UpdateManager& manager, SceneGraph::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::Texture*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1237,43 +1015,10 @@ inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
   new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
 }
 
-inline void UploadTextureMessage( UpdateManager& manager, Render::Texture& texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
+
+inline void AddFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer )
 {
-  typedef MessageValue3< UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::UploadTexture, &texture, pixelData, params );
-}
-
-inline void UploadTextureMessageV2( UpdateManager& manager, Render::Texture& texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
-{
-  typedef MessageValue3< UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::UploadTextureV2, &texture, pixelData, params );
-}
-
-inline void GenerateMipmapsMessage( UpdateManager& manager, Render::Texture& texture )
-{
-  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::GenerateMipmaps, &texture );
-}
-
-
-inline void AddFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
-{
-  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::FrameBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1282,9 +1027,9 @@ inline void AddFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBu
   new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, &frameBuffer );
 }
 
-inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
+inline void RemoveFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, SceneGraph::FrameBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1293,9 +1038,9 @@ inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& fram
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer );
 }
 
-inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
+inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
 {
-  typedef MessageValue4< UpdateManager, Render::FrameBuffer*, Render::Texture*, unsigned int, unsigned int  > LocalType;
+  typedef MessageValue4< UpdateManager, SceneGraph::FrameBuffer*, SceneGraph::Texture*, unsigned int, unsigned int  > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );

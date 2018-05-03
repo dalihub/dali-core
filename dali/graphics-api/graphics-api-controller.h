@@ -28,10 +28,14 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-sampler.h>
 #include <dali/graphics-api/graphics-api-shader.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-api-shader-factory.h>
 #include <dali/graphics-api/graphics-api-static-buffer.h>
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture-set.h>
 #include <dali/graphics-api/graphics-api-texture.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
@@ -40,6 +44,7 @@ namespace Graphics
 {
 namespace API
 {
+class ShaderFactory;
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
@@ -72,6 +77,11 @@ public:
   /**
    * @brief Create a new object
    */
+  virtual Accessor<Buffer> CreateBuffer( const BaseFactory<Buffer>& factory ) = 0;
+
+  /**
+   * @brief Create a new object
+   */
   virtual Accessor<StaticBuffer> CreateStaticBuffer( const BaseFactory<StaticBuffer>& factory ) = 0;
 
   /**
@@ -90,15 +100,22 @@ public:
   virtual void GetRenderItemList() = 0;
 
   /**
-   * Temporary way of instantiating new texture through controller
-   * @param width
-   * @param height
+   * @brief Returns texture factory
    * @return
    */
-  virtual void* CreateTextureRGBA32( void* data, size_t sizeInBytes, uint32_t width, uint32_t height )
-  {
-    return 0;
-  }
+  virtual TextureFactory& GetTextureFactory() const = 0;
+
+  /**
+   * @brief Returns shader factory
+   * @return
+   */
+  virtual ShaderFactory& GetShaderFactory() const = 0;
+
+  /**
+ * @brief Returns shader factory
+ * @return
+ */
+  virtual BufferFactory& GetBufferFactory() const = 0;
 
   /**
    * @brief Create a buffer
@@ -110,6 +127,18 @@ public:
    * @brief Submit a render command
    */
   virtual void SubmitCommand( API::RenderCommand&& command ) = 0;
+
+  /**
+   * @brief alAllocates render command ( depends on implementation );
+   * @return
+   */
+  virtual std::unique_ptr<API::RenderCommand> AllocateRenderCommand() = 0;
+
+  /**
+   * @brief Submits a list of commands
+   * @param commands
+   */
+  virtual void SubmitCommands( std::vector<API::RenderCommand*> commands ) = 0;
 
   /**
    * @brief Mark the beginning of a frame
