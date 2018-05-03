@@ -25,8 +25,6 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/math/rect.h>
 
-#include <type_traits>
-
 namespace Dali
 {
 /**
@@ -188,15 +186,6 @@ public:
   Value( const Extents& extentsValue );
 
   /**
-   * @brief Creates an enumeration property value.
-   *
-   * @SINCE_1_2.62
-   * @param[in] extentsValue A collection of 4 uint16_t values
-   */
-  template <typename T, typename std::enable_if<std::is_enum<typename std::remove_reference<typename std::remove_cv<T>::type>::type>::value>::type* = nullptr>
-  Value(T t) : Value(static_cast<int>(t)) { }
-
-  /**
    * @brief Explicitly sets a type and initialize it.
    *
    * @SINCE_1_0.0
@@ -240,7 +229,7 @@ public:
   /**
    * @brief Retrieves a specific value.
    *
-   * Works on a best-effort approach; if value type is different returns a default value of the type.
+   * Works on a best-effort approach; if value type is not convertible returns a default value of the type.
    *
    * @SINCE_1_0.0
    * @return A value of type T
@@ -253,22 +242,6 @@ public:
     return temp;
   }
 
-  /**
-   * @brief Retrieves an enumeration value.
-   *
-   * @SINCE_1_0.0
-   * @param[out] boolValue On return, an enumeration value
-   * @return @c true if the value is successfully retrieved, @c false if the type is different
-   * @pre GetType() is a type convertible to bool.
-   */
-  template <typename T, typename std::enable_if<std::is_enum<typename std::remove_reference<typename std::remove_cv<T>::type>::type>::value>::type* = nullptr>
-  bool Get(T &t) const
-  {
-    int temp = 0;
-    if (!Get(temp)) return false;
-    t = static_cast<T>(temp);
-    return true;
-  }
   /**
    * @brief Retrieves a boolean value.
    *
