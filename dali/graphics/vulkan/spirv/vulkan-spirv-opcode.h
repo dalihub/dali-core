@@ -89,8 +89,7 @@ struct SPIRVOpCode
 
 namespace
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wlarger-than="
+
 /**
  * List of all the SPIR-V opcodes
  * OpCodes describing types: 19-39

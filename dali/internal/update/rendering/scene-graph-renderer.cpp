@@ -292,7 +292,7 @@ void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex
   auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings( uboCount );
 
   // allocate new command ( may be not necessary at all )
- // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
+  // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
 
   // see if we need to reallocate memory for each UBO
   // todo: do it only when shader has changed

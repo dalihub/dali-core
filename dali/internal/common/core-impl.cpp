@@ -47,6 +47,10 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 
+extern "C"
+{
+std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
+}
 
 using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
@@ -88,6 +92,8 @@ Core::Core( RenderController& renderController,
 {
   // fixme: for now to ensure libgraphics.a won't be removed during linking due to being
   Integration::Graphics::IncludeThisLibrary();
+
+  GraphicsGetBuiltinShader("");
 
   // Create the thread local storage
   CreateThreadLocalStorage();

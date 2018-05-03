@@ -36,6 +36,11 @@ class Controller;
 }
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 
+namespace VulkanAPI
+{
+class Controller;
+}
+
 namespace Vulkan
 {
 
@@ -56,7 +61,6 @@ class Surface;
 class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
-class Controller;
 class PipelineCache;
 
 struct SwapchainSurfacePair
@@ -70,7 +74,7 @@ class Graphics
 
 public:
   Graphics();
-  Graphics(std::unique_ptr< SurfaceFactory > surfaceFactory);
+  explicit Graphics(std::unique_ptr< SurfaceFactory > surfaceFactory);
   Graphics(const Graphics&) = delete;
   Graphics& operator=(const Graphics&) = delete;
   ~Graphics();
@@ -191,7 +195,7 @@ private:
   std::vector<FramebufferRef>           mFramebufferCache;
 
 private:
-  std::unique_ptr<Dali::Graphics::Vulkan::Controller>           mGfxController;
+  std::unique_ptr<Dali::Graphics::VulkanAPI::Controller>           mGfxController;
 
   // TODO: rename
   std::unique_ptr<PipelineCache>        mPipelineDatabase;

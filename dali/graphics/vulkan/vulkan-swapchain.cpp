@@ -151,8 +151,6 @@ struct Swapchain::Impl
     return true;
   }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   void PrepareFramebuffers()
   {
     /*
@@ -367,8 +365,6 @@ struct Swapchain::Impl
    * @param image
    * @return
    */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   FramebufferRef CreateFramebuffer( vk::Image& image )
   {
     auto fbRef = Framebuffer::New( mGraphics, mSwapchainExtent.width, mSwapchainExtent.height );

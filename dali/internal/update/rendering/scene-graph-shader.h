@@ -52,8 +52,8 @@ class Shader : public PropertyOwner, public UniformMap::Observer
 public:
 
   /**
-   * Constructor
-   * @param hints Shader hints
+   * Devel constructor
+   * @param hints
    */
   Shader( Dali::Shader::Hint::Value& hints );
 

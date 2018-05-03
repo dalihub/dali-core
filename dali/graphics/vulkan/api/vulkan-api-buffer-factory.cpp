@@ -19,14 +19,14 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 namespace Dali
 {
 namespace Graphics
 {
 namespace VulkanAPI
 {
-BufferFactory::BufferFactory( Vulkan::Controller& controller )
+BufferFactory::BufferFactory( Controller& controller )
 : mController( controller ), mGraphics(controller.GetGraphics() )
 {
 
