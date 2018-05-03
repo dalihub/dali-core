@@ -28,13 +28,19 @@ namespace SceneGraph
 {
 
 FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
-:  mWidth( width ),
-   mHeight( height )
+: mGraphics( nullptr ),
+  mWidth( width ),
+  mHeight( height )
 {
 }
 
 FrameBuffer::~FrameBuffer()
 {
+}
+
+void FrameBuffer::Initialize( Integration::Graphics::Graphics& graphics )
+{
+  mGraphics = &graphics;
 }
 
 void FrameBuffer::AttachColorTexture( SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer )

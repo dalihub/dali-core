@@ -81,6 +81,13 @@ public:
   void operator delete( void* ptr );
 
   /**
+   * Initialize the renderer object with the Graphics API when added to UpdateManager
+   *
+   * @param[in] graphics The Graphics API
+   */
+  void Initialize( Integration::Graphics::Graphics& graphics );
+
+  /**
    * Set the texture set for the renderer
    * @param[in] textureSet The texture set this renderer will use
    */
@@ -293,19 +300,6 @@ public:
    */
   void TextureSetDeleted();
 
-  /**
-   * Connect the object to the scene graph
-   *
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void ConnectToSceneGraph( BufferIndex bufferIndex );
-
-  /**
-   * Disconnect the object from the scene graph
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void DisconnectFromSceneGraph( BufferIndex bufferIndex );
-
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -377,8 +371,13 @@ private:
    */
   const Vector4& GetBlendColor() const;
 
+  /**
+   * Helper function to update the uniform map.
+   */
+  void UpdateUniformMap( BufferIndex updateBufferIndex );
 
 private:
+  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   std::unique_ptr<RenderDataProvider> mRenderDataProvider;        ///< Contains data for graphics renderer @todo Refactor

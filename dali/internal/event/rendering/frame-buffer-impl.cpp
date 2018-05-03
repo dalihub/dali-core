@@ -54,7 +54,8 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 void FrameBuffer::Initialize()
 {
   mRenderObject = new SceneGraph::FrameBuffer( mWidth, mHeight, mAttachments );
-  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  OwnerPointer< SceneGraph::FrameBuffer > transferOwnership( mRenderObject );
+  AddFrameBufferMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
@@ -63,7 +64,7 @@ void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLev
       ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )
   {
     mColor = texture;
-    AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
+    AttachColorTextureMessage( mEventThreadServices, *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
   }
   else
   {
@@ -80,7 +81,7 @@ FrameBuffer::~FrameBuffer()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    RemoveFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    RemoveFrameBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 

@@ -47,6 +47,13 @@ public:
   ~FrameBuffer();
 
   /**
+   * Initialize the frame buffer object with the Graphics API when added to UpdateManager
+   *
+   * @param[in] graphics The Graphics API
+   */
+  void Initialize( Integration::Graphics::Graphics& graphics );
+
+  /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
    * param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
@@ -68,11 +75,26 @@ public:
   unsigned int GetHeight() const;
 
 private:
+  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   unsigned int mWidth;
   unsigned int mHeight;
 };
 
+inline void AttachColorTextureMessage( EventThreadServices& eventThreadServices,
+                                       SceneGraph::FrameBuffer& frameBuffer,
+                                       SceneGraph::Texture* texture,
+                                       unsigned int mipmapLevel,
+                                       unsigned int layer )
+{
+  typedef MessageValue3< SceneGraph::FrameBuffer, SceneGraph::Texture*, unsigned int, unsigned int  > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &frameBuffer, &FrameBuffer::AttachColorTexture, texture, mipmapLevel, layer );
+}
 
 } // namespace SceneGraph
 

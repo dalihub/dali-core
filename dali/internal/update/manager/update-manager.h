@@ -81,11 +81,8 @@ namespace SceneGraph
 
 class Animation;
 class DiscardQueue;
-class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
-class RenderQueue;
-class PropertyBuffer;
 
 
 /**
@@ -346,133 +343,70 @@ public:
   bool FlushQueue();
 
   /**
-   * Add a new sampler to RenderManager
+   * Add a new sampler to Update Manager
    * @param[in] sampler The sampler to add
-   * @post Sends a message to RenderManager to add the sampler.
-   * The sampler will be owned by RenderManager
+   * The sampler will be owned by UpdateManager
    */
   void AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler );
 
   /**
-   * Removes an existing sampler from RenderManager
+   * Removes an existing sampler from UpdateManager
    * @param[in] sampler The sampler to remove
-   * @post The sampler will be destroyed in the render thread
    */
   void RemoveSampler( SceneGraph::Sampler* sampler );
 
   /**
-   * Add a new property buffer to RenderManager
+   * Add a new property buffer to UpdateManager
    * @param[in] propertryBuffer The property buffer to add
-   * @post Sends a message to RenderManager to add the property buffer.
-   * The property buffer will be owned by RenderManager
+   * The property buffer will be owned by UpdateManager
    */
   void AddPropertyBuffer( OwnerPointer< SceneGraph::PropertyBuffer >& propertyBuffer );
 
   /**
-   * Removes an existing PropertyBuffer from RenderManager
+   * Removes an existing PropertyBuffer from UpdateManager
    * @param[in] propertryBuffer The property buffer to remove
-   * @post The property buffer will be destroyed in the render thread
    */
   void RemovePropertyBuffer( SceneGraph::PropertyBuffer* propertryBuffer );
 
   /**
-   * Sets the format of an existing property buffer
-   * @param[in] propertyBuffer The property buffer.
-   * @param[in] format The new format of the buffer
-   * @post Sends a message to RenderManager to set the new format to the property buffer.
-   */
-  void SetPropertyBufferFormat( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< SceneGraph::PropertyBuffer::Format>& format );
-
-  /**
-   * Sets the data of an existing property buffer
-   * @param[in] propertyBuffer The property buffer.
-   * @param[in] data The new data of the buffer
-   * @param[in] size The new size of the buffer
-   * @post Sends a message to RenderManager to set the new data to the property buffer.
-   */
-  void SetPropertyBufferData( SceneGraph::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
-
-  /**
-   * Adds a geometry to the RenderManager
+   * Adds a geometry to the UpdateManager
    * @param[in] geometry The geometry to add
-   * @post Sends a message to RenderManager to add the Geometry
-   * The geometry will be owned by RenderManager
+   * The geometry will be owned by UpdateManager
    */
   void AddGeometry( OwnerPointer< SceneGraph::Geometry >& geometry );
 
   /**
-   * Removes an existing Geometry from RenderManager
+   * Removes an existing Geometry from UpdateManager
    * @param[in] geometry The geometry to remove
-   * @post The geometry will be destroyed in the render thread
    */
   void RemoveGeometry( SceneGraph::Geometry* geometry );
 
   /**
-   * Sets the geometry type of an existing Geometry
-   * @param[in] geometry The geometry
-   * @param[in] geometryType The type of the geometry
-   */
-  void SetGeometryType( SceneGraph::Geometry* geometry, unsigned int geometryType );
-
-  /**
-   * Sets the index buffer to be used by a geometry
-   * @param[in] geometry The geometry
-   * @param[in] indices A vector containing the indices for the geometry
-   */
-  void SetIndexBuffer( SceneGraph::Geometry* geometry, Dali::Vector<unsigned short>& indices );
-
-  /**
-   * Adds a vertex buffer to a geometry
-   * @param[in] geometry The geometry
-   * @param[in] propertyBuffer The property buffer
-   */
-  void AttachVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer );
-
-  /**
-   * Removes a vertex buffer from a geometry
-   * @param[in] geometry The geometry
-   * @param[in] propertyBuffer The property buffer
-   */
-  void RemoveVertexBuffer( SceneGraph::Geometry* geometry, SceneGraph::PropertyBuffer* propertyBuffer );
-
-  /**
-   * Adds a texture to the render manager
+   * Adds a texture to the update manager
    * @param[in] texture The texture to add
-   * The texture will be owned by RenderManager
+   * The texture will be owned by UpdateManager
    */
   void AddTexture( OwnerPointer< SceneGraph::Texture >& texture );
 
   /**
-   * Removes a texture from the render manager
+   * Removes a texture from the update manager
    * @param[in] texture The texture to remove
-   * @post The texture will be destroyed in the render thread
    */
   void RemoveTexture( SceneGraph::Texture* texture );
 
   /**
-   * Adds a framebuffer to the render manager
+   * Adds a framebuffer to the update manager
    * @param[in] frameBuffer The framebuffer to add
-   * The framebuffer will be owned by RenderManager
+   * The framebuffer will be owned by UpdateManager
    */
-  void AddFrameBuffer( SceneGraph::FrameBuffer* frameBuffer );
+  void AddFrameBuffer( OwnerPointer<SceneGraph::FrameBuffer>& frameBuffer );
 
   /**
-   * Removes a FrameBuffer from the render manager
+   * Removes a FrameBuffer from the update manager
    * @param[in] frameBuffer The FrameBuffer to remove
-   * @post The FrameBuffer will be destroyed in the render thread
    */
   void RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer );
 
-  /**
-   * Attach a texture as color output to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
-   */
-  void AttachColorTextureToFrameBuffer( SceneGraph::FrameBuffer* frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int face );
-
-  Graphics::API::Controller& GetGraphicsController() const;
 
 public:
 
@@ -805,7 +739,6 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
 }
 
-// The render thread can safely change the Shader
 inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& shader )
 {
   typedef MessageValue1< UpdateManager, OwnerPointer< Shader > > LocalType;
@@ -817,7 +750,6 @@ inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& sh
   new (slot) LocalType( &manager, &UpdateManager::AddShader, shader );
 }
 
-// The render thread can safely change the Shader
 inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
 {
   typedef MessageValue1< UpdateManager, Shader* > LocalType;
@@ -911,7 +843,6 @@ inline void AddTextureSetMessage( UpdateManager& manager, OwnerPointer< TextureS
   new (slot) LocalType( &manager, &UpdateManager::AddTextureSet, textureSet );
 }
 
-// The render thread can safely change the Shader
 inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& textureSet )
 {
   typedef MessageValue1< UpdateManager, TextureSet* > LocalType;
@@ -969,7 +900,7 @@ inline void RemovePropertyBuffer( UpdateManager& manager, SceneGraph::PropertyBu
   new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
 }
 
-inline void AddGeometry( UpdateManager& manager, OwnerPointer< SceneGraph::Geometry >& geometry )
+inline void AddGeometryMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Geometry >& geometry )
 {
   // Message has ownership of Geometry while in transit from event -> update
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Geometry > > LocalType;
@@ -981,7 +912,7 @@ inline void AddGeometry( UpdateManager& manager, OwnerPointer< SceneGraph::Geome
   new (slot) LocalType( &manager, &UpdateManager::AddGeometry, geometry );
 }
 
-inline void RemoveGeometry( UpdateManager& manager, SceneGraph::Geometry& geometry )
+inline void RemoveGeometryMessage( UpdateManager& manager, SceneGraph::Geometry& geometry )
 {
   typedef MessageValue1< UpdateManager, SceneGraph::Geometry*  > LocalType;
 
@@ -1015,19 +946,18 @@ inline void RemoveTextureMessage( UpdateManager& manager, SceneGraph::Texture& t
   new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
 }
 
-
-inline void AddFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer )
+inline void AddFrameBufferMessage( UpdateManager& manager, OwnerPointer<SceneGraph::FrameBuffer>& frameBuffer )
 {
-  typedef MessageValue1< UpdateManager, SceneGraph::FrameBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer<SceneGraph::FrameBuffer> > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, &frameBuffer );
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, frameBuffer );
 }
 
-inline void RemoveFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer )
+inline void RemoveFrameBufferMessage( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer )
 {
   typedef MessageValue1< UpdateManager, SceneGraph::FrameBuffer*  > LocalType;
 
@@ -1036,17 +966,6 @@ inline void RemoveFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& 
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer );
-}
-
-inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, SceneGraph::FrameBuffer& frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
-{
-  typedef MessageValue4< UpdateManager, SceneGraph::FrameBuffer*, SceneGraph::Texture*, unsigned int, unsigned int  > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
 }
 
 inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDepths >& nodeDepths )

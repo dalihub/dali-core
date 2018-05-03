@@ -99,14 +99,14 @@ void Geometry::Initialize()
 {
   mRenderObject = new SceneGraph::Geometry();
   OwnerPointer< SceneGraph::Geometry > transferOwnership( mRenderObject );
-  AddGeometry( mEventThreadServices.GetUpdateManager(), transferOwnership );
+  AddGeometryMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 Geometry::~Geometry()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
   {
-    RemoveGeometry( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    RemoveGeometryMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 

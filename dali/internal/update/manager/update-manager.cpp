@@ -291,12 +291,11 @@ struct UpdateManager::Impl
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
   OwnerContainer< Shader* >            shaders;                       ///< A container of owned shaders
-
-  OwnerContainer< SceneGraph::Sampler* >        samplerContainer;        ///< List of owned samplers
-  OwnerContainer< SceneGraph::Texture* >        textureContainer;        ///< List of owned textures
-  OwnerContainer< SceneGraph::FrameBuffer* >    frameBufferContainer;    ///< List of owned framebuffers
-  OwnerContainer< SceneGraph::PropertyBuffer* > propertyBufferContainer; ///< List of owned property buffers
-  OwnerContainer< SceneGraph::Geometry* >       geometryContainer;       ///< List of owned Geometries
+  OwnerContainer< Sampler* >           samplerContainer;              ///< A container of owned samplers
+  OwnerContainer< Texture* >           textureContainer;              ///< A container of owned textures
+  OwnerContainer< FrameBuffer* >       frameBufferContainer;          ///< A container of owned framebuffers
+  OwnerContainer< PropertyBuffer* >    propertyBufferContainer;       ///< A container of owned property buffers
+  OwnerContainer< Geometry* >          geometryContainer;             ///< A container of owned Geometries
 
   OwnerPointer< PanGesture >           panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
@@ -362,7 +361,6 @@ void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel )
     mImpl->systemLevelRoot->CreateTransform( &mImpl->transformManager );
     mImpl->systemLevelRoot->SetRoot(true);
   }
-
 }
 
 void UpdateManager::AddNode( OwnerPointer<Node>& node )
@@ -514,7 +512,7 @@ void UpdateManager::RemoveShader( Shader* shader )
 
 void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
-  renderer->ConnectToSceneGraph( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  renderer->Initialize( mImpl->graphics );
   mImpl->renderers.PushBack( renderer.Release() );
   mImpl->renderersAdded = true;
 }
@@ -524,7 +522,6 @@ void UpdateManager::RemoveRenderer( Renderer* renderer )
   // Find the renderer and destroy it
   // @todo Don't need to use discard queue for SceneGraph::Renderer any more ( No dependency from Graphics::RenderCommand )
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  renderer->DisconnectFromSceneGraph( mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::SetPanGestureProcessor( PanGesture* panGestureProcessor )
@@ -724,7 +721,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
 
-    mImpl->renderers[i]->PrepareRender( mImpl->graphics.GetController(), bufferIndex );
+    mImpl->renderers[i]->PrepareRender( bufferIndex );
   }
 }
 
@@ -1029,17 +1026,16 @@ void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
   {
     if ( iter == texture )
     {
-      //texture->Destroy(); //@todo Do something in Gfx?
       mImpl->textureContainer.Erase( &iter ); // Texture found; now destroy it
       return;
     }
   }
 }
 
-void UpdateManager::AddFrameBuffer( SceneGraph::FrameBuffer* frameBuffer )
+void UpdateManager::AddFrameBuffer( OwnerPointer< SceneGraph::FrameBuffer>& frameBuffer )
 {
-  mImpl->frameBufferContainer.PushBack( frameBuffer );
-  //frameBuffer->Initialize(); @todo Rewrite for Gfx
+  frameBuffer->Initialize( mImpl->graphics );
+  mImpl->frameBufferContainer.PushBack( frameBuffer.Release() );
 }
 
 void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
@@ -1051,23 +1047,12 @@ void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
   {
     if ( iter == frameBuffer )
     {
-      //frameBuffer->Destroy(); @todo Rewrite for Gfx
       mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
       break;
     }
   }
 }
 
-void UpdateManager::AttachColorTextureToFrameBuffer( SceneGraph::FrameBuffer* frameBuffer, SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
-{
-  //frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer ); @todo Rewrite for Gfx
-  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
-}
-
-Graphics::API::Controller& UpdateManager::GetGraphicsController() const
-{
-  return mImpl->graphics.GetController();
-}
 
 } // namespace SceneGraph
 

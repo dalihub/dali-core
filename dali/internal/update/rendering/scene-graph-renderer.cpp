@@ -118,31 +118,6 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
   }
 }
 
-// Flags for re-sending data to renderer.
-enum Flags
-{
-  RESEND_DATA_PROVIDER               = 1 << 0,
-  RESEND_GEOMETRY                    = 1 << 1,
-  RESEND_FACE_CULLING_MODE           = 1 << 2,
-  RESEND_BLEND_COLOR                 = 1 << 3,
-  RESEND_BLEND_BIT_MASK              = 1 << 4,
-  RESEND_PREMULTIPLIED_ALPHA         = 1 << 5,
-  RESEND_INDEXED_DRAW_FIRST_ELEMENT  = 1 << 6,
-  RESEND_INDEXED_DRAW_ELEMENTS_COUNT = 1 << 7,
-  RESEND_DEPTH_WRITE_MODE            = 1 << 8,
-  RESEND_DEPTH_TEST_MODE             = 1 << 9,
-  RESEND_DEPTH_FUNCTION              = 1 << 10,
-  RESEND_RENDER_MODE                 = 1 << 11,
-  RESEND_STENCIL_FUNCTION            = 1 << 12,
-  RESEND_STENCIL_FUNCTION_MASK       = 1 << 13,
-  RESEND_STENCIL_FUNCTION_REFERENCE  = 1 << 14,
-  RESEND_STENCIL_MASK                = 1 << 15,
-  RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 16,
-  RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 17,
-  RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 18,
-  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 19,
-};
-
 } // Anonymous namespace
 
 namespace Dali
@@ -158,7 +133,8 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-: mRenderDataProvider(),
+: mGraphics( nullptr ),
+  mRenderDataProvider(),
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
@@ -168,7 +144,6 @@ Renderer::Renderer()
   mIndexedDrawElementsCount( 0u ),
   mBlendBitmask( 0u ),
   mRegenerateUniformMap( 0u ),
-  mResendFlag( 0u ),
   mDepthFunction( DepthFunction::LESS ),
   mFaceCullingMode( FaceCullingMode::NONE ),
   mBlendMode( BlendMode::AUTO ),
@@ -204,6 +179,30 @@ void Renderer::operator delete( void* ptr )
   gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
 }
 
+void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
+{
+  mGraphics = &graphics;
+
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+
+  mRenderDataProvider = std::make_unique< RenderDataProvider >();
+
+  mRenderDataProvider->mUniformMapDataProvider = this;
+  mRenderDataProvider->mShader = mShader;
+
+  if( mTextureSet )
+  {
+    size_t textureCount = mTextureSet->GetTextureCount();
+    mRenderDataProvider->mTextures.resize( textureCount );
+    mRenderDataProvider->mSamplers.resize( textureCount );
+    for( unsigned int i(0); i<textureCount; ++i )
+    {
+      mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
+      mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
+    }
+  }
+}
+
 
 void* AllocateUniformBufferMemory( size_t size )
 {
@@ -211,9 +210,48 @@ void* AllocateUniformBufferMemory( size_t size )
 }
 
 
-
-void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex )
+void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex )
 {
+
+  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
+  {
+    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
+    {
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      localMap.Resize(0);
+
+      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+      AddMappings( localMap, rendererUniformMap );
+
+      if( mShader )
+      {
+        AddMappings( localMap, mShader->GetUniformMap() );
+      }
+    }
+    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
+    {
+      // Copy old map into current map
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
+
+      localMap.Resize( oldMap.Count() );
+
+      unsigned int index=0;
+      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
+      {
+        localMap[index] = *iter;
+      }
+    }
+
+    mUniformMapChanged[updateBufferIndex] = true;
+    mRegenerateUniformMap--;
+  }
+}
+
+void Renderer::PrepareRender( BufferIndex updateBufferIndex )
+{
+  auto& controller = mGraphics->GetController();
+
   // prepare all stuff
   auto gfxShader = mShader->GetGfxObject();
 
@@ -249,42 +287,7 @@ void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex
     }
   }
 
-  /**
-   * REGENERATE UNIFORM MAP
-   */
-  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
-  {
-    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      localMap.Resize(0);
-
-      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-      AddMappings( localMap, rendererUniformMap );
-
-      if( mShader )
-      {
-        AddMappings( localMap, mShader->GetUniformMap() );
-      }
-    }
-    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
-    {
-      // Copy old map into current map
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
-
-      localMap.Resize( oldMap.Count() );
-
-      unsigned int index = 0;
-      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
-      {
-        localMap[index] = *iter;
-      }
-    }
-
-    mUniformMapChanged[updateBufferIndex] = true;
-    mRegenerateUniformMap--;
-  }
+  UpdateUniformMap( updateBufferIndex );
 
   auto& shader = mShader->GetGfxObject().Get();
   auto uboCount = shader.GetUniformBlockCount();
@@ -292,7 +295,7 @@ void Renderer::PrepareRender( Graphics::API::Controller& controller, BufferIndex
   auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings( uboCount );
 
   // allocate new command ( may be not necessary at all )
- // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
+  // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
 
   // see if we need to reallocate memory for each UBO
   // todo: do it only when shader has changed
@@ -430,49 +433,6 @@ void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t
   }
 }
 
-void Renderer::PrepareRender( BufferIndex updateBufferIndex )
-{
-
-  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
-  {
-    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      localMap.Resize(0);
-
-      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-      AddMappings( localMap, rendererUniformMap );
-
-      if( mShader )
-      {
-        AddMappings( localMap, mShader->GetUniformMap() );
-      }
-    }
-    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
-    {
-      // Copy old map into current map
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
-
-      localMap.Resize( oldMap.Count() );
-
-      unsigned int index=0;
-      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
-      {
-        localMap[index] = *iter;
-      }
-    }
-
-    mUniformMapChanged[updateBufferIndex] = true;
-    mRegenerateUniformMap--;
-  }
-
-  if( mResendFlag != 0 )
-  {
-    // This used to send messages to obsolete Render::Renderer at this point
-    mResendFlag = 0;
-  }
-}
 
 void Renderer::SetTextures( TextureSet* textureSet )
 {
@@ -486,7 +446,6 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -501,7 +460,6 @@ void Renderer::SetShader( Shader* shader )
   mShader = shader;
   mShader->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::SetGeometry( SceneGraph::Geometry* geometry )
@@ -518,7 +476,6 @@ void Renderer::SetDepthIndex( int depthIndex )
 void Renderer::SetFaceCullingMode( FaceCullingMode::Type faceCullingMode )
 {
   mFaceCullingMode = faceCullingMode;
-  mResendFlag |= RESEND_FACE_CULLING_MODE;
 }
 
 void Renderer::SetBlendMode( BlendMode::Type blendingMode )
@@ -531,7 +488,6 @@ void Renderer::SetBlendingOptions( unsigned int options )
   if( mBlendBitmask != options)
   {
     mBlendBitmask = options;
-    mResendFlag |= RESEND_BLEND_BIT_MASK;
   }
 }
 
@@ -552,120 +508,76 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
       *mBlendColor = blendColor;
     }
   }
-
-  mResendFlag |= RESEND_BLEND_COLOR;
 }
 
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
-  mResendFlag |= RESEND_INDEXED_DRAW_FIRST_ELEMENT;
 }
 
 void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
 {
   mIndexedDrawElementsCount = elementsCount;
-  mResendFlag |= RESEND_INDEXED_DRAW_ELEMENTS_COUNT;
 }
 
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
   mPremultipledAlphaEnabled = preMultipled;
-  mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
 {
   mDepthWriteMode = depthWriteMode;
-  mResendFlag |= RESEND_DEPTH_WRITE_MODE;
 }
 
 void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
 {
   mDepthTestMode = depthTestMode;
-  mResendFlag |= RESEND_DEPTH_TEST_MODE;
 }
 
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
-  mResendFlag |= RESEND_DEPTH_FUNCTION;
 }
 
 void Renderer::SetRenderMode( RenderMode::Type mode )
 {
   mStencilParameters.renderMode = mode;
-  mResendFlag |= RESEND_RENDER_MODE;
 }
 
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
 {
   mStencilParameters.stencilFunction = stencilFunction;
-  mResendFlag |= RESEND_STENCIL_FUNCTION;
 }
 
 void Renderer::SetStencilFunctionMask( int stencilFunctionMask )
 {
   mStencilParameters.stencilFunctionMask = stencilFunctionMask;
-  mResendFlag |= RESEND_STENCIL_FUNCTION_MASK;
 }
 
 void Renderer::SetStencilFunctionReference( int stencilFunctionReference )
 {
   mStencilParameters.stencilFunctionReference = stencilFunctionReference;
-  mResendFlag |= RESEND_STENCIL_FUNCTION_REFERENCE;
 }
 
 void Renderer::SetStencilMask( int stencilMask )
 {
   mStencilParameters.stencilMask = stencilMask;
-  mResendFlag |= RESEND_STENCIL_MASK;
 }
 
 void Renderer::SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail )
 {
   mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
-  mResendFlag |= RESEND_STENCIL_OPERATION_ON_FAIL;
 }
 
 void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail )
 {
   mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
-  mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_FAIL;
 }
 
 void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
-  mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
-}
-
-//Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
-void Renderer::ConnectToSceneGraph( BufferIndex bufferIndex )
-{
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  mRenderDataProvider = std::make_unique< RenderDataProvider >();
-
-  mRenderDataProvider->mUniformMapDataProvider = this;
-  mRenderDataProvider->mShader = mShader;
-
-  if( mTextureSet )
-  {
-    size_t textureCount = mTextureSet->GetTextureCount();
-    mRenderDataProvider->mTextures.resize( textureCount );
-    mRenderDataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
-    {
-      mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
-      mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
-    }
-  }
-}
-
-//Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
-void Renderer::DisconnectFromSceneGraph(  BufferIndex bufferIndex )
-{
 }
 
 const Vector4& Renderer::GetBlendColor() const
@@ -727,23 +639,18 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
 
 void Renderer::TextureSetChanged()
 {
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::TextureSetDeleted()
 {
   mTextureSet = NULL;
-
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
+
 void Renderer::ConnectionsChanged( PropertyOwner& object )
 {
   // One of our child objects has changed it's connections. Ensure the uniform
   // map gets regenerated during PrepareRender
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  // Ensure the child object pointers get re-sent to the renderer
-  mResendFlag |= RESEND_DATA_PROVIDER;
 }
 
 void Renderer::ConnectedUniformMapChanged()

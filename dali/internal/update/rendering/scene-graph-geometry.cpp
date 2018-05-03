@@ -30,7 +30,8 @@ namespace SceneGraph
 {
 
 Geometry::Geometry()
-: mIndices(),
+: mGraphics( nullptr ),
+  mIndices(),
   mGeometryType( Dali::Geometry::TRIANGLES ),
   mIndicesChanged(false),
   mHasBeenUpdated(false),
