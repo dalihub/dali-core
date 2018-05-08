@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd34c0ef_a1937399",
+        "filename": "dali/internal/common/core-impl.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013929
+      },
+      "writtenOn": "2018-05-08T07:05:54Z",
+      "side": 1,
+      "message": "This file is removed in this patch.\nCan this patch run?",
+      "revId": "3d6004a410ab436e8fe7b1a99555fa50f3830eee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
