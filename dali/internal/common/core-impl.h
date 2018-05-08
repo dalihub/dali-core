@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/view-mode.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
@@ -87,26 +86,6 @@ public:
    * Destructor
    */
   ~Core();
-
-  /**
-   * @copydoc Dali::Integration::Core::GetContextNotifier()
-   */
-  Integration::ContextNotifierInterface* GetContextNotifier();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextCreated()
-   */
-  void ContextCreated();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextDestroyed()
-   */
-  void ContextDestroyed();
-
-  /**
-   * @copydoc Dali::Integration::Core::RecoverFromContextLoss()
-   */
-  void RecoverFromContextLoss();
 
   /**
    * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int)

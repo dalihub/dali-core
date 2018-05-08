@@ -2,7 +2,7 @@
 #define __DALI_STAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,6 +336,8 @@ public:
   WheelEventSignalType& WheelEventSignal();
 
   /**
+   * @DEPRECATED_1_3.20 Not relevant for new Graphics API.
+   *
    * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).
    *
    * If the application is responsible for handling context loss, it should listen to
@@ -346,11 +348,14 @@ public:
   ContextStatusSignal& ContextLostSignal();
 
   /**
+   * @DEPRECATED_1_3.20 Not relevant for new Graphics API.
+   *
    * @brief This signal is emitted when the GL context is regained (Platform specific
    * behavior).
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and rebuild UI components on receipt.
+   * @deprecate
    * @SINCE_1_0.0
    * @return The context regained signal to connect to
    */

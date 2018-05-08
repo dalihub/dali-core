@@ -153,31 +153,6 @@ Core::~Core()
 
   // remove (last?) reference to stage
   mStage.Reset();
-
-}
-
-Integration::ContextNotifierInterface* Core::GetContextNotifier()
-{
-  return mStage.Get();
-}
-
-void Core::RecoverFromContextLoss()
-{
-  DALI_LOG_INFO(gCoreFilter, Debug::Verbose, "Core::RecoverFromContextLoss()\n");
-
-  mStage->GetRenderTaskList().RecoverFromContextLoss(); // Re-trigger render-tasks
-}
-
-void Core::ContextCreated()
-{
-  // TODO:
-  DALI_LOG_ERROR("TODO: NOTIFY CONTEXT CREATED\n");
-}
-
-void Core::ContextDestroyed()
-{
-  // TODO:
-  DALI_LOG_ERROR("TODO: NOTIFY CONTEXT DESTROYED\n");
 }
 
 void Core::SurfaceResized( unsigned int width, unsigned int height )
