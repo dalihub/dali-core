@@ -194,9 +194,6 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
     // The depth buffer must be enabled if either reading or writing.
     context.EnableDepthBuffer( true );
 
-    // Set up the depth mask based on our depth write setting.
-    context.DepthMask( enableDepthWrite );
-
     // Look-up the GL depth function from the Dali::DepthFunction enum, and set it.
     context.DepthFunc( DaliDepthToGLDepthTable[ item.mRenderer->GetDepthFunction() ] );
 
@@ -210,8 +207,12 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
       firstDepthBufferUse = false;
 
       // Note: The buffer will only be cleared if written to since a previous clear.
+      context.DepthMask( true );
       context.Clear( GL_DEPTH_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
     }
+
+    // Set up the depth mask based on our depth write setting.
+    context.DepthMask( enableDepthWrite );
   }
   else
   {
