@@ -50,6 +50,7 @@ my @system_packages = (
     "libcurl4-gnutls-dev",
     "curl",
     "libssl-dev",
+    "cifs-utils",
 );
 
 # Some packages like require building from source
