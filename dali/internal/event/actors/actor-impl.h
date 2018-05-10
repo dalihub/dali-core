@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1425,6 +1425,18 @@ public:
   void EmitLayoutDirectionChangedSignal( LayoutDirection::Type type );
 
   /**
+   * @brief Emits the ChildAdded signal for this actor
+   * @param[in] child The child actor that has been added
+   */
+  void EmitChildAddedSignal( Actor& child );
+
+  /**
+   * @brief Emits the ChildRemoved signal for this actor
+   * @param[in] child The child actor that has been removed
+   */
+  void EmitChildRemovedSignal( Actor& child );
+
+  /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalType& TouchedSignal();
@@ -1468,6 +1480,16 @@ public:
    * @copydoc LayoutDirectionChangedSignal
    */
   Dali::Actor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
+
+  /**
+   * @copydoc DevelActor::ChildAddedSignal
+   */
+  DevelActor::ChildChangedSignalType& ChildAddedSignal();
+
+  /**
+   * @copydoc DevelActor::ChildRemovedSignal
+   */
+  DevelActor::ChildChangedSignalType& ChildRemovedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1733,11 +1755,9 @@ private:
     };
   };
 
-  // Undefined
-  Actor();
-
-  // Undefined
-  Actor( const Actor& );
+  // Remove default constructor and copy constructor
+  Actor()=delete;
+  Actor( const Actor& )=delete;
 
   // Undefined
   Actor& operator=( const Actor& rhs );
@@ -1964,6 +1984,8 @@ protected:
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
+  DevelActor::ChildChangedSignalType       mChildAddedSignal;
+  DevelActor::ChildChangedSignalType       mChildRemovedSignal;
 
   Quaternion      mTargetOrientation; ///< Event-side storage for orientation
   Vector4         mTargetColor;       ///< Event-side storage for color

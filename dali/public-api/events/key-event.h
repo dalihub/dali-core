@@ -127,6 +127,14 @@ struct DALI_IMPORT_API KeyEvent
   bool IsAltModifier() const;
 
   /**
+   * @brief Get the key compose string.
+   *
+   * @SINCE_1_3.22
+   * @return The compose string
+   */
+  std::string GetCompose() const;
+
+  /**
    * @brief Get the device name the key event originated from.
    *
    * @SINCE_1_2.60

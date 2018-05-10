@@ -49,6 +49,22 @@ public:
   KeyEventImpl& operator=( const KeyEventImpl& rhs );
 
   /**
+   * @brief Get the compose string.
+   *
+   * @return The compose string.
+   */
+   std::string GetCompose() const;
+
+  /**
+   * @brief Set the compose string to the KeyEvent
+   * A string if this keystroke has modified a string in the middle of being composed,
+   * this string replaces the previous one.
+   *
+   * @param[in] compose The compose string to set
+   */
+  void SetCompose( const std::string& compose );
+
+  /**
    * @brief Get the device name the key event originated from
    *
    * @return The device name
@@ -100,6 +116,7 @@ private:
 
 private:
 
+  std::string mCompose;
   std::string mDeviceName;
   Device::Class::Type mDeviceClass;
   Device::Subclass::Type mDeviceSubclass;

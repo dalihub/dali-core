@@ -61,8 +61,10 @@ struct KeyEvent : public Event
    * @param[in]  keyModifier   The key modifier for special keys like shift and alt
    * @param[in]  timeStamp     The time (in ms) that the key event occurred.
    * @param[in]  keyState      The state of the key event.
+   * @param[in]  compose       The key compose
    * @param[in]  deviceName    Name of device KeyEvent originated from
    * @param[in]  deviceClass   Class of device KeyEvent originated from
+   * @param[in]  deviceSubclass  Subclass of device KeyEvent originated from
    */
   KeyEvent(const std::string& keyName,
            const std::string& keyString,
@@ -70,6 +72,7 @@ struct KeyEvent : public Event
            int keyModifier,
            unsigned long timeStamp,
            const State& keyState,
+           const std::string& compose,
            const std::string& deviceName,
            const Device::Class::Type deviceClass,
            const Device::Subclass::Type deviceSubclass );
@@ -117,6 +120,11 @@ struct KeyEvent : public Event
    * @see State
    */
   State state;
+
+  /**
+   * A string if this keystroke has modified a string in the middle of being composed - this string replaces the previous one.
+   */
+  std::string compose;
 
   /**
    * Name of device KeyEvent originated from

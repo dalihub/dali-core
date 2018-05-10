@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,21 @@ struct VisibilityChangedFunctor
   }
 
   VisibilityChangedFunctorData& data;
+};
+
+
+struct VisibilityChangedVoidFunctor
+{
+  VisibilityChangedVoidFunctor(bool& signalCalled)
+  : mSignalCalled( signalCalled )
+  { }
+
+  void operator()()
+  {
+    mSignalCalled  = true;
+  }
+
+  bool& mSignalCalled;
 };
 
 } // anonymous namespace
@@ -6513,6 +6528,38 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
 }
 
 
+int utcDaliActorVisibilityChangeSignalByName(void)
+{
+  TestApplication application;
+  tet_infoline( "Check that the visibility change signal is called when the visibility changes for the actor itself" );
+
+  Actor actor = Actor::New();
+
+  bool signalCalled=false;
+  actor.ConnectSignal( &application, "visibilityChanged", VisibilityChangedVoidFunctor(signalCalled) );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+  actor.SetVisible( false );
+  DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
+
+  tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
+  signalCalled = false;
+  actor.SetVisible( false );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+
+  tet_infoline( "Change the visibility using properties, ensure called" );
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
+
+  tet_infoline( "Set the visibility to current using properties, ensure not called" );
+  signalCalled = false;
+
+  actor.SetProperty( Actor::Property::VISIBLE, true );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 static void LayoutDirectionChanged( Actor actor, LayoutDirection::Type type )
 {
   gLayoutDirectionType = type;
@@ -6602,6 +6649,346 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor8.SetProperty( Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
   DALI_TEST_EQUALS( actor8.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor9.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+struct LayoutDirectionFunctor
+{
+  LayoutDirectionFunctor(bool& signalCalled)
+  : mSignalCalled( signalCalled )
+  {
+  }
+
+  LayoutDirectionFunctor(const LayoutDirectionFunctor& rhs)
+  : mSignalCalled( rhs.mSignalCalled )
+  {
+  }
+
+  void operator()()
+  {
+    mSignalCalled = true;
+  }
+
+  bool& mSignalCalled;
+};
+
+int UtcDaliActorLayoutDirectionSignal(void)
+{
+  TestApplication application;
+  tet_infoline( "Check changing layout direction property sends a signal" );
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( actor.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+  Stage::GetCurrent().Add( actor );
+  bool signalCalled = false;
+  LayoutDirectionFunctor layoutDirectionFunctor(signalCalled);
+
+  actor.ConnectSignal( &application, "layoutDirectionChanged", layoutDirectionFunctor );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+
+  // Test that writing the same value doesn't send a signal
+  actor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+
+  // Test that writing a different value sends the signal
+  signalCalled = false;
+  actor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
+
+  signalCalled = false;
+  actor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+struct ChildAddedSignalCheck
+{
+  ChildAddedSignalCheck( bool& signalReceived, Actor& childHandle )
+  : mSignalReceived( signalReceived ),
+    mChildHandle( childHandle )
+  {
+  }
+
+  void operator() ( Actor childHandle )
+  {
+    mSignalReceived = true;
+    mChildHandle = childHandle;
+  }
+  void operator() ()
+  {
+    mSignalReceived = true;
+    mChildHandle = Actor();
+  }
+
+  bool& mSignalReceived;
+  Actor& mChildHandle;
+};
+
+int UtcDaliChildAddedSignalP1(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildAddedSignalCheck signal( signalReceived, childActor );
+  DevelActor::ChildAddedSignal( stage.GetRootLayer() ).Connect( &application, signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor, actorA, TEST_LOCATION );
+  signalReceived = false;
+
+  auto actorB = Actor::New();
+  stage.Add( actorB );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor, actorB, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliChildAddedSignalP2(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildAddedSignalCheck signal( signalReceived, childActor );
+  tet_infoline( "Connect to childAdded signal by name" );
+
+  stage.GetRootLayer().ConnectSignal( &application, "childAdded", signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+
+  // Can't test which actor was added; signal signature is void() when connecting via name.
+  signalReceived = false;
+
+  auto actorB = Actor::New();
+  stage.Add( actorB );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliChildAddedSignalN(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildAddedSignalCheck signal( signalReceived, childActor );
+  DevelActor::ChildAddedSignal( stage.GetRootLayer() ).Connect( &application, signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor, actorA, TEST_LOCATION );
+  signalReceived = false;
+
+  auto actorB = Actor::New();
+  actorA.Add( actorB );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  END_TEST;
+}
+
+
+struct ChildRemovedSignalCheck
+{
+  ChildRemovedSignalCheck( bool& signalReceived, Actor& childHandle )
+  : mSignalReceived( signalReceived ),
+    mChildHandle( childHandle )
+  {
+  }
+
+  void operator() ( Actor childHandle )
+  {
+    mSignalReceived = true;
+    mChildHandle = childHandle;
+  }
+
+  void operator() ()
+  {
+    mSignalReceived = true;
+  }
+
+  bool& mSignalReceived;
+  Actor& mChildHandle;
+};
+
+int UtcDaliChildRemovedSignalP1(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildRemovedSignalCheck signal( signalReceived, childActor );
+  DevelActor::ChildRemovedSignal( stage.GetRootLayer() ).Connect( &application, signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  DALI_TEST_CHECK( !childActor );
+
+  stage.Remove( actorA );
+  DALI_TEST_EQUALS( childActor, actorA, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+
+  signalReceived = false;
+  auto actorB = Actor::New();
+  stage.Add( actorB );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  stage.Remove( actorB );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor, actorB, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliChildRemovedSignalP2(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildAddedSignalCheck signal( signalReceived, childActor );
+  tet_infoline( "Connect to childRemoved signal by name" );
+
+  stage.GetRootLayer().ConnectSignal( &application, "childRemoved", signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  stage.Remove( actorA );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+
+  signalReceived = false;
+  auto actorB = Actor::New();
+  stage.Add( actorB );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  stage.Remove( actorB );
+  DALI_TEST_EQUALS( signalReceived, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliChildRemovedSignalN(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool signalReceived=false;
+  Actor childActor;
+
+  ChildRemovedSignalCheck signal( signalReceived, childActor );
+  DevelActor::ChildRemovedSignal( stage.GetRootLayer() ).Connect( &application, signal );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  auto actorA = Actor::New();
+  stage.Add( actorA );
+
+  auto actorB = Actor::New();
+  actorA.Add( actorB );
+
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  DALI_TEST_CHECK( ! childActor );
+
+  actorA.Remove( actorB );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  END_TEST;
+}
+
+
+int UtcDaliChildMovedSignalP(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  bool addedASignalReceived   = false;
+  bool removedASignalReceived = false;
+  bool addedBSignalReceived   = false;
+  bool removedBSignalReceived = false;
+  Actor childActor;
+
+  auto actorA = Actor::New();
+  auto actorB = Actor::New();
+  stage.Add( actorA );
+  stage.Add( actorB );
+
+  ChildAddedSignalCheck addedSignalA( addedASignalReceived, childActor );
+  ChildRemovedSignalCheck removedSignalA( removedASignalReceived, childActor );
+  ChildAddedSignalCheck addedSignalB( addedBSignalReceived, childActor );
+  ChildRemovedSignalCheck removedSignalB( removedBSignalReceived, childActor );
+
+  DevelActor::ChildAddedSignal( actorA ).Connect( &application, addedSignalA );
+  DevelActor::ChildRemovedSignal( actorA ).Connect( &application, removedSignalA );
+  DevelActor::ChildAddedSignal( actorB ).Connect( &application, addedSignalB );
+  DevelActor::ChildRemovedSignal( actorB ).Connect( &application, removedSignalB );
+
+  DALI_TEST_EQUALS( addedASignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedASignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( addedBSignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedBSignalReceived, false, TEST_LOCATION );
+
+  // Create a child of A
+
+  auto child = Actor::New();
+  actorA.Add( child );
+
+  DALI_TEST_EQUALS( addedASignalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedASignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( addedBSignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedBSignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( childActor, child, TEST_LOCATION );
+
+  // Move child to B:
+  addedASignalReceived   = false;
+  addedBSignalReceived   = false;
+  removedASignalReceived = false;
+  removedBSignalReceived = false;
+
+  actorB.Add( child ); // Expect this child to be re-parented
+  DALI_TEST_EQUALS( addedASignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedASignalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( addedBSignalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedBSignalReceived, false, TEST_LOCATION );
+
+  // Move child back to A:
+  addedASignalReceived   = false;
+  addedBSignalReceived   = false;
+  removedASignalReceived = false;
+  removedBSignalReceived = false;
+
+  actorA.Add( child ); // Expect this child to be re-parented
+  DALI_TEST_EQUALS( addedASignalReceived, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedASignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( addedBSignalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( removedBSignalReceived, true, TEST_LOCATION );
+
 
   END_TEST;
 }
