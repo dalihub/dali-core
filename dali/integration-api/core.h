@@ -339,7 +339,7 @@ public:
    * @param[out] status showing whether update is required to run.
    * @todo GRAPHICS - REMOVE
    */
-  void Render( RenderStatus& status );
+  void Render( RenderStatus& status, bool forceClear );
 
   // System-level overlay
 

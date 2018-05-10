@@ -22,10 +22,17 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 
+#include <dali/integration-api/debug.h>
+
 #include <deque>
 
+namespace // unnamed namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN");
+#endif
+}
 
-#define debug( x ) std::cout << x << std::endl;
 
 namespace Dali
 {
@@ -79,7 +86,7 @@ struct Ubo::Impl
   uint32_t WriteKeepMapped( const void* data, uint32_t offset, uint32_t size )
   {
     void* ptr = mPool.Map( mUbo );
-    debug( "[UBO] Writing " << size << " bytes into: " << ptr );
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "[UBO] Writing " << size << " bytes into: " << ptr );
     memcpy( ptr, reinterpret_cast<const char*>(data)+offset, size );
     return size;
   }
@@ -139,7 +146,7 @@ struct UboPool::Impl
     mAllocationQueue.pop_back();
     uint32_t heapIndex = allocationIndex / mInitialCapacity;
 
-    debug("[POOL] Allocated block size " << mBlockSize << ", index: " << allocationIndex);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Allocated block size " << mBlockSize << ", index: " << allocationIndex);
 
     auto allocationIndexInPage = uint32_t(allocationIndex % mInitialCapacity);
 
@@ -166,7 +173,7 @@ struct UboPool::Impl
 
   void NewUboBuffer()
   {
-    debug("[POOL] Allocating new page of block size " << mBlockSize << ", capacity: " << mInitialCapacity);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Allocating new page of block size " << mBlockSize << ", capacity: " << mInitialCapacity);
     // add new Vulkan Buffer object
     auto& graphics = mController.GetGraphics();
     mBuffers.emplace_back( Vulkan::Buffer::New( graphics, vk::BufferCreateInfo{}
@@ -191,7 +198,7 @@ struct UboPool::Impl
     auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
     auto allocationIndex = uint32_t(impl.mAllocationInfo.allocationIndex % mInitialCapacity);
 
-    debug("[POOL] Mapping UBO = alloc_index = " << impl.mAllocationInfo.allocationIndex);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping UBO = alloc_index = " << impl.mAllocationInfo.allocationIndex);
 
     return MapBuffer<char>( bufferIndex ) + (allocationIndex*mBlockSize);
   }
@@ -201,7 +208,7 @@ struct UboPool::Impl
   {
     if( !mBuffers[bufferIndex].mappedPtr )
     {
-      debug("[POOL] Mapping PAGE = " << bufferIndex);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping PAGE = " << bufferIndex);
       mBuffers[bufferIndex].mappedPtr = mBuffers[bufferIndex].buffer->GetMemoryHandle()->Map();
     }
 
@@ -212,7 +219,7 @@ struct UboPool::Impl
   {
     if( mBuffers[bufferIndex].mappedPtr )
     {
-      debug("[POOL] Unmapping PAGE = " << bufferIndex);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Unmapping PAGE = " << bufferIndex);
       mBuffers[bufferIndex].buffer->GetMemoryHandle()->Unmap();
       mBuffers[bufferIndex].mappedPtr = nullptr;
     }
@@ -221,7 +228,7 @@ struct UboPool::Impl
   void Unmap( Ubo& ubo )
   {
     auto& impl = ubo.GetImplementation();
-    debug("[POOL] Mapping UBO = alloc[" << impl.mAllocationInfo.allocationIndex);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping UBO = alloc[" << impl.mAllocationInfo.allocationIndex);
     auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
     UnmapBuffer( bufferIndex );
   }
@@ -353,4 +360,3 @@ Ubo::Impl& Ubo::GetImplementation()
 }
 }
 }
-

@@ -63,6 +63,13 @@ using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 extern std::vector<uint8_t> VSH;
 extern std::vector<uint8_t> FSH;
 
+namespace // unnamed namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN");
+#endif
+}
+
 template<typename T, typename... Args>
 std::unique_ptr<T> MakeUnique( Args&&... args )
 {
@@ -569,12 +576,11 @@ void spirv_test0( std::vector<SPIRVWord> code )
 {
   auto shader = SPIRVUtils::Parse( code, vk::ShaderStageFlagBits::eVertex );
   auto opcodeCount = shader->GetOpCodeCount();
-  std::cout << "opcodecount" << opcodeCount << std::endl;
+  DEBUG_LOG_STREAMS( gVulkanFilter, Debug::General, "opcodecount" << opcodeCount );
 
   auto layoutCreateInfo = shader->GenerateDescriptorSetLayoutCreateInfo();
 
-  std::cout<< "yay!" <<std::endl;
-
+  DEBUG_LOG_STREAMS( gVulkanFilter, Debug::General, "yay!" );
 }
 
 void RunSPIRVTest()

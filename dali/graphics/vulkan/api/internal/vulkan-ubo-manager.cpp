@@ -17,8 +17,14 @@
 
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
+#include <dali/integration-api/debug.h>
 
-#define debug( x ) std::cout << x << std::endl;
+namespace // unnamed namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVulkanFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VULKAN" );
+#endif
+}
 
 namespace Dali
 {
@@ -131,4 +137,3 @@ void UboManager::UnmapAllBuffers()
 }
 }
 }
-

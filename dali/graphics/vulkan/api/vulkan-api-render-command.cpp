@@ -36,8 +36,15 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
-#include <iostream>
-#define debug( x ) std::cout << x << std::endl;
+#include <dali/integration-api/debug.h>
+
+namespace // unnamed namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN");
+#endif
+}
+
 
 namespace Dali
 {
@@ -473,8 +480,8 @@ void RenderCommand::BindUniformBuffers()
 
     auto offset = ubo->GetBindingOffset();
     auto size = ubo->GetBindingSize();
-    std::cout << "offset: " << offset << ", size: " << size << std::endl;
-    debug("[RenderCommand] BindingUBO: binding = " << pc.binding);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding);
     mDescriptorSets[0]->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
   }
 }
@@ -485,7 +492,7 @@ void RenderCommand::BindTexturesAndSamplers()
   for( auto&& texture : mTextureBindings )
   {
     auto& image = static_cast<VulkanAPI::Texture&>( texture.texture.Get() );
-    debug("[RenderCommand] BindingTextureSampler: binding = " << texture.binding);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingTextureSampler: binding = " << texture.binding);
     mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetTextureRef()->GetSampler(), image.GetTextureRef()->GetImageView() );
   }
 }

@@ -2,6 +2,7 @@
 
 layout(location=0) in vec2 aPosition;
 layout(location=0) out vec2 vTexCoord;
+layout(location=1) out vec2 vMaskTexCoord;
 
 layout(set = 0, binding = 0, std140) uniform VertData
 {
@@ -31,13 +32,15 @@ void main()
   vec2 stretch      = floor( aPosition * 0.5 );
   vec2 fixedTotal   = uFixed[ 2 ];
 
-  vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
+  vec4 gridPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
+  vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= size * vec2( 0.5, 0.5 );
-  vertexPosition.xy =  vertexPosition.xy + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
+  vertexPosition.xy += anchorPoint*size + (visualOffset + origin)*uSize.xy;
 
   vertexPosition = uMvpMatrix * vertexPosition;
 
   vTexCoord = ( fixedFactor + stretch * uStretchTotal ) / ( fixedTotal + uStretchTotal );
 
+  vMaskTexCoord = gridPosition.xy / size;
   gl_Position = vertexPosition;
 }
