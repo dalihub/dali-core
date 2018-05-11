@@ -93,7 +93,7 @@ class TypeRegistry;
  *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeRegistry : public BaseHandle
+class DALI_CORE_API TypeRegistry : public BaseHandle
 {
 public:
   /**
@@ -185,7 +185,7 @@ public: // Not intended for application developers
  * @brief Registers a type from type info.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeRegistration
+class DALI_CORE_API TypeRegistration
 {
 public:
   /**
@@ -241,7 +241,7 @@ private:
  * @brief Registers a signal connector function to a registered type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SignalConnectorType
+class DALI_CORE_API SignalConnectorType
 {
 public:
   /**
@@ -259,7 +259,7 @@ public:
  * @brief Registers an action function.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeAction
+class DALI_CORE_API TypeAction
 {
 public:
   /**
@@ -277,7 +277,7 @@ public:
  * @brief Registers a property for the given type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API PropertyRegistration
+class DALI_CORE_API PropertyRegistration
 {
 public:
 
@@ -316,7 +316,7 @@ public:
  * @brief Registers an animatable property for the given type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API AnimatablePropertyRegistration
+class DALI_CORE_API AnimatablePropertyRegistration
 {
 public:
 
@@ -357,7 +357,7 @@ public:
  * @brief Registers a component of animatable property for the given component index.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API AnimatablePropertyComponentRegistration
+class DALI_CORE_API AnimatablePropertyComponentRegistration
 {
 public:
 
@@ -385,7 +385,7 @@ public:
  * @brief Registers a child property for the given type.
  * @SINCE_1_1.35
  */
-class DALI_IMPORT_API ChildPropertyRegistration
+class DALI_CORE_API ChildPropertyRegistration
 {
 public:
 

@@ -2,7 +2,7 @@
 #define __DALI_CONSTANTS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,15 +47,15 @@ static const float LEFT = 0.0f;
 static const float RIGHT = 1.0f;
 static const float MIDDLE = 0.5f;
 
-DALI_IMPORT_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
 
 }
 
@@ -74,15 +74,15 @@ static const float RIGHT = 1.0f;
 static const float MIDDLE = 0.5f;
 
 extern const Vector3 DEFAULT; ///< CENTER
-DALI_IMPORT_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-DALI_IMPORT_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
+DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
 
 }
 
@@ -95,18 +95,18 @@ DALI_IMPORT_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
  */
 namespace Color
 {
-DALI_IMPORT_API extern const Vector4 BLACK;       ///< Pure black (0.0f, 0.0f, 0.0f, 1.0f);
-DALI_IMPORT_API extern const Vector4 WHITE;       ///< Pure white (1.0f, 1.0f, 1.0f, 1.0f);
+DALI_CORE_API extern const Vector4 BLACK;       ///< Pure black (0.0f, 0.0f, 0.0f, 1.0f);
+DALI_CORE_API extern const Vector4 WHITE;       ///< Pure white (1.0f, 1.0f, 1.0f, 1.0f);
 
-DALI_IMPORT_API extern const Vector4 RED;         ///< Pure red   (1.0f, 0.0f, 0.0f, 1.0f);
-DALI_IMPORT_API extern const Vector4 GREEN;       ///< Pure green (0.0f, 1.0f, 0.0f, 1.0f);
-DALI_IMPORT_API extern const Vector4 BLUE;        ///< Pure blue  (0.0f, 0.0f, 1.0f, 1.0f);
+DALI_CORE_API extern const Vector4 RED;         ///< Pure red   (1.0f, 0.0f, 0.0f, 1.0f);
+DALI_CORE_API extern const Vector4 GREEN;       ///< Pure green (0.0f, 1.0f, 0.0f, 1.0f);
+DALI_CORE_API extern const Vector4 BLUE;        ///< Pure blue  (0.0f, 0.0f, 1.0f, 1.0f);
 
-DALI_IMPORT_API extern const Vector4 YELLOW;      ///< Pure yellow  (1.0f, 1.0f, 0.0f, 1.0f);
-DALI_IMPORT_API extern const Vector4 MAGENTA;     ///< Pure magenta (1.0f, 0.0f, 1.0f, 1.0f);
-DALI_IMPORT_API extern const Vector4 CYAN;        ///< Pure cyan    (0.0f, 1.0f, 1.0f, 1.0f);
+DALI_CORE_API extern const Vector4 YELLOW;      ///< Pure yellow  (1.0f, 1.0f, 0.0f, 1.0f);
+DALI_CORE_API extern const Vector4 MAGENTA;     ///< Pure magenta (1.0f, 0.0f, 1.0f, 1.0f);
+DALI_CORE_API extern const Vector4 CYAN;        ///< Pure cyan    (0.0f, 1.0f, 1.0f, 1.0f);
 
-DALI_IMPORT_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f);
+DALI_CORE_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f);
 
 } // namespace Color
 
@@ -116,12 +116,12 @@ DALI_IMPORT_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 
  */
 namespace Math
 {
-DALI_IMPORT_API extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
-DALI_IMPORT_API extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
-DALI_IMPORT_API extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
-DALI_IMPORT_API extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
-DALI_IMPORT_API extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
-DALI_IMPORT_API extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
+DALI_CORE_API extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
+DALI_CORE_API extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
+DALI_CORE_API extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
+DALI_CORE_API extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
+DALI_CORE_API extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
+DALI_CORE_API extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
 
 // float is preferred to double for performance on ARM targets
 static const float PI   = static_cast<float>(M_PI);       ///< Constant representing PI

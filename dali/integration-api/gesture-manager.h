@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_GESTURE_MANAGER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Integration
  * by the adaptor. A concrete implementation must be created for each adaptor, and provided when creating
  * the Dali::Integration::Core object.
  */
-class DALI_IMPORT_API GestureManager
+class DALI_CORE_API GestureManager
 {
 public:
 

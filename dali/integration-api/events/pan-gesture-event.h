@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_PAN_GESTURE_EVENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/integration-api/events/gesture-event.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -42,7 +42,7 @@ namespace Integration
  * A Started state will be ignored if a Possible state does not precede it.
  * Likewise, a Continuing or Finished state will be ignored if a Started state does not precede it.
  */
-struct PanGestureEvent: public GestureEvent
+struct DALI_CORE_API PanGestureEvent: public GestureEvent
 {
   // Construction & Destruction
 

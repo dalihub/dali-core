@@ -2,7 +2,7 @@
 #define __DALI_CUSTOM_ACTOR_IMPL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
  * And CustomActorImpl is typically owned by a single CustomActor instance; see also CustomActor::CustomActor( CustomActorImpl &implementation ).
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
+class DALI_CORE_API CustomActorImpl : public Dali::RefObject
 {
 public:
 

@@ -2,7 +2,7 @@
 #define __DALI_DEGREE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ struct Degree
    * @SINCE_1_0.0
    * @param[in] value The initial value in Radians
    */
-  DALI_EXPORT_API Degree( Radian value );
+  DALI_CORE_API Degree( Radian value );
 
 public:
 
@@ -76,18 +76,18 @@ public:
 // compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 // useful constant angles
-DALI_EXPORT_API extern const Radian ANGLE_360; ///< 360 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_315; ///< 315 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_270; ///< 270 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_225; ///< 225 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_180; ///< 180 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_135; ///< 135 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_120; ///< 120 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_90;  ///< 90 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_60;  ///< 60 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_45;  ///< 45 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_30;  ///< 30 degree turn in radians
-DALI_EXPORT_API extern const Radian ANGLE_0;   ///< 0 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_360; ///< 360 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_315; ///< 315 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_270; ///< 270 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_225; ///< 225 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_180; ///< 180 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_135; ///< 135 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_120; ///< 120 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_90;  ///< 90 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_60;  ///< 60 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_45;  ///< 45 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_30;  ///< 30 degree turn in radians
+DALI_CORE_API extern const Radian ANGLE_0;   ///< 0 degree turn in radians
 
 /**
  * @brief Compares equality between two degrees.

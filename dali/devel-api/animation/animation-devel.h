@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace DevelAnimation
  * @param[in] animation the animation object to perform this operation on
  * @param[in] progress the progress percentage to trigger the signal at, e.g .3 for 30%.
  */
-DALI_IMPORT_API void SetProgressNotification( Animation animation, float progress );
+DALI_CORE_API void SetProgressNotification( Animation animation, float progress );
 
 /**
  * @brief Get progress percentage marker that has been set to trigger ProgressHasBeenReachedSignal
@@ -41,7 +41,7 @@ DALI_IMPORT_API void SetProgressNotification( Animation animation, float progres
  * @param[in] animation the animation object to perform this operation on
  * @return the percentage to trigger at eg 0.3 for 30%
  */
-DALI_IMPORT_API float GetProgressNotification( Animation animation );
+DALI_CORE_API float GetProgressNotification( Animation animation );
 
 /**
  * @brief Connects to this signal to be notified when an Animation's animations have reached set progress.
@@ -49,7 +49,7 @@ DALI_IMPORT_API float GetProgressNotification( Animation animation );
  * @return A signal object to connect with
  *
  */
-DALI_IMPORT_API Animation::AnimationSignalType& ProgressReachedSignal( Animation animation );
+DALI_CORE_API Animation::AnimationSignalType& ProgressReachedSignal( Animation animation );
 
 } // namespace DevelAnimation
 

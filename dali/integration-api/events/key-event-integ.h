@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/public-api/events/key-event.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -36,7 +36,7 @@ namespace Integration
  * the Dali core.
  *
  */
-struct KeyEvent : public Event
+struct DALI_CORE_API KeyEvent : public Event
 {
   // Enumerations
   // Specifies the state of the key event.

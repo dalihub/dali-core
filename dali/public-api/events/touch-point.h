@@ -2,7 +2,7 @@
 #define __DALI_TOUCH_POINT_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Dali
  * or where touch has stopped.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API TouchPoint
+struct DALI_CORE_API TouchPoint
 {
   // Enumerations
 

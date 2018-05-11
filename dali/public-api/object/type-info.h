@@ -45,7 +45,7 @@ namespace Internal DALI_INTERNAL
  * See TypeRegistry for methods of type registration and TypeInfo retrieval.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeInfo : public BaseHandle
+class DALI_CORE_API TypeInfo : public BaseHandle
 {
 public:
   typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0

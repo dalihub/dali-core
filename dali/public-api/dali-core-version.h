@@ -2,7 +2,7 @@
 #define __DALI_CORE_VERSION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@
 
 namespace Dali
 {
-DALI_IMPORT_API extern const unsigned int CORE_MAJOR_VERSION; ///< The major version number of the Core library.
-DALI_IMPORT_API extern const unsigned int CORE_MINOR_VERSION; ///< The minor version number of the Core library.
-DALI_IMPORT_API extern const unsigned int CORE_MICRO_VERSION; ///< The micro version number of the Core library.
-DALI_IMPORT_API extern const char * const CORE_BUILD_DATE;    ///< The date/time the Core library was built.
+DALI_CORE_API extern const unsigned int CORE_MAJOR_VERSION; ///< The major version number of the Core library.
+DALI_CORE_API extern const unsigned int CORE_MINOR_VERSION; ///< The minor version number of the Core library.
+DALI_CORE_API extern const unsigned int CORE_MICRO_VERSION; ///< The micro version number of the Core library.
+DALI_CORE_API extern const char * const CORE_BUILD_DATE;    ///< The date/time the Core library was built.
 } // namespace Dali
 
 #endif // __DALI_CORE_VERSION_H__

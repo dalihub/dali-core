@@ -171,7 +171,7 @@ private:
  * Interface to enable classes to be processed after the event loop. Classes are processed
  * in the order they are registered.
  */
-class DALI_IMPORT_API Processor
+class DALI_CORE_API Processor
 {
 public:
   /**
@@ -219,7 +219,7 @@ protected:
  * This is the recommended option, so that input processing will not affect the smoothness of animations.
  * Note that the rendering thread must be halted, before destroying the GL context.
  */
-class DALI_IMPORT_API Core
+class DALI_CORE_API Core
 {
 public:
 

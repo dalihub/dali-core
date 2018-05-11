@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_BITMAP_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace Integration
  * @param[out] pixelDataType  pixel data type (eg. GL_UNSIGNED_BYTE)
  * @param[out] internalFormat pixel internal format (eg. GL_RGBA)
  */
-DALI_IMPORT_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
+DALI_CORE_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
 
 class Bitmap;
 typedef IntrusivePtr<Bitmap>    BitmapPtr;
@@ -49,7 +49,7 @@ typedef unsigned char                 PixelBuffer;  ///< Pixel data buffers are 
  * Bitmap class.
  * An abstract container for image data.
  */
-class DALI_IMPORT_API Bitmap : public Dali::RefObject
+class DALI_CORE_API Bitmap : public Dali::RefObject
 {
 protected:
 

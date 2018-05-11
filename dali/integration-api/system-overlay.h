@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_SYSTEM_OVERLAY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace Integration
  * Use this interface to draw content for system-level indicators, dialogs etc.
  * The SystemOverlay is accessible using Dali::Integration::Core::GetSystemOverlay().
  */
-class DALI_IMPORT_API SystemOverlay
+class DALI_CORE_API SystemOverlay
 {
 public:
 

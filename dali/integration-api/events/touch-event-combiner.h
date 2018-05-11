@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ struct HoverEvent;
  * - Motion event throttling is carried out to satisfy the minimum distance and time delta required.
  * - If an interrupted event is received, then any stored Point history is cleared.
  */
-class DALI_IMPORT_API TouchEventCombiner
+class DALI_CORE_API TouchEventCombiner
 {
 public:
 

@@ -2,7 +2,7 @@
 #define __DALI_MATRIX3_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ struct Vector2;
  *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Matrix3
+class DALI_CORE_API Matrix3
 {
 public:
 
@@ -244,7 +244,7 @@ private:
  * @param[in] matrix The matrix to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
+DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
 
 // Allow Matrix3 to be treated as a POD type
 template <> struct TypeTraits< Matrix3 > : public BasicTypes< Matrix3 > { enum { IS_TRIVIAL_TYPE = true }; };
