@@ -51,6 +51,7 @@ my @system_packages = (
     "curl",
     "libssl-dev",
     "cifs-utils",
+    "libgtest-dev",
 );
 
 # Some packages like require building from source
@@ -66,6 +67,7 @@ my @source_pkgs = (
      # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
      # upgrading DALi to use  c++0x or c++11
      "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
+    {"name" => "gtest" },
 );
 
 ### Detect any http proxy, part of v8 installation requires this information
@@ -252,6 +254,12 @@ sub check_source_packages
         if($pkg eq "v8")
         {
             install_v8( $pkgref );
+        }
+        elsif ($pkg eq "gtest")
+        {
+            print "Attempting to build $pkg\n";
+            # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
+            run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
         }
     }
 }
