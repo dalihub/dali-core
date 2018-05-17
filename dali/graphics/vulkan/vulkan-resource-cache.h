@@ -191,7 +191,7 @@ public:
    * @param descriptorPool The DescriptorPool to be removed
    * @return A reference to the ResourceCache
    */
-  ResourceCache& RemoveDescriptorPool( std::unique_ptr<DescriptorPool> descriptorPool );
+  ResourceCache& RemoveDescriptorPool( DescriptorPool& descriptorPool );
 
   /**
    * Removes the specified Framebuffer from the cache
@@ -207,6 +207,7 @@ public:
    */
   ResourceCache& RemoveSampler( Sampler& sampler );
 
+  ResourceCache() = default;
 
   // The cache should not be copyable
   ResourceCache( const ResourceCache& other ) = delete;

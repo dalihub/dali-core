@@ -57,7 +57,7 @@ struct Shader::Impl
     return vk::Result::eErrorInitializationFailed;
   }
 
-  vk::ShaderModule GetVkShaderModule() const
+  vk::ShaderModule GetVkHandle() const
   {
     return mShaderModule;
   }
@@ -100,9 +100,9 @@ Shader::Shader( Graphics& graphics, const vk::ShaderModuleCreateInfo& info )
 
 Shader::~Shader() = default;
 
-vk::ShaderModule Shader::GetVkShaderModule() const
+vk::ShaderModule Shader::GetVkHandle() const
 {
-  return mImpl->GetVkShaderModule();
+  return mImpl->GetVkHandle();
 }
 
 bool Shader::OnDestroy()

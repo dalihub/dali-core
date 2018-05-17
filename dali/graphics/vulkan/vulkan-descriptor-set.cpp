@@ -104,7 +104,7 @@ DescriptorPool::DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCrea
 
 DescriptorPool::~DescriptorPool() = default;
 
-vk::DescriptorPool DescriptorPool::GetVkDescriptorPool() const
+vk::DescriptorPool DescriptorPool::GetVkHandle() const
 {
   return mImpl->mVkDescriptorPool;
 }
@@ -139,7 +139,7 @@ struct DescriptorSet::Impl
     if(mVkDescriptorSet)
     {
       // TODO: @todo non freeable!!!
-      //mGraphics.GetDevice().freeDescriptorSets( mPool.GetVkDescriptorPool(), 1, &mVkDescriptorSet );
+      //mGraphics.GetDevice().freeDescriptorSets( mPool.GetVkHandle(), 1, &mVkDescriptorSet );
     }
   }
 
@@ -151,7 +151,7 @@ struct DescriptorSet::Impl
     auto bufferInfo = vk::DescriptorBufferInfo{}
          .setOffset( U32(offset) )
          .setRange( U32(size) )
-         .setBuffer( buffer->GetVkBuffer() );
+         .setBuffer(buffer->GetVkHandle() );
 
     auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
          .setDescriptorType( vk::DescriptorType::eUniformBuffer )
@@ -173,7 +173,7 @@ struct DescriptorSet::Impl
     auto imageViewInfo = vk::DescriptorImageInfo{}
          .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
          .setImageView( imageView->GetVkImageView() )
-         .setSampler( sampler->GetVkSampler() );
+         .setSampler(sampler->GetVkHandle() );
 
     auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
                                          .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )

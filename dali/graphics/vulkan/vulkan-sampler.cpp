@@ -191,7 +191,7 @@ void Sampler::SetCompareOp( vk::CompareOp compareOp )
   mImpl->mModified = true;
 }
 
-vk::Sampler Sampler::GetVkSampler() const
+vk::Sampler Sampler::GetVkHandle() const
 {
   // if no sampler yet, create it now
   if( mImpl->mModified )

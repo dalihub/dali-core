@@ -19,6 +19,7 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/vulkan-shader.cpp \
     $(graphics_src_dir)/vulkan/vulkan-swapchain.cpp \
     $(graphics_src_dir)/vulkan/vulkan-sampler.cpp \
+    $(graphics_src_dir)/vulkan/vulkan-resource-cache.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics-texture.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-controller.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-shader.cpp \

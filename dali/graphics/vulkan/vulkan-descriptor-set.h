@@ -97,7 +97,7 @@ public:
 
   ~DescriptorPool() override;
 
-  vk::DescriptorPool GetVkDescriptorPool() const;
+  vk::DescriptorPool GetVkHandle() const;
 
   std::vector<DescriptorSetHandle> AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
 

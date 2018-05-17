@@ -109,7 +109,7 @@ Image::Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Ima
   mImpl = MakeUnique<Impl>( *this, graphics, createInfo, externalImage );
 }
 
-vk::Image Image::GetVkImage() const
+vk::Image Image::GetVkHandle() const
 {
   return mImpl->mVkImage;
 }
@@ -244,7 +244,7 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
                                                .setFormat( image->GetVkFormat() )
                                                .setSubresourceRange(subresourceRange)
                                                .setComponents( componentsMapping )
-                                                .setImage( image->GetVkImage() )));
+                                                .setImage(image->GetVkHandle() )));
   if(!retval->mImpl->Initialise())
   {
     return ImageViewRef();

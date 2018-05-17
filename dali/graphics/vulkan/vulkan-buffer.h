@@ -82,7 +82,7 @@ public:
    * Returns Vulkan VkBuffer object associated with this buffer
    * @return
    */
-  vk::Buffer GetVkBuffer() const;
+  vk::Buffer GetVkHandle() const;
 
   /**
    * Returns handle to the allocated memory

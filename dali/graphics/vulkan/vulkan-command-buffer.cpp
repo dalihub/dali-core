@@ -48,7 +48,7 @@ struct CommandBuffer::Impl
 
   ~Impl()
   {
-    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(),
+    mGraphics.GetDevice().freeCommandBuffers(mOwnerCommandPool.GetVkHandle(),
                                               1, &mCommandBuffer );
   }
 
@@ -107,7 +107,7 @@ struct CommandBuffer::Impl
       // Render pass is obtained from the default framebuffer
       // it's a legacy but little nicer
       auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
-      inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetVkRenderPass() );
+      inheritance.setRenderPass(swapchain->GetCurrentFramebuffer()->GetRenderPassVkHandle() );
       info.setPInheritanceInfo( &inheritance );
     }
 
@@ -137,7 +137,7 @@ struct CommandBuffer::Impl
   void Free()
   {
     assert( mCommandBuffer && "Invalid command buffer!" );
-    mGraphics.GetDevice().freeCommandBuffers( mOwnerCommandPool.GetPool(), mCommandBuffer );
+    mGraphics.GetDevice().freeCommandBuffers(mOwnerCommandPool.GetVkHandle(), mCommandBuffer );
   }
 
 
@@ -166,7 +166,7 @@ struct CommandBuffer::Impl
     vkBuffers.reserve( buffers.size() );
     for( auto&& buffer : buffers )
     {
-      vkBuffers.emplace_back( buffer->GetVkBuffer() );
+      vkBuffers.emplace_back(buffer->GetVkHandle() );
       PushResource( buffer );
     }
 
@@ -180,14 +180,14 @@ struct CommandBuffer::Impl
             "The buffer used as index buffer has wrong usage flags!" );
 
     PushResource( buffer );
-    mCommandBuffer.bindIndexBuffer( buffer->GetVkBuffer(), offset, indexType );
+    mCommandBuffer.bindIndexBuffer(buffer->GetVkHandle(), offset, indexType );
   }
 
   void BindGraphicsPipeline( Handle<Pipeline> pipeline )
   {
     PushResource( pipeline );
     mCurrentPipeline = pipeline;
-    mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkPipeline() );
+    mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkHandle() );
   }
 
   void BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets,
@@ -238,11 +238,11 @@ struct CommandBuffer::Impl
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
     auto surface = mGraphics.GetSurface( 0u );
     auto frameBuffer = swapchain->GetCurrentFramebuffer();
-    auto renderPass = frameBuffer->GetVkRenderPass();
+    auto renderPass = frameBuffer->GetRenderPassVkHandle();
     auto clearValues = frameBuffer->GetDefaultClearValues();
 
     auto info = vk::RenderPassBeginInfo{};
-    info.setFramebuffer( frameBuffer->GetVkFramebuffer() );
+    info.setFramebuffer(frameBuffer->GetVkHandle() );
     info.setRenderPass( renderPass );
     info.setClearValueCount( U32( clearValues.size() ) );
     info.setPClearValues( clearValues.data() );
@@ -308,7 +308,7 @@ struct CommandBuffer::Impl
     PushResource( srcBuffer );
     PushResource( dstImage );
 
-    mCommandBuffer.copyBufferToImage( srcBuffer->GetVkBuffer(), dstImage->GetVkImage(), dstLayout, regions );
+    mCommandBuffer.copyBufferToImage(srcBuffer->GetVkHandle(), dstImage->GetVkHandle(), dstLayout, regions );
   }
 
   vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
@@ -321,7 +321,7 @@ struct CommandBuffer::Impl
   {
     return vk::ImageMemoryBarrier{}
          .setNewLayout( newLayout )
-         .setImage( image->GetVkImage() )
+         .setImage(image->GetVkHandle() )
          .setOldLayout( oldLayout )
          .setSrcAccessMask( srcAccessMask )
          .setDstAccessMask( dstAccessMask )

@@ -59,7 +59,7 @@ public:
    *
    * @return
    */
-  vk::CommandPool GetPool() const;
+  vk::CommandPool GetVkHandle() const;
 
   /**
    *
