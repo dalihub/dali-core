@@ -54,7 +54,7 @@ public:
   static Handle<Shader> New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
 
   /**
-   * Creates new shader module from SPIRV code
+   * Creates new shader module from SPIR-V code
    * @param graphics
    * @param bytes
    * @param size
@@ -67,7 +67,7 @@ public:
    */
   ~Shader() override;
 
-  vk::ShaderModule GetVkShaderModule() const;
+  vk::ShaderModule GetVkHandle() const;
 
   const SpirV::SPIRVShader& GetSPIRVReflection() const;
 
@@ -75,7 +75,7 @@ public:
 
   operator vk::ShaderModule() const
   {
-    return GetVkShaderModule();
+    return GetVkHandle();
   }
 
   /**

@@ -124,7 +124,7 @@ public:
    * Returns Vulkan VkPipeline object associated with Pipeline
    * @return
    */
-  vk::Pipeline GetVkPipeline() const;
+  vk::Pipeline GetVkHandle() const;
 
   /**
    * Returns Vulkan VkPipelineLayout object associated with Pipeline

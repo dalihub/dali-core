@@ -190,7 +190,7 @@ struct Texture::Impl
     mSampler->SetFilter( vk::Filter::eLinear, vk::Filter::eLinear );
     mSampler->SetMipmapMode( vk::SamplerMipmapMode::eLinear );
 
-    mSampler->GetVkSampler();
+    mSampler->GetVkHandle();
   }
 
   SamplerRef GetSampler() const

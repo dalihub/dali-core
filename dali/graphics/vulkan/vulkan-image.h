@@ -58,7 +58,7 @@ public:
    * Returns underlying Vulkan object
    * @return
    */
-  vk::Image GetVkImage() const;
+  vk::Image GetVkHandle() const;
 
   /**
    * Returns VkImageLayout associated with the image
@@ -130,7 +130,7 @@ public:
 
   operator InternalVkImage() const
   {
-    return GetVkImage();
+    return GetVkHandle();
   }
 
 private:

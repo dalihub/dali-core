@@ -96,7 +96,7 @@ struct CommandBufferPool
 
     auto allocateInfo = vk::CommandBufferAllocateInfo{}
       .setCommandBufferCount( U32(diff) )
-      .setCommandPool( mOwner.GetPool() )
+      .setCommandPool(mOwner.GetVkHandle() )
       .setLevel( mIsPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary );
     auto newBuffers = AllocateVkCommandBuffers( allocateInfo );
 
@@ -276,7 +276,7 @@ CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& cr
 
 CommandPool::~CommandPool() = default;
 
-vk::CommandPool CommandPool::GetPool() const
+vk::CommandPool CommandPool::GetVkHandle() const
 {
   return mImpl->mCommandPool;
 }

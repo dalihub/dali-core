@@ -31,6 +31,8 @@
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
+#include <dali/graphics/vulkan/vulkan-sampler.h>
+#include <dali/graphics/vulkan/vulkan-resource-cache.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -343,7 +345,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
   assert(!mSurfaceFBIDMap.empty() &&
          "At least one surface has to be created before creating VkDevice!");
 
-  auto queueInfos = std::vector< vk::DeviceQueueCreateInfo >{};
+  std::vector< vk::DeviceQueueCreateInfo > queueInfos{};
 
   constexpr uint8_t MAX_QUEUE_TYPES = 3;
   // find suitable family for each type of queue
@@ -437,7 +439,7 @@ void Graphics::CreateDevice()
       info.setPQueuePriorities( priorities.data() );
     }
 
-    auto extensions = std::vector< const char* >{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    std::vector< const char* > extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     auto info = vk::DeviceCreateInfo{};
     info.setEnabledExtensionCount(U32(extensions.size()))
@@ -479,6 +481,7 @@ void Graphics::CreateDevice()
   }
 
   mPipelineDatabase = std::make_unique<PipelineCache>( *this );
+  mResourceCache = MakeUnique<ResourceCache>();
 }
 #pragma GCC diagnostic pop
 
@@ -508,7 +511,7 @@ Queue& Graphics::GetGraphicsQueue(uint32_t index) const
   // this will change in the future
   assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
 
-  return *mGraphicsQueues[0].get(); // will be mGraphicsQueues[index]
+  return *mGraphicsQueues[0]; // will be mGraphicsQueues[index]
 }
 
 Queue& Graphics::GetTransferQueue(uint32_t index) const
@@ -517,7 +520,7 @@ Queue& Graphics::GetTransferQueue(uint32_t index) const
   // this will change in the future
   assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
 
-  return *mTransferQueues[0].get(); // will be mGraphicsQueues[index]
+  return *mTransferQueues[0]; // will be mGraphicsQueues[index]
 }
 
 Queue& Graphics::GetComputeQueue(uint32_t index) const
@@ -526,7 +529,7 @@ Queue& Graphics::GetComputeQueue(uint32_t index) const
   // this will change in the future
   assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
 
-  return *mComputeQueues[0].get(); // will be mGraphicsQueues[index]
+  return *mComputeQueues[0]; // will be mGraphicsQueues[index]
 }
 
 Queue& Graphics::GetPresentQueue() const
@@ -558,102 +561,78 @@ SurfaceRef Graphics::GetSurface( FBID surfaceId )
 
 void Graphics::AddBuffer( Handle<Buffer> buffer )
 {
-  mBuffersCache.push_back( buffer );
+  mResourceCache->AddBuffer(std::move(buffer));
 }
 
 void Graphics::AddImage( Handle<Image> image )
 {
-  mImageCache.push_back( image );
+  mResourceCache->AddImage(std::move(image));
 }
 
 void Graphics::AddPipeline( Handle<Pipeline> pipeline )
 {
-  mPipelineCache.push_back( pipeline );
+  mResourceCache->AddPipeline(std::move(pipeline));
 }
 
 void Graphics::AddShader( Handle<Shader> shader )
 {
-  mShaderCache.push_back( shader );
+  mResourceCache->AddShader(std::move(shader));
 }
 
 void Graphics::AddCommandPool( Handle<CommandPool> pool )
 {
-  mCommandPoolCache.push_back( pool );
+  mResourceCache->AddCommandPool(std::move(pool));
 }
 
 void Graphics::AddDescriptorPool( Handle<DescriptorPool> pool )
 {
-  mDescriptorPoolCache.push_back( pool );
+  mResourceCache->AddDescriptorPool(std::move(pool));
 }
 
 void Graphics::AddFramebuffer( Handle<Framebuffer> framebuffer )
 {
-  mFramebufferCache.push_back( framebuffer );
+  mResourceCache->AddFramebuffer(std::move(framebuffer));
 }
 
 void Graphics::RemoveBuffer( Buffer& buffer )
 {
-  auto index = 0u;
-  for( auto&& iter : mBuffersCache )
-  {
-    if( &*iter == &buffer )
-    {
-      iter.Reset();
-      mBuffersCache.erase( mBuffersCache.begin()+index );
-      return;
-    }
-  }
+  mResourceCache->RemoveBuffer(buffer);
 }
 
 void Graphics::RemoveShader( Shader& shader )
 {
-  auto index = 0u;
-  for( auto&& iter : mShaderCache )
-  {
-    if( &*iter == &shader )
-    {
-      iter.Reset();
-      mShaderCache.erase( mShaderCache.begin()+index );
-      return;
-    }
-    ++index;
-  }
+  mResourceCache->RemoveShader(shader);
 }
 
 void Graphics::RemoveCommandPool( CommandPool& commandPool )
 {
-  NotImplemented();
+  mResourceCache->RemoveCommandPool(commandPool);
 }
 
-void Graphics::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool )
+void Graphics::RemoveDescriptorPool( DescriptorPool& pool )
 {
-  NotImplemented();
+  mResourceCache->RemoveDescriptorPool(pool);
+}
+
+void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
+{
+  mResourceCache->RemoveFramebuffer(framebuffer);
+}
+
+void Graphics::RemoveSampler( Sampler& sampler )
+{
+  mResourceCache->RemoveSampler(sampler);
 }
 
 ShaderRef Graphics::FindShader( vk::ShaderModule shaderModule )
 {
-  for( auto&& iter : mShaderCache )
-  {
-    if( iter->GetVkShaderModule() == shaderModule )
-    {
-      return Handle<Shader>(&*iter);
-    }
-  }
-  return Handle<Shader>();
+  return mResourceCache->FindShader(shaderModule);
 }
 
 ImageRef Graphics::FindImage( vk::Image image )
 {
-  for( auto&& iter : mImageCache )
-  {
-    if( iter->GetVkImage() == image )
-    {
-      return ImageRef(&*iter);
-    }
-  }
-  return ImageRef();
+  return mResourceCache->FindImage(image);
 }
-
 
 
 } // namespace Vulkan
