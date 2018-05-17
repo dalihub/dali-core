@@ -38,7 +38,7 @@ public:
   virtual ~Sampler() = default;
 
 protected:
-  // derived types should not be moved direcly to prevent slicing
+  // derived types should not be moved directly to prevent slicing
   Sampler(Sampler&&) = default;
   Sampler& operator=(Sampler&&) = default;
 
