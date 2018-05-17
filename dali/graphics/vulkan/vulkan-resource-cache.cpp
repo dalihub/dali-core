@@ -23,6 +23,8 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/vulkan-sampler.h>
 
 #include <algorithm>
 
@@ -85,7 +87,7 @@ PipelineRef ResourceCache::FindPipeline( vk::Pipeline pipeline )
 {
   auto iterator = std::find_if(mPipelines.begin(),
                                mPipelines.end(),
-                               [&](const PipelineRef entry) { return &*entry == pipeline; });
+                               [&](const PipelineRef entry) { return entry->GetVkHandle() == pipeline; });
 
   return iterator == mPipelines.end() ? PipelineRef() : PipelineRef(&**iterator);
 }
@@ -94,7 +96,7 @@ ShaderRef ResourceCache::FindShader( vk::ShaderModule shaderModule )
 {
   auto iterator = std::find_if(mShaders.begin(),
                                mShaders.end(),
-                               [&](const ShaderRef entry) { return &*entry == shaderModule; });
+                               [&](const ShaderRef entry) { return entry->GetVkHandle() == shaderModule; });
 
   return iterator == mShaders.end() ? ShaderRef() : ShaderRef(&**iterator);
 }
@@ -103,7 +105,7 @@ CommandPoolRef ResourceCache::FindCommandPool( vk::CommandPool commandPool )
 {
   auto iterator = std::find_if(mCommandPools.begin(),
                                mCommandPools.end(),
-                               [&](const CommandPoolRef entry) { return &*entry == commandPool; });
+                               [&](const CommandPoolRef entry) { return entry->GetVkHandle() == commandPool; });
 
   return iterator == mCommandPools.end() ? CommandPoolRef() : CommandPoolRef(&**iterator);
 }
@@ -112,7 +114,7 @@ DescriptorPoolRef ResourceCache::FindDescriptorPool( vk::DescriptorPool descript
 {
   auto iterator = std::find_if(mDescriptorPools.begin(),
                                mDescriptorPools.end(),
-                               [&](const DescriptorPoolRef entry) { return &*entry == descriptorPool; });
+                               [&](const DescriptorPoolRef entry) { return entry->GetVkHandle() == descriptorPool; });
 
   return iterator == mDescriptorPools.end() ? DescriptorPoolRef() : DescriptorPoolRef(&**iterator);
 }
@@ -121,7 +123,7 @@ FramebufferRef ResourceCache::FindFramebuffer( vk::Framebuffer framebuffer )
 {
   auto iterator = std::find_if(mFramebuffers.begin(),
                                mFramebuffers.end(),
-                               [&](const FramebufferRef entry) { return &*entry == framebuffer; });
+                               [&](const FramebufferRef entry) { return entry->GetVkHandle() == framebuffer; });
 
   return iterator == mFramebuffers.end() ? FramebufferRef() : FramebufferRef(&**iterator);
 }
@@ -130,7 +132,7 @@ SamplerRef ResourceCache::FindSampler( vk::Sampler sampler )
 {
   auto iterator = std::find_if(mSamplers.begin(),
                                mSamplers.end(),
-                               [&](const SamplerRef entry) { return &*entry == sampler; });
+                               [&](const SamplerRef entry) { return entry->GetVkHandle() == sampler; });
 
   return iterator == mSamplers.end() ? SamplerRef() : SamplerRef(&**iterator);
 }
@@ -139,7 +141,7 @@ BufferRef ResourceCache::FindBuffer( vk::Buffer buffer )
 {
   auto iterator = std::find_if(mBuffers.begin(),
                                mBuffers.end(),
-                               [&](const BufferRef entry) { return &*entry == buffer; });
+                               [&](const BufferRef entry) { return entry->GetVkHandle() == buffer; });
 
   return iterator == mBuffers.end() ? BufferRef() : BufferRef(&**iterator);
 }
@@ -148,7 +150,7 @@ ImageRef ResourceCache::FindImage( vk::Image image )
 {
   auto iterator = std::find_if(mImages.begin(),
                                mImages.end(),
-                               [&](const ImageRef entry) { return &*entry == image; });
+                               [&](const ImageRef entry) { return entry->GetVkHandle() == image; });
 
   return iterator == mImages.end() ? ImageRef() : ImageRef(&**iterator);
 }
@@ -206,7 +208,7 @@ ResourceCache& ResourceCache::RemoveShader( Shader& shader )
                                  mShaders.end(),
                                  [&](const ShaderRef entry) { return &*entry == &shader; });
 
-    std::iter_swap(iterator, std::prev(mShaders.end());
+    std::iter_swap(iterator, std::prev(mShaders.end()));
     mShaders.back().Reset();
     mShaders.pop_back();
   }
@@ -228,13 +230,13 @@ ResourceCache& ResourceCache::RemoveCommandPool( CommandPool& commandPool )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveDescriptorPool( std::unique_ptr<DescriptorPool> descriptorPool )
+ResourceCache& ResourceCache::RemoveDescriptorPool( DescriptorPool& descriptorPool )
 {
   if( !mDescriptorPools.empty() )
   {
     auto iterator = std::find_if(mDescriptorPools.begin(),
                                  mDescriptorPools.end(),
-                                 [&](const DescriptorPoolRef entry) { return &*entry == &*descriptorPool; });
+                                 [&](const DescriptorPoolRef entry) { return &*entry == &descriptorPool; });
 
     std::iter_swap(iterator, std::prev(mDescriptorPools.end()));
     mDescriptorPools.back().Reset();

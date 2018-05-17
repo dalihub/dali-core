@@ -64,9 +64,9 @@ public:
 
   void Commit();
 
-  vk::RenderPass GetVkRenderPass() const;
+  vk::RenderPass GetRenderPassVkHandle() const;
 
-  vk::Framebuffer GetVkFramebuffer() const;
+  vk::Framebuffer GetVkHandle() const;
 
   const std::vector<vk::ClearValue>& GetDefaultClearValues() const;
 

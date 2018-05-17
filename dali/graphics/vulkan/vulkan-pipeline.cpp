@@ -42,8 +42,8 @@ struct Pipeline::Impl
 {
 
 
-  Impl( Vulkan::Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info ) :
-    mInfo( info ),
+  Impl( Vulkan::Graphics& graphics, vk::GraphicsPipelineCreateInfo info ) :
+    mInfo( std::move(info) ),
     mGraphics( graphics )
   {
   };
@@ -65,7 +65,7 @@ struct Pipeline::Impl
    *
    * @return
    */
-  vk::Pipeline GetVkPipeline() const
+  vk::Pipeline GetVkHandle() const
   {
     return mPipeline;
   }
@@ -93,8 +93,8 @@ struct Pipeline::Impl
     // in place of swapchain structures!
     if( !mInfo.renderPass )
     {
-      SetRenderPass( mGraphics.GetSwapchainForFBID(0u)->
-                                GetCurrentFramebuffer()->GetVkRenderPass());
+      SetRenderPass(mGraphics.GetSwapchainForFBID(0u)->
+              GetCurrentFramebuffer()->GetRenderPassVkHandle());
     }
 
     if(!mInfo.pRasterizationState)
@@ -451,9 +451,9 @@ Pipeline::Pipeline( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& in
   mImpl = MakeUnique<Pipeline::Impl>( graphics, info );
 }
 
-vk::Pipeline Pipeline::GetVkPipeline() const
+vk::Pipeline Pipeline::GetVkHandle() const
 {
-  return mImpl->GetVkPipeline();
+  return mImpl->GetVkHandle();
 }
 
 bool Pipeline::OnDestroy()
