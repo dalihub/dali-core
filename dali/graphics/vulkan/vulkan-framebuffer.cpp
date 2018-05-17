@@ -326,12 +326,12 @@ void Framebuffer::Commit()
   mImpl->Commit();
 }
 
-vk::RenderPass Framebuffer::GetVkRenderPass() const
+vk::RenderPass Framebuffer::GetRenderPassVkHandle() const
 {
   return mImpl->mVkRenderPass;
 }
 
-vk::Framebuffer Framebuffer::GetVkFramebuffer() const
+vk::Framebuffer Framebuffer::GetVkHandle() const
 {
   return mImpl->mVkFramebuffer;
 }

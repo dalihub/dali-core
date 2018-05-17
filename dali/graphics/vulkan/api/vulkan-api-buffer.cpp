@@ -37,7 +37,7 @@ Buffer::Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buff
 
 bool Buffer::Initialise()
 {
-  auto type = Vulkan::Buffer::Type{};
+  Vulkan::Buffer::Type type;
   if( mUsage == vk::BufferUsageFlagBits::eUniformBuffer )
   {
     type = Vulkan::Buffer::Type::UNIFORM;

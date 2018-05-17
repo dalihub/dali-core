@@ -117,7 +117,7 @@ public:
    * Returns VkSampler object
    * @return
    */
-  vk::Sampler GetVkSampler() const;
+  vk::Sampler GetVkHandle() const;
 
 private:
 

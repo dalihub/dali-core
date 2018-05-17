@@ -82,7 +82,7 @@ struct Buffer::Impl final
    *
    * @return
    */
-  vk::Buffer GetVkBuffer() const
+  vk::Buffer GetVkHandle() const
   {
     return mBuffer;
   }
@@ -160,9 +160,9 @@ uint32_t Buffer::GetSize() const
   return U32(mImpl->GetSize());
 }
 
-vk::Buffer Buffer::GetVkBuffer() const
+vk::Buffer Buffer::GetVkHandle() const
 {
-  return mImpl->GetVkBuffer();
+  return mImpl->GetVkHandle();
 }
 
 void Buffer::BindMemory( const GpuMemoryBlockRef& handle )
