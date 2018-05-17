@@ -96,7 +96,7 @@ Dali::Graphics::API::Controller& Graphics::GetController()
     mGfxController = Dali::Graphics::VulkanAPI::Controller::New(*this);
   }
 
-  return *mGfxController.get();
+  return *mGfxController;
 }
 
 std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
