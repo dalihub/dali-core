@@ -372,7 +372,7 @@ void test_framebuffer(Dali::Graphics::Vulkan::Graphics &graphics)
       .setFormat(vk::Format::eR32G32B32A32Sfloat)
       .setComponents(vk::ComponentMapping(
         vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA))
-      .setImage(image->GetVkImage())
+      .setImage(image->GetVkHandle())
       .setSubresourceRange(vk::ImageSubresourceRange{}
                              .setLayerCount(1)
                              .setLevelCount(1)

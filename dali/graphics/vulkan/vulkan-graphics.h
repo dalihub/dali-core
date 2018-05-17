@@ -62,6 +62,7 @@ class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
 class PipelineCache;
+class ResourceCache;
 
 struct SwapchainSurfacePair
 {
@@ -183,16 +184,9 @@ public:
   void RemoveBuffer( Buffer& buffer );
   void RemoveShader( Shader& shader );
   void RemoveCommandPool( CommandPool& commandPool );
-  void RemoveDescriptorPool( std::unique_ptr<DescriptorPool> pool );
-
-private:
-  std::vector<BufferRef>                mBuffersCache;
-  std::vector<ImageRef>                 mImageCache;
-  std::vector<PipelineRef>              mPipelineCache;
-  std::vector<ShaderRef>                mShaderCache;
-  std::vector<CommandPoolRef>           mCommandPoolCache;
-  std::vector<DescriptorPoolRef>        mDescriptorPoolCache;
-  std::vector<FramebufferRef>           mFramebufferCache;
+  void RemoveDescriptorPool( DescriptorPool& pool );
+  void RemoveFramebuffer( Framebuffer& framebuffer );
+  void RemoveSampler( Sampler& sampler );
 
 private:
   std::unique_ptr<Dali::Graphics::VulkanAPI::Controller>           mGfxController;
@@ -200,10 +194,11 @@ private:
   // TODO: rename
   std::unique_ptr<PipelineCache>        mPipelineDatabase;
 
+  std::unique_ptr<ResourceCache>        mResourceCache;
 public:
   PipelineCache& GetPipelineCache()
   {
-    return *mPipelineDatabase.get();
+    return *mPipelineDatabase;
   }
 };
 

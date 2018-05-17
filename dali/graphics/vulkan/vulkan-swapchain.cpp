@@ -193,7 +193,7 @@ struct Swapchain::Impl
       for( auto&& colorImageView : colorImages )
       {
         auto image   = colorImageView->GetImage();
-        auto vkImage = image->GetVkImage();
+        auto vkImage = image->GetVkHandle();
 
         vk::ImageSubresourceRange range;
         range.setLayerCount( image->GetLayerCount() )
@@ -219,7 +219,7 @@ struct Swapchain::Impl
     if( depthStencilImage )
     {
       auto image   = depthStencilImage->GetImage();
-      auto vkImage = image->GetVkImage();
+      auto vkImage = image->GetVkHandle();
 
       vk::ImageSubresourceRange range;
       range.setLayerCount( image->GetLayerCount() )
@@ -421,8 +421,8 @@ struct Swapchain::Impl
 
     // start recording
     auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
-      .setFramebuffer( swapBuffer.framebuffer->GetVkFramebuffer() )
-      .setRenderPass(swapBuffer.framebuffer->GetVkRenderPass())
+      .setFramebuffer(swapBuffer.framebuffer->GetVkHandle() )
+      .setRenderPass(swapBuffer.framebuffer->GetRenderPassVkHandle())
       .setSubpass( 0 );
     swapBuffer.masterCmdBuffer->Reset();
     swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
@@ -444,8 +444,8 @@ struct Swapchain::Impl
   void BeginPrimaryRenderPass( SwapchainBuffer& currentBuffer )
   {
     vk::RenderPassBeginInfo rpInfo{};
-    rpInfo.setRenderPass( currentBuffer.framebuffer->GetVkRenderPass() )
-      .setFramebuffer( currentBuffer.framebuffer->GetVkFramebuffer() )
+    rpInfo.setRenderPass(currentBuffer.framebuffer->GetRenderPassVkHandle() )
+      .setFramebuffer(currentBuffer.framebuffer->GetVkHandle() )
       .setPClearValues( currentBuffer.framebuffer->GetDefaultClearValues().data() )
       .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) )
       .setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) );

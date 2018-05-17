@@ -186,11 +186,11 @@ bool RenderCommand::PreparePipeline()
       std::vector<vk::PipelineShaderStageCreateInfo> shaderStages =
                                                        {
                                                          vk::PipelineShaderStageCreateInfo{}
-                                                           .setModule(vertexShader->GetVkShaderModule())
+                                                           .setModule(vertexShader->GetVkHandle())
                                                            .setStage(vk::ShaderStageFlagBits::eVertex)
                                                            .setPName("main"),
                                                          vk::PipelineShaderStageCreateInfo{}
-                                                           .setModule(fragmentShader->GetVkShaderModule())
+                                                           .setModule(fragmentShader->GetVkHandle())
                                                            .setStage(vk::ShaderStageFlagBits::eFragment)
                                                            .setPName("main")
                                                        };
@@ -203,7 +203,7 @@ bool RenderCommand::PreparePipeline()
       vk::GraphicsPipelineCreateInfo pipelineInfo;
       pipelineInfo
         .setSubpass(0)
-        .setRenderPass(fb->GetVkRenderPass()) // based on render target
+        .setRenderPass(fb->GetRenderPassVkHandle()) // based on render target
         .setBasePipelineHandle(nullptr)
         .setBasePipelineIndex(0)
         .setLayout(pipelineLayout)
