@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    DALi 3D Engine
-Version:    1.3.24
+Version:    1.3.26
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -10,7 +10,7 @@ Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
-BuildRequires:  gawk
+BuildRequires:  gawkd
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
