@@ -252,9 +252,9 @@ struct Texture::Impl
  *
  */
 
-TextureRef Texture::New( Graphics& graphics, uint32_t width, uint32_t height, vk::Format format )
+RefCountedTexture Texture::New( Graphics& graphics, uint32_t width, uint32_t height, vk::Format format )
 {
-  auto result = TextureRef( new Texture( graphics, width, height, format ));
+  auto result = RefCountedTexture( new Texture( graphics, width, height, format ));
   if( !result->mImpl->Initialise() )
   {
     result.Reset();

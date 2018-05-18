@@ -81,7 +81,7 @@ struct Texture::Impl
     return true;
   }
 
-  Vulkan::TextureRef mTexture;
+  Vulkan::RefCountedTexture mTexture;
   VulkanAPI::TextureFactory& mTextureFactory;
   Vulkan::Graphics& mGraphics;
 };
@@ -93,7 +93,7 @@ Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 
 Texture::~Texture() = default;
 
-Vulkan::TextureRef Texture::GetTextureRef() const
+Vulkan::RefCountedTexture Texture::GetTextureRef() const
 {
   return mImpl->mTexture;
 }
