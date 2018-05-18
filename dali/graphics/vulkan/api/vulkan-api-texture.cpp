@@ -51,28 +51,42 @@ struct Texture::Impl
     auto sizeInBytes = mTextureFactory.GetDataSize();
     auto data = mTextureFactory.GetData();
 
-    auto textureRef = Dali::Graphics::Vulkan::Texture::New( mGraphics, U32(size.width), U32(size.height), vk::Format::eR8G8B8A8Unorm );
+    auto format = vk::Format::eR8G8B8A8Unorm;
 
-    // check bpp, if 24bpp convert
-    if( sizeInBytes == width*height*3 )
+    if(mTextureFactory.GetFormat() == API::TextureDetails::Format::RGBA8 )
     {
-
-      auto inData = reinterpret_cast<const uint8_t*>(data);
-      auto outData = new uint8_t[width*height*4];
-
-      auto outIdx = 0u;
-      for( auto i = 0u; i < sizeInBytes; i+= 3 )
+      // check bpp, if 24bpp convert
+      if (sizeInBytes == width * height * 3)
       {
-        outData[outIdx] = inData[i];
-        outData[outIdx+1] = inData[i+1];
-        outData[outIdx+2] = inData[i+2];
-        outData[outIdx+3] = 0xff;
-        outIdx += 4;
+
+        auto inData  = reinterpret_cast<const uint8_t *>(data);
+        auto outData = new uint8_t[width * height * 4];
+
+        auto      outIdx = 0u;
+        for (auto i      = 0u; i < sizeInBytes; i += 3)
+        {
+          outData[outIdx]     = inData[i];
+          outData[outIdx + 1] = inData[i + 1];
+          outData[outIdx + 2] = inData[i + 2];
+          outData[outIdx + 3] = 0xff;
+          outIdx += 4;
+        }
+
+        data        = outData;
+        sizeInBytes = U32(width * height * 4);
       }
 
-      data = outData;
-      sizeInBytes = U32(width*height*4);
     }
+    else if(mTextureFactory.GetFormat() == API::TextureDetails::Format::L8 )
+    {
+      format = vk::Format::eR8Unorm;
+    }
+
+    auto textureRef = Dali::Graphics::Vulkan::Texture::New( mGraphics,
+                                                            U32(size.width),
+                                                            U32(size.height),
+                                                            format );
+
 
     // Upload data immediately. Will stall the queue :(
     textureRef->UploadData( data, sizeInBytes, TextureUploadMode::eImmediate );
