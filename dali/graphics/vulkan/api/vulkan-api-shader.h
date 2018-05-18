@@ -47,11 +47,11 @@ public:
           Graphics::API::ShaderDetails::Language language,
           Graphics::API::ShaderDetails::ShaderSource shaderSource );
 
-  Vulkan::ShaderRef GetShader( vk::ShaderStageFlagBits shaderStage ) const ;
+  Vulkan::RefCountedShader GetShader( vk::ShaderStageFlagBits shaderStage ) const ;
 
   static Shader& DownCast( Dali::Graphics::API::Shader& shader );
 
-  Vulkan::ShaderRef GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const;
+  Vulkan::RefCountedShader GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const;
 
 
   // REFLECTION
@@ -99,8 +99,8 @@ protected:
 private:
 
   Vulkan::Graphics& mGraphics;
-  Vulkan::ShaderRef mVertexShader;
-  Vulkan::ShaderRef mFragmentShader;
+  Vulkan::RefCountedShader mVertexShader;
+  Vulkan::RefCountedShader mFragmentShader;
 
   std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute> mVertexInputAttributes;
   std::vector<Vulkan::SpirV::SPIRVUniformBlock> mUniformBlocks;

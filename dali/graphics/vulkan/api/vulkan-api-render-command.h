@@ -87,13 +87,13 @@ public:
    * Returns an array of updated descriptor sets
    * @return
    */
-  const std::vector<Vulkan::DescriptorSetRef>& GetDescriptorSets() const;
+  const std::vector<Vulkan::RefCountedDescriptorSet>& GetDescriptorSets() const;
 
   /**
    * Returns associated Vulkan command buffer
    * @return
    */
-  const Vulkan::CommandBufferRef& GetCommandBuffer() const;
+  const Vulkan::RefCountedCommandBuffer& GetCommandBuffer() const;
 
   /**
    * Returns pipeline cache
@@ -105,7 +105,7 @@ public:
    * Returns pipeline
    * @return
    */
-  const Vulkan::PipelineRef& GetPipeline() const;
+  const Vulkan::RefCountedPipeline& GetPipeline() const;
 
 
 
@@ -145,13 +145,13 @@ private:
   VulkanAPI::Controller&                mController;
   Vulkan::Graphics&                     mGraphics;
   Vulkan::PipelineCache&                mPipelineCache;
-  Vulkan::CommandBufferRef              mCommandBuffer;
-  Vulkan::PipelineRef                   mPipeline;
-  Vulkan::DescriptorPoolRef             mDescriptorPool;
+  Vulkan::RefCountedCommandBuffer              mCommandBuffer;
+  Vulkan::RefCountedPipeline                   mPipeline;
+  Vulkan::RefCountedDescriptorPool             mDescriptorPool;
 
   std::vector<vk::DescriptorSetLayout>  mVkDescriptorSetLayouts;
 
-  std::vector<Vulkan::DescriptorSetRef> mDescriptorSets;
+  std::vector<Vulkan::RefCountedDescriptorSet> mDescriptorSets;
 
   std::vector<std::unique_ptr<Ubo>>     mUboBuffers;
 

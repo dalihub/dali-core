@@ -40,7 +40,7 @@ class Surface : public VkManaged
 {
 public:
 
-  static SurfaceRef New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
+  static RefCountedSurface New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
 
   Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
   ~Surface() final;

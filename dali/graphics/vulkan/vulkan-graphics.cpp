@@ -283,13 +283,13 @@ FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
 
     // map surface to FBID
     auto fbid = ++mBaseFBID;
-    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ SwapchainRef{}, surfaceRef };
+    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ RefCountedSwapchain{}, surfaceRef };
     return fbid;
   }
   return -1;
 }
 
-SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
+RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
   auto swapchain = Swapchain::New( *this,
                                    GetGraphicsQueue(0u),
@@ -308,7 +308,7 @@ SwapchainRef Graphics::CreateSwapchainForSurface( SurfaceRef surface )
   return swapchain;
 }
 
-SwapchainRef Graphics::GetSwapchainForSurface( SurfaceRef surface )
+RefCountedSwapchain Graphics::GetSwapchainForSurface( RefCountedSurface surface )
 {
   for( auto&& val : mSurfaceFBIDMap )
   {
@@ -318,10 +318,10 @@ SwapchainRef Graphics::GetSwapchainForSurface( SurfaceRef surface )
                 .swapchain;
     }
   }
-  return SwapchainRef();
+  return RefCountedSwapchain();
 }
 
-SwapchainRef Graphics::GetSwapchainForFBID( FBID surfaceId )
+RefCountedSwapchain Graphics::GetSwapchainForFBID( FBID surfaceId )
 {
   if(surfaceId == 0)
   {
@@ -534,7 +534,7 @@ Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInf
   return cmdpool;
 }
 
-SurfaceRef Graphics::GetSurface( FBID surfaceId )
+RefCountedSurface Graphics::GetSurface( FBID surfaceId )
 {
   // TODO: FBID == 0 means default framebuffer, but there should be no
   // such thing as default framebuffer.
@@ -612,12 +612,12 @@ void Graphics::RemoveSampler( Sampler& sampler )
   mResourceCache->RemoveSampler(sampler);
 }
 
-ShaderRef Graphics::FindShader( vk::ShaderModule shaderModule )
+RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   return mResourceCache->FindShader(shaderModule);
 }
 
-ImageRef Graphics::FindImage( vk::Image image )
+RefCountedImage Graphics::FindImage( vk::Image image )
 {
   return mResourceCache->FindImage(image);
 }

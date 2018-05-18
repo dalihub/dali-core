@@ -112,7 +112,7 @@ public:
    * @param offset
    * @param indexType
    */
-  void BindIndexBuffer( BufferRef buffer, uint32_t offset, vk::IndexType indexType);
+  void BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType);
 
   /**
    * Binds single vertex buffer
@@ -213,14 +213,14 @@ public:
    * @param dtsLayout
    * @param regions
    */
-  void CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage, vk::ImageLayout dstLayout,
+  void CopyBufferToImage( RefCountedBuffer srcBuffer, RefCountedImage dstImage, vk::ImageLayout dstLayout,
                           std::vector<vk::BufferImageCopy> regions );
 
   /**
    * Creates layout transition barrier
    * @return
    */
-  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( RefCountedImage image,
                                                   vk::AccessFlags        srcAccessMask,
                                                   vk::AccessFlags        dstAccessMask,
                                                   vk::ImageLayout        oldLayout,
@@ -235,7 +235,7 @@ public:
    * @param aspectMask
    * @return
    */
-  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( RefCountedImage image,
                                                        vk::ImageLayout        olsLayout,
                                                        vk::ImageLayout        newLayout,
                                                        vk::ImageAspectFlags   aspectMask

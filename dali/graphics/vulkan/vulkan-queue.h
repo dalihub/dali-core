@@ -50,11 +50,11 @@ public:
   ~Queue(); // queues are non-destructible
 
   /** Submits command buffers */
-  std::unique_ptr< Submission > Submit(const std::vector< CommandBufferRef >& commandBuffers,
+  std::unique_ptr< Submission > Submit(const std::vector< RefCountedCommandBuffer >& commandBuffers,
                                        Handle<Fence>                                 fence);
 
   /** Helper function to submit single command buffer */
-  std::unique_ptr< Submission > Submit(CommandBufferRef commandBuffer, Handle<Fence> fence);
+  std::unique_ptr< Submission > Submit(RefCountedCommandBuffer commandBuffer, Handle<Fence> fence);
 
   void WaitIdle() const;
 
@@ -75,7 +75,7 @@ public:
 private:
   /** Prepares command buffers for submission */
   std::vector< vk::CommandBuffer > PrepareBuffers(
-      const std::vector< CommandBufferRef >& commandBuffers) const;
+      const std::vector< RefCountedCommandBuffer >& commandBuffers) const;
 
 
 

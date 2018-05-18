@@ -37,7 +37,7 @@ class Swapchain : public VkManaged
 {
 public:
 
-  static SwapchainRef New( Graphics& graphics, Queue& presentationQueue, SurfaceRef surface, uint8_t bufferCount, uint32_t flags );
+  static RefCountedSwapchain New( Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags );
 
 public:
 
@@ -48,27 +48,27 @@ public:
    * Returns current framebuffer ( the one which is rendering to )
    * @return
    */
-  FramebufferRef GetCurrentFramebuffer() const;
+  RefCountedFramebuffer GetCurrentFramebuffer() const;
 
   /**
    * Returns any framebuffer from the queue
    * @param index
    * @return
    */
-  FramebufferRef GetFramebuffer( uint32_t index ) const;
+  RefCountedFramebuffer GetFramebuffer( uint32_t index ) const;
 
   /**
    * Requests for next framebuffer
    * @return
    */
-  FramebufferRef AcquireNextFramebuffer();
+  RefCountedFramebuffer AcquireNextFramebuffer();
 
   /**
    * Returns primary command buffer associated with currently
    * being recorded frame
    * @return
    */
-  CommandBufferRef GetPrimaryCommandBuffer() const;
+  RefCountedCommandBuffer GetPrimaryCommandBuffer() const;
 
   /**
    * Begins primary render pass, must be called after acquiring new image
@@ -95,7 +95,7 @@ public:
 private:
 
   Swapchain();
-  Swapchain( Graphics& graphics, Queue& presentationQueue, SurfaceRef surface, uint8_t bufferCount, uint32_t flags );
+  Swapchain( Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags );
   ~Swapchain() override;
 
 private:

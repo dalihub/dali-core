@@ -53,7 +53,7 @@ public:
    * @param sampler
    * @param imageView
    */
-  void WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView );
+  void WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView );
   /**
    *
    * @param buffer
@@ -93,7 +93,7 @@ class DescriptorPool : public VkManaged
 {
 public:
 
-  static DescriptorPoolRef New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
+  static RefCountedDescriptorPool New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
 
   ~DescriptorPool() override;
 

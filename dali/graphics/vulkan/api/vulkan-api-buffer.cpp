@@ -92,7 +92,7 @@ void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
   mController.ScheduleBufferMemoryTransfer( std::move(transfer) );
 }
 
-Vulkan::BufferRef Buffer::GetBufferRef() const
+Vulkan::RefCountedBuffer Buffer::GetBufferRef() const
 {
   return mBufferRef;
 }

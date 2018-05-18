@@ -48,19 +48,19 @@ public:
     PRESERVE
   };
 
-  static FramebufferRef New( Graphics& graphics, uint32_t width, uint32_t height );
+  static RefCountedFramebuffer New( Graphics& graphics, uint32_t width, uint32_t height );
 
   uint32_t GetWidth() const;
 
   uint32_t GetHeight() const;
 
-  ImageViewRef GetAttachment( AttachmentType type, uint32_t index ) const;
+  RefCountedImageView GetAttachment( AttachmentType type, uint32_t index ) const;
 
-  std::vector<ImageViewRef> GetAttachments( AttachmentType type ) const;
+  std::vector<RefCountedImageView> GetAttachments( AttachmentType type ) const;
 
   uint32_t GetAttachmentCount( AttachmentType type ) const;
 
-  void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
+  void SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
 
   void Commit();
 

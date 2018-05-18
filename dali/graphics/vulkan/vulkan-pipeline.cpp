@@ -252,7 +252,7 @@ struct Pipeline::Impl
    * @param stage
    * @return
    */
-  bool SetShader( ShaderRef shader, Shader::Type stage )
+  bool SetShader( RefCountedShader shader, Shader::Type stage )
   {
     assert( !mPipeline && "Pipeline cannot be changed anymore!");
 
@@ -344,7 +344,7 @@ struct Pipeline::Impl
   }
 #pragma GCC diagnostic pop
 
-  vk::ShaderStageFlagBits GetShaderStage( ShaderRef shader )
+  vk::ShaderStageFlagBits GetShaderStage( RefCountedShader shader )
   {
     for( auto&& stage : mShaderStageCreateInfo )
     {
@@ -397,7 +397,7 @@ struct Pipeline::Impl
   Graphics&                       mGraphics;
 
   // resources
-  std::vector<ShaderRef>     mShaderResources;
+  std::vector<RefCountedShader>     mShaderResources;
 
   vk::PipelineViewportStateCreateInfo mViewportState {};
   std::vector<vk::Viewport> mViewports {};
@@ -437,7 +437,7 @@ struct Pipeline::Impl
  *
  */
 
-PipelineRef Pipeline::New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info )
+RefCountedPipeline Pipeline::New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info )
 {
   auto pipeline = Handle<Pipeline>( new Pipeline(graphics, info) );
   graphics.AddPipeline(pipeline);
@@ -466,7 +466,7 @@ void Pipeline::SetViewport( float x, float y, float width, float height )
   mImpl->SetViewport( x, y, width, height );
 }
 
-bool Pipeline::SetShader( ShaderRef shader, Shader::Type stage )
+bool Pipeline::SetShader( RefCountedShader shader, Shader::Type stage )
 {
   return mImpl->SetShader( shader, stage );
 }

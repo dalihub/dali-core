@@ -39,7 +39,7 @@ public:
    * @param info
    * @return
    */
-  static PipelineRef New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
+  static RefCountedPipeline New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
 
   /**
    * Destructor
@@ -61,7 +61,7 @@ public:
    * @param stage
    * @return
    */
-  bool SetShader( ShaderRef shader, Shader::Type stage );
+  bool SetShader( RefCountedShader shader, Shader::Type stage );
 
   /**
    *
@@ -139,7 +139,7 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-using PipelineRef = Handle<Pipeline>;
+using RefCountedPipeline = Handle<Pipeline>;
 
 } // Namespace Vulkan
 

@@ -96,7 +96,7 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-using ShaderRef = Handle<Shader>;
+using RefCountedShader = Handle<Shader>;
 
 } // Namespace Vulkan
 

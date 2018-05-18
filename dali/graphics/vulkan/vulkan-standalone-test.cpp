@@ -54,9 +54,9 @@ using Dali::Graphics::Vulkan::DescriptorPool;
 using Dali::Graphics::Vulkan::GpuMemoryAllocator;
 using Dali::Graphics::Vulkan::GpuMemoryManager;
 using Dali::Graphics::Vulkan::Pipeline;
-using Dali::Graphics::Vulkan::PipelineRef;
+using Dali::Graphics::Vulkan::RefCountedPipeline;
 using Dali::Graphics::Vulkan::Shader;
-using Dali::Graphics::Vulkan::ShaderRef;
+using Dali::Graphics::Vulkan::RefCountedShader;
 using Dali::Integration::Graphics::Graphics;
 using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 
@@ -230,7 +230,7 @@ std::unique_ptr<Test::xcb_window_t> create_xcb_window( int width, int height )
 
 namespace VulkanTest
 {
-Dali::Graphics::Vulkan::GpuMemoryBlockRef test_gpu_memory_manager(
+Dali::Graphics::Vulkan::RefCountedGpuMemoryBlock test_gpu_memory_manager(
   Dali::Graphics::Vulkan::Graphics &graphics,
   GpuMemoryManager &gpuManager,
   const Dali::Graphics::Vulkan::Handle<Buffer> &buffer)
@@ -257,7 +257,7 @@ struct UniformClipData
 mat4 MVP;
 
 template<class T>
-void update_buffer(Dali::Graphics::Vulkan::BufferRef buffer, T &value)
+void update_buffer(Dali::Graphics::Vulkan::RefCountedBuffer buffer, T &value)
 {
   auto ptr = reinterpret_cast<T *>( buffer->GetMemoryHandle()
                                           ->Map());
@@ -266,7 +266,7 @@ void update_buffer(Dali::Graphics::Vulkan::BufferRef buffer, T &value)
         ->Unmap();
 }
 
-void update_translation(Dali::Graphics::Vulkan::BufferRef buffer)
+void update_translation(Dali::Graphics::Vulkan::RefCountedBuffer buffer)
 {
   static float x = 0.0f;
   x += 0.5f;
@@ -284,7 +284,7 @@ void update_translation(Dali::Graphics::Vulkan::BufferRef buffer)
   */
 }
 
-Dali::Graphics::Vulkan::BufferRef create_uniform_buffer(Dali::Graphics::Vulkan::Graphics &gr)
+Dali::Graphics::Vulkan::RefCountedBuffer create_uniform_buffer(Dali::Graphics::Vulkan::Graphics &gr)
 {
   // create uniform buffer
   auto uniformBuffer = Buffer::New(gr, sizeof(UniformData), Buffer::Type::UNIFORM);
@@ -310,7 +310,7 @@ Dali::Graphics::Vulkan::BufferRef create_uniform_buffer(Dali::Graphics::Vulkan::
   return uniformBuffer;
 }
 
-Dali::Graphics::Vulkan::BufferRef create_clip_buffer(Dali::Graphics::Vulkan::Graphics &gr)
+Dali::Graphics::Vulkan::RefCountedBuffer create_clip_buffer(Dali::Graphics::Vulkan::Graphics &gr)
 {
   const glm::mat4 clip(
     1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f);
@@ -392,15 +392,15 @@ void test_handle()
 {
   /*
   using namespace Dali::Graphics::Vulkan;
-  GpuMemoryBlockRef handle( new GpuMemoryBlock() );
+  RefCountedGpuMemoryBlock handle( new GpuMemoryBlock() );
 
   decltype(handle) handle2 = handle;
   handle.GetRefCount();*/
 }
 
-PipelineRef create_pipeline(Dali::Graphics::Vulkan::Graphics &graphics,
-                            Dali::Graphics::Vulkan::ShaderRef vertexShader,
-                            Dali::Graphics::Vulkan::ShaderRef fragmentShader)
+RefCountedPipeline create_pipeline(Dali::Graphics::Vulkan::Graphics &graphics,
+                            Dali::Graphics::Vulkan::RefCountedShader vertexShader,
+                            Dali::Graphics::Vulkan::RefCountedShader fragmentShader)
 {
   using namespace Dali::Graphics::Vulkan;
   auto pipelineInfo = vk::GraphicsPipelineCreateInfo{};
