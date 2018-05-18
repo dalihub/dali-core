@@ -208,7 +208,7 @@ struct Controller::Impl
   }
 
   // resources
-  std::vector<Vulkan::TextureRef> mTextures;
+  std::vector<Vulkan::RefCountedTexture> mTextures;
   std::vector<Vulkan::RefCountedShader>  mShaders;
   std::vector<Vulkan::RefCountedBuffer>  mBuffers;
 

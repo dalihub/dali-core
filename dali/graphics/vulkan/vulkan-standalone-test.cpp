@@ -399,8 +399,8 @@ void test_handle()
 }
 
 RefCountedPipeline create_pipeline(Dali::Graphics::Vulkan::Graphics &graphics,
-                            Dali::Graphics::Vulkan::RefCountedShader vertexShader,
-                            Dali::Graphics::Vulkan::RefCountedShader fragmentShader)
+                                   Dali::Graphics::Vulkan::RefCountedShader vertexShader,
+                                   Dali::Graphics::Vulkan::RefCountedShader fragmentShader)
 {
   using namespace Dali::Graphics::Vulkan;
   auto pipelineInfo = vk::GraphicsPipelineCreateInfo{};
