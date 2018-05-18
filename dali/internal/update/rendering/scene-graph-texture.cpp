@@ -172,8 +172,16 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   {
     auto& controller = mGraphics->GetController();
 
+    auto format = Graphics::API::TextureDetails::Format::RGBA8;
+    auto pixelFormat = pixelData->GetPixelFormat();
+    if( pixelFormat == Dali::Pixel::Format::L8 )
+    {
+      format = Graphics::API::TextureDetails::Format::L8;
+    }
+
+
     mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
-                                                 .SetFormat( Graphics::API::TextureDetails::Format::RGBA8 )
+                                                 .SetFormat( format )
                                                  .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
                                                  .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
                                                  .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )

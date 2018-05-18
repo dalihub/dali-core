@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -101,6 +102,16 @@ ShaderPtr Shader::New( const std::string& vertexShader,
 {
   ShaderPtr shader( new Shader() );
   shader->Initialize( vertexShader, fragmentShader, hints );
+  return shader;
+}
+
+ShaderPtr Shader::New( std::vector<char>& vertexShader,
+                       std::vector<char>& fragmentShader,
+                       DevelShader::ShaderLanguage language,
+                       const Property::Map& specializationConstants )
+{
+  ShaderPtr shader( new Shader() );
+  shader->Initialize(vertexShader, fragmentShader, language, specializationConstants );
   return shader;
 }
 
@@ -313,6 +324,27 @@ void Shader::Initialize(
 
   // Add shader program to scene-object using a message to the UpdateManager
   SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
+
+  eventThreadServices.RegisterObject( this );
+}
+
+void Shader::Initialize( std::vector<char>& vertexShader,
+                         std::vector<char>& fragmentShader,
+                         DevelShader::ShaderLanguage language,
+                         const Property::Map& specializationConstants )
+{
+  auto hints = Dali::Shader::Hint::Value::NONE;
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+  mSceneObject = new SceneGraph::Shader( hints );
+
+  OwnerPointer< SceneGraph::Shader > transferOwnership( mSceneObject );
+  AddShaderMessage( updateManager, transferOwnership );
+
+  mShaderData = new ShaderData( vertexShader, fragmentShader, hints );
+
+  // Add shader program to scene-object using a message to the UpdateManager
+  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, false );
 
   eventThreadServices.RegisterObject( this );
 }
