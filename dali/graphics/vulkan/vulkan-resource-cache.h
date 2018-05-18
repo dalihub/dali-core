@@ -43,56 +43,56 @@ public:
    * @param buffer The buffer object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddBuffer( BufferRef buffer );
+  ResourceCache& AddBuffer( RefCountedBuffer buffer );
 
   /**
    * Adds the provided image object to the image cache
    * @param image The image object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddImage( ImageRef image );
+  ResourceCache& AddImage( RefCountedImage image );
 
   /**
    * Adds the provided pipeline object to the pipeline cache
    * @param pipeline The pipeline object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddPipeline( PipelineRef pipeline );
+  ResourceCache& AddPipeline( RefCountedPipeline pipeline );
 
   /**
    * Adds the provided shader object to the pipeline cache
    * @param shader The shader object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddShader( ShaderRef shader );
+  ResourceCache& AddShader( RefCountedShader shader );
 
   /**
    * Adds the provided command pool object to the command pool cache
    * @param pool The command pool object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddCommandPool( CommandPoolRef pool );
+  ResourceCache& AddCommandPool( RefCountedCommandPool pool );
 
   /**
    * Adds the provided descriptor pool object to the descriptor pool cache
    * @param pool The descriptor pool object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddDescriptorPool( DescriptorPoolRef pool );
+  ResourceCache& AddDescriptorPool( RefCountedDescriptorPool pool );
 
   /**
    * Adds the provided framebuffer object to the framebuffer cache
    * @param framebuffer The framebuffer object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddFramebuffer( FramebufferRef framebuffer );
+  ResourceCache& AddFramebuffer( RefCountedFramebuffer framebuffer );
 
   /**
    * Adds the provided sampler object to the sampler cache
    * @param sampler The sampler object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddSampler( SamplerRef sampler );
+  ResourceCache& AddSampler( RefCountedSampler sampler );
 
 
   /**
@@ -100,56 +100,56 @@ public:
    * @param buffer The Vulkan handle of the buffer object to be found
    * @return A Handle to the buffer object if found. An empty Handle otherwise
    */
-  BufferRef FindBuffer( vk::Buffer buffer );
+  RefCountedBuffer FindBuffer( vk::Buffer buffer );
 
   /**
    * Finds the image object using the specified Vulkan handle in the cache
    * @param image The Vulkan handle of the image object to be found
    * @return A handle to the Image object if found. An empty Handle otherwise
    */
-  ImageRef FindImage( vk::Image image);
+  RefCountedImage FindImage( vk::Image image);
 
   /**
    * Finds the Pipeline object using the specified Vulkan handle in the cache
    * @param pipeline The Vulkan handle of the Pipeline object to be found
    * @return A Handle to the Pipeline object if found. An empty Handle otherwise
    */
-  PipelineRef FindPipeline( vk::Pipeline pipeline );
+  RefCountedPipeline FindPipeline( vk::Pipeline pipeline );
 
   /**
    * Finds the shader module using the specified Vulkan handle in the cache
    * @param shaderModule The Vulkan handle of the shader module to be found
    * @return A Handle to the Shader module if found. An empty Handle otherwise
    */
-  ShaderRef FindShader( vk::ShaderModule shaderModule );
+  RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
   /**
    * Finds the CommandPool object using the specified Vulkan handle in the cache
    * @param commandPool The Vulkan handle of the CommandPool object to be found
    * @return A Handle to the CommandPool object if found. An empty Handle otherwise
    */
-  CommandPoolRef FindCommandPool( vk::CommandPool commandPool );
+  RefCountedCommandPool FindCommandPool( vk::CommandPool commandPool );
 
   /**
    * Finds the DescriptorPool object using the specified Vulkan handle in the cache
    * @param descriptorPool The Vulkan handle of the DescriptorPool object to be found
    * @return A Handle to the DescriptorPool object if found. An empty Handle otherwise
    */
-  DescriptorPoolRef FindDescriptorPool( vk::DescriptorPool descriptorPool );
+  RefCountedDescriptorPool FindDescriptorPool( vk::DescriptorPool descriptorPool );
 
   /**
    * Finds the Framebuffer object using the specified Vulkan handle in the cache
    * @param framebuffer The Vulkan handle of the Framebuffer object to be found
    * @return A Handle to the Framebuffer object if found. An empty Handle otherwise
    */
-  FramebufferRef FindFramebuffer( vk::Framebuffer framebuffer );
+  RefCountedFramebuffer FindFramebuffer( vk::Framebuffer framebuffer );
 
   /**
    * Finds the Sampler object using the specified Vulkan handle in the cache.
    * @param sampler The Vulkan handle of the Sampler object to be found
    * @return A Handle to the Sampler object if found. An empty Handle otherwise
    */
-  SamplerRef FindSampler( vk::Sampler sampler );
+  RefCountedSampler FindSampler( vk::Sampler sampler );
 
   /**
    * Removes the specified Buffer from the cache
@@ -220,14 +220,14 @@ public:
   ResourceCache&& operator=( ResourceCache&& other ) = delete;
 
 private:
-  std::vector<BufferRef> mBuffers;
-  std::vector<ImageRef> mImages;
-  std::vector<PipelineRef> mPipelines;
-  std::vector<ShaderRef> mShaders;
-  std::vector<CommandPoolRef> mCommandPools;
-  std::vector<DescriptorPoolRef> mDescriptorPools;
-  std::vector<FramebufferRef> mFramebuffers;
-  std::vector<SamplerRef> mSamplers;
+  std::vector<RefCountedBuffer> mBuffers;
+  std::vector<RefCountedImage> mImages;
+  std::vector<RefCountedPipeline> mPipelines;
+  std::vector<RefCountedShader> mShaders;
+  std::vector<RefCountedCommandPool> mCommandPools;
+  std::vector<RefCountedDescriptorPool> mDescriptorPools;
+  std::vector<RefCountedFramebuffer> mFramebuffers;
+  std::vector<RefCountedSampler> mSamplers;
 };
 
 } //namespace Vulkan

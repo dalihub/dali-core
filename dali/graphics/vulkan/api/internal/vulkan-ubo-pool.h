@@ -103,7 +103,7 @@ public:
    * @param ubo
    * @return
    */
-  Vulkan::BufferRef GetBuffer( Ubo& ubo ) const;
+  Vulkan::RefCountedBuffer GetBuffer( Ubo& ubo ) const;
 
 private:
 
@@ -141,7 +141,7 @@ struct Ubo
    * Returns buffer associated with the UBO
    * @return
    */
-  Vulkan::BufferRef GetBuffer() const;
+  Vulkan::RefCountedBuffer GetBuffer() const;
 
   /**
    * Returns binding offset within Vulkan buffer object

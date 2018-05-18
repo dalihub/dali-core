@@ -410,7 +410,7 @@ const vk::PipelineViewportStateCreateInfo* RenderCommand::PrepareViewportStateCr
           setScissorCount( Vulkan::U32(viewState.scissors.size())) );
 }
 
-const Vulkan::CommandBufferRef& RenderCommand::GetCommandBuffer() const
+const Vulkan::RefCountedCommandBuffer& RenderCommand::GetCommandBuffer() const
 {
   return mCommandBuffer;
 }
@@ -420,7 +420,7 @@ const Vulkan::PipelineCache& RenderCommand::GetPipelineCache() const
   return mPipelineCache;
 }
 
-const Vulkan::PipelineRef& RenderCommand::GetPipeline() const
+const Vulkan::RefCountedPipeline& RenderCommand::GetPipeline() const
 {
   return mPipeline;
 }
@@ -467,7 +467,7 @@ void RenderCommand::BindTexturesAndSamplers()
   }
 }
 
-const std::vector<Vulkan::DescriptorSetRef>& RenderCommand::GetDescriptorSets() const
+const std::vector<Vulkan::RefCountedDescriptorSet>& RenderCommand::GetDescriptorSets() const
 {
   return mDescriptorSets;
 }

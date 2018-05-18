@@ -49,7 +49,7 @@ struct BufferMemoryTransfer
   std::unique_ptr<char> srcPtr{ nullptr };
   uint32_t srcSize{ 0u };
 
-  Vulkan::BufferRef dstBuffer {};
+  Vulkan::RefCountedBuffer dstBuffer {};
   uint32_t          dstOffset { 0u };
 };
 

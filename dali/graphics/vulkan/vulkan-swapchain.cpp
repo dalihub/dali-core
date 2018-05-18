@@ -43,22 +43,22 @@ struct SwapchainBuffer
    * Each buffer has own master command buffer which executes
    * secondary buffers
    */
-  CommandBufferRef masterCmdBuffer;
+  RefCountedCommandBuffer masterCmdBuffer;
 
   /*
    * Each buffer has a command pool to allocate from
    */
-  CommandPoolRef masterCommandPool;
+  RefCountedCommandPool masterCommandPool;
 
   /*
    * Framebuffer object associated with the buffer
    */
-  FramebufferRef framebuffer;
+  RefCountedFramebuffer framebuffer;
 
   /*
    * Sync primitives
    */
-  FenceRef endOfFrameFence;
+  RefCountedFence endOfFrameFence;
 
   /*
    * Buffer index
@@ -76,7 +76,7 @@ struct Swapchain::Impl
   Impl( Swapchain& owner,
         Graphics&  graphics,
         Queue&     presentationQueue,
-        SurfaceRef surface,
+        RefCountedSurface surface,
         uint32_t   bufferCount,
         uint32_t   flags )
   : mOwner( owner ),
@@ -175,7 +175,7 @@ struct Swapchain::Impl
     auto cmdBuffer   = commandPool->NewCommandBuffer();
 
     std::vector<vk::ImageMemoryBarrier> barriers;
-    ImageViewRef                        depthStencilImage{};
+    RefCountedImageView                        depthStencilImage{};
 
     for( auto&& buffer : mSwapchainBuffer )
     {
@@ -250,7 +250,7 @@ struct Swapchain::Impl
     cmdBuffer->End();
 
     // use presentation queue to submit the call
-    mQueue.Submit( cmdBuffer, FenceRef{} );
+    mQueue.Submit( cmdBuffer, RefCountedFence{} );
     mQueue.WaitIdle();
   }
 
@@ -333,7 +333,7 @@ struct Swapchain::Impl
    * Creates depth stencil if necessary
    * @return
    */
-  ImageViewRef CreateDepthStencil()
+  RefCountedImageView CreateDepthStencil()
   {
     // create depth stencil image
     auto dsImageRef = Image::New( mGraphics,
@@ -364,14 +364,14 @@ struct Swapchain::Impl
    * @param image
    * @return
    */
-  FramebufferRef CreateFramebuffer( vk::Image& image )
+  RefCountedFramebuffer CreateFramebuffer( vk::Image& image )
   {
     auto fbRef = Framebuffer::New( mGraphics, mSwapchainExtent.width, mSwapchainExtent.height );
 
     // Create external Image reference
     // Note that despite we don't create VkImage, we still fill the createinfo structure
     // as this data will be used later
-    ImageRef imageRef = Image::New( mGraphics,
+    RefCountedImage imageRef = Image::New( mGraphics,
                                     vk::ImageCreateInfo{}
                                       .setFormat( mSwapchainImageFormat )
                                       .setSamples( vk::SampleCountFlagBits::e1 )
@@ -386,7 +386,7 @@ struct Swapchain::Impl
                                     image );
 
     // Create basic imageview ( all mipmaps, all layers )
-    ImageViewRef iv = ImageView::New( mGraphics, imageRef );
+    RefCountedImageView iv = ImageView::New( mGraphics, imageRef );
 
     fbRef->SetAttachment( iv, Framebuffer::AttachmentType::COLOR, 0u );
 
@@ -401,7 +401,7 @@ struct Swapchain::Impl
    */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
-  FramebufferRef AcquireNextFramebuffer()
+  RefCountedFramebuffer AcquireNextFramebuffer()
   {
     const auto& device    = mGraphics.GetDevice();
 
@@ -516,7 +516,7 @@ struct Swapchain::Impl
                              barriers );
   }
 
-  CommandBufferRef GetPrimaryCommandBuffer() const
+  RefCountedCommandBuffer GetPrimaryCommandBuffer() const
   {
     return mSwapchainBuffer[mCurrentBufferIndex].masterCmdBuffer;
   }
@@ -574,16 +574,16 @@ struct Swapchain::Impl
   Swapchain& mOwner;
   Graphics&  mGraphics;
   Queue&     mQueue;
-  SurfaceRef mSurface;
+  RefCountedSurface mSurface;
 
   uint32_t mBufferCount;
   uint32_t mFlags;
   uint32_t mCurrentBufferIndex;
 
-  FenceRef mFrameFence;
+  RefCountedFence mFrameFence;
 
   // swapchain framebuffers
-  std::vector<FramebufferRef> mFramebuffers;
+  std::vector<RefCountedFramebuffer> mFramebuffers;
 
   vk::SwapchainKHR           mSwapchainKHR;
   vk::SwapchainCreateInfoKHR mSwapchainCreateInfoKHR;
@@ -600,21 +600,21 @@ struct Swapchain::Impl
 /**
  * Swapchain API
  */
-SwapchainRef Swapchain::New(
-  Graphics& graphics, Queue& presentationQueue, SurfaceRef surface, uint8_t bufferCount, uint32_t flags )
+RefCountedSwapchain Swapchain::New(
+  Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
 {
-  auto retval = SwapchainRef( new Swapchain( graphics, presentationQueue, surface, bufferCount, flags ) );
+  auto retval = RefCountedSwapchain( new Swapchain( graphics, presentationQueue, surface, bufferCount, flags ) );
 
   if( retval->mImpl->Initialise() )
   {
     return retval;
   }
 
-  return SwapchainRef();
+  return RefCountedSwapchain();
 }
 
 Swapchain::Swapchain(
-  Graphics& graphics, Queue& presentationQueue, SurfaceRef surface, uint8_t bufferCount, uint32_t flags )
+  Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
 {
   mImpl = std::make_unique<Impl>( *this, graphics, presentationQueue, surface, bufferCount, flags );
 }
@@ -622,17 +622,17 @@ Swapchain::Swapchain(
 Swapchain::Swapchain()  = default;
 Swapchain::~Swapchain() = default;
 
-FramebufferRef Swapchain::GetCurrentFramebuffer() const
+RefCountedFramebuffer Swapchain::GetCurrentFramebuffer() const
 {
   return GetFramebuffer( mImpl->mCurrentBufferIndex );
 }
 
-FramebufferRef Swapchain::GetFramebuffer( uint32_t index ) const
+RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 {
   return mImpl->mSwapchainBuffer[index].framebuffer;
 }
 
-FramebufferRef Swapchain::AcquireNextFramebuffer()
+RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
   return mImpl->AcquireNextFramebuffer();
 }
@@ -647,7 +647,7 @@ void Swapchain::Present( std::vector<vk::Semaphore> waitSemaphores )
   mImpl->Present( waitSemaphores );
 }
 
-CommandBufferRef Swapchain::GetPrimaryCommandBuffer() const
+RefCountedCommandBuffer Swapchain::GetPrimaryCommandBuffer() const
 {
   return mImpl->GetPrimaryCommandBuffer();
 }
