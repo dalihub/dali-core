@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_DEBUG_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ enum DebugPriority
  * @param level debug level
  * @param format string format
  */
-DALI_IMPORT_API void LogMessage(enum DebugPriority level,const char *format, ...);
+DALI_CORE_API void LogMessage(enum DebugPriority level,const char *format, ...);
 
 /**
  * typedef for the logging function.
@@ -94,13 +94,13 @@ typedef void (*LogFunction)(DebugPriority priority, std::string& message);
  * @param logFunction the log function to install
  * @param logOpts the log options to save in thread
  */
-DALI_IMPORT_API void InstallLogFunction(const LogFunction& logFunction);
+DALI_CORE_API void InstallLogFunction(const LogFunction& logFunction);
 
 /**
  * A log function has to be uninstalled for every thread that wants to use logging.
  * The log function can be different for each thread.
  */
-DALI_IMPORT_API void UninstallLogFunction();
+DALI_CORE_API void UninstallLogFunction();
 
 /********************************************************************************
  *                            Error/Warning  macros.                            *
@@ -178,7 +178,7 @@ enum LogLevel
  * It provides the ability to turn tracing on or off.
  *
  */
-class DALI_IMPORT_API Filter
+class DALI_CORE_API Filter
 {
 public:
   typedef std::list<Filter*>           FilterList;
@@ -330,7 +330,7 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-class DALI_IMPORT_API TraceObj
+class DALI_CORE_API TraceObj
 {
 public:
   TraceObj(Filter* filter, const char* fmt, ...);
@@ -434,7 +434,7 @@ public: \
  * @param[in] color - the color to translate
  * @return string - the text representation of the color.
  */
-DALI_IMPORT_API std::string ColorToString(const Vector4& color);
+DALI_CORE_API std::string ColorToString(const Vector4& color);
 
 /**
  * Helper method to translate a vector4 to a string.
@@ -443,7 +443,7 @@ DALI_IMPORT_API std::string ColorToString(const Vector4& color);
  * @param[in] indent - the indent level to use.
  * @return string - the text representation of the vector.
  */
-DALI_IMPORT_API std::string Vector4ToString(const Vector4& v, size_t precision=3, size_t indent=0);
+DALI_CORE_API std::string Vector4ToString(const Vector4& v, size_t precision=3, size_t indent=0);
 
 /**
  * Helper method to translate a vector4 to a string.
@@ -452,7 +452,7 @@ DALI_IMPORT_API std::string Vector4ToString(const Vector4& v, size_t precision=3
  * @param[in] indent - the indent level to use.
  * @return string - the text representation of the vector.
  */
-DALI_IMPORT_API std::string Vector3ToString(const Vector3& v, size_t precision=3, size_t indent=0);
+DALI_CORE_API std::string Vector3ToString(const Vector3& v, size_t precision=3, size_t indent=0);
 
 /**
  * Helper method to translate a quaternion to a string.
@@ -461,7 +461,7 @@ DALI_IMPORT_API std::string Vector3ToString(const Vector3& v, size_t precision=3
  * @param[in] indent - the indent level to use.
  * @return string - the text representation of the quaternion.
  */
-DALI_IMPORT_API std::string QuaternionToString(const Quaternion& q, size_t precision=3, size_t indent=0);
+DALI_CORE_API std::string QuaternionToString(const Quaternion& q, size_t precision=3, size_t indent=0);
 
 /**
  * Helper method to translate a 3x3 matrix to a string.
@@ -470,7 +470,7 @@ DALI_IMPORT_API std::string QuaternionToString(const Quaternion& q, size_t preci
  * @param[in] indent - the indent level to use.
  * @return string - the text representation of the vector.
  */
-DALI_IMPORT_API std::string Matrix3ToString(const Matrix3& m, size_t precision=3, size_t indent=0);
+DALI_CORE_API std::string Matrix3ToString(const Matrix3& m, size_t precision=3, size_t indent=0);
 
 /**
  * Helper method to translate a 4x4 matrix to a string.
@@ -479,7 +479,7 @@ DALI_IMPORT_API std::string Matrix3ToString(const Matrix3& m, size_t precision=3
  * @param[in] indent - the indent level to use.
  * @return string - the text representation of the vector.
  */
-DALI_IMPORT_API std::string MatrixToString(const Matrix& m, size_t precision=3, size_t indent=0);
+DALI_CORE_API std::string MatrixToString(const Matrix& m, size_t precision=3, size_t indent=0);
 
 #ifdef DEBUG_ENABLED
 

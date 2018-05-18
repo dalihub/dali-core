@@ -2,7 +2,7 @@
 #define __DALI_MATRIX_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class Quaternion;
  * Each axis is contiguous in memory, so the x axis corresponds to elements 0, 1, 2 and 3, the y axis corresponds to elements 4, 5, 6, 7, etc.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Matrix
+class DALI_CORE_API Matrix
 {
 public:
 
@@ -414,7 +414,7 @@ private:
  * @param[in] matrix The matrix to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
+DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
 
 // Allow Matrix to be treated as a POD type
 template <> struct TypeTraits< Matrix > : public BasicTypes< Matrix > { enum { IS_TRIVIAL_TYPE = true }; };

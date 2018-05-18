@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_VALUE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ struct Extents;
  * @brief A value-type representing a property value.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Property::Value
+class DALI_CORE_API Property::Value
 {
 public:
 
@@ -429,7 +429,7 @@ private:
  * @param[in] value The value to insert
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
+DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
 
 /**
  * @}

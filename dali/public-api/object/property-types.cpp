@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ const unsigned int PROPERTY_TYPE_NAMES_COUNT = sizeof( PROPERTY_TYPE_NAMES ) / s
 namespace PropertyTypes
 {
 
-DALI_EXPORT_API const char* GetName(Property::Type type)
+DALI_CORE_API const char* GetName(Property::Type type)
 {
   if (type < PROPERTY_TYPE_NAMES_COUNT )
   {

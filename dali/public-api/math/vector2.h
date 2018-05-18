@@ -2,7 +2,7 @@
 #define __DALI_VECTOR_2_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ struct Vector4;
  * @brief A two dimensional vector.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API Vector2
+struct DALI_CORE_API Vector2
 {
 // (x width) and (y height) must be consecutive in memory.
 // No other data must be added before (x width) member.
@@ -468,7 +468,7 @@ typedef Vector2 Size;
  * @param[in] vector The vector to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Vector2& vector);
+DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Vector2& vector);
 
 /**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
@@ -507,7 +507,7 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
  * @param[in] max The maximum value
  * @return A vector containing the clamped components of v
  */
-DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );
+DALI_CORE_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );
 
 // Allow Vector2 to be treated as a POD type
 template <> struct TypeTraits< Vector2 > : public BasicTypes< Vector2 > { enum { IS_TRIVIAL_TYPE = true }; };

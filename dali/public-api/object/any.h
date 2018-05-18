@@ -2,7 +2,7 @@
 #define __DALI_ANY_TYPE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,13 @@ public:
    * @brief Default constructor.
    * @SINCE_1_0.0
    */
-  DALI_IMPORT_API Any();
+  DALI_CORE_API Any();
 
   /**
    * @brief Destructor. Free resources.
    * @SINCE_1_0.0
    */
-  DALI_IMPORT_API ~Any();
+  DALI_CORE_API ~Any();
 
   /**
    * @brief Passes Assert message.
@@ -67,7 +67,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] assertMessage Assert message to report
    */
-  DALI_IMPORT_API static void AssertAlways( const char* assertMessage );
+  DALI_CORE_API static void AssertAlways( const char* assertMessage );
 
   /**
    * @brief Constructs a Any type with the given value.
@@ -144,7 +144,7 @@ public:
    * @exception DaliException If parameter any is of a different type.
    *
    */
-  DALI_IMPORT_API Any& operator=( const Any& any );
+  DALI_CORE_API Any& operator=( const Any& any );
 
   /**
    * @brief Gets a value of type Type from container.
@@ -165,7 +165,7 @@ public:
    * @return The std::type_info of the stored value or the type info of the void
    * type if there is no value stored
    */
-  DALI_IMPORT_API const std::type_info& GetType() const;
+  DALI_CORE_API const std::type_info& GetType() const;
 
   /**
    * @brief Retrieves the stored value in the Any type.

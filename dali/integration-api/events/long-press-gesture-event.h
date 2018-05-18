@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_LONG_PRESS_GESTURE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/integration-api/events/gesture-event.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -38,7 +38,7 @@ namespace Integration
  * - Finished:  When the user finally lifts all touches.
  * - Cancelled: If, after a down event, no long press is detected, or a system interruption.
  */
-struct LongPressGestureEvent : public GestureEvent
+struct DALI_CORE_API LongPressGestureEvent : public GestureEvent
 {
   // Construction & Destruction
 

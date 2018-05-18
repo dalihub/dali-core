@@ -49,7 +49,7 @@ class Object;
  * @brief Dali::Handle is a handle to an internal property owning Dali object that can have constraints applied to it.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Handle : public BaseHandle
+class DALI_CORE_API Handle : public BaseHandle
 {
 public:
 
@@ -400,7 +400,7 @@ public:
 namespace WeightObject
 {
 
-DALI_IMPORT_API extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
+DALI_CORE_API extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
 
 /**
  * @brief Convenience function to create an object with a custom "weight" property.
@@ -408,7 +408,7 @@ DALI_IMPORT_API extern const Property::Index WEIGHT; ///< name "weight", type FL
  * @SINCE_1_0.0
  * @return A handle to a newly allocated object
  */
-DALI_IMPORT_API Handle New();
+DALI_CORE_API Handle New();
 
 } // namespace WeightObject
 

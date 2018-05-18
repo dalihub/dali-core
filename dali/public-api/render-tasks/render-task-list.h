@@ -2,7 +2,7 @@
 #define __DALI_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class RenderTaskList;
  * These tasks describe how the Dali scene should be rendered; @see Dali::RenderTask for more details.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API RenderTaskList : public BaseHandle
+class DALI_CORE_API RenderTaskList : public BaseHandle
 {
 public:
 

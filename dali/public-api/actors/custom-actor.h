@@ -2,7 +2,7 @@
 #define __DALI_CUSTOM_ACTOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class CustomActor;
  * The implementation of the control must be supplied; see CustomActorImpl for more details.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API CustomActor : public Actor
+class DALI_CORE_API CustomActor : public Actor
 {
 public:
 

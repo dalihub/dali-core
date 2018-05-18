@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_GESTURE_REQUESTS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -30,7 +30,7 @@ namespace Integration
 /**
  * This structure specifies the gesture type required (or no longer required) by Core.
  */
-struct GestureRequest
+struct DALI_CORE_API GestureRequest
 {
   // Creation & Destruction
 
@@ -57,7 +57,7 @@ struct GestureRequest
 /**
  * This is used by Core when a pan gesture is required.
  */
-struct PanGestureRequest : public GestureRequest
+struct DALI_CORE_API PanGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -87,7 +87,7 @@ struct PanGestureRequest : public GestureRequest
 /**
  * This is used by Core when a pinch gesture is required.
  */
-struct PinchGestureRequest : public GestureRequest
+struct DALI_CORE_API PinchGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -110,7 +110,7 @@ struct PinchGestureRequest : public GestureRequest
 /**
  * This is used by Core when a tap gesture is required.
  */
-struct TapGestureRequest : public GestureRequest
+struct DALI_CORE_API TapGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -144,7 +144,7 @@ struct TapGestureRequest : public GestureRequest
 /**
  * This is used by Core when a long press gesture is required.
  */
-struct LongPressGestureRequest : public GestureRequest
+struct DALI_CORE_API LongPressGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 

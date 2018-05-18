@@ -2,7 +2,7 @@
 #define DALI_SCRIPTING_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ struct StringEnum
  * @param[in]  tableCount  Number of items in the array.
  * @return     The index of the enumeration. If enumeration is not found, logs an error and returns tableCount.
  */
-DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
+DALI_CORE_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
 
 /**
  * @brief Find the enum as an integer from the table
@@ -68,7 +68,7 @@ DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum*
  * @param[out] integerEnum The value of the enum.
  * @return     true if one or more enums in value.
  */
-DALI_IMPORT_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, int& integerEnum );
+DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, int& integerEnum );
 
 /**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
@@ -272,7 +272,7 @@ const char * GetLinearEnumerationName( T value, const StringEnum* table, unsigne
  *
  * @return A pointer to a newly created object.
  */
-DALI_IMPORT_API Image NewImage( const Property::Value& property );
+DALI_CORE_API Image NewImage( const Property::Value& property );
 
 /**
  * @brief Creates an actor with the date from the property value map.
@@ -295,7 +295,7 @@ DALI_IMPORT_API Image NewImage( const Property::Value& property );
  *
  * @return A handle to the newly created actor.
  */
-DALI_IMPORT_API Actor NewActor( const Property::Map& map );
+DALI_CORE_API Actor NewActor( const Property::Map& map );
 
 /**
  * @brief Creates a Property::Map from the actor provided.
@@ -303,7 +303,7 @@ DALI_IMPORT_API Actor NewActor( const Property::Map& map );
  * @param[in]  actor The base-actor from which a Property::Map should be created
  * @param[out] map This map is cleared and a property map of actor and its children is filled in
  */
-DALI_IMPORT_API void CreatePropertyMap( Actor actor, Property::Map& map );
+DALI_CORE_API void CreatePropertyMap( Actor actor, Property::Map& map );
 
 /**
  * @brief Creates a Property::Map from the image provided.
@@ -311,7 +311,7 @@ DALI_IMPORT_API void CreatePropertyMap( Actor actor, Property::Map& map );
  * @param[in]  image The image from which a Property::Map should be created
  * @param[out] map This map is cleared and a property map of the image is filled in
  */
-DALI_IMPORT_API void CreatePropertyMap( Image image, Property::Map& map );
+DALI_CORE_API void CreatePropertyMap( Image image, Property::Map& map );
 
 /**
  * @brief Creates description data required to create an Animation object from a property map.
@@ -319,7 +319,7 @@ DALI_IMPORT_API void CreatePropertyMap( Image image, Property::Map& map );
  * @param[in]  map The property value map containing the animation description
  * @param[out] outputAnimationData Resultant data retrieved from the property map is written here
  */
-DALI_IMPORT_API void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimationData );
+DALI_CORE_API void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimationData );
 
 } // namespace Scripting
 

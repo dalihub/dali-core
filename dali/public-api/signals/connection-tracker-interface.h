@@ -2,7 +2,7 @@
 #define __DALI_CONNECTION_TRACKER_INTERFACE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace Dali
  * e.g. if Button object is destroyed while it is still connected.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API ConnectionTrackerInterface : public SignalObserver
+class DALI_CORE_API ConnectionTrackerInterface : public SignalObserver
 {
 public:
 
