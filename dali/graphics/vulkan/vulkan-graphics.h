@@ -66,8 +66,8 @@ class ResourceCache;
 
 struct SwapchainSurfacePair
 {
-  SwapchainRef swapchain;
-  SurfaceRef surface;
+  RefCountedSwapchain swapchain;
+  RefCountedSurface surface;
 };
 
 class Graphics
@@ -75,7 +75,6 @@ class Graphics
 
 public:
   Graphics();
-  explicit Graphics(std::unique_ptr< SurfaceFactory > surfaceFactory);
   Graphics(const Graphics&) = delete;
   Graphics& operator=(const Graphics&) = delete;
   ~Graphics();
@@ -85,18 +84,18 @@ public:
   // new way
   FBID CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory);
 
-  SwapchainRef CreateSwapchainForSurface( SurfaceRef surface );
+  RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
-  SurfaceRef GetSurface( FBID surfaceId );
+  RefCountedSurface GetSurface( FBID surfaceId );
 
-  SwapchainRef GetSwapchainForSurface( SurfaceRef surface );
+  RefCountedSwapchain GetSwapchainForSurface( RefCountedSurface surface );
 
-  SwapchainRef GetSwapchainForFBID( FBID surfaceId );
+  RefCountedSwapchain GetSwapchainForFBID( FBID surfaceId );
 
   void CreateDevice();
 
   /** Creates new command pool */
-  CommandPoolRef CreateCommandPool(const vk::CommandPoolCreateInfo& info);
+  RefCountedCommandPool CreateCommandPool(const vk::CommandPoolCreateInfo& info);
 
   vk::Device GetDevice() const;
 
@@ -137,9 +136,9 @@ private:
 
 private:
 
-  std::unique_ptr<GpuMemoryManager> mDeviceMemoryManager;
+  std::unique_ptr<GpuMemoryManager>        mDeviceMemoryManager;
 
-  vk::Instance             mInstance;
+  vk::Instance                             mInstance;
   std::unique_ptr<vk::AllocationCallbacks> mAllocator{nullptr};
 
   // physical device
@@ -170,16 +169,16 @@ private:
 public:
   // TODO: all this stuff should go into some vulkan cache
 
-  void AddBuffer( BufferRef buffer );
-  void AddImage( ImageRef image );
-  void AddPipeline( PipelineRef pipeline );
-  void AddShader( ShaderRef shader );
-  void AddCommandPool( CommandPoolRef pool );
-  void AddDescriptorPool( DescriptorPoolRef pool );
-  void AddFramebuffer( FramebufferRef framebuffer );
+  void AddBuffer( RefCountedBuffer buffer );
+  void AddImage( RefCountedImage image );
+  void AddPipeline( RefCountedPipeline pipeline );
+  void AddShader( RefCountedShader shader );
+  void AddCommandPool( RefCountedCommandPool pool );
+  void AddDescriptorPool( RefCountedDescriptorPool pool );
+  void AddFramebuffer( RefCountedFramebuffer framebuffer );
 
-  ShaderRef FindShader( vk::ShaderModule shaderModule );
-  ImageRef FindImage( vk::Image image );
+  RefCountedShader FindShader( vk::ShaderModule shaderModule );
+  RefCountedImage FindImage( vk::Image image );
 
   void RemoveBuffer( Buffer& buffer );
   void RemoveShader( Shader& shader );

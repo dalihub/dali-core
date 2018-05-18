@@ -193,20 +193,20 @@ struct Texture::Impl
     mSampler->GetVkHandle();
   }
 
-  SamplerRef GetSampler() const
+  RefCountedSampler GetSampler() const
   {
     return mSampler;
   }
 
   Graphics&    mGraphics;
-  ImageRef     mImage;
-  ImageViewRef mImageView;
-  SamplerRef   mSampler;
+  RefCountedImage     mImage;
+  RefCountedImageView mImageView;
+  RefCountedSampler   mSampler;
 
   // command pools should be 'per-thread' so they can be safely
   // used withing one single thread before submitting them
-  CommandPoolRef   mCommandPool;
-  CommandBufferRef mCommandBuffer; // primary buffer, executed independent
+  RefCountedCommandPool   mCommandPool;
+  RefCountedCommandBuffer mCommandBuffer; // primary buffer, executed independent
 
   // layouts
   vk::ImageLayout mOldLayout;
@@ -255,22 +255,22 @@ void Texture::UploadData( const void* data, size_t size, TextureUploadMode mode 
  * @param buffer
  * @param mode
  */
-void Texture::UploadFromBuffer( BufferRef buffer, TextureUploadMode mode )
+void Texture::UploadFromBuffer( RefCountedBuffer buffer, TextureUploadMode mode )
 {
 
 }
 
-ImageRef Texture::GetImage() const
+RefCountedImage Texture::GetImage() const
 {
   return mImpl->mImage;
 }
 
-ImageViewRef Texture::GetImageView() const
+RefCountedImageView Texture::GetImageView() const
 {
   return mImpl->mImageView;
 }
 
-SamplerRef Texture::GetSampler() const
+RefCountedSampler Texture::GetSampler() const
 {
   return mImpl->mSampler;
 }

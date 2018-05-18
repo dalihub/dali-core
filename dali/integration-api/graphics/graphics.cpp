@@ -37,7 +37,7 @@ namespace Integration
 namespace Graphics
 {
 using Swapchain = Dali::Graphics::Vulkan::Swapchain;
-using SwapchainRef = Dali::Graphics::Vulkan::SwapchainRef;
+using SwapchainRef = Dali::Graphics::Vulkan::RefCountedSwapchain;
 
 Graphics::Graphics()
 {

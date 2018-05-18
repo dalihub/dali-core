@@ -164,7 +164,7 @@ struct DescriptorSet::Impl
     mGraphics.GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
   }
 
-  void WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView )
+  void WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
   {
     // add resource to the list
     mResources.emplace_back( sampler.StaticCast<VkManaged>() );
@@ -220,7 +220,7 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
   return mImpl->mVkDescriptorSet;
 }
 
-void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, SamplerRef sampler, ImageViewRef imageView )
+void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
 {
   mImpl->WriteCombinedImageSampler( binding, sampler, imageView );
 }

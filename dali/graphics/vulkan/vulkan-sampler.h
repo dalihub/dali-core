@@ -37,7 +37,7 @@ public:
    * @param graphics
    * @return
    */
-  static SamplerRef New( Graphics& graphics );
+  static RefCountedSampler New( Graphics& graphics );
 
   /**
    * Creates new immutable sampler
@@ -45,7 +45,7 @@ public:
    * @param createInfo
    * @return
    */
-  static SamplerRef NewImmutable( Graphics& graphics, vk::SamplerCreateInfo createInfo );
+  static RefCountedSampler NewImmutable( Graphics& graphics, vk::SamplerCreateInfo createInfo );
 
   /**
    * Sets minification and magnifcation filters

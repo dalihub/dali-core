@@ -67,25 +67,25 @@ public:
    * @param buffer
    * @param mode
    */
-  void UploadFromBuffer( BufferRef buffer, TextureUploadMode mode );
+  void UploadFromBuffer( RefCountedBuffer buffer, TextureUploadMode mode );
 
   /**
    * Returns Image object
    * @return
    */
-  ImageRef GetImage() const;
+  RefCountedImage GetImage() const;
 
   /**
    * Returns image view
    * @return
    */
-  ImageViewRef GetImageView() const;
+  RefCountedImageView GetImageView() const;
 
   /**
    * Returns sampler
    * @return
    */
-  SamplerRef GetSampler() const;
+  RefCountedSampler GetSampler() const;
 
 private:
 
