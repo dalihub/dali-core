@@ -392,15 +392,12 @@ struct Swapchain::Impl
 
     return fbRef;
   }
-#pragma GCC diagnostic pop
 
   /**
    * This function acquires next framebuffer
    * @todo we should rather use roundrobin method
    * @return
    */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   RefCountedFramebuffer AcquireNextFramebuffer()
   {
     const auto& device    = mGraphics.GetDevice();
@@ -465,8 +462,8 @@ struct Swapchain::Impl
                                    } );
 
     rpInfo.setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) )
-          .setRenderPass( currentBuffer.framebuffer->GetVkRenderPass() )
-          .setFramebuffer( currentBuffer.framebuffer->GetVkFramebuffer() )
+          .setRenderPass( currentBuffer.framebuffer->GetRenderPassVkHandle() )
+          .setFramebuffer( currentBuffer.framebuffer->GetVkHandle() )
           .setPClearValues( newColors.data() )
           .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) );
 
