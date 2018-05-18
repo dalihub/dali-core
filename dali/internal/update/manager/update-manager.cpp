@@ -20,7 +20,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 // EXTERNAL INCLUDES
-#include <dali/graphics/graphics-controller.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>

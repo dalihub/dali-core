@@ -287,6 +287,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     }
   }
 
+  // Invalid input attributes!
+  if( mShader->GetGfxObject().Get().GetVertexAttributeLocations().size() != vertexAttributeBindings.size())
+    return;
+
   UpdateUniformMap( updateBufferIndex );
 
   auto& shader = mShader->GetGfxObject().Get();
@@ -389,16 +393,23 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
   auto samplers = shader.GetSamplers();
 
-  for( auto i = 0u; i < mTextureSet->GetTextureCount(); ++i )
+  if( mTextureSet )
   {
-    auto texture = mTextureSet->GetTexture( i );
-    auto gfxTexture = texture->GetGfxObject();
-    auto binding = Graphics::API::RenderCommand::TextureBinding{}
-        .SetBinding( samplers[i].binding )
-        .SetTexture( texture->GetGfxObject() )
-        .SetSampler( nullptr );
+    if(!samplers.empty())
+    {
+      for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
+      {
 
-    textureBindings.emplace_back( binding );
+        auto texture    = mTextureSet->GetTexture(i);
+        auto gfxTexture = texture->GetGfxObject();
+        auto binding    = Graphics::API::RenderCommand::TextureBinding{}
+          .SetBinding(samplers[i].binding)
+          .SetTexture(texture->GetGfxObject())
+          .SetSampler(nullptr);
+
+        textureBindings.emplace_back(binding);
+      }
+    }
   }
 
   // Build render command
@@ -407,11 +418,15 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   const auto& vb = mGeometry->GetVertexBuffers()[0];
   //vb->Update()
+
+
+
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
   mGfxRenderCommand->BindVertexBuffers( std::move(vertexAttributeBindings) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
-  mGfxRenderCommand->BindRenderState( std::move( Graphics::API::RenderCommand::RenderState{}
-                                       .SetShader( mShader->GetGfxObject() ) ) );
+  mGfxRenderCommand->BindRenderState( Graphics::API::RenderCommand::RenderState{}
+                                        .SetShader( mShader->GetGfxObject() )
+                                        .SetBlendState( { mBlendMode != BlendMode::OFF }) );
   mGfxRenderCommand->Draw( std::move(Graphics::API::RenderCommand::DrawCommand{}
                    .SetFirstVertex(0u)
                    .SetDrawType( Graphics::API::RenderCommand::DrawType::VERTEX_DRAW )
