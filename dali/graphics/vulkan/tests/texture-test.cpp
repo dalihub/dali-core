@@ -145,11 +145,11 @@ struct Texture
   }
 
   Graphics&        mGraphics;
-  ImageRef         mImage;
-  ImageViewRef     mImageView;
+  RefCountedImage         mImage;
+  RefCountedImageView     mImageView;
 
-  CommandPoolRef    mCommandPool;
-  CommandBufferRef  mCommandBuffer; // primary buffer, executed independent
+  RefCountedCommandPool    mCommandPool;
+  RefCountedCommandBuffer  mCommandBuffer; // primary buffer, executed independent
 
   // layouts
   vk::ImageLayout mOldLayout;

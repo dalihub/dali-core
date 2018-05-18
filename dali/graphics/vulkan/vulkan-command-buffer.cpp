@@ -173,7 +173,7 @@ struct CommandBuffer::Impl
     mCommandBuffer.bindVertexBuffers( firstBinding, bindingCount, vkBuffers.data(), pOffsets );
   }
 
-  void BindIndexBuffer( BufferRef buffer, uint32_t offset, vk::IndexType indexType )
+  void BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType )
   {
     // validate
     assert( ( buffer->GetUsage() & vk::BufferUsageFlagBits::eIndexBuffer ) &&
@@ -291,7 +291,7 @@ struct CommandBuffer::Impl
     {
       for( auto&& imageBarrier : imageBarriers )
       {
-        ImageRef imageResource{};
+        RefCountedImage imageResource{};
         if( (imageResource = mGraphics.FindImage( imageBarrier.image )) )
         {
           PushResource( imageResource );
@@ -303,7 +303,7 @@ struct CommandBuffer::Impl
     mCommandBuffer.pipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
   }
 
-  void CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage, vk::ImageLayout dstLayout, std::vector<vk::BufferImageCopy> regions )
+  void CopyBufferToImage( RefCountedBuffer srcBuffer, RefCountedImage dstImage, vk::ImageLayout dstLayout, std::vector<vk::BufferImageCopy> regions )
   {
     PushResource( srcBuffer );
     PushResource( dstImage );
@@ -311,7 +311,7 @@ struct CommandBuffer::Impl
     mCommandBuffer.copyBufferToImage(srcBuffer->GetVkHandle(), dstImage->GetVkHandle(), dstLayout, regions );
   }
 
-  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( ImageRef image,
+  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( RefCountedImage image,
                                                       const vk::AccessFlags&        srcAccessMask,
                                                       const vk::AccessFlags&        dstAccessMask,
                                                       vk::ImageLayout        oldLayout,
@@ -343,11 +343,11 @@ struct CommandBuffer::Impl
 
   std::vector<Handle<VkManaged>> mResources; // used resources
 
-  PipelineRef mCurrentPipeline;
+  RefCountedPipeline mCurrentPipeline;
 
   vk::RenderPass mCurrentRenderPass;
 
-  FenceRef       mFinishedFence;
+  RefCountedFence       mFinishedFence;
 
   bool mRecording{false};
 };
@@ -440,7 +440,7 @@ void CommandBuffer::BindVertexBuffers( uint32_t                    firstBinding,
   mImpl->BindVertexBuffers( firstBinding, bindingCount, buffers, pOffsets );
 }
 
-void CommandBuffer::BindIndexBuffer( BufferRef buffer, uint32_t offset, vk::IndexType indexType )
+void CommandBuffer::BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType )
 {
   mImpl->BindIndexBuffer( buffer, offset, indexType );
 }
@@ -513,13 +513,13 @@ void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
   mImpl->PipelineBarrier( srcStageMask, dstStageMask, dependencyFlags, memoryBarriers, bufferBarriers, imageBarriers );
 }
 
-void CommandBuffer::CopyBufferToImage( BufferRef srcBuffer, ImageRef dstImage,
+void CommandBuffer::CopyBufferToImage( RefCountedBuffer srcBuffer, RefCountedImage dstImage,
                                        vk::ImageLayout dstLayout, std::vector<vk::BufferImageCopy> regions )
 {
   mImpl->CopyBufferToImage( srcBuffer, dstImage, dstLayout, regions );
 }
 
-vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef image,
+vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( RefCountedImage image,
                                                      vk::AccessFlags        srcAccessMask,
                                                      vk::AccessFlags        dstAccessMask,
                                                      vk::ImageLayout        oldLayout,
@@ -533,7 +533,7 @@ vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef ima
                                               aspectMask  );
 }
 
-vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( ImageRef image,
+vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( RefCountedImage image,
                                                      vk::ImageLayout        oldLayout,
                                                      vk::ImageLayout        newLayout,
                                                      vk::ImageAspectFlags   aspectMask

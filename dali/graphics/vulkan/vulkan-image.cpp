@@ -58,7 +58,7 @@ struct Image::Impl
     return true;
   }
 
-  void BindMemory( const GpuMemoryBlockRef& handle )
+  void BindMemory( const RefCountedGpuMemoryBlock& handle )
   {
     mGraphics.GetDevice().bindImageMemory( mVkImage, *handle, 0 );
     mDeviceMemory = handle;
@@ -70,15 +70,15 @@ struct Image::Impl
   vk::ImageLayout     mVkImageLayout;
   vk::ImageCreateInfo mCreateInfo;
 
-  GpuMemoryBlockRef   mDeviceMemory;
+  RefCountedGpuMemoryBlock   mDeviceMemory;
   bool mIsExternal;
 };
 
 Image::~Image() = default;
 
-ImageRef Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo )
+RefCountedImage Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo )
 {
-  ImageRef retval( new Image( graphics, createInfo, nullptr ) );
+  RefCountedImage retval( new Image( graphics, createInfo, nullptr ) );
   if( !retval->mImpl->Initialise() )
   {
     retval.Reset();
@@ -90,9 +90,9 @@ ImageRef Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo )
   return retval;
 }
 
-ImageRef Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage )
+RefCountedImage Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage )
 {
-  ImageRef retval( new Image( graphics, createInfo, externalImage ) );
+  RefCountedImage retval( new Image( graphics, createInfo, externalImage ) );
   if( !retval->mImpl->Initialise() )
   {
     retval.Reset();
@@ -154,7 +154,7 @@ vk::ImageTiling Image::GetVkImageTiling() const
   return mImpl->mCreateInfo.tiling;
 }
 
-void Image::BindMemory( const GpuMemoryBlockRef& handle )
+void Image::BindMemory( const RefCountedGpuMemoryBlock& handle )
 {
   mImpl->BindMemory( handle );
 }
@@ -172,7 +172,7 @@ vk::ImageUsageFlags Image::GetVkImageUsageFlags() const
 
 struct ImageView::Impl
 {
-  Impl( ImageView& owner, Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo createInfo )
+  Impl( ImageView& owner, Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo createInfo )
   : mOwner( owner ), mGraphics( graphics ), mImage( image ), mCreateInfo( createInfo )
   {
   }
@@ -193,25 +193,25 @@ struct ImageView::Impl
 
   ImageView&              mOwner;
   Graphics&               mGraphics;
-  ImageRef                mImage;
+  RefCountedImage                mImage;
   vk::ImageViewCreateInfo mCreateInfo;
 
   vk::ImageView mVkImageView;
 };
 
-ImageViewRef ImageView::New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info )
+RefCountedImageView ImageView::New( Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo info )
 {
-  auto retval = ImageViewRef( new ImageView( graphics, image, info ) );
+  auto retval = RefCountedImageView( new ImageView( graphics, image, info ) );
   if( !retval->mImpl->Initialise() )
   {
-    return ImageViewRef();
+    return RefCountedImageView();
   }
   return retval;
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
-ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
+RefCountedImageView ImageView::New( Graphics& graphics, RefCountedImage image )
 {
   vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   vk::ImageAspectFlags aspectFlags{};
@@ -237,7 +237,7 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
     .setLayerCount( image->GetLayerCount() );
 
   // create reference, image may be null
-  auto retval = ImageViewRef( new ImageView( graphics,
+  auto retval = RefCountedImageView( new ImageView( graphics,
                                              image,
                                              vk::ImageViewCreateInfo{}
                                                .setViewType( vk::ImageViewType::e2D )
@@ -247,14 +247,14 @@ ImageViewRef ImageView::New( Graphics& graphics, ImageRef image )
                                                 .setImage(image->GetVkHandle() )));
   if(!retval->mImpl->Initialise())
   {
-    return ImageViewRef();
+    return RefCountedImageView();
   }
 
   return retval;
 }
 #pragma GCC diagnostic pop
 
-ImageView::ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo )
+ImageView::ImageView( Graphics& graphics, RefCountedImage image, const VkImageViewCreateInfo& createInfo )
 {
   mImpl = MakeUnique<Impl>( *this, graphics, image, createInfo );
 }
@@ -267,7 +267,7 @@ const vk::ImageView& ImageView::GetVkImageView() const
   return mImpl->mVkImageView;
 }
 
-ImageRef ImageView::GetImage() const
+RefCountedImage ImageView::GetImage() const
 {
   return mImpl->mImage;
 }

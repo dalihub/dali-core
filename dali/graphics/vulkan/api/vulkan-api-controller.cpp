@@ -140,7 +140,7 @@ struct Controller::Impl
       mBufferTransferRequests.clear();
     }
 
-    std::vector<Vulkan::CommandBufferRef> cmdBufRefs{};
+    std::vector<Vulkan::RefCountedCommandBuffer> cmdBufRefs{};
 
     // Prepare pipelines
     for( auto&& command : commands )
@@ -203,8 +203,8 @@ struct Controller::Impl
 
   // resources
   std::vector<Vulkan::TextureRef> mTextures;
-  std::vector<Vulkan::ShaderRef>  mShaders;
-  std::vector<Vulkan::BufferRef>  mBuffers;
+  std::vector<Vulkan::RefCountedShader>  mShaders;
+  std::vector<Vulkan::RefCountedBuffer>  mBuffers;
 
   // owner objects
   ObjectOwner<API::Texture>   mTexturesOwner;
@@ -220,7 +220,7 @@ struct Controller::Impl
   std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
 
   // todo: should be per thread
-  Vulkan::CommandPoolRef mCommandPool;
+  Vulkan::RefCountedCommandPool mCommandPool;
 
   std::vector<std::unique_ptr<VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 

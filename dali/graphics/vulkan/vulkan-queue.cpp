@@ -51,7 +51,7 @@ inline uint32_t u32(T val)
   return static_cast< uint32_t >(val);
 }
 
-inline PrepareSemaphoresData PrepareSemaphores(const std::vector< CommandBufferRef >& commandBuffers)
+inline PrepareSemaphoresData PrepareSemaphores(const std::vector< RefCountedCommandBuffer >& commandBuffers)
 {
   PrepareSemaphoresData retval{};
   for(auto& cmdbufref : commandBuffers)
@@ -97,15 +97,15 @@ Queue::~Queue() // queues are non-destructible
 {
 }
 
-std::unique_ptr< Submission > Queue::Submit( CommandBufferRef commandBuffer, Handle<Fence> fence)
+std::unique_ptr< Submission > Queue::Submit( RefCountedCommandBuffer commandBuffer, Handle<Fence> fence)
 {
-  auto buffers = std::vector< CommandBufferRef >({commandBuffer});
+  auto buffers = std::vector< RefCountedCommandBuffer >({commandBuffer});
   return Submit(buffers, fence);
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="
-std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef >& commandBuffers, Handle<Fence> fence)
+std::unique_ptr< Submission > Queue::Submit(const std::vector< RefCountedCommandBuffer >& commandBuffers, Handle<Fence> fence)
 {
   // Prepare command buffers for submission
   auto buffers = PrepareBuffers(commandBuffers);
@@ -129,7 +129,7 @@ std::unique_ptr< Submission > Queue::Submit(const std::vector< CommandBufferRef 
 }
 #pragma GCC diagnostic pop
 
-std::vector< vk::CommandBuffer > Queue::PrepareBuffers(const std::vector< CommandBufferRef >& commandBuffers) const
+std::vector< vk::CommandBuffer > Queue::PrepareBuffers(const std::vector< RefCountedCommandBuffer >& commandBuffers) const
 {
   std::vector< vk::CommandBuffer > retval(commandBuffers.size());
   for(uint32_t i = 0; i < commandBuffers.size(); ++i)

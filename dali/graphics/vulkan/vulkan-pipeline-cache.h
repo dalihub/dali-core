@@ -31,8 +31,8 @@ class Graphics;
 
 struct PipelineDescription
 {
-  ShaderRef vertexShader;
-  ShaderRef fragmentShader;
+  RefCountedShader vertexShader;
+  RefCountedShader fragmentShader;
 
   bool operator==(const PipelineDescription& description) const
   {
@@ -52,11 +52,11 @@ public:
 
   ~PipelineCache();
 
-  PipelineRef GetPipeline( const PipelineDescription& desc ) const;
+  RefCountedPipeline GetPipeline( const PipelineDescription& desc ) const;
 
-  bool AddPipeline( PipelineRef pipeline, const PipelineDescription& desc );
+  bool AddPipeline( RefCountedPipeline pipeline, const PipelineDescription& desc );
 
-  std::vector<vk::DescriptorSetLayout> GetDescriptorSetLayouts( const PipelineRef& pipeline ) const;
+  std::vector<vk::DescriptorSetLayout> GetDescriptorSetLayouts( const RefCountedPipeline& pipeline ) const;
 
 private:
   struct Impl;

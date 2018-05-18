@@ -56,7 +56,7 @@ public:
    * @param type
    * @return
    */
-  static BufferRef New( Graphics& graphics, size_t size, Type type );
+  static RefCountedBuffer New( Graphics& graphics, size_t size, Type type );
 
   /**
    *
@@ -64,7 +64,7 @@ public:
    * @param info
    * @return
    */
-  static BufferRef New( Graphics& graphics, vk::BufferCreateInfo info );
+  static RefCountedBuffer New( Graphics& graphics, vk::BufferCreateInfo info );
 
   /**
    * Returns buffer usage flags
@@ -88,13 +88,13 @@ public:
    * Returns handle to the allocated memory
    * @return
    */
-  const GpuMemoryBlockRef& GetMemoryHandle() const;
+  const RefCountedGpuMemoryBlock& GetMemoryHandle() const;
 
   /**
    * Binds buffer memory
    * @param handle
    */
-  void BindMemory( const GpuMemoryBlockRef& handle );
+  void BindMemory( const RefCountedGpuMemoryBlock& handle );
 
 public:
 

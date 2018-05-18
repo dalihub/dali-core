@@ -155,7 +155,7 @@ struct Framebuffer::Impl
     return false;
   }
 
-  void SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
+  void SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
   {
     // TODO: all array-type atyachments
     if( type == AttachmentType::COLOR )
@@ -173,7 +173,7 @@ struct Framebuffer::Impl
     }
   }
 
-  ImageViewRef GetAttachment( AttachmentType type, uint32_t index ) const
+  RefCountedImageView GetAttachment( AttachmentType type, uint32_t index ) const
   {
     switch( type )
     {
@@ -190,15 +190,15 @@ struct Framebuffer::Impl
       case AttachmentType::RESOLVE:
       case AttachmentType::PRESERVE:
       {
-        return ImageViewRef();
+        return RefCountedImageView();
       }
     }
-    return ImageViewRef();
+    return RefCountedImageView();
   }
 
-  std::vector<ImageViewRef> GetAttachments( AttachmentType type ) const
+  std::vector<RefCountedImageView> GetAttachments( AttachmentType type ) const
   {
-    std::vector<ImageViewRef> retval{};
+    std::vector<RefCountedImageView> retval{};
     switch( type )
     {
       case AttachmentType::COLOR:
@@ -224,7 +224,7 @@ struct Framebuffer::Impl
 
   uint32_t GetAttachmentCount( AttachmentType type ) const
   {
-    std::vector<ImageViewRef> retval{};
+    std::vector<RefCountedImageView> retval{};
     switch( type )
     {
       case AttachmentType::COLOR:
@@ -269,8 +269,8 @@ struct Framebuffer::Impl
   uint32_t mWidth;
   uint32_t mHeight;
 
-  std::vector<ImageViewRef> mColorImageViewAttachments;
-  ImageViewRef              mDepthStencilImageViewAttachment;
+  std::vector<RefCountedImageView> mColorImageViewAttachments;
+  RefCountedImageView              mDepthStencilImageViewAttachment;
   vk::Framebuffer           mVkFramebuffer;
   vk::RenderPass            mVkRenderPass;
 
@@ -282,9 +282,9 @@ struct Framebuffer::Impl
   bool mInitialised{false};
 };
 
-FramebufferRef Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
+RefCountedFramebuffer Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
 {
-  FramebufferRef ref( new Framebuffer( graphics, width, height ) );
+  RefCountedFramebuffer ref( new Framebuffer( graphics, width, height ) );
   return ref;
 }
 
@@ -293,7 +293,7 @@ Framebuffer::Framebuffer( Graphics& graphics, uint32_t width, uint32_t height )
   mImpl = std::make_unique<Impl>( *this, graphics, width, height );
 }
 
-void Framebuffer::SetAttachment( ImageViewRef imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
+void Framebuffer::SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
 {
   mImpl->SetAttachment( imageViewRef, type, index );
 }
@@ -308,12 +308,12 @@ uint32_t Framebuffer::GetHeight() const
   return mImpl->mHeight;
 }
 
-ImageViewRef Framebuffer::GetAttachment( AttachmentType type, uint32_t index ) const
+RefCountedImageView Framebuffer::GetAttachment( AttachmentType type, uint32_t index ) const
 {
   return mImpl->GetAttachment( type, index );
 }
 
-std::vector<ImageViewRef> Framebuffer::GetAttachments( AttachmentType type ) const
+std::vector<RefCountedImageView> Framebuffer::GetAttachments( AttachmentType type ) const
 {
   return mImpl->GetAttachments( type );
 }

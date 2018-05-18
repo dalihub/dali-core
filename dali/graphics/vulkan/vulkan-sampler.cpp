@@ -87,9 +87,9 @@ struct Sampler::Impl
  * @param graphics
  * @return
  */
-SamplerRef Sampler::New( Graphics& graphics )
+RefCountedSampler Sampler::New( Graphics& graphics )
 {
-  return SamplerRef(new Sampler(graphics, vk::SamplerCreateInfo{}, false));
+  return RefCountedSampler(new Sampler(graphics, vk::SamplerCreateInfo{}, false));
 }
 
 /**
@@ -98,14 +98,14 @@ SamplerRef Sampler::New( Graphics& graphics )
  * @param createInfo
  * @return
  */
-SamplerRef Sampler::NewImmutable( Graphics& graphics, vk::SamplerCreateInfo createInfo )
+RefCountedSampler Sampler::NewImmutable( Graphics& graphics, vk::SamplerCreateInfo createInfo )
 {
-  auto retval = SamplerRef(new Sampler(graphics, createInfo, true));
+  auto retval = RefCountedSampler(new Sampler(graphics, createInfo, true));
   if( retval->mImpl->CreateSampler() )
   {
     return retval;
   }
-  return SamplerRef();
+  return RefCountedSampler();
 }
 
 Sampler::Sampler( Graphics& graphics, vk::SamplerCreateInfo createInfo, bool immutable )

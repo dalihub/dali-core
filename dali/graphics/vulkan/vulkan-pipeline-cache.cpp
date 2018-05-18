@@ -33,12 +33,12 @@ struct PipelineCache::Impl
   struct PipelineCacheItem
   {
 
-    PipelineCacheItem( PipelineRef _pipeline, const PipelineDescription& _description )
+    PipelineCacheItem( RefCountedPipeline _pipeline, const PipelineDescription& _description )
       : pipeline(_pipeline), description(_description)
     {
 
     }
-    PipelineRef                           pipeline;
+    RefCountedPipeline                           pipeline;
     PipelineDescription                   description;
   };
 
@@ -55,7 +55,7 @@ struct PipelineCache::Impl
    * @param pipelineInfo
    * @return
    */
-  PipelineRef GetPipeline( const PipelineDescription& description )
+  RefCountedPipeline GetPipeline( const PipelineDescription& description )
   {
     for( auto&& item : mPipelines )
     {
@@ -64,17 +64,17 @@ struct PipelineCache::Impl
         return item.pipeline;
       }
     }
-    return PipelineRef();
+    return RefCountedPipeline();
   }
 
 
-  bool AddPipeline( PipelineRef pipeline, const PipelineDescription& description )
+  bool AddPipeline( RefCountedPipeline pipeline, const PipelineDescription& description )
   {
     mPipelines.emplace_back( pipeline, description );
     return true;
   }
 
-  std::vector<vk::DescriptorSetLayout> GetDescriptorSetLayouts( const PipelineRef& pipeline ) const
+  std::vector<vk::DescriptorSetLayout> GetDescriptorSetLayouts( const RefCountedPipeline& pipeline ) const
   {
     auto retval = std::vector<vk::DescriptorSetLayout>{};
     for( auto&& item : mPipelines )
@@ -102,17 +102,17 @@ PipelineCache::PipelineCache( Graphics& graphics )
 
 PipelineCache::~PipelineCache() = default;
 
-PipelineRef PipelineCache::GetPipeline( const PipelineDescription& desc ) const
+RefCountedPipeline PipelineCache::GetPipeline( const PipelineDescription& desc ) const
 {
   return mImpl->GetPipeline( desc );
 }
 
-bool PipelineCache::AddPipeline( PipelineRef pipeline, const PipelineDescription& desc )
+bool PipelineCache::AddPipeline( RefCountedPipeline pipeline, const PipelineDescription& desc )
 {
   return mImpl->AddPipeline( pipeline,desc );
 }
 
-std::vector<vk::DescriptorSetLayout> PipelineCache::GetDescriptorSetLayouts( const PipelineRef& pipeline ) const
+std::vector<vk::DescriptorSetLayout> PipelineCache::GetDescriptorSetLayouts( const RefCountedPipeline& pipeline ) const
 {
   return mImpl->GetDescriptorSetLayouts( pipeline );
 }

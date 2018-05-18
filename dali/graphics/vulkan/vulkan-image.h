@@ -37,7 +37,7 @@ public:
    * @param createInfo
    * @return
    */
-  static ImageRef New( Graphics& graphics, vk::ImageCreateInfo createInfo );
+  static RefCountedImage New( Graphics& graphics, vk::ImageCreateInfo createInfo );
 
   /**
    * Creates new managed object from external image, lifecycle must be managed
@@ -47,7 +47,7 @@ public:
    * @param image
    * @return
    */
-  static ImageRef New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
+  static RefCountedImage New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
 
   /**
    * Destructor
@@ -118,7 +118,7 @@ public:
    * Binds image memory
    * @param handle
    */
-  void BindMemory( const GpuMemoryBlockRef& handle );
+  void BindMemory( const RefCountedGpuMemoryBlock& handle );
 
   /**
    * Creates new VkImage with given specification, it doesn't
@@ -153,7 +153,7 @@ public:
    * @param info
    * @return
    */
-  static ImageViewRef New( Graphics& graphics, ImageRef image, vk::ImageViewCreateInfo info );
+  static RefCountedImageView New( Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo info );
 
   /**
    * Creates default image view which includes single layer and level, aspect
@@ -162,7 +162,7 @@ public:
    * @param image
    * @return
    */
-  static ImageViewRef New( Graphics& graphics, ImageRef image = ImageRef() );
+  static RefCountedImageView New( Graphics& graphics, RefCountedImage image = RefCountedImage() );
 
 
   virtual ~ImageView() override;
@@ -177,7 +177,7 @@ public:
    * Returns bound ImageRef
    * @return
    */
-  ImageRef GetImage() const;
+  RefCountedImage GetImage() const;
 
   /**
    *
@@ -269,7 +269,7 @@ public:
 
 private:
 
-  ImageView( Graphics& graphics, ImageRef image, const VkImageViewCreateInfo& createInfo );
+  ImageView( Graphics& graphics, RefCountedImage image, const VkImageViewCreateInfo& createInfo );
 
   struct Impl;
   std::unique_ptr<Impl> mImpl;

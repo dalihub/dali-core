@@ -38,7 +38,7 @@ mGraphics( graphics )
 
 }
 
-ShaderRef Shader::GetShader( vk::ShaderStageFlagBits shaderStage ) const
+RefCountedShader Shader::GetShader( vk::ShaderStageFlagBits shaderStage ) const
 {
   switch( shaderStage )
   {
@@ -59,7 +59,7 @@ ShaderRef Shader::GetShader( vk::ShaderStageFlagBits shaderStage ) const
     {
     }
   }
-  return ShaderRef();
+  return RefCountedShader();
 }
 
 Shader& Shader::DownCast( Dali::Graphics::API::Shader& shader )
@@ -67,7 +67,7 @@ Shader& Shader::DownCast( Dali::Graphics::API::Shader& shader )
   return *( dynamic_cast<Shader*>( &shader ) );
 }
 
-Vulkan::ShaderRef Shader::GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const
+Vulkan::RefCountedShader Shader::GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const
 {
   if(shaderStage == vk::ShaderStageFlagBits::eVertex)
   {
@@ -79,7 +79,7 @@ Vulkan::ShaderRef Shader::GetShaderRef( vk::ShaderStageFlagBits shaderStage ) co
   }
   else
   {
-    return Vulkan::ShaderRef( );
+    return Vulkan::RefCountedShader( );
   }
 }
 
