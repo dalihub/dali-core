@@ -78,24 +78,9 @@ public:
   API::Accessor<API::Texture> CreateTexture( const API::BaseFactory<API::Texture>& factory ) override;
 
   /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::TextureSet> CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory ) override;
-
-  /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::DynamicBuffer> CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory ) override;
-
-  /**
  * @brief Create a new object
  */
   API::Accessor<API::Buffer> CreateBuffer( const API::BaseFactory<API::Buffer>& factory ) override;
-
-  /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::StaticBuffer> CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory ) override;
 
   /**
    * @brief Create a new object
@@ -117,8 +102,6 @@ public:
    * @brief Get a render list
    */
   void GetRenderItemList() override;
-
-  void SubmitCommand( API::RenderCommand&& command ) override;
 
   void BeginFrame() override;
 

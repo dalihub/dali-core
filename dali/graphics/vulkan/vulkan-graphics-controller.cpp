@@ -89,7 +89,13 @@ struct Controller::Impl
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
-    swapchain->AcquireNextFramebuffer();
+
+    auto framebuffer = swapchain->AcquireNextFramebuffer();
+
+    swapchain->BeginPrimaryRenderPass( {
+                                         { 1.0f, 1.0f, 1.0f, 1.0f }
+                                       }  );
+
   }
 
   void EndFrame()
@@ -304,11 +310,6 @@ Controller& Controller::operator=( Controller&& ) = default;
 
 void Controller::GetRenderItemList()
 {
-}
-
-void Controller::SubmitCommand( Dali::Graphics::API::RenderCommand&& command )
-{
-  // not in use
 }
 
 void Controller::BeginFrame()
