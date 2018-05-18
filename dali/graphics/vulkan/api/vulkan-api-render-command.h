@@ -112,6 +112,7 @@ public:
   const Vulkan::PipelineRef& GetPipeline() const;
 
 
+
 private:
 
   const vk::PipelineColorBlendStateCreateInfo*      PrepareColorBlendStateCreateInfo();

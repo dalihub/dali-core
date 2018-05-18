@@ -21,18 +21,13 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-base-factory.h>
-#include <dali/graphics-api/graphics-api-dynamic-buffer.h>
-#include <dali/graphics-api/graphics-api-frame.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
-#include <dali/graphics-api/graphics-api-generic-buffer.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-sampler.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics-api/graphics-api-shader-factory.h>
-#include <dali/graphics-api/graphics-api-static-buffer.h>
 #include <dali/graphics-api/graphics-api-texture-factory.h>
-#include <dali/graphics-api/graphics-api-texture-set.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
@@ -67,22 +62,7 @@ public:
   /**
    * @brief Create a new object
    */
-  virtual Accessor<TextureSet> CreateTextureSet( const BaseFactory<TextureSet>& factory ) = 0;
-
-  /**
-   * @brief Create a new object
-   */
-  virtual Accessor<DynamicBuffer> CreateDynamicBuffer( const BaseFactory<DynamicBuffer>& factory ) = 0;
-
-  /**
-   * @brief Create a new object
-   */
   virtual Accessor<Buffer> CreateBuffer( const BaseFactory<Buffer>& factory ) = 0;
-
-  /**
-   * @brief Create a new object
-   */
-  virtual Accessor<StaticBuffer> CreateStaticBuffer( const BaseFactory<StaticBuffer>& factory ) = 0;
 
   /**
    * @brief Create a new object
@@ -116,17 +96,6 @@ public:
  * @return
  */
   virtual BufferFactory& GetBufferFactory() const = 0;
-
-  /**
-   * @brief Create a buffer
-   */
-  template<typename T>
-  std::unique_ptr<GenericBuffer<T>> CreateBuffer( size_t numberOfElements );
-
-  /**
-   * @brief Submit a render command
-   */
-  virtual void SubmitCommand( API::RenderCommand&& command ) = 0;
 
   /**
    * @brief alAllocates render command ( depends on implementation );
@@ -165,8 +134,6 @@ protected:
    */
   Controller() = default;
 
-
-
   /**
    * @brief create an element for the given number of elements and element size
    */
@@ -174,12 +141,6 @@ protected:
 
 private:
 };
-
-template<typename T>
-std::unique_ptr<GenericBuffer<T>> Controller::CreateBuffer( size_t numberOfElements )
-{
-    return std::make_unique<GenericBuffer<T>>(numberOfElements, std::move(CreateBuffer( numberOfElements, sizeof( T ) )));
-}
 
 } // namespace API
 } // namespace Graphics

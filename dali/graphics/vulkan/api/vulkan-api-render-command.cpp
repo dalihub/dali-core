@@ -92,7 +92,7 @@ bool RenderCommand::PreparePipeline()
     auto vertexShader   = shader.GetShader(vk::ShaderStageFlagBits::eVertex);
     auto fragmentShader = shader.GetShader(vk::ShaderStageFlagBits::eFragment);
 
-    auto pipelineRef = pipelineCache.GetPipeline({vertexShader, fragmentShader, {}});
+    auto pipelineRef = pipelineCache.GetPipeline({vertexShader, fragmentShader, renderState.blendState, {}});
 
     if (!pipelineRef)
     {
@@ -107,27 +107,37 @@ bool RenderCommand::PreparePipeline()
       std::vector<vk::VertexInputBindingDescription> bindingDescriptions{};
 
       uint32_t  currentBuffer{0xffffffff};
-      for (auto &&vb : GetVertexBufferBindings())
+      if( !attribs.empty() && attribs.size() == GetVertexBufferBindings().size() )
       {
-        if (currentBuffer != vb.buffer
-                               .GetHandle())
+        for (auto &&vb : GetVertexBufferBindings())
         {
-          bindingDescriptions.emplace_back(vk::VertexInputBindingDescription{}
-                                             .setBinding(bindingIndex)
-                                             .setInputRate(vb.rate == API::RenderCommand::InputAttributeRate::PER_VERTEX
-                                                           ? vk::VertexInputRate::eVertex
-                                                           : vk::VertexInputRate::eInstance)
-                                             .setStride(vb.stride));
-          bindingIndex++;
-          currentBuffer = Vulkan::U32(vb.buffer
-                                        .GetHandle());
-        }
+          if (currentBuffer != vb.buffer
+                                 .GetHandle())
+          {
+            bindingDescriptions.emplace_back(vk::VertexInputBindingDescription{}
+                                               .setBinding(bindingIndex)
+                                               .setInputRate(
+                                                 vb.rate == API::RenderCommand::InputAttributeRate::PER_VERTEX
+                                                 ? vk::VertexInputRate::eVertex
+                                                 : vk::VertexInputRate::eInstance)
+                                               .setStride(vb.stride));
+            bindingIndex++;
+            currentBuffer = Vulkan::U32(vb.buffer
+                                          .GetHandle());
+          }
 
-        attributeDescriptions.emplace_back(vk::VertexInputAttributeDescription{}
-                                             .setBinding(bindingDescriptions.back()
-                                                                            .binding)
-                                             .setFormat(attribs[vb.location].format)
-                                             .setOffset(vb.offset));
+
+          attributeDescriptions.emplace_back(vk::VertexInputAttributeDescription{}
+                                               .setBinding(bindingDescriptions.back()
+                                                                              .binding)
+                                               .setFormat(attribs[vb.location].format)
+                                               .setOffset(vb.offset));
+        }
+      }
+      else // incompatible pipeline
+      {
+        mUpdateFlags = 0;
+        return false;
       }
 
       auto vertexInputState = vk::PipelineVertexInputStateCreateInfo{}
@@ -224,7 +234,7 @@ bool RenderCommand::PreparePipeline()
 
       pipeline->Compile();
 
-      pipelineCache.AddPipeline(pipeline, Vulkan::PipelineDescription{vertexShader, fragmentShader, dsLayouts});
+      pipelineCache.AddPipeline(pipeline, Vulkan::PipelineDescription{vertexShader, fragmentShader, renderState.blendState, dsLayouts});
 
       pipelineRef = pipeline;
 
@@ -279,9 +289,12 @@ bool RenderCommand::PreparePipeline()
 void RenderCommand::UpdateUniformBuffers()
 {
   uint32_t uboIndex = 0u;
-  for( auto&& pc : mPushConstantsBindings )
+  if(!mUboBuffers.empty() && mUboBuffers.size() == mPushConstantsBindings.size())
   {
-    mUboBuffers[uboIndex++]->WriteKeepMapped( pc.data, 0, pc.size );
+    for (auto &&pc : mPushConstantsBindings)
+    {
+      mUboBuffers[uboIndex++]->WriteKeepMapped(pc.data, 0, pc.size);
+    }
   }
 }
 
@@ -290,15 +303,15 @@ const vk::PipelineColorBlendStateCreateInfo* RenderCommand::PrepareColorBlendSta
   //@todo support more attachments
   //@todo use data from render state
   auto blendAttachmentState = vk::PipelineColorBlendAttachmentState{}
-    .setBlendEnable( true )
+    .setBlendEnable( vk::Bool32(mRenderState.blendState.blendingEnabled) )
     .setColorWriteMask( vk::ColorComponentFlagBits::eR |
                         vk::ColorComponentFlagBits::eG |
                         vk::ColorComponentFlagBits::eB |
                         vk::ColorComponentFlagBits::eA )
     .setSrcColorBlendFactor( vk::BlendFactor::eSrcAlpha )
-    .setDstColorBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha )
+    .setDstColorBlendFactor( vk::BlendFactor::eOneMinusSrcAlpha )
     .setSrcAlphaBlendFactor( vk::BlendFactor::eOne )
-    .setDstAlphaBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha )
+    .setDstAlphaBlendFactor( vk::BlendFactor::eOneMinusSrcAlpha )
     .setColorBlendOp( vk::BlendOp::eAdd )
     .setAlphaBlendOp( vk::BlendOp::eAdd );
 
@@ -458,6 +471,7 @@ const std::vector<Vulkan::DescriptorSetRef>& RenderCommand::GetDescriptorSets() 
 {
   return mDescriptorSets;
 }
+
 
 } // namespace VulkanAPI
 } // namespace Graphics

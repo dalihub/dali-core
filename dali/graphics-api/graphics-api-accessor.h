@@ -47,6 +47,10 @@ public:
 
   bool Exists() const
   {
+    if( !mOwner )
+    {
+      return false;
+    }
     return GetOwner().Contains(mHandle);
   }
 

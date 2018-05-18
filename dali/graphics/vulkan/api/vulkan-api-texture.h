@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics/graphics-controller.h>
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-graphics-texture.h>
 
