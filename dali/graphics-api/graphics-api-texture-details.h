@@ -41,6 +41,7 @@ enum class Format {
 
   // texture color formats
   RGBA8,
+  L8,
   ETC2_RGBA8,
 
   // compressed color formats

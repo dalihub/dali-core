@@ -31,13 +31,11 @@ namespace Graphics
 namespace Vulkan
 {
 class PipelineCache;
-class Controller;
 }
+
 namespace VulkanAPI
 {
-
-using Controller = Vulkan::Controller;
-
+class Controller;
 class Ubo;
 
 /**
@@ -110,6 +108,7 @@ public:
    * @return
    */
   const Vulkan::PipelineRef& GetPipeline() const;
+
 
 
 private:

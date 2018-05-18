@@ -20,7 +20,7 @@
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <memory>
 namespace Dali
 {
@@ -29,7 +29,7 @@ namespace Graphics
 namespace VulkanAPI
 {
 
-Buffer::Buffer( Vulkan::Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size )
+Buffer::Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size )
 : mController( controller ), mGraphics( controller.GetGraphics() ), mUsageHints( usageHints ), mSize( size )
 {
 
