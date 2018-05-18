@@ -35,52 +35,22 @@ namespace Vulkan
 {
 using namespace Dali::Graphics::Vulkan;
 
-/**
- * Helper structure, temporary
- */
-struct Pixel
-{
-  Pixel() = default;
-
-  explicit Pixel( uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a )
-  {
-    components.r = _r;
-    components.g = _g;
-    components.b = _b;
-    components.a = _a;
-  }
-
-    struct
-    {
-      uint8_t r, g, b, a;
-    } components;
-
-  /*
-  uint8_t& r = components.r;
-  uint8_t& g = components.g;
-  uint8_t& b = components.b;
-  uint8_t& a = components.a;
-   */
-};
-
 struct Pixmap
 {
-  explicit Pixmap( std::vector<Pixel> _data, uint32_t _width, uint32_t _height )
-  : data( _data ), width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
+  explicit Pixmap( uint32_t _width, uint32_t _height, vk::Format format  )
+    : width( _width ), height( _height ), bytesPerPixel(1), pixelFormat( format )
   {
+    totalSizeInBytes = width*height*bytesPerPixel;
+    data.resize( totalSizeInBytes );
+
   }
 
-  explicit Pixmap( uint32_t _width, uint32_t _height )
-  : width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
-  {
-    data.resize( _width * _height );
-  }
-
-  std::vector<Pixel> data;
-  uint32_t           width;
-  uint32_t           height;
-  uint32_t           bytesPerPixel;
-  vk::Format         pixelFormat;
+  std::vector<uint8_t>  data;
+  uint32_t              width;
+  uint32_t              height;
+  uint32_t              bytesPerPixel;
+  uint32_t              totalSizeInBytes;
+  vk::Format            pixelFormat;
 };
 
 /**
@@ -91,23 +61,23 @@ struct Pixmap
  */
 struct Texture::Impl
 {
-  Impl( Graphics& graphics, Pixmap pixmap ) : mGraphics( graphics ), mPixmap( pixmap )
-  {
-  }
-
-  Impl( Texture& owner, Graphics& graphics, uint32_t width, uint32_t height, vk::Format format ) : mGraphics( graphics ),
-                                                                                                   mPixmap( width, height )
+  Impl( Texture& owner,
+        Graphics& graphics,
+        uint32_t width,
+        uint32_t height,
+        vk::Format format ) : mGraphics( graphics ),
+        mPixmap( width, height, format )
   {
     mWidth = width;
     mHeight = height;
+    mFormat = format;
   }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
+
   bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
   {
     // create buffer
     auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
-    auto size   = mPixmap.data.size() * sizeof( mPixmap.data[0] );
+    auto size   = sizeInBytes;
     auto buffer = Buffer::New( mGraphics,
                                vk::BufferCreateInfo{}
                                  .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
@@ -207,7 +177,7 @@ struct Texture::Impl
 
     return true;
   }
-#pragma GCC diagnostic pop
+
   void CreateSampler()
   {
     // mutable sampler creation will be deferred until it's used
@@ -243,6 +213,7 @@ struct Texture::Impl
   vk::ImageLayout mNewLayout;
 
   uint32_t mWidth { 0u }, mHeight { 0u };
+  vk::Format mFormat {};
   // Command pool
   Pixmap mPixmap;
 };
