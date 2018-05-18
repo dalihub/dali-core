@@ -19,7 +19,6 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
 
-
 namespace Dali
 {
 namespace Graphics
@@ -142,7 +141,6 @@ struct Framebuffer::Impl
 
     return true;
   }
-#pragma GCC diagnostic pop
 
   /**
    * Creates immutable framebuffer object
