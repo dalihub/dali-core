@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace DevelCustomActor
  * @param[in] actor The custom actor of which to get the type information
  * @return the TypeInfo of this actor
  */
-DALI_IMPORT_API const Dali::TypeInfo GetTypeInfo( CustomActor actor );
+DALI_CORE_API const Dali::TypeInfo GetTypeInfo( CustomActor actor );
 
 } // namespace DevelCustomActor
 

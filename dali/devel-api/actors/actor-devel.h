@@ -150,7 +150,7 @@ typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChanged
  * @pre The Actor has been initialized.
  * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
  */
-DALI_IMPORT_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
+DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
 
 
 typedef Signal< void (Actor) > ChildChangedSignalType; ///< Called when the actor has a child added or removed
@@ -171,7 +171,7 @@ typedef Signal< void (Actor) > ChildChangedSignalType; ///< Called when the acto
  * @return The signal to connect to
  * @pre The Actor has been initialized
  */
-DALI_IMPORT_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
+DALI_CORE_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
 
 /**
  * @brief This signal is emitted when a child is removed from this actor.
@@ -193,7 +193,7 @@ DALI_IMPORT_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
  * @return The signal to connect to
  * @pre The Actor has been initialized
  */
-DALI_IMPORT_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
+DALI_CORE_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
 
 
 } // namespace DevelActor

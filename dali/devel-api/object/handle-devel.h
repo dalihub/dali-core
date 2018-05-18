@@ -44,7 +44,7 @@ namespace DevelHandle
  *
  * @note The key is not the same as the returned index, though it has the same type.
  */
-DALI_IMPORT_API Property::Index GetPropertyIndex( const Handle& handle, Property::Index key );
+DALI_CORE_API Property::Index GetPropertyIndex( const Handle& handle, Property::Index key );
 
 /**
  * @brief Query the index of a property using the given key from a Property::Map
@@ -58,7 +58,7 @@ DALI_IMPORT_API Property::Index GetPropertyIndex( const Handle& handle, Property
  *
  * @note See also, GetPropertyIndex(Property::Index) and GetPropertyIndex(const std::string&)
  */
-DALI_IMPORT_API Property::Index GetPropertyIndex( const Handle& handle, Property::Key key );
+DALI_CORE_API Property::Index GetPropertyIndex( const Handle& handle, Property::Key key );
 
 /**
  * @brief Register a new animatable property with an integer key.
@@ -96,7 +96,7 @@ DALI_IMPORT_API Property::Index GetPropertyIndex( const Handle& handle, Property
  *       - Property::ROTATION
  * @note If a property with the desired name already exists, then the value given is just set.
  */
-DALI_IMPORT_API Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue );
+DALI_CORE_API Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue );
 
 /**
  * @brief Set the type-info that the object is created by.
@@ -106,7 +106,7 @@ DALI_IMPORT_API Property::Index RegisterProperty( Handle handle, Property::Index
  * @param[in] handle The handle created by this TypeInfo.
  * @param[in] typeInfo The TypeInfo that creates the handle.
  */
-DALI_IMPORT_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
+DALI_CORE_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
 
 
 /**
@@ -116,7 +116,7 @@ DALI_IMPORT_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
  * @param[in] handle The handle to check
  * @param[in] index The index of the property to test for
  */
-DALI_IMPORT_API bool DoesCustomPropertyExist( Handle& handle, Property::Index index );
+DALI_CORE_API bool DoesCustomPropertyExist( Handle& handle, Property::Index index );
 
 /**
  * @brief PropertySetSignal function prototype for signal handler. Called when a property is set on this object.
@@ -129,7 +129,7 @@ using PropertySetSignalType = Signal< void( Handle& handle, Property::Index inde
  * @param[in] handle The handle of the object to listen to.
  * @return The signal to attach a connection to.
  */
-DALI_IMPORT_API PropertySetSignalType& PropertySetSignal( Handle handle );
+DALI_CORE_API PropertySetSignalType& PropertySetSignal( Handle handle );
 
 
 } // namespace DevelHandle

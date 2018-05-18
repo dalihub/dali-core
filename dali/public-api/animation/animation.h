@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ class Animation;
  * | pause        | Pause()                  |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Animation : public BaseHandle
+class DALI_CORE_API Animation : public BaseHandle
 {
 public:
 

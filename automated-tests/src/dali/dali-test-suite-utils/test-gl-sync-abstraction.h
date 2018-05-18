@@ -2,7 +2,7 @@
 #define __TEST_GL_SYNC_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 namespace Dali
 {
 
-class DALI_IMPORT_API TestSyncObject : public Integration::GlSyncAbstraction::SyncObject
+class DALI_CORE_API TestSyncObject : public Integration::GlSyncAbstraction::SyncObject
 {
 public:
   TestSyncObject(TraceCallStack& trace);
@@ -44,7 +44,7 @@ public:
 /**
  * Class to emulate the GL sync functions with tracing
  */
-class DALI_IMPORT_API TestGlSyncAbstraction: public Integration::GlSyncAbstraction
+class DALI_CORE_API TestGlSyncAbstraction: public Integration::GlSyncAbstraction
 {
 public:
   /**

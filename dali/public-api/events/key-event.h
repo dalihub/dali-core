@@ -2,7 +2,7 @@
 #define __DALI_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Dali
  * module.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API KeyEvent
+struct DALI_CORE_API KeyEvent
 {
   // Enumerations
 

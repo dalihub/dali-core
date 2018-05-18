@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -238,7 +238,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  * @SINCE_1_0.0
  */
 
-class DALI_IMPORT_API Actor : public Handle
+class DALI_CORE_API Actor : public Handle
 {
 public:
 

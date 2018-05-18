@@ -2,7 +2,7 @@
 #define __DALI_ALPHA_FUNCTION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ typedef float (*AlphaFunctionPrototype)(float progress); ///< Prototype of an al
    * the animation before computing the final animation value.
    * @SINCE_1_0.0
    */
-class DALI_IMPORT_API AlphaFunction
+class DALI_CORE_API AlphaFunction
 {
 public:
 

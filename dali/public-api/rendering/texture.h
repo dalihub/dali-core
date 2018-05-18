@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ namespace CubeMapLayer
  * @brief Texture represents a texture object used as input or output by shaders.
  * @SINCE_1_1.43
  */
-class DALI_IMPORT_API Texture : public BaseHandle
+class DALI_CORE_API Texture : public BaseHandle
 {
 public:
 

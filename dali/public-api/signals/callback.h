@@ -2,7 +2,7 @@
 #define __DALI_CALLBACK_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class CallbackBase;
  * @brief Callback base class to hold the data for callback function and member function calls.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API CallbackBase
+class DALI_CORE_API CallbackBase
 {
 public:
 

@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_MAP_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ typedef std::pair<std::string, Property::Value> StringValuePair;
  * @brief A Map of property values, the key type could be String or Property::Index.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Property::Map
+class DALI_CORE_API Property::Map
 {
 public:
 
@@ -378,7 +378,7 @@ private:
  * @param[in] map The map to insert
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
+DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
 
 /**
  * @}

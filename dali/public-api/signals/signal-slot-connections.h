@@ -2,7 +2,7 @@
 #define __DALI_SIGNAL_SLOT_CONNECTIONS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class CallbackBase;
  * It holds a pointer to the callback, but does not own it.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SlotConnection
+class DALI_CORE_API SlotConnection
 {
 public:
 
@@ -103,7 +103,7 @@ private:
  * the connection is destroyed.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SignalConnection
+class DALI_CORE_API SignalConnection
 {
 public:
 

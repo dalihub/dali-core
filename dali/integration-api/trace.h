@@ -38,7 +38,7 @@ namespace Trace
  * @param start a bool to indicate start (true) or end (false) of the tracing / logging
  * @param tag a unique event tag name
  */
-DALI_IMPORT_API void LogContext( bool start, const char* tag );
+DALI_CORE_API void LogContext( bool start, const char* tag );
 
 /**
  * typedef for the LogContextFunction function.
@@ -51,7 +51,7 @@ typedef void ( *LogContextFunction )( bool start, const char* tag );
  * The LogContextFunction function can be different for each thread.
  * @param LogContextFunction the Log Context function to install
  */
-DALI_IMPORT_API void InstallLogContextFunction( const LogContextFunction& logContextFunction );
+DALI_CORE_API void InstallLogContextFunction( const LogContextFunction& logContextFunction );
 
 /********************************************************************************
  *                                    Filter                                    *
@@ -66,7 +66,7 @@ DALI_IMPORT_API void InstallLogContextFunction( const LogContextFunction& logCon
  * It provides the ability to turn tracing on or off.
  *
  */
-class DALI_IMPORT_API Filter
+class DALI_CORE_API Filter
 {
 public:
 
@@ -153,7 +153,7 @@ private:
  * and uses filter object which in tun routes the tracing via the platform abstraction's LogMessage.
  *
  */
-class DALI_IMPORT_API Tracer final
+class DALI_CORE_API Tracer final
 {
 public:
   Tracer( Filter* filter, const char* tag );
