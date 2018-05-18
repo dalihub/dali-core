@@ -305,21 +305,21 @@ assert( false && "Function no implemented" );\
 /*
  * Forward declarations of reference types
  */
-using ShaderRef = Handle<class Shader>;
-using PipelineRef = Handle<class Pipeline>;
-using FenceRef = Handle<class Fence>;
-using BufferRef = Handle<class Buffer>;
-using FramebufferRef = Handle<class Framebuffer>;
-using ImageRef = Handle<class Image>;
-using ImageViewRef = Handle<class ImageView>;
-using DescriptorPoolRef = Handle<class DescriptorPool>;
-using CommandPoolRef = Handle<class CommandPool>;
-using CommandBufferRef = Handle<class CommandBuffer>;
-using GpuMemoryBlockRef = Handle<class GpuMemoryBlock>;
-using DescriptorSetRef = Handle<class DescriptorSet>;
-using SwapchainRef = Handle<class Swapchain>;
-using SurfaceRef = Handle<class Surface>;
-using SamplerRef = Handle<class Sampler>;
+using RefCountedShader = Handle<class Shader>;
+using RefCountedPipeline = Handle<class Pipeline>;
+using RefCountedFence = Handle<class Fence>;
+using RefCountedBuffer = Handle<class Buffer>;
+using RefCountedFramebuffer = Handle<class Framebuffer>;
+using RefCountedImage = Handle<class Image>;
+using RefCountedImageView = Handle<class ImageView>;
+using RefCountedDescriptorPool = Handle<class DescriptorPool>;
+using RefCountedCommandPool = Handle<class CommandPool>;
+using RefCountedCommandBuffer = Handle<class CommandBuffer>;
+using RefCountedGpuMemoryBlock = Handle<class GpuMemoryBlock>;
+using RefCountedDescriptorSet = Handle<class DescriptorSet>;
+using RefCountedSwapchain = Handle<class Swapchain>;
+using RefCountedSurface = Handle<class Surface>;
+using RefCountedSampler = Handle<class Sampler>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="

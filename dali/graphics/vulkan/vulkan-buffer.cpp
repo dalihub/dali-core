@@ -87,7 +87,7 @@ struct Buffer::Impl final
     return mBuffer;
   }
 
-  void BindMemory( GpuMemoryBlockRef handle )
+  void BindMemory( RefCountedGpuMemoryBlock handle )
   {
     assert( mBuffer && "Buffer not initialised!");
     VkAssert(mGraphics.GetDevice().bindBufferMemory( mBuffer, (*handle), 0 ));
@@ -96,12 +96,12 @@ struct Buffer::Impl final
 
   Vulkan::Graphics&                     mGraphics;
   Vulkan::Buffer&                       mInterface;
-  GpuMemoryBlockRef                  mDeviceMemory;
+  RefCountedGpuMemoryBlock                  mDeviceMemory;
   vk::BufferCreateInfo                  mInfo;
   vk::Buffer                            mBuffer;
 };
 
-BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
+RefCountedBuffer Buffer::New(Graphics& graphics, size_t size, Type type)
 {
   auto usageFlags = vk::BufferUsageFlags{};
 
@@ -117,7 +117,7 @@ BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
   info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
-  auto buffer = BufferRef( new Buffer(graphics, info) );
+  auto buffer = RefCountedBuffer( new Buffer(graphics, info) );
 
   if(buffer && buffer->mImpl->Initialise())
   {
@@ -126,15 +126,15 @@ BufferRef Buffer::New(Graphics& graphics, size_t size, Type type)
   return buffer;
 }
 
-BufferRef Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
+RefCountedBuffer Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
 {
-  auto buffer = BufferRef( new Buffer(graphics, info) );
+  auto buffer = RefCountedBuffer( new Buffer(graphics, info) );
   if( buffer && buffer->mImpl->Initialise() )
   {
     graphics.AddBuffer( buffer );
     return buffer;
   }
-  return BufferRef();
+  return RefCountedBuffer();
 }
 
 Buffer::Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
@@ -150,7 +150,7 @@ vk::BufferUsageFlags Buffer::GetUsage() const
   return mImpl->GetUsage();
 }
 
-const GpuMemoryBlockRef& Buffer::GetMemoryHandle() const
+const RefCountedGpuMemoryBlock& Buffer::GetMemoryHandle() const
 {
   return mImpl->mDeviceMemory;
 }
@@ -165,7 +165,7 @@ vk::Buffer Buffer::GetVkHandle() const
   return mImpl->GetVkHandle();
 }
 
-void Buffer::BindMemory( const GpuMemoryBlockRef& handle )
+void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
 {
   mImpl->BindMemory( handle );
 }

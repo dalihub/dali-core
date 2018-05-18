@@ -122,7 +122,7 @@ struct CommandBufferPool
    * Allocates new command buffer
    * @return
    */
-  CommandBufferRef AllocateCommandBuffer( bool reset )
+  RefCountedCommandBuffer AllocateCommandBuffer( bool reset )
   {
     // resize if no more nodes
     if( mFirstFree == INVALID_NODE_INDEX )
@@ -139,7 +139,7 @@ struct CommandBufferPool
     }
 
     ++mAllocationCount;
-    return CommandBufferRef(node.commandBuffer);
+    return RefCountedCommandBuffer(node.commandBuffer);
   }
 
   /**
@@ -216,7 +216,7 @@ struct CommandPool::Impl
     mGraphics.GetDevice().resetCommandPool( mCommandPool, releaseResources ? vk::CommandPoolResetFlagBits::eReleaseResources : vk::CommandPoolResetFlags{} );
   }
 
-  CommandBufferRef NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+  RefCountedCommandBuffer NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
   {
     auto& usedPool = allocateInfo.level == vk::CommandBufferLevel::ePrimary ? *mInternalPoolPrimary.get() : *mInternalPoolSecondary.get();
     auto retval = usedPool.AllocateCommandBuffer( false );
@@ -291,12 +291,12 @@ bool CommandPool::OnDestroy()
   return false;
 }
 
-CommandBufferRef CommandPool::NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
+RefCountedCommandBuffer CommandPool::NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
 {
   return mImpl->NewCommandBuffer( allocateInfo );
 }
 
-CommandBufferRef CommandPool::NewCommandBuffer( bool isPrimary )
+RefCountedCommandBuffer CommandPool::NewCommandBuffer( bool isPrimary )
 {
   return mImpl->NewCommandBuffer( vk::CommandBufferAllocateInfo{}.setLevel(
     isPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary

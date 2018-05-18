@@ -79,9 +79,9 @@ struct Surface::Impl
  * Surface
  */
 
-SurfaceRef Surface::New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory )
+RefCountedSurface Surface::New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory )
 {
-  return SurfaceRef( new Surface( graphics, std::move(surfaceFactory) ));
+  return RefCountedSurface( new Surface( graphics, std::move(surfaceFactory) ));
 }
 
 Surface::Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory )

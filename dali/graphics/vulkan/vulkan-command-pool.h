@@ -77,14 +77,14 @@ public:
    * @param allocateInfo
    * @return
    */
-  CommandBufferRef NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
+  RefCountedCommandBuffer NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo );
 
   /**
    *
    * @param isPrimary
    * @return
    */
-  CommandBufferRef NewCommandBuffer( bool isPrimary = true );
+  RefCountedCommandBuffer NewCommandBuffer( bool isPrimary = true );
 
   /**
    * Releases command buffer

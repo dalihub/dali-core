@@ -84,7 +84,7 @@ struct Ubo::Impl
     return size;
   }
 
-  Vulkan::BufferRef GetBuffer() const
+  Vulkan::RefCountedBuffer GetBuffer() const
   {
     return mPool.GetBuffer( mUbo );
   }
@@ -109,12 +109,12 @@ struct UboPool::Impl
 {
   struct PoolBuffer
   {
-    explicit PoolBuffer( Vulkan::BufferRef buf ) :
+    explicit PoolBuffer( Vulkan::RefCountedBuffer buf ) :
     mappedPtr( nullptr ), buffer( buf ) {}
     ~PoolBuffer() = default;
 
     void* mappedPtr;
-    Vulkan::BufferRef buffer;
+    Vulkan::RefCountedBuffer buffer;
   };
 
   explicit Impl( UboPool& uboPool, Controller& controller, uint32_t blockSize, uint32_t initialCapacity )
@@ -233,7 +233,7 @@ struct UboPool::Impl
     return (nullptr != mBuffers[bufferIndex].mappedPtr);
   }
 
-  Vulkan::BufferRef GetBuffer( Ubo& ubo ) const
+  Vulkan::RefCountedBuffer GetBuffer( Ubo& ubo ) const
   {
     auto& impl = ubo.GetImplementation();
     auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
@@ -272,7 +272,7 @@ bool UboPool::IsMapped( Ubo& ubo )
   return mImpl->IsMapped( ubo );
 }
 
-Vulkan::BufferRef UboPool::GetBuffer( Ubo& ubo ) const
+Vulkan::RefCountedBuffer UboPool::GetBuffer( Ubo& ubo ) const
 {
   return mImpl->GetBuffer( ubo );
 }
@@ -330,7 +330,7 @@ uint32_t Ubo::WriteKeepMapped( const void* data, uint32_t offset, uint32_t size 
   return mImpl->WriteKeepMapped( data, offset, size );
 }
 
-Vulkan::BufferRef Ubo::GetBuffer() const
+Vulkan::RefCountedBuffer Ubo::GetBuffer() const
 {
   return mImpl->GetBuffer();
 }

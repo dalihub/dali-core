@@ -68,7 +68,7 @@ public:
    */
   void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) override;
 
-  Vulkan::BufferRef GetBufferRef() const;
+  Vulkan::RefCountedBuffer GetBufferRef() const;
 
 private:
 
@@ -78,7 +78,7 @@ private:
   API::Buffer::UsageHint mUsageHints;
   uint32_t mSize;
 
-  Vulkan::BufferRef mBufferRef;
+  Vulkan::RefCountedBuffer mBufferRef;
 };
 }
 } // namespace Graphics
