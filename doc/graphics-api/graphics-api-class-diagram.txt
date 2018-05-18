@@ -1,0 +1,910 @@
+@startuml
+skinparam defaultFontName Ubuntu Mono
+
+namespace Graphics::API::Device {
+
+class Controller {
+
+    Internal::ResourceCache resourceCache
+    Swapchain swapchain
+    Device device;
+
+    #void SubmitCommands( CommandList commandList )
+}
+
+note as ControllerNote
+Controller may be able to handle a list of swapchains
+end note
+Controller::swapchain .. ControllerNote
+
+Controller::device .. Device
+
+class Device {
+    #GetFeatures()
+    #GetLimitations()
+}
+
+}
+
+package Graphics::API::Windowing {
+class Surface {
+
+}
+
+class Swapchain {
+    #New( surface )
+
+    Surface surface
+}
+
+
+Swapchain *-- Surface
+
+}
+
+package Graphics::API::Resource {
+
+class Buffer {
+    Memory memory
+}
+
+class Image {
+    Memory memory
+}
+
+class Shader {
+
+}
+
+class Framebuffer {
+    Image colorAttachments[]
+    Image depthStencilAttachment
+}
+
+class Sampler {
+
+
+}
+
+class Pipeline {
+    BlendState blendState;
+    Shader shaders[]
+}
+
+Pipeline::shaders .. Shader
+
+class Internal::ResourceCache {
+    # shaderCache
+    # imageCache
+    # pipelineCache
+    # framebufferCache
+    # samplerCache
+    # bufferCache
+}
+
+
+}
+
+package Graphics::API::Command {
+
+interface Command {
+
+}
+
+class RenderCommand extends Command {
+
+}
+
+class PipelineCommand extends Command {
+
+}
+
+class CommandList {
+    Command commands[]
+}
+
+CommandList::commands *-- Command
+
+note as N1
+1. There may be
+   a dedicated class
+   for each command
+2. There may be just
+   a Command class that
+   contains all functionality
+   implemented inside
+end note
+
+}
+
+package Graphics::API::Memory {
+
+class MemoryManager {
+
+    Allocator allocators[]
+    DefaultAllocator defaultAllocator
+}
+
+interface Allocator {
+    Memory Allocate()
+}
+
+
+class DefaultAllocator extends Allocator {
+
+}
+
+note as DefaultAllocatorNote
+DefaultAllocator provide the simplest GPU
+memory allocation. Not optimal.
+end note
+
+DefaultAllocatorNote .. DefaultAllocator
+
+Memory .. Allocator::Allocate
+Allocator .. MemoryManager::allocators
+DefaultAllocator .. MemoryManager::defaultAllocator
+
+class Memory {
+    # void* Map()
+    # void Unmap()
+    # void Flush()
+    # void Copy()
+}
+
+}
+
+package Graphics::API::Synchronization {
+
+
+class Fence {
+
+}
+note "Fence can be used between Graphics and DALi APIs" as N3
+Fence .. N3
+
+note "Semaphore is used between commands" as N2
+class Semaphore {
+
+}
+
+Semaphore .. N2
+
+
+}
+
+Graphics::API::Device <|---[hidden]- Graphics::API::Resource
+Graphics::API::Resource -[hidden]- Graphics::API::Memory
+Graphics::API::Command <|---[hidden]- Graphics::API::Synchronization
+@enduml
+#Graphics::API::Windowing .[hidden]. Graphics::API::Resource
+#Graphics::API::Memory .[hidden]. Graphics::API::Device
+#Graphics::API::Memory .[hidden]. Graphics::API::Synchronization
+
+#Graphics::API::Resource .[hidden]. Graphics::API::Synchronization
+
+@startuml
+skinparam BoxPadding 10
+title Example of instantiating the texture object
+skinparam defaultFontName Ubuntu Mono
+box "Dali"
+App -> Texture : New()
+end box
+
+box "Graphics::API"
+participant "Controller" as C
+participant "TextureFactory" as TF
+participant "Texture" as T
+end box
+
+box "Graphics::Vulkan"
+participant "Graphics" as VG
+participant "Texture" as VT
+participant "Image" as VI
+participant "Sampler" as VS
+end box
+
+
+Texture -> C : GetTextureFatory()
+C --> Texture : textureFactory
+Texture -> C : CreateTexture( textureFactory )
+C -> TF : Create()
+create T
+TF -> T : New()
+
+create VT
+T -> VT : New()
+create VI
+VT -> VI : New()
+VI -> VG : mDevice.createImage()
+note right : mDevice is a Vulkan device
+
+VI -> VG : GetAllocator().allocateMemory()
+note right : Allocator is obtained from Graphics
+
+create VS
+VT -> VS : New()
+VS -> VG : mDevice.createSampler()
+VS -> VG : GetAllocator().allocateMemory()
+
+VT --> T : vulkanTexture
+T --> TF :
+TF --> C :
+C --> Texture : texture
+
+
+
+@enduml
+
+@startuml
+skinparam defaultFontName Ubuntu Mono
+skinparam BoxPadding 10
+box "DALi"
+participant "SceneGraphRenderer" as SGR
+participant "RenderItem" as RI
+end box
+
+box "Graphics::API"
+participant "Controller" as C
+participant "PipelineState" as P
+participant "Buffer" as B
+participant "Texture" as T
+participant "RenderCommand" as RC
+end box
+
+->SGR : PrepareRenderer()
+
+@enduml
+
+'
+*** API Design
+'
+
+@startuml
+skinparam defaultFontName Ubuntu Mono
+
+package Dali::Graphics::API {
+
+package State {
+
+class PipelineState #lightblue  {
+    #BlendState           blendState
+    #InputAssemblyState   iaState
+    #DepthStencilState    dsState
+    #Shader*              shaderStages
+    #ViewportScissorState viewport
+    #RasterizationState   rasterizationState
+}
+
+class BlendState {
+    #bool            enabled
+}
+
+class DepthStencilState {
+    #bool            enabled
+}
+
+class InputAssemblyState {
+    #Topology      topology
+    #bool          primitiveRestartEnabled
+}
+
+class ShaderStage {
+    #Shader                  shaderModule
+    #PipelineShaderStage     stage
+}
+
+class ViewportScissorState {
+    #Rect2D viewport
+    #Rect2D scissor;
+    #bool   scissorTestEnabled;
+}
+
+class RasterizationState {
+    #CullMode    cullMode
+    #FrontFace   frontFace
+    #PolygonMode mode { Fill, Line, Point }
+}
+
+}
+
+PipelineState::blendState *-u- BlendState
+PipelineState::iaState *-u- InputAssemblyState
+PipelineState::dsState *-u- DepthStencilState
+PipelineState::viewport *-- ViewportScissorState
+PipelineState::rasterizationState *-- RasterizationState
+PipelineState::shaderStages *-- ShaderStage
+
+' **** BINDINGS ***** '
+
+package Binding {
+
+class UniformBufferBinding #lightblue {
+    #Accessor<Buffer> buffer
+    #uint32_t         offset
+    #uint32_t         dataSize
+    #uint32_t         binding
+    #void*            pNext
+}
+
+class IndexBufferBinding #lightblue {
+    #Accessor<Buffer> buffer
+    #uint32_t         offset
+    #IndexType        type
+    #void*            pNext
+}
+
+class PipelineBinding #lightblue {
+    #Accessor<Pipeline> pipeline
+    #void*              pNext
+}
+
+class TextureBinding #lightblue {
+#Accessor<Texture> texture
+#Accessor<Sampler> sampler
+#uint32_t          binding
+#void*             pNext
+}
+
+class PushConstantsBinding #lightblue {
+#void*     data
+#uint32_t  size
+#uint32_t  binding
+#void*    pNext
+}
+
+}
+
+package Device {
+class Device #yellow {
+#CreateSwapchain( Surface ) : Swapchain
+#CreateSurface( SurfaceFactory ) : Surface
+--
+#GetExtensions() : ExtensionList
+#GetFeatures() : FeatureList
+#GetLimitations() : LimitationList
+}
+
+class Controller #yellow {
+#GetTextureFactory() : TextureFactory
+#GetShaderFactory() : ShaderFactory
+#GetSamplerFactory() : SamplerFactory
+#GetFramebufferFactory() : FramebufferFactory
+#GetPipelineFactory() : PipelineFactory
+#GetBufferFactory() : BufferFactory
+--
+#CreateTexture( TextureFactory ) : Texture
+#CreateShader( ShaderFactory ) : Shader
+#CreateSampler( SamplerFactory ) : Sampler
+#CreateFramebuffer( FramebufferFactory ) : Framebuffer
+#CreatePipeline( PipelineFactory ) : Pipeline
+#CreateBuffer( BufferFactory ) : Buffer
+--
+#GetDevice() : Device
+
+}
+
+Controller o- Device
+
+}
+
+package Memory {
+class DeviceMemoryManager #yellow {
+}
+
+class DeviceMemory #yellow {
+}
+}
+
+package Windowing {
+class Surface #yellow {
+}
+
+interface SurfaceFactory #yellow {
+}
+
+
+class Swapchain #yellow {
+}
+}
+
+package Synchronization {
+class Fence #yellow {
+}
+
+}
+
+Synchronization .[hidden]. Windowing
+Synchronization .[hidden]. Device
+Device::Device .. Surface
+Device::Device .. Swapchain
+SurfaceFactory .. Surface : << Create >>
+Swapchain o- Surface
+State .[hidden]. Binding
+
+package Resource {
+
+    class Shader #orange {
+    }
+
+    class Framebuffer #orange {
+    }
+
+    class Texture #orange {
+    }
+
+    class Sampler #orange {
+    }
+
+    class Pipeline #orange {
+        PipelineState pipelineState
+    }
+
+    class Buffer #orange {
+    }
+
+    Pipeline::pipelineState *- PipelineState
+
+package Factory {
+    class ShaderFactory #orange {
+        #Create() : Shader
+    }
+
+    class FramebufferFactory #orange {
+        #Create() : Framebuffer
+    }
+
+    class TextureFactory #orange {
+        #Create() : Texture
+    }
+
+    class SamplerFactory #orange {
+        #Create() : Sampler
+    }
+
+    class PipelineFactory #orange {
+        #Create() : Pipeline
+    }
+
+    class BufferFactory #orange {
+        #Create() : Buffer
+    }
+
+ShaderFactory .. Shader : << Create >>
+BufferFactory .. Buffer : << Create >>
+TextureFactory .. Texture : << Create >>
+SamplerFactory .. Sampler : << Create >>
+PipelineFactory .. Pipeline : << Create >>
+FramebufferFactory .. Framebuffer: << Create >>
+
+}
+PipelineBinding::pipeline *-u Pipeline
+}
+
+
+class RenderCommand #yellow {
+    PipelineBinding pipeline
+    TextureBinding* texturesBindings
+    SamplerBinding* samplerBindings
+    UniformBufferBinding* uniformBufferBindings
+    PushConstantsBinding* pushConstantsBindings
+    VertexBufferBinding* vertexBufferBindings
+    IndexBufferBinding indexBufferBinding
+    RenderTargetBinding renderTargetBinding
+    DrawCommand
+}
+
+RenderCommand::pipeline *- PipelineBinding
+RenderCommand::pushConstantsBindings *- PushConstantsBinding
+RenderCommand::texturesBindings *- TextureBinding
+RenderCommand::uniformBufferBindings *-r- UniformBufferBinding
+RenderCommand::indexBufferBinding *-r- IndexBufferBinding
+
+Binding .[hidden]u. RenderCommand
+RenderCommand .[hidden]u. Resource
+State .[hidden]u. Device
+Device .[hidden]u. RenderCommand
+
+
+@enduml
+
+'
+*** Resource API ***
+'
+@startuml
+skinparam defaultFontName Ubuntu Mono
+
+note as N2
+Resources are considered to be mostly immutable.
+Once created the resource specification should not
+be changed.
+end note
+
+N2 .d. Resource
+
+package Resource {
+
+    class Shader #orange {
+        -- Reflection --
+        +GetInputAttributes() : vector
+        +GetUniformBlocks() : vector
+        +GetSamplers() : vector
+    }
+
+    class Framebuffer #orange {
+    }
+
+    class Texture #orange {
+        -- Getters --
+        +GetSize() : Rect2D
+        +GetFormat() : Format
+        (...)
+        --
+        +WriteImage( src, offset, size, rowLength, layer, level )
+        +ReadImage( dst, offset, firstLayer, layerCount, firstLevel, levelCount )
+    }
+
+    class Sampler #orange {
+    }
+
+    class Pipeline #orange {
+        PipelineState pipelineState
+    }
+
+    class Buffer #orange {
+    }
+
+package Factory {
+    class ShaderFactory #orange {
+        +Create() : Shader
+        --
+        +SetShaderModule( pipelineStage, language, shaderSource )
+    }
+
+    class FramebufferFactory #orange {
+        +Create() : Framebuffer
+        --
+    }
+
+    class TextureFactory #orange {
+        +Create() : Texture
+        --
+        +SetType( type )
+        +SetSize( rect2D )
+        +SetFormat( format )
+        +SetMipmapCount( mipmapCount )
+        +SetLayerCount( layerCount )
+        +SetUsage( usageFlags )
+        +SetSamples( samples )
+        +SetImmutable( true )
+    }
+
+    note as N1
+    Texture is allocated with needed device memory.
+    Immutable texture will commit memory writes directly
+    on the GPU. Mutable texture will use Linear layout
+    end note
+
+    TextureFactory::Immutable -- N1
+
+    class SamplerFactory #orange {
+        +Create() : Sampler
+        --
+        +SetFilter( minFilter, magFilter )
+        +SetAddressMode( modeU, modeV, modeW )
+        +SetLod( minLod, maxLod )
+        +SetMipmapMode( mipmapMode )
+        +SetBorderColor( borderColor )
+    }
+
+    class PipelineFactory #orange {
+        +Create() : Pipeline
+        --
+        +SetInheritance( pipeline )
+        +SetPipelineState( pipelineState )
+        +SetPipelineCache( pipelineCache )
+    }
+
+    class BufferFactory #orange {
+        +Create() : Buffer
+    }
+
+ShaderFactory .u. Shader : << Create >>
+BufferFactory .u. Buffer : << Create >>
+TextureFactory .u. Texture : << Create >>
+SamplerFactory .u. Sampler : << Create >>
+PipelineFactory .u. Pipeline : << Create >>
+FramebufferFactory .u. Framebuffer: << Create >>
+
+
+}
+
+
+@enduml
+
+'
+*** Resource API ***
+'
+@startuml
+skinparam defaultFontName Ubuntu Mono
+
+package Graphics::API::Command #lightyellow {
+' **** BINDINGS ***** '
+
+package Binding #lightorange {
+
+class UniformBufferBinding #lightblue {
+    #Accessor<Buffer> buffer
+    #uint32_t         offset
+    #uint32_t         dataSize
+    #uint32_t         binding
+    #void*            pNext
+}
+
+class IndexBufferBinding #lightblue {
+    #Accessor<Buffer> buffer
+    #uint32_t         offset
+    #IndexType        type
+    #void*            pNext
+}
+
+class PipelineBinding #lightblue {
+    #Accessor<Pipeline> pipeline
+    #void*              pNext
+}
+
+class TextureBinding #lightblue {
+#Accessor<Texture> texture
+#Accessor<Sampler> sampler
+#uint32_t          binding
+#void*             pNext
+}
+
+class PushConstantsBinding #lightblue {
+#void*     data
+#uint32_t  size
+#uint32_t  binding
+#void*    pNext
+}
+
+class DrawCommand #lightblue{
+  #DrawType drawType;
+  #uint32_t firstVertex
+  #uint32_t firstIndex
+  #uint32_t vertexCount
+  #uint32_t indicesCount
+  #uint32_t firstInstance
+  #uint32_t instanceCount
+  #void*    pNext
+}
+
+class SamplerBinding #lightblue{
+#Accessor<Sampler> sampler
+#uint32_t binding
+#void*    pNext
+}
+
+class VertexAttributeBufferBinding #lightblue {
+Accessor<Buffer>   buffer
+uint32_t           location
+uint32_t           offset
+uint32_t           stride
+InputAttributeRate rate
+void*              pNext
+}
+
+class RenderTargetBinding #lightblue{
+#Accessor<Framebuffer>                 framebuffer
+#std::vector<Framebuffer::ClearColor>  clearColors
+#Framebuffer::DepthStencilClearColor   dsClearColor
+#void*                                 pNext
+}
+}
+
+class RenderCommand #yellow {
+    PipelineBinding pipelineBinding
+    TextureBinding texturesBindings
+    SamplerBinding samplerBindings
+    UniformBufferBinding uniformBufferBindings
+    PushConstantsBinding pushConstantsBindings
+    VertexAttributeBufferBinding vertexBufferBindings
+    IndexBufferBinding indexBufferBinding
+    RenderTargetBinding renderTargetBinding
+    DrawCommand drawCommand
+}
+
+RenderCommand::pipelineBinding "1" o-- "1" PipelineBinding
+RenderCommand::texturesBindings "1" o-- "N" TextureBinding
+RenderCommand::samplerBindings "1" o-- "N" SamplerBinding
+RenderCommand::uniformBufferBindings "1" o-- "N" UniformBufferBinding
+RenderCommand::pushConstantsBindings "1" o-- "N" PushConstantsBinding
+RenderCommand::vertexBufferBindings "1" o-- "N" VertexAttributeBufferBinding
+RenderCommand::indexBufferBinding "1" o-- "1" IndexBufferBinding
+RenderCommand::renderTargetBinding "1" o-- "1" RenderTargetBinding
+RenderCommand::drawCommand "1" o-- "1" DrawCommand
+
+VertexAttributeBufferBinding -[hidden]u- SamplerBinding
+TextureBinding -[hidden]u- SamplerBinding
+PushConstantsBinding -[hidden]u- SamplerBinding
+RenderTargetBinding -[hidden]u- SamplerBinding
+IndexBufferBinding -[hidden]u- PipelineBinding
+
+}
+
+@enduml
+
+@startuml
+skinparam defaultFontName Ubuntu Mono
+
+class TextureSet {
+    -- public --
+    +SetTexture()
+    +GetTexture() : Texture
+    +SetSampler()
+    +GetSampler() : Sampler
+    +GetTextureCount() : size_t
+}
+
+class Geometry {
+    +AddVertexBuffer( PropertyBuffer ) : size_t
+    +GetNumberOfVertexBuffers() : size_t
+    +RemoveVertexBuffer(size_t)
+    +SetIndexBuffer( void*, size_t )
+    +SetType( Geometry::Type ) -> sets topology
+    +GetType() : Type
+}
+
+class Framebuffer {
+    -- public --
+    +AttachColorTexture( Texture )
+    +AttachColorTexture( Texture, level, layer )
+    +GetColorTexture() : Texture
+}
+
+class PropertyBuffer {
+    -- static --
+    {static} New( Property::Map ) : PropertyBuffer
+    -- public --
+    +SetData( void*, size_t )
+    +GetSize() : size_t
+}
+
+class Renderer {
+    {static} New( Geometry, Shader ) : Renderer
+    -- public --
+    +SetGeometry( geometry )
+    +GetGeometry() : Geometry
+    +SetIndexRange( firstIndex, elementCount )
+    +SetTextures( TextureSet )
+    +GetTextures() : TextureSet
+    +SetShader( Shader )
+    +GetShader() : Shader
+}
+
+class Sampler {
+    -- public --
+    +SetFilterMode( minFilter, magFilter )
+    +SetWrapMode( uWrap, vWrap )
+    +SetWrapMode( rWrap, sWrap, tWrap )
+}
+
+class Shader {
+    -- public --
+    {static} New( vsh : string, fsh : string, hints ) : Shader
+}
+
+class Texture {
+    {static} New( TextureType, Format, width, height ) : Texture
+    -- public --
+    +Upload( PixelData ) : bool
+    +Upload( PixelData,layer,mipmap,xoffset,yoffset,width,height ) : bool
+    +GenerateMipmaps()
+    +GetWidth() : int
+    +GetHeight() : int
+}
+
+enum TextureType {
+  TEXTURE_2D
+  TEXTURE_CUBE
+}
+
+Texture o-- TextureType
+TextureSet "1" o-- "*" Texture
+Renderer o-- Shader
+Renderer o-- Geometry
+TextureSet "1" o-- "*" Sampler
+Renderer o-- TextureSet
+Geometry "1" o-- "*" PropertyBuffer
+Framebuffer o-- Texture
+
+
+@enduml
+
+@startuml
+skinparam defaultFontName Ubuntu Mono
+participant "App" as A
+participant "Core/Event" as E
+participant "Core/Update" as U
+participant "Core/Graphics" as G
+== Instantiating rendering objects ==
+A -> E : Shader::New()
+E -> U : Shader::AddShaderMessage()
+E -> U : Shader::SetShaderProgramMessage()
+E --> A : shader
+
+A -> E : Texture::New()
+E -> U : Texture::AddTextureMessage()
+E --> A : texture
+
+A -> E : Geometry::New()
+E -> U : Geometry::AddGeometryMessage()
+E --> A : geometry
+
+A -> E : PropertyBuffer::New()
+E -> U : PropertyBuffer::AddPropertyBufferMessage()
+E --> A : propertyBuffer
+
+A -> E : Renderer::New( geometry, shader )
+E -> U : Renderer::AddGeometryMessage()
+E --> A : renderer
+
+A -> E : TextureSet::New()
+E -> U : AddTextureSetMessage()
+E --> A : textureSet
+
+A -> E : textureSet.SetTexture( 0, texture )
+E -> U : Texture::SetTextureMessage()
+
+newpage
+== Instantiating an Actor ==
+
+
+A -> E : Actor::New()
+E -> U : Actor::AddActorMessage()
+E --> A : actor
+A -> E : actor.AddRenderer( renderer )
+E -> U : Actor::AddRendererMessage()
+
+newpage
+== Executing queued messages ==
+loop N times
+U -> G
+end loop
+
+
+@enduml
+
+@startuml
+skinparam defaultFontName Ubuntu Mono
+participant "Core/Update" as U
+participant "Core/SceneGraphRenderer" as SG
+participant "Core/RenderItem" as RI
+participant "Core/Graphics" as G
+== Executing queued messages ==
+loop for each Renderer
+U -> SG : renderer.PrepareRenderer()
+SG -> G : PrepareVertexBuffers()
+SG -> SG : UpdateUniformMap()
+SG -> G : PrepareTextures()
+SG -> G : graphics.NewRenderCommand()
+G --> SG : renderCommand
+SG -> SG : SetRenderCommandData()
+end loop
+
+U -> U : Sort()
+U -> U : PrepareRenderItems()
+
+loop for each RenderItem
+
+U -> RI : GetMatrices()
+U -> RI : GetDefaultUniforms()
+U -> RI : GetSceneGraphRenderer()
+RI --> U : sgRenderer
+U -> SG : UpdateRenderCommand()
+U -> U : push_back( renderCommand )
+
+end loop
+
+U -> G : graphics.SubmitCommands()
+
+@enduml
