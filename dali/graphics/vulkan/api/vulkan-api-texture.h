@@ -43,7 +43,7 @@ public:
 
   bool Initialise();
 
-  Vulkan::TextureRef GetTextureRef() const;
+  Vulkan::RefCountedTexture GetTextureRef() const;
 
 private:
   struct Impl;

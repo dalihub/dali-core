@@ -320,6 +320,7 @@ using RefCountedDescriptorSet = Handle<class DescriptorSet>;
 using RefCountedSwapchain = Handle<class Swapchain>;
 using RefCountedSurface = Handle<class Surface>;
 using RefCountedSampler = Handle<class Sampler>;
+using RefCountedTexture = Handle<class Texture>;
 /*
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wframe-larger-than="

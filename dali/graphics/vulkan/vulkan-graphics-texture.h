@@ -96,7 +96,6 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-using TextureRef = Handle<Texture>;
 }
 } // namespace Graphics
 } // namespace Dali
