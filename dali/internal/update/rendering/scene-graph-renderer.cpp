@@ -260,6 +260,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mGfxRenderCommand = controller.AllocateRenderCommand();
   }
 
+  if( !mShader->GetGfxObject().Exists() )
+  {
+    return;
+  }
+
   /**
    * Prepare vertex attribute buffer bindings
    */
@@ -335,8 +340,19 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   {
     for( auto&& j : i )
     {
+      std::string uniformName( j->uniformName );
+      int arrayIndex = 0;
+      auto arrayLeftBracket = j->uniformName.find('[');
+      if(arrayLeftBracket != std::string::npos)
+      {
+        auto arrayRightBracket = j->uniformName.find(']');
+        arrayIndex = std::atoi( &uniformName.c_str()[arrayLeftBracket+1] );
+        std::cout << "UNIFORM NAME: " << j->uniformName << ", index: " << arrayIndex << std::endl;
+        uniformName = uniformName.substr( 0, arrayLeftBracket );
+      }
+
       auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-      if( shader.GetNamedUniform( j->uniformName, uniformInfo ) )
+      if( shader.GetNamedUniform( uniformName, uniformInfo ) )
       {
         // write into correct uniform buffer
         auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
@@ -347,36 +363,42 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           case Property::Type::BOOLEAN:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing 32bit offset: " << uniformInfo.offset << ", size: " << sizeof(float) << std::endl;
+            dst += sizeof(float) * arrayIndex;
             memcpy( dst, &j->propertyPtr->GetFloat( updateBufferIndex ), sizeof(float) );
             break;
           }
           case Property::Type::VECTOR2:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec2 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector2) << std::endl;
+            dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
             memcpy( dst, &j->propertyPtr->GetVector2( updateBufferIndex ), sizeof(Vector2) );
             break;
           }
           case Property::Type::VECTOR3:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " <<  "Writing vec3 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector3) << std::endl;
+            dst += sizeof(Vector3) * arrayIndex;
             memcpy( dst, &j->propertyPtr->GetVector3( updateBufferIndex ), sizeof(Vector3) );
             break;
           }
           case Property::Type::VECTOR4:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec4 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector4) << std::endl;
+            dst += sizeof(float) * arrayIndex;
             memcpy( dst, &j->propertyPtr->GetVector4( updateBufferIndex ), sizeof(Vector4) );
             break;
           }
           case Property::Type::MATRIX:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat4 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix) << std::endl;
+            dst += sizeof(Matrix) * arrayIndex;
             memcpy( dst, &j->propertyPtr->GetMatrix( updateBufferIndex ), sizeof(Matrix) );
             break;
           }
           case Property::Type::MATRIX3:
           {
             std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat3 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix3) << std::endl;
+            dst += sizeof(Matrix3) * arrayIndex;
             memcpy( dst, &j->propertyPtr->GetMatrix3( updateBufferIndex ), sizeof(Matrix3) );
             break;
           }

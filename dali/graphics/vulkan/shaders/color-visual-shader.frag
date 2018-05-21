@@ -1,6 +1,6 @@
 #version 430
 
-layout( set = 1, binding = 0, std140) uniform FragData
+layout( set = 0, binding = 1, std140) uniform FragData
 {
   vec4 uColor;
   vec3 mixColor;

@@ -74,9 +74,12 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
 {
   // TODO: for now we will use hardcoded binary SPIRV shaders which will replace anything
   // that is passed by the caller
-  mGraphicsShader = mShaderCache->GetShader( Graphics::API::ShaderDetails::ShaderSource( shaderData->GetShaderForStage( ShaderData::ShaderStage::VERTEX ) ),
-                                             Graphics::API::ShaderDetails::ShaderSource( shaderData->GetShaderForStage( ShaderData::ShaderStage::FRAGMENT) ) );
-
+  if (shaderData->GetType() == ShaderData::Type::BINARY)
+  {
+    mGraphicsShader = mShaderCache->GetShader(
+      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
+      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
+  }
 }
 
 

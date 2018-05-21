@@ -37,4 +37,5 @@ extern std::vector<uint32_t> SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHA
 extern std::vector<uint32_t> SHADER_WIREFRAME_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_WIREFRAME_VISUAL_SHADER_VERT;
 extern "C" std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
+#define GraphicsGetBuiltinShaderId( x ) GraphicsGetBuiltinShader( #x )
 #endif // GRAPHICS_BUILTIN_SHADER_EXTERN_GEN_H

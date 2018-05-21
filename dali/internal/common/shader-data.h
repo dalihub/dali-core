@@ -208,6 +208,11 @@ public: // API
     return mBuffer;
   }
 
+  Type GetType() const
+  {
+    return mType;
+  }
+
   ShaderData(const ShaderData& other) = delete;            ///< no copying of this object
   ShaderData& operator= (const ShaderData& rhs) = delete;  ///< no copying of this object
 

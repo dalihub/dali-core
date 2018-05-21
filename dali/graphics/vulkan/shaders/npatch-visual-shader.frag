@@ -2,7 +2,7 @@
 
 layout(location=0) in vec2 vTexCoord;
 
-layout(set=1, binding=0, std140) uniform FragData
+layout(set=0, binding=1, std140) uniform FragData
 {
     vec4 uColor;
     vec3 mixColor;
@@ -10,7 +10,7 @@ layout(set=1, binding=0, std140) uniform FragData
     float preMultipliedAlpha;
 };
 
-layout(set=1, binding=1) uniform sampler2D sTexture;
+layout(set=0, binding=2) uniform sampler2D sTexture;
 
 layout(location=0) out vec4 fragColor;
 

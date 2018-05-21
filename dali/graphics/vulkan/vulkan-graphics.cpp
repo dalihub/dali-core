@@ -61,7 +61,7 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
   //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  //"VK_LAYER_RENDERDOC_Capture",
+  "VK_LAYER_RENDERDOC_Capture",
   //"VK_LAYER_LUNARG_parameter_validation", // parameter
   //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
   //"VK_LAYER_LUNARG_monitor",             // monitor
