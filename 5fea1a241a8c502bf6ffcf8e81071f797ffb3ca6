@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ceb4fdbb_3173a7a9",
+        "filename": "dali/graphics-api/graphics-api-device.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T13:22:13Z",
+      "side": 1,
+      "message": "not directly what?",
+      "range": {
+        "startLine": 25,
+        "startChar": 45,
+        "endLine": 25,
+        "endChar": 46
+      },
+      "revId": "5fea1a241a8c502bf6ffcf8e81071f797ffb3ca6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "062c25f9_a0c49e96",
+        "filename": "dali/graphics-api/graphics-api-pipeline.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T13:22:13Z",
+      "side": 1,
+      "message": "not directly what?",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 47,
+        "endChar": 45
+      },
+      "revId": "5fea1a241a8c502bf6ffcf8e81071f797ffb3ca6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
