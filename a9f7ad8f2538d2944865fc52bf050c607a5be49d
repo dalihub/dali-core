@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df6acc00_1cfcef27",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T13:43:18Z",
+      "side": 1,
+      "message": "should construct this without initializing (pass false to constructor)",
+      "range": {
+        "startLine": 116,
+        "startChar": 16,
+        "endLine": 116,
+        "endChar": 30
+      },
+      "revId": "a9f7ad8f2538d2944865fc52bf050c607a5be49d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecb7de71_21d362b6",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T13:43:18Z",
+      "side": 1,
+      "message": "We should use a conversion method to convert DALi Pixel::Format into Vulkan texture format.",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 1
+      },
+      "revId": "a9f7ad8f2538d2944865fc52bf050c607a5be49d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
