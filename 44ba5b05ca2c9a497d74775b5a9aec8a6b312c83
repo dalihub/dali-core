@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09b74bfa_f9e464eb",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:26:38Z",
+      "side": 0,
+      "message": "This removal should be done in the larger cleanup patch, not in this patch.",
+      "range": {
+        "startLine": 260,
+        "startChar": 0,
+        "endLine": 268,
+        "endChar": 1
+      },
+      "revId": "44ba5b05ca2c9a497d74775b5a9aec8a6b312c83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
