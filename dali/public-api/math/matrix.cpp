@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -778,10 +778,10 @@ void Matrix::GetTransformComponents(Vector3&     position,
 
 std::ostream& operator<< (std::ostream& o, const Matrix& matrix)
 {
-  return o << "[ [" << matrix.mMatrix[0] << ", " << matrix.mMatrix[1] << ", " << matrix.mMatrix[2]  << ", " << matrix.mMatrix[3] << "], "
-             << "[" << matrix.mMatrix[4] << ", " << matrix.mMatrix[5] << ", " << matrix.mMatrix[6]  << ", " << matrix.mMatrix[7] << "], "
-             << "[" << matrix.mMatrix[8] << ", " << matrix.mMatrix[9] << ", " << matrix.mMatrix[10] << ", " << matrix.mMatrix[11] << "], "
-             << "[" << matrix.mMatrix[12] << ", " << matrix.mMatrix[13] << ", " << matrix.mMatrix[14] << ", " << matrix.mMatrix[15] << "] ]";
+  return o << "[ " << matrix.mMatrix[0]  << ", " << matrix.mMatrix[1]  << ", " << matrix.mMatrix[2]  << ", " << matrix.mMatrix[3]  << ", "
+                   << matrix.mMatrix[4]  << ", " << matrix.mMatrix[5]  << ", " << matrix.mMatrix[6]  << ", " << matrix.mMatrix[7]  << ", "
+                   << matrix.mMatrix[8]  << ", " << matrix.mMatrix[9]  << ", " << matrix.mMatrix[10] << ", " << matrix.mMatrix[11] << ", "
+                   << matrix.mMatrix[12] << ", " << matrix.mMatrix[13] << ", " << matrix.mMatrix[14] << ", " << matrix.mMatrix[15] << " ]";
 }
 
 } // namespace Dali

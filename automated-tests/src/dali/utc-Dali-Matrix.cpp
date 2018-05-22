@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -795,7 +795,7 @@ int UtcDaliMatrixOStreamOperator(void)
 
   oss << matrix;
 
-  std::string expectedOutput = "[ [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1] ]";
+  std::string expectedOutput = "[ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]";
 
   DALI_TEST_EQUALS( oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;

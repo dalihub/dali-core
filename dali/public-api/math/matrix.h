@@ -38,8 +38,22 @@ class Quaternion;
 /**
  * @brief The Matrix class represents transformations and projections.
  *
- * It is agnostic w.r.t. row/column major notation - it operates on a flat array.
- * Each axis is contiguous in memory, so the x axis corresponds to elements 0, 1, 2 and 3, the y axis corresponds to elements 4, 5, 6, 7, etc.
+ * The matrix is stored as a flat array and is Column Major, i.e. the storage order is as follows (numbers represent
+ * indices of array):
+ *
+ * @code
+ *
+ * 0   4   8   12
+ * 1   5   9   13
+ * 2   6   10  14
+ * 3   7   11  15
+ *
+ * @endcode
+ *
+ * Each axis is contiguous in memory, so the x-axis corresponds to elements 0, 1, 2 and 3, the y-axis corresponds to
+ * elements 4, 5, 6, 7, the z-axis corresponds to elements 12, 13, 14 and 15, and the translation vector corresponds to
+ * elements 12, 13 and 14.
+ *
  * @SINCE_1_0.0
  */
 class DALI_CORE_API Matrix
@@ -71,12 +85,7 @@ public:
    * The order of the values for a transform matrix is:
    *
    * @code
-   *
-   *   xAxis.x xAxis.y xAxis.z 0.0f
-   *   yAxis.x yAxis.y yAxis.z 0.0f
-   *   zAxis.x zAxis.y zAxis.z 0.0f
-   *   trans.x trans.y trans.z 1.0f
-   *
+   * [ xAxis.x, xAxis.y, xAxis.z, 0.0f, yAxis.x, yAxis.y, yAxis.z, 0.0f, zAxis.x, zAxis.y, zAxis.z, 0.0f, trans.x, trans.y, trans.z, 1.0f ]
    * @endcode
    *
    * @SINCE_1_0.0
@@ -259,12 +268,7 @@ public:
    * The order of the values for a transform matrix is:
    *
    * @code
-   *
-   *   xAxis.x xAxis.y xAxis.z 0.0f
-   *   yAxis.x yAxis.y yAxis.z 0.0f
-   *   zAxis.x zAxis.y zAxis.z 0.0f
-   *   trans.x trans.y trans.z 1.0f
-   *
+   * [ xAxis.x, xAxis.y, xAxis.z, 0.0f, yAxis.x, yAxis.y, yAxis.z, 0.0f, zAxis.x, zAxis.y, zAxis.z, 0.0f, trans.x, trans.y, trans.z, 1.0f ]
    * @endcode
    *
    * @SINCE_1_0.0
@@ -279,12 +283,7 @@ public:
    * The order of the values for a transform matrix is:
    *
    * @code
-   *
-   *   xAxis.x xAxis.y xAxis.z 0.0f
-   *   yAxis.x yAxis.y yAxis.z 0.0f
-   *   zAxis.x zAxis.y zAxis.z 0.0f
-   *   trans.x trans.y trans.z 1.0f
-   *
+   * [ xAxis.x, xAxis.y, xAxis.z, 0.0f, yAxis.x, yAxis.y, yAxis.z, 0.0f, zAxis.x, zAxis.y, zAxis.z, 0.0f, trans.x, trans.y, trans.z, 1.0f ]
    * @endcode
    *
    * @SINCE_1_0.0
@@ -297,6 +296,9 @@ public:
    * @brief Function to multiply two matrices and store the result onto third.
    *
    * Use this method in time critical path as it does not require temporaries.
+   *
+   * result = rhs * lhs
+   *
    * @SINCE_1_0.0
    * @param[out] result Result of the multiplication
    * @param[in] lhs Matrix, this can be same matrix as result
@@ -318,9 +320,11 @@ public:
   /**
    * @brief The multiplication operator.
    *
+   * Returned Vector = This Matrix * rhs
+   *
    * @SINCE_1_0.0
-   * @param[in] rhs The Matrix to multiply this by
-   * @return A matrix containing the result
+   * @param[in] rhs The Vector4 to multiply this by
+   * @return A Vector4 containing the result
    */
   Vector4 operator*(const Vector4& rhs) const;
 
@@ -408,7 +412,7 @@ private:
 /**
  * @brief Prints a matrix.
  *
- * It is printed in memory order, i.e. each printed row is contiguous in memory.
+ * It is printed in memory order.
  * @SINCE_1_0.0
  * @param[in] o The output stream operator
  * @param[in] matrix The matrix to print

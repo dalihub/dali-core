@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@
 #define S22 8
 
 /*
- * S00 S01 S02
- * S10 S11 S12
- * S20 S21 S22
+ * S00 S10 S20
+ * S01 S11 S21
+ * S02 S12 S22
  */
 
 namespace
@@ -281,9 +281,9 @@ bool Matrix3::operator!=(const Matrix3& rhs) const
 
 std::ostream& operator<< (std::ostream& o, const Matrix3& matrix)
 {
-  return o << "[ [" << matrix.mElements[0] << ", " << matrix.mElements[1] << ", " << matrix.mElements[2]  << "], "
-             << "[" << matrix.mElements[3] << ", " << matrix.mElements[4] << ", " << matrix.mElements[5]  << "], "
-             << "[" << matrix.mElements[6] << ", " << matrix.mElements[7] << ", " << matrix.mElements[8]  << "] ]";
+  return o << "[ " << matrix.mElements[0] << ", " << matrix.mElements[1] << ", " << matrix.mElements[2] << ", "
+                   << matrix.mElements[3] << ", " << matrix.mElements[4] << ", " << matrix.mElements[5] << ", "
+                   << matrix.mElements[6] << ", " << matrix.mElements[7] << ", " << matrix.mElements[8] << " ]";
 }
 
 } // namespace Dali
