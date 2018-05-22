@@ -1,0 +1,372 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b1ff025e_d24971c1",
+        "filename": "dali/devel-api/rendering/shader-devel.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "2018",
+      "range": {
+        "startLine": 2,
+        "startChar": 17,
+        "endLine": 2,
+        "endChar": 21
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46672faf_ae23bdfc",
+        "filename": "dali/devel-api/rendering/shader-devel.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "2018",
+      "range": {
+        "startLine": 5,
+        "startChar": 17,
+        "endLine": 5,
+        "endChar": 21
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d27705d8_36601b7d",
+        "filename": "dali/devel-api/rendering/shader-devel.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Max Line length is 120 characters.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 1
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "babfd5ea_89948248",
+        "filename": "dali/devel-api/rendering/shader-devel.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "This ignores endianness. We should use a neutral protocol.",
+      "range": {
+        "startLine": 54,
+        "startChar": 27,
+        "endLine": 54,
+        "endChar": 50
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7db43243_480b71d8",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-ubo-manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Should use DALI_LOG_INFO for logging.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 47
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa5a967f_de9d1cf2",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-ubo-manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Shouldn\u0027t use abbreviations.",
+      "range": {
+        "startLine": 30,
+        "startChar": 7,
+        "endLine": 30,
+        "endChar": 10
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "96f3c8e6_8bc36862",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-buffer.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "namespace comment?",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 1
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06e757f6_7a5a05b5",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "headers should be in lexical order where possible.",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 59
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a869800d_627038ab",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Could remove this method",
+      "range": {
+        "startLine": 265,
+        "startChar": 46,
+        "endLine": 265,
+        "endChar": 65
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63b1254c_1c0bff43",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Could remove this method",
+      "range": {
+        "startLine": 278,
+        "startChar": 45,
+        "endLine": 278,
+        "endChar": 63
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da9c5eeb_287cbde6",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "what does our coding standard say about defining default methods like this?",
+      "range": {
+        "startLine": 308,
+        "startChar": 41,
+        "endLine": 308,
+        "endChar": 42
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18440d9f_42f56b29",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Fix comment",
+      "range": {
+        "startLine": 58,
+        "startChar": 30,
+        "endLine": 58,
+        "endChar": 43
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d50ca4d7_28c246e8",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "directly what?",
+      "range": {
+        "startLine": 145,
+        "startChar": 37,
+        "endLine": 145,
+        "endChar": 46
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa9d802c_bdfe6aee",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "You may want to consider making the forward declaration public for future access/extensibility.",
+      "range": {
+        "startLine": 150,
+        "startChar": 2,
+        "endLine": 150,
+        "endChar": 14
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "355ad927_c80e67b4",
+        "filename": "dali/graphics/vulkan/generated/builtin-shader-gen.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "Should use DALI_VULKAN_API, and define it in a platform specific dali_vulkan_common.h header (see MS Windows backend email thread)",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 59
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9091152d_d616022d",
+        "filename": "dali/internal/event/rendering/shader-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-22T16:11:43Z",
+      "side": 1,
+      "message": "We don\u0027t need to send a message, we can call the method directly on the new object before sending to UpdateManager above.",
+      "range": {
+        "startLine": 347,
+        "startChar": 2,
+        "endLine": 347,
+        "endChar": 25
+      },
+      "revId": "08e4b7195f5db3f0697ca11ca173aa67633d777b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
