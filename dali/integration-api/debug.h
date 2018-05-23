@@ -133,7 +133,7 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for release
  */
-#define DALI_LOG_RELEASE_INFO(format, args, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_RELEASE_INFO(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
 
 #ifdef DEBUG_ENABLED
 
