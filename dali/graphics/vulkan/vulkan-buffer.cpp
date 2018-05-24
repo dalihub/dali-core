@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+#include <utility>
 
 namespace Dali
 {
@@ -27,153 +28,72 @@ namespace Graphics
 namespace Vulkan
 {
 
-struct Buffer::Impl final
-{
-  /**
-   *
-   * @param graphics
-   * @param createInfo
-   */
-  Impl(Graphics& graphics, Buffer& owner, const vk::BufferCreateInfo& createInfo)
-  : mGraphics(graphics),
-    mInterface( owner ),
-    mDeviceMemory(nullptr),
-    mInfo(createInfo)
-  {
-  }
-
-  /**
-   *
-   */
-  ~Impl()
-  {
-    mGraphics.GetDevice().destroyBuffer( mBuffer, mGraphics.GetAllocator() );
-  }
-
-  /**
-   * Initialises Buffer with memory, as host visible ( for write )
-   * @return
-   */
-  bool Initialise()
-  {
-    mBuffer = VkAssert(mGraphics.GetDevice().createBuffer( mInfo, mGraphics.GetAllocator()));
-    return true;
-  }
-
-  /**
-   *
-   * @return
-   */
-  vk::BufferUsageFlags GetUsage() const
-  {
-    return mInfo.usage;
-  }
-
-  /**
-   *
-   * @return
-   */
-  size_t GetSize() const
-  {
-    return static_cast<size_t>(mInfo.size);
-  }
-
-  /**
-   *
-   * @return
-   */
-  vk::Buffer GetVkHandle() const
-  {
-    return mBuffer;
-  }
-
-  void BindMemory( RefCountedGpuMemoryBlock handle )
-  {
-    assert( mBuffer && "Buffer not initialised!");
-    VkAssert(mGraphics.GetDevice().bindBufferMemory( mBuffer, (*handle), 0 ));
-    mDeviceMemory = handle;
-  }
-
-  Vulkan::Graphics&                     mGraphics;
-  Vulkan::Buffer&                       mInterface;
-  RefCountedGpuMemoryBlock                  mDeviceMemory;
-  vk::BufferCreateInfo                  mInfo;
-  vk::Buffer                            mBuffer;
-};
-
-RefCountedBuffer Buffer::New(Graphics& graphics, size_t size, Type type)
-{
-  auto usageFlags = vk::BufferUsageFlags{};
-
-  switch( type )
-  {
-    case Type::VERTEX: { usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer; break; };
-    case Type::INDEX: { usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer; break; };
-    case Type::UNIFORM: { usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer; break; };
-    case Type::SHADER_STORAGE: { usageFlags |= vk::BufferUsageFlagBits::eStorageBuffer; break; };
-  }
-
-  auto info = vk::BufferCreateInfo{};
-  info.setSharingMode( vk::SharingMode::eExclusive );
-  info.setSize( size );
-  info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
-  auto buffer = RefCountedBuffer( new Buffer(graphics, info) );
-
-  if(buffer && buffer->mImpl->Initialise())
-  {
-    graphics.AddBuffer( buffer );
-  }
-  return buffer;
-}
-
 RefCountedBuffer Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
 {
-  auto buffer = RefCountedBuffer( new Buffer(graphics, info) );
-  if( buffer && buffer->mImpl->Initialise() )
-  {
-    graphics.AddBuffer( buffer );
-    return buffer;
-  }
-  return RefCountedBuffer();
+  return RefCountedBuffer(new Buffer(graphics, info));
 }
 
-Buffer::Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo)
-: VkManaged()
+const Buffer& Buffer::ConstRef()
 {
-  mImpl = MakeUnique<Buffer::Impl>(graphics, *this, createInfo);
+  return *this;
+}
+
+Buffer& Buffer::Ref()
+{
+  return *this;
+}
+
+Buffer::Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo )
+        : VkManaged(),
+          mGraphics(&graphics),
+          mDeviceMemory(nullptr),
+          mInfo(createInfo)
+{
 }
 
 Buffer::~Buffer() = default;
 
 vk::BufferUsageFlags Buffer::GetUsage() const
 {
-  return mImpl->GetUsage();
+  return mInfo.usage;
 }
 
 const RefCountedGpuMemoryBlock& Buffer::GetMemoryHandle() const
 {
-  return mImpl->mDeviceMemory;
+  return mDeviceMemory;
 }
 
 uint32_t Buffer::GetSize() const
 {
-  return U32(mImpl->GetSize());
+  return static_cast<uint32_t>(mInfo.size);
 }
 
 vk::Buffer Buffer::GetVkHandle() const
 {
-  return mImpl->GetVkHandle();
+  return mBuffer;
 }
 
 void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
 {
-  mImpl->BindMemory( handle );
+  assert(mBuffer && "Buffer not initialised!");
+  VkAssert(mGraphics->GetDevice().bindBufferMemory(mBuffer, (*handle), 0));
+  mDeviceMemory = handle;
 }
 
 bool Buffer::OnDestroy()
 {
-  //mImpl->mGraphics.RemoveBuffer( *this );
+  mGraphics->RemoveBuffer(*this);
+
+  mGraphics->DiscardResource([this]() {
+    mGraphics->GetDevice().destroyBuffer(mBuffer, mGraphics->GetAllocator());
+  });
+
   return false;
+}
+
+Buffer::operator vk::Buffer*()
+{
+  return &mBuffer;
 }
 
 

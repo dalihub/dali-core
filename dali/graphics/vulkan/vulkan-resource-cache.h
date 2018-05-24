@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-types.h>
+#include <functional>
 
 namespace Dali
 {
@@ -51,13 +52,6 @@ public:
    * @return A reference to the ResourceCache
    */
   ResourceCache& AddImage( RefCountedImage image );
-
-  /**
-   * Adds the provided pipeline object to the pipeline cache
-   * @param pipeline The pipeline object to be added to the cache
-   * @return A reference to the ResourceCache
-   */
-  ResourceCache& AddPipeline( RefCountedPipeline pipeline );
 
   /**
    * Adds the provided shader object to the pipeline cache
@@ -110,13 +104,6 @@ public:
   RefCountedImage FindImage( vk::Image image);
 
   /**
-   * Finds the Pipeline object using the specified Vulkan handle in the cache
-   * @param pipeline The Vulkan handle of the Pipeline object to be found
-   * @return A Handle to the Pipeline object if found. An empty Handle otherwise
-   */
-  RefCountedPipeline FindPipeline( vk::Pipeline pipeline );
-
-  /**
    * Finds the shader module using the specified Vulkan handle in the cache
    * @param shaderModule The Vulkan handle of the shader module to be found
    * @return A Handle to the Shader module if found. An empty Handle otherwise
@@ -166,13 +153,6 @@ public:
   ResourceCache& RemoveImage( Image& image );
 
   /**
-   * Removes the specified Pipeline from the cache
-   * @param pipeline The Pipeline to be removed
-   * @return A reference to the ResourceCache
-   */
-  ResourceCache& RemovePipeline( Pipeline& pipeline );
-
-  /**
    * Removes the specified Shader from the cache
    * @param shader The Shader to be removed
    * @return A reference to the ResourceCache
@@ -207,6 +187,10 @@ public:
    */
   ResourceCache& RemoveSampler( Sampler& sampler );
 
+  void CollectGarbage();
+
+  void EnqueueDiscardOperation( std::function<void()> deleter );
+
   ResourceCache() = default;
 
   // The cache should not be copyable
@@ -220,14 +204,15 @@ public:
   ResourceCache&& operator=( ResourceCache&& other ) = delete;
 
 private:
-  std::vector<RefCountedBuffer> mBuffers;
-  std::vector<RefCountedImage> mImages;
-  std::vector<RefCountedPipeline> mPipelines;
-  std::vector<RefCountedShader> mShaders;
-  std::vector<RefCountedCommandPool> mCommandPools;
-  std::vector<RefCountedDescriptorPool> mDescriptorPools;
-  std::vector<RefCountedFramebuffer> mFramebuffers;
-  std::vector<RefCountedSampler> mSamplers;
+  std::vector< RefCountedBuffer >         mBuffers;
+  std::vector< RefCountedImage >          mImages;
+  std::vector< RefCountedShader >         mShaders;
+  std::vector< RefCountedCommandPool >    mCommandPools;
+  std::vector< RefCountedDescriptorPool > mDescriptorPools;
+  std::vector< RefCountedFramebuffer >    mFramebuffers;
+  std::vector< RefCountedSampler >        mSamplers;
+
+  std::vector< std::function<void()> >    mDiscardQueue;
 };
 
 } //namespace Vulkan

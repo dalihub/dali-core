@@ -143,7 +143,7 @@ struct Swapchain::Impl
       swapBuffer.index             = 0;
       swapBuffer.masterCmdBuffer   = masterCmd;
       swapBuffer.masterCommandPool = cmdPool;
-      swapBuffer.endOfFrameFence   = Fence::New( mGraphics );
+      swapBuffer.endOfFrameFence   = mGraphics.CreateFence({});
       swapBuffer.firstUse          = true;
       mSwapchainBuffer.emplace_back( swapBuffer );
     }
@@ -408,14 +408,14 @@ struct Swapchain::Impl
 
     if( !mFrameFence )
     {
-      mFrameFence = Fence::New( mGraphics );
+      mFrameFence = mGraphics.CreateFence({});
     }
 
     mCurrentBufferIndex =
-      VkAssert( device.acquireNextImageKHR( mSwapchainKHR, 1000000, nullptr, mFrameFence->GetFence() ) );
+      VkAssert( device.acquireNextImageKHR( mSwapchainKHR, 1000000, nullptr, mFrameFence->GetVkHandle() ) );
 
-    mFrameFence->Wait();
-    mFrameFence->Reset();
+    mGraphics.WaitForFence(mFrameFence);
+    mGraphics.ResetFence(mFrameFence);
 
     auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
@@ -515,9 +515,9 @@ struct Swapchain::Impl
     swapBuffer.masterCmdBuffer->End();
 
     // submit
-    swapBuffer.endOfFrameFence->Reset();
+    mGraphics.ResetFence(swapBuffer.endOfFrameFence);
     mQueue.Submit( swapBuffer.masterCmdBuffer, swapBuffer.endOfFrameFence );
-    swapBuffer.endOfFrameFence->Wait( 0u );
+    mGraphics.WaitForFence(swapBuffer.endOfFrameFence);
 
     // fixme: use semaphores to synchronize all previously submitted command buffers!
     vk::PresentInfoKHR presentInfo{};

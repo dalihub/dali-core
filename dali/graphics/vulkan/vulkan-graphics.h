@@ -26,6 +26,11 @@
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/integration-api/graphics/surface-factory.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+#include <thread>
+#include <mutex>
+#include <map>
+#include <functional>
+
 namespace Dali
 {
 namespace Graphics
@@ -34,7 +39,6 @@ namespace API
 {
 class Controller;
 }
-using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 
 namespace VulkanAPI
 {
@@ -43,14 +47,6 @@ class Controller;
 
 namespace Vulkan
 {
-
-enum class Platform
-{
-  UNDEFINED,
-  XLIB,
-  XCB,
-  WAYLAND,
-};
 
 class Buffer;
 class Image;
@@ -63,6 +59,9 @@ class DescriptorPool;
 class GpuMemoryManager;
 class PipelineCache;
 class ResourceCache;
+
+using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
+using ResourceCacheMap = std::unordered_map< std::thread::id, std::unique_ptr<ResourceCache> >;
 
 struct SwapchainSurfacePair
 {
@@ -79,23 +78,42 @@ public:
   Graphics& operator=(const Graphics&) = delete;
   ~Graphics();
 
-  void Create();
+public: // Create methods
 
-  // new way
-  FBID CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory);
+  void                                    Create();
+  void                                    CreateDevice();
+  FBID                                    CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory);
+  RefCountedSwapchain                     CreateSwapchainForSurface( RefCountedSurface surface );
+  RefCountedShader                        CreateShader(); //will see if this will work
+  RefCountedPipeline                      CreatePipeline();
+  RefCountedFence                         CreateFence( const vk::FenceCreateInfo& fenceCreateInfo );
+  RefCountedBuffer                        CreateBuffer( size_t size, BufferType type );
+  RefCountedBuffer                        CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo );
+  RefCountedFramebuffer                   CreateFramebuffer();
+  RefCountedImage                         CreateImage();
+  RefCountedImageView                     CreateImageView();
+  RefCountedDescriptorPool                CreateDescriptorPool();
+  RefCountedCommandPool                   CreateCommandPool(const vk::CommandPoolCreateInfo& info);
+  RefCountedCommandBuffer                 CreateCommandBuffer();
+  std::vector< RefCountedCommandBuffer >  CreateCommandBuffers();
+  RefCountedGpuMemoryBlock                CreateGpuMemoryBlock();
+  RefCountedDescriptorSet                 CreateDescriptorSet();
+  RefCountedSampler                       CreateSampler();
 
-  RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
+public: // Actions
+  vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = 0 );
+  vk::Result WaitForFences( const std::vector< RefCountedFence >& fences,
+                            bool waitAll = true,
+                            uint32_t timeout = std::numeric_limits<uint32_t>::max() );
+  vk::Result ResetFence( RefCountedFence fence );
+  vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
+public: // Getters
   RefCountedSurface GetSurface( FBID surfaceId );
 
   RefCountedSwapchain GetSwapchainForSurface( RefCountedSurface surface );
 
   RefCountedSwapchain GetSwapchainForFBID( FBID surfaceId );
-
-  void CreateDevice();
-
-  /** Creates new command pool */
-  RefCountedCommandPool CreateCommandPool(const vk::CommandPoolCreateInfo& info);
 
   vk::Device GetDevice() const;
 
@@ -105,15 +123,9 @@ public:
 
   const vk::AllocationCallbacks& GetAllocator() const;
 
-  GpuMemoryManager& GetDeviceMemoryManager() const
-  {
-    return *mDeviceMemoryManager;
-  }
+  GpuMemoryManager& GetDeviceMemoryManager() const;
 
-  const vk::PhysicalDeviceMemoryProperties& GetMemoryProperties() const
-  {
-    return *mPhysicalDeviceMemoryProperties;
-  }
+  const vk::PhysicalDeviceMemoryProperties& GetMemoryProperties() const;
 
   Queue& GetGraphicsQueue(uint32_t index = 0u) const;
   Queue& GetTransferQueue(uint32_t index = 0u) const;
@@ -124,54 +136,12 @@ public:
 
   Dali::Graphics::API::Controller& GetController();
 
-private:
+  PipelineCache& GetPipelineCache();
 
-  void                                     CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers );
-  void                                     DestroyInstance();
-  void                                     PreparePhysicalDevice();
-  void                                     GetPhysicalDeviceProperties();
-  void                                     GetQueueFamilyProperties();
-  std::vector< vk::DeviceQueueCreateInfo > GetQueueCreateInfos();
-  std::vector<const char*>                 PrepareDefaultInstanceExtensions();
-
-private:
-
-  std::unique_ptr<GpuMemoryManager>        mDeviceMemoryManager;
-
-  vk::Instance                             mInstance;
-  std::unique_ptr<vk::AllocationCallbacks> mAllocator{nullptr};
-
-  // physical device
-  vk::PhysicalDevice mPhysicalDevice;
-
-  // logical device
-  vk::Device mDevice;
-
-  // physical device properites
-  std::unique_ptr< vk::PhysicalDeviceProperties >       mPhysicalDeviceProperties;
-  std::unique_ptr< vk::PhysicalDeviceMemoryProperties > mPhysicalDeviceMemoryProperties;
-  std::unique_ptr< vk::PhysicalDeviceFeatures >         mPhysicalDeviceFeatures;
-
-  // queue family properties
-  std::vector< vk::QueueFamilyProperties > mQueueFamilyProperties;
-
-  std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
-  FBID mBaseFBID{0u};
-
-  // Sets of queues
-  std::vector< std::unique_ptr<Queue> >  mGraphicsQueues;
-  std::vector< std::unique_ptr<Queue> >  mTransferQueues;
-  std::vector< std::unique_ptr<Queue> >  mComputeQueues;
-  //std::unique_ptr< Queue > mPresentQueue;
-
-  Platform                               mPlatform  { Platform::UNDEFINED };
-
-public:
-  // TODO: all this stuff should go into some vulkan cache
+public: //Cache management methods
 
   void AddBuffer( RefCountedBuffer buffer );
   void AddImage( RefCountedImage image );
-  void AddPipeline( RefCountedPipeline pipeline );
   void AddShader( RefCountedShader shader );
   void AddCommandPool( RefCountedCommandPool pool );
   void AddDescriptorPool( RefCountedDescriptorPool pool );
@@ -187,18 +157,63 @@ public:
   void RemoveFramebuffer( Framebuffer& framebuffer );
   void RemoveSampler( Sampler& sampler );
 
-private:
-  std::unique_ptr<Dali::Graphics::VulkanAPI::Controller>           mGfxController;
+  void CollectGarbage();
+
+  void DiscardResource(std::function<void()> deleter);
+
+private: // Methods
+
+  void                                      CreateInstance( const std::vector<const char*>& extensions,
+                                                            const std::vector<const char*>& validationLayers );
+  void                                      DestroyInstance();
+  void                                      PreparePhysicalDevice();
+  void                                      GetPhysicalDeviceProperties();
+  void                                      GetQueueFamilyProperties();
+  std::vector< vk::DeviceQueueCreateInfo >  GetQueueCreateInfos();
+  std::vector<const char*>                  PrepareDefaultInstanceExtensions();
+
+  std::unique_ptr< ResourceCache >&         GetResourceCache(std::thread::id thread_id);
+
+private: // Members
+
+  std::unique_ptr<GpuMemoryManager>                           mDeviceMemoryManager;
+
+  vk::Instance                                                mInstance;
+  std::unique_ptr<vk::AllocationCallbacks>                    mAllocator{nullptr};
+
+  // physical device
+  vk::PhysicalDevice mPhysicalDevice;
+
+  // logical device
+  vk::Device                                                  mDevice;
+
+  // physical device properties
+  std::unique_ptr< vk::PhysicalDeviceProperties >             mPhysicalDeviceProperties;
+  std::unique_ptr< vk::PhysicalDeviceMemoryProperties >       mPhysicalDeviceMemoryProperties;
+  std::unique_ptr< vk::PhysicalDeviceFeatures >               mPhysicalDeviceFeatures;
+
+  // queue family properties
+  std::vector< vk::QueueFamilyProperties >                    mQueueFamilyProperties;
+
+  std::unordered_map< FBID, SwapchainSurfacePair >            mSurfaceFBIDMap;
+  FBID mBaseFBID{0u};
+
+  // Sets of queues
+  std::vector< std::unique_ptr<Queue> >                       mGraphicsQueues;
+  std::vector< std::unique_ptr<Queue> >                       mTransferQueues;
+  std::vector< std::unique_ptr<Queue> >                       mComputeQueues;
+  //std::unique_ptr< Queue > mPresentQueue;
+
+  Platform                                                    mPlatform  { Platform::UNDEFINED };
+
+  std::unique_ptr<Dali::Graphics::VulkanAPI::Controller>      mGfxController;
 
   // TODO: rename
-  std::unique_ptr<PipelineCache>        mPipelineDatabase;
+  std::unique_ptr<PipelineCache>                              mPipelineDatabase;
 
-  std::unique_ptr<ResourceCache>        mResourceCache;
-public:
-  PipelineCache& GetPipelineCache()
-  {
-    return *mPipelineDatabase;
-  }
+  std::mutex                                                  mMutex;
+  ResourceCacheMap                                            mResourceCacheMap;
+
 };
 
 } // namespace Vulkan

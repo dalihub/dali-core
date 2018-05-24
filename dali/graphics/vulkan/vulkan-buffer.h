@@ -34,29 +34,9 @@ class Buffer : public VkManaged
 public:
 
   /**
-   * Type of the buffer
-   */
-  enum class Type
-  {
-    VERTEX,
-    INDEX,
-    UNIFORM,
-    SHADER_STORAGE
-  };
-
-  /**
    * Destructor
    */
   ~Buffer() override;
-
-  /**
-   * Creates logical buffer without allocating any memory
-   * @param graphics
-   * @param size
-   * @param type
-   * @return
-   */
-  static RefCountedBuffer New( Graphics& graphics, size_t size, Type type );
 
   /**
    *
@@ -65,6 +45,10 @@ public:
    * @return
    */
   static RefCountedBuffer New( Graphics& graphics, vk::BufferCreateInfo info );
+
+  const Buffer& ConstRef();
+
+  Buffer& Ref();
 
   /**
    * Returns buffer usage flags
@@ -96,14 +80,16 @@ public:
    */
   void BindMemory( const RefCountedGpuMemoryBlock& handle );
 
-public:
-
   /**
    *
    * @return
    */
   bool OnDestroy() override;
 
+  Buffer( const Buffer& ) = delete;
+  Buffer& operator =( const Buffer& ) = delete;
+
+  operator vk::Buffer*();
 
 private:
 
@@ -113,15 +99,13 @@ private:
    * @param graphics
    * @param createInfo
    */
-  Buffer(Graphics& graphics, const vk::BufferCreateInfo& createInfo);
-
-  Buffer( const Buffer& ) = delete;
-  Buffer& operator =( const Buffer& ) = delete;
+  Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo );
 
 private:
-
-  struct Impl;
-  std::unique_ptr<Buffer::Impl> mImpl;
+  Graphics*                             mGraphics;
+  RefCountedGpuMemoryBlock              mDeviceMemory;
+  vk::BufferCreateInfo                  mInfo;
+  vk::Buffer                            mBuffer;
 };
 
 

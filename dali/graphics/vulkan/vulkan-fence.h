@@ -33,39 +33,25 @@ class Fence : public VkManaged
 {
 public:
 
-  static Handle<Fence> New( Graphics& graphics );
+  static RefCountedFence New( Graphics& graphics );
 
-  Fence( Fence&& ) = default;
-  ~Fence();
-
-private:
-
-  Fence( Graphics& graphics );
-
-public:
+  ~Fence() override;
 
   const Fence& ConstRef() const;
 
   Fence& Ref();
 
-  /**
-   *
-   * @param timeout
-   * @return
-   */
-  bool Wait( uint32_t timeout = 0u );
+  vk::Fence GetVkHandle() const;
 
-  /**
-   *
-   */
-  void Reset();
+  operator vk::Fence*();
 
-  vk::Fence GetFence() const;
+private:
+  explicit Fence( Graphics& graphics );
 
 private:
 
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  Graphics* mGraphics;
+  vk::Fence mFence;
 };
 
 } // namespace Vulkan

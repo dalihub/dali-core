@@ -28,15 +28,18 @@ namespace Graphics
 namespace Vulkan
 {
 
+//TODO: The Submission calls has to be redesigned or removed
 class Fence;
 class Submission
 {
 public:
-  Submission(Handle<Fence> fence);
+  Submission( Graphics& graphics, Handle <Fence> fence );
 
   bool WaitForFence(uint32_t timeout = 0u);
 
 private:
+  Graphics& mGraphics;
+
   // todo: possibly resources locks stored here?
   Handle<Fence> mFences;
 };
@@ -80,10 +83,10 @@ private:
 
 
 private:
-  //Graphics&                mGraphics;
-  vk::Queue                mQueue;
-  vk::QueueFlags           mFlags;
-  std::vector< vk::Fence > mFences;
+  Graphics&                  mGraphics;
+  vk::Queue                  mQueue;
+  vk::QueueFlags             mFlags;
+  std::vector< vk::Fence >   mFences;
   //uint32_t                 mQueueFamilyIndex;
   //uint32_t                 mQueueIndex;
 };

@@ -138,9 +138,9 @@ struct Texture
     mCommandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = Fence::New( mGraphics );
+    auto fence = mGraphics.CreateFence({});
     mGraphics.GetGraphicsQueue(0u).Submit( mCommandBuffer, fence );
-    fence->Wait();
+    mGraphics.WaitForFence(fence);
 
   }
 
