@@ -77,19 +77,19 @@ inline PrepareSemaphoresData PrepareSemaphores(const std::vector< RefCountedComm
 }
 
 // submission
-Submission::Submission(Handle<Fence> fence) : mFences(fence)
+Submission::Submission( Graphics& graphics, Handle <Fence> fence ) : mGraphics(graphics), mFences(fence)
 {
 }
 
 bool Submission::WaitForFence(uint32_t timeout)
 {
-  return mFences->Wait(timeout);
+  return mGraphics.WaitForFence(mFences, timeout) == vk::Result::eSuccess;
 }
 
 // queue
 Queue::Queue(Graphics& graphics, vk::Queue queue, uint32_t queueFamilyIndex, uint32_t queueIndex,
              vk::QueueFlags queueFlags)
-: /*mGraphics(graphics),*/ mQueue(queue), mFlags(queueFlags) /*, mQueueFamilyIndex(queueFamilyIndex), mQueueIndex(queueIndex) */
+: mGraphics(graphics), mQueue(queue), mFlags(queueFlags) /*, mQueueFamilyIndex(queueFamilyIndex), mQueueIndex(queueIndex) */
 {
 }
 
@@ -123,9 +123,9 @@ std::unique_ptr< Submission > Queue::Submit(const std::vector< RefCountedCommand
   info.setPWaitSemaphores(semaphores.waitSemaphores.data());
   info.setPWaitDstStageMask(semaphores.waitDstStageMasks.data());
 
-  VkAssert(mQueue.submit(1, &info, fence ? fence->GetFence() : nullptr ));
+  VkAssert(mQueue.submit(1, &info, fence ? fence->GetVkHandle() : nullptr ));
 
-  return MakeUnique< Submission >(fence);
+  return MakeUnique< Submission >(mGraphics, fence);
 }
 #pragma GCC diagnostic pop
 

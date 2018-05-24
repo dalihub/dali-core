@@ -37,18 +37,18 @@ Buffer::Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buff
 
 bool Buffer::Initialise()
 {
-  Vulkan::Buffer::Type type;
+  Vulkan::BufferType type;
   if( mUsage == vk::BufferUsageFlagBits::eUniformBuffer )
   {
-    type = Vulkan::Buffer::Type::UNIFORM;
+    type = Vulkan::BufferType::UNIFORM;
   }
   else if( mUsage == vk::BufferUsageFlagBits::eIndexBuffer )
   {
-    type = Vulkan::Buffer::Type::INDEX;
+    type = Vulkan::BufferType::INDEX;
   }
   else if( mUsage == vk::BufferUsageFlagBits::eVertexBuffer )
   {
-    type = Vulkan::Buffer::Type::VERTEX;
+    type = Vulkan::BufferType::VERTEX;
   }
   else
   {
@@ -57,7 +57,7 @@ bool Buffer::Initialise()
   }
 
   // create buffer
-  mBufferRef = Vulkan::Buffer::New( mGraphics, mSize, type );
+  mBufferRef = mGraphics.CreateBuffer( mSize, type );
 
   // allocate memory
   auto memory =

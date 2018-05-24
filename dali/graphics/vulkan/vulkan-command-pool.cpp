@@ -186,10 +186,10 @@ struct CommandBufferPool
  */
 struct CommandPool::Impl
 {
-  Impl( Graphics& graphics, CommandPool& interface, const vk::CommandPoolCreateInfo& createInfo )
+  Impl( Graphics& graphics, CommandPool& interface, vk::CommandPoolCreateInfo createInfo )
   : mGraphics( graphics ),
     mInterface( interface ),
-    mCreateInfo( createInfo ),
+    mCreateInfo( std::move(createInfo) ),
     mCommandPool( nullptr )
   {
   }
@@ -218,7 +218,7 @@ struct CommandPool::Impl
 
   RefCountedCommandBuffer NewCommandBuffer( const vk::CommandBufferAllocateInfo& allocateInfo )
   {
-    auto& usedPool = allocateInfo.level == vk::CommandBufferLevel::ePrimary ? *mInternalPoolPrimary.get() : *mInternalPoolSecondary.get();
+    auto& usedPool = allocateInfo.level == vk::CommandBufferLevel::ePrimary ? *mInternalPoolPrimary : *mInternalPoolSecondary;
     auto retval = usedPool.AllocateCommandBuffer( false );
     return retval;
   }
@@ -250,7 +250,7 @@ struct CommandPool::Impl
  *
  * Class: CommandPool
  */
-CommandPoolHandle CommandPool::New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo )
+RefCountedCommandPool CommandPool::New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo )
 {
   auto retval = Handle<CommandPool>( new CommandPool(graphics, createInfo) );
 
@@ -262,7 +262,7 @@ CommandPoolHandle CommandPool::New( Graphics& graphics, const vk::CommandPoolCre
   return retval;
 }
 
-CommandPoolHandle CommandPool::New( Graphics& graphics )
+RefCountedCommandPool CommandPool::New( Graphics& graphics )
 {
   return New( graphics, vk::CommandPoolCreateInfo{});
 }

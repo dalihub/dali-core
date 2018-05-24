@@ -47,12 +47,6 @@ ResourceCache& ResourceCache::AddImage( RefCountedImage image )
   return *this;
 }
 
-ResourceCache& ResourceCache::AddPipeline( RefCountedPipeline pipeline )
-{
-  mPipelines.push_back( pipeline );
-  return *this;
-}
-
 ResourceCache& ResourceCache::AddShader( RefCountedShader shader )
 {
   mShaders.push_back( shader );
@@ -81,15 +75,6 @@ ResourceCache& ResourceCache::AddSampler( RefCountedSampler sampler )
 {
   mSamplers.push_back(sampler);
   return *this;
-}
-
-RefCountedPipeline ResourceCache::FindPipeline( vk::Pipeline pipeline )
-{
-  auto iterator = std::find_if(mPipelines.begin(),
-                               mPipelines.end(),
-                               [&](const RefCountedPipeline entry) { return entry->GetVkHandle() == pipeline; });
-
-  return iterator == mPipelines.end() ? RefCountedPipeline() : RefCountedPipeline(&**iterator);
 }
 
 RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
@@ -185,21 +170,6 @@ ResourceCache& ResourceCache::RemoveImage( Image& image )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemovePipeline( Pipeline &pipeline )
-{
-  if( !mPipelines.empty() )
-  {
-    auto found = std::find_if(mPipelines.begin(),
-                              mPipelines.end(),
-                              [&](const RefCountedPipeline entry) { return &(*entry) == &pipeline; });
-
-    std::iter_swap(found, std::prev(mPipelines.end()));
-    mPipelines.back().Reset();
-    mPipelines.pop_back();
-  }
-  return *this;
-}
-
 ResourceCache& ResourceCache::RemoveShader( Shader& shader )
 {
   if( !mShaders.empty() )
@@ -273,6 +243,21 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler &sampler )
     mSamplers.pop_back();
   }
   return *this;
+}
+
+void ResourceCache::CollectGarbage()
+{
+  for( const auto& functor : mDiscardQueue )
+  {
+    functor();
+  }
+
+  mDiscardQueue.clear();
+}
+
+void ResourceCache::EnqueueDiscardOperation( std::function<void()> deleter )
+{
+  mDiscardQueue.push_back(std::move(deleter));
 }
 
 } //namespace Vulkan
