@@ -27,95 +27,16 @@ namespace Vulkan
 {
 
 /**
- * Class: Fence::Impl
- *
- */
-struct Fence::Impl
-{
-  Impl( Vulkan::Graphics& graphics )
-  : mGraphics( graphics )
-  {
-  }
-
-  ~Impl()
-  {
-    if( mFence )
-    {
-      mGraphics.GetDevice().destroyFence( mFence, mGraphics.GetAllocator() );
-    }
-  }
-
-  vk::Result Initialise()
-  {
-    mFence = VkAssert( mGraphics.GetDevice().createFence( vk::FenceCreateInfo{}, mGraphics.GetAllocator() ) );
-    if( mFence )
-      return vk::Result::eSuccess;
-    return vk::Result::eErrorInitializationFailed;
-  }
-
-  /**
-   *
-   * @param timeout
-   * @return
-   */
-  bool Wait( uint32_t timeout = 0u )
-  {
-    if(mFence)
-    {
-      if(timeout)
-      {
-        return mGraphics.GetDevice().waitForFences(mFence, true, timeout) == vk::Result::eSuccess;
-      }
-      else
-      {
-        timeout = 16000000;
-        while(mGraphics.GetDevice().waitForFences(mFence, true, timeout) != vk::Result::eSuccess)
-        {
-          // fixme: busy wait, bit ugly
-        }
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   *
-   */
-  void Reset()
-  {
-    if(mFence)
-    {
-      mGraphics.GetDevice().resetFences(mFence);
-    }
-  }
-
-  vk::Fence GetVkFence() const
-  {
-    return mFence;
-  }
-
-  Vulkan::Graphics& mGraphics;
-  vk::Fence mFence;
-};
-
-/**
  * Class: Fence
  *
  */
-Handle<Fence> Fence::New( Graphics& graphics )
+RefCountedFence Fence::New( Graphics& graphics )
 {
-  auto retval = Handle<Fence>( new Fence(graphics) );
-  if( vk::Result::eSuccess == retval->mImpl->Initialise() )
-  {
-    return retval;
-  }
-  return Handle<Fence>();
+  return Handle<Fence>( new Fence(graphics) );
 }
 
-Fence::Fence(Graphics& graphics)
+Fence::Fence( Graphics& graphics ) : mGraphics(&graphics)
 {
-  mImpl = MakeUnique<Impl>(graphics);
 }
 
 const Fence& Fence::ConstRef() const
@@ -128,23 +49,23 @@ Fence& Fence::Ref()
   return *this;
 }
 
-Fence::~Fence() = default;
-
-bool Fence::Wait(uint32_t timeout)
+Fence::~Fence()
 {
-  return mImpl->Wait( timeout );
+  if( mFence )
+  {
+    mGraphics->GetDevice().destroyFence( mFence, mGraphics->GetAllocator() );
+  }
 }
 
-void Fence::Reset()
+vk::Fence Fence::GetVkHandle() const
 {
-  mImpl->Reset();
+  return mFence;
 }
 
-vk::Fence Fence::GetFence() const
+Fence::operator vk::Fence*()
 {
-  return mImpl->GetVkFence();
+  return &mFence;
 }
-
 
 
 } // namespace Vulkan

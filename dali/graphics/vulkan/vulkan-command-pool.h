@@ -31,7 +31,6 @@ namespace Vulkan
 class Graphics;
 class CommandBuffer;
 
-using CommandPoolHandle = Handle<class CommandPool>;
 
 class CommandPool : public VkManaged
 {
@@ -44,14 +43,14 @@ public:
    * @param createInfo
    * @return
    */
-  static CommandPoolHandle New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+  static RefCountedCommandPool New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
 
   /**
    *
    * @param graphics
    * @return
    */
-  static CommandPoolHandle New( Graphics& graphics );
+  static RefCountedCommandPool New( Graphics& graphics );
 
   ~CommandPool() override;
 
