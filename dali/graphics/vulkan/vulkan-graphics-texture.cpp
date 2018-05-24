@@ -43,6 +43,10 @@ struct Pixmap
     totalSizeInBytes = width*height*bytesPerPixel;
     data.resize( totalSizeInBytes );
 
+  explicit Pixmap( uint32_t _width, uint32_t _height )
+  : width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
+  {
+    data.resize( _width * _height );
   }
 
   std::vector<uint8_t>  data;
@@ -78,11 +82,10 @@ struct Texture::Impl
     // create buffer
     auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
     auto size   = sizeInBytes;
-    auto buffer = Buffer::New( mGraphics,
-                               vk::BufferCreateInfo{}
-                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                 .setSharingMode( vk::SharingMode::eExclusive )
-                                 .setSize( size ) );
+    auto buffer = mGraphics.CreateBuffer(vk::BufferCreateInfo{}
+                                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
+                                                 .setSharingMode( vk::SharingMode::eExclusive )
+                                                 .setSize( size ));
 
     buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
@@ -142,9 +145,9 @@ struct Texture::Impl
     mCommandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = Fence::New( mGraphics );
+    auto fence = mGraphics.CreateFence({});
     mGraphics.GetGraphicsQueue( 0u ).Submit( mCommandBuffer, fence );
-    fence->Wait();
+    VkAssert(mGraphics.WaitForFence(fence));
     return true;
   }
 
