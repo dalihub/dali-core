@@ -49,6 +49,7 @@
 #endif
 
 #include <iostream>
+#include "vulkan-fence.h"
 
 namespace Dali
 {
@@ -78,6 +79,383 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
 Graphics::Graphics() = default;
 Graphics::~Graphics() = default;
 
+// Create methods -----------------------------------------------------------------------------------------------
+void Graphics::Create()
+{
+
+  auto extensions = PrepareDefaultInstanceExtensions();
+
+  auto layers = vk::enumerateInstanceLayerProperties();
+  std::vector<const char*> validationLayers;
+  for( auto&& reqLayer : VALIDATION_LAYERS )
+  {
+    for( auto&& prop : layers.value )
+    {
+      std::cout << prop.layerName << std::endl;
+      if( std::string(prop.layerName) == reqLayer )
+      {
+        validationLayers.push_back(reqLayer);
+      }
+    }
+  }
+
+  CreateInstance(extensions, validationLayers);
+  PreparePhysicalDevice();
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wframe-larger-than="
+void Graphics::CreateDevice()
+{
+  auto queueInfos = GetQueueCreateInfos();
+  {
+    auto maxQueueCountPerFamily = 0u;
+    for( auto&& info : queueInfos )
+    {
+      maxQueueCountPerFamily = std::max( info.queueCount, maxQueueCountPerFamily );
+    }
+
+    auto priorities = std::vector<float>( maxQueueCountPerFamily );
+    std::fill( priorities.begin(), priorities.end(), 1.0f );
+
+    for( auto& info : queueInfos )
+    {
+      info.setPQueuePriorities( priorities.data() );
+    }
+
+    std::vector< const char* > extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+    auto info = vk::DeviceCreateInfo{};
+    info.setEnabledExtensionCount(U32(extensions.size()))
+            .setPpEnabledExtensionNames(extensions.data())
+            .setPEnabledFeatures(&(*mPhysicalDeviceFeatures))
+            .setPQueueCreateInfos(queueInfos.data())
+            .setQueueCreateInfoCount(U32(queueInfos.size()));
+
+    mDevice = VkAssert(mPhysicalDevice.createDevice(info, *mAllocator));
+  }
+
+  // create Queue objects
+  for(auto& queueInfo : queueInfos)
+  {
+    for(auto i = 0u; i < queueInfo.queueCount; ++i)
+    {
+      auto queue = mDevice.getQueue(queueInfo.queueFamilyIndex, i);
+
+      // based on family push queue instance into right array
+      auto flags = mQueueFamilyProperties[queueInfo.queueFamilyIndex].queueFlags;
+      if(flags & vk::QueueFlagBits::eGraphics)
+      {
+        mGraphicsQueues.emplace_back(
+                MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
+      }
+      if(flags & vk::QueueFlagBits::eTransfer)
+      {
+        mTransferQueues.emplace_back(
+                MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
+      }
+      if(flags & vk::QueueFlagBits::eCompute)
+      {
+        mComputeQueues.emplace_back(
+                MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
+      }
+
+      // todo: present queue
+    }
+  }
+
+  mPipelineDatabase = std::make_unique<PipelineCache>( *this );
+  mResourceCacheMap[std::this_thread::get_id()] = MakeUnique<ResourceCache>();
+}
+#pragma GCC diagnostic pop
+
+FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
+{
+  // create surface from the factory
+  auto surfaceRef = Surface::New( *this, std::move(surfaceFactory) );
+
+  if( surfaceRef->Create() )
+  {
+
+    // map surface to FBID
+    auto fbid = ++mBaseFBID;
+    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ RefCountedSwapchain{}, surfaceRef };
+    return fbid;
+  }
+  return -1;
+}
+
+RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
+{
+  auto swapchain = Swapchain::New( *this,
+                                   GetGraphicsQueue(0u),
+                                   surface, 4, 0 );
+
+  // store swapchain in the correct pair
+  for( auto&& val : mSurfaceFBIDMap )
+  {
+    if( val.second.surface == surface )
+    {
+      val.second.swapchain = swapchain;
+      break;
+    }
+  }
+
+  return swapchain;
+}
+
+RefCountedShader Graphics::CreateShader()
+{
+  NotImplemented()
+}
+
+RefCountedPipeline Graphics::CreatePipeline()
+{
+  NotImplemented()
+}
+
+RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInfo )
+{
+  auto refCountedFence = Fence::New(*this);
+
+  VkAssert(mDevice.createFence(&fenceCreateInfo, mAllocator.get(), refCountedFence->Ref()));
+
+  return refCountedFence;
+}
+
+RefCountedBuffer Graphics::CreateBuffer(size_t size, BufferType type)
+{
+  auto usageFlags = vk::BufferUsageFlags{};
+
+  switch ( type ) {
+    case BufferType::VERTEX: {
+      usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer;
+      break;
+    };
+    case BufferType::INDEX: {
+      usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer;
+      break;
+    };
+    case BufferType::UNIFORM: {
+      usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer;
+      break;
+    };
+    case BufferType::SHADER_STORAGE: {
+      usageFlags |= vk::BufferUsageFlagBits::eStorageBuffer;
+      break;
+    };
+  }
+
+  auto info = vk::BufferCreateInfo{};
+  info.setSharingMode(vk::SharingMode::eExclusive);
+  info.setSize(size);
+  info.setUsage(usageFlags | vk::BufferUsageFlagBits::eTransferDst);
+
+  auto refCountedBuffer = Buffer::New(*this, info);
+
+  VkAssert(mDevice.createBuffer(&info, mAllocator.get(), refCountedBuffer->Ref()));
+
+  AddBuffer(refCountedBuffer);
+
+  return refCountedBuffer;
+}
+
+RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo )
+{
+  auto refCountedBuffer = Buffer::New(*this, bufferCreateInfo);
+
+  VkAssert(mDevice.createBuffer(&bufferCreateInfo, mAllocator.get(), refCountedBuffer->Ref()));
+
+  AddBuffer(refCountedBuffer);
+
+  return refCountedBuffer;
+}
+
+RefCountedFramebuffer Graphics::CreateFramebuffer()
+{
+  NotImplemented()
+}
+
+RefCountedImage Graphics::CreateImage()
+{
+  NotImplemented()
+}
+
+RefCountedImageView Graphics::CreateImageView()
+{
+  NotImplemented()
+}
+
+RefCountedDescriptorPool Graphics::CreateDescriptorPool()
+{
+  NotImplemented()
+}
+
+RefCountedCommandPool Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
+{
+  return CommandPool::New( *this,
+                           vk::CommandPoolCreateInfo{}.setQueueFamilyIndex( 0u )
+                                                      .setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ) );
+}
+
+RefCountedCommandBuffer Graphics::CreateCommandBuffer()
+{
+  NotImplemented()
+}
+
+std::vector<RefCountedCommandBuffer> Graphics::CreateCommandBuffers()
+{
+  NotImplemented()
+}
+
+RefCountedGpuMemoryBlock Graphics::CreateGpuMemoryBlock()
+{
+  NotImplemented()
+}
+
+RefCountedDescriptorSet Graphics::CreateDescriptorSet()
+{
+  NotImplemented()
+}
+
+RefCountedSampler Graphics::CreateSampler()
+{
+  NotImplemented()
+}
+// --------------------------------------------------------------------------------------------------------------
+
+// Actions ------------------------------------------------------------------------------------------------------
+vk::Result Graphics::WaitForFence( RefCountedFence fence, uint32_t timeout )
+{
+  return mDevice.waitForFences(1, *fence, VK_TRUE, timeout);
+}
+
+vk::Result Graphics::WaitForFences( const std::vector<RefCountedFence>& fences, bool waitAll, uint32_t timeout )
+{
+  std::vector<vk::Fence> vkFenceHandles{};
+  std::transform(fences.begin(),
+                 fences.end(),
+                 std::back_inserter(vkFenceHandles),
+                 [](RefCountedFence entry){ return entry->GetVkHandle(); });
+
+
+  return mDevice.waitForFences(vkFenceHandles, vk::Bool32(waitAll), timeout);
+}
+
+vk::Result Graphics::ResetFence( RefCountedFence fence )
+{
+  return mDevice.resetFences(1, *fence);
+}
+
+vk::Result Graphics::ResetFences( const std::vector<RefCountedFence>& fences )
+{
+  std::vector<vk::Fence> vkFenceHandles{};
+  std::transform(fences.begin(),
+                 fences.end(),
+                 std::back_inserter(vkFenceHandles),
+                 [](RefCountedFence entry){ return entry->GetVkHandle(); });
+
+  return mDevice.resetFences(vkFenceHandles);
+}
+// --------------------------------------------------------------------------------------------------------------
+
+// Getters ------------------------------------------------------------------------------------------------------
+RefCountedSurface Graphics::GetSurface( FBID surfaceId )
+{
+  // TODO: FBID == 0 means default framebuffer, but there should be no
+  // such thing as default framebuffer.
+  if( surfaceId == 0 )
+  {
+    return mSurfaceFBIDMap.begin()->second.surface;
+  }
+  return mSurfaceFBIDMap[surfaceId].surface;
+}
+
+RefCountedSwapchain Graphics::GetSwapchainForSurface( RefCountedSurface surface )
+{
+  for( auto&& val : mSurfaceFBIDMap )
+  {
+    if( val.second.surface == surface )
+    {
+      return val.second
+              .swapchain;
+    }
+  }
+  return RefCountedSwapchain();
+}
+
+RefCountedSwapchain Graphics::GetSwapchainForFBID( FBID surfaceId )
+{
+  if(surfaceId == 0)
+  {
+    return mSurfaceFBIDMap.begin()->second.swapchain;
+  }
+  return mSurfaceFBIDMap[surfaceId].swapchain;
+}
+
+vk::Device Graphics::GetDevice() const
+{
+  return mDevice;
+}
+
+vk::PhysicalDevice Graphics::GetPhysicalDevice() const
+{
+  return mPhysicalDevice;
+}
+
+vk::Instance Graphics::GetInstance() const
+{
+  return mInstance;
+}
+
+const vk::AllocationCallbacks& Graphics::GetAllocator() const
+{
+  return *mAllocator;
+}
+
+GpuMemoryManager& Graphics::GetDeviceMemoryManager() const
+{
+  return *mDeviceMemoryManager;
+}
+
+const vk::PhysicalDeviceMemoryProperties& Graphics::GetMemoryProperties() const
+{
+  return *mPhysicalDeviceMemoryProperties;
+}
+
+Queue& Graphics::GetGraphicsQueue(uint32_t index) const
+{
+  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
+  // this will change in the future
+  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
+
+  return *mGraphicsQueues[0]; // will be mGraphicsQueues[index]
+}
+
+Queue& Graphics::GetTransferQueue(uint32_t index) const
+{
+  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
+  // this will change in the future
+  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
+
+  return *mTransferQueues[0]; // will be mGraphicsQueues[index]
+}
+
+Queue& Graphics::GetComputeQueue(uint32_t index) const
+{
+  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
+  // this will change in the future
+  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
+
+  return *mComputeQueues[0]; // will be mGraphicsQueues[index]
+}
+
+Queue& Graphics::GetPresentQueue() const
+{
+  // fixme: should be a dedicated presentation queue
+  return GetGraphicsQueue(0);
+}
+
 Platform Graphics::GetDefaultPlatform() const
 {
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
@@ -101,106 +479,94 @@ Dali::Graphics::API::Controller& Graphics::GetController()
   return *mGfxController;
 }
 
-std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
+PipelineCache& Graphics::GetPipelineCache()
 {
-  auto extensions = vk::enumerateInstanceExtensionProperties();
+  return *mPipelineDatabase;
+}
+// --------------------------------------------------------------------------------------------------------------
 
-  std::string extensionName;
-
-  bool xlibAvailable    { false };
-  bool xcbAvailable     { false };
-  bool waylandAvailable { false };
-
-  for( auto&& ext : extensions.value )
-  {
-    extensionName = ext.extensionName;
-    if( extensionName == VK_KHR_XCB_SURFACE_EXTENSION_NAME )
-    {
-      xcbAvailable = true;
-    }
-    else if( extensionName == VK_KHR_XLIB_SURFACE_EXTENSION_NAME )
-    {
-      xlibAvailable = true;
-    }
-    else if( extensionName == VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME )
-    {
-      waylandAvailable = true;
-    }
-  }
-
-  std::vector<const char*> retval;
-
-  // depending on the platform validate extensions
-  auto platform = GetDefaultPlatform();
-
-  if( platform != Platform::UNDEFINED )
-  {
-    if (platform == Platform::XCB && xcbAvailable)
-    {
-      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-    }
-    else if (platform == Platform::XLIB && xlibAvailable)
-    {
-      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-    }
-    else if (platform == Platform::WAYLAND && waylandAvailable)
-    {
-      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-    }
-  }
-  else // try to determine the platform based on available extensions
-  {
-    if (xcbAvailable)
-    {
-      mPlatform = Platform::XCB;
-      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-    }
-    else if (xlibAvailable)
-    {
-      mPlatform = Platform::XLIB;
-      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-    }
-    else if (waylandAvailable)
-    {
-      mPlatform = Platform::WAYLAND;
-      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-    }
-    else
-    {
-      // can't determine the platform!
-      mPlatform = Platform::UNDEFINED;
-    }
-  }
-
-  // other essential extensions
-  retval.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
-  retval.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
-
-  return retval;
+// Cache manipulation methods -----------------------------------------------------------------------------------
+void Graphics::AddBuffer( Handle<Buffer> buffer )
+{
+  GetResourceCache(std::this_thread::get_id())->AddBuffer(std::move(buffer));
 }
 
-void Graphics::Create()
+void Graphics::AddImage( Handle<Image> image )
 {
-
-  auto extensions = PrepareDefaultInstanceExtensions();
-
-  auto layers = vk::enumerateInstanceLayerProperties();
-  std::vector<const char*> validationLayers;
-  for( auto&& reqLayer : VALIDATION_LAYERS )
-  {
-    for( auto&& prop : layers.value )
-    {
-      std::cout << prop.layerName << std::endl;
-      if( std::string(prop.layerName) == reqLayer )
-      {
-        validationLayers.push_back(reqLayer);
-      }
-    }
-  }
-
-  CreateInstance(extensions, validationLayers);
-  PreparePhysicalDevice();
+  GetResourceCache(std::this_thread::get_id())->AddImage(std::move(image));
 }
+
+void Graphics::AddShader( Handle<Shader> shader )
+{
+  GetResourceCache(std::this_thread::get_id())->AddShader(std::move(shader));
+}
+
+void Graphics::AddCommandPool( Handle<CommandPool> pool )
+{
+  GetResourceCache(std::this_thread::get_id())->AddCommandPool(std::move(pool));
+}
+
+void Graphics::AddDescriptorPool( Handle<DescriptorPool> pool )
+{
+  GetResourceCache(std::this_thread::get_id())->AddDescriptorPool(std::move(pool));
+}
+
+void Graphics::AddFramebuffer( Handle<Framebuffer> framebuffer )
+{
+  GetResourceCache(std::this_thread::get_id())->AddFramebuffer(std::move(framebuffer));
+}
+
+RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
+{
+  return GetResourceCache(std::this_thread::get_id())->FindShader(shaderModule);
+}
+
+RefCountedImage Graphics::FindImage( vk::Image image )
+{
+  return GetResourceCache(std::this_thread::get_id())->FindImage(image);
+}
+
+void Graphics::RemoveBuffer( Buffer& buffer )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveBuffer(buffer);
+}
+
+void Graphics::RemoveShader( Shader& shader )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveShader(shader);
+}
+
+void Graphics::RemoveCommandPool( CommandPool& commandPool )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveCommandPool(commandPool);
+}
+
+void Graphics::RemoveDescriptorPool( DescriptorPool& pool )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveDescriptorPool(pool);
+}
+
+void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveFramebuffer(framebuffer);
+}
+
+void Graphics::RemoveSampler( Sampler& sampler )
+{
+  GetResourceCache(std::this_thread::get_id())->RemoveSampler(sampler);
+}
+
+void Graphics::CollectGarbage()
+{
+  GetResourceCache(std::this_thread::get_id())->CollectGarbage();
+}
+
+void Graphics::DiscardResource( std::function<void()> deleter )
+{
+  GetResourceCache(std::this_thread::get_id())->EnqueueDiscardOperation(std::move(deleter));
+}
+// --------------------------------------------------------------------------------------------------------------
+
 
 void Graphics::CreateInstance( const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers )
 {
@@ -228,7 +594,7 @@ void Graphics::DestroyInstance()
 void Graphics::PreparePhysicalDevice()
 {
   auto devices = VkAssert(mInstance.enumeratePhysicalDevices());
-  assert(devices.size() > 0 && "No Vulkan supported device found!");
+  assert(!devices.empty() && "No Vulkan supported device found!");
 
   // if only one, pick first
   mPhysicalDevice = nullptr;
@@ -277,63 +643,6 @@ void Graphics::GetPhysicalDeviceProperties()
 void Graphics::GetQueueFamilyProperties()
 {
   mQueueFamilyProperties = mPhysicalDevice.getQueueFamilyProperties();
-}
-
-FBID Graphics::CreateSurface(std::unique_ptr< SurfaceFactory > surfaceFactory)
-{
-  // create surface from the factory
-  auto surfaceRef = Surface::New( *this, std::move(surfaceFactory) );
-
-  if( surfaceRef->Create() )
-  {
-
-    // map surface to FBID
-    auto fbid = ++mBaseFBID;
-    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ RefCountedSwapchain{}, surfaceRef };
-    return fbid;
-  }
-  return -1;
-}
-
-RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
-{
-  auto swapchain = Swapchain::New( *this,
-                                   GetGraphicsQueue(0u),
-                                   surface, 4, 0 );
-
-  // store swapchain in the correct pair
-  for( auto&& val : mSurfaceFBIDMap )
-  {
-    if( val.second.surface == surface )
-    {
-      val.second.swapchain = swapchain;
-      break;
-    }
-  }
-
-  return swapchain;
-}
-
-RefCountedSwapchain Graphics::GetSwapchainForSurface( RefCountedSurface surface )
-{
-  for( auto&& val : mSurfaceFBIDMap )
-  {
-    if( val.second.surface == surface )
-    {
-      return val.second
-                .swapchain;
-    }
-  }
-  return RefCountedSwapchain();
-}
-
-RefCountedSwapchain Graphics::GetSwapchainForFBID( FBID surfaceId )
-{
-  if(surfaceId == 0)
-  {
-    return mSurfaceFBIDMap.begin()->second.swapchain;
-  }
-  return mSurfaceFBIDMap[surfaceId].swapchain;
 }
 
 #pragma GCC diagnostic push
@@ -419,221 +728,94 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
 }
 #pragma GCC diagnostic pop
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-void Graphics::CreateDevice()
+std::vector<const char*> Graphics::PrepareDefaultInstanceExtensions()
 {
-  auto queueInfos = GetQueueCreateInfos();
+  auto extensions = vk::enumerateInstanceExtensionProperties();
+
+  std::string extensionName;
+
+  bool xlibAvailable    { false };
+  bool xcbAvailable     { false };
+  bool waylandAvailable { false };
+
+  for( auto&& ext : extensions.value )
   {
-    auto maxQueueCountPerFamily = 0u;
-    for( auto&& info : queueInfos )
+    extensionName = ext.extensionName;
+    if( extensionName == VK_KHR_XCB_SURFACE_EXTENSION_NAME )
     {
-      maxQueueCountPerFamily = std::max( info.queueCount, maxQueueCountPerFamily );
+      xcbAvailable = true;
     }
-
-    auto priorities = std::vector<float>( maxQueueCountPerFamily );
-    std::fill( priorities.begin(), priorities.end(), 1.0f );
-
-    for( auto& info : queueInfos )
+    else if( extensionName == VK_KHR_XLIB_SURFACE_EXTENSION_NAME )
     {
-      info.setPQueuePriorities( priorities.data() );
+      xlibAvailable = true;
     }
-
-    std::vector< const char* > extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-
-    auto info = vk::DeviceCreateInfo{};
-    info.setEnabledExtensionCount(U32(extensions.size()))
-        .setPpEnabledExtensionNames(extensions.data())
-        .setPEnabledFeatures(&(*mPhysicalDeviceFeatures))
-        .setPQueueCreateInfos(queueInfos.data())
-        .setQueueCreateInfoCount(U32(queueInfos.size()));
-
-    mDevice = VkAssert(mPhysicalDevice.createDevice(info, *mAllocator));
-  }
-
-  // create Queue objects
-  for(auto& queueInfo : queueInfos)
-  {
-    for(auto i = 0u; i < queueInfo.queueCount; ++i)
+    else if( extensionName == VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME )
     {
-      auto queue = mDevice.getQueue(queueInfo.queueFamilyIndex, i);
-
-      // based on family push queue instance into right array
-      auto flags = mQueueFamilyProperties[queueInfo.queueFamilyIndex].queueFlags;
-      if(flags & vk::QueueFlagBits::eGraphics)
-      {
-        mGraphicsQueues.emplace_back(
-          MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
-      }
-      if(flags & vk::QueueFlagBits::eTransfer)
-      {
-        mTransferQueues.emplace_back(
-          MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
-      }
-      if(flags & vk::QueueFlagBits::eCompute)
-      {
-        mComputeQueues.emplace_back(
-          MakeUnique<Queue>(*this, queue, queueInfo.queueFamilyIndex, i, flags));
-      }
-
-      // todo: present queue
+      waylandAvailable = true;
     }
   }
 
-  mPipelineDatabase = std::make_unique<PipelineCache>( *this );
-  mResourceCache = MakeUnique<ResourceCache>();
-}
-#pragma GCC diagnostic pop
+  std::vector<const char*> retval{};
 
-vk::Device Graphics::GetDevice() const
-{
-  return mDevice;
-}
+  // depending on the platform validate extensions
+  auto platform = GetDefaultPlatform();
 
-vk::PhysicalDevice Graphics::GetPhysicalDevice() const
-{
-  return mPhysicalDevice;
-}
-
-vk::Instance Graphics::GetInstance() const
-{
-  return mInstance;
-}
-
-const vk::AllocationCallbacks& Graphics::GetAllocator() const
-{
-  return *mAllocator;
-}
-
-Queue& Graphics::GetGraphicsQueue(uint32_t index) const
-{
-  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
-  // this will change in the future
-  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
-
-  return *mGraphicsQueues[0]; // will be mGraphicsQueues[index]
-}
-
-Queue& Graphics::GetTransferQueue(uint32_t index) const
-{
-  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
-  // this will change in the future
-  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
-
-  return *mTransferQueues[0]; // will be mGraphicsQueues[index]
-}
-
-Queue& Graphics::GetComputeQueue(uint32_t index) const
-{
-  // todo: at the moment each type of queue may use only one, indices greater than 0 are invalid
-  // this will change in the future
-  assert(index == 0u && "Each type of queue may use only one, indices greater than 0 are invalid!");
-
-  return *mComputeQueues[0]; // will be mGraphicsQueues[index]
-}
-
-Queue& Graphics::GetPresentQueue() const
-{
-  // fixme: should be a dedicated presentation queue
-  return GetGraphicsQueue(0);
-}
-
-Handle< CommandPool > Graphics::CreateCommandPool(const vk::CommandPoolCreateInfo& info)
-{
-  auto cmdpool = CommandPool::New( *this, vk::CommandPoolCreateInfo{}.
-                                                                       setQueueFamilyIndex( 0u ).
-                                                                       setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ) );
-  return cmdpool;
-}
-
-RefCountedSurface Graphics::GetSurface( FBID surfaceId )
-{
-  // TODO: FBID == 0 means default framebuffer, but there should be no
-  // such thing as default framebuffer.
-  if( surfaceId == 0 )
+  if( platform != Platform::UNDEFINED )
   {
-    return mSurfaceFBIDMap.begin()->second.surface;
+    if (platform == Platform::XCB && xcbAvailable)
+    {
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::XLIB && xlibAvailable)
+    {
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (platform == Platform::WAYLAND && waylandAvailable)
+    {
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
   }
-  return mSurfaceFBIDMap[surfaceId].surface;
+  else // try to determine the platform based on available extensions
+  {
+    if (xcbAvailable)
+    {
+      mPlatform = Platform::XCB;
+      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    }
+    else if (xlibAvailable)
+    {
+      mPlatform = Platform::XLIB;
+      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    }
+    else if (waylandAvailable)
+    {
+      mPlatform = Platform::WAYLAND;
+      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    }
+    else
+    {
+      // can't determine the platform!
+      mPlatform = Platform::UNDEFINED;
+    }
+  }
+
+  // other essential extensions
+  retval.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
+  retval.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
+
+  return retval;
 }
 
-// TODO: all this stuff should go into some vulkan cache
-
-void Graphics::AddBuffer( Handle<Buffer> buffer )
+std::unique_ptr<ResourceCache>& Graphics::GetResourceCache(std::thread::id threadId)
 {
-  mResourceCache->AddBuffer(std::move(buffer));
-}
+  if( mResourceCacheMap.count(threadId) == 0 )
+  {
+    std::lock_guard<std::mutex> lock{ mMutex };
+    mResourceCacheMap[threadId] = MakeUnique< ResourceCache >();
+  }
 
-void Graphics::AddImage( Handle<Image> image )
-{
-  mResourceCache->AddImage(std::move(image));
+  return mResourceCacheMap[threadId];
 }
-
-void Graphics::AddPipeline( Handle<Pipeline> pipeline )
-{
-  mResourceCache->AddPipeline(std::move(pipeline));
-}
-
-void Graphics::AddShader( Handle<Shader> shader )
-{
-  mResourceCache->AddShader(std::move(shader));
-}
-
-void Graphics::AddCommandPool( Handle<CommandPool> pool )
-{
-  mResourceCache->AddCommandPool(std::move(pool));
-}
-
-void Graphics::AddDescriptorPool( Handle<DescriptorPool> pool )
-{
-  mResourceCache->AddDescriptorPool(std::move(pool));
-}
-
-void Graphics::AddFramebuffer( Handle<Framebuffer> framebuffer )
-{
-  mResourceCache->AddFramebuffer(std::move(framebuffer));
-}
-
-void Graphics::RemoveBuffer( Buffer& buffer )
-{
-  mResourceCache->RemoveBuffer(buffer);
-}
-
-void Graphics::RemoveShader( Shader& shader )
-{
-  mResourceCache->RemoveShader(shader);
-}
-
-void Graphics::RemoveCommandPool( CommandPool& commandPool )
-{
-  mResourceCache->RemoveCommandPool(commandPool);
-}
-
-void Graphics::RemoveDescriptorPool( DescriptorPool& pool )
-{
-  mResourceCache->RemoveDescriptorPool(pool);
-}
-
-void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
-{
-  mResourceCache->RemoveFramebuffer(framebuffer);
-}
-
-void Graphics::RemoveSampler( Sampler& sampler )
-{
-  mResourceCache->RemoveSampler(sampler);
-}
-
-RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
-{
-  return mResourceCache->FindShader(shaderModule);
-}
-
-RefCountedImage Graphics::FindImage( vk::Image image )
-{
-  return mResourceCache->FindImage(image);
-}
-
 
 } // namespace Vulkan
 } // namespace Graphics

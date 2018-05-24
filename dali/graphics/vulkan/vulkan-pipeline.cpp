@@ -440,7 +440,7 @@ struct Pipeline::Impl
 RefCountedPipeline Pipeline::New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info )
 {
   auto pipeline = Handle<Pipeline>( new Pipeline(graphics, info) );
-  graphics.AddPipeline(pipeline);
+  //graphics.AddPipeline(pipeline); //TODO: Use the pipeline cache class here?
   return pipeline;
 }
 

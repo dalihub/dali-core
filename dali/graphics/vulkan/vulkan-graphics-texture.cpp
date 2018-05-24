@@ -108,11 +108,10 @@ struct Texture::Impl
     // create buffer
     auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
     auto size   = mPixmap.data.size() * sizeof( mPixmap.data[0] );
-    auto buffer = Buffer::New( mGraphics,
-                               vk::BufferCreateInfo{}
-                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                 .setSharingMode( vk::SharingMode::eExclusive )
-                                 .setSize( size ) );
+    auto buffer = mGraphics.CreateBuffer(vk::BufferCreateInfo{}
+                                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
+                                                 .setSharingMode( vk::SharingMode::eExclusive )
+                                                 .setSize( size ));
 
     buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
@@ -172,9 +171,9 @@ struct Texture::Impl
     mCommandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = Fence::New( mGraphics );
+    auto fence = mGraphics.CreateFence({});
     mGraphics.GetGraphicsQueue( 0u ).Submit( mCommandBuffer, fence );
-    fence->Wait();
+    VkAssert(mGraphics.WaitForFence(fence));
     return true;
   }
 
