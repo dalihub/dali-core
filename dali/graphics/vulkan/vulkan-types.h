@@ -253,6 +253,7 @@ class VkManaged
 public:
 
   VkManaged() = default;
+
   virtual ~VkManaged() = default;
 
   void Release()
@@ -301,6 +302,23 @@ using FBID = int32_t;
 printf("Function %s isn't implemented!\n", __FUNCTION__);\
 assert( false && "Function no implemented" );\
 }
+
+
+enum class BufferType
+{
+  VERTEX,
+  INDEX,
+  UNIFORM,
+  SHADER_STORAGE
+};
+
+enum class Platform
+{
+  UNDEFINED,
+  XLIB,
+  XCB,
+  WAYLAND,
+};
 
 /*
  * Forward declarations of reference types
