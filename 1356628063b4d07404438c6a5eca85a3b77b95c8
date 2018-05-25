@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0bb392_040b14f8",
+        "filename": "dali/graphics/vulkan/spirv/vulkan-spirv-opcode.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "Remove pop",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 414,
+        "endChar": 26
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e2ef4ef_14fe1000",
+        "filename": "dali/graphics/vulkan/spirv/vulkan-spirv.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "Remove pop",
+      "range": {
+        "startLine": 977,
+        "startChar": 0,
+        "endLine": 977,
+        "endChar": 26
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79ddca91_2ab3fc83",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "remove pop and other diagnostics",
+      "range": {
+        "startLine": 258,
+        "startChar": 1,
+        "endLine": 259,
+        "endChar": 26
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a0385d9_4d1d91f4",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "remove diagnostic and patching pop",
+      "range": {
+        "startLine": 337,
+        "startChar": 0,
+        "endLine": 338,
+        "endChar": 53
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "128c98f5_52f16ea4",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "Remove diagnostic and matching pop",
+      "range": {
+        "startLine": 420,
+        "startChar": 0,
+        "endLine": 421,
+        "endChar": 53
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6fc7638_4eb63c13",
+        "filename": "dali/graphics/vulkan/vulkan-swapchain.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T15:16:38Z",
+      "side": 1,
+      "message": "Remove pop and all other frame-larger-than diagnostics in this file",
+      "range": {
+        "startLine": 395,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 26
+      },
+      "revId": "1356628063b4d07404438c6a5eca85a3b77b95c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
