@@ -31,6 +31,7 @@
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
@@ -73,6 +74,13 @@ public:
    * @brief Create a new object
    */
   virtual Accessor<Framebuffer> CreateFramebuffer( const BaseFactory<Framebuffer>& factory ) = 0;
+
+  /**
+   *
+   * @param factory
+   * @return
+   */
+  virtual Accessor<Pipeline> CreatePipeline( const BaseFactory<Pipeline>& factory ) = 0;
 
   /**
    * @brief Get a render list
