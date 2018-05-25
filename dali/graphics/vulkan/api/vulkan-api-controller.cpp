@@ -1,9 +1,19 @@
-#include "generated/spv-shaders-gen.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/matrix.hpp>
-#include <glm/vector_relational.hpp>
+/*
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
@@ -12,7 +22,7 @@
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
@@ -40,19 +50,12 @@
 #include <iostream>
 #include <dali/graphics-api/utility/utility-memory-pool.h>
 
-using namespace glm;
-
 namespace Dali
 {
 namespace Graphics
 {
-namespace Vulkan
+namespace VulkanAPI
 {
-static const mat4 CLIP_MATRIX(
-  1.0f,  0.0f, 0.0f, 0.0f,
-  0.0f, -1.0f, 0.0f, 0.0f,
-  0.0f,  0.0f, 0.5f, 0.0f,
-  0.0f,  0.0f, 0.5f, 1.0f );
 
 struct Controller::Impl
 {
@@ -69,8 +72,6 @@ struct Controller::Impl
 
   // TODO: @todo this function initialises basic buffers, shaders and pipeline
   // for the prototype ONLY
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wframe-larger-than="
   bool Initialise()
   {
     // Create factories
@@ -83,13 +84,18 @@ struct Controller::Impl
     return true;
   }
 
-#pragma GCC diagnostic pop
   void BeginFrame()
   {
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
-    swapchain->AcquireNextFramebuffer();
+
+    auto framebuffer = swapchain->AcquireNextFramebuffer();
+
+    swapchain->BeginPrimaryRenderPass( {
+                                         { 1.0f, 1.0f, 1.0f, 1.0f }
+                                       }  );
+
   }
 
   void EndFrame()
@@ -140,7 +146,7 @@ struct Controller::Impl
       mBufferTransferRequests.clear();
     }
 
-    std::vector<CommandBufferRef> cmdBufRefs{};
+    std::vector<Vulkan::CommandBufferRef> cmdBufRefs{};
 
     // Prepare pipelines
     for( auto&& command : commands )
@@ -202,37 +208,36 @@ struct Controller::Impl
   }
 
   // resources
-  std::vector<TextureRef> mTextures;
-  std::vector<ShaderRef>  mShaders;
-  std::vector<BufferRef>  mBuffers;
+  std::vector<Vulkan::TextureRef> mTextures;
+  std::vector<Vulkan::ShaderRef>  mShaders;
+  std::vector<Vulkan::BufferRef>  mBuffers;
 
   // owner objects
   ObjectOwner<API::Texture>   mTexturesOwner;
   ObjectOwner<API::Shader>    mShadersOwner;
   ObjectOwner<API::Buffer>    mBuffersOwner;
 
-  Graphics&           mGraphics;
-  Controller&         mOwner;
-  GpuMemoryAllocator& mDefaultAllocator;
+  Vulkan::Graphics&           mGraphics;
+  Controller&                 mOwner;
+  Vulkan::GpuMemoryAllocator& mDefaultAllocator;
 
   std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
   std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
   std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
 
   // todo: should be per thread
-  CommandPoolRef mCommandPool;
+  Vulkan::CommandPoolRef mCommandPool;
 
   std::vector<std::unique_ptr<VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 
-  std::unique_ptr<PipelineCache> mPipelineCache;
+  std::unique_ptr<Vulkan::PipelineCache> mPipelineCache;
 
   std::unique_ptr<VulkanAPI::UboManager> mUboManager;
 
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
-#pragma GCC diagnostic push
-#pragma GCC diagnostic     ignored "-Wreturn-type"
+
 API::Accessor<API::Shader> Controller::CreateShader( const API::BaseFactory<API::Shader>& factory )
 {
   auto handle = mImpl->mShadersOwner.CreateObject( factory );
@@ -254,11 +259,12 @@ API::Accessor<API::Texture> Controller::CreateTexture( const API::BaseFactory<AP
 
 API::Accessor<API::TextureSet> Controller::CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory )
 {
-
+  return { nullptr };
 }
 
 API::Accessor<API::DynamicBuffer> Controller::CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory )
 {
+  return { nullptr };
 }
 
 API::Accessor<API::Buffer> Controller::CreateBuffer( const API::BaseFactory<API::Buffer>& factory )
@@ -271,14 +277,17 @@ API::Accessor<API::Buffer> Controller::CreateBuffer( const API::BaseFactory<API:
 
 API::Accessor<API::StaticBuffer> Controller::CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory )
 {
+  return { nullptr };
 }
 
 API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<API::Sampler>& factory )
 {
+  return { nullptr };
 }
 
 API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
 {
+  return { nullptr };
 }
 
 std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
@@ -286,29 +295,22 @@ std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t 
   return std::unique_ptr<char>( new char[numberOfElements * elementSize] );
 }
 
-#pragma GCC diagnostic pop
-
-std::unique_ptr<Controller> Controller::New( Graphics& vulkanGraphics )
+std::unique_ptr<Controller> Controller::New( Vulkan::Graphics& vulkanGraphics )
 {
   return std::make_unique<Controller>( vulkanGraphics );
 }
 
-Controller::Controller( Graphics& vulkanGraphics ) : mImpl( std::make_unique<Impl>( *this, vulkanGraphics ) )
+Controller::Controller( Vulkan::Graphics& vulkanGraphics ) : mImpl( std::make_unique<Impl>( *this, vulkanGraphics ) )
 {
   mImpl->Initialise();
 }
 
 Controller::~Controller()       = default;
 Controller::Controller()        = default;
-Controller& Controller::operator=( Controller&& ) = default;
+Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::GetRenderItemList()
 {
-}
-
-void Controller::SubmitCommand( Dali::Graphics::API::RenderCommand&& command )
-{
-  // not in use
 }
 
 void Controller::BeginFrame()
@@ -362,6 +364,6 @@ std::unique_ptr<API::RenderCommand> Controller::AllocateRenderCommand()
 }
 
 
-} // namespace Vulkan
+} // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali

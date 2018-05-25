@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
-#define DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#ifndef DALI_GRAPHICS_VULKAN_API_CONTROLLER_H
+#define DALI_GRAPHICS_VULKAN_API_CONTROLLER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -19,15 +19,23 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics/graphics-controller.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
 namespace Graphics
 {
+
+namespace Vulkan
+{
+class Graphics;
+}
+
 namespace VulkanAPI
 {
+
 class UboManager;
+
 /**
  * Structure describes deferred memory transfer
  * Source memory is owned by the buffer and will be discarded
@@ -45,16 +53,11 @@ struct BufferMemoryTransfer
   uint32_t          dstOffset { 0u };
 };
 
-}
-
-namespace Vulkan
-{
-class Graphics;
 
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
-class Controller : public Dali::Graphics::Controller
+class Controller : public Dali::Graphics::API::Controller
 {
 public:
 
@@ -78,24 +81,9 @@ public:
   API::Accessor<API::Texture> CreateTexture( const API::BaseFactory<API::Texture>& factory ) override;
 
   /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::TextureSet> CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory ) override;
-
-  /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::DynamicBuffer> CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory ) override;
-
-  /**
  * @brief Create a new object
  */
   API::Accessor<API::Buffer> CreateBuffer( const API::BaseFactory<API::Buffer>& factory ) override;
-
-  /**
-   * @brief Create a new object
-   */
-  API::Accessor<API::StaticBuffer> CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory ) override;
 
   /**
    * @brief Create a new object
@@ -117,8 +105,6 @@ public:
    * @brief Get a render list
    */
   void GetRenderItemList() override;
-
-  void SubmitCommand( API::RenderCommand&& command ) override;
 
   void BeginFrame() override;
 
@@ -152,8 +138,8 @@ public:
 
 protected:
   // derived types should not be moved direcly to prevent slicing
-  Controller( Controller&& );
-  Controller& operator=( Controller&& );
+  Controller( Controller&& ) noexcept = default;
+  Controller& operator=( Controller&& ) noexcept;
 
   /**
    * Objects of this type should not directly.
@@ -165,8 +151,8 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace Vulkan
+} // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_VULAKN_GRAPHICS_CONTROLLER_H
+#endif // DALI_GRAPHICS_VULKAN_API_CONTROLLER_H
