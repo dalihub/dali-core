@@ -30,7 +30,7 @@ namespace VulkanAPI
 {
 
 Buffer::Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size )
-: mController( controller ), mGraphics( controller.GetGraphics() ), mUsageHints( usageHints ), mSize( size )
+: mController( controller ), mGraphics( controller.GetGraphics() ), mUsage( usage ), mUsageHints( usageHints ), mSize( size )
 {
 
 }
