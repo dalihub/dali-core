@@ -22,6 +22,8 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 
+#include <dali/graphics-api/graphics-api-buffer.h>
+
 namespace Dali
 {
 namespace Internal
@@ -31,11 +33,13 @@ namespace SceneGraph
 
 Geometry::Geometry()
 : mGraphics( nullptr ),
-  mIndices(),
+  mIndexBuffer{ nullptr },
+  mIndexBufferElementCount( 0 ),
   mGeometryType( Dali::Geometry::TRIANGLES ),
   mIndicesChanged(false),
   mHasBeenUpdated(false),
-  mAttributesChanged(true)
+  mAttributesChanged(true),
+  mHasIndexBuffer(false)
 {
 }
 
@@ -56,8 +60,25 @@ void Geometry::AddPropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
 
 void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
 {
-  mIndices.Swap( indices );
-  mIndicesChanged = true;
+  // set new index buffer
+  auto& mController = mGraphics->GetController();
+
+  // create index buffer]
+  auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
+  auto indexBuffer = mController.CreateBuffer(
+                        mController.GetBufferFactory()
+                                 .SetSize( uint32_t(indices.Size() * sizeof(indices[0])) )
+                                 .SetUsage( Graphics::API::Buffer::UsageHint::INDEX_BUFFER )
+  );
+
+  // transfer data
+  indexBuffer.Get().Write( indices.begin(), sizeInBytes, 0u );
+
+  mIndexBuffer = indexBuffer;
+
+  mIndexBufferElementCount = uint32_t(indices.Size());
+
+  mHasIndexBuffer = true;
 }
 
 void Geometry::RemovePropertyBuffer( const SceneGraph::PropertyBuffer* propertyBuffer )

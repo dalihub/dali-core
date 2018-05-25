@@ -196,7 +196,20 @@ struct Controller::Impl
 
       // draw
       const auto& drawCommand = apiCommand->GetDrawCommand();
-      cmdbuf->Draw( drawCommand.vertexCount, drawCommand.instanceCount, drawCommand.firstVertex, drawCommand.firstInstance );
+
+      const auto& indexBinding = apiCommand->GetIndexBufferBinding();
+      if( indexBinding.buffer.Exists() )
+      {
+        cmdbuf->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(indexBinding.buffer.Get()).GetBufferRef(),
+                                 0, vk::IndexType::eUint16 );
+        cmdbuf->DrawIndexed( drawCommand.indicesCount, drawCommand.instanceCount,
+        drawCommand.firstIndex, 0, drawCommand.firstInstance );
+      }
+      else
+      {
+        cmdbuf->Draw(drawCommand.vertexCount, drawCommand.instanceCount, drawCommand.firstVertex,
+                     drawCommand.firstInstance);
+      }
       cmdbuf->End();
       cmdBufRefs.emplace_back( cmdbuf );
     }

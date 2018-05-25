@@ -78,6 +78,22 @@ RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphic
 {
 }
 
+uint32_t GetLocationIndex( const std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute>& attribs, uint32_t location )
+{
+  auto retval = 0u;
+
+  for( auto&& attr : attribs )
+  {
+    if( attr.location == location )
+    {
+      return retval;
+    }
+    retval++;
+  }
+  return -1u;
+}
+
+
 ///@todo: needs pipeline factory rather than pipeline creation in place!!!
 bool RenderCommand::PreparePipeline()
 {
@@ -130,7 +146,8 @@ bool RenderCommand::PreparePipeline()
           attributeDescriptions.emplace_back(vk::VertexInputAttributeDescription{}
                                                .setBinding(bindingDescriptions.back()
                                                                               .binding)
-                                               .setFormat(attribs[vb.location].format)
+                                               .setFormat(attribs[GetLocationIndex( attribs, vb.location)].format)
+                                               .setLocation( vb.location )
                                                .setOffset(vb.offset));
         }
       }
@@ -334,10 +351,16 @@ const vk::PipelineDepthStencilStateCreateInfo* RenderCommand::PrepareDepthStenci
 
 const vk::PipelineInputAssemblyStateCreateInfo* RenderCommand::PrepareInputAssemblyStateCreateInfo()
 {
+  auto vkTopology =  vk::PrimitiveTopology::eTriangleList;
+  if( mRenderState.topology == Topology::TRIANGLE_STRIP )
+  {
+    vkTopology = vk::PrimitiveTopology::eTriangleStrip;
+  }
+
   //@todo support topology and restart
   return &(mVulkanPipelineState->inputAssembly
   .setPrimitiveRestartEnable( true )
-  .setTopology( vk::PrimitiveTopology::eTriangleStrip ));
+  .setTopology( vkTopology ));
 }
 
 const vk::PipelineMultisampleStateCreateInfo* RenderCommand::PrepareMultisampleStateCreateInfo()
