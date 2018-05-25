@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/rendering/shader.h> // Dali::Shader
+#include <dali/devel-api/rendering/shader-devel.h> // Dali::Shader
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/common/shader-data.h> // ShaderPtr
@@ -52,6 +53,19 @@ public:
   static ShaderPtr New( const std::string& vertexShader,
                         const std::string& fragmentShader,
                         Dali::Shader::Hint::Value hints );
+
+  /**
+   *
+   * @param vertexShader
+   * @param fragmentShader
+   * @param language
+   * @param specializationConstants
+   * @return
+   */
+  static ShaderPtr New( std::vector<char>& vertexShader,
+                        std::vector<char>& fragmentShader,
+                        DevelShader::ShaderLanguage language,
+                        const Property::Map& specializationConstants );
 
   /**
    * @brief Get the shader scene object
@@ -160,6 +174,21 @@ private: // implementation
    * Second stage initialization
    */
   void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
+
+  /**
+   *
+   * Second stage initialization, devel initialiser
+   *
+   *
+   * @param vertexShader
+   * @param fragmentShader
+   * @param language
+   * @param specializationConstants
+   */
+  void Initialize(  std::vector<char>& vertexShader,
+                    std::vector<char>& fragmentShader,
+                    DevelShader::ShaderLanguage language,
+                    const Property::Map& specializationConstants );
 
 protected:
   /**

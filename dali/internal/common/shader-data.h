@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
@@ -35,6 +36,17 @@ namespace Internal
 class ShaderData;
 typedef IntrusivePtr<ShaderData> ShaderDataPtr;
 
+namespace
+{
+inline std::vector<char> StringToVector( const std::string& str )
+{
+  auto retval = std::vector<char>{};
+  retval.insert( retval.begin(), str.begin(), str.end() );
+  retval.push_back( '\0' );
+  return retval;
+}
+}
+
 /**
  * ShaderData class.
  * A container for shader source code and compiled binary byte code.
@@ -43,16 +55,42 @@ class ShaderData : public Dali::RefObject
 {
 public:
 
+  enum class Type
+  {
+    TEXT,
+    BINARY,
+  };
+
+  enum class ShaderStage
+  {
+    VERTEX,
+    FRAGMENT
+  };
   /**
    * Constructor
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    */
   ShaderData(const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::Hint::Value hints)
-  : mShaderHash( -1 ),
-    mVertexShader(vertexSource),
-    mFragmentShader(fragmentSource),
-    mHints(hints)
+  : mShaderHash( uint32_t(-1) ),
+    mVertexShader(StringToVector(vertexSource)),
+    mFragmentShader(StringToVector(fragmentSource)),
+    mHints(hints),
+    mType( Type::TEXT )
+  { }
+
+  /**
+   * Creates a shader data containing binary content
+   * @param vertexSource
+   * @param fragmentSource
+   * @param hints
+   */
+  ShaderData( std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints)
+    : mShaderHash( uint32_t(-1) ),
+      mVertexShader(vertexSource),
+      mFragmentShader(fragmentSource),
+      mHints(hints),
+      mType( Type::BINARY )
   { }
 
 protected:
@@ -60,10 +98,7 @@ protected:
    * Protected Destructor
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~ShaderData()
-  {
-    // vector releases its data
-  }
+  ~ShaderData() override = default;
 
 public: // API
 
@@ -92,7 +127,7 @@ public: // API
    */
   const char* GetVertexShader() const
   {
-    return mVertexShader.c_str();
+    return &mVertexShader[0];
   }
 
   /**
@@ -100,7 +135,24 @@ public: // API
    */
   const char* GetFragmentShader() const
   {
-    return mFragmentShader.c_str();
+    return &mFragmentShader[0];
+  }
+
+  /**
+   * Returns a std::vector containing shader code associated with particular stage
+   * @param stage
+   * @return
+   */
+  const std::vector<char>& GetShaderForStage( ShaderStage stage ) const
+  {
+    if( stage == ShaderStage::VERTEX )
+    {
+      return mVertexShader;
+    }
+    else
+    {
+      return mFragmentShader;
+    }
   }
 
   /**
@@ -156,18 +208,23 @@ public: // API
     return mBuffer;
   }
 
-private: // Not implemented
+  Type GetType() const
+  {
+    return mType;
+  }
 
-  ShaderData(const ShaderData& other);            ///< no copying of this object
-  ShaderData& operator= (const ShaderData& rhs);  ///< no copying of this object
+  ShaderData(const ShaderData& other) = delete;            ///< no copying of this object
+  ShaderData& operator= (const ShaderData& rhs) = delete;  ///< no copying of this object
 
 private: // Data
 
   size_t                      mShaderHash;     ///< hash key created with vertex and fragment shader code
-  std::string                 mVertexShader;   ///< source code for vertex program
-  std::string                 mFragmentShader; ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;          ///< take a hint
+  std::vector<char>           mVertexShader;   ///< binary code for vertex program
+  std::vector<char>           mFragmentShader; ///< binary code for fragment program
+  Dali::Shader::Hint::Value   mHints;          ///< take a hint
   Dali::Vector<unsigned char> mBuffer;         ///< buffer containing compiled binary bytecode
+  Type                        mType;           ///< Type of shader data ( text or binary )
+
 };
 
 } // namespace Integration
