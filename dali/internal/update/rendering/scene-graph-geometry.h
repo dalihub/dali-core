@@ -101,19 +101,10 @@ public:
     mGeometryType = type;
   }
 
-  /**
-   * Upload the geometry if it has changed, set up the attributes and perform
-   * the Draw call corresponding to the geometry type
-   * @param[in] bufferIndex The current buffer index
-   * @param[in] attributeLocation The location for the attributes in the shader
-   * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
-   * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
-   */
-  void UploadAndDraw( Graphics::API::Controller& controller,
-                      BufferIndex bufferIndex,
-                      Vector<uint32_t>& attributeLocation,
-                      size_t elementBufferOffset,
-                      size_t elementBufferCount );
+  Type GetType() const
+  {
+    return mGeometryType;
+  }
 
   /**
    * @return
@@ -123,24 +114,42 @@ public:
     return mVertexBuffers;
   }
 
+  Graphics::API::Accessor<Graphics::API::Buffer> GetIndexBuffer()
+  {
+    return mIndexBuffer;
+  }
+
+  bool HasIndexBuffer() const
+  {
+    return mHasIndexBuffer;
+  }
+
+  uint32_t GetIndexBufferElementCount() const
+  {
+    return mIndexBufferElementCount;
+  }
+
+  /*
   const Dali::Vector< unsigned short>& GetIndices() const
   {
     return mIndices;
   }
+   */
 
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;
-  Dali::Vector< unsigned short> mIndices;
-
+  Graphics::API::Accessor<Graphics::API::Buffer> mIndexBuffer;
+  uint32_t mIndexBufferElementCount;
   Type mGeometryType;
 
   // Booleans
   bool mIndicesChanged : 1;
   bool mHasBeenUpdated : 1;
   bool mAttributesChanged : 1;
+  bool mHasIndexBuffer : 1;
 };
 
 } // SceneGraph

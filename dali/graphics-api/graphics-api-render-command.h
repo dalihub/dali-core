@@ -207,6 +207,14 @@ public:
     INDEXED_DRAW,
   };
 
+  enum class Topology
+  {
+    TRIANGLES,
+    TRIANGLE_FAN,
+    TRIANGLE_STRIP,
+    LINES
+  };
+
   /**
    * Describes buffer attribute binding
    *
@@ -493,6 +501,7 @@ public:
 
     Accessor<Shader> shader { nullptr };
     BlendState blendState {};
+    Topology topology{ Topology::TRIANGLES };
 
     RenderState& SetShader( Accessor<Shader> value )
     {
@@ -503,6 +512,12 @@ public:
     RenderState& SetBlendState( BlendState value )
     {
       blendState = value;
+      return *this;
+    }
+
+    RenderState& SetTopology( Topology value )
+    {
+      topology = value;
       return *this;
     }
 
@@ -595,6 +610,12 @@ public:
     return *this;
   }
 
+  RenderCommand& BindIndexBuffer( const IndexBufferBinding& binding )
+  {
+    mIndexBufferBinding = binding;
+    return *this;
+  }
+
   static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings()
   {
     return std::vector<VertexAttributeBufferBinding>{};
@@ -643,7 +664,7 @@ public:
     return mTextureBindings;
   }
 
-  const auto& GetIndexBufferBinding() const
+  const IndexBufferBinding& GetIndexBufferBinding() const
   {
     return mIndexBufferBinding;
   }

@@ -250,138 +250,184 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  auto& controller = mGraphics->GetController();
+  auto &controller = mGraphics->GetController();
 
   // prepare all stuff
-  auto gfxShader = mShader->GetGfxObject();
+  auto gfxShader                   = mShader->GetGfxObject();
 
-  if( !mGfxRenderCommand )
+  if (!mGfxRenderCommand)
   {
     mGfxRenderCommand = controller.AllocateRenderCommand();
+  }
+
+  if (!mShader->GetGfxObject()
+              .Exists())
+  {
+    return;
   }
 
   /**
    * Prepare vertex attribute buffer bindings
    */
-  uint32_t bindingIndex { 0u };
-  uint32_t locationIndex { 0u };
-  auto vertexAttributeBindings = Graphics::API::RenderCommand::NewVertexAttributeBufferBindings();
-  for( auto&& vertexBuffer : mGeometry->GetVertexBuffers() )
+  uint32_t bindingIndex{0u};
+  uint32_t locationIndex{0u};
+  auto     vertexAttributeBindings = Graphics::API::RenderCommand::NewVertexAttributeBufferBindings();
+  for (auto &&vertexBuffer : mGeometry->GetVertexBuffers())
   {
     auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
 
     // update vertex buffer if necessary
-    vertexBuffer->Update( controller );
+    vertexBuffer->Update(controller);
 
-    for( auto i = 0u; i < attributeCountInForBuffer; ++i )
+    for (auto i = 0u; i < attributeCountInForBuffer; ++i)
     {
       // create binding per attribute
       auto binding = Graphics::API::RenderCommand::VertexAttributeBufferBinding{}
-        .SetOffset( (vertexBuffer->GetFormat()->components[i]).offset )
-        .SetBinding( bindingIndex )
-        .SetBuffer( vertexBuffer->GetGfxObject() )
-        .SetInputAttributeRate( Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX )
-        .SetLocation( locationIndex + i )
-        .SetStride( vertexBuffer->GetFormat()->size );
-      vertexAttributeBindings.emplace_back( binding );
+        .SetOffset((vertexBuffer->GetFormat()
+                                ->components[i]).offset)
+        .SetBinding(bindingIndex)
+        .SetBuffer(vertexBuffer->GetGfxObject())
+        .SetInputAttributeRate(Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX)
+        .SetLocation(locationIndex + i)
+        .SetStride(vertexBuffer->GetFormat()
+                               ->size);
+      vertexAttributeBindings.emplace_back(binding);
     }
+    locationIndex += attributeCountInForBuffer;
   }
 
   // Invalid input attributes!
-  if( mShader->GetGfxObject().Get().GetVertexAttributeLocations().size() != vertexAttributeBindings.size())
+  if (mShader->GetGfxObject()
+             .Get()
+             .GetVertexAttributeLocations()
+             .size() != vertexAttributeBindings.size())
     return;
 
-  UpdateUniformMap( updateBufferIndex );
+  UpdateUniformMap(updateBufferIndex);
 
-  auto& shader = mShader->GetGfxObject().Get();
+  auto &shader = mShader->GetGfxObject()
+                        .Get();
   auto uboCount = shader.GetUniformBlockCount();
 
-  auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings( uboCount );
+  auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
 
   // allocate new command ( may be not necessary at all )
   // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
 
   // see if we need to reallocate memory for each UBO
   // todo: do it only when shader has changed
-  if( mUboMemory.size() != uboCount )
+  if (mUboMemory.size() != uboCount)
   {
     mUboMemory.resize(uboCount);
   }
 
-  for( auto i = 0u; i < uboCount; ++i )
+  for (auto i = 0u; i < uboCount; ++i)
   {
     Graphics::API::ShaderDetails::UniformBlockInfo ubInfo;
 
-    std::cout<<sizeof(ubInfo) << std::endl;
+    std::cout << sizeof(ubInfo) << std::endl;
 
-    shader.GetUniformBlock( i, ubInfo );
+    shader.GetUniformBlock(i, ubInfo);
 
-    if( mUboMemory[i].size() != ubInfo.size )
+    if (mUboMemory[i].size() != ubInfo.size)
     {
-      mUboMemory[i].resize( ubInfo.size );
+      mUboMemory[i].resize(ubInfo.size);
     }
 
     // Set push constant bindings
     auto &pushBinding = pushConstantsBindings[i];
-    pushBinding.data = mUboMemory[i].data();
-    pushBinding.size = uint32_t(mUboMemory[i].size());
+    pushBinding.data    = mUboMemory[i].data();
+    pushBinding.size    = uint32_t(mUboMemory[i].size());
     pushBinding.binding = ubInfo.binding;
   }
 
   // add built-in uniforms
 
   // write to memory
-  for( auto&& i : mCollectedUniformMap )
+  for (auto &&i : mCollectedUniformMap)
   {
-    for( auto&& j : i )
+    for (auto &&j : i)
     {
+      std::string uniformName(j->uniformName);
+      int         arrayIndex       = 0;
+      auto        arrayLeftBracket = j->uniformName
+                                      .find('[');
+      if (arrayLeftBracket != std::string::npos)
+      {
+        auto arrayRightBracket = j->uniformName
+                                  .find(']');
+        arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
+        std::cout << "UNIFORM NAME: " << j->uniformName << ", index: " << arrayIndex << std::endl;
+        uniformName = uniformName.substr(0, arrayLeftBracket);
+      }
+
       auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-      if( shader.GetNamedUniform( j->uniformName, uniformInfo ) )
+      if (shader.GetNamedUniform(uniformName, uniformInfo))
       {
         // write into correct uniform buffer
-        auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
-        switch( j->propertyPtr->GetType() )
+        auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
+        switch (j->propertyPtr
+                 ->GetType())
         {
           case Property::Type::FLOAT:
           case Property::Type::INTEGER:
           case Property::Type::BOOLEAN:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing 32bit offset: " << uniformInfo.offset << ", size: " << sizeof(float) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetFloat( updateBufferIndex ), sizeof(float) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(float) << std::endl;
+            dst += sizeof(float) * arrayIndex;
+            memcpy(dst, &j->propertyPtr
+                          ->GetFloat(updateBufferIndex), sizeof(float));
             break;
           }
           case Property::Type::VECTOR2:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec2 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector2) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetVector2( updateBufferIndex ), sizeof(Vector2) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(Vector2) << std::endl;
+            dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
+            memcpy(dst, &j->propertyPtr
+                          ->GetVector2(updateBufferIndex), sizeof(Vector2));
             break;
           }
           case Property::Type::VECTOR3:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " <<  "Writing vec3 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector3) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetVector3( updateBufferIndex ), sizeof(Vector3) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(Vector3) << std::endl;
+            dst += sizeof(Vector3) * arrayIndex;
+            memcpy(dst, &j->propertyPtr
+                          ->GetVector3(updateBufferIndex), sizeof(Vector3));
             break;
           }
           case Property::Type::VECTOR4:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing vec4 offset: " << uniformInfo.offset << ", size: " << sizeof(Vector4) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetVector4( updateBufferIndex ), sizeof(Vector4) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(Vector4) << std::endl;
+            dst += sizeof(float) * arrayIndex;
+            memcpy(dst, &j->propertyPtr
+                          ->GetVector4(updateBufferIndex), sizeof(Vector4));
             break;
           }
           case Property::Type::MATRIX:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat4 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetMatrix( updateBufferIndex ), sizeof(Matrix) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(Matrix) << std::endl;
+            dst += sizeof(Matrix) * arrayIndex;
+            memcpy(dst, &j->propertyPtr
+                          ->GetMatrix(updateBufferIndex), sizeof(Matrix));
             break;
           }
           case Property::Type::MATRIX3:
           {
-            std::cout << uniformInfo.name << ":["<<uniformInfo.bufferIndex<<"]: " << "Writing mat3 offset: " << uniformInfo.offset << ", size: " << sizeof(Matrix3) << std::endl;
-            memcpy( dst, &j->propertyPtr->GetMatrix3( updateBufferIndex ), sizeof(Matrix3) );
+            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
+                      << uniformInfo.offset << ", size: " << sizeof(Matrix3) << std::endl;
+            dst += sizeof(Matrix3) * arrayIndex;
+            memcpy(dst, &j->propertyPtr
+                          ->GetMatrix3(updateBufferIndex), sizeof(Matrix3));
             break;
           }
           default:
-          {}
+          {
+          }
         }
       }
     }
@@ -391,11 +437,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
    * Prepare textures
    */
   auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
-  auto samplers = shader.GetSamplers();
+  auto samplers        = shader.GetSamplers();
 
-  if( mTextureSet )
+  if (mTextureSet)
   {
-    if(!samplers.empty())
+    if (!samplers.empty())
     {
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
@@ -416,24 +462,60 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   // todo: this may be deferred until all render items are sorted, otherwise
   // certain optimisations cannot be done
 
-  const auto& vb = mGeometry->GetVertexBuffers()[0];
-  //vb->Update()
+  const auto &vb = mGeometry->GetVertexBuffers()[0];
 
+  // set optional index buffer
+  bool usesIndexBuffer{false};
+  auto topology  = Graphics::API::RenderCommand::Topology::TRIANGLE_STRIP;
+  if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
+  {
+    mGfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
+                                         .SetBuffer(mGeometry->GetIndexBuffer())
+                                         .SetOffset(0)
+    );
+  }
 
+  auto type = mGeometry->GetType();
+
+  switch (type)
+  {
+    case Dali::Geometry::Type::TRIANGLE_STRIP:
+    {
+      topology = Graphics::API::RenderCommand::Topology::TRIANGLE_STRIP;
+      break;
+    }
+    default:
+    {
+      topology = Graphics::API::RenderCommand::Topology::TRIANGLES;
+    }
+  }
 
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
   mGfxRenderCommand->BindVertexBuffers( std::move(vertexAttributeBindings) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
   mGfxRenderCommand->BindRenderState( Graphics::API::RenderCommand::RenderState{}
                                         .SetShader( mShader->GetGfxObject() )
-                                        .SetBlendState( { mBlendMode != BlendMode::OFF }) );
-  mGfxRenderCommand->Draw( std::move(Graphics::API::RenderCommand::DrawCommand{}
-                   .SetFirstVertex(0u)
-                   .SetDrawType( Graphics::API::RenderCommand::DrawType::VERTEX_DRAW )
-                   .SetFirstInstance(0u)
-                   .SetVertexCount( vb->GetElementCount() )
-                   .SetInstanceCount( 1u )));
+                                        .SetBlendState( { mBlendMode != BlendMode::OFF })
+                                        .SetTopology( topology ));
 
+  if(usesIndexBuffer)
+  {
+    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+                                        .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
+                                        .SetDrawType(Graphics::API::RenderCommand::DrawType::INDEXED_DRAW)
+                                        .SetFirstInstance(0u)
+                                        .SetIndicesCount( mGeometry->GetIndexBufferElementCount() )
+                                        .SetInstanceCount(1u)));
+  }
+  else
+  {
+    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+                                        .SetFirstVertex(0u)
+                                        .SetDrawType(Graphics::API::RenderCommand::DrawType::VERTEX_DRAW)
+                                        .SetFirstInstance(0u)
+                                        .SetVertexCount(vb->GetElementCount())
+                                        .SetInstanceCount(1u)));
+  }
   std::cout << "done\n";
 }
 
