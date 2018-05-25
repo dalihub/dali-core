@@ -72,10 +72,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
 };
 
 Graphics::Graphics() = default;
-
 Graphics::~Graphics() = default;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 
 Platform Graphics::GetDefaultPlatform() const
 {
@@ -208,7 +205,7 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      .setEnabledLayerCount(0)
+      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -257,10 +254,7 @@ void Graphics::PreparePhysicalDevice()
 
   mDeviceMemoryManager = GpuMemoryManager::New( *this );
 }
-#pragma GCC diagnostic pop
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 void Graphics::GetPhysicalDeviceProperties()
 {
   // store data on heap to keep object smaller
@@ -271,7 +265,6 @@ void Graphics::GetPhysicalDeviceProperties()
   mPhysicalDeviceFeatures =
     MakeUnique<vk::PhysicalDeviceFeatures>(mPhysicalDevice.getFeatures());
 }
-#pragma GCC diagnostic pop
 
 void Graphics::GetQueueFamilyProperties()
 {
@@ -335,8 +328,6 @@ SwapchainRef Graphics::GetSwapchainForFBID( FBID surfaceId )
   return mSurfaceFBIDMap[surfaceId].swapchain;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
 {
   // surface is needed in order to find a family that supports presentation to this surface
@@ -416,10 +407,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
 
   return queueInfos;
 }
-#pragma GCC diagnostic pop
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
 void Graphics::CreateDevice()
 {
   auto queueInfos = GetQueueCreateInfos();
@@ -481,7 +469,6 @@ void Graphics::CreateDevice()
 
   mPipelineDatabase = std::make_unique<PipelineCache>( *this );
 }
-#pragma GCC diagnostic pop
 
 vk::Device Graphics::GetDevice() const
 {

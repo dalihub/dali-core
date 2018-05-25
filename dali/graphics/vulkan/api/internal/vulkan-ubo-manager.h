@@ -33,6 +33,10 @@ class UboManager
 {
 public:
 
+  /**
+   *
+   * @param controller
+   */
   explicit UboManager( Controller& controller );
   ~UboManager();
 

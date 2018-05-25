@@ -68,7 +68,7 @@ class Graphics
 
 public:
   Graphics();
-  Graphics(std::unique_ptr< SurfaceFactory > surfaceFactory);
+  explicit Graphics(std::unique_ptr< SurfaceFactory > surfaceFactory);
   Graphics(const Graphics&) = delete;
   Graphics& operator=(const Graphics&) = delete;
   ~Graphics();

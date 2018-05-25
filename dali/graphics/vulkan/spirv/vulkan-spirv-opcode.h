@@ -89,8 +89,7 @@ struct SPIRVOpCode
 
 namespace
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wlarger-than="
+
 /**
  * List of all the SPIR-V opcodes
  * OpCodes describing types: 19-39
@@ -412,7 +411,7 @@ static const SPIRVOpCode OP_CODE_ARRAY[] = {{"OpNop", 0, false, false, false},
                                             {"OpGroupFMaxNonUniformAMD", 5005, true, true, false},
                                             {"OpGroupUMaxNonUniformAMD", 5006, true, true, false},
                                             {"OpGroupSMaxNonUniformAMD", 5007, true, true, false}};
-#pragma GCC diagnostic pop
+
 static const SPIRVOpCode OP_CODE_NULL{};
 const SPIRVOpCode& FindOpCode( uint32_t code )
 {

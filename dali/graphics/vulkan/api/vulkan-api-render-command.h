@@ -30,6 +30,7 @@ namespace Vulkan
 {
 class PipelineCache;
 }
+
 namespace VulkanAPI
 {
 class Controller;

@@ -27,7 +27,6 @@ namespace Graphics
 namespace VulkanAPI
 {
 
-
 struct UboManager::Impl
 {
   explicit Impl( UboManager& uboManager, Controller& controller )
