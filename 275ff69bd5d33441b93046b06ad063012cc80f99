@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfdfc907_92dde4ed",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-buffer.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-25T16:33:11Z",
+      "side": 1,
+      "message": "Should use DALi style guidelines - 1 initializer per line.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 125
+      },
+      "revId": "275ff69bd5d33441b93046b06ad063012cc80f99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
