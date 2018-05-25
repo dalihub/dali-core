@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-types.h>
-
+#include <dali/graphics-api/graphics-api-render-command.h>
 namespace Dali
 {
 namespace Graphics
@@ -34,10 +34,13 @@ struct PipelineDescription
   ShaderRef vertexShader;
   ShaderRef fragmentShader;
 
+  API::RenderCommand::RenderState::BlendState blendState;
+
   bool operator==(const PipelineDescription& description) const
   {
     return (vertexShader == description.vertexShader) &&
-           (fragmentShader == description.fragmentShader);
+           (fragmentShader == description.fragmentShader) &&
+           (std::memcmp( &blendState, &description.blendState, sizeof(blendState) ));
   }
 
   std::vector<vk::DescriptorSetLayout> descriptorSetLayouts;

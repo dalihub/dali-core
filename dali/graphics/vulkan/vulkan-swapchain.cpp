@@ -255,7 +255,6 @@ struct Swapchain::Impl
     mQueue.Submit( cmdBuffer, FenceRef{} );
     mQueue.WaitIdle();
   }
-#pragma GCC diagnostic pop
 
   bool SetImageFormat()
   {
@@ -439,20 +438,41 @@ struct Swapchain::Impl
     }
     swapBuffer.firstUse = false;
 
-    // Begins primary render pass
-    BeginPrimaryRenderPass( swapBuffer );
-
     return swapBuffer.framebuffer;
   }
-#pragma GCC diagnostic pop
-  void BeginPrimaryRenderPass( SwapchainBuffer& currentBuffer )
+
+  void BeginPrimaryRenderPass()
   {
+    auto& currentBuffer = mSwapchainBuffer[mCurrentBufferIndex];
+
     vk::RenderPassBeginInfo rpInfo{};
     rpInfo.setRenderPass( currentBuffer.framebuffer->GetVkRenderPass() )
       .setFramebuffer( currentBuffer.framebuffer->GetVkFramebuffer() )
       .setPClearValues( currentBuffer.framebuffer->GetDefaultClearValues().data() )
       .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) )
       .setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) );
+
+    currentBuffer.masterCmdBuffer->BeginRenderPass( rpInfo, vk::SubpassContents::eSecondaryCommandBuffers );
+  }
+
+  void BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors )
+  {
+    auto& currentBuffer = mSwapchainBuffer[mCurrentBufferIndex];
+
+    vk::RenderPassBeginInfo rpInfo{};
+
+    auto newColors = currentBuffer.framebuffer->GetDefaultClearValues();
+    newColors[0].color.setFloat32( { colors[0][0],
+                                     colors[0][1],
+                                     colors[0][2],
+                                     colors[0][3]
+                                   } );
+
+    rpInfo.setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) )
+          .setRenderPass( currentBuffer.framebuffer->GetVkRenderPass() )
+          .setFramebuffer( currentBuffer.framebuffer->GetVkFramebuffer() )
+          .setPClearValues( newColors.data() )
+          .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) );
 
     currentBuffer.masterCmdBuffer->BeginRenderPass( rpInfo, vk::SubpassContents::eSecondaryCommandBuffers );
   }
@@ -468,8 +488,6 @@ struct Swapchain::Impl
    * The master command buffer must be in the recording state
    * @param swapBuffer
    */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   void UpdateLayoutPresentToColorAttachment( SwapchainBuffer& swapBuffer )
   {
     auto& cmdBuf = swapBuffer.masterCmdBuffer;
@@ -501,7 +519,6 @@ struct Swapchain::Impl
                              std::vector<vk::BufferMemoryBarrier>{},
                              barriers );
   }
-#pragma GCC diagnostic pop
 
   CommandBufferRef GetPrimaryCommandBuffer() const
   {
@@ -638,6 +655,17 @@ CommandBufferRef Swapchain::GetPrimaryCommandBuffer() const
 {
   return mImpl->GetPrimaryCommandBuffer();
 }
+
+void Swapchain::BeginPrimaryRenderPass()
+{
+  mImpl->BeginPrimaryRenderPass( );
+}
+
+void Swapchain::BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors )
+{
+  mImpl->BeginPrimaryRenderPass( colors );
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics

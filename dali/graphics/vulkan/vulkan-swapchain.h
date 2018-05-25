@@ -71,6 +71,17 @@ public:
   CommandBufferRef GetPrimaryCommandBuffer() const;
 
   /**
+   * Begins primary render pass, must be called after acquiring new image
+   */
+  void BeginPrimaryRenderPass();
+
+  /**
+   * Begins primary render pass, must be called after acquiring new image
+   * @param beginInfo custom initialisation structure
+   */
+  void BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors );
+
+  /**
    * Presents using default present queue, asynchronously
    */
   void Present();
