@@ -82,23 +82,30 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
-    auto sgRenderer = item.mNode->GetRendererAt(0);
-    auto& cmd = sgRenderer->GetGfxRenderCommand();
-    if(cmd.GetVertexBufferBindings().empty())
+    for( auto j = 0u; j < item.mNode->GetRendererCount(); ++j )
     {
-      continue;
+      auto sgRenderer = item.mNode
+                            ->GetRendererAt(j);
+      auto &cmd = sgRenderer->GetGfxRenderCommand();
+      if (cmd.GetVertexBufferBindings()
+             .empty())
+      {
+        continue;
+      }
+      cmd.BindRenderTarget(renderTargetBinding);
+      Matrix mvp, mvp2;
+      Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
+      Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
+      sgRenderer->WriteUniform("uModelMatrix", item.mModelMatrix);
+      sgRenderer->WriteUniform("uMvpMatrix", mvp2);
+      sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
+      sgRenderer->WriteUniform("uModelViewMatrix", item.mModelViewMatrix);
+      sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
+      sgRenderer->WriteUniform("uSize", item.mSize);
+      sgRenderer->WriteUniform("uColor", item.mNode
+                                             ->GetWorldColor(bufferIndex));
+      commandList.push_back(&cmd);
     }
-    cmd.BindRenderTarget( renderTargetBinding );
-    Matrix mvp;
-    Matrix::Multiply( mvp, item.mModelMatrix, viewProjection );
-    sgRenderer->WriteUniform( "uModelMatrix", item.mModelMatrix );
-    sgRenderer->WriteUniform( "uMvpMatrix", mvp );
-    sgRenderer->WriteUniform( "uViewMatrix", *viewMatrix );
-    sgRenderer->WriteUniform( "uModelViewMatrix", item.mModelViewMatrix );
-    sgRenderer->WriteUniform( "uProjection", vulkanProjectionMatrix );
-    sgRenderer->WriteUniform( "uSize", item.mSize );
-    sgRenderer->WriteUniform( "uColor", item.mNode->GetWorldColor( bufferIndex ));
-    commandList.push_back( &cmd  );
   }
 
   graphics.SubmitCommands( std::move(commandList) );
