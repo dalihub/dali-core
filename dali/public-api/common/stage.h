@@ -336,7 +336,7 @@ public:
   WheelEventSignalType& WheelEventSignal();
 
   /**
-   * @DEPRECATED_1_3.20 Not relevant for new Graphics API.
+   * @DEPRECATED_1_2.65 Not relevant for new Graphics API.
    *
    * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).
    *
@@ -348,14 +348,13 @@ public:
   ContextStatusSignal& ContextLostSignal();
 
   /**
-   * @DEPRECATED_1_3.20 Not relevant for new Graphics API.
+   * @DEPRECATED_1_2.65 Not relevant for new Graphics API.
    *
    * @brief This signal is emitted when the GL context is regained (Platform specific
    * behavior).
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and rebuild UI components on receipt.
-   * @deprecate
    * @SINCE_1_0.0
    * @return The context regained signal to connect to
    */
