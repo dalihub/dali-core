@@ -257,27 +257,12 @@ API::Accessor<API::Texture> Controller::CreateTexture( const API::BaseFactory<AP
   return API::Accessor<API::Texture>( mImpl->mTexturesOwner, handle);
 }
 
-API::Accessor<API::TextureSet> Controller::CreateTextureSet( const API::BaseFactory<API::TextureSet>& factory )
-{
-  return { nullptr };
-}
-
-API::Accessor<API::DynamicBuffer> Controller::CreateDynamicBuffer( const API::BaseFactory<API::DynamicBuffer>& factory )
-{
-  return { nullptr };
-}
-
 API::Accessor<API::Buffer> Controller::CreateBuffer( const API::BaseFactory<API::Buffer>& factory )
 {
   auto handle = mImpl->mBuffersOwner.CreateObject( factory );
   auto bufferRef = static_cast<VulkanAPI::Buffer&>(mImpl->mBuffersOwner[handle]).GetBufferRef();
   mImpl->mBuffers.push_back( bufferRef );
   return API::Accessor<API::Buffer>( mImpl->mBuffersOwner, handle);
-}
-
-API::Accessor<API::StaticBuffer> Controller::CreateStaticBuffer( const API::BaseFactory<API::StaticBuffer>& factory )
-{
-  return { nullptr };
 }
 
 API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<API::Sampler>& factory )

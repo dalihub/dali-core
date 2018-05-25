@@ -18,12 +18,12 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 
 #include <deque>
-#include <iostream>
+
 
 #define debug( x ) std::cout << x << std::endl;
 

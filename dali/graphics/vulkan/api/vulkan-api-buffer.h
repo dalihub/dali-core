@@ -29,13 +29,9 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace Vulkan
-{
-class Controller;
-}
 namespace VulkanAPI
 {
-
+class Controller;
 
 /**
  * Buffer represents a Buffer-type resource
@@ -44,7 +40,7 @@ class Buffer : public Graphics::API::Buffer
 {
 public:
 
-  explicit Buffer( Vulkan::Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size );
+  explicit Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size );
 
   bool Initialise();
 
@@ -71,7 +67,7 @@ public:
 
 private:
 
-  Vulkan::Controller& mController;
+  Controller& mController;
   Vulkan::Graphics& mGraphics;
   vk::BufferUsageFlagBits mUsage{ vk::BufferUsageFlagBits::eVertexBuffer};
   API::Buffer::UsageHint mUsageHints;

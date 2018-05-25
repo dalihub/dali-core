@@ -29,7 +29,7 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/vulkan-graphics-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -45,8 +45,6 @@
 #ifndef VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
-
-#include <iostream>
 
 namespace Dali
 {
@@ -96,7 +94,7 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 {
   if(!mGfxController)
   {
-    mGfxController = Dali::Graphics::Vulkan::Controller::New(*this);
+    mGfxController = Dali::Graphics::VulkanAPI::Controller::New(*this);
   }
 
   return *mGfxController.get();

@@ -22,8 +22,6 @@
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics/vulkan/vulkan-types.h>
 
-//#include <dali/graphics/vulkan/vulkan-command-buffer.h>
-
 namespace Dali
 {
 namespace Graphics
@@ -31,13 +29,10 @@ namespace Graphics
 namespace Vulkan
 {
 class PipelineCache;
-class Controller;
 }
 namespace VulkanAPI
 {
-
-using Controller = Vulkan::Controller;
-
+class Controller;
 class Ubo;
 
 /**

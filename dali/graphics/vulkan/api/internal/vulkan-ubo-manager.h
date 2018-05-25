@@ -24,15 +24,10 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace Vulkan
-{
-class Controller;
-}
 namespace VulkanAPI
 {
-using Controller = Vulkan::Controller;
+class Controller;
 class Ubo;
-
 
 class UboManager
 {

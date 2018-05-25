@@ -30,12 +30,11 @@ namespace Dali
 {
 namespace Graphics
 {
+using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 namespace API
 {
 class Controller;
 }
-using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
-
 namespace Vulkan
 {
 
@@ -56,7 +55,6 @@ class Surface;
 class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
-class Controller;
 class PipelineCache;
 
 struct SwapchainSurfacePair
@@ -191,7 +189,7 @@ private:
   std::vector<FramebufferRef>           mFramebufferCache;
 
 private:
-  std::unique_ptr<Dali::Graphics::Vulkan::Controller>           mGfxController;
+  std::unique_ptr<Dali::Graphics::API::Controller>           mGfxController;
 
   // TODO: rename
   std::unique_ptr<PipelineCache>        mPipelineDatabase;

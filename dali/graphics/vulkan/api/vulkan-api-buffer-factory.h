@@ -29,15 +29,15 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
-class Controller;
 }
 namespace VulkanAPI
 {
+class Controller;
 class BufferFactory : public Dali::Graphics::API::BufferFactory
 {
 public:
 
-  explicit BufferFactory( Vulkan::Controller& controller );
+  explicit BufferFactory( Controller& controller );
 
   VulkanAPI::BufferFactory& SetUsage( API::Buffer::UsageHint usage ) override;
 
@@ -47,7 +47,7 @@ public:
 
 private:
 
-  Vulkan::Controller&         mController;
+  Controller&                 mController;
   Vulkan::Graphics&           mGraphics;
   vk::BufferUsageFlagBits     mUsage;
   API::Buffer::UsageHint      mUsageHints;
