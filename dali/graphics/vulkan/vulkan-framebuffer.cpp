@@ -18,6 +18,7 @@
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-image-view.h>
 
 namespace Dali
 {
@@ -52,7 +53,7 @@ struct Framebuffer::Impl
       attRef.setLayout( vk::ImageLayout::eColorAttachmentOptimal );
       attRef.setAttachment( colorAttachmentSize++ );
       mAttachmentReference.emplace_back( attRef );
-      attachments.emplace_back( colorAttachment->GetVkImageView() );
+      attachments.emplace_back( colorAttachment->GetVkHandle() );
 
       vk::AttachmentDescription attDesc{};
       attDesc.setSamples( vk::SampleCountFlagBits::e1 )
@@ -81,7 +82,7 @@ struct Framebuffer::Impl
       attRef.setLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
       attRef.setAttachment( colorAttachmentSize );
       mAttachmentReference.emplace_back( attRef );
-      attachments.emplace_back( mDepthStencilImageViewAttachment->GetVkImageView() );
+      attachments.emplace_back( mDepthStencilImageViewAttachment->GetVkHandle() );
 
       vk::AttachmentDescription attDesc{};
       attDesc.setSamples( vk::SampleCountFlagBits::e1 )
