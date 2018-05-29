@@ -177,6 +177,15 @@ Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
   return Device::Subclass::NONE;
 }
 
+MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetMouseButton();
+  }
+  return MouseButton::INVALID;
+}
+
 } // namsespace Internal
 
 } // namespace Dali

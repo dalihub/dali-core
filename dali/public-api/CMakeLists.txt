@@ -147,6 +147,7 @@ SET(PUBLIC_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-point.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-event.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-data.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/mouse-button.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/images/buffer-image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/encoded-buffer-image.h
