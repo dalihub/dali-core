@@ -23,10 +23,12 @@
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-fence.h>
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <thread>
+
 namespace Dali
 {
 namespace Graphics
@@ -40,8 +42,9 @@ struct Pixmap
   explicit Pixmap( uint32_t _width, uint32_t _height, vk::Format format  )
     : width( _width ), height( _height ), bytesPerPixel(1), pixelFormat( format )
   {
-    totalSizeInBytes = width*height*bytesPerPixel;
-    data.resize( totalSizeInBytes );
+    totalSizeInBytes = width * height * bytesPerPixel;
+    data.resize(totalSizeInBytes);
+  }
 
   explicit Pixmap( uint32_t _width, uint32_t _height )
   : width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
@@ -155,6 +158,7 @@ struct Texture::Impl
   // uploaded at this point
   bool Initialise()
   {
+    //TODO: Create image using the Graphics class
     // create image
     mImage = Image::New( mGraphics,
                          vk::ImageCreateInfo{}
@@ -173,7 +177,7 @@ struct Texture::Impl
     mImage->BindMemory( allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ) );
 
     // create default image view
-    mImageView = ImageView::New( mGraphics, mImage );
+    mImageView = mGraphics.CreateImageView(mImage);
 
     // create basic sampler
     CreateSampler();

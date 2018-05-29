@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 
 namespace Dali
@@ -172,7 +173,7 @@ struct DescriptorSet::Impl
 
     auto imageViewInfo = vk::DescriptorImageInfo{}
          .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
-         .setImageView( imageView->GetVkImageView() )
+         .setImageView( imageView->GetVkHandle() )
          .setSampler(sampler->GetVkHandle() );
 
     auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )

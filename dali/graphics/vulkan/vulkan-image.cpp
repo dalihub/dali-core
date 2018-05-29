@@ -134,7 +134,7 @@ uint32_t Image::GetLayerCount() const
   return mImpl->mCreateInfo.arrayLayers;
 }
 
-uint32_t Image::GetLevelCount() const
+uint32_t Image::GetMipLevelCount() const
 {
   return mImpl->mCreateInfo.mipLevels;
 }
@@ -162,114 +162,6 @@ void Image::BindMemory( const RefCountedGpuMemoryBlock& handle )
 vk::ImageUsageFlags Image::GetVkImageUsageFlags() const
 {
   return mImpl->mCreateInfo.usage;
-}
-
-/***************************************************************************
- *
- *  ImageView
- *
- */
-
-struct ImageView::Impl
-{
-  Impl( ImageView& owner, Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo createInfo )
-  : mOwner( owner ), mGraphics( graphics ), mImage( image ), mCreateInfo( createInfo )
-  {
-  }
-
-  ~Impl()
-  {
-  }
-
-  bool Initialise()
-  {
-    mVkImageView = VkAssert( mGraphics.GetDevice().createImageView( mCreateInfo, mGraphics.GetAllocator() ) );
-    if( !mVkImageView )
-    {
-      return false;
-    }
-    return true;
-  }
-
-  ImageView&              mOwner;
-  Graphics&               mGraphics;
-  RefCountedImage                mImage;
-  vk::ImageViewCreateInfo mCreateInfo;
-
-  vk::ImageView mVkImageView;
-};
-
-RefCountedImageView ImageView::New( Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo info )
-{
-  auto retval = RefCountedImageView( new ImageView( graphics, image, info ) );
-  if( !retval->mImpl->Initialise() )
-  {
-    return RefCountedImageView();
-  }
-  return retval;
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-RefCountedImageView ImageView::New( Graphics& graphics, RefCountedImage image )
-{
-  vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
-  vk::ImageAspectFlags aspectFlags{};
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
-  {
-    aspectFlags |= vk::ImageAspectFlagBits::eColor;
-    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
-  }
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
-  {
-    aspectFlags |= (vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil);
-  }
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eSampled )
-  {
-    aspectFlags |= (vk::ImageAspectFlagBits::eColor);
-    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eR,vk::ComponentSwizzle::eA };
-  }
-  auto subresourceRange = vk::ImageSubresourceRange{}
-    .setAspectMask( aspectFlags )
-    .setBaseArrayLayer( 0 )
-    .setBaseMipLevel( 0 )
-    .setLevelCount( image->GetLevelCount() )
-    .setLayerCount( image->GetLayerCount() );
-
-  // create reference, image may be null
-  auto retval = RefCountedImageView( new ImageView( graphics,
-                                             image,
-                                             vk::ImageViewCreateInfo{}
-                                               .setViewType( vk::ImageViewType::e2D )
-                                               .setFormat( image->GetVkFormat() )
-                                               .setSubresourceRange(subresourceRange)
-                                               .setComponents( componentsMapping )
-                                                .setImage(image->GetVkHandle() )));
-  if(!retval->mImpl->Initialise())
-  {
-    return RefCountedImageView();
-  }
-
-  return retval;
-}
-#pragma GCC diagnostic pop
-
-ImageView::ImageView( Graphics& graphics, RefCountedImage image, const VkImageViewCreateInfo& createInfo )
-{
-  mImpl = MakeUnique<Impl>( *this, graphics, image, createInfo );
-}
-
-
-ImageView::~ImageView() = default;
-
-const vk::ImageView& ImageView::GetVkImageView() const
-{
-  return mImpl->mVkImageView;
-}
-
-RefCountedImage ImageView::GetImage() const
-{
-  return mImpl->mImage;
 }
 
 } // namespace Vulkan

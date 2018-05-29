@@ -242,12 +242,6 @@ Handle< T > NewRef(Args&&... args)
 }
 
 
-template<class T>
-typename T::Impl& GetImpl( Handle<T>& object )
-{
-  return static_cast<typename T::Impl&>(*object->mImpl);
-}
-
 class VkManaged
 {
 public:
@@ -339,11 +333,7 @@ using RefCountedSwapchain = Handle<class Swapchain>;
 using RefCountedSurface = Handle<class Surface>;
 using RefCountedSampler = Handle<class Sampler>;
 using RefCountedTexture = Handle<class Texture>;
-/*
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-#pragma GCC diagnostic pop
-*/
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
