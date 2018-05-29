@@ -247,9 +247,9 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler &sampler )
 
 void ResourceCache::CollectGarbage()
 {
-  for( const auto& functor : mDiscardQueue )
+  for( const auto& deleter : mDiscardQueue )
   {
-    functor();
+    deleter();
   }
 
   mDiscardQueue.clear();

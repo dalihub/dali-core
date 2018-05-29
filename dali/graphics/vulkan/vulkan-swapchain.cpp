@@ -25,9 +25,11 @@
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -197,7 +199,7 @@ struct Swapchain::Impl
 
         vk::ImageSubresourceRange range;
         range.setLayerCount( image->GetLayerCount() )
-          .setLevelCount( image->GetLevelCount() )
+          .setLevelCount( image->GetMipLevelCount() )
           .setBaseMipLevel( 0 )
           .setBaseArrayLayer( 0 )
           .setAspectMask( vk::ImageAspectFlagBits::eColor );
@@ -223,7 +225,7 @@ struct Swapchain::Impl
 
       vk::ImageSubresourceRange range;
       range.setLayerCount( image->GetLayerCount() )
-        .setLevelCount( image->GetLevelCount() )
+        .setLevelCount( image->GetMipLevelCount() )
         .setBaseMipLevel( 0 )
         .setBaseArrayLayer( 0 )
         .setAspectMask( vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil );
@@ -270,12 +272,7 @@ struct Swapchain::Impl
       }
     }
 
-    if( vk::Format::eUndefined == mSwapchainImageFormat )
-    {
-      return false;
-    }
-
-    return true;
+    return vk::Format::eUndefined != mSwapchainImageFormat;
   }
 
   /**
@@ -335,27 +332,30 @@ struct Swapchain::Impl
    */
   RefCountedImageView CreateDepthStencil()
   {
+    //TODO: create the image using the Graphics class
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+            .setFormat( vk::Format::eD24UnormS8Uint )
+            .setMipLevels( 1 )
+            .setTiling( vk::ImageTiling::eOptimal )
+            .setImageType( vk::ImageType::e2D )
+            .setArrayLayers( 1 )
+            .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
+            .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
+            .setSharingMode( vk::SharingMode::eExclusive )
+            .setInitialLayout( vk::ImageLayout::eUndefined )
+            .setSamples( vk::SampleCountFlagBits::e1 );
+
     // create depth stencil image
-    auto dsImageRef = Image::New( mGraphics,
-                                  vk::ImageCreateInfo{}
-                                    .setFormat( vk::Format::eD24UnormS8Uint )
-                                    .setMipLevels( 1 )
-                                    .setTiling( vk::ImageTiling::eOptimal )
-                                    .setImageType( vk::ImageType::e2D )
-                                    .setArrayLayers( 1 )
-                                    .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
-                                    .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
-                                    .setSharingMode( vk::SharingMode::eExclusive )
-                                    .setInitialLayout( vk::ImageLayout::eUndefined )
-                                    .setSamples( vk::SampleCountFlagBits::e1 ) );
+    auto dsRefCountedImage = Image::New( mGraphics, imageCreateInfo);
 
     auto memory = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate(
-      dsImageRef, vk::MemoryPropertyFlagBits::eDeviceLocal );
+            dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-    dsImageRef->BindMemory( memory );
+    //TODO: use the graphics class to bind memory. Maybe...
+    dsRefCountedImage->BindMemory( memory );
 
     // create imageview to be used within framebuffer
-    auto dsImageViewRef = ImageView::New( mGraphics, dsImageRef );
+    auto dsImageViewRef = mGraphics.CreateImageView(dsRefCountedImage);
     return dsImageViewRef;
   }
 
@@ -368,25 +368,25 @@ struct Swapchain::Impl
   {
     auto fbRef = Framebuffer::New( mGraphics, mSwapchainExtent.width, mSwapchainExtent.height );
 
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+            .setFormat( mSwapchainImageFormat )
+            .setSamples( vk::SampleCountFlagBits::e1 )
+            .setInitialLayout( vk::ImageLayout::eUndefined )
+            .setSharingMode( vk::SharingMode::eExclusive )
+            .setUsage( vk::ImageUsageFlagBits::eColorAttachment )
+            .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
+            .setArrayLayers( 1 )
+            .setImageType( vk::ImageType::e2D )
+            .setTiling( vk::ImageTiling::eOptimal )
+            .setMipLevels( 1 );
+
     // Create external Image reference
     // Note that despite we don't create VkImage, we still fill the createinfo structure
     // as this data will be used later
-    RefCountedImage imageRef = Image::New( mGraphics,
-                                    vk::ImageCreateInfo{}
-                                      .setFormat( mSwapchainImageFormat )
-                                      .setSamples( vk::SampleCountFlagBits::e1 )
-                                      .setInitialLayout( vk::ImageLayout::eUndefined )
-                                      .setSharingMode( vk::SharingMode::eExclusive )
-                                      .setUsage( vk::ImageUsageFlagBits::eColorAttachment )
-                                      .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
-                                      .setArrayLayers( 1 )
-                                      .setImageType( vk::ImageType::e2D )
-                                      .setTiling( vk::ImageTiling::eOptimal )
-                                      .setMipLevels( 1 ),
-                                    image );
+    auto refCountedImage = Image::New( mGraphics, imageCreateInfo, image );
 
     // Create basic imageview ( all mipmaps, all layers )
-    RefCountedImageView iv = ImageView::New( mGraphics, imageRef );
+    RefCountedImageView iv = mGraphics.CreateImageView(refCountedImage);
 
     fbRef->SetAttachment( iv, Framebuffer::AttachmentType::COLOR, 0u );
 
