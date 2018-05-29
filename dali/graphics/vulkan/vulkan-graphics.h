@@ -47,11 +47,6 @@ class Controller;
 
 namespace Vulkan
 {
-  UNDEFINED,
-  XLIB,
-  XCB,
-  WAYLAND,
-};
 
 class Buffer;
 class Image;
@@ -66,7 +61,6 @@ class PipelineCache;
 class ResourceCache;
 
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
-using ResourceCacheMap = std::unordered_map< std::thread::id, std::unique_ptr<ResourceCache> >;
 
 struct SwapchainSurfacePair
 {
@@ -96,7 +90,13 @@ public: // Create methods
   RefCountedBuffer                        CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo );
   RefCountedFramebuffer                   CreateFramebuffer();
   RefCountedImage                         CreateImage();
-  RefCountedImageView                     CreateImageView();
+  RefCountedImageView                     CreateImageView(const vk::ImageViewCreateFlags& flags,
+                                                          const RefCountedImage& image,
+                                                          vk::ImageViewType viewType,
+                                                          vk::Format format,
+                                                          vk::ComponentMapping components,
+                                                          vk::ImageSubresourceRange subresourceRange);
+  RefCountedImageView                     CreateImageView(RefCountedImage image);
   RefCountedDescriptorPool                CreateDescriptorPool();
   RefCountedCommandPool                   CreateCommandPool(const vk::CommandPoolCreateInfo& info);
   RefCountedCommandBuffer                 CreateCommandBuffer();
@@ -109,7 +109,7 @@ public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = 0 );
   vk::Result WaitForFences( const std::vector< RefCountedFence >& fences,
                             bool waitAll = true,
-                            uint32_t timeout = std::numeric_limits<uint32_t>::max() );
+                            uint32_t timeout = std::numeric_limits< uint32_t >::max() );
   vk::Result ResetFence( RefCountedFence fence );
   vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
@@ -177,8 +177,6 @@ private: // Methods
   std::vector< vk::DeviceQueueCreateInfo >  GetQueueCreateInfos();
   std::vector<const char*>                  PrepareDefaultInstanceExtensions();
 
-  std::unique_ptr< ResourceCache >&         GetResourceCache(std::thread::id thread_id);
-
 private: // Members
 
   std::unique_ptr<GpuMemoryManager>                           mDeviceMemoryManager;
@@ -217,7 +215,8 @@ private: // Members
   std::unique_ptr<PipelineCache>                              mPipelineDatabase;
 
   std::mutex                                                  mMutex;
-  ResourceCacheMap                                            mResourceCacheMap;
+  std::unique_ptr< ResourceCache >                            mResourceCache;
+
 };
 
 } // namespace Vulkan

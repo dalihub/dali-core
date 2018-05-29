@@ -325,7 +325,7 @@ struct CommandBuffer::Impl
          .setOldLayout( oldLayout )
          .setSrcAccessMask( srcAccessMask )
          .setDstAccessMask( dstAccessMask )
-         .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask, 0, image->GetLevelCount(), 0, image->GetLayerCount() } );
+         .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask, 0, image->GetMipLevelCount(), 0, image->GetLayerCount() } );
   }
 
   CommandBuffer&                mOwner;
