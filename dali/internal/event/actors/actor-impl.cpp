@@ -150,7 +150,7 @@ namespace // unnamed namespace
 /**
  * We want to discourage the use of property strings (minimize string comparisons),
  * particularly for the default properties.
- *              Name                  Type   writable animatable constraint-input  enum for index-checking
+ *              Name                        Type   writable animatable constraint-input  enum for index-checking
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "parentOrigin",              VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN )

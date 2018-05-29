@@ -29,7 +29,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/common/performance-monitor.h>
 
 namespace
 {

@@ -25,7 +25,7 @@
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
@@ -182,7 +182,7 @@ void Renderer::SetGeometry( Geometry& geometry )
 {
   mGeometry = &geometry;
 
-  const Render::Geometry* geometrySceneObject = geometry.GetRenderObject();
+  const SceneGraph::Geometry* geometrySceneObject = geometry.GetRenderObject();
   SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
 }
 

@@ -31,6 +31,8 @@ awk -F',' -v HEADER_NAME="$HEADER_NAME" '
 print "#ifndef __" HEADER_NAME "__"
 print "#define __" HEADER_NAME "__"
 print ""
+print "#include <cstdio>"
+print ""
 print "#include \"testcase.h\""
 print ""
     }

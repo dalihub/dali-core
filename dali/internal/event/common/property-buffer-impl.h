@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
+#include <dali/public-api/rendering/property-buffer.h> // Dali::Property::Map
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 
 namespace Dali
 {
@@ -64,7 +65,7 @@ public: // Default property extensions from Object
    *
    * @return The render thread side of this PropertyBuffer
    */
-  const Render::PropertyBuffer* GetRenderObject() const;
+  const SceneGraph::PropertyBuffer* GetRenderObject() const;
 
 protected:
   /**
@@ -89,7 +90,7 @@ private: // unimplemented methods
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Render::PropertyBuffer* mRenderObject;        ///<Render side object
+  SceneGraph::PropertyBuffer* mRenderObject;        ///<Render side object
   unsigned int mBufferFormatSize;
   unsigned int mSize; ///< Number of elements in the buffer
 };
@@ -117,7 +118,7 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType );
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::PropertyBuffer& GetImplementation(Dali::PropertyBuffer& handle)
+inline Internal::PropertyBuffer& GetImplementation( Dali::PropertyBuffer& handle )
 {
   DALI_ASSERT_ALWAYS(handle && "PropertyBuffer handle is empty");
 
@@ -126,7 +127,7 @@ inline Internal::PropertyBuffer& GetImplementation(Dali::PropertyBuffer& handle)
   return static_cast<Internal::PropertyBuffer&>(object);
 }
 
-inline const Internal::PropertyBuffer& GetImplementation(const Dali::PropertyBuffer& handle)
+inline const Internal::PropertyBuffer& GetImplementation( const Dali::PropertyBuffer& handle )
 {
   DALI_ASSERT_ALWAYS(handle && "PropertyBuffer handle is empty");
 

@@ -28,7 +28,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/renderers/render-renderer.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -104,7 +103,6 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
 inline int UpdateNodes( Node& node,
                         int parentFlags,
                         BufferIndex updateBufferIndex,
-                        RenderQueue& renderQueue,
                         Layer& currentLayer,
                         int inheritedDrawMode )
 {
@@ -168,7 +166,6 @@ inline int UpdateNodes( Node& node,
     cumulativeDirtyFlags |=UpdateNodes( child,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
-                                        renderQueue,
                                         *layer,
                                         inheritedDrawMode );
   }
@@ -180,8 +177,7 @@ inline int UpdateNodes( Node& node,
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
 int UpdateNodeTree( Layer& rootNode,
-                    BufferIndex updateBufferIndex,
-                    RenderQueue& renderQueue )
+                    BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
 
@@ -216,7 +212,6 @@ int UpdateNodeTree( Layer& rootNode,
     cumulativeDirtyFlags |= UpdateNodes( child,
                                          nodeDirtyFlags,
                                          updateBufferIndex,
-                                         renderQueue,
                                          rootNode,
                                          drawMode );
   }

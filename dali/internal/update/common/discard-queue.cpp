@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,9 @@
 #include <dali/internal/update/common/discard-queue.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/rendering/scene-graph-shader.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
@@ -36,9 +33,8 @@ namespace Internal
 namespace SceneGraph
 {
 
-DiscardQueue::DiscardQueue( RenderQueue& renderQueue )
-: mRenderQueue( renderQueue ),
-  mNodeQueue(),
+DiscardQueue::DiscardQueue()
+: mNodeQueue(),
   mShaderQueue(),
   mRendererQueue(),
   mCameraQueue()

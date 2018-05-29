@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ void TextureSet::operator delete( void* ptr )
   gTextureSetMemoryPool.FreeThreadSafe( static_cast<TextureSet*>( ptr ) );
 }
 
-void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
+void TextureSet::SetSampler( size_t index, SceneGraph::Sampler* sampler )
 {
   size_t samplerCount( mSamplers.Size() );
   if( samplerCount < index + 1 )
@@ -79,7 +79,7 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   NotifyChangeToRenderers();
 }
 
-void TextureSet::SetTexture( size_t index, Render::Texture* texture )
+void TextureSet::SetTexture( size_t index, SceneGraph::Texture* texture )
 {
   const size_t textureCount( mTextures.Size() );
   if( textureCount < index + 1 )

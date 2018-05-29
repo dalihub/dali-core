@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_DISCARD_QUEUE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-class RenderQueue;
 class Shader;
 class Camera;
 
@@ -57,9 +56,8 @@ public:
 
   /**
    * Create a new DiscardQueue.
-   * @param[in] renderQueue Used to send GL clean-up messages for the next Render.
    */
-  DiscardQueue( RenderQueue& renderQueue );
+  DiscardQueue();
 
   /**
    * Non-virtual destructor; DiscardQueue is not suitable as a base class.
@@ -117,7 +115,7 @@ private:
 
 private:
 
-  RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
+  //RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
 
   // Messages are queued here following the current update buffer number
   OwnerContainer< Node* >      mNodeQueue[2];

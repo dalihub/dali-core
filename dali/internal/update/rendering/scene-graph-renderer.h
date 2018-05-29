@@ -26,8 +26,10 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/rendering/data-providers/render-data-provider.h>
+#include <dali/internal/update/rendering/stencil-parameters.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
 {
@@ -35,28 +37,24 @@ namespace Dali
 namespace Internal
 {
 
-namespace Render
-{
-class Renderer;
-class Geometry;
-}
+
 
 namespace SceneGraph
 {
+class Geometry;
 class SceneController;
+class TextureSet;
 
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
 typedef RendererContainer::Iterator RendererIter;
 typedef RendererContainer::ConstIterator RendererConstIter;
 
-class TextureSet;
-class Geometry;
 
-class Renderer :  public PropertyOwner,
-                  public UniformMapDataProvider,
-                  public UniformMap::Observer,
-                  public ConnectionChangePropagator::Observer
+class Renderer : public PropertyOwner,
+                 public UniformMapDataProvider,
+                 public UniformMap::Observer,
+                 public ConnectionChangePropagator::Observer
 {
 public:
 
@@ -82,6 +80,13 @@ public:
    * Deletes the renderer from its global memory pool
    */
   void operator delete( void* ptr );
+
+  /**
+   * Initialize the renderer object with the Graphics API when added to UpdateManager
+   *
+   * @param[in] graphics The Graphics API
+   */
+  void Initialize( Integration::Graphics::Graphics& graphics );
 
   /**
    * Set the texture set for the renderer
@@ -117,7 +122,16 @@ public:
    * Set the geometry for the renderer
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry( Render::Geometry* geometry );
+  void SetGeometry( SceneGraph::Geometry* geometry );
+
+  /**
+   * Get the geometry for the renderer
+   * @return The geometry this renderer will use
+   */
+  SceneGraph::Geometry* GetGeometry() const
+  {
+    return mGeometry;
+  }
 
   /**
    * Set the depth index
@@ -330,10 +344,25 @@ public:
   void PrepareRender( BufferIndex updateBufferIndex );
 
   /**
-   * Retrieve the Render thread renderer
-   * @return The associated render thread renderer
+   * AB: preparing the command data
+   * @param controller
+   * @param updateBufferIndex
    */
-  Render::Renderer& GetRenderer();
+  void PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
+
+  Graphics::API::RenderCommand& GetGfxRenderCommand()
+  {
+    return *mGfxRenderCommand.get();
+  }
+
+  template<class T>
+  void WriteUniform( const std::string& name, const T& data )
+  {
+    WriteUniform( name, &data, sizeof(T) );
+  }
+
+  void WriteUniform( const std::string& name, const void* data, uint32_t size );
+
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -351,21 +380,6 @@ public:
    * Called by the TextureSet to notify to the renderer that it is about to be deleted
    */
   void TextureSetDeleted();
-
-  /**
-   * Connect the object to the scene graph
-   *
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
-
-  /**
-   * Disconnect the object from the scene graph
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
-   */
-  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
 public: // Implementation of ConnectionChangePropagator
   /**
@@ -430,20 +444,29 @@ private:
    * Update texture set to the render data provider
    */
   void UpdateTextureSet();
+  
+  /**
+   * Helper function to retrieve the blend color.
+   * @return The blend color.
+   */
+  const Vector4& GetBlendColor() const;
+
+  /**
+   * Helper function to update the uniform map.
+   */
+  void UpdateUniformMap( BufferIndex updateBufferIndex );
 
 private:
+  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
-
-  SceneController*             mSceneController;                  ///< Used for initializing renderers
-  Render::Renderer*            mRenderer;                         ///< Raw pointer to the renderer (that's owned by RenderManager)
+  std::unique_ptr<RenderDataProvider> mRenderDataProvider;        ///< Contains data for graphics renderer @todo Refactor
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*            mGeometry;                         ///< The geometry this renderer uses. (Not owned)
+  SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
-  RenderDataProvider*          mRenderDataProvider;               ///< The render data provider
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
-  Dali::Internal::Render::Renderer::StencilParameters mStencilParameters;         ///< Struct containing all stencil related options
+  StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
 
   size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
   size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
@@ -460,11 +483,12 @@ private:
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-public:
+  std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
+  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
 
+public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
-
 };
 
 
@@ -480,15 +504,15 @@ inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &renderer, &Renderer::SetTextures, const_cast<TextureSet*>(&textureSet) );
 }
 
-inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry& geometry )
+inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const SceneGraph::Geometry& geometry )
 {
-  typedef MessageValue1< Renderer, Render::Geometry* > LocalType;
+  typedef MessageValue1< Renderer, SceneGraph::Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(&geometry) );
+  new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<SceneGraph::Geometry*>(&geometry) );
 }
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Shader& shader )

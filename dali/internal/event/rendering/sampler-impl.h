@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SAMPLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ namespace Dali
 {
 namespace Internal
 {
-namespace Render
+namespace SceneGraph
 {
-struct Sampler;
+class Sampler;
 }
 
 class Sampler;
@@ -68,7 +68,7 @@ public:
    *
    * @return The render thread sampler
    */
-  Render::Sampler* GetSamplerRenderObject();
+  SceneGraph::Sampler* GetSamplerRenderObject();
 
 private:
   Sampler();
@@ -85,9 +85,8 @@ protected:
   virtual ~Sampler();
 
 private: // data
-  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via the update thread
-  Render::Sampler* mRenderObject;               ///<Render thread sampler for this sampler
-
+  EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via the update thread
+  SceneGraph::Sampler* mRenderObject; ///<Render thread sampler for this sampler
 };
 
 } // namespace Internal

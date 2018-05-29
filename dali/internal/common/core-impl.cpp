@@ -19,13 +19,16 @@
 #include <dali/internal/common/core-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
+
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/graphics/graphics.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/system-overlay.h>
+
+#include <dali/internal/common/performance-monitor.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -44,14 +47,13 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 
-#include <dali/internal/render/common/performance-monitor.h>
-#include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/gl-resources/context.h>
+extern "C"
+{
+std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
+}
 
 using Dali::Internal::SceneGraph::UpdateManager;
-using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
-using Dali::Internal::SceneGraph::RenderQueue;
 
 namespace
 {
@@ -65,23 +67,21 @@ Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE
 
 namespace Dali
 {
-
 namespace Internal
 {
 
 using Integration::RenderController;
 using Integration::PlatformAbstraction;
-using Integration::GlSyncAbstraction;
 using Integration::GestureManager;
-using Integration::GlAbstraction;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
+using Integration::Graphics::Graphics;
+
 
 Core::Core( RenderController& renderController,
             PlatformAbstraction& platform,
-            GlAbstraction& glAbstraction,
-            GlSyncAbstraction& glSyncAbstraction,
+            Graphics& graphics,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -89,8 +89,14 @@ Core::Core( RenderController& renderController,
             Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
-  mProcessingEvent(false)
+  mProcessingEvent(false),
+  mGraphics(graphics)
 {
+  // fixme: for now to ensure libgraphics.a won't be removed during linking due to being
+  Integration::Graphics::IncludeThisLibrary();
+
+  GraphicsGetBuiltinShader("");
+
   // Create the thread local storage
   CreateThreadLocalStorage();
 
@@ -105,22 +111,16 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, depthBufferAvailable, stencilBufferAvailable );
-
-  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-
-  mDiscardQueue = new DiscardQueue( renderQueue );
+  mDiscardQueue = new DiscardQueue();
 
   mUpdateManager = new UpdateManager( *mNotificationManager,
                                       *mAnimationPlaylist,
                                       *mPropertyNotificationManager,
                                       *mDiscardQueue,
                                        renderController,
-                                      *mRenderManager,
-                                       renderQueue,
-                                      *mRenderTaskProcessor );
+                                      *mRenderTaskProcessor,
+                                       graphics );
 
-  mRenderManager->SetShaderSaver( *mUpdateManager );
 
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager, mRenderController ) );
 
@@ -133,7 +133,6 @@ Core::Core( RenderController& renderController,
   mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
 
   mShaderFactory = new ShaderFactory();
-  mUpdateManager->SetShaderSaver( *mShaderFactory );
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 }
@@ -162,29 +161,6 @@ Core::~Core()
 
   // remove (last?) reference to stage
   mStage.Reset();
-
-}
-
-Integration::ContextNotifierInterface* Core::GetContextNotifier()
-{
-  return mStage.Get();
-}
-
-void Core::RecoverFromContextLoss()
-{
-  DALI_LOG_INFO(gCoreFilter, Debug::Verbose, "Core::RecoverFromContextLoss()\n");
-
-  mStage->GetRenderTaskList().RecoverFromContextLoss(); // Re-trigger render-tasks
-}
-
-void Core::ContextCreated()
-{
-  mRenderManager->ContextCreated();
-}
-
-void Core::ContextDestroyed()
-{
-  mRenderManager->ContextDestroyed();
 }
 
 void Core::SurfaceResized( unsigned int width, unsigned int height )
@@ -233,7 +209,8 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
 
 void Core::Render( RenderStatus& status, bool forceClear )
 {
-  mRenderManager->Render( status, forceClear );
+  DALI_LOG_ERROR("Render()!");
+  (void)status;
 }
 
 void Core::SceneCreated()
@@ -373,10 +350,6 @@ UpdateManager& Core::GetUpdateManager()
   return *(mUpdateManager);
 }
 
-RenderManager& Core::GetRenderManager()
-{
-  return *(mRenderManager);
-}
 
 NotificationManager& Core::GetNotificationManager()
 {

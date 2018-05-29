@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ void TextureSet::SetTexture( size_t index, TexturePtr texture )
 
   mTextures[index]= texture;
 
-  Render::Texture* renderTexture(0);
+  SceneGraph::Texture* renderTexture(0);
   if( texture )
   {
     renderTexture = texture->GetRenderObject();
@@ -101,7 +101,7 @@ void TextureSet::SetSampler( size_t index, SamplerPtr sampler )
 
   mSamplers[index] = sampler;
 
-  Render::Sampler* renderSampler(0);
+  SceneGraph::Sampler* renderSampler(0);
   if( sampler )
   {
     renderSampler = sampler->GetSamplerRenderObject();

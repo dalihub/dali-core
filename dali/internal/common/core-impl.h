@@ -19,27 +19,30 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/view-mode.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/public-api/common/view-mode.h>
-#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
 
 namespace Integration
 {
+namespace Graphics
+{
+class Graphics;
+}
 class Processor;
 class RenderController;
 class PlatformAbstraction;
 class GestureManager;
-class GlAbstraction;
-class GlSyncAbstraction;
+
 class SystemOverlay;
 class UpdateStatus;
 class RenderStatus;
@@ -62,7 +65,6 @@ class RelayoutController;
 namespace SceneGraph
 {
 class UpdateManager;
-class RenderManager;
 class DiscardQueue;
 class RenderTaskProcessor;
 }
@@ -79,8 +81,7 @@ public:
    */
   Core( Integration::RenderController& renderController,
         Integration::PlatformAbstraction& platform,
-        Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction,
+        Integration::Graphics::Graphics& graphics,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -91,26 +92,6 @@ public:
    * Destructor
    */
   ~Core();
-
-  /**
-   * @copydoc Dali::Integration::Core::GetContextNotifier()
-   */
-  Integration::ContextNotifierInterface* GetContextNotifier();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextCreated()
-   */
-  void ContextCreated();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextDestroyed()
-   */
-  void ContextDestroyed();
-
-  /**
-   * @copydoc Dali::Integration::Core::RecoverFromContextLoss()
-   */
-  void RecoverFromContextLoss();
 
   /**
    * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int)
@@ -226,11 +207,6 @@ private:
    */
   SceneGraph::UpdateManager& GetUpdateManager();
 
-  /**
-   * Returns the render manager.
-   * @return A reference to the render manager.
-   */
-  SceneGraph::RenderManager& GetRenderManager();
 
   /**
    * Returns the notification manager.
@@ -281,7 +257,6 @@ private:
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
   OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
-  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;               ///< Render manager
   OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;               ///< Update manager
   OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
   OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory
@@ -289,6 +264,8 @@ private:
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
   Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
+
+  Integration::Graphics::Graphics& mGraphics; ///< Graphics object
 
   friend class ThreadLocalStorage;
 

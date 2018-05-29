@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/property-buffer.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
+
 
 namespace Dali
 {
@@ -138,7 +139,7 @@ void PropertyBuffer::SetData( const void* data, std::size_t size )
   unsigned int bufferSize = mBufferFormatSize * mSize;
 
   // create a new DALi vector to store the buffer data
-  // the heap allocated vector will end up being owned by Render::PropertyBuffer
+  // the heap allocated vector will end up being owned by SceneGraph::PropertyBuffer
   OwnerPointer< Vector<char> > bufferCopy = new Dali::Vector<char>();
   bufferCopy->Resize( bufferSize );
 
@@ -148,7 +149,7 @@ void PropertyBuffer::SetData( const void* data, std::size_t size )
   std::copy( source, source + bufferSize, destination );
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
-  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
+  SceneGraph::SetPropertyBufferDataMessage( mEventThreadServices, *mRenderObject, bufferCopy, mSize );
 }
 
 std::size_t PropertyBuffer::GetSize() const
@@ -156,7 +157,7 @@ std::size_t PropertyBuffer::GetSize() const
   return mSize;
 }
 
-const Render::PropertyBuffer* PropertyBuffer::GetRenderObject() const
+const SceneGraph::PropertyBuffer* PropertyBuffer::GetRenderObject() const
 {
   return mRenderObject;
 }
@@ -179,14 +180,14 @@ PropertyBuffer::PropertyBuffer()
 
 void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 {
-  mRenderObject = new Render::PropertyBuffer();
-  OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
+  mRenderObject = new SceneGraph::PropertyBuffer();
+  OwnerPointer< SceneGraph::PropertyBuffer > transferOwnership( mRenderObject );
   SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 
   size_t numComponents = formatMap.Count();
 
   // Create the format
-  OwnerPointer< Render::PropertyBuffer::Format> format = new Render::PropertyBuffer::Format();
+  OwnerPointer< SceneGraph::PropertyBuffer::Format> format = new SceneGraph::PropertyBuffer::Format();
   format->components.resize( numComponents );
 
   unsigned int currentAlignment = 0u;
@@ -255,7 +256,8 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 
   mBufferFormatSize = format->size;
 
-  SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
+  // @todo Why isn't this in the initial render object New?!
+  SceneGraph::SetPropertyBufferFormatMessage( mEventThreadServices, *mRenderObject, format );
 }
 
 unsigned int GetPropertyImplementationSize( Property::Type& propertyType )

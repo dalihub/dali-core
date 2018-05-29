@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2018 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,11 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                          $(dali_core_includes) \
                          $(DALI_CFLAGS)
 
+
+DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
+
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
+                      $(VULKAN_LIBS) \
                       -lpthread
 
 dali_core_includes = \
@@ -58,7 +62,7 @@ lib_LTLIBRARIES = libdali-core.la
 
 libdali_core_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 else
 
@@ -66,16 +70,20 @@ lib_LTLIBRARIES = libdali-core-cxx11.la
 
 libdali_core_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD)
+libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 endif
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
+platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
+platformabstractiongraphicsvulkandir = $(includedir)/dali/integration-api/graphics/vulkan
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
+platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
+platformabstractiongraphicsvulkan_HEADERS = $(graphics_vulkan_integration_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
@@ -144,22 +152,21 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
 linker_test_CXXFLAGS = \
   $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
-  $(DALI_CFLAGS)
+  $(VULKAN_CFLAGS)
 
 if ENABLE_CXX03_ABI
 
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \
-  libdali-core.la
+  libdali-core.la \
+  $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename
@@ -173,7 +180,8 @@ else
 
 linker_test_DEPENDENCIES = libdali-core-cxx11.la
 linker_test_LDADD = \
-  libdali-core-cxx11.la
+  libdali-core-cxx11.la \
+  $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename

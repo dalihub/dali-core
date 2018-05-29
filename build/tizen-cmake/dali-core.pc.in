@@ -9,4 +9,4 @@ Description: Cross platform 3D Engine
 Version: ${apiversion}
 Requires:
 Libs: -L${libdir} -ldali-core
-Cflags: -I${includedir} -std=c++11
+Cflags: -I${includedir} -std=c++14

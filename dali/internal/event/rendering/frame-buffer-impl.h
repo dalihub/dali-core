@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Dali
 {
 namespace Internal
 {
-namespace Render
+namespace SceneGraph
 {
 class FrameBuffer;
 }
@@ -57,7 +57,7 @@ public:
    *
    * @return the FrameBuffer render object
    */
-  Render::FrameBuffer* GetRenderObject() const;
+  SceneGraph::FrameBuffer* GetRenderObject() const;
 
   /**
    * @copydoc Dali::FrameBuffer::AttachColorTexture()
@@ -97,14 +97,13 @@ private: // unimplemented methods
 
 private: // data
 
-  Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
-  Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
+  EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
+  SceneGraph::FrameBuffer* mRenderObject;        ///< The Render::Framebuffer associated with this framebuffer
 
   TexturePtr mColor;
   unsigned int mWidth;
   unsigned int mHeight;
-  unsigned int mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
-
+  unsigned int mAttachments; ///< Bit-mask of type FrameBuffer::Attachment::Mask
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,12 @@ namespace Dali
 {
 namespace Internal
 {
-
-namespace Render
-{
-struct Sampler;
-class Texture;
-}
 namespace SceneGraph
 {
+
 class Renderer;
+class Sampler;
+class Texture;
 
 class TextureSet
 {
@@ -62,14 +59,14 @@ public:
    * @param[in] index The index of the texture
    * @param[in] sampler The sampler to be used by the texture
    */
-  void SetSampler( size_t index, Render::Sampler* sampler );
+  void SetSampler( size_t index, SceneGraph::Sampler* sampler );
 
   /**
    * Set the texture at position "index"
    * @param[in] index The index of the texture
    * @param[in] texture The texture
    */
-  void SetTexture( size_t index, Render::Texture* texture );
+  void SetTexture( size_t index, SceneGraph::Texture* texture );
 
   /**
    * Return whether any texture in the texture set has an alpha channel
@@ -97,7 +94,7 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the sampler used by the texture
    */
-  Render::Sampler* GetTextureSampler( size_t index )
+  SceneGraph::Sampler* GetTextureSampler( size_t index )
   {
     return mSamplers[index];
   }
@@ -116,7 +113,7 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the pointer to the Texture in that position
    */
-  Render::Texture* GetTexture( size_t index )
+  SceneGraph::Texture* GetTexture( size_t index )
   {
     return mTextures[index];
   }
@@ -136,15 +133,15 @@ private:
 
 private: // Data
 
-  Vector< Render::Sampler* >      mSamplers;                    ///< List of samplers used by each texture. Not owned
-  Vector< Render::Texture* >   mTextures;                    ///< List of Textures. Not owned
-  Vector<Renderer*>               mRenderers;                   ///< List of renderers using the TextureSet
-  bool                            mHasAlpha;                    ///< if any of the textures has an alpha channel
+  Vector< SceneGraph::Sampler* >  mSamplers;  ///< List of samplers used by each texture. Not owned
+  Vector< SceneGraph::Texture* >  mTextures;  ///< List of Textures. Not owned
+  Vector<Renderer*>               mRenderers; ///< List of renderers using the TextureSet
+  bool                            mHasAlpha;  ///< if any of the textures has an alpha channel
 };
 
-inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, Render::Texture* texture )
+inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, SceneGraph::Texture* texture )
 {
-  typedef MessageValue2< TextureSet, size_t, Render::Texture* > LocalType;
+  typedef MessageValue2< TextureSet, size_t, SceneGraph::Texture* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -153,9 +150,9 @@ inline void SetTextureMessage( EventThreadServices& eventThreadServices, const T
   new (slot) LocalType( &textureSet, &TextureSet::SetTexture, index, texture );
 }
 
-inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, Render::Sampler* sampler )
+inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, SceneGraph::Sampler* sampler )
 {
-  typedef MessageValue2< TextureSet, size_t, Render::Sampler* > LocalType;
+  typedef MessageValue2< TextureSet, size_t, SceneGraph::Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

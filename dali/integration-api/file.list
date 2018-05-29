@@ -26,7 +26,6 @@ platform_abstraction_src_files = \
 platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/core.h \
    $(platform_abstraction_src_dir)/core-enumerations.h \
-   $(platform_abstraction_src_dir)/context-notifier.h \
    $(platform_abstraction_src_dir)/debug.h \
    $(platform_abstraction_src_dir)/trace.h \
    $(platform_abstraction_src_dir)/profiling.h \
@@ -34,9 +33,6 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/bitmap.h \
    $(platform_abstraction_src_dir)/resource-policies.h \
    $(platform_abstraction_src_dir)/resource-types.h \
-   $(platform_abstraction_src_dir)/gl-abstraction.h \
-   $(platform_abstraction_src_dir)/gl-defines.h \
-   $(platform_abstraction_src_dir)/gl-sync-abstraction.h \
    $(platform_abstraction_src_dir)/gesture-manager.h \
    $(platform_abstraction_src_dir)/render-controller.h \
    $(platform_abstraction_src_dir)/platform-abstraction.h \
@@ -58,3 +54,14 @@ platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.h \
    $(platform_abstraction_src_dir)/events/touch-event-combiner.h \
    $(platform_abstraction_src_dir)/events/touch-event-integ.h
+
+graphics_integration_src_files = \
+   $(platform_abstraction_src_dir)/graphics/graphics.cpp
+
+graphics_integration_header_files = \
+  $(platform_abstraction_src_dir)/graphics/graphics.h \
+  $(platform_abstraction_src_dir)/graphics/surface-factory.h
+
+graphics_vulkan_integration_header_files = \
+  $(platform_abstraction_src_dir)/graphics/vulkan/vk-surface-factory.h \
+  $(platform_abstraction_src_dir)/graphics/vulkan/vulkan-hpp-wrapper.h

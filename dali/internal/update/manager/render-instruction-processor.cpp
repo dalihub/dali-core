@@ -25,13 +25,10 @@
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/render/common/render-item.h>
-#include <dali/internal/render/common/render-tracker.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/update/rendering/render-item.h>
+#include <dali/internal/update/rendering/render-tracker.h>
+#include <dali/internal/update/rendering/render-instruction.h>
+#include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 namespace
@@ -188,13 +185,12 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
       if( DALI_LIKELY( renderable.mRenderer ) )
       {
-        item.mRenderer =   &renderable.mRenderer->GetRenderer();
         item.mTextureSet =  renderable.mRenderer->GetTextures();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else
       {
-        item.mRenderer = nullptr;
+        item.mTextureSet = nullptr;
       }
 
       // Save ModelView matrix onto the item.
@@ -262,12 +258,9 @@ inline bool TryReuseCachedRenderers( Layer& layer,
     // Therefore we check a combined sum of all renderer addresses.
     size_t checkSumNew = 0;
     size_t checkSumOld = 0;
-    for( size_t index = 0; index < renderableCount; ++index )
-    {
-      const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
-      checkSumNew += size_t( &renderer );
-      checkSumOld += size_t( &renderList.GetRenderer( index ) );
-    }
+
+    // Used to add all renderers to checksum.
+
     if( checkSumNew == checkSumOld )
     {
       // tell list to reuse its existing items
@@ -337,11 +330,6 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
     {
       RenderItem& item = renderList.GetItem( index );
 
-      if( item.mRenderer )
-      {
-        item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
-      }
-
       // texture set
       mSortingHelper[ index ].textureSet = item.mTextureSet;
 
@@ -359,11 +347,8 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
     {
       RenderItem& item = renderList.GetItem( index );
 
-      item.mRenderer->SetSortAttributes( bufferIndex, mSortingHelper[ index ] );
-
       // texture set
       mSortingHelper[ index ].textureSet = item.mTextureSet;
-
 
       mSortingHelper[ index ].zValue = (*sortFunction)( item.mModelViewMatrix.GetTranslation3() ) - item.mDepthIndex;
 
@@ -386,7 +371,7 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
   for( unsigned int index = 0; index < renderableCount; ++index, ++renderListIter )
   {
     *renderListIter = mSortingHelper[ index ].renderItem;
-    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, mSortingHelper[ index ].renderItem->mRenderer);
+    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d]\n", index );
   }
 }
 
