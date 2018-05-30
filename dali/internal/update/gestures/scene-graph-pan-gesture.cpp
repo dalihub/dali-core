@@ -551,7 +551,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
   mLastGesture = frameGesture;
   mLastUnmodifiedGesture = unmodifiedGesture;
 
-  mInGesture &= ~frameInfo.justFinished;
+  mInGesture = mInGesture && !frameInfo.justFinished;
   if( mProfiling && frameInfo.justFinished )
   {
     mProfiling->PrintData();
@@ -1281,7 +1281,7 @@ bool PanGesture::NewAlgorithm( unsigned int lastVSyncTime, unsigned int nextVSyn
     }
   }
 
-  mInGesture &= ~justFinished;
+  mInGesture = mInGesture && !justFinished;
 
   return performUpdate;
 }

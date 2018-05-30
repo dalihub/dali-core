@@ -1269,6 +1269,29 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   END_TEST;
 }
 
+int UtcDaliActorCalculateScreenExtents(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetPosition(Vector3(2.0f, 2.0f, 16.0f));
+  actor.SetSize(Vector3{ 1.0f, 1.0f, 1.0f });
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedExtent = Rect<>{ -0.5f, -0.5f, 1.0f, 1.0f };
+  auto actualExtent = DevelActor::CalculateScreenExtents( actor );
+  DALI_TEST_EQUALS( expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
+  DALI_TEST_EQUALS( expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
+  DALI_TEST_EQUALS( expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
+  DALI_TEST_EQUALS( expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
+
+  Stage::GetCurrent().Remove( actor );
+  END_TEST;
+}
+
 // SetPosition(float x, float y)
 int UtcDaliActorSetPosition01(void)
 {
