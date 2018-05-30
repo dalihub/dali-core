@@ -295,6 +295,8 @@ RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInf
 
   VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), refCountedImage->Ref() ) );
 
+  AddImage( refCountedImage );
+
   return refCountedImage;
 }
 
@@ -316,6 +318,8 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
   auto refCountedImageView = ImageView::New( *this, image, imageViewCreateInfo );
 
   VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, refCountedImageView->Ref()));
+
+  AddImageView( refCountedImageView );
 
   return refCountedImageView;
 }
@@ -347,12 +351,16 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
           .setLevelCount( image->GetMipLevelCount())
           .setLayerCount( image->GetLayerCount());
 
-  return CreateImageView( {},
-                          image,
-                          vk::ImageViewType::e2D,
-                          image->GetFormat(),
-                          componentsMapping,
-                          subresourceRange );
+  auto refCountedImageView = CreateImageView( {},
+                                              image,
+                                              vk::ImageViewType::e2D,
+                                              image->GetFormat(),
+                                              componentsMapping,
+                                              subresourceRange );
+
+  AddImageView( refCountedImageView );
+
+  return refCountedImageView;
 }
 
 RefCountedDescriptorPool Graphics::CreateDescriptorPool()
@@ -581,6 +589,12 @@ void Graphics::AddImage( Handle< Image > image )
   mResourceCache->AddImage( std::move( image ));
 }
 
+void Graphics::AddImageView( RefCountedImageView imageView )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->AddImageView( std::move( imageView ));
+}
+
 void Graphics::AddShader( Handle< Shader > shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
@@ -627,6 +641,12 @@ void Graphics::RemoveImage( Image& image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mResourceCache->RemoveImage( image );
+}
+
+void Graphics::RemoveImageView( ImageView& imageView )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->RemoveImageView( imageView );
 }
 
 void Graphics::RemoveShader( Shader& shader )
