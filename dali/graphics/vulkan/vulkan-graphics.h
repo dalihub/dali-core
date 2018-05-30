@@ -188,6 +188,8 @@ public: //Cache management methods
 
   void AddImage( RefCountedImage image );
 
+  void AddImageView( RefCountedImageView imageView );
+
   void AddShader( RefCountedShader shader );
 
   void AddCommandPool( RefCountedCommandPool pool );
@@ -203,6 +205,8 @@ public: //Cache management methods
   void RemoveBuffer( Buffer& buffer );
 
   void RemoveImage( Image& image );
+
+  void RemoveImageView( ImageView& imageView );
 
   void RemoveShader( Shader& shader );
 

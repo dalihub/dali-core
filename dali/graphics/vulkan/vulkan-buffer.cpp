@@ -82,11 +82,11 @@ void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
 
 bool Buffer::OnDestroy()
 {
-  mGraphics->RemoveBuffer(*this);
+  mGraphics->RemoveBuffer( *this );
 
-  mGraphics->DiscardResource([this]() {
+  mGraphics->DiscardResource( [this]() {
     mGraphics->GetDevice().destroyBuffer(mBuffer, mGraphics->GetAllocator());
-  });
+  } );
 
   return false;
 }
