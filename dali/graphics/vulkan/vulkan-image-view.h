@@ -82,7 +82,8 @@ public:
 
   operator vk::ImageView*();
 
-  //TODO: Use the graphics class to manage lifetime.
+  bool OnDestroy() override;
+//TODO: Use the graphics class to manage lifetime.
 
 private:
   ImageView( Graphics& graphics,
