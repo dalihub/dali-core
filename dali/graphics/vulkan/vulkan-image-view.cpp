@@ -84,6 +84,17 @@ ImageView::operator vk::ImageView*()
   return &mImageView;
 }
 
+bool ImageView::OnDestroy()
+{
+  mGraphics->RemoveImageView( *this );
+
+  mGraphics->DiscardResource( [this]() {
+    mGraphics->GetDevice().destroyImageView(mImageView, mGraphics->GetAllocator());
+  } );
+
+  return VkManaged::OnDestroy();
+}
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali

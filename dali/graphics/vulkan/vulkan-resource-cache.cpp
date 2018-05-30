@@ -19,6 +19,7 @@
 
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
@@ -44,6 +45,12 @@ ResourceCache& ResourceCache::AddBuffer( RefCountedBuffer buffer )
 ResourceCache& ResourceCache::AddImage( RefCountedImage image )
 {
   mImages.push_back( image );
+  return *this;
+}
+
+ResourceCache& ResourceCache::AddImageView( RefCountedImageView imageView )
+{
+  mImageViews.push_back( imageView );
   return *this;
 }
 
@@ -140,6 +147,15 @@ RefCountedImage ResourceCache::FindImage( vk::Image image )
   return iterator == mImages.end() ? RefCountedImage() : RefCountedImage(&**iterator);
 }
 
+RefCountedImageView ResourceCache::FindImageView( vk::ImageView imageView )
+{
+  auto iterator = std::find_if(mImageViews.begin(),
+                               mImageViews.end(),
+                               [&](const RefCountedImageView entry) { return entry->GetVkHandle() == imageView; });
+
+  return iterator == mImageViews.end() ? RefCountedImageView() : RefCountedImageView(&**iterator);
+}
+
 ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
 {
   if( !mBuffers.empty() )
@@ -166,6 +182,21 @@ ResourceCache& ResourceCache::RemoveImage( Image& image )
     std::iter_swap(found, std::prev(mImages.end()));
     mImages.back().Reset();
     mImages.pop_back();
+  }
+  return *this;
+}
+
+ResourceCache& ResourceCache::RemoveImageView( ImageView& imageView )
+{
+  if( !mImageViews.empty() )
+  {
+    auto found = std::find_if(mImageViews.begin(),
+                              mImageViews.end(),
+                              [&](const RefCountedImageView entry) { return &(*entry) == &imageView; });
+
+    std::iter_swap(found, std::prev(mImageViews.end()));
+    mImageViews.back().Reset();
+    mImageViews.pop_back();
   }
   return *this;
 }
