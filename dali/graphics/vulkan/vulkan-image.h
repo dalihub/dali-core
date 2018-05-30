@@ -26,8 +26,7 @@ namespace Graphics
 {
 namespace Vulkan
 {
-class ImageView;
-using InternalVkImage = vk::Image;
+
 class Image : public VkManaged
 {
 public:
@@ -47,7 +46,7 @@ public:
    * @param image
    * @return
    */
-  static RefCountedImage New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
+  static RefCountedImage NewFromExternal( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
 
   /**
    * Destructor
@@ -64,7 +63,7 @@ public:
    * Returns VkImageLayout associated with the image
    * @return
    */
-  vk::ImageLayout GetVkImageLayout() const;
+  vk::ImageLayout GetImageLayout() const;
 
   /**
    * Returns width in pixels
@@ -94,31 +93,42 @@ public:
    * Returns pixel format
    * @return
    */
-  vk::Format GetVkFormat() const;
+  vk::Format GetFormat() const;
 
   /**
    * returns image type ( VkImageType)
    * @return
    */
-  vk::ImageType GetVkImageType() const;
+  vk::ImageType GetImageType() const;
 
   /**
    * Returns used image tiling mode
    * @return
    */
-  vk::ImageTiling GetVkImageTiling() const;
+  vk::ImageTiling GetImageTiling() const;
 
   /**
    *
    * @return
    */
-  vk::ImageUsageFlags  GetVkImageUsageFlags() const;
+  vk::ImageUsageFlags  GetUsageFlags() const;
 
   /**
-   * Binds image memory
-   * @param handle
+   * Assigns the specified image memory to the image
+   * @warning This method does NOT bind the memory. Use Graphics::BindImageMemory instead
+   * @param memory The device memory to be assigned to the image
    */
-  void BindMemory( const RefCountedGpuMemoryBlock& handle );
+  void AssignMemory( RefCountedGpuMemoryBlock memory );
+
+  const Image& ConstRef();
+
+  Image& Ref();
+
+  operator vk::Image*();
+
+  bool OnDestroy() override;
+
+private:
 
   /**
    * Creates new VkImage with given specification, it doesn't
@@ -126,16 +136,16 @@ public:
    * @param graphics
    * @param createInfo
    */
-  Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage );
-
-  operator InternalVkImage() const
-  {
-    return GetVkHandle();
-  }
+  Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage = nullptr );
 
 private:
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  Graphics*           mGraphics;
+  vk::ImageCreateInfo mCreateInfo;
+  vk::Image           mImage;
+  vk::ImageLayout     mImageLayout;
+
+  RefCountedGpuMemoryBlock   mDeviceMemory;
+  bool mIsExternal;
 };
 
 } // namespace Vulkan

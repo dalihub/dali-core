@@ -82,6 +82,8 @@ public:
 
   operator vk::ImageView*();
 
+  //TODO: Use the graphics class to manage lifetime.
+
 private:
   ImageView( Graphics& graphics,
              RefCountedImage image,

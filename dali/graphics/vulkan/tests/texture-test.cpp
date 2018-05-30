@@ -68,22 +68,25 @@ struct Texture
   bool Initialise()
   {
     // create image
-    mImage = Image::New( mGraphics,
-                         vk::ImageCreateInfo{}
-                           .setFormat( mPixmap.pixelFormat )
-                           .setInitialLayout( vk::ImageLayout::ePreinitialized )
-                           .setSamples( vk::SampleCountFlagBits::e1 )
-                           .setSharingMode( vk::SharingMode::eExclusive )
-                           .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
-                           .setExtent( {mPixmap.width, mPixmap.height, 1} )
-                           .setArrayLayers( 1 )
-                           .setImageType( vk::ImageType::e2D )
-                           .setTiling( vk::ImageTiling::eOptimal )
-                           .setMipLevels( 1 ) );
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+            .setFormat( mPixmap.pixelFormat )
+            .setInitialLayout( vk::ImageLayout::ePreinitialized )
+            .setSamples( vk::SampleCountFlagBits::e1 )
+            .setSharingMode( vk::SharingMode::eExclusive )
+            .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
+            .setExtent( {mPixmap.width, mPixmap.height, 1} )
+            .setArrayLayers( 1 )
+            .setImageType( vk::ImageType::e2D )
+            .setTiling( vk::ImageTiling::eOptimal )
+            .setMipLevels( 1 );
 
-    // allocate memory and bind to the image
-    auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
-    mImage->BindMemory( allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ) );
+    mImage = mGraphics.CreateImage( imageCreateInfo );
+
+    auto& allocator = mGraphics
+            .GetDeviceMemoryManager()
+            .GetDefaultAllocator();
+
+    mGraphics.BindImageMemory( mImage, allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ), 0 );
 
     // create transient buffer to copy data
     auto size = mPixmap.data.size()*sizeof(mPixmap.data[0]);
