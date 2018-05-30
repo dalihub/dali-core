@@ -54,6 +54,13 @@ public:
   ResourceCache& AddImage( RefCountedImage image );
 
   /**
+   * Adds the provided image view object to the image view cache
+   * @param imageView The image view object to be added to the cache
+   * @return A reference to the ResourceCache
+   */
+  ResourceCache& AddImageView( RefCountedImageView imageView );
+
+  /**
    * Adds the provided shader object to the pipeline cache
    * @param shader The shader object to be added to the cache
    * @return A reference to the ResourceCache
@@ -104,35 +111,42 @@ public:
   RefCountedImage FindImage( vk::Image image);
 
   /**
-   * Finds the shader module using the specified Vulkan handle in the cache
+   * Finds the image view object using the specified Vulkan handle
+   * @param imageView The Vulkan handle of the image view object to be found
+   * @return A handle to the ImageView object if found. An empty Handle otherwise
+   */
+  RefCountedImageView FindImageView( vk::ImageView imageView );
+
+  /**
+   * Finds the shader module using the specified Vulkan handle
    * @param shaderModule The Vulkan handle of the shader module to be found
    * @return A Handle to the Shader module if found. An empty Handle otherwise
    */
   RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
   /**
-   * Finds the CommandPool object using the specified Vulkan handle in the cache
+   * Finds the CommandPool object using the specified Vulkan handle
    * @param commandPool The Vulkan handle of the CommandPool object to be found
    * @return A Handle to the CommandPool object if found. An empty Handle otherwise
    */
   RefCountedCommandPool FindCommandPool( vk::CommandPool commandPool );
 
   /**
-   * Finds the DescriptorPool object using the specified Vulkan handle in the cache
+   * Finds the DescriptorPool object using the specified Vulkan handle
    * @param descriptorPool The Vulkan handle of the DescriptorPool object to be found
    * @return A Handle to the DescriptorPool object if found. An empty Handle otherwise
    */
   RefCountedDescriptorPool FindDescriptorPool( vk::DescriptorPool descriptorPool );
 
   /**
-   * Finds the Framebuffer object using the specified Vulkan handle in the cache
+   * Finds the Framebuffer object using the specified Vulkan handle
    * @param framebuffer The Vulkan handle of the Framebuffer object to be found
    * @return A Handle to the Framebuffer object if found. An empty Handle otherwise
    */
   RefCountedFramebuffer FindFramebuffer( vk::Framebuffer framebuffer );
 
   /**
-   * Finds the Sampler object using the specified Vulkan handle in the cache.
+   * Finds the Sampler object using the specified Vulkan handle
    * @param sampler The Vulkan handle of the Sampler object to be found
    * @return A Handle to the Sampler object if found. An empty Handle otherwise
    */
@@ -151,6 +165,13 @@ public:
    * @return A reference to the ResourceCache
    */
   ResourceCache& RemoveImage( Image& image );
+
+  /**
+   * Removes the specified ImageView from the cache
+   * @param imageView The ImageView to be removed
+   * @return A reference to the ResourceCache
+   */
+  ResourceCache& RemoveImageView( ImageView& imageView );
 
   /**
    * Removes the specified Shader from the cache
@@ -206,7 +227,7 @@ public:
 private:
   std::vector< RefCountedBuffer >         mBuffers;
   std::vector< RefCountedImage >          mImages;
-  //TODO: add storage for ImageViews
+  std::vector< RefCountedImageView >      mImageViews;
   std::vector< RefCountedShader >         mShaders;
   std::vector< RefCountedCommandPool >    mCommandPools;
   std::vector< RefCountedDescriptorPool > mDescriptorPools;
