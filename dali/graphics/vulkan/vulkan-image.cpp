@@ -25,143 +25,110 @@ namespace Graphics
 {
 namespace Vulkan
 {
-struct Image::Impl
-{
-  Impl( Image& owner, Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage = nullptr )
-  : mOwner( owner ),
-    mGraphics( graphics ),
-    mVkImage( externalImage ),
-    mCreateInfo( std::move( createInfo ) ),
-    mIsExternal( static_cast<bool>( externalImage ) )
-  {
-    mVkImageLayout = mCreateInfo.initialLayout;
-  }
-
-  ~Impl()
-  {
-    if( !mIsExternal )
-    {
-      // destroy
-    }
-  }
-
-  bool Initialise()
-  {
-    if( !mIsExternal )
-    {
-      mVkImage = VkAssert( mGraphics.GetDevice().createImage( mCreateInfo, mGraphics.GetAllocator() ) );
-      if( !mVkImage )
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  void BindMemory( const RefCountedGpuMemoryBlock& handle )
-  {
-    mGraphics.GetDevice().bindImageMemory( mVkImage, *handle, 0 );
-    mDeviceMemory = handle;
-  }
-
-  Image&              mOwner;
-  Graphics&           mGraphics;
-  vk::Image           mVkImage;
-  vk::ImageLayout     mVkImageLayout;
-  vk::ImageCreateInfo mCreateInfo;
-
-  RefCountedGpuMemoryBlock   mDeviceMemory;
-  bool mIsExternal;
-};
 
 Image::~Image() = default;
 
 RefCountedImage Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo )
 {
-  RefCountedImage retval( new Image( graphics, createInfo, nullptr ) );
-  if( !retval->mImpl->Initialise() )
-  {
-    retval.Reset();
-  }
-  else
-  {
-    graphics.AddImage( retval );
-  }
-  return retval;
+  return RefCountedImage( new Image( graphics, createInfo, nullptr ) );
 }
 
-RefCountedImage Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage )
+RefCountedImage Image::NewFromExternal( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage )
 {
-  RefCountedImage retval( new Image( graphics, createInfo, externalImage ) );
-  if( !retval->mImpl->Initialise() )
-  {
-    retval.Reset();
-  }
-  else
-  {
-    graphics.AddImage( retval );
-  }
-  return retval;
+  return RefCountedImage( new Image( graphics, createInfo, externalImage ) );
 }
 
 Image::Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage )
+        : mGraphics(&graphics),
+          mCreateInfo(createInfo),
+          mImage(externalImage),
+          mImageLayout(mCreateInfo.initialLayout),
+          mIsExternal( static_cast<bool>(externalImage))
 {
-  mImpl = MakeUnique<Impl>( *this, graphics, createInfo, externalImage );
 }
 
 vk::Image Image::GetVkHandle() const
 {
-  return mImpl->mVkImage;
+  return mImage;
 }
 
-vk::ImageLayout Image::GetVkImageLayout() const
+vk::ImageLayout Image::GetImageLayout() const
 {
-  return mImpl->mVkImageLayout;
+  return mImageLayout;
 }
 
 uint32_t Image::GetWidth() const
 {
-  return mImpl->mCreateInfo.extent.width;
+  return mCreateInfo.extent.width;
 }
 
 uint32_t Image::GetHeight() const
 {
-  return mImpl->mCreateInfo.extent.height;
+  return mCreateInfo.extent.height;
 }
 
 uint32_t Image::GetLayerCount() const
 {
-  return mImpl->mCreateInfo.arrayLayers;
+  return mCreateInfo.arrayLayers;
 }
 
 uint32_t Image::GetMipLevelCount() const
 {
-  return mImpl->mCreateInfo.mipLevels;
+  return mCreateInfo.mipLevels;
 }
 
-vk::Format Image::GetVkFormat() const
+vk::Format Image::GetFormat() const
 {
-  return mImpl->mCreateInfo.format;
+  return mCreateInfo.format;
 }
 
-vk::ImageType Image::GetVkImageType() const
+vk::ImageType Image::GetImageType() const
 {
-  return mImpl->mCreateInfo.imageType;
+  return mCreateInfo.imageType;
 }
 
-vk::ImageTiling Image::GetVkImageTiling() const
+vk::ImageTiling Image::GetImageTiling() const
 {
-  return mImpl->mCreateInfo.tiling;
+  return mCreateInfo.tiling;
 }
 
-void Image::BindMemory( const RefCountedGpuMemoryBlock& handle )
+void Image::AssignMemory( RefCountedGpuMemoryBlock memory )
 {
-  mImpl->BindMemory( handle );
+  mDeviceMemory = memory;
 }
 
-vk::ImageUsageFlags Image::GetVkImageUsageFlags() const
+const Image& Image::ConstRef()
 {
-  return mImpl->mCreateInfo.usage;
+  return *this;
+}
+
+Image& Image::Ref()
+{
+  return *this;
+}
+
+Image::operator vk::Image*()
+{
+  return &mImage;
+}
+
+vk::ImageUsageFlags Image::GetUsageFlags() const
+{
+  return mCreateInfo.usage;
+}
+
+bool Image::OnDestroy()
+{
+  if( !mIsExternal )
+  {
+    mGraphics->RemoveImage(*this);
+
+    mGraphics->DiscardResource([this]() {
+      mGraphics->GetDevice().destroyImage(mImage, mGraphics->GetAllocator());
+    });
+  }
+
+  return false;
 }
 
 } // namespace Vulkan
