@@ -35,6 +35,7 @@
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <dali/graphics/vulkan/vulkan-resource-cache.h>
 #include <dali/graphics/vulkan/vulkan-fence.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -288,9 +289,13 @@ RefCountedFramebuffer Graphics::CreateFramebuffer()
   NotImplemented()
 }
 
-RefCountedImage Graphics::CreateImage()
+RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
 {
-  NotImplemented()
+  auto refCountedImage = Image::New(*this, imageCreateInfo);
+
+  VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), refCountedImage->Ref() ) );
+
+  return refCountedImage;
 }
 
 RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& flags,
@@ -320,16 +325,16 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
   vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG,
                                              vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA };
   vk::ImageAspectFlags aspectFlags{};
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
+  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
   {
     aspectFlags |= vk::ImageAspectFlagBits::eColor;
     //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   }
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
   {
     aspectFlags |= ( vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil );
   }
-  if( image->GetVkImageUsageFlags() & vk::ImageUsageFlagBits::eSampled )
+  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eSampled )
   {
     aspectFlags |= ( vk::ImageAspectFlagBits::eColor );
     //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eR,vk::ComponentSwizzle::eA };
@@ -345,7 +350,7 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
   return CreateImageView( {},
                           image,
                           vk::ImageViewType::e2D,
-                          image->GetVkFormat(),
+                          image->GetFormat(),
                           componentsMapping,
                           subresourceRange );
 }
@@ -422,6 +427,13 @@ vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
                   []( RefCountedFence entry ) { return entry->GetVkHandle(); } );
 
   return mDevice.resetFences( vkFenceHandles );
+}
+
+vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset )
+{
+  auto result = VkAssert( mDevice.bindImageMemory( image->GetVkHandle(), *memory, offset ) );
+  image->AssignMemory(memory);
+  return result;
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -611,6 +623,12 @@ void Graphics::RemoveBuffer( Buffer& buffer )
   mResourceCache->RemoveBuffer( buffer );
 }
 
+void Graphics::RemoveImage( Image& image )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->RemoveImage( image );
+}
+
 void Graphics::RemoveShader( Shader& shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
@@ -763,12 +781,8 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
     {
       transferFamily = queueFamilyIndex;
     }
-    if( mPhysicalDevice.getSurfaceSupportKHR( queueFamilyIndex, mSurfaceFBIDMap.begin()
-                                                                               ->second
-                                                                               .surface
-                                                                               ->GetSurfaceKHR())
-                       .value &&
-        presentFamily == -1u )
+    if( mPhysicalDevice.getSurfaceSupportKHR( queueFamilyIndex, mSurfaceFBIDMap.begin()->second.
+            surface->GetSurfaceKHR()).value && presentFamily == -1u )
     {
       presentFamily = queueFamilyIndex;
     }

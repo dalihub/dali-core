@@ -206,13 +206,14 @@ public:
 private:
   std::vector< RefCountedBuffer >         mBuffers;
   std::vector< RefCountedImage >          mImages;
+  //TODO: add storage for ImageViews
   std::vector< RefCountedShader >         mShaders;
   std::vector< RefCountedCommandPool >    mCommandPools;
   std::vector< RefCountedDescriptorPool > mDescriptorPools;
   std::vector< RefCountedFramebuffer >    mFramebuffers;
   std::vector< RefCountedSampler >        mSamplers;
 
-  std::vector< std::function<void()> >    mDiscardQueue;
+  std::vector< std::function< void() > >    mDiscardQueue;
 };
 
 } //namespace Vulkan

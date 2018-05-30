@@ -345,14 +345,14 @@ struct Swapchain::Impl
             .setInitialLayout( vk::ImageLayout::eUndefined )
             .setSamples( vk::SampleCountFlagBits::e1 );
 
-    // create depth stencil image
-    auto dsRefCountedImage = Image::New( mGraphics, imageCreateInfo);
+    auto dsRefCountedImage = mGraphics.CreateImage( imageCreateInfo );
 
-    auto memory = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate(
-            dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+    auto memory = mGraphics
+            .GetDeviceMemoryManager()
+            .GetDefaultAllocator()
+            .Allocate( dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-    //TODO: use the graphics class to bind memory. Maybe...
-    dsRefCountedImage->BindMemory( memory );
+    mGraphics.BindImageMemory( dsRefCountedImage, memory, 0 );
 
     // create imageview to be used within framebuffer
     auto dsImageViewRef = mGraphics.CreateImageView(dsRefCountedImage);
@@ -383,12 +383,12 @@ struct Swapchain::Impl
     // Create external Image reference
     // Note that despite we don't create VkImage, we still fill the createinfo structure
     // as this data will be used later
-    auto refCountedImage = Image::New( mGraphics, imageCreateInfo, image );
+    auto refCountedImage = Image::NewFromExternal( mGraphics, imageCreateInfo, image );
 
     // Create basic imageview ( all mipmaps, all layers )
-    RefCountedImageView iv = mGraphics.CreateImageView(refCountedImage);
+    auto refCountedImageView = mGraphics.CreateImageView(refCountedImage);
 
-    fbRef->SetAttachment( iv, Framebuffer::AttachmentType::COLOR, 0u );
+    fbRef->SetAttachment( refCountedImageView, Framebuffer::AttachmentType::COLOR, 0u );
 
     return fbRef;
   }
@@ -502,7 +502,7 @@ struct Swapchain::Impl
 
     for( auto&& imageView : attachments )
     {
-      barriers.emplace_back( barrier.setImage( *imageView->GetImage() ) );
+      barriers.emplace_back( barrier.setImage( imageView->GetImage()->GetVkHandle() ) );
     }
 
     cmdBuf->PipelineBarrier( vk::PipelineStageFlagBits::eBottomOfPipe,

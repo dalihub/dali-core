@@ -154,27 +154,33 @@ struct Texture::Impl
     return true;
   }
 
-  // creates image with preallocated memory and default sampler, no data
+  // creates image with pre-allocated memory and default sampler, no data
   // uploaded at this point
   bool Initialise()
   {
-    //TODO: Create image using the Graphics class
     // create image
-    mImage = Image::New( mGraphics,
-                         vk::ImageCreateInfo{}
-                           .setFormat( mPixmap.pixelFormat )
-                           .setInitialLayout( vk::ImageLayout::ePreinitialized )
-                           .setSamples( vk::SampleCountFlagBits::e1 )
-                           .setSharingMode( vk::SharingMode::eExclusive )
-                           .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
-                           .setExtent( {mPixmap.width, mPixmap.height, 1} )
-                           .setArrayLayers( 1 )
-                           .setImageType( vk::ImageType::e2D )
-                           .setTiling( vk::ImageTiling::eOptimal )
-                           .setMipLevels( 1 ) );
-    // allocate memory and bind to the image
-    auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
-    mImage->BindMemory( allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ) );
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+            .setFormat( mPixmap.pixelFormat )
+            .setInitialLayout( vk::ImageLayout::ePreinitialized )
+            .setSamples( vk::SampleCountFlagBits::e1 )
+            .setSharingMode( vk::SharingMode::eExclusive )
+            .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
+            .setExtent( {mPixmap.width, mPixmap.height, 1} )
+            .setArrayLayers( 1 )
+            .setImageType( vk::ImageType::e2D )
+            .setTiling( vk::ImageTiling::eOptimal )
+            .setMipLevels( 1 );
+
+    // Create the image handle
+    mImage = mGraphics.CreateImage( imageCreateInfo );
+
+    // allocate memory for the image
+    auto memory = mGraphics.GetDeviceMemoryManager()
+            .GetDefaultAllocator()
+            .Allocate(mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
+    // bind the allocated memory to the image
+    mGraphics.BindImageMemory( mImage, memory, 0 );
 
     // create default image view
     mImageView = mGraphics.CreateImageView(mImage);
