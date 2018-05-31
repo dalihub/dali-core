@@ -96,8 +96,6 @@ private:
   std::unique_ptr<Impl> mImpl;
 };
 
-using RefCountedShader = Handle<Shader>;
-
 } // Namespace Vulkan
 
 } // Namespace Graphics
