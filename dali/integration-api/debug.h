@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_DEBUG_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ enum DebugPriority
  * @param level debug level
  * @param format string format
  */
-DALI_IMPORT_API void LogMessage(enum DebugPriority level,const char *format, ...);
+DALI_CORE_API void LogMessage(enum DebugPriority level,const char *format, ...);
 
 /**
  * typedef for the logging function.
@@ -94,13 +94,13 @@ typedef void (*LogFunction)(DebugPriority priority, std::string& message);
  * @param logFunction the log function to install
  * @param logOpts the log options to save in thread
  */
-DALI_IMPORT_API void InstallLogFunction(const LogFunction& logFunction);
+DALI_CORE_API void InstallLogFunction(const LogFunction& logFunction);
 
 /**
  * A log function has to be uninstalled for every thread that wants to use logging.
  * The log function can be different for each thread.
  */
-DALI_IMPORT_API void UninstallLogFunction();
+DALI_CORE_API void UninstallLogFunction();
 
 /********************************************************************************
  *                            Error/Warning  macros.                            *
@@ -129,6 +129,11 @@ DALI_IMPORT_API void UninstallLogFunction();
  * Provides unfiltered logging for render information
  */
 #define DALI_LOG_RENDER_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
+
+/**
+ * Provides unfiltered logging for release
+ */
+#define DALI_LOG_RELEASE_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
 #ifdef DEBUG_ENABLED
 
@@ -173,7 +178,7 @@ enum LogLevel
  * It provides the ability to turn tracing on or off.
  *
  */
-class DALI_IMPORT_API Filter
+class DALI_CORE_API Filter
 {
 public:
   typedef std::list<Filter*>           FilterList;
@@ -325,7 +330,7 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-class DALI_IMPORT_API TraceObj
+class DALI_CORE_API TraceObj
 {
 public:
   TraceObj(Filter* filter, const char* fmt, ...);
@@ -417,94 +422,6 @@ public: \
 #define DALI_LOG_GET_OBJECT_STRING(object)
 #define DALI_LOG_GET_OBJECT_C_STR(object) ""
 #define DALI_LOG_OBJECT(filter, object)
-
-#endif
-
-/********************************************************************************
- *                                Helper writers                                *
- ********************************************************************************/
-
-/**
- * Helper method to translate a color to a string.
- * @param[in] color - the color to translate
- * @return string - the text representation of the color.
- */
-DALI_IMPORT_API std::string ColorToString(const Vector4& color);
-
-/**
- * Helper method to translate a vector4 to a string.
- * @param[in] v - the vector
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the vector.
- */
-DALI_IMPORT_API std::string Vector4ToString(const Vector4& v, size_t precision=3, size_t indent=0);
-
-/**
- * Helper method to translate a vector4 to a string.
- * @param[in] v - the vector
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the vector.
- */
-DALI_IMPORT_API std::string Vector3ToString(const Vector3& v, size_t precision=3, size_t indent=0);
-
-/**
- * Helper method to translate a quaternion to a string.
- * @param[in] q the quaternion
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the quaternion.
- */
-DALI_IMPORT_API std::string QuaternionToString(const Quaternion& q, size_t precision=3, size_t indent=0);
-
-/**
- * Helper method to translate a 3x3 matrix to a string.
- * @param[in] m - the matrix
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the vector.
- */
-DALI_IMPORT_API std::string Matrix3ToString(const Matrix3& m, size_t precision=3, size_t indent=0);
-
-/**
- * Helper method to translate a 4x4 matrix to a string.
- * @param[in] m - the matrix
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the vector.
- */
-DALI_IMPORT_API std::string MatrixToString(const Matrix& m, size_t precision=3, size_t indent=0);
-
-#ifdef DEBUG_ENABLED
-
-
-/**
- * Filtered write of a matrix
- */
-#define DALI_LOG_MATRIX(filter, matrix)  DALI_LOG_INFO(filter, Debug::General, MatrixToString(matrix))
-
-/**
- * Filtered write of a vector
- */
-#define DALI_LOG_VECTOR4(filter, vector) DALI_LOG_INFO(filter, Debug::General, Vector4ToString(vector))
-
-/**
- * Filtered write of a vector
- */
-#define DALI_LOG_VECTOR3(filter, vector) DALI_LOG_INFO(filter, Debug::General, Vector3ToString(vector))
-
-/**
- * Filtered write of a color
- */
-#define DALI_LOG_COLOR(filter, color)    DALI_LOG_INFO(filter, Debug::General, ColorToString(color))
-
-#else
-
-#define DALI_LOG_MATRIX(filter, matrix)
-#define DALI_LOG_VECTOR4(filter,vector)
-#define DALI_LOG_VECTOR3(filter,vector)
-#define DALI_LOG_COLOR(filter, color)
 
 #endif
 

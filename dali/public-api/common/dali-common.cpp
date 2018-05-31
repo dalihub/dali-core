@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ std::string Demangle(const char* symbol)
   return result;
 }
 
-DALI_EXPORT_API DaliException::DaliException( const char* location, const char* condition )
+DALI_CORE_API DaliException::DaliException( const char* location, const char* condition )
 : location( location ), condition( condition )
 {
   // Note, if a memory error has occured, then the backtrace won't work - backtrace_symbols relies on
@@ -124,7 +124,7 @@ DALI_EXPORT_API DaliException::DaliException( const char* location, const char* 
 
 #else // BACKTRACE_ENABLED
 
-DALI_EXPORT_API DaliException::DaliException( const char* location, const char* condition )
+DALI_CORE_API DaliException::DaliException( const char* location, const char* condition )
 : location( location ), condition( condition )
 {
 #if defined(DEBUG_ENABLED)
@@ -137,7 +137,7 @@ DALI_EXPORT_API DaliException::DaliException( const char* location, const char* 
 
 #endif // BACKTRACE_ENABLED
 
-DALI_EXPORT_API void DaliAssertMessage( const char* location, const char* condition )
+DALI_CORE_API void DaliAssertMessage( const char* location, const char* condition )
 {
 #if defined(DEBUG_ENABLED)
   DALI_LOG_ERROR_NOFN( "Assert (%s) failed in: %s\n", condition, location );

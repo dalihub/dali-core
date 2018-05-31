@@ -19,9 +19,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/view-mode.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/integration-api/resource-policies.h>
+#include <dali/public-api/common/view-mode.h>
+
+#include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -35,6 +38,7 @@ namespace Graphics
 {
 class Graphics;
 }
+class Processor;
 class RenderController;
 class PlatformAbstraction;
 class GestureManager;
@@ -80,7 +84,9 @@ public:
         Integration::Graphics::Graphics& graphics,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
-        bool renderToFboEnabled );
+        Integration::RenderToFrameBuffer renderToFboEnabled,
+        Integration::DepthBufferAvailable depthBufferAvailable,
+        Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Destructor
@@ -115,7 +121,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void Render( Integration::RenderStatus& status );
+  void Render( Integration::RenderStatus& status, bool forceClear );
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()
@@ -164,7 +170,24 @@ public:
    */
   float GetStereoBase() const;
 
-private:  // for use by ThreadLocalStorage
+
+  /**
+   * @copydoc Dali::Integration::Core::RegisterProcessor
+   */
+  void RegisterProcessor( Dali::Integration::Processor& processor );
+
+  /**
+   * @copydoc Dali::Integration::Core::UnregisterProcessor
+   */
+  void UnregisterProcessor( Dali::Integration::Processor& processor );
+
+private:
+  /**
+   * Run each registered processor
+   */
+  void RunProcessors();
+
+  // for use by ThreadLocalStorage
 
   /**
    * Returns the current stage.
@@ -240,6 +263,7 @@ private:
   OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
+  Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
 
   Integration::Graphics::Graphics& mGraphics; ///< Graphics object
 

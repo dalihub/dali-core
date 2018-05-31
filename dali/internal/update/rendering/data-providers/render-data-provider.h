@@ -25,6 +25,7 @@
 #include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
+#include <dali/internal/update/common/animatable-property.h>
 
 namespace Dali
 {
@@ -57,7 +58,7 @@ public:
    * The RendererAttachment that creates this object will initialize the members
    * directly.
    */
-  RenderDataProvider();
+  RenderDataProvider( AnimatableProperty< float >& opacity );
 
   /**
    * Destructor
@@ -101,12 +102,19 @@ public:
    */
   std::vector<SceneGraph::Texture*>& GetTextures();
 
+  /**
+   * Get the opacity
+   * @return The opacity
+   */
+  float GetOpacity( BufferIndex bufferIndex );
+
 private:
 
-  const UniformMapDataProvider*       mUniformMapDataProvider;
-  Shader*                             mShader;
+  const UniformMapDataProvider*    mUniformMapDataProvider;
+  Shader*                          mShader;
   std::vector<SceneGraph::Texture*>   mTextures;
-  Samplers                            mSamplers;
+  Samplers                         mSamplers;
+  AnimatableProperty< float >&     mOpacity;
 
   // Give Renderer access to our private data to reduce copying vectors on construction.
   friend class Renderer;

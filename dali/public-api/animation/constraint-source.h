@@ -2,7 +2,7 @@
 #define __DALI_CONSTRAINT_SOURCE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ enum SourceType
  * @brief Identifies a property from an object.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API LocalSource
+struct DALI_CORE_API LocalSource
 {
   /**
    * @brief Creates a local constraint source.
@@ -64,7 +64,7 @@ struct DALI_IMPORT_API LocalSource
  * @brief Identifies a property from the parent of an object.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API ParentSource
+struct DALI_CORE_API ParentSource
 {
   /**
    * @brief Creates a parent constraint source.
@@ -81,7 +81,7 @@ struct DALI_IMPORT_API ParentSource
  * @brief Identifies a property from any object.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API Source
+struct DALI_CORE_API Source
 {
   /**
    * @brief Creates a constraint source.
@@ -101,7 +101,7 @@ struct DALI_IMPORT_API Source
  * @brief The source of an input property for a constraint.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API ConstraintSource
+struct DALI_CORE_API ConstraintSource
 {
   /**
    * @brief Creates a constraint source.

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_INFO_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,6 +268,12 @@ public:
   Property::Type GetChildPropertyType( Property::Index index ) const;
 
   /**
+   * Retrive the child indices into the given container.
+   * @param[in,out] indices The container to put the child indices into
+   */
+  void GetChildPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * Retrieve the default value of the property at the given index.
    * @param[in] index The property index.
    * @return The default property value at that index.
@@ -377,6 +383,17 @@ private:
   typedef std::vector< ConnectionPair > ConnectorContainer;
   typedef std::vector< RegisteredPropertyPair > RegisteredPropertyContainer;
   typedef std::vector< PropertyDefaultValuePair > PropertyDefaultValueContainer;
+
+
+  /**
+   * Append properties from registeredProperties onto indices.
+   * @param[in,out] indices The vector to append indices onto
+   * @param[in] registeredProperties The container to retrive indices from
+   */
+  void AppendProperties( Dali::Property::IndexContainer& indices,
+                         const TypeInfo::RegisteredPropertyContainer& registeredProperties ) const;
+
+private:
 
   std::string mTypeName;
   std::string mBaseTypeName;

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,12 +162,6 @@ public:
     return mCustomProperties;
   }
 
-  /**
-   * Reset animatable properties to the corresponding base values.
-   * @param[in] currentBufferIndex The buffer to reset.
-   * @post The ResetDefaultProperties method is called, during which derived classes can reset default properties.
-   */
-  void ResetToBaseValues( BufferIndex updateBufferIndex );
 
   // Constraints
 
@@ -229,12 +223,6 @@ private:
 
   // Undefined
   PropertyOwner& operator=(const PropertyOwner& rhs);
-
-  /**
-   * Called after ResetToBaseValues; derived classes should reset any default properties.
-   * @param[in] currentBufferIndex The buffer to reset.
-   */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex ) {}
 
 protected:
 

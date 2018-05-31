@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,25 @@ typedef PropertyOwnerContainer::Iterator PropertyOwnerIter;
 class ConstraintBase : public PropertyOwner::Observer
 {
 public:
+  /**
+   * Observer to determine when the constraint is no longer present
+   */
+  class LifecycleObserver
+  {
+  public:
+    /**
+     * Called shortly before the constraint is destroyed.
+     */
+    virtual void ObjectDestroyed() = 0;
+
+  protected:
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~LifecycleObserver() = default;
+  };
+
+public:
 
   typedef Dali::Constraint::RemoveAction RemoveAction;
 
@@ -65,6 +84,22 @@ public:
    * Virtual destructor.
    */
   virtual ~ConstraintBase();
+
+  /**
+   * Property resetter observes the lifecycle of this object
+   */
+  void AddLifecycleObserver( LifecycleObserver& observer )
+  {
+    mLifecycleObserver = &observer;
+  }
+
+  /**
+   * Property resetter observers the lifecycle of this object
+   */
+  void RemoveLifecycleObserver( LifecycleObserver& observer )
+  {
+    mLifecycleObserver = nullptr;
+  }
 
   /**
    * Initialize the constraint.
@@ -190,11 +225,6 @@ private:
   }
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
-   */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
-
-  /**
    * Notify the derived class to disconnect from property owners
    */
   virtual void OnDisconnect() = 0;
@@ -209,6 +239,7 @@ protected:
 private:
 
   PropertyOwnerContainer mObservedOwners; ///< A set of pointers to each observed object. Not owned.
+  LifecycleObserver* mLifecycleObserver; ///< Resetter observers this object
 
 #ifdef DEBUG_ENABLED
   static unsigned int mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.

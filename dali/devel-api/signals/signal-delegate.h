@@ -2,7 +2,7 @@
 #define __DALI_SIGNAL_DELEGATE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Dali
  * EG: The SignalDelegate can be created internally and exposed to the application-developer.
  * They can then call the connect function to transparently bind to their callback.
  */
-class DALI_IMPORT_API SignalDelegate
+class DALI_CORE_API SignalDelegate
 {
 public:
 

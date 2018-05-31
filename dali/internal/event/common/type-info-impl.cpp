@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,14 +317,34 @@ void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
     baseImpl.GetPropertyIndices( indices );
   }
 
-  if ( ! mRegisteredProperties.empty() )
-  {
-    indices.Reserve( indices.Size() + mRegisteredProperties.size() );
+  AppendProperties( indices, mRegisteredProperties );
+}
 
-    const RegisteredPropertyContainer::const_iterator endIter = mRegisteredProperties.end();
-    for ( RegisteredPropertyContainer::const_iterator iter = mRegisteredProperties.begin(); iter != endIter; ++iter )
+void TypeInfo::GetChildPropertyIndices( Property::IndexContainer& indices ) const
+{
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    const TypeInfo& baseImpl( GetImplementation( base ) );
+    baseImpl.GetChildPropertyIndices( indices );
+  }
+
+  AppendProperties( indices, mRegisteredChildProperties );
+}
+
+/**
+ * Append the indices in RegisteredProperties to the given index container.
+ */
+void TypeInfo::AppendProperties( Dali::Property::IndexContainer& indices,
+                                 const TypeInfo::RegisteredPropertyContainer& registeredProperties ) const
+{
+  if ( ! registeredProperties.empty() )
+  {
+    indices.Reserve( indices.Size() + registeredProperties.size() );
+
+    for( auto&& elem : registeredProperties )
     {
-      indices.PushBack( iter->first );
+      indices.PushBack( elem.first );
     }
   }
 }

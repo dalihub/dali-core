@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_PROFILING_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,26 +42,26 @@ enum ProfilingType
  * @pre Should be called after Core creation.
  * @param type The type of profiling information to output.
  */
-DALI_IMPORT_API void EnableProfiling( ProfilingType type );
+DALI_CORE_API void EnableProfiling( ProfilingType type );
 
 
 namespace Profiling
 {
 
-DALI_IMPORT_API extern const int ANIMATION_MEMORY_SIZE;    ///< Total size of animation and associated internal objects
-DALI_IMPORT_API extern const int CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
-DALI_IMPORT_API extern const int ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
-DALI_IMPORT_API extern const int CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
-DALI_IMPORT_API extern const int IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
-DALI_IMPORT_API extern const int LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
-DALI_IMPORT_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
+DALI_CORE_API extern const int ANIMATION_MEMORY_SIZE;    ///< Total size of animation and associated internal objects
+DALI_CORE_API extern const int CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
+DALI_CORE_API extern const int ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
+DALI_CORE_API extern const int CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
+DALI_CORE_API extern const int IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
+DALI_CORE_API extern const int LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
+DALI_CORE_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
 
-DALI_IMPORT_API extern const int RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
-DALI_IMPORT_API extern const int GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
-DALI_IMPORT_API extern const int PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
-DALI_IMPORT_API extern const int TEXTURE_SET_MEMORY_SIZE;     ///< Total size of TextureSet and associated internal objects
-DALI_IMPORT_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of Sampler and associated internal objects
-DALI_IMPORT_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of shader and associated internal objects
+DALI_CORE_API extern const int RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
+DALI_CORE_API extern const int GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
+DALI_CORE_API extern const int PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
+DALI_CORE_API extern const int TEXTURE_SET_MEMORY_SIZE;     ///< Total size of TextureSet and associated internal objects
+DALI_CORE_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of Sampler and associated internal objects
+DALI_CORE_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of shader and associated internal objects
 } // namespace Profiling
 
 } // namespace Integration

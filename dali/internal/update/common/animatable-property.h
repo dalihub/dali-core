@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,10 @@ public:
     if( mBaseValue != value )
     {
       mBaseValue = value;
+      // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+      // has never been atomically safe.
       mValue[bufferIndex] = value;
+      mValue[1-bufferIndex] = value;
 
       OnBake();
     }
@@ -416,6 +419,7 @@ public:
   void Bake(BufferIndex bufferIndex, int value)
   {
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();
@@ -595,7 +599,10 @@ public:
    */
   void Bake(BufferIndex bufferIndex, float value)
   {
+    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+    // has never been atomically safe.
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();
@@ -824,7 +831,10 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Vector2& value)
   {
+    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+    // has never been atomically safe.
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = value;
 
     OnBake();
@@ -838,6 +848,7 @@ public:
   void BakeX(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].x = value;
+    mValue[1-bufferIndex].x = value;
     mBaseValue.x = value;
 
     OnBake();
@@ -851,6 +862,7 @@ public:
   void BakeY(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].y = value;
+    mValue[1-bufferIndex].y = value;
     mBaseValue.y = value;
 
     OnBake();
@@ -1117,6 +1129,7 @@ public:
   void Bake(BufferIndex bufferIndex, const Vector3& value)
   {
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = value;
 
     OnBake();
@@ -1130,6 +1143,7 @@ public:
   void BakeX(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].x = value;
+    mValue[1-bufferIndex].x = value;
     mBaseValue.x = value;
 
     OnBake();
@@ -1143,6 +1157,7 @@ public:
   void BakeY(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].y = value;
+    mValue[1-bufferIndex].y = value;
     mBaseValue.y = value;
 
     OnBake();
@@ -1156,6 +1171,7 @@ public:
   void BakeZ(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].z = value;
+    mValue[1-bufferIndex].z = value;
     mBaseValue.z = value;
 
     OnBake();
@@ -1464,6 +1480,7 @@ public:
   void Bake(BufferIndex bufferIndex, const Vector4& value)
   {
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();
@@ -1477,6 +1494,7 @@ public:
   void BakeX(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].x = value;
+    mValue[1-bufferIndex].x = value;
     mBaseValue.x = mValue[bufferIndex].x;
 
     OnBake();
@@ -1490,6 +1508,7 @@ public:
   void BakeY(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].y = value;
+    mValue[1-bufferIndex].y = value;
     mBaseValue.y = mValue[bufferIndex].y;
 
     OnBake();
@@ -1503,6 +1522,7 @@ public:
   void BakeZ(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].z = value;
+    mValue[1-bufferIndex].z = value;
     mBaseValue.z = mValue[bufferIndex].z;
 
     OnBake();
@@ -1516,6 +1536,7 @@ public:
   void BakeW(BufferIndex bufferIndex, float value)
   {
     mValue[bufferIndex].w = value;
+    mValue[1-bufferIndex].w = value;
     mBaseValue.w = mValue[bufferIndex].w;
 
     OnBake();
@@ -1743,7 +1764,10 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Quaternion& value)
   {
+    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+    // has never been atomically safe.
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = value;
 
     OnBake();
@@ -1901,7 +1925,10 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Matrix& value)
   {
+    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+    // has never been atomically safe.
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();
@@ -2059,7 +2086,10 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Matrix3& value)
   {
+    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+    // has never been atomically safe.
     mValue[bufferIndex] = value;
+    mValue[1-bufferIndex] = value;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();

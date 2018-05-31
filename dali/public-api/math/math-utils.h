@@ -2,7 +2,7 @@
 #define __DALI_MATH_UTILS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ inline float Round(float value, int pos)
  * @endcode
  *
  * The value x will be confined to this domain.
- * If x is below 2 e.g. 0, then it is wraped to 6.
+ * If x is below 2 e.g. 0, then it is wrapped to 6.
  * If x is above or equal to 8 e.g. 8.1 then it is
  * wrapped to 2.1.
  *

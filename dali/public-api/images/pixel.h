@@ -2,7 +2,7 @@
 #define __DALI_PIXEL_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ const Format LAST_VALID_PIXEL_FORMAT = RGB32F;
  * @param[in] pixelformat Pixel format
  * @return @c true if format has alpha, @c false otherwise
  */
-DALI_IMPORT_API bool HasAlpha(Format pixelformat);
+DALI_CORE_API bool HasAlpha(Format pixelformat);
 
 /**
  * @brief Returns The number of bytes per pixel for the specified pixel format.
@@ -144,7 +144,7 @@ DALI_IMPORT_API bool HasAlpha(Format pixelformat);
  * @param[in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
-DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
+DALI_CORE_API unsigned int GetBytesPerPixel(Format pixelFormat);
 
 /**
  * @brief Returns the offset of the byte containing the alpha value from the start of the pixel data
@@ -160,7 +160,7 @@ DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
  * @param[out] bitMask The bitmask of the byte to get the alpha value
  *
  */
-DALI_IMPORT_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask);
+DALI_CORE_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask);
 
 } //namespace Pixel
 

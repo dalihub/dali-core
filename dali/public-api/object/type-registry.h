@@ -2,7 +2,7 @@
 #define __DALI_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class TypeRegistry;
  *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeRegistry : public BaseHandle
+class DALI_CORE_API TypeRegistry : public BaseHandle
 {
 public:
   /**
@@ -185,7 +185,7 @@ public: // Not intended for application developers
  * @brief Registers a type from type info.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeRegistration
+class DALI_CORE_API TypeRegistration
 {
 public:
   /**
@@ -241,7 +241,7 @@ private:
  * @brief Registers a signal connector function to a registered type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SignalConnectorType
+class DALI_CORE_API SignalConnectorType
 {
 public:
   /**
@@ -259,7 +259,7 @@ public:
  * @brief Registers an action function.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TypeAction
+class DALI_CORE_API TypeAction
 {
 public:
   /**
@@ -277,7 +277,7 @@ public:
  * @brief Registers a property for the given type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API PropertyRegistration
+class DALI_CORE_API PropertyRegistration
 {
 public:
 
@@ -316,7 +316,7 @@ public:
  * @brief Registers an animatable property for the given type.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API AnimatablePropertyRegistration
+class DALI_CORE_API AnimatablePropertyRegistration
 {
 public:
 
@@ -357,7 +357,7 @@ public:
  * @brief Registers a component of animatable property for the given component index.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API AnimatablePropertyComponentRegistration
+class DALI_CORE_API AnimatablePropertyComponentRegistration
 {
 public:
 
@@ -385,7 +385,7 @@ public:
  * @brief Registers a child property for the given type.
  * @SINCE_1_1.35
  */
-class DALI_IMPORT_API ChildPropertyRegistration
+class DALI_CORE_API ChildPropertyRegistration
 {
 public:
 
@@ -401,6 +401,19 @@ public:
    * @pre "registered" must be registered with the TypeRegistry.
    */
   ChildPropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+
+  /**
+   * @brief This constructor registers an event-thread only child property (i.e. a property
+   * that the parent supports in its children) with the registered type.
+   *
+   * @SINCE_1_3.20
+   * @param[in] registered The name of the registered type
+   * @param[in] name The name of the property
+   * @param[in] index The property index. Must be a value between CHILD_PROPERTY_REGISTRATION_START_INDEX and CHILD_PROPERTY_REGISTRATION_MAX_INDEX inclusive
+   * @param[in] type The property value type
+   * @pre "registered" must be registered with the TypeRegistry.
+   */
+  ChildPropertyRegistration( const std::string& registered, const std::string& name, Property::Index index, Property::Type type );
 };
 
 

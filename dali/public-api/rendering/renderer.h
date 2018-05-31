@@ -2,7 +2,7 @@
 #define DALI_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,11 +171,11 @@ namespace RenderMode
  */
 enum Type
 {
-  NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2_5
-  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                      @SINCE_1_2_5
-  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                       @SINCE_1_2_5
-  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                @SINCE_1_2_5
-  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                    @SINCE_1_2_5
+  NONE,         ///< Do not write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_1_2_5
+  AUTO,         ///< Managed by the Actor Clipping API. This is the default.                                       @SINCE_1_2_5
+  COLOR,        ///< Ingore stencil properties.  Write to the color buffer.                                        @SINCE_1_2_5
+  STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.                                 @SINCE_1_2_5
+  COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.                                     @SINCE_1_2_5
 };
 
 } // namespace RenderMode
@@ -228,7 +228,7 @@ enum Type
  *
  * @SINCE_1_1.43
  */
-class DALI_IMPORT_API Renderer : public Handle
+class DALI_CORE_API Renderer : public Handle
 {
 public:
 

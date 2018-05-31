@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ class Animation;
  * | pause        | Pause()                  |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Animation : public BaseHandle
+class DALI_CORE_API Animation : public BaseHandle
 {
 public:
 
@@ -261,7 +261,7 @@ public:
    * @brief Enables looping for 'count' repeats.
    *
    * A zero is the same as SetLooping(true) i.e. repeat forever.
-   * If Play() Stop() or 'count' loops is reached, the loop counter will reset.
+   * This function resets the looping value and should not be used with SetLooping(bool).
    * Setting this parameter does not cause the animation to Play().
    *
    * @SINCE_1_1.20
@@ -635,7 +635,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] target The target object property to animate
    * @param[in] keyFrames The set of time/value pairs between which to animate
-   * @param[in] period The effect will occur duing this time period
+   * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation);
@@ -658,7 +658,7 @@ public:
    * @param[in] target The target object property to animate
    * @param[in] keyFrames The set of time/value pairs between which to animate
    * @param[in] alpha The alpha function to apply to the overall progress
-   * @param[in] period The effect will occur duing this time period
+   * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);

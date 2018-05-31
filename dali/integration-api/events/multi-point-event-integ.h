@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_MULTI_POINT_EVENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/point.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -39,7 +39,7 @@ typedef PointContainer::const_iterator PointContainerConstIterator; ///< Const i
  * This class can contain one or multiple touch points. It also contains the time at which the
  * event occurred.
  */
-struct MultiPointEvent : public Event
+struct DALI_CORE_API MultiPointEvent : public Event
 {
   // Construction & Destruction
 

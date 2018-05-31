@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet, RemoveAction r
 : mRemoveAction( removeAction ),
   mFirstApply( true ),
   mDisconnected( true ),
-  mObservedOwners( ownerSet )
+  mObservedOwners( ownerSet ),
+  mLifecycleObserver( nullptr )
 {
 #ifdef DEBUG_ENABLED
   ++mCurrentInstanceCount;
@@ -51,14 +52,14 @@ ConstraintBase::~ConstraintBase()
     StopObservation();
   }
 
+  if( mLifecycleObserver != nullptr )
+  {
+    mLifecycleObserver->ObjectDestroyed();
+  }
+
 #ifdef DEBUG_ENABLED
   --mCurrentInstanceCount;
 #endif
-}
-
-void ConstraintBase::ResetDefaultProperties( BufferIndex updateBufferIndex )
-{
-  DALI_ASSERT_DEBUG( false );
 }
 
 unsigned int ConstraintBase::GetCurrentInstanceCount()

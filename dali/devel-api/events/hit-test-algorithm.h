@@ -2,7 +2,7 @@
 #define  __DALI_HIT_TEST_ALGORITHM_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ typedef bool (*HitTestFunction)(Actor actor, TraverseType type);
  * @param[in] func The function to use in the hit-test algorithm.
  * @return true if something was hit
  */
-DALI_IMPORT_API bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_CORE_API bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 /**
  * @brief Hit test specific to a given RenderTask.
@@ -154,7 +154,7 @@ DALI_IMPORT_API bool HitTest( Stage stage, const Vector2& screenCoordinates, Res
  * @param[in] func The function to use in the hit-test algorithm.
  * @return true if something was hit
  */
-DALI_IMPORT_API bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_CORE_API bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 } // namespace HitTestAlgorithm
 

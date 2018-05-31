@@ -2,7 +2,7 @@
 #define DALI_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class FrameBuffer;
  * @brief FrameBuffer is a collection of textures that can be used as the destination for rendering.
  * @SINCE_1_1.43
  */
-class DALI_IMPORT_API FrameBuffer : public BaseHandle
+class DALI_CORE_API FrameBuffer : public BaseHandle
 {
 public:
 

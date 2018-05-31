@@ -44,3 +44,4 @@ libdali-core.so.0.1.1
 /build/tizen/.cov
 /build/desktop
 /packaging/home*
+compile_commands.json

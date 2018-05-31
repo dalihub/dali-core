@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_POINT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace Integration
 /**
  * @brief A Point represents a point on the screen that is currently being touched or where touch has stopped.
  */
-struct DALI_IMPORT_API Point
+struct DALI_CORE_API Point
 {
   /**
    * @brief Default Constructor

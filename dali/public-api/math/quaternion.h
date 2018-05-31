@@ -2,7 +2,7 @@
 #define __DALI_QUATERNION_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class Matrix;
  * @brief The Quaternion class encapsulates the mathematics of the quaternion.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Quaternion
+class DALI_CORE_API Quaternion
 {
 public:
 
@@ -480,7 +480,7 @@ public:
  * @param[in] quaternion The quaternion to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Quaternion& quaternion);
+DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Quaternion& quaternion);
 
 // Allow Quaternion to be treated as a POD type
 template <> struct TypeTraits< Quaternion > : public BasicTypes< Quaternion > { enum { IS_TRIVIAL_TYPE = true }; };

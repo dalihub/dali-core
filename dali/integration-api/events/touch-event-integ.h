@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_TOUCH_EVENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/integration-api/events/multi-point-event-integ.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -34,7 +34,7 @@ namespace Integration
  * This class can contain one or many touch points. It also contains the time at which the
  * event occurred.
  */
-struct TouchEvent : public MultiPointEvent
+struct DALI_CORE_API TouchEvent : public MultiPointEvent
 {
   // Construction & Destruction
 

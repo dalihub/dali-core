@@ -2,7 +2,7 @@
 #define __DALI_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class RenderTask;
  * RenderTasks may optionally target a frame-buffer, otherwise the default GL surface is used;
  * typically this is a window provided by the native system.
  *
- * By default Dali provides a single RenderTask, which renders the entire actor hierachy using
+ * By default Dali provides a single RenderTask, which renders the entire actor hierarchy using
  * a default camera actor and GL surface. If stereoscopic rendering is enabled, Dali will create
  * two additional render tasks, on for each eye. Each render task will have its own camera parented
  * to the default camera actor.
@@ -81,7 +81,7 @@ class RenderTask;
  * | finished     | @ref FinishedSignal() |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API RenderTask : public Handle
+class DALI_CORE_API RenderTask : public Handle
 {
 public:
 
@@ -301,7 +301,7 @@ public:
   /**
    * @brief Sets the frame-buffer used as a render target.
    * @SINCE_1_1.38
-   * @param[in] frameBuffer er A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it
+   * @param[in] frameBuffer A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it
    */
   void SetFrameBuffer( FrameBuffer frameBuffer );
 
@@ -482,7 +482,7 @@ public:
    */
   unsigned int GetRefreshRate() const;
 
-  /*
+  /**
    * @brief Gets viewport coordinates for given world position.
    *
    * @SINCE_1_1.13
@@ -493,7 +493,7 @@ public:
    */
   bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
 
-  /*
+  /**
    * @brief Gets actor local coordinates for given viewport coordinates.
    *
    * @SINCE_1_1.13

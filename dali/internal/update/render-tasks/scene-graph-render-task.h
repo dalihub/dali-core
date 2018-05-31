@@ -331,9 +331,6 @@ private:
   // Undefined
   RenderTask& operator=(const RenderTask&);
 
-private: // PropertyOwner
-
-  virtual void ResetDefaultProperties( BufferIndex currentBufferIndex );
 
 public: // Animatable Properties
   AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewportPosition

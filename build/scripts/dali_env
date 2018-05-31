@@ -51,7 +51,9 @@ my @system_packages = (
     "lcov",
     "libcurl4-gnutls-dev",
     "curl",
-    "libglm-dev",
+    "libssl-dev",
+    "cifs-utils",
+    "libgtest-dev",
 );
 
 # Some packages like require building from source
@@ -59,14 +61,15 @@ my @system_packages = (
 my @source_pkgs = (
 
     {"name" => "disabled-v8",
-        "force-rebuild" => 0,
-        "use_depot_tools" => 1,
-        "repo" => "https://chromium.googlesource.com/v8/v8.git",
-        "depot_tools_repo" => "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+     "force-rebuild" => 0,
+     "use_depot_tools" => 1,
+     "repo" => "https://chromium.googlesource.com/v8/v8.git",
+     "depot_tools_repo" => "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
 
-        # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
-        # upgrading DALi to use  c++0x or c++11
-        "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
+     # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
+     # upgrading DALi to use  c++0x or c++11
+     "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" },
+    {"name" => "gtest" },
 );
 
 ### Detect any http proxy, part of v8 installation requires this information
@@ -289,6 +292,12 @@ sub check_source_packages
         if($pkg eq "v8")
         {
             install_v8( $pkgref );
+        }
+        elsif ($pkg eq "gtest")
+        {
+            print "Attempting to build $pkg\n";
+            # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
+            run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
         }
     }
 }

@@ -32,6 +32,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -216,6 +217,13 @@ public:
    * @return True if any animations are running.
    */
   bool IsAnimationRunning() const;
+
+  /**
+   * Add a property resetter. UpdateManager takes ownership of the object.
+   * It will be killed by UpdateManager when the associated animator or
+   * constraint has finished; or the property owner of the property is destroyed.
+   */
+  void AddPropertyResetter( OwnerPointer<PropertyResetterBase>& propertyResetter );
 
   // Property Notification
 
@@ -978,6 +986,18 @@ inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDe
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDepthIndices, nodeDepths );
 }
+
+inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyResetterBase> resetter )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer<PropertyResetterBase> > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
+}
+
 
 } // namespace SceneGraph
 

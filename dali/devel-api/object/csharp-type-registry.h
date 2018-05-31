@@ -2,7 +2,7 @@
 #define __DALI_CSHARP_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace CSharpTypeRegistry
  * @param [in] f registerType instance creation function
  * @return true if the name could be registered.
  */
-  DALI_IMPORT_API bool RegisterType( const std::string& name,
+  DALI_CORE_API bool RegisterType( const std::string& name,
                                      const std::type_info& baseType,
                                      CSharpTypeInfo::CreateFunction f );
 
@@ -62,7 +62,7 @@ namespace CSharpTypeRegistry
    * @param [in] getFunc The function to get the value of a property.
    * @return true if the property could be registered.
   */
-  DALI_IMPORT_API bool RegisterProperty( const std::string& objectName,
+  DALI_CORE_API bool RegisterProperty( const std::string& objectName,
                                          const std::string& name,
                                          Property::Index index,
                                          Property::Type type,

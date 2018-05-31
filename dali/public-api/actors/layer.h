@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ typedef Rect<int> ClippingBox;
  * | lowerToBottom   | @ref LowerToBottom() |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Layer : public Actor
+class DALI_CORE_API Layer : public Actor
 {
 public:
 

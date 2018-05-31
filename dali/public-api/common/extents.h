@@ -2,7 +2,7 @@
 #define DALI_EXTENTS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace Dali
  * @brief Structure describing the a collection of uint16_t.
  * @SINCE_1_2.62
  */
-struct DALI_EXPORT_API Extents
+struct DALI_CORE_API Extents
 {
   /**
    * @brief Default constructor which provides an initialized Dali::Extents( 0u, 0u, 0u, 0u ).
@@ -113,7 +113,7 @@ public:
  * @param[in] extents The Extents to output
  * @return The output stream operator
  */
-DALI_EXPORT_API std::ostream& operator<<( std::ostream& stream, const Extents& extents );
+DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Extents& extents );
 
 /**
  * @}

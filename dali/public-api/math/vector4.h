@@ -2,7 +2,7 @@
 #define __DALI_VECTOR_4_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ struct Vector3;
  * Components can be used as position or offset (x,y,z,w); color (r,g,b,a) or texture coords(s,t,p,q).
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API Vector4
+struct DALI_CORE_API Vector4
 {
 // NOTE
 // xrs, ygt, zbp and waq must be consecutive in memory.
@@ -569,7 +569,7 @@ struct DALI_IMPORT_API Vector4
  * @param[in] vector The vector to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<<(std::ostream& o, const Vector4& vector);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Vector4& vector);
 
 /**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
@@ -614,7 +614,7 @@ inline Vector4 Max( const Vector4& a, const Vector4& b )
  * @param[in] max The maximum value
  * @return A vector containing the clamped components of v
  */
-DALI_IMPORT_API Vector4 Clamp( const Vector4& v, const float& min, const float& max );
+DALI_CORE_API Vector4 Clamp( const Vector4& v, const float& min, const float& max );
 
 // Allow Vector4 to be treated as a POD type
 template <> struct TypeTraits< Vector4 > : public BasicTypes< Vector4 > { enum { IS_TRIVIAL_TYPE = true }; };
