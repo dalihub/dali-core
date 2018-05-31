@@ -20,11 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/view-mode.h>
+#include <dali/public-api/object/ref-object.h>
 
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
+#include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>

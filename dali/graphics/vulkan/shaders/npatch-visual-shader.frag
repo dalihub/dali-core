@@ -14,12 +14,7 @@ layout(set=0, binding=2) uniform sampler2D sTexture;
 
 layout(location=0) out vec4 fragColor;
 
-vec4 visualMixColor()
-{
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );
-}
-
 void main()
 {
-    fragColor = texture( sTexture, vTexCoord ) * uColor * visualMixColor();
+    fragColor = texture( sTexture, vTexCoord ) * uColor * vec4(mixColor,1.0);
 }

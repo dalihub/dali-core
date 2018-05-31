@@ -308,6 +308,12 @@ std::vector<API::ShaderDetails::UniformInfo> Shader::GetSamplers() const
       retval.emplace_back( info );
     }
   }
+  std::sort(retval.begin(), retval.end(),
+            []( const API::ShaderDetails::UniformInfo& a, const API::ShaderDetails::UniformInfo& b )
+            {
+              return a.binding < b.binding;
+            } );
+
   return retval;
 }
 

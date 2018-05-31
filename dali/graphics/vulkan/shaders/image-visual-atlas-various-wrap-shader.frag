@@ -26,14 +26,9 @@ float wrapCoordinate( vec2 range, float coordinate, float wrap )
   return clamp( mix(range.x, range.y, coord), range.x, range.y );
 }
 
-vec4 visualMixColor()
-{
-  return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );
-}
-
 void main()
 {
     vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
                                   wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );
-    fragColor = texture( sTexture, texCoord ) * uColor * visualMixColor();
+    fragColor = texture( sTexture, texCoord ) * uColor * vec4(mixColor,1.0);
 }

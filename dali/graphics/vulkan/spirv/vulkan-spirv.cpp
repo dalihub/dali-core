@@ -15,12 +15,10 @@
  *
  */
 
-#include <iostream>
-
 #include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 #include <dali/graphics/vulkan/spirv/vulkan-spirv-opcode.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
-#define debug( x ) std::cout << x << std::endl;
 
 namespace Dali
 {
@@ -395,7 +393,7 @@ struct SPIRVShader::Impl
         {
           auto decorationQualifier = decoration->GetParameter<SpvDecoration>( 1 );
           decorationInfo.decorations.emplace( decorationQualifier, decoration );
-          std::cout << decorationQualifier << std::endl;
+          DALI_LOG_STREAM( gVulkanFilter, Debug::General, decorationQualifier);
         }
         decorationVariables.emplace( id, decorationInfo );
 
@@ -409,7 +407,7 @@ struct SPIRVShader::Impl
           // variable may not be named ( global scope of the shader )
           if( !(*name.result)->GetParameterAsString( 1 ).empty() )
           {
-            std::cout <<"Found name\n";
+            DALI_LOG_STREAM( gVulkanFilter, Debug::General, "Found name");
             decorationVariables[id].name = (*name.result)->GetParameterAsString( 1 );
             foundName = true;
           }
@@ -427,7 +425,7 @@ struct SPIRVShader::Impl
           GetResult<SPIRVOpCode*> retval{};
           if( (retval = GetMapItem( opNames, pointerToType.localData.resultId )).success )
           {
-            std::cout << "Found: " << (*retval.result)->GetParameterAsString(1) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::General, "Found: " << (*retval.result)->GetParameterAsString(1));
             decorationVariables[id].name = (*retval.result)->GetParameterAsString(1);
           }
 
@@ -437,8 +435,9 @@ struct SPIRVShader::Impl
           {
 
             auto memberCount = pointerToType.localData.count-2;
-            std::cout << "Found struct, look for member names and member decorations: "
-                      "member count: " << memberCount << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                               "Found struct, look for member names and member decorations: "
+                               "member count: " << memberCount);
 
             // for each member resolve type and compute size of the structure
             auto memberNames = opMemberNames[ pointerToType.localData.resultId ];
@@ -457,8 +456,7 @@ struct SPIRVShader::Impl
                 memberOpInfo.decorations.emplace( mop->GetParameter<SpvDecoration>( 2 ), mop );
               }
               decorationVariables[id].members.emplace_back(memberOpInfo);
-              std::cout << "memberName: " << memberName->GetParameterAsString(2);
-              std::cout << std::endl;
+              DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "memberName: " << memberName->GetParameterAsString(2) );
             }
 
             uint32_t structSize = 0u;
@@ -479,13 +477,13 @@ struct SPIRVShader::Impl
               }
               decorationVariables[id].structSize = structSize;
             }
-            std::cout << "struct size: " << structSize << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::General, "struct size: " << structSize);
           }
         }
       }
     }
 
-    std::cout << "Found " << uniformVariables.size() << " variables\n";
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "Found " << uniformVariables.size() << " variables" );
 
     return decorationVariables;
   }
@@ -498,11 +496,11 @@ struct SPIRVShader::Impl
     auto iter = data.begin();
     if( !CheckHeader() )
     {
-      debug( "Not SPIRV!" );
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "Not SPIRV!" );
       return retval;
     }
 
-    debug( "SPIR-V detected" );
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "SPIR-V detected" );
     std::advance( iter, 5u ); // skip header
 
     while( iter != data.end() )
@@ -632,7 +630,7 @@ struct SPIRVShader::Impl
       {
         auto binding = MapContains( symbolData.decorations, SpvDecorationBinding ) ? symbolData.decorations[SpvDecorationBinding]->GetParameterU32(2) : 0u;
         auto descriptorSet = MapContains( symbolData.decorations, SpvDecorationDescriptorSet ) ? symbolData.decorations[SpvDecorationDescriptorSet]->GetParameterU32(2) : 0u;
-        debug("found layout: binding: " << binding << " ds: " << descriptorSet << ", type: " << U32(symbolData.descriptorType) );
+        DALI_LOG_STREAM( gVulkanFilter, Debug::General, "found layout: binding: " << binding << " ds: " << descriptorSet << ", type: " << U32(symbolData.descriptorType) );
 
         auto& ds = (MapContains( vkDescriptorSetLayoutCreateInfos, descriptorSet ) ?
                     vkDescriptorSetLayoutCreateInfos[descriptorSet] :
