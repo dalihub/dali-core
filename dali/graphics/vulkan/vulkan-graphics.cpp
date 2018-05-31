@@ -398,9 +398,16 @@ RefCountedDescriptorSet Graphics::CreateDescriptorSet()
   NotImplemented()
 }
 
-RefCountedSampler Graphics::CreateSampler()
+RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo )
 {
-  NotImplemented()
+  auto refCountedSampler = Sampler::New( *this, samplerCreateInfo );
+
+  VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), refCountedSampler->Ref() ) );
+
+  AddSampler( refCountedSampler );
+
+  return refCountedSampler;
+
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -618,6 +625,12 @@ void Graphics::AddFramebuffer( Handle< Framebuffer > framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mResourceCache->AddFramebuffer( std::move( framebuffer ));
+}
+
+void Graphics::AddSampler( RefCountedSampler sampler )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->AddSampler( std::move( sampler ) );
 }
 
 RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )

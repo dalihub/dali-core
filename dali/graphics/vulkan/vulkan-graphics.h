@@ -134,7 +134,7 @@ public: // Create methods
 
   RefCountedDescriptorSet CreateDescriptorSet();
 
-  RefCountedSampler CreateSampler();
+  RefCountedSampler CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo );
 
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = 0 );
@@ -197,6 +197,8 @@ public: //Cache management methods
   void AddDescriptorPool( RefCountedDescriptorPool pool );
 
   void AddFramebuffer( RefCountedFramebuffer framebuffer );
+
+  void AddSampler( RefCountedSampler sampler );
 
   RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
