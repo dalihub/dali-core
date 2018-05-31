@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2775,6 +2775,142 @@ int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponents
   DALI_TEST_EQUALS( customActor.GetProperty< float >( componentTwoPropertyIndex ), 3.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( customActor.GetProperty< float >( componentThreePropertyIndex ), 4.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( customActor.GetProperty< Vector4 >( basePropertyIndex ), Vector4( 1.0f, 2.0f, 3.0f, 4.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliTypeInfoRegisterChildProperties01(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register child properties on a type via name" );
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(CustomActor) );
+  auto myCustomTypeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( customActorTypeInfo );
+  DALI_TEST_CHECK( myCustomTypeInfo );
+
+  const Property::Index WIDTH_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const Property::Index HEIGHT_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1);
+  const Property::Index MARGIN_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 100);
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS );
+
+  auto customActor = MyTestCustomActor::New();
+  Stage::GetCurrent().Add( customActor );
+  auto child = Actor::New();
+  customActor.Add( child );
+
+  child.SetProperty( WIDTH_SPECIFICATION, 33 );
+
+  auto value = child.GetProperty( WIDTH_SPECIFICATION );
+  DALI_TEST_EQUALS( value, Property::Value(33), TEST_LOCATION );
+
+  child.SetProperty( HEIGHT_SPECIFICATION, 44 );
+  value = child.GetProperty( HEIGHT_SPECIFICATION );
+  DALI_TEST_EQUALS( value, Property::Value(44), TEST_LOCATION );
+
+  child.SetProperty( MARGIN_SPECIFICATION, Extents(10, 10, 10, 10) );
+  value = child.GetProperty( MARGIN_SPECIFICATION );
+  DALI_TEST_EQUALS( value, Property::Value(Extents(10,10,10,10)), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliTypeInfoRegisterChildProperties02(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Register child properties on a type via name" );
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(CustomActor) );
+  auto myCustomTypeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( customActorTypeInfo );
+  DALI_TEST_CHECK( myCustomTypeInfo );
+
+  const Property::Index WIDTH_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const Property::Index HEIGHT_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1);
+  const Property::Index MARGIN_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 100);
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS );
+
+
+  auto index = customActorTypeInfo.GetChildPropertyIndex( "widthSpecification" );
+  DALI_TEST_EQUALS( index, WIDTH_SPECIFICATION, TEST_LOCATION );
+
+  index = customActorTypeInfo.GetChildPropertyIndex( "heightSpecification" );
+  DALI_TEST_EQUALS( index, HEIGHT_SPECIFICATION, TEST_LOCATION );
+
+  index = customActorTypeInfo.GetChildPropertyIndex( "marginSpecification" );
+  DALI_TEST_EQUALS( index, Property::INVALID_INDEX, TEST_LOCATION );
+
+  index = myCustomTypeInfo.GetChildPropertyIndex( "marginSpecification" );
+  DALI_TEST_EQUALS( index, MARGIN_SPECIFICATION, TEST_LOCATION );
+
+
+  auto name = customActorTypeInfo.GetChildPropertyName( WIDTH_SPECIFICATION );
+  DALI_TEST_EQUALS( name, "widthSpecification", TEST_LOCATION );
+
+  name = customActorTypeInfo.GetChildPropertyName( HEIGHT_SPECIFICATION );
+  DALI_TEST_EQUALS( name, "heightSpecification", TEST_LOCATION );
+
+  name = myCustomTypeInfo.GetChildPropertyName( MARGIN_SPECIFICATION );
+  DALI_TEST_EQUALS( name, "marginSpecification", TEST_LOCATION );
+
+
+  auto type = customActorTypeInfo.GetChildPropertyType( WIDTH_SPECIFICATION );
+  DALI_TEST_EQUALS( type, Property::INTEGER, TEST_LOCATION );
+
+  type = customActorTypeInfo.GetChildPropertyType( HEIGHT_SPECIFICATION );
+  DALI_TEST_EQUALS( type, Property::INTEGER, TEST_LOCATION );
+
+  type = myCustomTypeInfo.GetChildPropertyType( MARGIN_SPECIFICATION );
+  DALI_TEST_EQUALS( type, Property::EXTENTS, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
+int UtcDaliTypeInfoRegisterChildProperties03(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  tet_infoline( "Check registered child properties can be retrieved" );
+
+  auto customActorTypeInfo = typeRegistry.GetTypeInfo( typeid(CustomActor) );
+  auto myCustomTypeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( customActorTypeInfo );
+  DALI_TEST_CHECK( myCustomTypeInfo );
+
+  const Property::Index WIDTH_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX );
+  const Property::Index HEIGHT_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 1);
+  const Property::Index MARGIN_SPECIFICATION( CHILD_PROPERTY_REGISTRATION_START_INDEX + 100);
+
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "widthSpecification", WIDTH_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( customActorTypeInfo.GetName(), "heightSpecification", HEIGHT_SPECIFICATION, Property::INTEGER );
+  ChildPropertyRegistration( myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS );
+
+  Property::IndexContainer indices;
+  myCustomTypeInfo.GetChildPropertyIndices( indices );
+
+  auto result = std::find( indices.Begin(), indices.End(), WIDTH_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
+
+  result = std::find( indices.Begin(), indices.End(), HEIGHT_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
+
+  result = std::find( indices.Begin(), indices.End(), MARGIN_SPECIFICATION );
+  DALI_TEST_EQUALS( result != indices.End(), true, TEST_LOCATION );
 
   END_TEST;
 }

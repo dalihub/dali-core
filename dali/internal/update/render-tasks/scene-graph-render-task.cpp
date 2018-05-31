@@ -436,13 +436,6 @@ void RenderTask::SetSyncRequired( bool requiresSync )
   mRequiresSync = requiresSync;
 }
 
-void RenderTask::ResetDefaultProperties( BufferIndex updateBufferIndex )
-{
-  // Reset default properties
-  mViewportPosition.ResetToBaseValue( updateBufferIndex );
-  mViewportSize.ResetToBaseValue( updateBufferIndex );
-  mClearColor.ResetToBaseValue( updateBufferIndex );
-}
 
 RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),

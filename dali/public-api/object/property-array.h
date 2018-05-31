@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_ARRAY_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace Dali
  * @brief A Array of property values.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Property::Array
+class DALI_CORE_API Property::Array
 {
 public:
 
@@ -215,7 +215,7 @@ private:
  * @param[in] array The array to insert
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
+DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
 
 /**
  * @}

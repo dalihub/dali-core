@@ -2,7 +2,7 @@
 #define __DALI_SIGNAL_SLOT_OBSERVERS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class CallbackBase;
  * This will happen if the object owning the signal is destroyed.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SignalObserver
+class DALI_CORE_API SignalObserver
 {
 public:
 
@@ -69,7 +69,7 @@ public:
  * This is used by the slot if wants to disconnect or is deleted.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API SlotObserver
+class DALI_CORE_API SlotObserver
 {
 public:
 

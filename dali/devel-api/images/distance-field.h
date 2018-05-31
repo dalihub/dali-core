@@ -2,7 +2,7 @@
 #define __DALI_DISTANCE_FIELD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ struct Vector2;
  * @param[in]  maxSize         The image is scaled from this size to distanceMapSize
  * @param[in]  highQuality     Set true to generate high quality distance fields
  */
-DALI_IMPORT_API void GenerateDistanceFieldMap( const unsigned char* const imagePixels, const Vector2& imageSize,
+DALI_CORE_API void GenerateDistanceFieldMap( const unsigned char* const imagePixels, const Vector2& imageSize,
                                                unsigned char* const distanceMap, const Vector2& distanceMapSize,
                                                const unsigned int fieldBorder,
                                                const Vector2& maxSize,

@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_SET_IMAGE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class TextureSet;
  * @param[in] index The position in the TextureSet that the image will be set
  * @param[in] image The image to set
  */
-DALI_IMPORT_API void TextureSetImage( TextureSet textureSet, size_t index, Image image );
+DALI_CORE_API void TextureSetImage( TextureSet textureSet, size_t index, Image image );
 
 } //namespace Dali
 

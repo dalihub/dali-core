@@ -25,6 +25,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/rendering/data-providers/render-data-provider.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
@@ -57,7 +58,7 @@ class Renderer : public PropertyOwner,
 {
 public:
 
-  enum Opacity
+  enum OpacityType
   {
     OPAQUE,
     TRANSPARENT,
@@ -154,10 +155,22 @@ public:
   void SetFaceCullingMode( FaceCullingMode::Type faceCullingMode );
 
   /**
+   * Get face culling mode
+   * @return The face culling mode
+   */
+  FaceCullingMode::Type GetFaceCullingMode() const;
+
+  /**
    * Set the blending mode
    * @param[in] blendingMode to use
    */
   void SetBlendMode( BlendMode::Type blendingMode );
+
+  /**
+   * Get the blending mode
+   * @return The the blending mode
+   */
+  BlendMode::Type GetBlendMode() const;
 
   /**
    * Set the blending options. This should only be called from the update thread.
@@ -166,10 +179,22 @@ public:
   void SetBlendingOptions( unsigned int options );
 
   /**
+   * Get the blending options
+   * @return The the blending mode
+   */
+  unsigned int GetBlendingOptions() const;
+
+  /**
    * Set the blend color for blending operation
    * @param blendColor to pass to GL
    */
   void SetBlendColor( const Vector4& blendColor );
+
+  /**
+   * Get the blending color
+   * @return The blend color
+   */
+  Vector4 GetBlendColor() const;
 
   /**
    * Set the index of first element for indexed draw
@@ -178,10 +203,22 @@ public:
   void SetIndexedDrawFirstElement( size_t firstElement );
 
   /**
+   * Get the index of first element for indexed draw
+   * @return The index of first element for indexed draw
+   */
+  size_t GetIndexedDrawFirstElement() const;
+
+  /**
    * Set the number of elements to draw by indexed draw
    * @param[in] elementsCount number of elements to draw
    */
   void SetIndexedDrawElementsCount( size_t elementsCount );
+
+  /**
+   * Get the number of elements to draw by indexed draw
+   * @return The number of elements to draw by indexed draw
+   */
+  size_t GetIndexedDrawElementsCount() const;
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -190,10 +227,22 @@ public:
   void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
+   * @brief Query whether alpha is pre-multiplied.
+   * @return True is alpha is pre-multiplied, false otherwise.
+   */
+  bool IsPreMultipliedAlphaEnabled() const;
+
+  /**
    * Sets the depth buffer write mode
    * @param[in] depthWriteMode The depth buffer write mode
    */
   void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
+
+  /**
+   * Get the depth buffer write mode
+   * @return The depth buffer write mode
+   */
+  DepthWriteMode::Type GetDepthWriteMode() const;
 
   /**
    * Sets the depth buffer test mode
@@ -202,10 +251,22 @@ public:
   void SetDepthTestMode( DepthTestMode::Type depthTestMode );
 
   /**
+   * Get the depth buffer test mode
+   * @return The depth buffer test mode
+   */
+  DepthTestMode::Type GetDepthTestMode() const;
+
+  /**
    * Sets the depth function
    * @param[in] depthFunction The depth function
    */
   void SetDepthFunction( DepthFunction::Type depthFunction );
+
+  /**
+   * Get the depth function
+   * @return The depth function
+   */
+  DepthFunction::Type GetDepthFunction() const;
 
   /**
    * Sets the render mode
@@ -256,6 +317,26 @@ public:
   void SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass );
 
   /**
+   * Gets the stencil parameters
+   * @return The stencil parameters
+   */
+  const Render::Renderer::StencilParameters& GetStencilParameters() const;
+
+  /**
+   * Bakes the opacity
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] opacity The opacity
+   */
+  void BakeOpacity( BufferIndex updateBufferIndex, float opacity );
+
+  /**
+   * Gets the opacity
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The opacity
+   */
+  float GetOpacity( BufferIndex updateBufferIndex ) const;
+
+  /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -288,7 +369,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  Opacity GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const;
+  OpacityType GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const;
 
   /**
    * Called by the TextureSet to notify to the renderer that it has changed
@@ -360,16 +441,9 @@ private:
   Renderer();
 
   /**
-   * Helper function to create a new render data provider
-   * @return the new (initialized) data provider
+   * Update texture set to the render data provider
    */
-  RenderDataProvider* NewRenderDataProvider();
-
-  /**
-   * Helper function to retrieve the blend color.
-   * @return The blend color.
-   */
-  const Vector4& GetBlendColor() const;
+  void UpdateTextureSet();
 
   /**
    * Helper function to update the uniform map.
@@ -380,10 +454,12 @@ private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
+
   std::unique_ptr<RenderDataProvider> mRenderDataProvider;        ///< Contains data for graphics renderer @todo Refactor
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+  RenderDataProvider*          mRenderDataProvider;               ///< The render data provider
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
@@ -407,6 +483,7 @@ private:
   std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
 
 public:
+  AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
 };
 
@@ -634,6 +711,16 @@ inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadS
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZPass, stencilOperation );
+}
+
+inline void BakeOpacityMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, float opacity )
+{
+  typedef MessageDoubleBuffered1< Renderer, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::BakeOpacity, opacity );
 }
 
 } // namespace SceneGraph

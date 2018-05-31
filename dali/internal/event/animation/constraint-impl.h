@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTIVE_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,11 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-owner-messages.h>
+#include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
+#include <memory>
 
 namespace Dali
 {
@@ -137,11 +139,11 @@ private:
   Constraint& operator=( const Constraint& rhs );
 
   /**
-   * Create and connect a constraint for a scene-object.
+   * Create and connect a constraint and property resetter for a scene-graph property
    */
   void ConnectConstraint()
   {
-    // Should not come here if target-object has been destroyed
+    // Should not come here if target object has been destroyed
     DALI_ASSERT_DEBUG( NULL != mTargetObject );
 
     // Guard against double connections
@@ -163,9 +165,10 @@ private:
 
     if ( func )
     {
-      // Create the SceneGraphConstraint, and connect to the scene-graph
+      // Create the SceneGraphConstraint and PropertyResetter, and connect them to the scene-graph
 
       const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetIndex );
+      OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
 
       // The targetProperty should exist, when targetObject exists
       DALI_ASSERT_ALWAYS( NULL != targetProperty && "Constraint target property does not exist" );
@@ -173,10 +176,12 @@ private:
       if( targetProperty->IsTransformManagerProperty() )  //It is a property managed by the transform manager
       {
         // Connect the constraint
-        mSceneGraphConstraint = SceneGraph::Constraint<PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
-                                                                                                                           propertyOwners,
-                                                                                                                           func,
-                                                                                                                           mRemoveAction );
+        mSceneGraphConstraint =
+          SceneGraph::Constraint<PropertyType, TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
+                                                                                                      propertyOwners,
+                                                                                                      func,
+                                                                                                      mRemoveAction );
+        // Don't create a resetter for transform manager property, it's less efficient
       }
       else  //SceneGraph property
       {
@@ -185,9 +190,17 @@ private:
                                                            propertyOwners,
                                                            func,
                                                            mRemoveAction );
+        // Connect the resetter
+        resetter = SceneGraph::ConstraintResetter::New( *targetObject, *targetProperty, *mSceneGraphConstraint );
+
       }
       OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
       ApplyConstraintMessage( GetEventThreadServices(), *targetObject, transferOwnership );
+
+      if( resetter != nullptr )
+      {
+        AddResetterMessage( GetEventThreadServices().GetUpdateManager(), resetter );
+      }
     }
   }
 
@@ -390,6 +403,7 @@ private:
       // Create the SceneGraphConstraint, and connect to the scene-graph
 
       const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetIndex );
+      OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
 
       // The targetProperty should exist, when targetObject exists
       DALI_ASSERT_ALWAYS( NULL != targetProperty && "Constraint target property does not exist" );
@@ -404,6 +418,7 @@ private:
         typedef SceneGraph::Constraint< float, PropertyAccessor<float> > SceneGraphConstraint;
 
         mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
+        resetter = SceneGraph::ConstraintResetter::New( *targetObject, *targetProperty, *mSceneGraphConstraint );
       }
       else
       {
@@ -422,6 +437,10 @@ private:
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector2> > SceneGraphConstraint;
             mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
+          }
+          if( mSceneGraphConstraint )
+          {
+            resetter = SceneGraph::ConstraintResetter::New( *targetObject, *targetProperty, *mSceneGraphConstraint );
           }
         }
         else if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
@@ -444,6 +463,7 @@ private:
               typedef SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,2> > SceneGraphConstraint;
               mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
             }
+            // Do not create a resetter for transform manager property
           }
           else
           {
@@ -461,6 +481,10 @@ private:
             {
               typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
               mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            }
+            if( mSceneGraphConstraint )
+            {
+              resetter = SceneGraph::ConstraintResetter::New( *targetObject, *targetProperty, *mSceneGraphConstraint );
             }
           }
         }
@@ -488,6 +512,11 @@ private:
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorW<Vector4> > SceneGraphConstraint;
             mSceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mRemoveAction );
           }
+
+          if( mSceneGraphConstraint )
+          {
+            resetter = SceneGraph::ConstraintResetter::New( *targetObject, *targetProperty, *mSceneGraphConstraint );
+          }
         }
       }
 
@@ -495,6 +524,10 @@ private:
       {
         OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
         ApplyConstraintMessage( GetEventThreadServices(), *targetObject, transferOwnership );
+      }
+      if( resetter != nullptr )
+      {
+        AddResetterMessage( GetEventThreadServices().GetUpdateManager(), resetter );
       }
     }
   }

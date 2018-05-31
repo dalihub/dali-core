@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,12 +276,12 @@ bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& typeRe
   return false;
 }
 
-bool TypeRegistry::RegisterChildProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterChildProperty( const std::string& registeredType, const std::string& name, Property::Index index, Property::Type type )
 {
   for( auto&& iter : mRegistryLut )
   {
     auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( impl.GetName() == registeredType )
     {
       impl.AddChildProperty( name, index, type );
       return true;
@@ -289,6 +289,11 @@ bool TypeRegistry::RegisterChildProperty( TypeRegistration& typeRegistration, co
   }
 
   return false;
+}
+
+bool TypeRegistry::RegisterChildProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
+{
+  return RegisterChildProperty( typeRegistration.RegisteredName(), name, index, type );
 }
 
 bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string& actionName, const Property::Map& properties )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,39 +52,6 @@ namespace // unnamed namespace
 {
 
 const uint64_t NANOSECONDS_PER_SECOND = 1e+9;
-
-/**
- * Generic function to print out any 2-Dimensional array
- * @param[in] data pointer to the source data stored as float[rows][cols]
- * @param[in] rows number of rows in 2D array
- * @param[in] cols number of columns in 2D array
- * @param[in] precision - the precision to write the float data.
- * @param[in] indent - the indent level to use.
- * @return string - the text representation of the 2D array
- */
-std::string Array2DToString(const float *data, unsigned int rows, unsigned int cols, size_t precision, size_t indent)
-{
-  std::ostringstream oss;
-
-  std::ios_base::fmtflags mask = oss.flags();
-  mask &= ~std::ios_base::scientific;
-  mask |=  std::ios_base::fixed;
-
-  for(unsigned int rowIdx = 0; rowIdx < rows; rowIdx++)
-  {
-    oss  << std::setw(indent) << std::setfill(' ') << ' ' << "[ ";
-    oss  << std::setfill(' ') << std::setprecision(precision) << std::right << std::setiosflags(mask);
-
-    for(unsigned int colIdx = 0; colIdx < cols; colIdx++)
-    {
-      oss << std::setw(precision + 6) << (*data++) << ' ';
-    }
-
-    oss << ']' << std::endl;
-  }
-
-  return oss.str();
-}
 
 }
 
@@ -283,58 +250,6 @@ std::string FormatToString(const char *format, ...)
   std::string s = ArgListToString(format, arg);
   va_end(arg);
   return s;
-}
-
-std::string ColorToString(const Vector4& color)
-{
-  std::ostringstream oss;
-  oss << "<R:" << color.r << " G:" << color.g << " B:" << color.b << " A:" << color.a << ">";
-  return oss.str();
-}
-
-std::string Vector4ToString(const Vector4& v, size_t precision, size_t indent)
-{
-  std::ostringstream oss;
-  oss << std::setw(indent+3) << std::setfill(' ') << std::setprecision(precision) << std::right;
-  oss << "<X:" << std::setw(precision+4) << v.x
-      << " Y:" << std::setw(precision+4) << v.y
-      << " Z:" << std::setw(precision+4) << v.z
-      << " W:" << std::setw(precision+4) << v.w << ">";
-  return oss.str();
-}
-
-std::string Vector3ToString(const Vector3& v, size_t precision, size_t indent)
-{
-  std::ostringstream oss;
-  oss << std::setw(indent+3) << std::setfill(' ') << std::setprecision(precision) << std::right << std::setiosflags(std::ios_base::fixed);
-  oss << "<X:" << std::setw(precision+4) << v.x
-      << " Y:" << std::setw(precision+4) << v.y
-      << " Z:" << std::setw(precision+4) << v.z << ">";
-  return oss.str();
-}
-
-std::string QuaternionToString(const Quaternion& q, size_t precision, size_t indent)
-{
-  std::ostringstream oss;
-
-  Vector3 axis;
-  Radian angle;
-  q.ToAxisAngle(axis, angle);
-
-  oss << std::setw(indent+3) << std::setfill(' ') << std::setprecision(precision) << std::right;
-  oss << "<A:" << std::setw(precision+4) << Degree( angle ).degree << ", " << Vector3ToString(axis, precision, 0) << ">";
-
-  return oss.str();
-}
-
-std::string Matrix3ToString(const Matrix3& m, size_t precision, size_t indent)
-{
-  return Array2DToString(m.AsFloat(), 3, 3, precision, indent);
-}
-
-std::string MatrixToString(const Matrix& m, size_t precision, size_t indent)
-{
-  return Array2DToString(m.AsFloat(), 4, 4, precision, indent);
 }
 
 void GetNanoseconds( uint64_t& timeInNanoseconds )

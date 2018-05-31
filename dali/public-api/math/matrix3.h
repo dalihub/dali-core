@@ -2,7 +2,7 @@
 #define __DALI_MATRIX3_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,23 @@ struct Vector2;
 /**
  * @brief A 3x3 matrix.
  *
+ * The matrix is stored as a flat array and is Column Major, i.e. the storage order is as follows (numbers represent
+ * indices of array):
+ *
+ * @code
+ *
+ * 0  3  6
+ * 1  4  7
+ * 2  5  8
+ *
+ * @endcode
+ *
+ * Each axis is contiguous in memory, so the x-axis corresponds to elements 0, 1 and 2, the y-axis corresponds to
+ * elements 3, 4 and 5, and the z-axis corresponds to elements 6, 7 and 8.
+ *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Matrix3
+class DALI_CORE_API Matrix3
 {
 public:
 
@@ -145,11 +159,7 @@ public:
    * The order of the values for a matrix is:
    *
    * @code
-   *
-   *   xAxis.x yAxis.x zAxis.x
-   *   xAxis.y yAxis.y zAxis.y
-   *   xAxis.z yAxis.z zAxis.z
-   *
+   * [ xAxis.x, xAxis.y, xAxis.z, yAxis.x, yAxis.y, yAxis.z, zAxis.x, zAxis.y, zAxis.z ]
    * @endcode
    *
    * @SINCE_1_0.0
@@ -160,13 +170,10 @@ public:
   /**
    * @brief Returns the contents of the matrix as an array of 9 floats.
    *
-   * @code
-   *
    * The order of the values for a matrix is:
-   *   xAxis.x yAxis.x zAxis.x
-   *   xAxis.y yAxis.y zAxis.y
-   *   xAxis.z yAxis.z zAxis.z
    *
+   * @code
+   * [ xAxis.x, xAxis.y, xAxis.z, yAxis.x, yAxis.y, yAxis.z, zAxis.x, zAxis.y, zAxis.z ]
    * @endcode
    *
    * @SINCE_1_0.0
@@ -194,7 +201,6 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] scale The value by which to scale the whole matrix
-   *
    */
   void Scale(float scale);
 
@@ -224,6 +230,9 @@ public:
    * @brief Function to multiply two matrices and store the result onto third.
    *
    * Use this method in time critical path as it does not require temporaries
+   *
+   * result = rhs * lhs
+   *
    * @SINCE_1_0.0
    * @param[out] result Result of the multiplication
    * @param[in] lhs Matrix, this can be same matrix as result
@@ -244,7 +253,7 @@ private:
  * @param[in] matrix The matrix to print
  * @return The output stream operator
  */
-DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
+DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
 
 // Allow Matrix3 to be treated as a POD type
 template <> struct TypeTraits< Matrix3 > : public BasicTypes< Matrix3 > { enum { IS_TRIVIAL_TYPE = true }; };

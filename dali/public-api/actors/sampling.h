@@ -2,7 +2,7 @@
 #define __DALI_SAMPLING_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,13 +100,16 @@ enum Type
 
 namespace WrapMode
 {
-
+/**
+ * @brief Enumeration for Wrap mode.
+ * @SINCE_1_0.0
+ */
 enum Type
 {
   DEFAULT = 0,    ///< Clamp to edge @SINCE_1_0.0
-  CLAMP_TO_EDGE,
-  REPEAT,
-  MIRRORED_REPEAT
+  CLAMP_TO_EDGE,  ///< Clamp to edge @SINCE_1_0.0
+  REPEAT,         ///< Repeat @SINCE_1_0.0
+  MIRRORED_REPEAT ///< Mirrored repeat @SINCE_1_0.0
 };
 
 } //namespace WrapMode

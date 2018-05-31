@@ -138,6 +138,7 @@ Renderer::Renderer()
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
+  mRenderDataProvider( NULL ),
   mBlendColor( NULL ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
@@ -151,6 +152,7 @@ Renderer::Renderer()
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
   mGfxRenderCommand(),
+  mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
   mUniformMapChanged[0] = false;
@@ -213,7 +215,11 @@ void* AllocateUniformBufferMemory( size_t size )
 void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex )
 {
 
-  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
+  if( mRegenerateUniformMap == UNIFORM_MAP_READY )
+  {
+    mUniformMapChanged[updateBufferIndex] = false;
+  }
+  else
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
@@ -543,6 +549,8 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+
+  UpdateTextureSet();
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -575,9 +583,19 @@ void Renderer::SetFaceCullingMode( FaceCullingMode::Type faceCullingMode )
   mFaceCullingMode = faceCullingMode;
 }
 
+FaceCullingMode::Type Renderer::GetFaceCullingMode() const
+{
+  return mFaceCullingMode;
+}
+
 void Renderer::SetBlendMode( BlendMode::Type blendingMode )
 {
   mBlendMode = blendingMode;
+}
+
+BlendMode::Type Renderer::GetBlendMode() const
+{
+  return mBlendMode;
 }
 
 void Renderer::SetBlendingOptions( unsigned int options )
@@ -586,6 +604,11 @@ void Renderer::SetBlendingOptions( unsigned int options )
   {
     mBlendBitmask = options;
   }
+}
+
+unsigned int Renderer::GetBlendingOptions() const
+{
+  return mBlendBitmask;
 }
 
 void Renderer::SetBlendColor( const Vector4& blendColor )
@@ -607,9 +630,23 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
   }
 }
 
+Vector4 Renderer::GetBlendColor() const
+{
+  if( mBlendColor )
+  {
+    return *mBlendColor;
+  }
+  return Color::TRANSPARENT;
+}
+
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
+}
+
+size_t Renderer::GetIndexedDrawFirstElement() const
+{
+  return mIndexedDrawFirstElement;
 }
 
 void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
@@ -617,9 +654,19 @@ void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
   mIndexedDrawElementsCount = elementsCount;
 }
 
+size_t Renderer::GetIndexedDrawElementsCount() const
+{
+  return mIndexedDrawElementsCount;
+}
+
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
   mPremultipledAlphaEnabled = preMultipled;
+}
+
+bool Renderer::IsPreMultipliedAlphaEnabled() const
+{
+  return mPremultipledAlphaEnabled;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
@@ -627,14 +674,29 @@ void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
   mDepthWriteMode = depthWriteMode;
 }
 
+DepthWriteMode::Type Renderer::GetDepthWriteMode() const
+{
+  return mDepthWriteMode;
+}
+
 void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
 {
   mDepthTestMode = depthTestMode;
 }
 
+DepthTestMode::Type Renderer::GetDepthTestMode() const
+{
+  return mDepthTestMode;
+}
+
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
+}
+
+DepthFunction::Type Renderer::GetDepthFunction() const
+{
+  return mDepthFunction;
 }
 
 void Renderer::SetRenderMode( RenderMode::Type mode )
@@ -675,6 +737,24 @@ void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperati
 void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
+const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
+{
+  return mStencilParameters;
+}
+
+void Renderer::BakeOpacity( BufferIndex updateBufferIndex, float opacity )
+{
+  mOpacity.Bake( updateBufferIndex, opacity );
+}
+
+float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
+{
+  return mOpacity[updateBufferIndex];
+}
+
+  mRenderDataProvider = NULL;
+RenderDataProvider* Renderer::NewRenderDataProvider()
+  if( mRenderDataProvider )
 }
 
 const Vector4& Renderer::GetBlendColor() const
@@ -691,15 +771,23 @@ const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) co
   return mCollectedUniformMap[bufferIndex];
 }
 
-Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Node& node ) const
+Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const
 {
-  Renderer::Opacity opacity = Renderer::OPAQUE;
+  Renderer::OpacityType opacityType = Renderer::OPAQUE;
 
   switch( mBlendMode )
   {
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      opacity = Renderer::TRANSLUCENT;
+      float alpha = node.GetWorldColor( updateBufferIndex ).a * mOpacity[updateBufferIndex];
+      if( alpha <= FULLY_TRANSPARENT )
+      {
+        opacityType = Renderer::TRANSPARENT;
+      }
+      else
+      {
+        opacityType = Renderer::TRANSLUCENT;
+      }
       break;
     }
     case BlendMode::AUTO:
@@ -707,31 +795,30 @@ Renderer::Opacity Renderer::GetOpacity( BufferIndex updateBufferIndex, const Nod
       bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
-        opacity = Renderer::TRANSLUCENT;
+        opacityType = Renderer::TRANSLUCENT;
       }
-      else // renderer should determine opacity using the actor color
+
+      // renderer should determine opacity using the actor color
+      float alpha = node.GetWorldColor( updateBufferIndex ).a * mOpacity[updateBufferIndex];
+      if( alpha <= FULLY_TRANSPARENT )
       {
-        float alpha = node.GetWorldColor( updateBufferIndex ).a;
-        if( alpha <= FULLY_TRANSPARENT )
-        {
-          opacity = TRANSPARENT;
-        }
-        else if( alpha <= FULLY_OPAQUE )
-        {
-          opacity = TRANSLUCENT;
-        }
+        opacityType = Renderer::TRANSPARENT;
+      }
+      else if( alpha <= FULLY_OPAQUE )
+      {
+        opacityType = Renderer::TRANSLUCENT;
       }
       break;
     }
     case BlendMode::OFF: // the renderer should never use blending
     default:
     {
-      opacity = Renderer::OPAQUE;
+      opacityType = Renderer::OPAQUE;
       break;
     }
   }
 
-  return opacity;
+  return opacityType;
 }
 
 void Renderer::TextureSetChanged()

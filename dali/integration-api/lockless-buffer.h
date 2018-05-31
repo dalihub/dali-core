@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_LOCKLESS_BUFFER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ namespace Integration
  * In case the other thread is writing at that moment, buffers are not swapped and previously available data is read.
  * Similarly if Write() is called before a Read() has finished the previous write buffer is overwritten.
  */
-class DALI_IMPORT_API LocklessBuffer
+class DALI_CORE_API LocklessBuffer
 {
 
 public:

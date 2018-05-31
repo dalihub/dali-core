@@ -2,7 +2,7 @@
 #define __DALI_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Dali
  * module.
  * @SINCE_1_0.0
  */
-struct DALI_IMPORT_API KeyEvent
+struct DALI_CORE_API KeyEvent
 {
   // Enumerations
 
@@ -125,6 +125,14 @@ struct DALI_IMPORT_API KeyEvent
    * @return True if alt modifier
    */
   bool IsAltModifier() const;
+
+  /**
+   * @brief Get the key compose string.
+   *
+   * @SINCE_1_3.22
+   * @return The compose string
+   */
+  std::string GetCompose() const;
 
   /**
    * @brief Get the device name the key event originated from.

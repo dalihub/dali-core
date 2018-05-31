@@ -86,6 +86,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/signals/functor-delegate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-info.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/object/type-registry.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/object/weak-handle.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dali-core-version.cpp
 
   PARENT_SCOPE )

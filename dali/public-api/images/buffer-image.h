@@ -2,7 +2,7 @@
 #define __DALI_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SIN
  *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API BufferImage : public Image
+class DALI_CORE_API BufferImage : public Image
 {
 public:
 

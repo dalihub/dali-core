@@ -96,6 +96,10 @@ if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
 
+if test "x$enable_trace" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DTRACE_ENABLED"
+fi
+
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_CFLAGS="$DALI_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
@@ -165,9 +169,13 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  Trace Build:                      $enable_trace
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
+  OpenGL ES version:                $enable_gles
+  C++03 ABI:                        $enable_cxx03_abi
+  Rename so file:                   $enable_rename_so
   Vulkan Support:                   $enable_vulkan
 "

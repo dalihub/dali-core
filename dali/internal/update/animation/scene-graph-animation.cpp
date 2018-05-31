@@ -30,15 +30,15 @@ namespace //Unnamed namespace
 //Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
 
-inline void WrapInPlayRange( float& elapsed, const Dali::Vector2& playRangeSeconds)
+inline void WrapInPlayRange( float& elapsed, const float& playRangeStartSeconds, const float& playRangeEndSeconds)
 {
-  if( elapsed > playRangeSeconds.y )
+  if( elapsed > playRangeEndSeconds )
   {
-    elapsed = playRangeSeconds.x + fmodf((elapsed-playRangeSeconds.x), (playRangeSeconds.y-playRangeSeconds.x));
+    elapsed = playRangeStartSeconds + fmodf( ( elapsed - playRangeStartSeconds ), ( playRangeEndSeconds - playRangeStartSeconds ) );
   }
-  else if( elapsed < playRangeSeconds.x )
+  else if( elapsed < playRangeStartSeconds )
   {
-    elapsed = playRangeSeconds.y - fmodf( (playRangeSeconds.x - elapsed), (playRangeSeconds.y-playRangeSeconds.x) );
+    elapsed = playRangeEndSeconds - fmodf( ( playRangeStartSeconds - elapsed ), ( playRangeEndSeconds - playRangeStartSeconds ) );
   }
 }
 
@@ -315,20 +315,19 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   // The animation must still be applied when Paused/Stopping
   if (mState == Playing)
   {
+    // Sign value of speed factor. It can optimize many arithmetic comparision
+    int signSpeedFactor = ( mSpeedFactor < 0.0f ) ? -1 : 1;
+
     // If there is delay time before Animation starts, wait the Animation until mDelaySeconds.
     if( mDelaySeconds > 0.0f )
     {
       float reduceSeconds = fabsf( elapsedSeconds * mSpeedFactor );
       if( reduceSeconds > mDelaySeconds )
       {
-        if( mSpeedFactor < 0.0f )
-        {
-          mElapsedSeconds -= reduceSeconds - mDelaySeconds;
-        }
-        else
-        {
-          mElapsedSeconds += reduceSeconds - mDelaySeconds;
-        }
+        // add overflowed time to mElapsedSecond.
+        // If speed factor > 0, add it. if speed factor < 0, subtract it.
+        float overflowSeconds = reduceSeconds - mDelaySeconds;
+        mElapsedSeconds += signSpeedFactor * overflowSeconds;
         mDelaySeconds = 0.0f;
       }
       else
@@ -341,63 +340,86 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
       mElapsedSeconds += ( elapsedSeconds * mSpeedFactor );
     }
 
-    if ( mProgressReachedSignalRequired && ( mElapsedSeconds >= mProgressMarker ) )
+    const float playRangeStartSeconds = mPlayRange.x * mDurationSeconds;
+    const float playRangeEndSeconds = mPlayRange.y * mDurationSeconds;
+    // Final reached seconds. It can optimize many arithmetic comparision
+    float edgeRangeSeconds = ( mSpeedFactor < 0.0f ) ? playRangeStartSeconds : playRangeEndSeconds;
+
+    // Optimized Factors.
+    // elapsed >  edge   --> check if looped
+    // elapsed >= marker --> check if elapsed reached to marker in normal case
+    // edge    >= marker --> check if elapsed reached to marker in looped case
+    float elapsedFactor = signSpeedFactor * mElapsedSeconds;
+    float edgeFactor = signSpeedFactor * edgeRangeSeconds;
+    float markerFactor = signSpeedFactor * mProgressMarker;
+
+    // check it is looped
+    looped = ( elapsedFactor > edgeFactor );
+
+    if( looped )
     {
-      // The application should be notified by NotificationManager, in another thread
-      progressReached = true;
-      mProgressReachedSignalRequired = false;
-    }
-  }
+      WrapInPlayRange( mElapsedSeconds, playRangeStartSeconds, playRangeEndSeconds );
 
-  Vector2 playRangeSeconds = mPlayRange * mDurationSeconds;
+      // Recalculate elapsedFactor here
+      elapsedFactor = signSpeedFactor * mElapsedSeconds;
 
-  if( 0 == mLoopCount || mCurrentLoop < mLoopCount - 1) // '-1' here so last loop iteration uses play once below
-  {
-    // looping
-    looped =  (mState == Playing                                                 &&
-               (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
-                ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
-
-    WrapInPlayRange( mElapsedSeconds, playRangeSeconds );
-
-    UpdateAnimators(bufferIndex, false, false );
-
-    if(looped)
-    {
       if( mLoopCount != 0 )
       {
+        // Check If this animation is finished
         ++mCurrentLoop;
+        if( mCurrentLoop >= mLoopCount )
+        {
+          DALI_ASSERT_DEBUG( mCurrentLoop == mLoopCount );
+          finished = true;
+
+          // The animation has now been played to completion
+          ++mPlayedCount;
+
+          // Make elapsed second as edge of range forcely.
+          mElapsedSeconds = edgeRangeSeconds + signSpeedFactor * Math::MACHINE_EPSILON_10;
+          UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished );
+
+          // After update animation, mElapsedSeconds must be begin of value
+          mElapsedSeconds = playRangeStartSeconds + playRangeEndSeconds - edgeRangeSeconds;
+          mState = Stopped;
+        }
       }
-      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
-      // don't increment mPlayedCount until the finished final loop
+
+      // when it is on looped state, 2 case to send progress signal.
+      // (require && range_value >= marker) ||         << Signal at previous loop
+      // (marker > 0 && !finished && elaped >= marker) << Signal at current loop
+      if( ( mProgressMarker > 0.0f ) && !finished && ( elapsedFactor >= markerFactor ) )
+      {
+        // The application should be notified by NotificationManager, in another thread
+        progressReached = true;
+        mProgressReachedSignalRequired = false;
+      }
+      else
+      {
+        if( mProgressReachedSignalRequired && ( edgeFactor >= markerFactor ) )
+        {
+          progressReached = true;
+        }
+        mProgressReachedSignalRequired = mProgressMarker > 0.0f;
+      }
+    }
+    else
+    {
+      // when it is not on looped state, only 1 case to send progress signal.
+      // (require && elaped >= marker)
+      if( mProgressReachedSignalRequired && ( elapsedFactor >= markerFactor ) )
+      {
+        // The application should be notified by NotificationManager, in another thread
+        progressReached = true;
+        mProgressReachedSignalRequired = false;
+      }
     }
   }
-  else
+
+  // Already updated when finished. So skip.
+  if( !finished )
   {
-    // playing once (and last mCurrentLoop)
-    finished = (mState == Playing                                                 &&
-                (( mSpeedFactor > 0.0f && mElapsedSeconds > playRangeSeconds.y )  ||
-                 ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x )) );
-
-    // update with bake if finished
-    UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished );
-
-    if(finished)
-    {
-      // The animation has now been played to completion
-      ++mPlayedCount;
-
-      // loop iterations come to this else branch for their final iterations
-      if( mCurrentLoop < mLoopCount)
-      {
-        ++mCurrentLoop;
-        DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
-      }
-
-      mProgressReachedSignalRequired = mProgressMarker > 0.0f;
-      mElapsedSeconds = playRangeSeconds.x;
-      mState = Stopped;
-    }
+    UpdateAnimators(bufferIndex, false, false );
   }
 }
 

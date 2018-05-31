@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,22 @@ public:
    * @return A reference to this
    */
   KeyEventImpl& operator=( const KeyEventImpl& rhs );
+
+  /**
+   * @brief Get the compose string.
+   *
+   * @return The compose string.
+   */
+   std::string GetCompose() const;
+
+  /**
+   * @brief Set the compose string to the KeyEvent
+   * A string if this keystroke has modified a string in the middle of being composed,
+   * this string replaces the previous one.
+   *
+   * @param[in] compose The compose string to set
+   */
+  void SetCompose( const std::string& compose );
 
   /**
    * @brief Get the device name the key event originated from
@@ -100,6 +116,7 @@ private:
 
 private:
 
+  std::string mCompose;
   std::string mDeviceName;
   Device::Class::Type mDeviceClass;
   Device::Subclass::Type mDeviceSubclass;

@@ -81,7 +81,7 @@ struct WheelEvent;
  * | sceneCreated            | @ref SceneCreatedSignal()            |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Stage : public BaseHandle
+class DALI_CORE_API Stage : public BaseHandle
 {
 public:
 

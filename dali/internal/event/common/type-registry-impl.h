@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,16 @@ public:
    * @return true if registered
    */
   bool RegisterAnimatablePropertyComponent( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+
+  /**
+   * Register a event-thread only property with a type and a default value
+   * @param [in] registeredType Name of a registered type on which to register the child property.
+   * @param [in] name Property name
+   * @param [in] index Property index
+   * @param [in] type Property type
+   * @return true if registered
+   */
+  bool RegisterChildProperty( const std::string& registeredType, const std::string& name, Property::Index index, Property::Type type );
 
   /**
    * Register a event-thread only property with a type and a default value

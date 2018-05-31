@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_KEY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace Dali
  * @brief A key type which can be either a std::string or a Property::Index
  * @SINCE_1_2.7
  */
-struct DALI_IMPORT_API Property::Key
+struct DALI_CORE_API Property::Key
 {
   /**
    * @brief The type of key
@@ -131,7 +131,7 @@ struct DALI_IMPORT_API Property::Key
  * @param [in] key the key to convert
  * @return The output stream operator.
  */
-DALI_IMPORT_API std::ostream& operator<<( std::ostream& stream, const Property::Key& key );
+DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Key& key );
 
 
 /**

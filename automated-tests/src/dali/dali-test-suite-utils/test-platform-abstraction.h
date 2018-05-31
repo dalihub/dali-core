@@ -2,7 +2,7 @@
 #define __DALI_TEST_PLATFORM_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace Dali
 /**
  * Concrete implementation of the platform abstraction class.
  */
-class DALI_IMPORT_API TestPlatformAbstraction : public Dali::Integration::PlatformAbstraction
+class DALI_CORE_API TestPlatformAbstraction : public Dali::Integration::PlatformAbstraction
 {
 
 public:
