@@ -95,6 +95,12 @@ public:
    */
   ResourceCache& AddSampler( RefCountedSampler sampler );
 
+  /**
+   * Adds the provided fence object to the fence cache
+   * @param fence The fence object to be added to the cache
+   * @return A reference to the ResourceCache
+   */
+  ResourceCache& AddFence( RefCountedFence fence );
 
   /**
    * Finds the buffer object using the specified Vulkan handle in the cache
@@ -153,6 +159,13 @@ public:
   RefCountedSampler FindSampler( vk::Sampler sampler );
 
   /**
+   * Finds the Fence object using the specified Vulkan handle
+   * @param fence The Vulkan handle of the Fence object to be found
+   * @return A Handle to the Sampler object if found. An empty Handle otherwise
+   */
+  RefCountedFence FindFence( vk::Fence fence );
+
+  /**
    * Removes the specified Buffer from the cache
    * @param buffer The Buffer to be removed
    * @return A reference to the ResourceCache
@@ -208,6 +221,13 @@ public:
    */
   ResourceCache& RemoveSampler( Sampler& sampler );
 
+  /**
+   * Removes the specified Fence from the cache
+   * @param fence The Fence to be removed
+   * @return A reference to the ResourceCache
+   */
+  ResourceCache& RemoveFence( Fence& fence );
+
   void CollectGarbage();
 
   void EnqueueDiscardOperation( std::function<void()> deleter );
@@ -233,6 +253,7 @@ private:
   std::vector< RefCountedDescriptorPool > mDescriptorPools;
   std::vector< RefCountedFramebuffer >    mFramebuffers;
   std::vector< RefCountedSampler >        mSamplers;
+  std::vector< RefCountedFence >          mFences;
 
   std::vector< std::function< void() > >    mDiscardQueue;
 };

@@ -45,6 +45,8 @@ public:
 
   operator vk::Fence*();
 
+  bool OnDestroy() override;
+
 private:
   explicit Fence( Graphics& graphics );
 

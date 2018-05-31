@@ -46,6 +46,86 @@ Sampler::Sampler( Graphics& graphics, const vk::SamplerCreateInfo& createInfo )
 {
 }
 
+vk::SamplerCreateFlags Sampler::GetCreateFlags() const
+{
+  return mCreateInfo.flags;
+}
+
+vk::Filter Sampler::GetMinFilter() const
+{
+  return mCreateInfo.minFilter;
+}
+
+vk::Filter Sampler::GetMagFilter() const
+{
+  return mCreateInfo.magFilter;
+}
+
+vk::SamplerMipmapMode Sampler::GetMipMapMode() const
+{
+  return mCreateInfo.mipmapMode;
+}
+
+vk::SamplerAddressMode Sampler::GetAddressModeU() const
+{
+  return mCreateInfo.addressModeU;
+}
+
+vk::SamplerAddressMode Sampler::GetAddressModeV() const
+{
+  return mCreateInfo.addressModeV;
+}
+
+vk::SamplerAddressMode Sampler::GetAddressModeW() const
+{
+  return mCreateInfo.addressModeW;
+}
+
+float Sampler::GetMipLodBias() const
+{
+  return mCreateInfo.mipLodBias;
+}
+
+vk::Bool32 Sampler::AnisotropyEnabled() const
+{
+  return mCreateInfo.anisotropyEnable;
+}
+
+float Sampler::GetMaxAnisotropy() const
+{
+  return mCreateInfo.maxAnisotropy;
+}
+
+vk::Bool32 Sampler::CompareEnabled() const
+{
+  return mCreateInfo.compareEnable;
+}
+
+vk::CompareOp Sampler::GetCompareOperation() const
+{
+  return mCreateInfo.compareOp;
+}
+
+float Sampler::GetMinLod() const
+{
+  return mCreateInfo.minLod;
+}
+
+float Sampler::GetMaxLod() const
+{
+  return mCreateInfo.maxLod;
+}
+
+vk::BorderColor Sampler::GetBorderColor() const
+{
+  return mCreateInfo.borderColor;
+}
+
+vk::Bool32 Sampler::UsesUnnormalizedCoordinates() const
+{
+  return mCreateInfo.unnormalizedCoordinates;
+}
+
 Sampler::~Sampler() = default;
 
 vk::Sampler Sampler::GetVkHandle() const
