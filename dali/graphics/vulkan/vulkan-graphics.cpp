@@ -228,6 +228,8 @@ RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInf
 
   VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), refCountedFence->Ref()));
 
+  AddFence( refCountedFence );
+
   return refCountedFence;
 }
 
@@ -632,6 +634,12 @@ void Graphics::AddSampler( RefCountedSampler sampler )
   mResourceCache->AddSampler( std::move( sampler ) );
 }
 
+void Graphics::AddFence( RefCountedFence fence )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->AddFence( std::move(fence) );
+}
+
 RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
@@ -690,6 +698,12 @@ void Graphics::RemoveSampler( Sampler& sampler )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mResourceCache->RemoveSampler( sampler );
+}
+
+void Graphics::RemoveFence( Fence& fence )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mResourceCache->RemoveFence( fence );
 }
 
 void Graphics::CollectGarbage()

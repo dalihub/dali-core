@@ -200,6 +200,8 @@ public: //Cache management methods
 
   void AddSampler( RefCountedSampler sampler );
 
+  void AddFence( RefCountedFence fence );
+
   RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
   RefCountedImage FindImage( vk::Image image );
@@ -219,6 +221,8 @@ public: //Cache management methods
   void RemoveFramebuffer( Framebuffer& framebuffer );
 
   void RemoveSampler( Sampler& sampler );
+
+  void RemoveFence( Fence& fence );
 
   void CollectGarbage();
 

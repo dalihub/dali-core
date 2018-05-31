@@ -41,6 +41,38 @@ public:
    */
   static RefCountedSampler New( Graphics& graphics, const vk::SamplerCreateInfo& createInfo );
 
+  vk::SamplerCreateFlags GetCreateFlags() const;
+
+  vk::Filter GetMinFilter() const;
+
+  vk::Filter GetMagFilter() const;
+
+  vk::SamplerMipmapMode GetMipMapMode() const;
+
+  vk::SamplerAddressMode GetAddressModeU() const;
+
+  vk::SamplerAddressMode GetAddressModeV() const;
+
+  vk::SamplerAddressMode GetAddressModeW() const;
+
+  float GetMipLodBias() const;
+
+  vk::Bool32 AnisotropyEnabled() const;
+
+  float GetMaxAnisotropy() const;
+
+  vk::Bool32 CompareEnabled() const;
+
+  vk::CompareOp GetCompareOperation() const;
+
+  float GetMinLod() const;
+
+  float GetMaxLod() const;
+
+  vk::BorderColor GetBorderColor() const;
+
+  vk::Bool32 UsesUnnormalizedCoordinates() const;
+
   /**
    * Returns VkSampler object
    * @return
