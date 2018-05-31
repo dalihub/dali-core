@@ -18,7 +18,6 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
 
-#define debug( x ) std::cout << x << std::endl;
 
 namespace Dali
 {

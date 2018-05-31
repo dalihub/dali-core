@@ -25,6 +25,7 @@
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
@@ -1084,49 +1085,49 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilFunction;
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_MASK:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilFunctionMask;
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilFunctionReference;
       break;
     }
     case Dali::Renderer::Property::STENCIL_MASK:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilMask;
       break;
     }
     case Dali::Renderer::Property::RENDER_MODE:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.renderMode;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilOperationOnFail;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilOperationOnZFail;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
     {
-      Render::Renderer::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
       value = stencilParameters.stencilOperationOnZPass;
       break;
     }

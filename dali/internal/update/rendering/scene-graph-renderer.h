@@ -19,14 +19,15 @@
 
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/rendering/data-providers/render-data-provider.h>
+#include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -37,13 +38,12 @@ namespace Dali
 namespace Internal
 {
 
-
-
 namespace SceneGraph
 {
 class Geometry;
 class SceneController;
 class TextureSet;
+class Shader;
 
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
@@ -194,7 +194,7 @@ public:
    * Get the blending color
    * @return The blend color
    */
-  Vector4 GetBlendColor() const;
+  const Vector4& GetBlendColor() const;
 
   /**
    * Set the index of first element for indexed draw
@@ -320,7 +320,7 @@ public:
    * Gets the stencil parameters
    * @return The stencil parameters
    */
-  const Render::Renderer::StencilParameters& GetStencilParameters() const;
+  const StencilParameters& GetStencilParameters() const;
 
   /**
    * Bakes the opacity
@@ -441,11 +441,6 @@ private:
   Renderer();
 
   /**
-   * Update texture set to the render data provider
-   */
-  void UpdateTextureSet();
-
-  /**
    * Helper function to update the uniform map.
    */
   void UpdateUniformMap( BufferIndex updateBufferIndex );
@@ -454,12 +449,9 @@ private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
-
-  std::unique_ptr<RenderDataProvider> mRenderDataProvider;        ///< Contains data for graphics renderer @todo Refactor
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
-  RenderDataProvider*          mRenderDataProvider;               ///< The render data provider
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options

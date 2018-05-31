@@ -29,42 +29,23 @@
 #include <dali/internal/update/rendering/data-providers/node-data-provider.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/rendering/scene-graph-shader.h>
+#include <dali/internal/update/rendering/scene-graph-sampler.h>
+#include <dali/internal/update/rendering/scene-graph-texture.h>
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
-
 #include <cstring>
-
-
-namespace
-{
-
-/**
- * Helper to set view and projection matrices once per program
- * @param program to set the matrices to
- * @param modelMatrix to set
- * @param viewMatrix to set
- * @param projectionMatrix to set
- * @param modelViewMatrix to set
- * @param modelViewProjectionMatrix to set
- */
-inline void SetMatrices(
-                         const Dali::Matrix& modelMatrix,
-                         const Dali::Matrix& viewMatrix,
-                         const Dali::Matrix& projectionMatrix,
-                         const Dali::Matrix& modelViewMatrix )
-{
-
-}
-
-}
 
 namespace // unnamed namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN_UNIFORMS");
+#endif
+
 
 const unsigned int UNIFORM_MAP_READY      = 0;
 const unsigned int COPY_UNIFORM_MAP       = 1;
@@ -134,11 +115,9 @@ Renderer* Renderer::New()
 
 Renderer::Renderer()
 : mGraphics( nullptr ),
-  mRenderDataProvider(),
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
-  mRenderDataProvider( NULL ),
   mBlendColor( NULL ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
@@ -186,23 +165,6 @@ void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
   mGraphics = &graphics;
 
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  mRenderDataProvider = std::make_unique< RenderDataProvider >();
-
-  mRenderDataProvider->mUniformMapDataProvider = this;
-  mRenderDataProvider->mShader = mShader;
-
-  if( mTextureSet )
-  {
-    size_t textureCount = mTextureSet->GetTextureCount();
-    mRenderDataProvider->mTextures.resize( textureCount );
-    mRenderDataProvider->mSamplers.resize( textureCount );
-    for( unsigned int i(0); i<textureCount; ++i )
-    {
-      mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
-      mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
-    }
-  }
 }
 
 
@@ -215,11 +177,7 @@ void* AllocateUniformBufferMemory( size_t size )
 void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex )
 {
 
-  if( mRegenerateUniformMap == UNIFORM_MAP_READY )
-  {
-    mUniformMapChanged[updateBufferIndex] = false;
-  }
-  else
+  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
@@ -289,14 +247,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     {
       // create binding per attribute
       auto binding = Graphics::API::RenderCommand::VertexAttributeBufferBinding{}
-        .SetOffset((vertexBuffer->GetFormat()
-                                ->components[i]).offset)
+        .SetOffset((vertexBuffer->GetFormat()->components[i]).offset)
         .SetBinding(bindingIndex)
         .SetBuffer(vertexBuffer->GetGfxObject())
         .SetInputAttributeRate(Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX)
         .SetLocation(locationIndex + i)
-        .SetStride(vertexBuffer->GetFormat()
-                               ->size);
+        .SetStride(vertexBuffer->GetFormat()->size);
+
       vertexAttributeBindings.emplace_back(binding);
     }
     locationIndex += attributeCountInForBuffer;
@@ -311,8 +268,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   UpdateUniformMap(updateBufferIndex);
 
-  auto &shader = mShader->GetGfxObject()
-                        .Get();
+  auto &shader = mShader->GetGfxObject().Get();
   auto uboCount = shader.GetUniformBlockCount();
 
   auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
@@ -331,7 +287,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   {
     Graphics::API::ShaderDetails::UniformBlockInfo ubInfo;
 
-    std::cout << sizeof(ubInfo) << std::endl;
+    DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose, sizeof(ubInfo) );
 
     shader.GetUniformBlock(i, ubInfo);
 
@@ -363,7 +319,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         auto arrayRightBracket = j->uniformName
                                   .find(']');
         arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
-        std::cout << "UNIFORM NAME: " << j->uniformName << ", index: " << arrayIndex << std::endl;
+        DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << j->uniformName << ", index: " << arrayIndex );
         uniformName = uniformName.substr(0, arrayLeftBracket);
       }
 
@@ -379,8 +335,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           case Property::Type::INTEGER:
           case Property::Type::BOOLEAN:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(float) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(float) );
+
             dst += sizeof(float) * arrayIndex;
             memcpy(dst, &j->propertyPtr
                           ->GetFloat(updateBufferIndex), sizeof(float));
@@ -388,8 +345,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           }
           case Property::Type::VECTOR2:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(Vector2) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
             dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
             memcpy(dst, &j->propertyPtr
                           ->GetVector2(updateBufferIndex), sizeof(Vector2));
@@ -397,8 +354,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           }
           case Property::Type::VECTOR3:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(Vector3) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(Vector3) );
             dst += sizeof(Vector3) * arrayIndex;
             memcpy(dst, &j->propertyPtr
                           ->GetVector3(updateBufferIndex), sizeof(Vector3));
@@ -406,8 +363,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           }
           case Property::Type::VECTOR4:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(Vector4) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(Vector4) );
+
             dst += sizeof(float) * arrayIndex;
             memcpy(dst, &j->propertyPtr
                           ->GetVector4(updateBufferIndex), sizeof(Vector4));
@@ -415,8 +373,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           }
           case Property::Type::MATRIX:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(Matrix) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(Matrix)  );
             dst += sizeof(Matrix) * arrayIndex;
             memcpy(dst, &j->propertyPtr
                           ->GetMatrix(updateBufferIndex), sizeof(Matrix));
@@ -424,8 +382,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           }
           case Property::Type::MATRIX3:
           {
-            std::cout << uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
-                      << uniformInfo.offset << ", size: " << sizeof(Matrix3) << std::endl;
+            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
+                   << uniformInfo.offset << ", size: " << sizeof(Matrix3) );
             dst += sizeof(Matrix3) * arrayIndex;
             memcpy(dst, &j->propertyPtr
                           ->GetMatrix3(updateBufferIndex), sizeof(Matrix3));
@@ -522,7 +480,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
                                         .SetVertexCount(vb->GetElementCount())
                                         .SetInstanceCount(1u)));
   }
-  std::cout << "done\n";
+  DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
 void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t size )
@@ -549,8 +507,6 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  UpdateTextureSet();
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -630,7 +586,7 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
   }
 }
 
-Vector4 Renderer::GetBlendColor() const
+const Vector4& Renderer::GetBlendColor() const
 {
   if( mBlendColor )
   {
@@ -737,7 +693,9 @@ void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperati
 void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
-const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
+}
+
+const StencilParameters& Renderer::GetStencilParameters() const
 {
   return mStencilParameters;
 }
@@ -750,20 +708,6 @@ void Renderer::BakeOpacity( BufferIndex updateBufferIndex, float opacity )
 float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
 {
   return mOpacity[updateBufferIndex];
-}
-
-  mRenderDataProvider = NULL;
-RenderDataProvider* Renderer::NewRenderDataProvider()
-  if( mRenderDataProvider )
-}
-
-const Vector4& Renderer::GetBlendColor() const
-{
-  if( mBlendColor )
-  {
-    return *mBlendColor;
-  }
-  return Color::TRANSPARENT;
 }
 
 const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) const

@@ -18,16 +18,12 @@ layout( set = 0, binding = 4 ) uniform sampler2D sGloss;
 
 layout( location = 0 ) out vec4 fragColor;
 
-vec4 visualMixColor()
-{
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );
-}
 void main()
 {
     vec4 diffuse = texture( sDiffuse, vTexCoord );
     vec3 normal = normalize( texture( sNormal, vTexCoord ).xyz * 2.0 - 1.0 );
     vec4 glossMap = texture( sGloss, vTexCoord );
-    vec4 visualMixColor = visualMixColor();
+    vec4 visualMixColor = vec4(mixColor,1.0);
 
     float lightDiffuse = max( 0.0, dot( normal, normalize( vLightDirection ) ) );
     lightDiffuse = lightDiffuse * 0.5 + 0.5;

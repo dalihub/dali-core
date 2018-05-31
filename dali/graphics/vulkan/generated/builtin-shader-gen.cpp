@@ -24,6 +24,7 @@
 #include "mesh-visual-simple-shader-frag.h"
 #include "mesh-visual-simple-shader-vert.h"
 #include "npatch-visual-3x3-shader-vert.h"
+#include "npatch-visual-mask-shader-frag.h"
 #include "npatch-visual-shader-frag.h"
 #include "npatch-visual-shader-vert.h"
 #include "text-visual-multi-color-text-shader-frag.h"
@@ -57,6 +58,7 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG", SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG },
   { "SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT", SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT },
   { "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT", SHADER_NPATCH_VISUAL_3X3_SHADER_VERT },
+  { "SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG", SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG },
   { "SHADER_NPATCH_VISUAL_SHADER_FRAG", SHADER_NPATCH_VISUAL_SHADER_FRAG },
   { "SHADER_NPATCH_VISUAL_SHADER_VERT", SHADER_NPATCH_VISUAL_SHADER_VERT },
   { "SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG", SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG },

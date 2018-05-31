@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
