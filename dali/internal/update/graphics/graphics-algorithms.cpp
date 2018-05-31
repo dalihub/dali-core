@@ -82,6 +82,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
+    auto color = item.mNode->GetWorldColor( bufferIndex );
+
     for( auto j = 0u; j < item.mNode->GetRendererCount(); ++j )
     {
       auto sgRenderer = item.mNode
@@ -93,6 +95,18 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
         continue;
       }
       cmd.BindRenderTarget(renderTargetBinding);
+
+      auto opacity = sgRenderer->GetOpacity( bufferIndex );
+      if( sgRenderer->IsPreMultipliedAlphaEnabled() )
+      {
+        float alpha = color.a * opacity;
+        color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
+      }
+      else
+      {
+        color.a *= opacity;
+      }
+
       Matrix mvp, mvp2;
       Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
       Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
@@ -102,8 +116,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       sgRenderer->WriteUniform("uModelViewMatrix", item.mModelViewMatrix);
       sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
       sgRenderer->WriteUniform("uSize", item.mSize);
-      sgRenderer->WriteUniform("uColor", item.mNode
-                                             ->GetWorldColor(bufferIndex));
+      sgRenderer->WriteUniform( "uColor", color );
+
       commandList.push_back(&cmd);
     }
   }

@@ -33,8 +33,9 @@
 #include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <dali/graphics/vulkan/vulkan-resource-cache.h>
-
+#include <dali/graphics/vulkan/vulkan-debug.h>
 #include <dali/graphics-api/graphics-api-controller.h>
+
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -48,6 +49,7 @@
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
 
+
 namespace Dali
 {
 namespace Graphics
@@ -59,8 +61,8 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
   //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  //"VK_LAYER_RENDERDOC_Capture",
-  //"VK_LAYER_LUNARG_parameter_validation", // parameter
+  "VK_LAYER_RENDERDOC_Capture",
+  "VK_LAYER_LUNARG_parameter_validation", // parameter
   //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
   //"VK_LAYER_LUNARG_monitor",             // monitor
   "VK_LAYER_LUNARG_swapchain",           // swapchain
@@ -188,7 +190,7 @@ void Graphics::Create()
   {
     for( auto&& prop : layers.value )
     {
-      std::cout << prop.layerName << std::endl;
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, prop.layerName );
       if( std::string(prop.layerName) == reqLayer )
       {
         validationLayers.push_back(reqLayer);
@@ -207,8 +209,14 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   info.setEnabledExtensionCount(U32(extensions.size()))
       .setPpEnabledExtensionNames(extensions.data())
       .setEnabledLayerCount(U32(validationLayers.size()))
-      //.setEnabledLayerCount(0)
       .setPpEnabledLayerNames(validationLayers.data());
+
+#if defined(DEBUG_ENABLED)
+  if( ! getenv("LOG_VULKAN") )
+  {
+    info.setEnabledLayerCount(0);
+  }
+#endif
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
 }

@@ -21,6 +21,7 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/scene-graph-texture.h>
 
 namespace //Unnamed namespace
 {

@@ -207,9 +207,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Any message to update will wake it up anyways
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  DALI_LOG_ERROR("Render()!");
+  DALI_LOG_ERROR("Render()!\n");
   (void)status;
 }
 

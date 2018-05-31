@@ -21,13 +21,23 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <list>
 #include <stdint.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
+
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+
+#pragma GCC diagnostic pop
 
 // Using Debug namespace alias shortens the log usage significantly
 namespace Dali{namespace Integration{namespace Log{}}}
@@ -312,9 +322,18 @@ public:
 #define DALI_LOG_INFO(filter, level, format, args...)                        \
   if(filter && filter->IsEnabledFor(level)) { filter->Log(level, format,  ## args); }
 
+#define DALI_LOG_STREAM( filter, level, stream )  \
+  if(filter && filter->IsEnabledFor(level))       \
+  {                                               \
+    std::ostringstream o;                         \
+    o << stream << std::endl;                     \
+    filter->Log(level, "%s", o.str().c_str());    \
+  }
+
 #else // DEBUG_ENABLED
 
 #define DALI_LOG_INFO(filter, level, format, args...)
+#define DALI_LOG_STREAM( filter, level, stream )
 
 #endif // DEBUG_ENABLED
 

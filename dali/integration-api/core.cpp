@@ -105,9 +105,9 @@ void Core::Update(
                  renderToFboEnabled, isRenderingToFbo );
 }
 
-void Core::Render( RenderStatus& status )
+void Core::Render( RenderStatus& status, bool forceClear )
 {
-  DALI_LOG_ERROR("Core::Render() called in error");
+  DALI_LOG_ERROR("Core::Render() called in error\n");
 }
 
 SystemOverlay& Core::GetSystemOverlay()
