@@ -193,17 +193,17 @@ struct Texture::Impl
 
   void CreateSampler()
   {
-    // mutable sampler creation will be deferred until it's used
-    mSampler = Sampler::New( mGraphics );
-    mSampler->SetAddressMode( vk::SamplerAddressMode::eClampToEdge,
-                              vk::SamplerAddressMode::eClampToEdge,
-                              vk::SamplerAddressMode::eClampToEdge );
-    mSampler->SetBorderColor( vk::BorderColor::eFloatOpaqueBlack );
-    mSampler->SetCompareOp( vk::CompareOp::eNever );
-    mSampler->SetFilter( vk::Filter::eLinear, vk::Filter::eLinear );
-    mSampler->SetMipmapMode( vk::SamplerMipmapMode::eLinear );
+    auto samplerCreateInfo = vk::SamplerCreateInfo()
+            .setAddressModeU( vk::SamplerAddressMode::eClampToEdge )
+            .setAddressModeV( vk::SamplerAddressMode::eClampToEdge )
+            .setAddressModeW( vk::SamplerAddressMode::eClampToEdge )
+            .setBorderColor( vk::BorderColor::eFloatOpaqueBlack )
+            .setCompareOp( vk::CompareOp::eNever )
+            .setMinFilter( vk::Filter::eLinear )
+            .setMagFilter( vk::Filter::eLinear )
+            .setMipmapMode( vk::SamplerMipmapMode::eLinear );
 
-    mSampler->GetVkHandle();
+    mSampler = mGraphics.CreateSampler( samplerCreateInfo );
   }
 
   RefCountedSampler GetSampler() const

@@ -27,91 +27,19 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
 class Graphics;
+
 class Sampler : public VkManaged
 {
 public:
 
   /**
-   * Creates new mutable sampler
+   * Creates a new Sampler
    * @param graphics
    * @return
    */
-  static RefCountedSampler New( Graphics& graphics );
-
-  /**
-   * Creates new immutable sampler
-   * @param graphics
-   * @param createInfo
-   * @return
-   */
-  static RefCountedSampler NewImmutable( Graphics& graphics, vk::SamplerCreateInfo createInfo );
-
-  /**
-   * Sets minification and magnifcation filters
-   * @param minFilter
-   * @param magFilter
-   */
-  void SetFilter( vk::Filter minFilter, vk::Filter magFilter );
-
-  /**
-   * Sets UVW address mode
-   * @param addressModeU
-   * @param addressModeV
-   * @param addressModeW
-   */
-  void SetAddressMode( vk::SamplerAddressMode addressModeU,
-                       vk::SamplerAddressMode addressModeV,
-                       vk::SamplerAddressMode addressModeW );
-
-  /**
-   * Sets minimum and maximum LOD
-   * @param minLod
-   * @param maxLod
-   */
-  void SetLod( float minLod, float maxLod );
-
-  /**
-   * Enables anisotropy
-   * @param enabled
-   */
-  void EnableAnisotropy( bool enabled );
-
-  /**
-   * Sets mipmap mode
-   * @param mode
-   */
-  void SetMipmapMode( vk::SamplerMipmapMode mode );
-
-  /**
-   * Sets maximum anisotropy
-   * @param maxAnisotropy
-   */
-  void SetMaxAnisotropy( float maxAnisotropy );
-
-  /**
-   * Turns on/off comparison with reference value when sampling
-   * @param enabled
-   */
-  void EnableCompare( bool enabled );
-
-  /**
-   * Specifies predefined border color to use
-   * @param color
-   */
-  void SetBorderColor( vk::BorderColor color );
-
-  /**
-   * Enables/disables use of unnormalized texture coordinates
-   * @param enabled
-   */
-  void UseUnnormalizedCoordinates( bool enabled );
-
-  /**
-   * Specifies comparison function used when comparing with reference value
-   * @param compareOp
-   */
-  void SetCompareOp( vk::CompareOp compareOp );
+  static RefCountedSampler New( Graphics& graphics, const vk::SamplerCreateInfo& createInfo );
 
   /**
    * Returns VkSampler object
@@ -119,16 +47,27 @@ public:
    */
   vk::Sampler GetVkHandle() const;
 
+  const Sampler& ConstRef();
+
+  Sampler& Ref();
+
+  operator vk::Sampler*();
+
+  bool OnDestroy() override;
+
 private:
 
-  explicit Sampler( Graphics& graphics, vk::SamplerCreateInfo createInfo, bool immutable );
+  explicit Sampler( Graphics& graphics, const vk::SamplerCreateInfo& createInfo );
 
   ~Sampler() override;
 
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+private:
+  Graphics*             mGraphics;
+  vk::SamplerCreateInfo mCreateInfo;
+  vk::Sampler           mSampler;
 
 };
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
