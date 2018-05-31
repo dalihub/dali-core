@@ -67,13 +67,20 @@ void TestApplication::Initialize()
                                         mGraphics,
                                         mGestureManager,
                                         mDataRetentionPolicy,
-                                        false );
+                                        Integration::RenderToFrameBuffer::FALSE,
+                                        Integration::DepthBufferAvailable::TRUE,
+                                        Integration::StencilBufferAvailable::TRUE );
 
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
   mCore->SetDpi( mDpi.x, mDpi.y );
 
   Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
   Dali::Integration::Log::InstallLogFunction(logFunction);
+
+  Dali::Integration::Trace::LogContextFunction logContextFunction(&TestApplication::LogContext);
+  Dali::Integration::Trace::InstallLogContextFunction( logContextFunction );
+
+  Dali::Integration::Trace::LogContext( true, "Test" );
 
   mCore->SceneCreated();
 }
@@ -82,6 +89,18 @@ TestApplication::~TestApplication()
 {
   Dali::Integration::Log::UninstallLogFunction();
   delete mCore;
+}
+
+void TestApplication::LogContext( bool start, const char* tag )
+{
+  if( start )
+  {
+    fprintf(stderr, "INFO: Trace Start: %s", tag);
+  }
+  else
+  {
+    fprintf(stderr, "INFO: Trace End: %s", tag);
+  }
 }
 
 void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message)
@@ -169,7 +188,7 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
 bool TestApplication::Render( unsigned int intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 
@@ -195,7 +214,7 @@ bool TestApplication::GetRenderNeedsUpdate()
 bool TestApplication::RenderOnly( )
 {
   // Update Time values
-  mCore->Render( mRenderStatus );
+  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 

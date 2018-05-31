@@ -2,7 +2,7 @@
 #define __DALI_TOUCH_DATA_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ struct Vector2;
  *
  * Should not use this in a TouchData container as it is just a handle and the internal object can change.
  */
-class DALI_IMPORT_API TouchData : public BaseHandle
+class DALI_CORE_API TouchData : public BaseHandle
 {
 public:
 

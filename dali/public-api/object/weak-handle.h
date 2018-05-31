@@ -2,7 +2,7 @@
 #define DALI_WEAK_HANDLE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace Dali
  * deleted object will return an empty handle.
  * @SINCE_1_2.60
  */
-class DALI_IMPORT_API WeakHandleBase
+class DALI_CORE_API WeakHandleBase
 {
 
 public:

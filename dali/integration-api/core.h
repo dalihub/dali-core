@@ -18,9 +18,10 @@
  *
  */
 
-// EXTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
@@ -167,6 +168,23 @@ private:
 };
 
 /**
+ * Interface to enable classes to be processed after the event loop. Classes are processed
+ * in the order they are registered.
+ */
+class DALI_CORE_API Processor
+{
+public:
+  /**
+   * @brief Run the processor
+   */
+  virtual void Process() = 0;
+
+protected:
+  virtual ~Processor() { }
+};
+
+
+/**
  * Integration::Core is used for integration with the native windowing system.
  * The following integration tasks must be completed:
  *
@@ -199,7 +217,7 @@ private:
  * See the method description in Core to see which thread it should be called from.
  * This is the recommended option, so that input processing will not affect the smoothness of animations.
  */
-class DALI_IMPORT_API Core
+class DALI_CORE_API Core
 {
 public:
 
@@ -213,6 +231,8 @@ public:
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
+   * @param[in] depthBufferAvailable Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -220,7 +240,9 @@ public:
                     Graphics::Graphics& graphics,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
-                    bool renderToFboEnabled );
+                    RenderToFrameBuffer renderToFboEnabled,
+                    DepthBufferAvailable depthBufferAvailable,
+                    StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -315,9 +337,8 @@ public:
    * Render the next frame. This method should be preceded by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @param[out] status showing whether update is required to run.
-   * @todo GRAPHICS - REMOVE
    */
-  void Render( RenderStatus& status );
+  void Render( RenderStatus& status, bool forceClear );
 
   // System-level overlay
 
@@ -351,6 +372,20 @@ public:
    * @return The stereo base (eye seperation) for stereoscopic 3D (mm)
    */
   float GetStereoBase() const;
+
+  /**
+   * @brief Register a processor
+   *
+   * Note, Core does not take ownership of this processor.
+   * @param[in] processor The process to register
+   */
+  void RegisterProcessor( Processor& processor );
+
+  /**
+   * @brief Unregister a processor
+   * @param[in] processor The process to unregister
+   */
+  void UnregisterProcessor( Processor& processor );
 
 private:
 

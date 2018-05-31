@@ -2,7 +2,7 @@
 #define __DALI_LONG_PRESS_GESTURE_DETECTOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ struct LongPressGesture;
  * |-------------------|-----------------------|
  * | longPressDetected | @ref DetectedSignal() |
  */
-class DALI_IMPORT_API LongPressGestureDetector : public GestureDetector
+class DALI_CORE_API LongPressGestureDetector : public GestureDetector
 {
 public: // Typedefs
 

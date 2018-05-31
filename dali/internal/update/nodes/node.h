@@ -774,6 +774,11 @@ public:
    */
   void CreateTransform( SceneGraph::TransformManager* transformManager );
 
+  /**
+   * Reset dirty flags
+   */
+  void ResetDirtyFlags( BufferIndex updateBufferIndex );
+
 protected:
 
   /**
@@ -837,11 +842,6 @@ private:
 
   // Undefined
   Node& operator=(const Node& rhs);
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
-   */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
   /**
    * Recursive helper to disconnect a Node and its children.

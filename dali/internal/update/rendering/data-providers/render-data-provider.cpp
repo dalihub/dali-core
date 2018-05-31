@@ -24,9 +24,10 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderDataProvider::RenderDataProvider()
+RenderDataProvider::RenderDataProvider( AnimatableProperty< float >& opacity )
 : mUniformMapDataProvider( NULL ),
-  mShader( NULL )
+  mShader( NULL ),
+  mOpacity( opacity )
 {
 }
 
@@ -62,6 +63,11 @@ RenderDataProvider::Samplers& RenderDataProvider::GetSamplers()
 std::vector<SceneGraph::Texture*>& RenderDataProvider::GetTextures()
 {
   return mTextures;
+}
+
+float RenderDataProvider::GetOpacity( BufferIndex bufferIndex )
+{
+  return mOpacity[bufferIndex];
 }
 
 } // SceneGraph

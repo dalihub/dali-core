@@ -2,7 +2,7 @@
 #define __TEST_NATIVE_IMAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class TestNativeImageNoExt;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
 typedef IntrusivePtr<TestNativeImageNoExt> TestNativeImageNoExtPointer;
 
-class DALI_IMPORT_API TestNativeImageExtension: public Dali::NativeImageInterface::Extension
+class DALI_CORE_API TestNativeImageExtension: public Dali::NativeImageInterface::Extension
 {
 public:
   inline const char* GetCustomFragmentPreFix(){return "#extension GL_OES_EGL_image_external:require\n";}
@@ -40,7 +40,7 @@ public:
 
 };
 
-class DALI_IMPORT_API TestNativeImage : public Dali::NativeImageInterface
+class DALI_CORE_API TestNativeImage : public Dali::NativeImageInterface
 {
 public:
   static TestNativeImagePointer New(int width, int height);
@@ -71,7 +71,7 @@ public:
 };
 
 
-class DALI_IMPORT_API TestNativeImageNoExt : public Dali::NativeImageInterface
+class DALI_CORE_API TestNativeImageNoExt : public Dali::NativeImageInterface
 {
 public:
   static TestNativeImageNoExtPointer New(int width, int height);

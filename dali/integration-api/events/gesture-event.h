@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_GESTURE_EVENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/integration-api/events/event.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Integration
@@ -32,7 +32,7 @@ namespace Integration
  * This is the abstract base structure for any gestures that the adaptor detects and wishes to send
  * to the Core.
  */
-struct GestureEvent : public Event
+struct DALI_CORE_API GestureEvent : public Event
 {
   // Destruction
 

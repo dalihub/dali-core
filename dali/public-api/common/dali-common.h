@@ -2,7 +2,7 @@
 #define __DALI_COMMON_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,12 @@
 #  ifndef HIDE_DALI_INTERNALS
 #    define DALI_EXPORT_API
 #    define DALI_IMPORT_API
+#    define DALI_CORE_API
 #    define DALI_INTERNAL
 #  else
 #    define DALI_EXPORT_API __attribute__ ((visibility ("default")))
 #    define DALI_IMPORT_API __attribute__ ((visibility ("default")))
+#    define DALI_CORE_API   __attribute__ ((visibility ("default")))
 #    define DALI_INTERNAL   __attribute__ ((visibility ("hidden")))
 #  endif
 #else
@@ -45,6 +47,8 @@
 #  define DALI_EXPORT_API
 /** Visibility attribute to show declarations */
 #  define DALI_IMPORT_API
+/** Visibility attribute to show declarations */
+#  define DALI_CORE_API
 /** Visibility attribute to hide declarations */
 #  define DALI_INTERNAL
 #endif
@@ -90,13 +94,13 @@ namespace Dali
  * @param[in] location Where the assertion occurred
  * @param[in] condition The assertion condition
  */
-DALI_IMPORT_API void DaliAssertMessage( const char* location, const char* condition );
+DALI_CORE_API void DaliAssertMessage( const char* location, const char* condition );
 
 /**
  * @brief Exception class for Dali Core library - Raised by assertions in codebase.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API DaliException
+class DALI_CORE_API DaliException
 {
 public:
   /**

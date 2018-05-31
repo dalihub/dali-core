@@ -27,11 +27,12 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/integration-api/trace.h>
 
 namespace Dali
 {
 
-class DALI_IMPORT_API TestApplication : public ConnectionTracker
+class DALI_CORE_API TestApplication : public ConnectionTracker
 {
 public:
 
@@ -67,6 +68,7 @@ public:
   void Initialize();
   virtual ~TestApplication();
   static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
+  static void LogContext( bool start, const char* tag );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController& GetRenderController();

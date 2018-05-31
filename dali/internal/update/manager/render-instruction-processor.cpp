@@ -168,15 +168,17 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
   if( inside )
   {
-    Renderer::Opacity opacity = renderable.mRenderer ? renderable.mRenderer->GetOpacity( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
-    if( opacity != Renderer::TRANSPARENT )
+    Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
+    if( opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN )
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
       item.mNode = renderable.mNode;
-      item.mIsOpaque = ( opacity == Renderer::OPAQUE );
-      if( !isLayer3d )
+      item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
+      item.mDepthIndex = 0;
+
+      if(!isLayer3d)
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();
       }
@@ -385,6 +387,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
   RenderInstruction& instruction = instructions.GetNextInstruction( updateBufferIndex );
   renderTask.PrepareRenderInstruction( instruction, updateBufferIndex );
   bool viewMatrixHasNotChanged = !renderTask.ViewMatrixUpdated();
+  bool isRenderListAdded = false;
 
   const Matrix& viewMatrix = renderTask.GetViewMatrix( updateBufferIndex );
   SceneGraph::Camera& camera = renderTask.GetCamera();
@@ -415,6 +418,8 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
         SortRenderItems( updateBufferIndex, *renderList, layer, hasClippingNodes );
       }
+
+      isRenderListAdded = true;
     }
 
     if( !layer.overlayRenderables.Empty() )
@@ -435,13 +440,19 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
         SortRenderItems( updateBufferIndex, *renderList, layer, false );
       }
+
+      isRenderListAdded = true;
     }
   }
 
   // Inform the render instruction that all renderers have been added and this frame is complete.
   instruction.UpdateCompleted();
-}
 
+  if( !isRenderListAdded && !instruction.mIsClearColorSet )
+  {
+    instructions.DiscardCurrentInstruction( updateBufferIndex );
+  }
+}
 
 } // SceneGraph
 

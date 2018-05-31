@@ -2,7 +2,7 @@
 #define __DALI_REF_OBJECT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ class Value;
 /**
  * @brief Base class for reference counted objects.
  *
- * Typically this should be used with an instrusive pointer,
+ * Typically this should be used with an intrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API RefObject
+class DALI_CORE_API RefObject
 {
 public:
 

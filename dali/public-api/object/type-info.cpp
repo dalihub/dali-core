@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,10 +101,30 @@ const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
   return GetImplementation(*this).GetPropertyName( index );
 }
 
+Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
+{
+  return GetImplementation(*this).GetChildPropertyIndex( name );
+}
+
+const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
+{
+  return GetImplementation(*this).GetChildPropertyName( index );
+}
+
+Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
+{
+  return GetImplementation(*this).GetChildPropertyType( index );
+}
+
+void TypeInfo::GetChildPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.Clear(); // We do not want to clear the container if called internally, so only clear here
+  GetImplementation(*this).GetChildPropertyIndices( indices );
+}
+
 TypeInfo::TypeInfo(Internal::TypeInfo* internal)
 : BaseHandle(internal)
 {
 }
 
 } // namespace Dali
-

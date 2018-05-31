@@ -36,7 +36,9 @@ Core* Core::New( RenderController& renderController,
                  Graphics::Graphics& graphics,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
-                 bool renderToFboEnabled )
+                 RenderToFrameBuffer renderToFboEnabled,
+                 DepthBufferAvailable depthBufferAvailable,
+                 StencilBufferAvailable stencilBufferAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -44,7 +46,9 @@ Core* Core::New( RenderController& renderController,
                                         graphics,
                                         gestureManager,
                                         policy,
-                                        renderToFboEnabled );
+                                        renderToFboEnabled,
+                                        depthBufferAvailable,
+                                        stencilBufferAvailable );
 
   return instance;
 }
@@ -129,6 +133,16 @@ void Core::SetStereoBase( float stereoBase )
 float Core::GetStereoBase() const
 {
   return mImpl->GetStereoBase();
+}
+
+void Core::RegisterProcessor( Processor& processor )
+{
+  mImpl->RegisterProcessor( processor );
+}
+
+void Core::UnregisterProcessor( Processor& processor )
+{
+  mImpl->UnregisterProcessor( processor );
 }
 
 Core::Core()

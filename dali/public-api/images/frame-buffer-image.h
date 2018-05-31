@@ -2,7 +2,7 @@
 #define __DALI_FRAME_BUFFER_IMAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ enum Format ///< Framebuffer format, default color depth is RGBA 32 bit with alp
  * The FrameBufferImage can then be used for rendering to the screen.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API FrameBufferImage : public Image
+class DALI_CORE_API FrameBufferImage : public Image
 {
 public:
 

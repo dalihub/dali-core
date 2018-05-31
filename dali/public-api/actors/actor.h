@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -238,7 +238,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  * @SINCE_1_0.0
  */
 
-class DALI_IMPORT_API Actor : public Handle
+class DALI_CORE_API Actor : public Handle
 {
 public:
 
@@ -1294,6 +1294,7 @@ public:
    * @brief Raises the actor above the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
@@ -1304,6 +1305,7 @@ public:
    * @brief Lower the actor to below the target actor.
    *
    * @SINCE_1_2.60
+   * @param[in] target The target actor
    * @pre The Actor has been initialized.
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
@@ -1430,7 +1432,7 @@ public:
    * @brief Returns the minimum relayout size.
    *
    * @SINCE_1_0.0
-   * @return Return the mininmum size
+   * @return Return the minimum size
    */
   Vector2 GetMinimumSize();
 
@@ -1634,7 +1636,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
    * @endcode
-   * actor: The actor, or child of actor, whose laytou direction has changed
+   * actor: The actor, or child of actor, whose layout direction has changed
    * type: Whether the actor's layout direction property has changed or a parent's.
    *
    * @SINCE_1_2.60

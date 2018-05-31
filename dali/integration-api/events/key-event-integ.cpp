@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ KeyEvent::KeyEvent()
   keyModifier( 0 ),
   time( 0 ),
   state( KeyEvent::Down ),
+  compose( "" ),
   deviceName( "" ),
   deviceClass( Device::Class::NONE ),
   deviceSubclass( Device::Subclass::NONE )
@@ -39,7 +40,7 @@ KeyEvent::KeyEvent()
 }
 
 KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
-                    unsigned long timeStamp, const State& keyState, const std::string& deviceName,
+                    unsigned long timeStamp, const State& keyState, const std::string& compose, const std::string& deviceName,
                     const Device::Class::Type deviceClass, const Device::Subclass::Type deviceSubclass )
 : Event( Key ),
   keyName( keyName ),
@@ -48,6 +49,7 @@ KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, in
   keyModifier( keyModifier ),
   time( timeStamp ),
   state( keyState ),
+  compose( compose ),
   deviceName( deviceName ),
   deviceClass( deviceClass ),
   deviceSubclass( deviceSubclass )
@@ -62,6 +64,7 @@ KeyEvent::KeyEvent( const Dali::KeyEvent& event )
   keyModifier( event.keyModifier ),
   time( event.time ),
   state( static_cast< Integration::KeyEvent::State >( event.state ) ),
+  compose( "" ),
   deviceName( "" ),
   deviceClass( Device::Class::NONE ),
   deviceSubclass( Device::Subclass::NONE )
