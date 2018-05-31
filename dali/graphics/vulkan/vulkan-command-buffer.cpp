@@ -270,6 +270,7 @@ struct CommandBuffer::Impl
     vkBuffers.reserve( commandBuffers.size() );
     for( auto&& buf : commandBuffers )
     {
+      assert( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary && "Cannot Execute Commands. Command buffer level not secondary" );
       vkBuffers.emplace_back( buf->GetVkCommandBuffer() );
       PushResource( buf );
     }

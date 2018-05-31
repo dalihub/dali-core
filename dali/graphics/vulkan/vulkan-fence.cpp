@@ -67,6 +67,17 @@ Fence::operator vk::Fence*()
   return &mFence;
 }
 
+bool Fence::OnDestroy()
+{
+  mGraphics->RemoveFence( *this );
+
+  mGraphics->DiscardResource( [this]() {
+    mGraphics->GetDevice().destroyFence( mFence, mGraphics->GetAllocator() );
+  } );
+
+  return false;
+}
+
 
 } // namespace Vulkan
 } // namespace Graphics
