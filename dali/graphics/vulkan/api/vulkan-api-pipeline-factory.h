@@ -24,21 +24,74 @@ namespace Dali
 {
 namespace Graphics
 {
+
+namespace Vulkan
+{
+class Graphics;
+}
+
 namespace VulkanAPI
 {
-
+class Controller;
+class Pipeline;
+class PipelineCache;
 /**
  * @brief Interface class for ShaderFactory types in the graphics API.
  */
-class PipelineFactory : public API::BaseFactory<API::Pipeline>
+class PipelineFactory : public API::PipelineFactory
 {
 public:
 
+  PipelineFactory( Controller& controller );
 
+  API::PipelineFactory& SetPipelineCache( API::PipelineCache& pipelineCache ) override;
 
-protected:
+  API::PipelineFactory& SetColorBlendState( const API::Pipeline::ColorBlendState& state ) override;
 
+  API::PipelineFactory& SetShaderState( const API::Pipeline::ShaderState& state ) override;
 
+  API::PipelineFactory& SetViewportState( const API::Pipeline::ViewportState& state ) override;
+
+  API::PipelineFactory& SetBasePipeline( API::Pipeline& pipeline ) override;
+
+  API::PipelineFactory& SetDepthStencilState( API::Pipeline::DepthStencilState state ) override;
+
+  API::PipelineFactory& SetRasterizationState( const API::Pipeline::RasterizationState& state ) override;
+
+  API::PipelineFactory& SetVertexInputState( const API::Pipeline::VertexInputState& state ) override;
+
+  API::PipelineFactory& SetInputAssemblyState( const API::Pipeline::InputAssemblyState& state ) override;
+
+  // To be called when getting new factory
+  void Reset();
+
+  std::unique_ptr<API::Pipeline> Create() const;
+
+  uint32_t GetHashCode() const;
+
+  struct Info
+  {
+    API::Pipeline::DepthStencilState  depthStencilState;
+    API::Pipeline::ColorBlendState    colorBlendState;
+    API::Pipeline::ShaderState        shaderState;
+    API::Pipeline::ViewportState      viewportState;
+    API::Pipeline::RasterizationState rasterizationState;
+    API::Pipeline::VertexInputState   vertexInputState;
+    API::Pipeline::InputAssemblyState inputAssemblyState;
+  };
+
+  const Info& GetCreateInfo() const
+  {
+    return mInfo;
+  }
+
+public:
+
+  Info                              mInfo;
+  Controller&                       mController;
+  Vulkan::Graphics&                 mGraphics;
+  VulkanAPI::PipelineCache*         mPipelineCache;
+  VulkanAPI::Pipeline*              mBasePipeline;
 };
 
 } // namespace API

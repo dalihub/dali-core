@@ -44,21 +44,21 @@ public:
 
   virtual PipelineFactory& SetPipelineCache( PipelineCache& pipelineCache ) = 0;
 
-  virtual PipelineFactory& SetColorBlendState() = 0;
+  virtual PipelineFactory& SetColorBlendState( const Pipeline::ColorBlendState& state ) = 0;
 
-  virtual PipelineFactory& SetShaderState() = 0;
+  virtual PipelineFactory& SetShaderState( const Pipeline::ShaderState& state ) = 0;
 
-  virtual PipelineFactory& SetViewportState() = 0;
+  virtual PipelineFactory& SetViewportState( const Pipeline::ViewportState& state ) = 0;
 
   virtual PipelineFactory& SetBasePipeline( Pipeline& pipeline ) = 0;
 
-  virtual PipelineFactory& SetDepthStencilState() = 0;
+  virtual PipelineFactory& SetDepthStencilState( Pipeline::DepthStencilState state ) = 0;
 
-  virtual PipelineFactory& SetRasterizationState() = 0;
+  virtual PipelineFactory& SetRasterizationState( const Pipeline::RasterizationState& state ) = 0;
 
-  virtual PipelineFactory& SetVertexInputState() = 0;
+  virtual PipelineFactory& SetVertexInputState( const Pipeline::VertexInputState& state ) = 0;
 
-  virtual PipelineFactory& SetInputAssemblyState() = 0;
+  virtual PipelineFactory& SetInputAssemblyState( const Pipeline::InputAssemblyState& state ) = 0;
 
 protected:
   /// @brief default constructor

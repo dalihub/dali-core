@@ -93,6 +93,16 @@ public:
   /**
    * @brief Create a new object
    */
+  std::unique_ptr<API::Pipeline> CreatePipeline( const API::BaseFactory<API::Pipeline>& factory ) override;
+
+  /**
+   * @brief Create a new object
+   */
+  std::unique_ptr<API::PipelineCache> CreatePipelineCache() override;
+
+  /**
+   * @brief Create a new object
+   */
   API::Accessor<API::Framebuffer> CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory ) override;
 
   std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
@@ -128,6 +138,8 @@ public:
   API::ShaderFactory& GetShaderFactory() const override;
 
   API::BufferFactory& GetBufferFactory() const override;
+
+  API::PipelineFactory& GetPipelineFactory() override;
 
 public:
   // not copyable

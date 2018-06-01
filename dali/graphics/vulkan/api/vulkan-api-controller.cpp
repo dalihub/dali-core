@@ -43,12 +43,11 @@
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline-cache.h>
 
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
-
-#include <iostream>
-#include <dali/graphics-api/utility/utility-memory-pool.h>
 
 namespace Dali
 {
@@ -78,8 +77,11 @@ struct Controller::Impl
     mShaderFactory = std::make_unique<VulkanAPI::ShaderFactory>( mGraphics );
     mTextureFactory = std::make_unique<VulkanAPI::TextureFactory>( mGraphics );
     mBufferFactory = std::make_unique<VulkanAPI::BufferFactory>( mOwner );
+    mPipelineFactory = std::make_unique<VulkanAPI::PipelineFactory>( mOwner );
 
     mUboManager = std::make_unique<VulkanAPI::UboManager>( mOwner );
+
+    mDefaultPipelineCache = std::make_unique<VulkanAPI::PipelineCache>( mGraphics, mOwner );
 
     return true;
   }
@@ -153,7 +155,7 @@ struct Controller::Impl
     {
       // prepare pipelines
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-      apiCommand->PreparePipeline();
+      apiCommand->PrepareResources();
     }
 
     // Update uniform buffers
@@ -182,13 +184,13 @@ struct Controller::Impl
       auto cmdbuf = mCommandPool->NewCommandBuffer( false );
       cmdbuf->Reset();
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
-      cmdbuf->BindGraphicsPipeline( apiCommand->GetPipeline() );
+      cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
 
       // bind vertex buffers
       auto binding = 0u;
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )
       {
-        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>(vb.buffer.Get()).GetBufferRef(), vb.offset );
+        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( vb.Get() ).GetBufferRef(), 0 );
       }
 
       // note: starting set = 0
@@ -230,6 +232,8 @@ struct Controller::Impl
   ObjectOwner<API::Shader>    mShadersOwner;
   ObjectOwner<API::Buffer>    mBuffersOwner;
 
+  std::unique_ptr<PipelineCache> mDefaultPipelineCache;
+
   Vulkan::Graphics&           mGraphics;
   Controller&                 mOwner;
   Vulkan::GpuMemoryAllocator& mDefaultAllocator;
@@ -237,6 +241,7 @@ struct Controller::Impl
   std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
   std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
   std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
+  std::unique_ptr<VulkanAPI::PipelineFactory> mPipelineFactory;
 
   // todo: should be per thread
   Vulkan::RefCountedCommandPool mCommandPool;
@@ -283,6 +288,19 @@ API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<AP
   return { nullptr };
 }
 
+std::unique_ptr<API::Pipeline> Controller::CreatePipeline( const API::BaseFactory<API::Pipeline>& factory )
+{
+  auto& pipelineFactory = const_cast<PipelineFactory&>(dynamic_cast<const PipelineFactory&>( factory ));
+
+  // if no custom cache, use default one
+  if(!pipelineFactory.mPipelineCache)
+  {
+    pipelineFactory.mPipelineCache = mImpl->mDefaultPipelineCache.get();
+  }
+
+  return mImpl->mPipelineFactory->Create();
+}
+
 API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
 {
   return { nullptr };
@@ -291,6 +309,11 @@ API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFa
 std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
 {
   return std::unique_ptr<char>( new char[numberOfElements * elementSize] );
+}
+
+std::unique_ptr<API::PipelineCache> Controller::CreatePipelineCache()
+{
+  return std::make_unique<API::PipelineCache>( VulkanAPI::PipelineCache( mImpl->mGraphics, *this ) );
 }
 
 std::unique_ptr<Controller> Controller::New( Vulkan::Graphics& vulkanGraphics )
@@ -334,6 +357,12 @@ API::ShaderFactory& Controller::GetShaderFactory() const
 API::BufferFactory& Controller::GetBufferFactory() const
 {
   return mImpl->GetBufferFactory();
+}
+
+API::PipelineFactory& Controller::GetPipelineFactory()
+{
+  mImpl->mPipelineFactory->Reset();
+  return *mImpl->mPipelineFactory;
 }
 
 Vulkan::Graphics& Controller::GetGraphics() const
