@@ -1,9 +1,8 @@
-
-#ifndef DALI_GRAPHICS_API_UTILITY_H
-#define DALI_GRAPHICS_API_UTILITY_H
+#ifndef DALI_GRAPHICS_API_PIPELINE_CACHE_H
+#define DALI_GRAPHICS_API_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstdint>
-#include <cstdlib>
-
 namespace Dali
 {
 namespace Graphics
@@ -30,36 +25,24 @@ namespace Graphics
 namespace API
 {
 
-/**
- * Structure that represents a rectangular size
- */
-struct RectSize {
-  size_t width = 0;
-  size_t height = 0;
-};
-
-struct Rect2D {
-  int32_t x = 0;
-  int32_t y = 0;
-  uint32_t width = 0;
-  uint32_t height = 0;
-};
-
-/**
- * Structure represents area of viewport
- */
-struct Viewport
+class PipelineCache
 {
-  float x = 0.0f;
-  float y = 0.0f;
-  float width = 0.0f;
-  float height = 0.0f;
-  float minDepth = 0.0f;
-  float maxDepth = 0.0f;
+public:
+
+  // not copyable
+  PipelineCache(const PipelineCache&) = delete;
+  PipelineCache& operator=(const PipelineCache&) = delete;
+
+  virtual ~PipelineCache() = default;
+
+  PipelineCache(PipelineCache&&) = default;
+  PipelineCache& operator=(PipelineCache&&) = default;
+
+  PipelineCache() = default;
 };
 
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_UTILITY_H
+#endif // DALI_GRAPHICS_API_PIPELINE_CACHE_H
