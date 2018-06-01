@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,14 +107,15 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
 
   if( !equivalent )
   {
-    fprintf(stderr, "%s, checking\n"
-               "(%f, %f, %f)    (%f, %f, %f)\n"
-               "(%f, %f, %f) == (%f, %f, %f)\n"
-               "(%f, %f, %f)    (%f, %f, %f)\n",
+    // Align each float to 1234.67, i.e. 3.6 will be "   3.60"
+    fprintf( stderr, "%s, checking\n"
+               "%7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f\n"
+               "%7.2f %7.2f %7.2f == %7.2f %7.2f %7.2f\n"
+               "%7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f\n",
                location,
-               m1[0],  m1[1], m1[2],   m2[0],  m2[1], m2[2],
-               m1[3],  m1[4], m1[5],   m2[3],  m2[4], m2[5],
-               m1[6],  m1[7], m1[8],   m2[6],  m2[7], m2[8]);
+               m1[0], m1[3], m1[6],    m2[0], m2[3], m2[6],
+               m1[1], m1[4], m1[7],    m2[1], m2[4], m2[7],
+               m1[2], m1[5], m1[8],    m2[2], m2[5], m2[8] );
 
     tet_result(TET_FAIL);
     throw("TET_FAIL");
@@ -138,14 +139,15 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, float eps
 
   if (!equivalent)
   {
-    fprintf(stderr, "%s, checking\n"
-               "(%f, %f, %f)    (%f, %f, %f)\n"
-               "(%f, %f, %f) == (%f, %f, %f)\n"
-               "(%f, %f, %f)    (%f, %f, %f)\n",
+    // Align each float to 1234.67, i.e. 3.6 will be "   3.60"
+    fprintf( stderr, "%s, checking\n"
+               "%7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f\n"
+               "%7.2f %7.2f %7.2f == %7.2f %7.2f %7.2f\n"
+               "%7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f\n",
                location,
-               m1[0],  m1[1], m1[2],   m2[0],  m2[1], m2[2],
-               m1[3],  m1[4], m1[5],   m2[3],  m2[4], m2[5],
-               m1[6],  m1[7], m1[8],   m2[6],  m2[7], m2[8]);
+               m1[0], m1[3], m1[6],    m2[0], m2[3], m2[6],
+               m1[1], m1[4], m1[7],    m2[1], m2[4], m2[7],
+               m1[2], m1[5], m1[8],    m2[2], m2[5], m2[8] );
 
     tet_result(TET_FAIL);
     throw("TET_FAIL");
@@ -174,15 +176,17 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, const char*
 
   if (!identical)
   {
-    fprintf(stderr, "%s, checking\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f) == (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n", location,
-               m1[0],  m1[1],  m1[2],  m1[3],   m2[0],  m2[1],  m2[2],  m2[3],
-               m1[4],  m1[5],  m1[6],  m1[7],   m2[4],  m2[5],  m2[6],  m2[7],
-               m1[8],  m1[9], m1[10], m1[11],   m2[8],  m2[9], m2[10], m2[11],
-              m1[12], m1[13], m1[14], m1[15],  m2[12], m2[13], m2[14], m2[15]);
+    // Align each float to 1234.67, i.e. 3.6 will be "   3.60"
+    fprintf( stderr, "%s, checking\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f == %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n",
+             location,
+             m1[0], m1[4], m1[8],  m1[12],    m2[0], m2[4], m2[8],  m2[12],
+             m1[1], m1[5], m1[9],  m1[13],    m2[1], m2[5], m2[9],  m2[13],
+             m1[2], m1[6], m1[10], m1[14],    m2[2], m2[6], m2[10], m2[14],
+             m1[3], m1[7], m1[11], m1[15],    m2[3], m2[7], m2[11], m2[15] );
 
     tet_result(TET_FAIL);
     throw("TET_FAIL");
@@ -206,15 +210,17 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, float epsil
 
   if (!equivalent)
   {
-    fprintf(stderr, "%s, checking\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f) == (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n"
-               "(%f, %f, %f, %f)    (%f, %f, %f, %f)\n", location,
-               m1[0],  m1[1],  m1[2],  m1[3],   m2[0],  m2[1],  m2[2],  m2[3],
-               m1[4],  m1[5],  m1[6],  m1[7],   m2[4],  m2[5],  m2[6],  m2[7],
-               m1[8],  m1[9], m1[10], m1[11],   m2[8],  m2[9], m2[10], m2[11],
-              m1[12], m1[13], m1[14], m1[15],  m2[12], m2[13], m2[14], m2[15]);
+    // Align each float to 1234.67, i.e. 3.6 will be "   3.60"
+    fprintf( stderr, "%s, checking\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f == %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n"
+             "%7.2f %7.2f %7.2f %7.2f    %7.2f %7.2f %7.2f %7.2f\n",
+             location,
+             m1[0], m1[4], m1[8],  m1[12],    m2[0], m2[4], m2[8],  m2[12],
+             m1[1], m1[5], m1[9],  m1[13],    m2[1], m2[5], m2[9],  m2[13],
+             m1[2], m1[6], m1[10], m1[14],    m2[2], m2[6], m2[10], m2[14],
+             m1[3], m1[7], m1[11], m1[15],    m2[3], m2[7], m2[11], m2[15] );
 
     tet_result(TET_FAIL);
     throw("TET_FAIL");
