@@ -471,9 +471,7 @@ void RenderCommand::BindUniformBuffers()
     auto& ubo = mUboBuffers[i];
     auto& pc = mPushConstantsBindings[i];
 
-    auto offset = ubo->GetBindingOffset();
-    auto size = ubo->GetBindingSize();
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << ubo->GetBindingOffset() << ", size: " << ubo->GetBindingSize());
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding);
     mDescriptorSets[0]->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
   }

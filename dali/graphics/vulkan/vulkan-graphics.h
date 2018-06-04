@@ -30,6 +30,7 @@
 #include <mutex>
 #include <map>
 #include <functional>
+#include "vulkan-queue.h"
 
 namespace Dali
 {
@@ -101,6 +102,7 @@ public: // Create methods
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
   RefCountedShader CreateShader(); //will see if this will work
+
   RefCountedPipeline CreatePipeline();
 
   RefCountedFence CreateFence( const vk::FenceCreateInfo& fenceCreateInfo );
@@ -148,6 +150,14 @@ public: // Actions
   vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
   vk::Result BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset);
+
+  vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
+
+  vk::Result Present( Queue& queue, vk::PresentInfoKHR presentInfo );
+
+  vk::Result QueueWaitIdle( Queue& queue );
+
+  vk::Result DeviceWaitIdle();
 
 public: // Getters
   RefCountedSurface GetSurface( FBID surfaceId );

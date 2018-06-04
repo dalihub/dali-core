@@ -149,7 +149,7 @@ struct Texture::Impl
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
     auto fence = mGraphics.CreateFence({});
-    mGraphics.GetGraphicsQueue( 0u ).Submit( mCommandBuffer, fence );
+    mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { mCommandBuffer } ) }, fence );
     VkAssert(mGraphics.WaitForFence(fence));
     return true;
   }

@@ -27,11 +27,13 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
 class Image;
 class Graphics;
 class Buffer;
 class Pipeline;
 class DescriptorSet;
+
 class CommandBuffer : public VkManaged
 {
   friend class CommandPool;
@@ -56,38 +58,8 @@ public:
   /** Free command buffer */
   void Free();
 
-  /** Push wait semaphores */
-  void PushWaitSemaphores(const std::vector< vk::Semaphore >&          semaphores,
-                          const std::vector< vk::PipelineStageFlags >& stages);
-
-  /** Push signal semaphores */
-  void PushSignalSemaphores(const std::vector< vk::Semaphore >& semaphores);
-
-  /**
-   *
-   * @return
-   */
-  const std::vector< vk::Semaphore >& GetSignalSemaphores() const;
-
-  /**
-   *
-   * @return
-   */
-  const std::vector< vk::Semaphore >& GetSWaitSemaphores() const;
-
-  /**
-   *
-   * @return
-   */
-  const std::vector< vk::PipelineStageFlags >& GetWaitSemaphoreStages() const;
-
   /** Returns Vulkan object associated with the buffer */
-  vk::CommandBuffer GetVkCommandBuffer() const;
-
-  operator vk::CommandBuffer() const
-  {
-    return GetVkCommandBuffer();
-  }
+  vk::CommandBuffer GetVkHandle() const;
 
   /**
    * Tests if the command buffer is primary
@@ -258,10 +230,25 @@ private:
 private:
 
   // Constructor called by the CommandPool only
-  CommandBuffer( CommandPool& commandPool, uint32_t poolIndex, const vk::CommandBufferAllocateInfo& allocateInfo, vk::CommandBuffer vkCommandBuffer );
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  CommandBuffer( CommandPool& commandPool,
+                 uint32_t poolIndex,
+                 const vk::CommandBufferAllocateInfo& allocateInfo,
+                 vk::CommandBuffer vulkanHandle );
 
+private:
+
+  CommandPool*                  mOwnerCommandPool;
+  Graphics*                     mGraphics;
+  uint32_t                      mPoolAllocationIndex;
+  vk::CommandBufferAllocateInfo mAllocateInfo{};
+
+  vk::CommandBuffer mCommandBuffer{};
+
+  RefCountedPipeline mCurrentPipeline;
+
+  vk::RenderPass mCurrentRenderPass;
+
+  bool mRecording{ false };
 };
 
 } // namespace Vulkan
