@@ -252,8 +252,9 @@ struct Swapchain::Impl
     cmdBuffer->End();
 
     // use presentation queue to submit the call
-    mQueue.Submit( cmdBuffer, RefCountedFence{} );
-    mQueue.WaitIdle();
+    auto submissionData = SubmissionData{}.SetCommandBuffers({ cmdBuffer });
+    mGraphics.Submit( mQueue, { submissionData }, RefCountedFence{} );
+    mGraphics.QueueWaitIdle( mQueue ); //TODO: Use a fence. Wait idle is bad
   }
 
   bool SetImageFormat()
@@ -530,7 +531,11 @@ struct Swapchain::Impl
 
     // submit
     mGraphics.ResetFence(swapBuffer.endOfFrameFence);
-    mQueue.Submit( swapBuffer.masterCmdBuffer, swapBuffer.endOfFrameFence );
+
+    auto submissionData = SubmissionData{}.SetCommandBuffers({ swapBuffer.masterCmdBuffer });
+
+    mGraphics.Submit( mQueue, { std::move(submissionData) } , swapBuffer.endOfFrameFence );
+
     mGraphics.WaitForFence(swapBuffer.endOfFrameFence);
 
     // fixme: use semaphores to synchronize all previously submitted command buffers!
@@ -542,10 +547,13 @@ struct Swapchain::Impl
       .setSwapchainCount( 1 )
       .setPWaitSemaphores( nullptr )
       .setWaitSemaphoreCount( 0 );
-    mQueue.Present( presentInfo );
+
+    mGraphics.Present( mQueue, presentInfo );
 
     // just to speed things up :P
-    mQueue.WaitIdle();
+    mGraphics.QueueWaitIdle( mQueue );
+
+    mGraphics.CollectGarbage();
 
     return true;
   }
@@ -563,7 +571,9 @@ struct Swapchain::Impl
       .setPWaitSemaphores( nullptr )
       .setWaitSemaphoreCount( 0 );
 
-    mQueue.Present( presentInfo );
+    mGraphics.Present( mQueue, presentInfo );
+
+    mGraphics.CollectGarbage();
 
     return true;
   }

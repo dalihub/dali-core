@@ -28,20 +28,29 @@ namespace Graphics
 namespace Vulkan
 {
 
-//TODO: The Submission calls has to be redesigned or removed
 class Fence;
-class Submission
+
+struct SubmissionData
 {
-public:
-  Submission( Graphics& graphics, Handle <Fence> fence );
+  SubmissionData() = default;
 
-  bool WaitForFence(uint32_t timeout = 0u);
+  explicit SubmissionData( const std::vector< vk::Semaphore >& waitSemaphores_,
+                           vk::PipelineStageFlags waitDestinationStageMask_,
+                           const std::vector< RefCountedCommandBuffer >& commandBuffers_,
+                           const std::vector< vk::Semaphore >& signalSemaphores_ );
 
-private:
-  Graphics& mGraphics;
+  SubmissionData& SetWaitSemaphores( const std::vector< vk::Semaphore >& semaphores );
 
-  // todo: possibly resources locks stored here?
-  Handle<Fence> mFences;
+  SubmissionData& SetWaitDestinationStageMask( vk::PipelineStageFlags dstStageMask );
+
+  SubmissionData& SetCommandBuffers( const std::vector< RefCountedCommandBuffer >& cmdBuffers );
+
+  SubmissionData& SetSignalSemaphores( const std::vector< vk::Semaphore >& semaphores );
+
+  std::vector< vk::Semaphore > waitSemaphores;
+  vk::PipelineStageFlags waitDestinationStageMask;
+  std::vector< RefCountedCommandBuffer > commandBuffers;
+  std::vector< vk::Semaphore > signalSemaphores;
 };
 
 class Queue
@@ -52,43 +61,14 @@ public:
         vk::QueueFlags queueFlags);
   ~Queue(); // queues are non-destructible
 
-  /** Submits command buffers */
-  std::unique_ptr< Submission > Submit(const std::vector< RefCountedCommandBuffer >& commandBuffers,
-                                       Handle<Fence>                                 fence);
-
-  /** Helper function to submit single command buffer */
-  std::unique_ptr< Submission > Submit(RefCountedCommandBuffer commandBuffer, Handle<Fence> fence);
-
-  void WaitIdle() const;
-
-  /**
-   *
-   * @param presentInfo
-   * @return
-   */
-  vk::Result Present( const vk::PresentInfoKHR& presentInfo );
-
-  /**
-   *
-   * @param swapchain
-   * @return
-   */
-  vk::Result Present( vk::SwapchainKHR swapchain, uint32_t imageIndex );
-
-private:
-  /** Prepares command buffers for submission */
-  std::vector< vk::CommandBuffer > PrepareBuffers(
-      const std::vector< RefCountedCommandBuffer >& commandBuffers) const;
-
-
+  vk::Queue GetVkHandle();
 
 private:
   Graphics&                  mGraphics;
   vk::Queue                  mQueue;
   vk::QueueFlags             mFlags;
-  std::vector< vk::Fence >   mFences;
-  //uint32_t                 mQueueFamilyIndex;
-  //uint32_t                 mQueueIndex;
+  uint32_t                   mQueueFamilyIndex;
+  uint32_t                   mQueueIndex;
 };
 
 } // namespace Vulkan

@@ -18,6 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
@@ -108,9 +109,6 @@ void Graphics::Create()
   PreparePhysicalDevice();
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-
 void Graphics::CreateDevice()
 {
   auto queueInfos = GetQueueCreateInfos();
@@ -173,8 +171,6 @@ void Graphics::CreateDevice()
   mPipelineDatabase = std::make_unique< PipelineCache >( *this );
   mResourceCache = MakeUnique< ResourceCache >();
 }
-
-#pragma GCC diagnostic pop
 
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
@@ -452,6 +448,54 @@ vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemory
   auto result = VkAssert( mDevice.bindImageMemory( image->GetVkHandle(), *memory, offset ) );
   image->AssignMemory(memory);
   return result;
+}
+
+vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
+{
+  std::vector< vk::SubmitInfo > submitInfos;
+
+  // Transform SubmissionData to vk::SubmitInfo
+  std::transform(submissionData.begin(),
+                 submissionData.end(),
+                 std::back_inserter( submitInfos ),
+                 []( SubmissionData subData )
+                 {
+                   std::vector< vk::CommandBuffer > commandBufferHandles;
+
+                   //Extract the command buffer handles
+                   std::transform(subData.commandBuffers.begin(),
+                                  subData.commandBuffers.end(),
+                                  std::back_inserter(commandBufferHandles),
+                                  []( RefCountedCommandBuffer& entry )
+                                  {
+                                    return entry->GetVkHandle();
+                                  });
+
+                   return vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
+                                          .setPWaitSemaphores( subData.waitSemaphores.data() )
+                                          .setPWaitDstStageMask( &subData.waitDestinationStageMask )
+                                          .setCommandBufferCount( U32( subData.commandBuffers.size() )  )
+                                          .setPCommandBuffers( commandBufferHandles.data() )
+                                          .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
+                                          .setPSignalSemaphores( subData.signalSemaphores.data() );
+                 });
+
+  return VkAssert( queue.GetVkHandle().submit( submitInfos, fence ? fence->GetVkHandle() : nullptr ) );
+}
+
+vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
+{
+  return queue.GetVkHandle().presentKHR(presentInfo);
+}
+
+vk::Result Graphics::QueueWaitIdle( Queue& queue )
+{
+  return queue.GetVkHandle().waitIdle();
+}
+
+vk::Result Graphics::DeviceWaitIdle()
+{
+  return mDevice.waitIdle();
 }
 // --------------------------------------------------------------------------------------------------------------
 
