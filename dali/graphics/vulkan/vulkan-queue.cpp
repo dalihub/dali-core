@@ -28,139 +28,61 @@ namespace Graphics
 namespace Vulkan
 {
 
-namespace
-{
-// this class is non-copyable, just movable
-struct PrepareSemaphoresData
-{
-  PrepareSemaphoresData()                             = default;
-  PrepareSemaphoresData(const PrepareSemaphoresData&) = delete;
-  PrepareSemaphoresData& operator=(const PrepareSemaphoresData&) = delete;
-  PrepareSemaphoresData(PrepareSemaphoresData&&)                 = default;
-  PrepareSemaphoresData& operator=(PrepareSemaphoresData&&) = default;
-
-  std::vector< vk::Semaphore >          signalSemaphores;
-  std::vector< vk::Semaphore >          waitSemaphores;
-  std::vector< vk::PipelineStageFlags > waitDstStageMasks;
-};
-
-// helper function converting size_t to required uint32_t
-template< typename T >
-inline uint32_t u32(T val)
-{
-  return static_cast< uint32_t >(val);
-}
-
-inline PrepareSemaphoresData PrepareSemaphores(const std::vector< RefCountedCommandBuffer >& commandBuffers)
-{
-  PrepareSemaphoresData retval{};
-  for(auto& cmdbufref : commandBuffers)
-  {
-    auto& cmdbuf = cmdbufref;
-    if(!retval.signalSemaphores.empty())
-    {
-      retval.signalSemaphores.insert(retval.signalSemaphores.end(),
-                                     cmdbuf->GetSignalSemaphores().begin(),
-                                     cmdbuf->GetSignalSemaphores().end());
-    }
-    if(!retval.waitSemaphores.empty())
-    {
-      retval.waitSemaphores.insert(retval.waitSemaphores.end(), cmdbuf->GetSWaitSemaphores().begin(),
-                                   cmdbuf->GetSWaitSemaphores().end());
-      retval.waitDstStageMasks.insert(retval.waitDstStageMasks.end(),
-                                      cmdbuf->GetWaitSemaphoreStages().begin(),
-                                      cmdbuf->GetWaitSemaphoreStages().end());
-    }
-  }
-  return retval;
-}
-}
-
 // submission
-Submission::Submission( Graphics& graphics, Handle <Fence> fence ) : mGraphics(graphics), mFences(fence)
+SubmissionData::SubmissionData( const std::vector< vk::Semaphore >& waitSemaphores_,
+                                vk::PipelineStageFlags waitDestinationStageMask_,
+                                const std::vector< RefCountedCommandBuffer >& commandBuffers_,
+                                const std::vector< vk::Semaphore >& signalSemaphores_ )
+        : waitSemaphores( waitSemaphores_ ),
+          waitDestinationStageMask( waitDestinationStageMask_ ),
+          commandBuffers( commandBuffers_ ),
+          signalSemaphores( signalSemaphores_ )
 {
 }
 
-bool Submission::WaitForFence(uint32_t timeout)
+SubmissionData& SubmissionData::SetWaitSemaphores( const std::vector< vk::Semaphore >& semaphores )
 {
-  return mGraphics.WaitForFence(mFences, timeout) == vk::Result::eSuccess;
+  waitSemaphores = semaphores;
+  return *this;
+}
+
+SubmissionData& SubmissionData::SetWaitDestinationStageMask( vk::PipelineStageFlags dstStageMask )
+{
+  waitDestinationStageMask = dstStageMask;
+  return *this;
+}
+
+SubmissionData& SubmissionData::SetCommandBuffers( const std::vector< RefCountedCommandBuffer >& cmdBuffers )
+{
+  commandBuffers = cmdBuffers;
+  return *this;
+}
+
+SubmissionData& SubmissionData::SetSignalSemaphores( const std::vector< vk::Semaphore >& semaphores )
+{
+  signalSemaphores = semaphores;
+  return *this;
 }
 
 // queue
-Queue::Queue(Graphics& graphics, vk::Queue queue, uint32_t queueFamilyIndex, uint32_t queueIndex,
+Queue::Queue(Graphics& graphics,
+             vk::Queue queue,
+             uint32_t queueFamilyIndex,
+             uint32_t queueIndex,
              vk::QueueFlags queueFlags)
-: mGraphics(graphics), mQueue(queue), mFlags(queueFlags) /*, mQueueFamilyIndex(queueFamilyIndex), mQueueIndex(queueIndex) */
+        : mGraphics(graphics),
+          mQueue(queue),
+          mFlags(queueFlags),
+          mQueueFamilyIndex(queueFamilyIndex),
+          mQueueIndex(queueIndex)
 {
 }
 
-Queue::~Queue() // queues are non-destructible
+Queue::~Queue() = default; // queues are non-destructible
+
+vk::Queue Queue::GetVkHandle()
 {
-}
-
-std::unique_ptr< Submission > Queue::Submit( RefCountedCommandBuffer commandBuffer, Handle<Fence> fence)
-{
-  auto buffers = std::vector< RefCountedCommandBuffer >({commandBuffer});
-  return Submit(buffers, fence);
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
-std::unique_ptr< Submission > Queue::Submit(const std::vector< RefCountedCommandBuffer >& commandBuffers, Handle<Fence> fence)
-{
-  // Prepare command buffers for submission
-  auto buffers = PrepareBuffers(commandBuffers);
-
-  auto semaphores = PrepareSemaphores(commandBuffers);
-
-  auto info = vk::SubmitInfo{};
-
-  /* semaphores per command buffer */
-  info.setCommandBufferCount(u32(commandBuffers.size()));
-  info.setPCommandBuffers(buffers.data());
-  info.setSignalSemaphoreCount(u32(semaphores.signalSemaphores.size()));
-  info.setPSignalSemaphores(semaphores.signalSemaphores.data());
-  info.setWaitSemaphoreCount(u32(semaphores.waitSemaphores.size()));
-  info.setPWaitSemaphores(semaphores.waitSemaphores.data());
-  info.setPWaitDstStageMask(semaphores.waitDstStageMasks.data());
-
-  VkAssert(mQueue.submit(1, &info, fence ? fence->GetVkHandle() : nullptr ));
-
-  return MakeUnique< Submission >(mGraphics, fence);
-}
-#pragma GCC diagnostic pop
-
-std::vector< vk::CommandBuffer > Queue::PrepareBuffers(const std::vector< RefCountedCommandBuffer >& commandBuffers) const
-{
-  std::vector< vk::CommandBuffer > retval(commandBuffers.size());
-  for(uint32_t i = 0; i < commandBuffers.size(); ++i)
-  {
-    retval[i] = commandBuffers[i]->GetVkCommandBuffer();
-  }
-  return retval;
-}
-
-void Queue::WaitIdle() const
-{
-  assert(mQueue && "Queue isn't initialised!");
-  mQueue.waitIdle();
-}
-
-vk::Result Queue::Present(const vk::PresentInfoKHR& presentInfo)
-{
-  return VkTest(mQueue.presentKHR(presentInfo));
-}
-
-vk::Result Queue::Present(vk::SwapchainKHR swapchain, uint32_t imageIndex)
-{
-  auto info = vk::PresentInfoKHR{}
-                  .setWaitSemaphoreCount(0)
-                  .setPWaitSemaphores(nullptr)
-                  .setPResults(nullptr)
-                  .setPImageIndices(&imageIndex)
-                  .setPSwapchains(&swapchain)
-                  .setSwapchainCount(1);
-
-  return Present(info);
+  return mQueue;
 }
 
 } // namespace Vulkan
