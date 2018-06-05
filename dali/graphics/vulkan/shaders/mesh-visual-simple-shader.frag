@@ -12,5 +12,5 @@ layout(location=0) out vec4 fragColor;
 
 void main()
 {
-    fragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a ) * vec4(mixColor,1.0);
+    fragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a );// * vec4(mixColor,1.0);
 }

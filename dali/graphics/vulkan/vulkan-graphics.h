@@ -26,6 +26,7 @@
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/integration-api/graphics/surface-factory.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -55,7 +56,6 @@ class Surface;
 class CommandPool;
 class DescriptorPool;
 class GpuMemoryManager;
-class PipelineCache;
 class ResourceCache;
 
 struct SwapchainSurfacePair
@@ -184,15 +184,7 @@ public:
 private:
   std::unique_ptr<Dali::Graphics::API::Controller>           mGfxController;
 
-  // TODO: rename
-  std::unique_ptr<PipelineCache>        mPipelineDatabase;
-
   std::unique_ptr<ResourceCache>        mResourceCache;
-public:
-  PipelineCache& GetPipelineCache()
-  {
-    return *mPipelineDatabase;
-  }
 };
 
 } // namespace Vulkan

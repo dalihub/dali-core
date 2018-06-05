@@ -43,9 +43,9 @@ public:
 
   explicit Shader( Vulkan::Graphics& graphics );
 
-  bool AddShaderModule( Graphics::API::ShaderDetails::PipelineStage pipelineStage,
-          Graphics::API::ShaderDetails::Language language,
-          Graphics::API::ShaderDetails::ShaderSource shaderSource );
+  bool AddShaderModule( Dali::Graphics::API::ShaderDetails::PipelineStage pipelineStage,
+                        Dali::Graphics::API::ShaderDetails::Language language,
+                        Dali::Graphics::API::ShaderDetails::ShaderSource shaderSource );
 
   Vulkan::RefCountedShader GetShader( vk::ShaderStageFlagBits shaderStage ) const ;
 
