@@ -30,7 +30,7 @@
 #include <mutex>
 #include <map>
 #include <functional>
-#include "vulkan-queue.h"
+#include <dali/graphics/vulkan/vulkan-queue.h>
 
 namespace Dali
 {
