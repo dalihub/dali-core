@@ -167,13 +167,16 @@ struct UboPool::Impl
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Allocating new page of block size " << mBlockSize << ", capacity: " << mInitialCapacity);
     // add new Vulkan Buffer object
     auto& graphics = mController.GetGraphics();
-    mBuffers.emplace_back( Vulkan::Buffer::New( graphics, vk::BufferCreateInfo{}
-                                      .setUsage( vk::BufferUsageFlagBits::eUniformBuffer)
-                                      .setSharingMode( vk::SharingMode::eExclusive )
-                                      .setSize( mBlockSize * mInitialCapacity ) ) );
+
+    mBuffers.emplace_back( graphics.CreateBuffer(vk::BufferCreateInfo{}
+                                                         .setUsage( vk::BufferUsageFlagBits::eUniformBuffer)
+                                                         .setSharingMode( vk::SharingMode::eExclusive )
+                                                         .setSize( mBlockSize * mInitialCapacity ) ) );
     mBuffers.back().buffer->BindMemory(
-              graphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible )
-    );
+              graphics
+                      .GetDeviceMemoryManager()
+                      .GetDefaultAllocator()
+                      .Allocate( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
 
     auto startIndex = ((mBuffers.size()-1)*mInitialCapacity);

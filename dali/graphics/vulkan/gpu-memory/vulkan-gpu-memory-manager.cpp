@@ -73,7 +73,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
     vk::DeviceMemory        memory { nullptr };
   };
 
-  GpuMemoryDefaultAllocator( GpuMemoryManager& manager )
+  explicit GpuMemoryDefaultAllocator( GpuMemoryManager& manager )
     : GpuMemoryAllocator(), mGpuManager( manager ),
       mGraphics(manager.GetGraphics())
   {
@@ -117,7 +117,9 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    */
   virtual RefCountedGpuMemoryBlock Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return Allocate( mGraphics.GetDevice().getBufferMemoryRequirements(buffer->GetVkHandle() ),
+    vk::Buffer handle = buffer->GetVkHandle();
+    vk::MemoryRequirements memReqs = mGraphics.GetDevice().getBufferMemoryRequirements( handle );
+    return Allocate( memReqs,
                      memoryProperties );
   }
 

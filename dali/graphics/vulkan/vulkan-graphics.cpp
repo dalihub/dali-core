@@ -331,7 +331,6 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
   if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
   {
     aspectFlags |= vk::ImageAspectFlagBits::eColor;
-    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eB,vk::ComponentSwizzle::eA };
   }
   if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
   {
@@ -339,8 +338,7 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
   }
   if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eSampled )
   {
-    aspectFlags |= ( vk::ImageAspectFlagBits::eColor );
-    //componentsMapping = { vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eG, vk::ComponentSwizzle::eR,vk::ComponentSwizzle::eA };
+    aspectFlags |= vk::ImageAspectFlagBits::eColor;
   }
 
   auto subresourceRange = vk::ImageSubresourceRange{}
@@ -453,20 +451,21 @@ vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemory
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
   std::vector< vk::SubmitInfo > submitInfos;
+  std::vector< vk::CommandBuffer > commandBufferHandles;
 
   // Transform SubmissionData to vk::SubmitInfo
   std::transform(submissionData.begin(),
                  submissionData.end(),
                  std::back_inserter( submitInfos ),
-                 []( SubmissionData subData )
+                 [&]( SubmissionData subData )
                  {
-                   std::vector< vk::CommandBuffer > commandBufferHandles;
+
 
                    //Extract the command buffer handles
                    std::transform(subData.commandBuffers.begin(),
                                   subData.commandBuffers.end(),
                                   std::back_inserter(commandBufferHandles),
-                                  []( RefCountedCommandBuffer& entry )
+                                  [&]( RefCountedCommandBuffer& entry )
                                   {
                                     return entry->GetVkHandle();
                                   });
