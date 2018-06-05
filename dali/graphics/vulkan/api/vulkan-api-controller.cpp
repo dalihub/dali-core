@@ -81,7 +81,8 @@ struct Controller::Impl
     return true;
   }
 
-  void BeginFrame()
+
+  void BeginFrame( float clearColor[4] )
   {
     auto surface = mGraphics.GetSurface( 0u );
 
@@ -89,8 +90,9 @@ struct Controller::Impl
 
     auto framebuffer = swapchain->AcquireNextFramebuffer();
 
+
     swapchain->BeginPrimaryRenderPass( {
-                                         { 1.0f, 1.0f, 1.0f, 1.0f }
+                                         { clearColor[0], clearColor[1], clearColor[2], clearColor[3] }
                                        }  );
 
   }
@@ -168,7 +170,11 @@ struct Controller::Impl
       //const auto& vertexBufferBindings = command->GetVertexBufferBindings();
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
-      //apiCommand->PreparePipeline();
+      // skip if there's no valid pipeline
+      if( !apiCommand->GetVulkanPipeline() )
+      {
+        continue;
+      }
 
       if( !mCommandPool )
       {
@@ -317,9 +323,9 @@ Controller::~Controller()       = default;
 Controller::Controller()        = default;
 Controller& Controller::operator=( Controller&& ) noexcept = default;
 
-void Controller::BeginFrame()
+void Controller::BeginFrame( float clearColor[4] )
 {
-  mImpl->BeginFrame();
+  mImpl->BeginFrame( clearColor );
 }
 
 void Controller::EndFrame()

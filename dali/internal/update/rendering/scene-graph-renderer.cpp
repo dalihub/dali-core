@@ -124,8 +124,8 @@ Renderer::Renderer()
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
-  mBlendBitmask( 0u ),
   mRegenerateUniformMap( 0u ),
+  mBlendOptions(),
   mDepthFunction( DepthFunction::LESS ),
   mFaceCullingMode( FaceCullingMode::NONE ),
   mBlendMode( BlendMode::AUTO ),
@@ -227,48 +227,15 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     return;
   }
 
-  using Graphics::API::Pipeline;
-
-  // vertex input state
-  VertexInputState vi{};
   /**
    * Prepare vertex attribute buffer bindings
    */
-  uint32_t bindingIndex{0u};
   std::vector<Graphics::API::Accessor<Graphics::API::Buffer>> vertexBuffers{};
 
   for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
   {
     vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
-    auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
-
-    // update vertex buffer if necessary
-    vertexBuffer->Update(controller);
-
-    // store buffer binding
-    vi.bufferBindings
-      .emplace_back( vertexBuffer->GetFormat()->size, VertexInputRate::PER_VERTEX);
-
-    for (auto i = 0u; i < attributeCountInForBuffer; ++i)
-    {
-      // create attribute description
-      vi.attributes
-        .emplace_back(
-          gfxShader.Get().GetVertexAttributeLocation( vertexBuffer->GetAttributeName( i ) ),
-          bindingIndex, (vertexBuffer->GetFormat()->components[i]).offset,
-                      VertexInputFormat::UNDEFINED);
-
-    }
-    bindingIndex++;
   }
-
-
-  // Invalid input attributes!
-  if (mShader->GetGfxObject()
-             .Get()
-             .GetVertexAttributeLocations()
-             .size() != vi.attributes.size())
-    return;
 
   UpdateUniformMap(updateBufferIndex);
 
@@ -434,21 +401,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   // set optional index buffer
   bool usesIndexBuffer{false};
-  auto topology  = PrimitiveTopology::TRIANGLE_STRIP;
-  auto geometryTopology = mGeometry->GetType();
-  switch (geometryTopology)
-  {
-    case Dali::Geometry::Type::TRIANGLE_STRIP:
-    {
-      topology = PrimitiveTopology::TRIANGLE_STRIP;
-      break;
-    }
-    default:
-    {
-      topology = PrimitiveTopology::TRIANGLE_LIST;
-    }
-  }
-
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
     mGfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
@@ -457,62 +409,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     );
   }
 
-
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
   mGfxRenderCommand->BindVertexBuffers( std::move( vertexBuffers ) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
 
-  // create pipeline
-  if(!mGfxPipeline)
-  {
-    mGfxPipeline = controller.CreatePipeline(controller.GetPipelineFactory()
-
-                                                       // vertex input
-                                                       .SetVertexInputState( vi )
-
-                                                       // shaders
-                                                       .SetShaderState( ShaderState()
-                                                                                  .SetShaderProgram( shader ))
-
-                                                       // input assembly
-                                                       .SetInputAssemblyState( InputAssemblyState()
-                                                                                  .SetTopology( topology )
-                                                                                  .SetPrimitiveRestartEnable( true ))
-
-                                                         // viewport ( if zeroes then framebuffer size used )
-                                                       .SetViewportState( ViewportState()
-                                                                                  .SetViewport( { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } ))
-
-                                                       // depth stencil
-                                                       .SetDepthStencilState( DepthStencilState()
-                                                                                  .SetDepthTestEnable(
-                                                                                    mDepthTestMode != DepthTestMode::ON ? false : true
-                                                                                  )
-                                                       .SetDepthWriteEnable( true )
-                                                       .SetDepthCompareOp( CompareOp::GREATER_OR_EQUAL ))
-
-
-                                                       // color blend
-                                                       .SetColorBlendState( ColorBlendState()
-                                                                                  .SetBlendEnable( mBlendMode != BlendMode::OFF ? true : false  )
-                                                                                  .SetColorComponentsWriteBits( 0xff )
-                                                                                  .SetSrcColorBlendFactor( Graphics::API::BlendFactor::SRC_ALPHA )
-                                                                                  .SetDstColorBlendFactor( Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA )
-                                                                                  .SetSrcAlphaBlendFactor( Graphics::API::BlendFactor::ONE )
-                                                                                  .SetDstAlphaBlendFactor( Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA )
-                                                                                  .SetColorBlendOp( BlendOp::ADD )
-                                                                                  .SetAlphaBlendOp( BlendOp::ADD )
-                                                                                  .SetLogicOpEnable( false ))
-
-                                                       // rasterization
-                                                       .SetRasterizationState( RasterizationState()
-                                                                                  .SetCullMode( CullMode::NONE )
-                                                                                  .SetPolygonMode( PolygonMode::FILL )
-                                                                                  .SetFrontFace( FrontFace::CLOCKWISE )));
-  }
-
-  // bind pipeline
-  mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
   if(usesIndexBuffer)
   {
     mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
@@ -605,17 +505,25 @@ BlendMode::Type Renderer::GetBlendMode() const
   return mBlendMode;
 }
 
-void Renderer::SetBlendingOptions( unsigned int options )
+void Renderer::SetBlendingOptions( const BlendingOptions& options )
 {
-  if( mBlendBitmask != options)
+  if( mBlendOptions.GetBitmask() != options.GetBitmask())
   {
-    mBlendBitmask = options;
+    mBlendOptions.SetBitmask( options.GetBitmask() );
   }
 }
 
-unsigned int Renderer::GetBlendingOptions() const
+void Renderer::SetBlendingOptions( unsigned int options )
 {
-  return mBlendBitmask;
+  if( options != mBlendOptions.GetBitmask() )
+  {
+    mBlendOptions.SetBitmask( options );
+  }
+}
+
+const BlendingOptions& Renderer::GetBlendingOptions() const
+{
+  return mBlendOptions;
 }
 
 void Renderer::SetBlendColor( const Vector4& blendColor )

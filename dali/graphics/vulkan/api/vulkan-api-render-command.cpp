@@ -65,6 +65,10 @@ void RenderCommand::PrepareResources()
     if( !mVulkanPipeline )
     {
       auto pipeline = dynamic_cast<const VulkanAPI::Pipeline*>( mPipeline );
+      if(!pipeline)
+      {
+        return;
+      }
       mVkDescriptorSetLayouts.clear();
       mVkDescriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
       mVulkanPipeline = pipeline->GetVkPipeline();

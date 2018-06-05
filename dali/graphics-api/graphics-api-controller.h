@@ -121,7 +121,7 @@ public:
   /**
    * @brief Mark the beginning of a frame
    */
-  virtual void BeginFrame() = 0;
+  virtual void BeginFrame( float clearColor[4] ) = 0;
 
   /**
    * @brief Mark the end of a frame

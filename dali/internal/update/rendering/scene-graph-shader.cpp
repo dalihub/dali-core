@@ -48,10 +48,16 @@ void Shader::Initialize( Integration::Graphics::Graphics& graphics, ShaderCache&
   mShaderCache = &shaderCache;
 }
 
+const Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject() const
+{
+  return mGraphicsShader;
+}
+
 Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject()
 {
   return mGraphicsShader;
 }
+
 
 void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
