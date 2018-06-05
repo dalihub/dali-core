@@ -205,7 +205,7 @@ struct Swapchain::Impl
                               .setImage( vkImage )
                               .setSubresourceRange( range )
                               .setSrcAccessMask( vk::AccessFlags{} )
-                              .setDstAccessMask( vk::AccessFlagBits::eColorAttachmentWrite )
+                              .setDstAccessMask( vk::AccessFlags{} )
                               .setOldLayout( vk::ImageLayout::eUndefined )
                               .setNewLayout( vk::ImageLayout::eColorAttachmentOptimal );
 
@@ -231,7 +231,7 @@ struct Swapchain::Impl
                                    .setImage( vkImage )
                                    .setSubresourceRange( range )
                                    .setSrcAccessMask( vk::AccessFlags{} )
-                                   .setDstAccessMask( vk::AccessFlagBits::eDepthStencilAttachmentWrite )
+                                   .setDstAccessMask( vk::AccessFlags{} )//vk::AccessFlagBits::eDepthStencilAttachmentWrite )
                                    .setOldLayout( vk::ImageLayout::eUndefined )
                                    .setNewLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
       barriers.emplace_back( depthStencilBarrier );
@@ -491,8 +491,9 @@ struct Swapchain::Impl
 
     std::vector<vk::ImageMemoryBarrier> barriers;
     vk::ImageMemoryBarrier              barrier;
-    barrier.setSrcAccessMask( vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eColorAttachmentRead )
-      .setDstAccessMask( vk::AccessFlagBits::eColorAttachmentWrite )
+    barrier
+      .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eColorAttachmentRead )
+      .setDstAccessMask( vk::AccessFlagBits::eShaderWrite )
       .setOldLayout( vk::ImageLayout::ePresentSrcKHR )
       .setNewLayout( vk::ImageLayout::eColorAttachmentOptimal )
       .setSubresourceRange( vk::ImageSubresourceRange{}.setAspectMask( vk::ImageAspectFlagBits::eColor ).setBaseArrayLayer(0)
@@ -505,8 +506,8 @@ struct Swapchain::Impl
       barriers.emplace_back( barrier.setImage( *imageView->GetImage() ) );
     }
 
-    cmdBuf->PipelineBarrier( vk::PipelineStageFlagBits::eBottomOfPipe,
-                             vk::PipelineStageFlagBits::eColorAttachmentOutput,
+    cmdBuf->PipelineBarrier( vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                             vk::PipelineStageFlagBits::eFragmentShader,
                              vk::DependencyFlags{},
                              std::vector<vk::MemoryBarrier>{},
                              std::vector<vk::BufferMemoryBarrier>{},
