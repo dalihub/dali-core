@@ -35,6 +35,7 @@ namespace VulkanAPI
 {
 class Controller;
 class Ubo;
+class Pipeline;
 
 /**
  * Render command stores internal command buffer per draw call
@@ -56,8 +57,7 @@ public:
   constexpr static uint32_t UPDATE_ALL = 0xffffffff;
 
   RenderCommand( VulkanAPI::Controller& controller,
-                 Vulkan::Graphics& graphics,
-                 Vulkan::PipelineCache& pipelineCache );
+                 Vulkan::Graphics& graphics );
 
   ~RenderCommand() override;
 
@@ -66,7 +66,7 @@ public:
    * updates cache
    * @return
    */
-  bool PreparePipeline();
+  void PrepareResources();
 
   /**
    * Updates uniform buffers
@@ -84,6 +84,11 @@ public:
   void BindTexturesAndSamplers();
 
   /**
+   * Binds vertex buffers
+   */
+  void BindVertexBuffers();
+
+  /**
    * Returns an array of updated descriptor sets
    * @return
    */
@@ -96,36 +101,12 @@ public:
   const Vulkan::RefCountedCommandBuffer& GetCommandBuffer() const;
 
   /**
-   * Returns pipeline cache
+   * Returns Vulkan backed pipeline
    * @return
    */
-  const Vulkan::PipelineCache& GetPipelineCache() const;
-
-  /**
-   * Returns pipeline
-   * @return
-   */
-  const Vulkan::RefCountedPipeline& GetPipeline() const;
-
-
+  Vulkan::RefCountedPipeline GetVulkanPipeline() const;
 
 private:
-
-  const vk::PipelineColorBlendStateCreateInfo*      PrepareColorBlendStateCreateInfo();
-
-  const vk::PipelineDepthStencilStateCreateInfo*    PrepareDepthStencilStateCreateInfo();
-
-  const vk::PipelineInputAssemblyStateCreateInfo*   PrepareInputAssemblyStateCreateInfo();
-
-  const vk::PipelineMultisampleStateCreateInfo*     PrepareMultisampleStateCreateInfo();
-
-  const vk::PipelineRasterizationStateCreateInfo*   PrepareRasterizationStateCreateInfo();
-
-  const vk::PipelineTessellationStateCreateInfo*    PrepareTesselationStateCreateInfo();
-
-  const vk::PipelineVertexInputStateCreateInfo*     PrepareVertexInputStateCreateInfo();
-
-  const vk::PipelineViewportStateCreateInfo*        PrepareViewportStateCreateInfo();
 
   /**
    * Allocates UBO memory based on the pipeline. Executed only
@@ -135,25 +116,17 @@ private:
 
 private:
 
-  /**
-   * Describes assigned UBO buffers
-   */
-
-  struct VulkanPipelineState;
-  std::unique_ptr<VulkanPipelineState>  mVulkanPipelineState;
-
-  VulkanAPI::Controller&                mController;
-  Vulkan::Graphics&                     mGraphics;
-  Vulkan::PipelineCache&                mPipelineCache;
+  VulkanAPI::Controller&                       mController;
+  Vulkan::Graphics&                            mGraphics;
   Vulkan::RefCountedCommandBuffer              mCommandBuffer;
-  Vulkan::RefCountedPipeline                   mPipeline;
+  Vulkan::RefCountedPipeline                   mVulkanPipeline;
   Vulkan::RefCountedDescriptorPool             mDescriptorPool;
 
-  std::vector<vk::DescriptorSetLayout>  mVkDescriptorSetLayouts;
+  std::vector<vk::DescriptorSetLayout>         mVkDescriptorSetLayouts;
 
   std::vector<Vulkan::RefCountedDescriptorSet> mDescriptorSets;
 
-  std::vector<std::unique_ptr<Ubo>>     mUboBuffers;
+  std::vector<std::unique_ptr<Ubo>>            mUboBuffers;
 
   uint32_t mUpdateFlags;
 };
