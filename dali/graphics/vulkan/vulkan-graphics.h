@@ -40,12 +40,6 @@ namespace API
 {
 class Controller;
 }
-
-namespace VulkanAPI
-{
-class Controller;
-}
-
 namespace Vulkan
 {
 
@@ -66,9 +60,6 @@ class CommandPool;
 class DescriptorPool;
 
 class GpuMemoryManager;
-
-class PipelineCache;
-
 class ResourceCache;
 
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
@@ -186,8 +177,6 @@ public: // Getters
 
   Dali::Graphics::API::Controller& GetController();
 
-  PipelineCache& GetPipelineCache();
-
 public: //Cache management methods
 
   void AddBuffer( RefCountedBuffer buffer );
@@ -281,10 +270,7 @@ private: // Members
 
   Platform mPlatform{ Platform::UNDEFINED };
 
-  std::unique_ptr< Dali::Graphics::VulkanAPI::Controller > mGfxController;
-
-  // TODO: rename
-  std::unique_ptr< PipelineCache > mPipelineDatabase;
+  std::unique_ptr< Dali::Graphics::API::Controller > mGfxController;
 
   std::mutex mMutex;
   std::unique_ptr< ResourceCache > mResourceCache;

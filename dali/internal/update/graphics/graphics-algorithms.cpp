@@ -112,11 +112,17 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
       sgRenderer->WriteUniform("uModelMatrix", item.mModelMatrix);
       sgRenderer->WriteUniform("uMvpMatrix", mvp2);
+
       sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
-      sgRenderer->WriteUniform("uModelViewMatrix", item.mModelViewMatrix);
+      sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
+
+
+
+     // sgRenderer->WriteUniform("uNormalMatrix", normal);
+
       sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
       sgRenderer->WriteUniform("uSize", item.mSize);
-      sgRenderer->WriteUniform( "uColor", color );
+      sgRenderer->WriteUniform("uColor", color );
 
       commandList.push_back(&cmd);
     }
