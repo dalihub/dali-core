@@ -63,7 +63,7 @@ void GpuMemoryBlock::Unmap()
 
 void GpuMemoryBlock::Flush()
 {
-  NotImplemented();
+
 }
 
 }

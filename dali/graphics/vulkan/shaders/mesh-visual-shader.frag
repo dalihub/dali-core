@@ -16,7 +16,7 @@ layout( location = 0 ) out vec4 fragColor;
 
 void main()
 {
-    vec4 texture = texture( sDiffuse, vTexCoord );
+    vec4 tex = texture( sDiffuse, vTexCoord );
     vec4 visualMixColor = vec4(mixColor,1.0);
-    fragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb * visualMixColor.rgb + vSpecular * 0.3, texture.a * uColor.a * visualMixColor.a );
+    fragColor = vec4( vIllumination.rgb * tex.rgb * uColor.rgb * visualMixColor.rgb + vSpecular * 0.3, tex.a * uColor.a * visualMixColor.a );
 }
