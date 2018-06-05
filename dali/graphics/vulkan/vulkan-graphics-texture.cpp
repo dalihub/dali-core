@@ -90,13 +90,14 @@ struct Texture::Impl
                                                  .setSharingMode( vk::SharingMode::eExclusive )
                                                  .setSize( size ));
 
-    buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
+    buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent ) );
 
     // copy pixels to the buffer
     auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
     std::copy( reinterpret_cast<const char*>(data),
                reinterpret_cast<const char*>(data) + sizeInBytes,
                ptr );
+
     buffer->GetMemoryHandle()->Unmap();
 
     // record copy and layout change
@@ -149,8 +150,8 @@ struct Texture::Impl
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
     auto fence = mGraphics.CreateFence({});
-    mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { mCommandBuffer } ) }, fence );
-    VkAssert(mGraphics.WaitForFence(fence));
+    VkAssert(mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { mCommandBuffer } ) }, fence ));
+    VkAssert(mGraphics.WaitForFence(fence, std::numeric_limits<uint32_t>::max()));
     return true;
   }
 

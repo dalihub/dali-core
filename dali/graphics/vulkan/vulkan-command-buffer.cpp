@@ -233,12 +233,16 @@ void CommandBuffer::EndRenderPass()
 
 void CommandBuffer::ExecuteCommands( std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>> commandBuffers )
 {
+  assert( mAllocateInfo.level == vk::CommandBufferLevel::ePrimary
+          && "Cannot record command: ExecuteCommands\tReason: The command buffer recording this command is not primary" );
+
   auto vkBuffers = std::vector< vk::CommandBuffer >{};
   vkBuffers.reserve( commandBuffers.size());
   for( auto&& buf : commandBuffers )
   {
-    assert( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary &&
-            "Cannot Execute Commands. Command buffer level not secondary" );
+    assert(buf->mAllocateInfo.level == vk::CommandBufferLevel::eSecondary &&
+            "Cannot record command: Execute Commands\tReason: A command buffer provided for execution is not secondary" );
+
     vkBuffers.emplace_back( buf->GetVkHandle());
   }
 
