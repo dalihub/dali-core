@@ -550,9 +550,9 @@ public:
   /**
    * Resource binding API
    */
-  RenderCommand& BindVertexBuffers( std::vector<VertexAttributeBufferBinding>&& bindings )
+  RenderCommand& BindVertexBuffers( std::vector<Accessor<Buffer>>&& buffers )
   {
-    mVertexBufferBindings = std::move( bindings );
+    mVertexBufferBindings = std::move( buffers );
     return *this;
   }
 
@@ -604,9 +604,9 @@ public:
     return *this;
   }
 
-  RenderCommand& BindPipeline( const Accessor<Pipeline>& pipeline )
+  RenderCommand& BindPipeline( const Pipeline& pipeline )
   {
-    mPipeline = pipeline;
+    mPipeline = &pipeline;
     return *this;
   }
 
@@ -649,7 +649,7 @@ public:
   }
 
   // Getters
-  const std::vector<VertexAttributeBufferBinding>& GetVertexBufferBindings() const
+  const std::vector<Accessor<Buffer>>& GetVertexBufferBindings() const
   {
     return mVertexBufferBindings;
   }
@@ -689,23 +689,26 @@ public:
     return mRenderState;
   }
 
-  Accessor<Pipeline> GetPipeline() const
+  const Pipeline* GetPipeline() const
   {
     return mPipeline;
   }
 
-protected:
+public:
 
-  std::vector<VertexAttributeBufferBinding> mVertexBufferBindings;
+  // list of resources
+  std::vector<Accessor<Buffer>>             mVertexBufferBindings;
   std::vector<UniformBufferBinding>         mUniformBufferBindings;
   std::vector<TextureBinding>               mTextureBindings;
   std::vector<SamplerBinding>               mSamplerBindings;
+
+
   IndexBufferBinding                        mIndexBufferBinding;
   RenderTargetBinding                       mRenderTargetBinding;
   DrawCommand                               mDrawCommand;
   std::vector<PushConstantsBinding>         mPushConstantsBindings;
   RenderState                               mRenderState;
-  Accessor<Pipeline>                        mPipeline;
+  const Pipeline*                           mPipeline;
 
 };
 

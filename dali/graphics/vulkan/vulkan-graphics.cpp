@@ -30,7 +30,6 @@
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <dali/graphics/vulkan/vulkan-resource-cache.h>
 #include <dali/graphics/vulkan/vulkan-debug.h>
@@ -61,7 +60,7 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
   //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  "VK_LAYER_RENDERDOC_Capture",
+  //"VK_LAYER_RENDERDOC_Capture",
   "VK_LAYER_LUNARG_parameter_validation", // parameter
   //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
   //"VK_LAYER_LUNARG_monitor",             // monitor
@@ -70,7 +69,6 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
   "VK_LAYER_LUNARG_api_dump",            // api
   "VK_LAYER_LUNARG_object_tracker",      // objects
   "VK_LAYER_LUNARG_core_validation",     // core
-  "VK_LAYER_GOOGLE_unique_objects",      // unique objects
   "VK_LAYER_GOOGLE_unique_objects",      // unique objects
   "VK_LAYER_LUNARG_standard_validation", // standard
 };
@@ -216,6 +214,8 @@ void Graphics::CreateInstance( const std::vector<const char*>& extensions, const
   {
     info.setEnabledLayerCount(0);
   }
+#else
+  //info.setEnabledLayerCount(0);
 #endif
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -477,7 +477,6 @@ void Graphics::CreateDevice()
     }
   }
 
-  mPipelineDatabase = std::make_unique<PipelineCache>( *this );
   mResourceCache = MakeUnique<ResourceCache>();
 }
 

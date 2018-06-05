@@ -31,6 +31,8 @@
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-pipeline-factory.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
@@ -75,9 +77,9 @@ public:
   virtual Accessor<Framebuffer> CreateFramebuffer( const BaseFactory<Framebuffer>& factory ) = 0;
 
   /**
-   * @brief Get a render list
+   * Creates new pipeline
    */
-  virtual void GetRenderItemList() = 0;
+  virtual std::unique_ptr<Pipeline> CreatePipeline( const BaseFactory<Pipeline>& factory ) = 0;
 
   /**
    * @brief Returns texture factory
@@ -92,10 +94,17 @@ public:
   virtual ShaderFactory& GetShaderFactory() const = 0;
 
   /**
- * @brief Returns shader factory
- * @return
- */
+   * @brief Returns buffer factory
+   * @return
+   */
   virtual BufferFactory& GetBufferFactory() const = 0;
+
+  /**
+   * @brief Returns pipeline factory
+   * @return
+   */
+  virtual PipelineFactory& GetPipelineFactory() = 0;
+
 
   /**
    * @brief alAllocates render command ( depends on implementation );
