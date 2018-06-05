@@ -1,6 +1,5 @@
-
-#ifndef DALI_GRAPHICS_API_UTILITY_H
-#define DALI_GRAPHICS_API_UTILITY_H
+#ifndef DALI_GRAPHICS_API_PIPELINE_H
+#define DALI_GRAPHICS_API_PIPELINE_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -19,9 +18,7 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstdint>
-#include <cstdlib>
+#include <dali/graphics-api/graphics-api-types.h>
 
 namespace Dali
 {
@@ -30,36 +27,24 @@ namespace Graphics
 namespace API
 {
 
-/**
- * Structure that represents a rectangular size
- */
-struct RectSize {
-  size_t width = 0;
-  size_t height = 0;
-};
-
-struct Rect2D {
-  int32_t x = 0;
-  int32_t y = 0;
-  uint32_t width = 0;
-  uint32_t height = 0;
-};
-
-/**
- * Structure represents area of viewport
- */
-struct Viewport
+class Pipeline
 {
-  float x = 0.0f;
-  float y = 0.0f;
-  float width = 0.0f;
-  float height = 0.0f;
-  float minDepth = 0.0f;
-  float maxDepth = 0.0f;
+public:
+  // not copyable
+  Pipeline(const Pipeline&) = delete;
+  Pipeline& operator=(const Pipeline&) = delete;
+
+  virtual ~Pipeline() = default;
+
+protected:
+
+  Pipeline(Pipeline&&) = default;
+  Pipeline& operator=(Pipeline&&) = default;
+
+  Pipeline() = default;
+
 };
-
-} // namespace API
-} // namespace Graphics
-} // namespace Dali
-
-#endif // DALI_GRAPHICS_API_UTILITY_H
+}
+}
+}
+#endif // DALI_GRAPHICS_API_PIPELINE_H

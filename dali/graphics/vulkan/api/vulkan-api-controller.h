@@ -93,6 +93,11 @@ public:
   /**
    * @brief Create a new object
    */
+  std::unique_ptr<API::Pipeline> CreatePipeline( const API::BaseFactory<API::Pipeline>& factory ) override;
+
+  /**
+   * @brief Create a new object
+   */
   API::Accessor<API::Framebuffer> CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory ) override;
 
   std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
@@ -101,15 +106,9 @@ public:
 
   std::unique_ptr<API::RenderCommand> AllocateRenderCommand() override;
 
-  /**
-   * @brief Get a render list
-   */
-  void GetRenderItemList() override;
-
   void BeginFrame() override;
 
   void EndFrame() override;
-
 
   // VULKAN only
 
@@ -128,6 +127,8 @@ public:
   API::ShaderFactory& GetShaderFactory() const override;
 
   API::BufferFactory& GetBufferFactory() const override;
+
+  API::PipelineFactory& GetPipelineFactory() override;
 
 public:
   // not copyable

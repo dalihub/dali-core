@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_VULKAN_GRAPHICS
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,16 @@
 #endif
 
 // INTERNAL INCLUDES
-#include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/integration-api/graphics/surface-factory.h>
+#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+
 #include <thread>
 #include <mutex>
 #include <map>
 #include <functional>
-#include <dali/graphics/vulkan/vulkan-queue.h>
+
 
 namespace Dali
 {
@@ -40,7 +42,6 @@ namespace API
 {
 class Controller;
 }
-
 namespace VulkanAPI
 {
 class Controller;
@@ -66,9 +67,6 @@ class CommandPool;
 class DescriptorPool;
 
 class GpuMemoryManager;
-
-class PipelineCache;
-
 class ResourceCache;
 
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
@@ -186,8 +184,6 @@ public: // Getters
 
   Dali::Graphics::API::Controller& GetController();
 
-  PipelineCache& GetPipelineCache();
-
   bool IsShuttingDown();
 
 public: //Cache management methods
@@ -286,9 +282,6 @@ private: // Members
   std::unique_ptr< GpuMemoryManager > mDeviceMemoryManager;
 
   Platform mPlatform{ Platform::UNDEFINED };
-
-  // TODO: rename
-  std::unique_ptr< PipelineCache > mPipelineDatabase;
 
   std::mutex mMutex;
 

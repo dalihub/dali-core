@@ -38,6 +38,8 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-api-pipeline-factory.h>
+
 #include <cstring>
 
 namespace // unnamed namespace
@@ -159,13 +161,6 @@ void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
-
-void* AllocateUniformBufferMemory( size_t size )
-{
-  return nullptr;
-}
-
-
 void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 {
   // Called every frame.
@@ -210,6 +205,8 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
+  using namespace Dali::Graphics::API;
+
   auto &controller = mGraphics->GetController();
 
   // prepare all stuff
@@ -226,40 +223,47 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     return;
   }
 
+  using Graphics::API::Pipeline;
+
+  // vertex input state
+  VertexInputState vi{};
   /**
    * Prepare vertex attribute buffer bindings
    */
   uint32_t bindingIndex{0u};
-  uint32_t locationIndex{0u};
-  auto     vertexAttributeBindings = Graphics::API::RenderCommand::NewVertexAttributeBufferBindings();
-  for (auto &&vertexBuffer : mGeometry->GetVertexBuffers())
+  std::vector<Graphics::API::Accessor<Graphics::API::Buffer>> vertexBuffers{};
+
+  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
   {
+    vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
     auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
 
     // update vertex buffer if necessary
     vertexBuffer->Update(controller);
 
+    // store buffer binding
+    vi.bufferBindings
+      .emplace_back( vertexBuffer->GetFormat()->size, VertexInputRate::PER_VERTEX);
+
     for (auto i = 0u; i < attributeCountInForBuffer; ++i)
     {
-      // create binding per attribute
-      auto binding = Graphics::API::RenderCommand::VertexAttributeBufferBinding{}
-        .SetOffset((vertexBuffer->GetFormat()->components[i]).offset)
-        .SetBinding(bindingIndex)
-        .SetBuffer(vertexBuffer->GetGfxObject())
-        .SetInputAttributeRate(Graphics::API::RenderCommand::InputAttributeRate::PER_VERTEX)
-        .SetLocation(locationIndex + i)
-        .SetStride(vertexBuffer->GetFormat()->size);
+      // create attribute description
+      vi.attributes
+        .emplace_back(
+          gfxShader.Get().GetVertexAttributeLocation( vertexBuffer->GetAttributeName( i ) ),
+          bindingIndex, (vertexBuffer->GetFormat()->components[i]).offset,
+                      VertexInputFormat::UNDEFINED);
 
-      vertexAttributeBindings.emplace_back(binding);
     }
-    locationIndex += attributeCountInForBuffer;
+    bindingIndex++;
   }
+
 
   // Invalid input attributes!
   if (mShader->GetGfxObject()
              .Get()
              .GetVertexAttributeLocations()
-             .size() != vertexAttributeBindings.size())
+             .size() != vi.attributes.size())
     return;
 
   auto &shader = mShader->GetGfxObject().Get();
@@ -414,7 +418,21 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   // set optional index buffer
   bool usesIndexBuffer{false};
-  auto topology  = Graphics::API::RenderCommand::Topology::TRIANGLE_STRIP;
+  auto topology  = PrimitiveTopology::TRIANGLE_STRIP;
+  auto geometryTopology = mGeometry->GetType();
+  switch (geometryTopology)
+  {
+    case Dali::Geometry::Type::TRIANGLE_STRIP:
+    {
+      topology = PrimitiveTopology::TRIANGLE_STRIP;
+      break;
+    }
+    default:
+    {
+      topology = PrimitiveTopology::TRIANGLE_LIST;
+    }
+  }
+
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
     mGfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
@@ -423,29 +441,62 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     );
   }
 
-  auto type = mGeometry->GetType();
-
-  switch (type)
-  {
-    case Dali::Geometry::Type::TRIANGLE_STRIP:
-    {
-      topology = Graphics::API::RenderCommand::Topology::TRIANGLE_STRIP;
-      break;
-    }
-    default:
-    {
-      topology = Graphics::API::RenderCommand::Topology::TRIANGLES;
-    }
-  }
 
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
-  mGfxRenderCommand->BindVertexBuffers( std::move(vertexAttributeBindings) );
+  mGfxRenderCommand->BindVertexBuffers( std::move( vertexBuffers ) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
-  mGfxRenderCommand->BindRenderState( Graphics::API::RenderCommand::RenderState{}
-                                        .SetShader( mShader->GetGfxObject() )
-                                        .SetBlendState( { mBlendMode != BlendMode::OFF })
-                                        .SetTopology( topology ));
 
+  // create pipeline
+  if(!mGfxPipeline)
+  {
+    mGfxPipeline = controller.CreatePipeline(controller.GetPipelineFactory()
+
+                                                       // vertex input
+                                                       .SetVertexInputState( vi )
+
+                                                       // shaders
+                                                       .SetShaderState( ShaderState()
+                                                                                  .SetShaderProgram( shader ))
+
+                                                       // input assembly
+                                                       .SetInputAssemblyState( InputAssemblyState()
+                                                                                  .SetTopology( topology )
+                                                                                  .SetPrimitiveRestartEnable( true ))
+
+                                                         // viewport ( if zeroes then framebuffer size used )
+                                                       .SetViewportState( ViewportState()
+                                                                                  .SetViewport( { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } ))
+
+                                                       // depth stencil
+                                                       .SetDepthStencilState( DepthStencilState()
+                                                                                  .SetDepthTestEnable(
+                                                                                    mDepthTestMode != DepthTestMode::ON ? false : true
+                                                                                  )
+                                                       .SetDepthWriteEnable( true )
+                                                       .SetDepthCompareOp( CompareOp::GREATER_OR_EQUAL ))
+
+
+                                                       // color blend
+                                                       .SetColorBlendState( ColorBlendState()
+                                                                                  .SetBlendEnable( mBlendMode != BlendMode::OFF ? true : false  )
+                                                                                  .SetColorComponentsWriteBits( 0xff )
+                                                                                  .SetSrcColorBlendFactor( Graphics::API::BlendFactor::SRC_ALPHA )
+                                                                                  .SetDstColorBlendFactor( Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA )
+                                                                                  .SetSrcAlphaBlendFactor( Graphics::API::BlendFactor::ONE )
+                                                                                  .SetDstAlphaBlendFactor( Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA )
+                                                                                  .SetColorBlendOp( BlendOp::ADD )
+                                                                                  .SetAlphaBlendOp( BlendOp::ADD )
+                                                                                  .SetLogicOpEnable( false ))
+
+                                                       // rasterization
+                                                       .SetRasterizationState( RasterizationState()
+                                                                                  .SetCullMode( CullMode::NONE )
+                                                                                  .SetPolygonMode( PolygonMode::FILL )
+                                                                                  .SetFrontFace( FrontFace::CLOCKWISE )));
+  }
+
+  // bind pipeline
+  mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
   if(usesIndexBuffer)
   {
     mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}

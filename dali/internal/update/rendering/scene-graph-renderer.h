@@ -30,6 +30,7 @@
 #include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
@@ -462,7 +463,7 @@ private:
 
   std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
   std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
-
+  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
