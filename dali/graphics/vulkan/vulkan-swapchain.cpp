@@ -421,6 +421,7 @@ struct Swapchain::Impl
       .setFramebuffer(swapBuffer.framebuffer->GetVkHandle() )
       .setRenderPass(swapBuffer.framebuffer->GetRenderPassVkHandle())
       .setSubpass( 0 );
+
     swapBuffer.masterCmdBuffer->Reset();
     swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
 
@@ -536,7 +537,7 @@ struct Swapchain::Impl
 
     mGraphics.Submit( mQueue, { std::move(submissionData) } , swapBuffer.endOfFrameFence );
 
-    mGraphics.WaitForFence(swapBuffer.endOfFrameFence);
+    mGraphics.WaitForFence( swapBuffer.endOfFrameFence );
 
     // fixme: use semaphores to synchronize all previously submitted command buffers!
     vk::PresentInfoKHR presentInfo{};
@@ -549,9 +550,6 @@ struct Swapchain::Impl
       .setWaitSemaphoreCount( 0 );
 
     mGraphics.Present( mQueue, presentInfo );
-
-    // just to speed things up :P
-    mGraphics.QueueWaitIdle( mQueue );
 
     mGraphics.CollectGarbage();
 
