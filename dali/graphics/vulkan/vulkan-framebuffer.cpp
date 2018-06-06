@@ -223,7 +223,6 @@ struct Framebuffer::Impl
 
   uint32_t GetAttachmentCount( AttachmentType type ) const
   {
-    std::vector<RefCountedImageView> retval{};
     switch( type )
     {
       case AttachmentType::COLOR:
