@@ -113,44 +113,36 @@ struct Texture::Impl
                               .setLayerCount( 1 )
                               .setBaseArrayLayer( 0 ) );
 
-    if(!mCommandPool)
-    {
-      mCommandPool   = CommandPool::New(mGraphics);
-      mCommandBuffer = mCommandPool->NewCommandBuffer(true);
-    }
-    else
-    {
-      mCommandBuffer->Reset();
-    }
+    auto commandBuffer = mGraphics.CreateCommandBuffer( true );
 
-    mCommandBuffer->Begin(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+    commandBuffer->Begin(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
 
     // change layout
-    auto barrier = std::vector<vk::ImageMemoryBarrier>{mCommandBuffer->ImageLayoutTransitionBarrier(
+    auto barrier = std::vector<vk::ImageMemoryBarrier>{commandBuffer->ImageLayoutTransitionBarrier(
       mImage, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferDstOptimal, vk::ImageAspectFlagBits::eColor )};
 
     // change layout to prepare image to transfer data
-    mCommandBuffer->PipelineBarrier(
+    commandBuffer->PipelineBarrier(
       vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, {barrier} );
 
     // copy image
-    mCommandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, {copy} );
+    commandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, {copy} );
 
     // change layout to shader read-only optimal
-    mCommandBuffer->PipelineBarrier(
+    commandBuffer->PipelineBarrier(
       vk::PipelineStageFlagBits::eVertexShader,
       vk::PipelineStageFlagBits::eVertexShader,
       {},
       {},
       {},
-      {mCommandBuffer->ImageLayoutTransitionBarrier(
+      {commandBuffer->ImageLayoutTransitionBarrier(
         mImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageAspectFlagBits::eColor )} );
 
-    mCommandBuffer->End();
+    commandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
     auto fence = mGraphics.CreateFence({});
-    VkAssert(mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { mCommandBuffer } ) }, fence ));
+    VkAssert(mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { commandBuffer } ) }, fence ));
     VkAssert(mGraphics.WaitForFence(fence, std::numeric_limits<uint32_t>::max()));
     return true;
   }
@@ -216,11 +208,6 @@ struct Texture::Impl
   RefCountedImage     mImage;
   RefCountedImageView mImageView;
   RefCountedSampler   mSampler;
-
-  // command pools should be 'per-thread' so they can be safely
-  // used withing one single thread before submitting them
-  RefCountedCommandPool   mCommandPool;
-  RefCountedCommandBuffer mCommandBuffer; // primary buffer, executed independent
 
   // layouts
   vk::ImageLayout mOldLayout;

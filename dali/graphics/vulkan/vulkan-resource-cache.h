@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <functional>
+#include <thread>
 
 namespace Dali
 {
@@ -32,6 +33,9 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
+using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
+using DiscardQueue = std::vector< std::function< void() > >;
 
 /**
  * Stores and manages Vulkan resources
@@ -72,7 +76,7 @@ public:
    * @param pool The command pool object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddCommandPool( RefCountedCommandPool pool );
+  ResourceCache& AddCommandPool( std::thread::id currentThreadId, RefCountedCommandPool pool );
 
   /**
    * Adds the provided descriptor pool object to the descriptor pool cache
@@ -132,10 +136,10 @@ public:
 
   /**
    * Finds the CommandPool object using the specified Vulkan handle
-   * @param commandPool The Vulkan handle of the CommandPool object to be found
+   * @param currentThreadId The Vulkan handle of the CommandPool object to be found
    * @return A Handle to the CommandPool object if found. An empty Handle otherwise
    */
-  RefCountedCommandPool FindCommandPool( vk::CommandPool commandPool );
+  RefCountedCommandPool FindCommandPool( std::thread::id currentThreadId );
 
   /**
    * Finds the DescriptorPool object using the specified Vulkan handle
@@ -249,13 +253,16 @@ private:
   std::vector< RefCountedImage >          mImages;
   std::vector< RefCountedImageView >      mImageViews;
   std::vector< RefCountedShader >         mShaders;
-  std::vector< RefCountedCommandPool >    mCommandPools;
   std::vector< RefCountedDescriptorPool > mDescriptorPools;
   std::vector< RefCountedFramebuffer >    mFramebuffers;
   std::vector< RefCountedSampler >        mSamplers;
   std::vector< RefCountedFence >          mFences;
 
-  std::vector< std::function< void() > >    mDiscardQueue;
+
+  // Command pool map using thread IDs as keys
+  CommandPoolMap                          mCommandPools;
+
+  DiscardQueue                            mDiscardQueue;
 };
 
 } //namespace Vulkan

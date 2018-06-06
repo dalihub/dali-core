@@ -126,17 +126,13 @@ public: // Create methods
 
   RefCountedDescriptorPool CreateDescriptorPool();
 
-  RefCountedCommandPool CreateCommandPool( const vk::CommandPoolCreateInfo& info );
-
-  RefCountedCommandBuffer CreateCommandBuffer();
-
-  std::vector< RefCountedCommandBuffer > CreateCommandBuffers();
-
   RefCountedGpuMemoryBlock CreateGpuMemoryBlock();
 
   RefCountedDescriptorSet CreateDescriptorSet();
 
   RefCountedSampler CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo );
+
+  RefCountedCommandBuffer CreateCommandBuffer( bool primary );
 
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );
@@ -254,6 +250,8 @@ private: // Methods
   std::vector< vk::DeviceQueueCreateInfo > GetQueueCreateInfos();
 
   std::vector< const char* > PrepareDefaultInstanceExtensions();
+
+  RefCountedCommandPool FindCommandPool( std::thread::id );
 
 private: // Members
 

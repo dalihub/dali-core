@@ -48,11 +48,6 @@ struct SwapchainBuffer
   RefCountedCommandBuffer masterCmdBuffer;
 
   /*
-   * Each buffer has a command pool to allocate from
-   */
-  RefCountedCommandPool masterCommandPool;
-
-  /*
    * Framebuffer object associated with the buffer
    */
   RefCountedFramebuffer framebuffer;
@@ -137,14 +132,12 @@ struct Swapchain::Impl
     mSwapchainBuffer.clear();
     for( auto&& fb : mFramebuffers )
     {
-      auto cmdPool   = CommandPool::New( mGraphics, vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ) );
-      auto masterCmd = cmdPool->NewCommandBuffer( true );
+      auto masterCmd = mGraphics.CreateCommandBuffer( true );
 
       auto swapBuffer              = SwapchainBuffer{};
       swapBuffer.framebuffer       = fb;
       swapBuffer.index             = 0;
       swapBuffer.masterCmdBuffer   = masterCmd;
-      swapBuffer.masterCommandPool = cmdPool;
       swapBuffer.endOfFrameFence   = mGraphics.CreateFence({});
       swapBuffer.firstUse          = true;
       mSwapchainBuffer.emplace_back( swapBuffer );
@@ -173,8 +166,7 @@ struct Swapchain::Impl
     /*
      * Create temporary command pool
      */
-    auto commandPool = CommandPool::New( mGraphics );
-    auto cmdBuffer   = commandPool->NewCommandBuffer();
+    auto cmdBuffer   = mGraphics.CreateCommandBuffer( true );
 
     std::vector<vk::ImageMemoryBarrier> barriers;
     RefCountedImageView                        depthStencilImage{};

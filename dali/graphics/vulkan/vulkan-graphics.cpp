@@ -73,7 +73,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
   //"VK_LAYER_LUNARG_monitor",             // monitor
   "VK_LAYER_LUNARG_swapchain",           // swapchain
   "VK_LAYER_GOOGLE_threading",           // threading
-  "VK_LAYER_LUNARG_api_dump",            // api
+  //"VK_LAYER_LUNARG_api_dump",            // api
   "VK_LAYER_LUNARG_object_tracker",      // objects
   "VK_LAYER_LUNARG_core_validation",     // core
   "VK_LAYER_GOOGLE_unique_objects",      // unique objects
@@ -365,25 +365,6 @@ RefCountedDescriptorPool Graphics::CreateDescriptorPool()
   NotImplemented()
 }
 
-RefCountedCommandPool Graphics::CreateCommandPool( const vk::CommandPoolCreateInfo& info )
-{
-  //TODO: move the logic of creation here
-  //TODO: add the object to the cache
-  return CommandPool::New( *this,
-                           vk::CommandPoolCreateInfo{}.setQueueFamilyIndex( 0u )
-                                                      .setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer ));
-}
-
-RefCountedCommandBuffer Graphics::CreateCommandBuffer()
-{
-  NotImplemented()
-}
-
-std::vector< RefCountedCommandBuffer > Graphics::CreateCommandBuffers()
-{
-  NotImplemented()
-}
-
 RefCountedGpuMemoryBlock Graphics::CreateGpuMemoryBlock()
 {
   NotImplemented()
@@ -404,6 +385,13 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
 
   return refCountedSampler;
 
+}
+
+RefCountedCommandBuffer Graphics::CreateCommandBuffer( bool primary )
+{
+  auto commandPool = FindCommandPool( std::this_thread::get_id() );
+
+  return commandPool->NewCommandBuffer( primary );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -657,7 +645,7 @@ void Graphics::AddShader( Handle< Shader > shader )
 void Graphics::AddCommandPool( Handle< CommandPool > pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddCommandPool( std::move( pool ));
+  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move( pool ));
 }
 
 void Graphics::AddDescriptorPool( Handle< DescriptorPool > pool )
@@ -776,10 +764,10 @@ Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledLayerNames(validationLayers.data());
 
 #if defined(DEBUG_ENABLED)
-  if( ! getenv("LOG_VULKAN") )
-  {
-    info.setEnabledLayerCount(0);
-  }
+//  if( ! getenv("LOG_VULKAN") )
+//  {
+//    info.setEnabledLayerCount(0);
+//  }
 #endif
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));
@@ -999,6 +987,23 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
   retval.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
 
   return retval;
+}
+
+RefCountedCommandPool Graphics::FindCommandPool( std::thread::id )
+{
+  RefCountedCommandPool commandPool;
+  {
+    std::lock_guard< std::mutex > lock{ mMutex };
+    commandPool = mResourceCache->FindCommandPool( std::this_thread::get_id() );
+  }
+
+  if( !commandPool )
+  {
+    auto&& createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
+    commandPool = CommandPool::New( *this,  createInfo);
+  }
+
+  return commandPool;
 }
 
 } // namespace Vulkan
