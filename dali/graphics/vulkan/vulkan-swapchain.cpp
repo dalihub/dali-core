@@ -517,9 +517,6 @@ struct Swapchain::Impl
   {
     auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-    // end render pass
-    EndPrimaryRenderPass( swapBuffer );
-
     // end command buffer
     swapBuffer.masterCmdBuffer->End();
 

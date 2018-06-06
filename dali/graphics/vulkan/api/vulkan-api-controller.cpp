@@ -53,6 +53,29 @@ namespace VulkanAPI
 
 struct Controller::Impl
 {
+  struct RenderPassChange
+  {
+    // only move semantics
+    RenderPassChange( vk::RenderPassBeginInfo _beginInfo,
+                      std::vector<vk::ClearValue>&& _clearColorValues,
+                      const Vulkan::RefCountedFramebuffer& _framebuffer,
+                      uint32_t _offset )
+    : beginInfo( std::move(_beginInfo) ),
+      colorValues( std::move(_clearColorValues) ),
+      framebuffer( _framebuffer ),
+      offset( _offset )
+      {
+      }
+
+    // no default constructor!
+    RenderPassChange() = delete;
+
+    vk::RenderPassBeginInfo beginInfo     {};
+    std::vector<vk::ClearValue>           colorValues {};
+    Vulkan::RefCountedFramebuffer         framebuffer {};
+    uint32_t offset { 0 };
+  };
+
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
   : mGraphics( graphics ),
     mOwner( owner ),
@@ -81,30 +104,49 @@ struct Controller::Impl
     return true;
   }
 
+
   void BeginFrame()
   {
+    // for all swapchains acquire new framebuffer
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    auto framebuffer = swapchain->AcquireNextFramebuffer();
+    swapchain->AcquireNextFramebuffer();
 
-    swapchain->BeginPrimaryRenderPass( {
-                                         { 1.0f, 1.0f, 1.0f, 1.0f }
-                                       }  );
-
+    mCurrentFramebuffer.Reset();
   }
 
   void EndFrame()
   {
+    // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    // execute as secondary buffers
-    swapchain->GetPrimaryCommandBuffer()
-             ->ExecuteCommands( mSecondaryCommandBufferRefs );
+    auto primaryCommandBuffer = swapchain->GetPrimaryCommandBuffer();
+
+    for( auto i = 0u; i < mRenderPasses.size(); ++i )
+    {
+      if( i != 0u )
+      {
+        primaryCommandBuffer->EndRenderPass();
+      }
+
+      const auto& rp = mRenderPasses[i];
+      uint32_t offset = rp.offset;
+      uint32_t count = uint32_t(
+                 (i == mRenderPasses.size()-1) ?
+                 mSecondaryCommandBufferRefs.size() - rp.offset :
+                 mRenderPasses[i+1].offset - rp.offset );
+
+      primaryCommandBuffer->BeginRenderPass( rp.beginInfo, vk::SubpassContents::eSecondaryCommandBuffers );
+      primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs, offset, count );
+    }
+
+    primaryCommandBuffer->EndRenderPass();
 
     swapchain->Present();
     mSecondaryCommandBufferRefs.clear();
+    mRenderPasses.clear();
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -131,6 +173,60 @@ struct Controller::Impl
     return std::make_unique<VulkanAPI::RenderCommand>( mOwner, mGraphics );
   }
 
+  bool UpdateRenderPass( const API::RenderCommand::RenderTargetBinding& renderTargetBinding )
+  {
+    Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
+    if( renderTargetBinding.framebuffer.Exists() )
+    {
+      // @todo use VulkanAPI::Framebuffer when available
+      //framebuffer = static_cast<VulkanAPI::Framebuffer&>(renderTargetBinding.framebuffer.Get()).GetVkHandle();
+    }
+    else
+    {
+      // use first surface/swapchain as render target
+      auto surface = mGraphics.GetSurface( 0u );
+      auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+      framebuffer = swapchain->GetCurrentFramebuffer();
+    }
+
+    // If there is no framebuffer the it means DALi tries to use
+    // default framebuffer. For now just substitute with surface/swapchain
+    if( framebuffer != mCurrentFramebuffer )
+    {
+      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer();
+
+      mCurrentFramebuffer = framebuffer;
+      mCurrentFramebuffer->GetRenderPassVkHandle();
+      auto newColors = mCurrentFramebuffer->GetDefaultClearValues();
+      newColors[0].color.setFloat32( { renderTargetBinding.clearColors[0].r,
+                                       renderTargetBinding.clearColors[0].g,
+                                       renderTargetBinding.clearColors[0].b,
+                                       renderTargetBinding.clearColors[0].a
+                                     } );
+      mRenderPasses.emplace_back(
+                                // render pass
+                                vk::RenderPassBeginInfo{}
+                                    .setRenderPass( mCurrentFramebuffer->GetRenderPassVkHandle() )
+                                    .setFramebuffer( mCurrentFramebuffer->GetVkHandle() )
+                                    .setRenderArea( vk::Rect2D( {0, 0}, {mCurrentFramebuffer->GetWidth(), mCurrentFramebuffer->GetHeight()} ) )
+                                    .setClearValueCount( uint32_t( mCurrentFramebuffer->GetDefaultClearValues().size() ) )
+                                    .setPClearValues( newColors.data() ),
+
+                                // colors
+                                std::move(newColors),
+
+                                // framebuffer
+                                framebuffer,
+
+                                // offset when to begin new render pass
+                                0 );
+      return true;
+    }
+
+    // same render pass
+    return false;
+  }
+
   /**
    * Submits number of commands in one go ( simiar to vkCmdExecuteCommands )
    * @param commands
@@ -147,6 +243,13 @@ struct Controller::Impl
         req->dstBuffer->GetMemoryHandle()->Unmap();
       }
       mBufferTransferRequests.clear();
+    }
+
+    // the list of commands may be empty, but still we may have scheduled memory
+    // transfers
+    if( commands.empty() )
+    {
+      return;
     }
 
     std::vector<Vulkan::RefCountedCommandBuffer> cmdBufRefs{};
@@ -168,13 +271,22 @@ struct Controller::Impl
       apiCommand->PrepareResources();
     }
 
+    // Begin render pass for render target
+    // clear color obtained from very first command in the batch
+    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
+    UpdateRenderPass( firstCommand->GetRenderTargetBinding() );
+
     // set up writes
     for( auto&& command : commands )
     {
       //const auto& vertexBufferBindings = command->GetVertexBufferBindings();
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
-      //apiCommand->PreparePipeline();
+      // skip if there's no valid pipeline
+      if( !apiCommand->GetVulkanPipeline() )
+      {
+        continue;
+      }
 
       // start new command buffer
       auto cmdbuf = mGraphics.CreateCommandBuffer( false );//mCommandPool->NewCommandBuffer( false );
@@ -246,6 +358,9 @@ struct Controller::Impl
   // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
   // and ready to be used for the next frame.
   std::vector<Vulkan::RefCountedCommandBuffer> mSecondaryCommandBufferRefs;
+
+  Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
+  std::vector<RenderPassChange> mRenderPasses;
 
 };
 
@@ -375,7 +490,6 @@ std::unique_ptr<API::RenderCommand> Controller::AllocateRenderCommand()
 {
   return mImpl->AllocateRenderCommand();
 }
-
 
 } // namespace VulkanAPI
 } // namespace Graphics

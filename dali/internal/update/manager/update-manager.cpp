@@ -715,8 +715,8 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 
 void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 {
-  const unsigned int rendererCount = mImpl->renderers.Count();
-  for( unsigned int i = 0; i < rendererCount; ++i )
+  auto rendererCount = mImpl->renderers.Count();
+  for( auto i = 0u; i < rendererCount; ++i )
   {
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
@@ -824,6 +824,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       cameraIterator->Update( bufferIndex );
     }
 
+    auto* impl = mImpl.get();
+    impl = impl;
     //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
     //reset the update buffer index and make sure there is enough room in the instruction container
     if( mImpl->renderersAdded )
@@ -854,8 +856,12 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
                                               isRenderingToFbo );
         }
       }
+
+      // Prepare pipelines
+
+
       // generate graphics objects
-      (*mImpl);
+
       SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
@@ -940,7 +946,9 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
 void UpdateManager::SetBackgroundColor( const Vector4& color )
 {
-  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
+  mImpl->taskList.GetTasks()[0]->SetClearEnabled( true );
+  mImpl->taskList.GetTasks()[0]->SetClearColor( 0, color );
+  mImpl->taskList.GetTasks()[0]->SetClearColor( 1, color );
 }
 
 void UpdateManager::SetDefaultSurfaceRect( const Rect<int>& rect )

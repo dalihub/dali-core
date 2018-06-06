@@ -748,7 +748,7 @@ Graphics::CreateInstance( const std::vector< const char* >& extensions,
     info.setEnabledLayerCount(0);
   }
 #else
-  //info.setEnabledLayerCount(0);
+  info.setEnabledLayerCount(0);
 #endif
 
   mInstance = VkAssert(vk::createInstance(info, *mAllocator));

@@ -176,7 +176,13 @@ public:
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
-  void ExecuteCommands( std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>> commandBuffers );
+  void ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers );
+
+  /**
+   * Executes secondary command buffers within primary command buffer
+   * @param commandBuffers
+   */
+  void ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers, uint32_t offset, uint32_t count );
 
   /**
    * Copies buffer into the specified image
