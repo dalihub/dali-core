@@ -139,7 +139,7 @@ public: // Create methods
   RefCountedSampler CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo );
 
 public: // Actions
-  vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = 0 );
+  vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );
 
   vk::Result WaitForFences( const std::vector< RefCountedFence >& fences,
                             bool waitAll = true,
