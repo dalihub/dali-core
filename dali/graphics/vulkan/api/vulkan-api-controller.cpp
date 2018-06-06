@@ -101,7 +101,13 @@ struct Controller::Impl
   void EndFrame()
   {
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+
+    // execute as secondary buffers
+    swapchain->GetPrimaryCommandBuffer()
+             ->ExecuteCommands( mSecondaryCommandBufferRefs );
+
     swapchain->Present();
+    mSecondaryCommandBufferRefs.clear();
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -145,8 +151,6 @@ struct Controller::Impl
       }
       mBufferTransferRequests.clear();
     }
-
-    std::vector<Vulkan::RefCountedCommandBuffer> cmdBufRefs{};
 
     // Prepare pipelines
     for( auto&& command : commands )
@@ -211,12 +215,8 @@ struct Controller::Impl
                      drawCommand.firstInstance);
       }
       cmdbuf->End();
-      cmdBufRefs.emplace_back( cmdbuf );
+      mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
     }
-
-    // execute as secondary buffers
-    mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer()
-      ->ExecuteCommands( cmdBufRefs );
 
   }
 
@@ -246,6 +246,11 @@ struct Controller::Impl
   std::unique_ptr<Vulkan::PipelineCache> mPipelineCache;
 
   std::unique_ptr<VulkanAPI::UboManager> mUboManager;
+
+  // Accumulate all the secondary command buffers of the frame here to avoid them being overwritten
+  // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
+  // and ready to be used for the next frame.
+  std::vector<Vulkan::RefCountedCommandBuffer> mSecondaryCommandBufferRefs;
 
 };
 
