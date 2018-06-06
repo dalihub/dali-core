@@ -179,10 +179,15 @@ public:
   void SetBlendingOptions( unsigned int options );
 
   /**
+   * Set the blending options. This should only be called from the update thread.
+   * @param[in] options blending options.
+   */
+  void SetBlendingOptions( const BlendingOptions& options );
+  /**
    * Get the blending options
    * @return The the blending mode
    */
-  unsigned int GetBlendingOptions() const;
+  const BlendingOptions& GetBlendingOptions() const;
 
   /**
    * Set the blend color for blending operation
@@ -388,6 +393,12 @@ public:
    */
   void TextureSetDeleted();
 
+  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline )
+  {
+    mGfxPipeline = std::move(pipeline);
+    mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
+  }
+
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -449,13 +460,17 @@ private:
 
   size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
   size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
-  unsigned int                 mBlendBitmask;                     ///< The bitmask of blending options
+
   unsigned int                 mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
   unsigned int                 mResendFlag;                       ///< Indicate whether data should be resent to the renderer
 
+  BlendingOptions              mBlendOptions;                     ///< The blending options
+
   DepthFunction::Type          mDepthFunction:3;                  ///< Local copy of the depth function
   FaceCullingMode::Type        mFaceCullingMode:2;                ///< Local copy of the mode of face culling
+
   BlendMode::Type              mBlendMode:2;                      ///< Local copy of the mode of blending
+
   DepthWriteMode::Type         mDepthWriteMode:2;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
 

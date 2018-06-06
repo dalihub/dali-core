@@ -93,6 +93,12 @@ public:
    * Get the graphics shader object
    * @return the graphics shader object
    */
+  const Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject() const;
+
+  /**
+   * Get the graphics shader object
+   * @return the graphics shader object
+   */
   Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject();
 
 public: // Messages

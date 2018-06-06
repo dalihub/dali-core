@@ -669,7 +669,7 @@ public:
     return mIndexBufferBinding;
   }
 
-  const auto& GetRenderTargetBinding() const
+  const RenderTargetBinding& GetRenderTargetBinding() const
   {
     return mRenderTargetBinding;
   }
