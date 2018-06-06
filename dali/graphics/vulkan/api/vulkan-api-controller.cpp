@@ -178,12 +178,8 @@ struct Controller::Impl
 
       //apiCommand->PreparePipeline();
 
-      if( !mCommandPool )
-      {
-        mCommandPool = Vulkan::CommandPool::New( mGraphics );
-      }
       // start new command buffer
-      auto cmdbuf = mCommandPool->NewCommandBuffer( false );
+      auto cmdbuf = mGraphics.CreateCommandBuffer( false );//mCommandPool->NewCommandBuffer( false );
       cmdbuf->Reset();
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
       cmdbuf->BindGraphicsPipeline( apiCommand->GetPipeline() );

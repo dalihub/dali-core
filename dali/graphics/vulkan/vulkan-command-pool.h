@@ -35,22 +35,9 @@ class CommandBuffer;
 class CommandPool : public VkManaged
 {
 
+  friend class Graphics;
+
 public:
-
-  /**
-   *
-   * @param graphics
-   * @param createInfo
-   * @return
-   */
-  static RefCountedCommandPool New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
-
-  /**
-   *
-   * @param graphics
-   * @return
-   */
-  static RefCountedCommandPool New( Graphics& graphics );
 
   ~CommandPool() override;
 
@@ -120,6 +107,21 @@ private:
   CommandPool();
 
   CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+
+  /**
+ *
+ * @param graphics
+ * @param createInfo
+ * @return
+ */
+  static RefCountedCommandPool New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo );
+
+  /**
+   *
+   * @param graphics
+   * @return
+   */
+  static RefCountedCommandPool New( Graphics& graphics );
 
   struct Impl;
   std::unique_ptr<Impl> mImpl;

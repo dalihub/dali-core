@@ -61,9 +61,9 @@ ResourceCache& ResourceCache::AddShader( RefCountedShader shader )
   return *this;
 }
 
-ResourceCache& ResourceCache::AddCommandPool( RefCountedCommandPool pool )
+ResourceCache& ResourceCache::AddCommandPool( std::thread::id currentThreadId, RefCountedCommandPool pool )
 {
-  mCommandPools.push_back( pool );
+  mCommandPools[currentThreadId] = pool;
   return *this;
 }
 
@@ -100,13 +100,9 @@ RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
   return iterator == mShaders.end() ? RefCountedShader() : RefCountedShader(&**iterator);
 }
 
-RefCountedCommandPool ResourceCache::FindCommandPool( vk::CommandPool commandPool )
+RefCountedCommandPool ResourceCache::FindCommandPool( std::thread::id currentThreadId )
 {
-  auto iterator = std::find_if(mCommandPools.begin(),
-                               mCommandPools.end(),
-                               [&](const RefCountedCommandPool entry) { return entry->GetVkHandle() == commandPool; });
-
-  return iterator == mCommandPools.end() ? RefCountedCommandPool() : RefCountedCommandPool(&**iterator);
+  return mCommandPools.find( currentThreadId ) == mCommandPools.end() ? RefCountedCommandPool() : mCommandPools[ currentThreadId ];
 }
 
 RefCountedDescriptorPool ResourceCache::FindDescriptorPool( vk::DescriptorPool descriptorPool )
@@ -236,13 +232,12 @@ ResourceCache& ResourceCache::RemoveCommandPool( CommandPool& commandPool )
 {
   if( !mCommandPools.empty() )
   {
+    using EntryPair = std::pair< std::thread::id, RefCountedCommandPool >;
     auto iterator = std::find_if(mCommandPools.begin(),
                                  mCommandPools.end(),
-                                 [&](const RefCountedCommandPool entry) { return &*entry == &commandPool; });
+                                 [&](const EntryPair& entry) { return &*(entry.second) == &commandPool; });
 
-    std::iter_swap(iterator, std::prev(mCommandPools.end()));
-    mCommandPools.back().Reset();
-    mCommandPools.pop_back();
+    mCommandPools.erase( iterator );
   }
   return *this;
 }
