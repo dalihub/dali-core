@@ -81,22 +81,29 @@ struct Controller::Impl
     return true;
   }
 
+
   void BeginFrame()
   {
+    // for all swapchains acquire new framebuffer
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    auto framebuffer = swapchain->AcquireNextFramebuffer();
+    //auto framebuffer =
+    swapchain->AcquireNextFramebuffer();
 
+    /*
     swapchain->BeginPrimaryRenderPass( {
-                                         { 1.0f, 1.0f, 1.0f, 1.0f }
+                                         { clearColor[0], clearColor[1], clearColor[2], clearColor[3] }
                                        }  );
+     */
 
+    mCurrentFramebuffer.Reset();
   }
 
   void EndFrame()
   {
+    // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
     swapchain->Present();
   }
@@ -143,6 +150,13 @@ struct Controller::Impl
       mBufferTransferRequests.clear();
     }
 
+    // the list of commands may be empty, but still we may have scheduled memory
+    // transfers
+    if( commands.empty() )
+    {
+      return;
+    }
+
     std::vector<Vulkan::RefCountedCommandBuffer> cmdBufRefs{};
 
     // Update uniform buffers
@@ -162,13 +176,66 @@ struct Controller::Impl
       apiCommand->PrepareResources();
     }
 
+    // Begin render pass for render target
+    // clear color obtained from very first command in the batch
+    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
+    const auto& renderTargetBinding = firstCommand->GetRenderTargetBinding();
+
+    Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
+    if( renderTargetBinding.framebuffer.Exists() )
+    {
+      // @todo use VulkanAPI::Framebuffer when available
+      //framebuffer = static_cast<VulkanAPI::Framebuffer&>(renderTargetBinding.framebuffer.Get()).GetVkHandle();
+    }
+    else
+    {
+      // use first surface/swapchain as render target
+      auto surface = mGraphics.GetSurface( 0u );
+      auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+      framebuffer = swapchain->GetCurrentFramebuffer();
+    }
+
+    // If there is no framebuffer the it means DALi tries to use
+    // default framebuffer. For now just substitute with surface/swapchain
+    if( framebuffer != mCurrentFramebuffer )
+    {
+      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer();
+
+      // end render pass for current framebuffer
+      if( mCurrentFramebuffer )
+      {
+        primaryCommandBuffer->EndRenderPass();
+      }
+
+      mCurrentFramebuffer = framebuffer;
+      mCurrentFramebuffer->GetRenderPassVkHandle();
+      auto newColors = mCurrentFramebuffer->GetDefaultClearValues();
+      newColors[0].color.setFloat32( { renderTargetBinding.clearColors[0].r,
+                                       renderTargetBinding.clearColors[0].g,
+                                       renderTargetBinding.clearColors[0].b,
+                                       renderTargetBinding.clearColors[0].a
+                                     } );
+
+      primaryCommandBuffer->
+                 BeginRenderPass( vk::RenderPassBeginInfo{}
+                       .setRenderPass( mCurrentFramebuffer->GetRenderPassVkHandle() )
+                       .setFramebuffer( mCurrentFramebuffer->GetVkHandle() )
+                       .setRenderArea( vk::Rect2D( {0, 0}, {mCurrentFramebuffer->GetWidth(), mCurrentFramebuffer->GetHeight()} ) )
+                       .setClearValueCount( uint32_t( mCurrentFramebuffer->GetDefaultClearValues().size() ) )
+                       .setPClearValues( newColors.data() ), vk::SubpassContents::eSecondaryCommandBuffers );
+    }
+
     // set up writes
     for( auto&& command : commands )
     {
       //const auto& vertexBufferBindings = command->GetVertexBufferBindings();
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
-      //apiCommand->PreparePipeline();
+      // skip if there's no valid pipeline
+      if( !apiCommand->GetVulkanPipeline() )
+      {
+        continue;
+      }
 
       if( !mCommandPool )
       {
@@ -211,9 +278,7 @@ struct Controller::Impl
     }
 
     // execute as secondary buffers
-    mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer()
-      ->ExecuteCommands( cmdBufRefs );
-
+    mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer()->ExecuteCommands( cmdBufRefs );
   }
 
   // resources
@@ -244,6 +309,7 @@ struct Controller::Impl
 
   std::unique_ptr<VulkanAPI::UboManager> mUboManager;
 
+  Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -372,7 +438,6 @@ std::unique_ptr<API::RenderCommand> Controller::AllocateRenderCommand()
 {
   return mImpl->AllocateRenderCommand();
 }
-
 
 } // namespace VulkanAPI
 } // namespace Graphics
