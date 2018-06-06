@@ -12,6 +12,10 @@
 #include "color-visual-shader-frag.h"
 #include "color-visual-shader-vert.h"
 #include "experimental-shader-vert.h"
+#include "gradient-visual-shader-0-frag.h"
+#include "gradient-visual-shader-0-vert.h"
+#include "gradient-visual-shader-1-frag.h"
+#include "gradient-visual-shader-1-vert.h"
 #include "image-visual-atlas-clamp-shader-frag.h"
 #include "image-visual-atlas-various-wrap-shader-frag.h"
 #include "image-visual-no-atlas-shader-frag.h"
@@ -46,6 +50,10 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_COLOR_VISUAL_SHADER_FRAG", SHADER_COLOR_VISUAL_SHADER_FRAG },
   { "SHADER_COLOR_VISUAL_SHADER_VERT", SHADER_COLOR_VISUAL_SHADER_VERT },
   { "SHADER_EXPERIMENTAL_SHADER_VERT", SHADER_EXPERIMENTAL_SHADER_VERT },
+  { "SHADER_GRADIENT_VISUAL_SHADER_0_FRAG", SHADER_GRADIENT_VISUAL_SHADER_0_FRAG },
+  { "SHADER_GRADIENT_VISUAL_SHADER_0_VERT", SHADER_GRADIENT_VISUAL_SHADER_0_VERT },
+  { "SHADER_GRADIENT_VISUAL_SHADER_1_FRAG", SHADER_GRADIENT_VISUAL_SHADER_1_FRAG },
+  { "SHADER_GRADIENT_VISUAL_SHADER_1_VERT", SHADER_GRADIENT_VISUAL_SHADER_1_VERT },
   { "SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG", SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG },
   { "SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG", SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG },
   { "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG", SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG },
