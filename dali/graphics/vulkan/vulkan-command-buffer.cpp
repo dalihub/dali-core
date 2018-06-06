@@ -231,22 +231,33 @@ void CommandBuffer::EndRenderPass()
   mCommandBuffer.endRenderPass();
 }
 
-void CommandBuffer::ExecuteCommands( std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>> commandBuffers )
+void CommandBuffer::ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers, uint32_t offset, uint32_t count )
 {
   assert( mAllocateInfo.level == vk::CommandBufferLevel::ePrimary
           && "Cannot record command: ExecuteCommands\tReason: The command buffer recording this command is not primary" );
 
   auto vkBuffers = std::vector< vk::CommandBuffer >{};
   vkBuffers.reserve( commandBuffers.size());
-  for( auto&& buf : commandBuffers )
+
+  auto iter = commandBuffers.begin();
+  std::advance(iter, offset);
+
+  for( uint32_t i = 0; i < count; ++i )
   {
+    const auto& buf = *iter;
     assert(buf->mAllocateInfo.level == vk::CommandBufferLevel::eSecondary &&
-            "Cannot record command: Execute Commands\tReason: A command buffer provided for execution is not secondary" );
+           "Cannot record command: Execute Commands\tReason: A command buffer provided for execution is not secondary" );
 
     vkBuffers.emplace_back( buf->GetVkHandle());
+    ++iter;
   }
 
   mCommandBuffer.executeCommands( vkBuffers );
+}
+
+void CommandBuffer::ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers )
+{
+  ExecuteCommands( commandBuffers, 0, uint32_t(commandBuffers.size()) );
 }
 
 void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
