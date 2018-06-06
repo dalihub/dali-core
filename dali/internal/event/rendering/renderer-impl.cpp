@@ -1002,50 +1002,32 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendEquationRgb() );
+      value = static_cast<int>( mBlendingOptions.GetBlendEquationRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendEquationAlpha() );
+      value = static_cast<int>( mBlendingOptions.GetBlendEquationAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendSrcFactorRgb() );
+      value = static_cast<int>( mBlendingOptions.GetBlendSrcFactorRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendDestFactorRgb() );
+      value = static_cast<int>( mBlendingOptions.GetBlendDestFactorRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendSrcFactorAlpha() );
+      value = static_cast<int>( mBlendingOptions.GetBlendSrcFactorAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
     {
-      unsigned int bitMask = mSceneObject->GetBlendingOptions();
-      BlendingOptions blendingOptions;
-      blendingOptions.SetBitmask( bitMask );
-      value = static_cast<int>( blendingOptions.GetBlendDestFactorAlpha() );
+      value = static_cast<int>( mBlendingOptions.GetBlendDestFactorAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_COLOR:

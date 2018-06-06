@@ -106,7 +106,7 @@ public:
 
   std::unique_ptr<API::RenderCommand> AllocateRenderCommand() override;
 
-  void BeginFrame() override;
+  virtual void BeginFrame() override;
 
   void EndFrame() override;
 

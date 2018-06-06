@@ -17,9 +17,9 @@
 
 // CLASS HEADER
 #include <dali/internal/update/graphics/graphics-algorithms.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 
 // EXTERNAL INCLUDES
-#include <glm/glm.hpp>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 
@@ -48,17 +48,65 @@ static constexpr float CLIP_MATRIX_DATA[] = {
 static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
 
 
+
+constexpr Graphics::API::BlendFactor ConvertBlendFactor( BlendFactor::Type blendFactor )
+{
+  switch( blendFactor )
+  {
+    case BlendFactor::ZERO:
+      return Graphics::API::BlendFactor::ZERO;
+    case BlendFactor::ONE:
+      return Graphics::API::BlendFactor::ONE;
+    case BlendFactor::SRC_COLOR:
+      return Graphics::API::BlendFactor::SRC_COLOR;
+    case BlendFactor::ONE_MINUS_SRC_COLOR:
+      return Graphics::API::BlendFactor::ONE_MINUS_SRC_COLOR;
+    case BlendFactor::SRC_ALPHA:
+      return Graphics::API::BlendFactor::SRC_ALPHA;
+    case BlendFactor::ONE_MINUS_SRC_ALPHA:
+      return Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA;
+    case BlendFactor::DST_ALPHA:
+      return Graphics::API::BlendFactor::DST_ALPHA;
+    case BlendFactor::ONE_MINUS_DST_ALPHA:
+      return Graphics::API::BlendFactor::ONE_MINUS_DST_ALPHA;
+    case BlendFactor::DST_COLOR:
+      return Graphics::API::BlendFactor::DST_COLOR;
+    case BlendFactor::ONE_MINUS_DST_COLOR:
+      return Graphics::API::BlendFactor::ONE_MINUS_DST_COLOR;
+    case BlendFactor::SRC_ALPHA_SATURATE:
+      return Graphics::API::BlendFactor::SRC_ALPHA_SATURATE;
+    case BlendFactor::CONSTANT_COLOR:
+      return Graphics::API::BlendFactor::CONSTANT_COLOR;
+    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+      return Graphics::API::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
+    case BlendFactor::CONSTANT_ALPHA:
+      return Graphics::API::BlendFactor::CONSTANT_ALPHA;
+    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+      return Graphics::API::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
+  }
+  return Graphics::API::BlendFactor{};
+}
+
+constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blendEquation )
+{
+  switch( blendEquation )
+  {
+    case BlendEquation::ADD:
+      return Graphics::API::BlendOp::ADD;
+    case BlendEquation::SUBTRACT:
+      return Graphics::API::BlendOp::SUBTRACT;
+    case BlendEquation::REVERSE_SUBTRACT:
+      return Graphics::API::BlendOp::REVERSE_SUBTRACT;
+  }
+  return Graphics::API::BlendOp{};
+}
+
 void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                            BufferIndex                          bufferIndex,
                            Matrix                               viewProjection,
                            RenderInstruction&                   instruction,
                            const RenderList&                    renderItemList )
 {
-  // TODO: @todo Set shaders and other properties
-  //commandBuilder.Set( );
-
-  // TODO: @todo Clipping...
-  //using InternalTextureSet = Dali::Internal::SceneGraph::TextureSet;
   auto numberOfRenderItems = renderItemList.Count();
 
   const auto viewMatrix = instruction.GetViewMatrix( bufferIndex );
@@ -97,6 +145,7 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       cmd.BindRenderTarget(renderTargetBinding);
 
       auto opacity = sgRenderer->GetOpacity( bufferIndex );
+
       if( sgRenderer->IsPreMultipliedAlphaEnabled() )
       {
         float alpha = color.a * opacity;
@@ -112,14 +161,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
       sgRenderer->WriteUniform("uModelMatrix", item.mModelMatrix);
       sgRenderer->WriteUniform("uMvpMatrix", mvp2);
-
       sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
       sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
-
-
-
-     // sgRenderer->WriteUniform("uNormalMatrix", normal);
-
       sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
       sgRenderer->WriteUniform("uSize", item.mSize);
       sgRenderer->WriteUniform("uColor", color );
@@ -152,22 +195,224 @@ void SubmitInstruction( Graphics::API::Controller& graphics,
 }
 } // namespace
 
-void SubmitRenderInstructions( Graphics::API::Controller&  graphics,
+
+
+bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+                              RenderInstruction& instruction,
+                              const RenderList* renderList,
+                              RenderItem& item,
+                              BufferIndex bufferIndex )
+{
+  using namespace Dali::Graphics::API;
+
+  // for each renderer within node
+  for( auto rendererIndex = 0u; rendererIndex < item.mNode->GetRendererCount(); ++rendererIndex )
+  {
+    // vertex input state
+    VertexInputState vi{};
+
+    auto *renderer = item.mNode->GetRendererAt(rendererIndex);
+    auto *geometry = renderer->GetGeometry();
+    auto gfxShader = renderer->GetShader()
+                             .GetGfxObject();
+
+    if( !gfxShader.Exists() )
+    {
+      continue;
+    }
+    /**
+     * Prepare vertex attribute buffer bindings
+     */
+    uint32_t                                                    bindingIndex{0u};
+    std::vector<Graphics::API::Accessor<Graphics::API::Buffer>> vertexBuffers{};
+
+    for (auto &&vertexBuffer : geometry->GetVertexBuffers())
+    {
+      vertexBuffers.push_back(vertexBuffer->GetGfxObject());
+      auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
+
+      // update vertex buffer if necessary
+      vertexBuffer->Update(controller);
+
+      // store buffer binding
+      vi.bufferBindings
+        .emplace_back(vertexBuffer->GetFormat()
+                                  ->size, VertexInputRate::PER_VERTEX);
+
+      for (auto i = 0u; i < attributeCountInForBuffer; ++i)
+      {
+        // create attribute description
+        vi.attributes
+          .emplace_back(
+            gfxShader.Get()
+                     .GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
+            bindingIndex, (vertexBuffer->GetFormat()
+                                       ->components[i]).offset,
+            VertexInputFormat::UNDEFINED);
+
+      }
+      bindingIndex++;
+    }
+
+    // Invalid input attributes!
+    if (gfxShader
+          .Get()
+          .GetVertexAttributeLocations()
+          .size() != vi.attributes
+                       .size())
+      continue; // incompatible pipeline!
+
+    // set optional index buffer
+    auto topology         = PrimitiveTopology::TRIANGLE_STRIP;
+    auto geometryTopology = geometry->GetType();
+    switch (geometryTopology)
+    {
+      case Dali::Geometry::Type::TRIANGLE_STRIP:
+      {
+        topology = PrimitiveTopology::TRIANGLE_STRIP;
+        break;
+      }
+      default:
+      {
+        topology = PrimitiveTopology::TRIANGLE_LIST;
+      }
+    }
+
+    /**
+     * 1. DEPTH MDOE
+     */
+    // use correct depth mode
+    DepthStencilState depthStencilState;
+    depthStencilState.SetDepthTestEnable(false)
+                     .SetDepthCompareOp(CompareOp::GREATER_OR_EQUAL);
+
+    if ((renderer->GetDepthTestMode() == DepthTestMode::AUTO && !renderList->GetSourceLayer()
+                                                                           ->IsDepthTestDisabled())
+        || (renderer->GetDepthTestMode() == DepthTestMode::ON))
+    {
+      depthStencilState.SetDepthTestEnable(true);
+      if (renderer->GetDepthWriteMode() == DepthWriteMode::ON)
+      {
+        depthStencilState.SetDepthWriteEnable(true);
+      }
+    }
+
+    /**
+     * 2. BLENDING
+     */
+    ColorBlendState colorBlendState{};
+    colorBlendState.SetBlendEnable(false);
+    if( renderer->GetBlendMode() != BlendMode::OFF)
+    {
+      colorBlendState.SetBlendEnable(true);
+      const auto& options = renderer->GetBlendingOptions();
+      colorBlendState
+        .SetSrcColorBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorRgb()))
+        .SetSrcAlphaBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorAlpha()))
+        .SetDstColorBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorRgb()))
+        .SetDstAlphaBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorAlpha()))
+        .SetColorBlendOp(ConvertBlendEquation(options.GetBlendEquationRgb()))
+        .SetAlphaBlendOp(ConvertBlendEquation(options.GetBlendEquationAlpha()));
+    }
+
+    /**
+     * 3. VIEWPORT
+     */
+    ViewportState viewportState{};
+    if (instruction.mIsViewportSet)
+    {
+      viewportState.SetViewport({float(instruction.mViewport
+                                                  .x), float(instruction.mViewport
+                                                                        .y),
+                                  float(instruction.mViewport
+                                                   .width), float(instruction.mViewport
+                                                                             .height),
+                                  0.0, 1.0});
+    }
+    else
+    {
+      viewportState.SetViewport({0.0, 0.0, 0.0, 0.0,
+                                  0.0, 1.0});
+    }
+
+
+    // create pipeline
+    auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
+
+                // vertex input
+              .SetVertexInputState(vi)
+
+                // shaders
+              .SetShaderState(ShaderState()
+                                .SetShaderProgram(gfxShader.Get()))
+
+                // input assembly
+              .SetInputAssemblyState(InputAssemblyState()
+                                       .SetTopology(topology)
+                                       .SetPrimitiveRestartEnable(true))
+
+                // viewport ( if zeroes then framebuffer size used )
+              .SetViewportState(viewportState)
+
+                // depth stencil
+              .SetDepthStencilState(depthStencilState)
+
+
+                // color blend
+              .SetColorBlendState(colorBlendState
+                                    .SetColorComponentsWriteBits(0xff)
+                                    .SetLogicOpEnable(false))
+
+                // rasterization
+              .SetRasterizationState(RasterizationState()
+                                       .SetCullMode(CullMode::NONE)
+                                       .SetPolygonMode(PolygonMode::FILL)
+                                       .SetFrontFace(FrontFace::CLOCKWISE)));
+
+    // bind pipeline to the renderer
+    renderer->BindPipeline(std::move(pipeline));
+  }
+
+  return true;
+}
+
+void PrepareRendererPipelines( Graphics::API::Controller& controller,
+                               RenderInstructionContainer& renderInstructions,
+                               BufferIndex bufferIndex )
+{
+  for( auto i = 0u; i < renderInstructions.Count( bufferIndex ); ++i )
+  {
+    RenderInstruction &ri = renderInstructions.At(bufferIndex, i);
+    for (auto renderListIndex = 0u; renderListIndex < ri.RenderListCount(); ++renderListIndex)
+    {
+      const auto *renderList = ri.GetRenderList(renderListIndex);
+      for (auto renderItemIndex = 0u; renderItemIndex < renderList->Count(); ++renderItemIndex)
+      {
+        auto &item = renderList->GetItem(renderItemIndex);
+        PrepareGraphicsPipeline(controller, ri, renderList, item, bufferIndex);
+      }
+    }
+  }
+}
+
+void SubmitRenderInstructions( Graphics::API::Controller&  controller,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex                 bufferIndex )
 {
-  graphics.BeginFrame();
-
+  PrepareRendererPipelines( controller, renderInstructions, bufferIndex );
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
+
+  controller.BeginFrame();
+
   for( size_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 
-    SubmitInstruction( graphics, bufferIndex, instruction );
+    SubmitInstruction( controller, bufferIndex, instruction );
   }
 
-  graphics.EndFrame( );
+  controller.EndFrame();
 }
 
 } // namespace SceneGraph
