@@ -45,14 +45,13 @@ struct CommandBufferPool
     CommandBuffer*    commandBuffer;
   };
 
-  CommandBufferPool( CommandPool& owner, Graphics& graphics, uint32_t initialCapacity, uint32_t defaultIncrease, bool isPrimary )
+  CommandBufferPool( CommandPool& owner, Graphics& graphics, uint32_t initialCapacity, bool isPrimary )
   : mOwner( owner ),
     mGraphics( graphics ),
     mPoolData{},
     mFirstFree(INVALID_NODE_INDEX),
     mCapacity( initialCapacity ),
     mAllocationCount( 0u ),
-    mDefaultIncrease( defaultIncrease ),
     mIsPrimary( isPrimary )
   {
     // don't allocate anything if initial capacity is 0
@@ -127,7 +126,8 @@ struct CommandBufferPool
     // resize if no more nodes
     if( mFirstFree == INVALID_NODE_INDEX )
     {
-      Resize( U32(mPoolData.size() + mDefaultIncrease) );
+      auto newSize = static_cast<uint32_t>(mPoolData.empty() ? 1 : 2 * mPoolData.size());
+      Resize( U32( newSize ) );
     }
 
     auto& node = mPoolData[mFirstFree];
@@ -176,7 +176,6 @@ struct CommandBufferPool
   uint32_t                      mFirstFree;
   uint32_t                      mCapacity;
   uint32_t                      mAllocationCount;
-  uint32_t                      mDefaultIncrease;
   bool                          mIsPrimary;
 };
 
@@ -206,8 +205,8 @@ struct CommandPool::Impl
   {
     mCreateInfo.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
     mCommandPool = VkAssert(mGraphics.GetDevice().createCommandPool(mCreateInfo, mGraphics.GetAllocator()));
-    mInternalPoolPrimary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, 32, true );
-    mInternalPoolSecondary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, 32, false );
+    mInternalPoolPrimary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, true );
+    mInternalPoolSecondary = std::make_unique<CommandBufferPool>( mInterface, mGraphics, 0, false );
     return true;
   }
 
