@@ -32,6 +32,7 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <cstring>
 
 namespace Dali
 {
@@ -371,6 +372,19 @@ public:
   void WriteUniform( const std::string& name, const T& data )
   {
     WriteUniform( name, &data, sizeof(T) );
+  }
+
+  void WriteUniform( const std::string& name, const Matrix3& data )
+  {
+    // Matrix3 has to take stride in account ( 16 )
+    float values[12];
+    std::fill( values, values+12, 10.0f );
+
+    std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
+    std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
+    std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
+
+    WriteUniform( name, &values, sizeof(float)*12 );
   }
 
   void WriteUniform( const std::string& name, const void* data, uint32_t size );
