@@ -84,8 +84,12 @@ bool Buffer::OnDestroy()
 {
   mGraphics->RemoveBuffer( *this );
 
-  mGraphics->DiscardResource( [this]() {
-    mGraphics->GetDevice().destroyBuffer(mBuffer, mGraphics->GetAllocator());
+  auto device = mGraphics->GetDevice();
+  auto buffer = mBuffer;
+  auto allocator = &mGraphics->GetAllocator();
+
+  mGraphics->DiscardResource( [device, buffer, allocator]() {
+    device.destroyBuffer(buffer, allocator);
   } );
 
   return false;

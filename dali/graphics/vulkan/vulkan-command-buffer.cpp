@@ -401,7 +401,7 @@ uint32_t CommandBuffer::GetPoolAllocationIndex() const
 
 bool CommandBuffer::OnDestroy()
 {
-  mOwnerCommandPool->ReleaseCommandBuffer( *this, false );
+  mOwnerCommandPool->ReleaseCommandBuffer( *this );
   return true;
 }
 

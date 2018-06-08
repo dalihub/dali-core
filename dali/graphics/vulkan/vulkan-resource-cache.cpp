@@ -85,12 +85,6 @@ ResourceCache& ResourceCache::AddSampler( RefCountedSampler sampler )
   return *this;
 }
 
-ResourceCache& ResourceCache::AddFence( RefCountedFence fence )
-{
-  mFences.push_back( fence );
-  return *this;
-}
-
 RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
 {
   auto iterator = std::find_if(mShaders.begin(),
@@ -130,15 +124,6 @@ RefCountedSampler ResourceCache::FindSampler( vk::Sampler sampler )
                                [&](const RefCountedSampler entry) { return entry->GetVkHandle() == sampler; });
 
   return iterator == mSamplers.end() ? RefCountedSampler() : RefCountedSampler(&**iterator);
-}
-
-RefCountedFence ResourceCache::FindFence( vk::Fence fence )
-{
-  auto iterator = std::find_if(mFences.begin(),
-                               mFences.end(),
-                               [&](const RefCountedFence entry) { return entry->GetVkHandle() == fence; });
-
-  return iterator == mFences.end() ? RefCountedFence() : RefCountedFence(&**iterator);
 }
 
 RefCountedBuffer ResourceCache::FindBuffer( vk::Buffer buffer )
@@ -283,21 +268,6 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler &sampler )
     std::iter_swap(iterator, std::prev(mSamplers.end()));
     mSamplers.back().Reset();
     mSamplers.pop_back();
-  }
-  return *this;
-}
-
-ResourceCache& ResourceCache::RemoveFence( Fence& fence )
-{
-  if( !mFences.empty() )
-  {
-    auto iterator = std::find_if(mFences.begin(),
-                                 mFences.end(),
-                                 [&](const RefCountedFence entry) { return &*entry == &fence; });
-
-    std::iter_swap(iterator, std::prev(mFences.end()));
-    mFences.back().Reset();
-    mFences.pop_back();
   }
   return *this;
 }
