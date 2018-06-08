@@ -710,6 +710,7 @@ public:
   RenderState                               mRenderState;
   const Pipeline*                           mPipeline;
 
+  int tag{0};
 };
 
 } // namespace API

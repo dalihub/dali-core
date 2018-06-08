@@ -404,6 +404,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   mGfxRenderCommand->BindVertexBuffers( std::move( vertexBuffers ) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
 
+  auto* var = mGfxRenderCommand.get();
+  var->tag = tag;
   if(usesIndexBuffer)
   {
     mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}

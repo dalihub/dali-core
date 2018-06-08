@@ -18,7 +18,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
-#include <dali/graphics-api/graphics-api-texture-details.h>
+#include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 
@@ -29,7 +29,23 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+
+namespace
+{
+/*
+constexpr vk::Format ConvertFormat( API::Format format )
+{
+  switch( format )
+  {
+
+  }
+}
+ */
+}
+
 using namespace Dali::Graphics::Vulkan;
+
+
 
 struct Texture::Impl
 {
@@ -53,7 +69,7 @@ struct Texture::Impl
 
     auto format = vk::Format::eR8G8B8A8Unorm;
 
-    if(mTextureFactory.GetFormat() == API::TextureDetails::Format::RGBA8 )
+    if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
     {
       // check bpp, if 24bpp convert
       if (sizeInBytes == width * height * 3)
@@ -77,7 +93,7 @@ struct Texture::Impl
       }
 
     }
-    else if(mTextureFactory.GetFormat() == API::TextureDetails::Format::L8 )
+    else if(mTextureFactory.GetFormat() == API::Format::R8_UNORM )
     {
       format = vk::Format::eR8Unorm;
     }

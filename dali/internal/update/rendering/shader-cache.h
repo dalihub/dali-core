@@ -21,9 +21,11 @@
 #include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
+
 namespace Internal
 {
 namespace SceneGraph
@@ -56,6 +58,11 @@ struct ShaderCache
   Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> GetShader(
     const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
     const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh );
+
+  Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> GetShader(
+    const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
+    const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh,
+    const Dali::Property::Map& specializationConstants );
 
 private:
   std::vector<Item> mItems;
