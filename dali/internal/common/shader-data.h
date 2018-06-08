@@ -26,6 +26,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/shader.h> // ShaderHints
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -85,12 +86,14 @@ public:
    * @param fragmentSource
    * @param hints
    */
-  ShaderData( std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints)
+  ShaderData( std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints,
+  Property::Map specializationConstants = {})
     : mShaderHash( uint32_t(-1) ),
       mVertexShader(vertexSource),
       mFragmentShader(fragmentSource),
       mHints(hints),
-      mType( Type::BINARY )
+      mType( Type::BINARY ),
+      mSpecializationConstants( specializationConstants )
   { }
 
 protected:
@@ -213,6 +216,11 @@ public: // API
     return mType;
   }
 
+  const Property::Map& GetSpecializationConstants() const
+  {
+    return mSpecializationConstants;
+  }
+
   ShaderData(const ShaderData& other) = delete;            ///< no copying of this object
   ShaderData& operator= (const ShaderData& rhs) = delete;  ///< no copying of this object
 
@@ -224,6 +232,7 @@ private: // Data
   Dali::Shader::Hint::Value   mHints;          ///< take a hint
   Dali::Vector<unsigned char> mBuffer;         ///< buffer containing compiled binary bytecode
   Type                        mType;           ///< Type of shader data ( text or binary )
+  Property::Map               mSpecializationConstants; ///< Specialization constnts
 
 };
 

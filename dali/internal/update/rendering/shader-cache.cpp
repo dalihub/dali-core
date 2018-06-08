@@ -16,6 +16,7 @@
 
 #include <dali/internal/update/rendering/shader-cache.h>
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -31,7 +32,7 @@ ShaderCache::ShaderCache( Dali::Graphics::API::Controller& controller )
 
 Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShader(
   const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
-  const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh )
+  const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh)
 {
   for( auto&& item : mItems )
   {
@@ -51,6 +52,44 @@ Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShade
   mItems.emplace_back( Item() = { shaderRef, vsh, fsh } );
   return shaderRef;
 }
+
+Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShader(
+  const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
+  const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh,
+  const Dali::Property::Map& specializationConstants )
+{
+  for( auto&& item : mItems )
+  {
+    if( item.vertexSource == vsh && item.fragmentSource == fsh )
+    {
+      return item.shader;
+    }
+  }
+
+  auto& factory = mController.GetShaderFactory()
+             .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
+                               Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                               vsh )
+             .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
+                               Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                               fsh );
+  auto tag = specializationConstants.Find("tag");
+  if( tag )
+  {
+    tag->Get( factory.tag );
+  }
+  auto shaderRef =
+         mController.CreateShader( factory
+                                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
+                                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                                                                vsh )
+                                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
+                                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                                                                fsh ) );
+  mItems.emplace_back( Item() = { shaderRef, vsh, fsh } );
+  return shaderRef;
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

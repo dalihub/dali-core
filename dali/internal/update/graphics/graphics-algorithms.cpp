@@ -163,6 +163,12 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       sgRenderer->WriteUniform("uMvpMatrix", mvp2);
       sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
       sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
+
+      Matrix3 uNormalMatrix( item.mModelViewMatrix );
+      uNormalMatrix.ScaledInverseTranspose();
+
+
+      sgRenderer->WriteUniform("uNormalMatrix", uNormalMatrix);
       sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
       sgRenderer->WriteUniform("uSize", item.mSize);
       sgRenderer->WriteUniform("uColor", color );
@@ -291,6 +297,9 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
         || (renderer->GetDepthTestMode() == DepthTestMode::ON))
     {
       depthStencilState.SetDepthTestEnable(true);
+
+      // should be done true if layer 3d???
+      depthStencilState.SetDepthWriteEnable(true);
       if (renderer->GetDepthWriteMode() == DepthWriteMode::ON)
       {
         depthStencilState.SetDepthWriteEnable(true);

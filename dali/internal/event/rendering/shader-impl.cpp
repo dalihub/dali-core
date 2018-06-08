@@ -341,7 +341,7 @@ void Shader::Initialize( std::vector<char>& vertexShader,
   OwnerPointer< SceneGraph::Shader > transferOwnership( mSceneObject );
   AddShaderMessage( updateManager, transferOwnership );
 
-  mShaderData = new ShaderData( vertexShader, fragmentShader, hints );
+  mShaderData = new ShaderData( vertexShader, fragmentShader, hints, specializationConstants );
 
   // Add shader program to scene-object using a message to the UpdateManager
   SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, false );

@@ -175,7 +175,21 @@ API::ShaderDetails::VertexInputAttributeFormat Shader::GetVertexAttributeFormat(
     return API::ShaderDetails::VertexInputAttributeFormat::UNDEFINED;
   }
 
-  const auto& attr = mVertexInputAttributes[location];
+  int index = -1;
+  for( auto i = 0u; mVertexInputAttributes.size(); ++i )
+  {
+    if(mVertexInputAttributes[i].location == location)
+    {
+      index = int(i);
+    }
+  }
+
+  if( index < 0 )
+  {
+    return API::ShaderDetails::VertexInputAttributeFormat::UNDEFINED;
+  }
+
+  const auto& attr = mVertexInputAttributes[uint32_t(index)];
 
   if( attr.format == vk::Format::eR32Sfloat )
   {
@@ -207,7 +221,21 @@ std::string Shader::GetVertexAttributeName(uint32_t location) const
     return "";
   }
 
-  return mVertexInputAttributes[location].name;
+  int index = -1;
+  for( auto i = 0u; mVertexInputAttributes.size(); ++i )
+  {
+    if(mVertexInputAttributes[i].location == location)
+    {
+      index = int(i);
+    }
+  }
+
+  if( index < 0 )
+  {
+    return "";
+  }
+
+  return mVertexInputAttributes[uint32_t(index)].name;
 }
 
 std::vector<uint32_t> Shader::GetVertexAttributeLocations() const
