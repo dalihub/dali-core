@@ -225,8 +225,6 @@ RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInf
 
   VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), refCountedFence->Ref()));
 
-  AddFence( refCountedFence );
-
   return refCountedFence;
 }
 
@@ -389,7 +387,7 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
 
 RefCountedCommandBuffer Graphics::CreateCommandBuffer( bool primary )
 {
-  auto commandPool = FindCommandPool( std::this_thread::get_id() );
+  auto commandPool = GetCommandPool( std::this_thread::get_id());
 
   return commandPool->NewCommandBuffer( primary );
 }
@@ -666,12 +664,6 @@ void Graphics::AddSampler( RefCountedSampler sampler )
   mResourceCache->AddSampler( std::move( sampler ) );
 }
 
-void Graphics::AddFence( RefCountedFence fence )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddFence( std::move(fence) );
-}
-
 RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
@@ -730,12 +722,6 @@ void Graphics::RemoveSampler( Sampler& sampler )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mResourceCache->RemoveSampler( sampler );
-}
-
-void Graphics::RemoveFence( Fence& fence )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveFence( fence );
 }
 
 void Graphics::CollectGarbage()
@@ -989,7 +975,7 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
   return retval;
 }
 
-RefCountedCommandPool Graphics::FindCommandPool( std::thread::id )
+RefCountedCommandPool Graphics::GetCommandPool( std::thread::id )
 {
   RefCountedCommandPool commandPool;
   {

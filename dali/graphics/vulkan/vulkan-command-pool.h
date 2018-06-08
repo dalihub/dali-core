@@ -77,7 +77,7 @@ public:
    * @param buffer
    * @return
    */
-  bool ReleaseCommandBuffer( CommandBuffer& buffer, bool forceRelease );
+  bool ReleaseCommandBuffer( CommandBuffer& buffer );
 
   /**
    * Returns current pool capacity ( 0 if nothing allocated )
@@ -98,11 +98,9 @@ public:
    */
   uint32_t GetAllocationCount( vk::CommandBufferLevel level ) const;
 
-public:
+  bool OnDestroy() override; //TODO: Queue deleter for destruction
 
-  bool OnDestroy() override;
-
-private:
+private: //Private methods
 
   CommandPool();
 
@@ -123,8 +121,75 @@ private:
    */
   static RefCountedCommandPool New( Graphics& graphics );
 
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  bool Initialize();
+
+private: //Internal structs
+  /**
+ * CommandBufferPool contains preallocated command buffers that are
+ * reusable.
+ */
+  struct InternalPool
+  {
+    static constexpr uint32_t INVALID_NODE_INDEX{ 0xffffffffu };
+    struct Node
+    {
+      Node( uint32_t _nextFreeIndex, CommandBuffer* _commandBuffer );
+
+      uint32_t          nextFreeIndex;
+      CommandBuffer*    commandBuffer;
+    };
+
+    InternalPool( CommandPool& owner, Graphics* graphics, uint32_t initialCapacity, bool isPrimary );
+
+    ~InternalPool();
+
+    /**
+     * Creates new batch of command buffers
+     * @param allocateInfo
+     * @return
+     */
+    std::vector<vk::CommandBuffer> AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo );
+
+    /**
+     * Resizes command pool to the new capacity. Pool may only grow
+     * @param newCapacity
+     */
+    void Resize( uint32_t newCapacity );
+
+    /**
+     * Allocates new command buffer
+     * @return
+     */
+    RefCountedCommandBuffer AllocateCommandBuffer( bool reset );
+
+    /**
+     * Releases command buffer back to the pool
+     * @param reset if true, Resets command buffer
+     * @param ref
+     */
+    void ReleaseCommandBuffer( CommandBuffer& buffer, bool reset = false );
+
+    uint32_t GetCapacity() const;
+
+    uint32_t GetAllocationCount() const;
+
+    CommandPool&                  mOwner;
+    Graphics*                     mGraphics;
+    std::vector<Node>             mPoolData;
+    uint32_t                      mFirstFree;
+    uint32_t                      mCapacity;
+    uint32_t                      mAllocationCount;
+    bool                          mIsPrimary;
+  };
+
+private: // Data members
+  Graphics* mGraphics;
+  vk::CommandPoolCreateInfo mCreateInfo;
+  vk::CommandPool mCommandPool;
+
+  // Pools are lazily allocated, depends on the requested command buffers
+  std::unique_ptr<InternalPool> mInternalPoolPrimary;
+  std::unique_ptr<InternalPool> mInternalPoolSecondary;
 
 };
 
