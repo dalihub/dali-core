@@ -49,13 +49,7 @@ Fence& Fence::Ref()
   return *this;
 }
 
-Fence::~Fence()
-{
-  if( mFence )
-  {
-    mGraphics->GetDevice().destroyFence( mFence, mGraphics->GetAllocator() );
-  }
-}
+Fence::~Fence() = default;
 
 vk::Fence Fence::GetVkHandle() const
 {
@@ -69,10 +63,17 @@ Fence::operator vk::Fence*()
 
 bool Fence::OnDestroy()
 {
-  mGraphics->RemoveFence( *this );
+  // Copy the Vulkan handles and pointers here.
+  // Cannot capture the "this" pointer in the lambda.
+  // When the lambda is invoked "this" is already destroyed.
+  // This method is only deferring execution to the end of the frame.
+  auto device = mGraphics->GetDevice();
+  auto fence = mFence;
+  auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [this]() {
-    mGraphics->GetDevice().destroyFence( mFence, mGraphics->GetAllocator() );
+  // capture copies of the pointers and handles
+  mGraphics->DiscardResource( [device, fence, allocator]() {
+    device.destroyFence( fence, allocator );
   } );
 
   return false;

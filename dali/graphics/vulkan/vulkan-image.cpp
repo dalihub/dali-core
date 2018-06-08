@@ -123,8 +123,12 @@ bool Image::OnDestroy()
   {
     mGraphics->RemoveImage(*this);
 
-    mGraphics->DiscardResource([this]() {
-      mGraphics->GetDevice().destroyImage(mImage, mGraphics->GetAllocator());
+    auto device = mGraphics->GetDevice();
+    auto image = mImage;
+    auto allocator = &mGraphics->GetAllocator();
+
+    mGraphics->DiscardResource([device, image, allocator]() {
+      device.destroyImage(image, allocator);
     });
   }
 

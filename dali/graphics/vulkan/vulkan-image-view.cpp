@@ -88,8 +88,12 @@ bool ImageView::OnDestroy()
 {
   mGraphics->RemoveImageView( *this );
 
-  mGraphics->DiscardResource( [this]() {
-    mGraphics->GetDevice().destroyImageView(mImageView, mGraphics->GetAllocator());
+  auto device = mGraphics->GetDevice();
+  auto imageView = mImageView;
+  auto allocator = &mGraphics->GetAllocator();
+
+  mGraphics->DiscardResource( [device, imageView, allocator]() {
+    device.destroyImageView(imageView, allocator);
   } );
 
   return VkManaged::OnDestroy();
