@@ -96,7 +96,7 @@ static const int RenderableUpdateFlags = TransformFlag | SortModifierFlag | Chil
  * thread to modify node data, without interferring with another
  * thread reading the values from the previous update traversal.
  */
-class Node : public PropertyOwner, public NodeDataProvider
+class Node : public PropertyOwner
 {
 public:
 
@@ -760,6 +760,11 @@ public:
   void RemoveUniformMapping( const std::string& uniformName );
 
   /**
+   * Return true if the uniform map has changed this frame
+   */
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const;
+
+  /**
    * Prepare the node for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -818,23 +823,6 @@ private: // from NodeDataProvider
     return GetWorldColor( bufferId );
   }
 
-public: // From UniformMapDataProvider
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMapChanged
-   */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const
-  {
-    return mUniformMapChanged[bufferIndex];
-  }
-
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMap
-   */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const
-  {
-    return mCollectedUniformMap[bufferIndex];
-  }
-
 private:
 
   // Undefined
@@ -883,8 +871,7 @@ protected:
 
   NodeContainer                      mChildren;               ///< Container of children; not owned
 
-  CollectedUniformMap                mCollectedUniformMap[2]; ///< Uniform maps of the node
-  unsigned int                       mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
+
   uint32_t                           mClippingDepth;          ///< The number of stencil clipping nodes deep this node is
   uint32_t                           mScissorDepth;           ///< The number of scissor clipping nodes deep this node is
 
