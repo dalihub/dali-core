@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b05fb72_eb9a0917",
+        "filename": "dali/graphics/vulkan/vulkan-sampler.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-08T17:55:04Z",
+      "side": 1,
+      "message": "Not sure why vulkan-sampler.h \u0026 cpp changes are in this patch rather than the previous patch...",
+      "range": {
+        "startLine": 44,
+        "startChar": 25,
+        "endLine": 44,
+        "endChar": 39
+      },
+      "revId": "020b0d1670d9ef0a3f50b3b349b4d35f0e8b5785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
