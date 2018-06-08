@@ -165,8 +165,8 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
       sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
 
       Matrix3 uNormalMatrix( item.mModelViewMatrix );
-      uNormalMatrix.ScaledInverseTranspose();
-
+      uNormalMatrix.Invert();
+      uNormalMatrix.Transpose();
 
       sgRenderer->WriteUniform("uNormalMatrix", uNormalMatrix);
       sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
