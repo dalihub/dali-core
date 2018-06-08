@@ -120,6 +120,134 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 
   return false;
 }
+
+/**
+ * Converts DALi pixel format to Graphics::API::Format
+ * @param format
+ * @return
+ */
+constexpr Graphics::API::Format ConvertPixelFormat( Pixel::Format format )
+{
+  switch( format )
+  {
+    case Pixel::INVALID:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::A8:
+      return Graphics::API::Format::R8_UNORM;
+    case Pixel::L8:
+      return Graphics::API::Format::R8_UNORM;
+    case Pixel::LA88:
+      return Graphics::API::Format::R8G8_UNORM;
+    case Pixel::RGB565:
+      return Graphics::API::Format::R5G6B5_UNORM_PACK16;
+    case Pixel::BGR565:
+      return Graphics::API::Format::B5G6R5_UNORM_PACK16;
+    case Pixel::RGBA4444:
+      return Graphics::API::Format::R4G4B4A4_UNORM_PACK16;
+    case Pixel::BGRA4444:
+      return Graphics::API::Format::B4G4R4A4_UNORM_PACK16;
+    case Pixel::RGBA5551:
+      return Graphics::API::Format::R5G5B5A1_UNORM_PACK16;
+    case Pixel::BGRA5551:
+      return Graphics::API::Format::B5G5R5A1_UNORM_PACK16;
+    case Pixel::RGB888:
+      return Graphics::API::Format::R8G8B8_UNORM;
+    case Pixel::RGB8888:
+      return Graphics::API::Format::R8G8B8A8_UNORM;
+    case Pixel::BGR8888:
+      return Graphics::API::Format::B8G8R8A8_UNORM;
+    case Pixel::RGBA8888:
+      return Graphics::API::Format::R8G8B8A8_UNORM;
+    case Pixel::BGRA8888:
+      return Graphics::API::Format::B8G8R8A8_UNORM;
+    case Pixel::COMPRESSED_R11_EAC:
+      return Graphics::API::Format::EAC_R11_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SIGNED_R11_EAC:
+      return Graphics::API::Format::EAC_R11_SNORM_BLOCK;;
+    case Pixel::COMPRESSED_RG11_EAC:
+      return Graphics::API::Format::EAC_R11G11_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
+      return Graphics::API::Format::EAC_R11G11_SNORM_BLOCK;
+    case Pixel::COMPRESSED_RGB8_ETC2:
+      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ETC2:
+      return Graphics::API::Format::ETC2_R8G8B8_SRGB_BLOCK;
+    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+      return Graphics::API::Format::ETC2_R8G8B8A1_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+      return Graphics::API::Format::ETC2_R8G8B8A1_SRGB_BLOCK;
+    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGB8_ETC1:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+      return Graphics::API::Format::UNDEFINED;
+    case Pixel::RGB16F:
+      return Graphics::API::Format::R16G16B16_SFLOAT;
+    case Pixel::RGB32F:
+      return Graphics::API::Format::R32G32B32_SFLOAT;
+  }
+  return Graphics::API::Format::UNDEFINED;
+}
+
 } //Unnamed namespace
 
 
@@ -144,8 +272,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mNativeImage( nativeImageInterface ),
   mSampler(),
   mId( 0 ),
-  mWidth( nativeImageInterface->GetWidth() ),
-  mHeight( nativeImageInterface->GetHeight() ),
+  mWidth( uint16_t(nativeImageInterface->GetWidth()) ),
+  mHeight( uint16_t(nativeImageInterface->GetHeight()) ),
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
@@ -172,16 +300,9 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   {
     auto& controller = mGraphics->GetController();
 
-    auto format = Graphics::API::TextureDetails::Format::RGBA8;
-    auto pixelFormat = pixelData->GetPixelFormat();
-    if( pixelFormat == Dali::Pixel::Format::L8 )
-    {
-      format = Graphics::API::TextureDetails::Format::L8;
-    }
-
-
+    // Convert DALi format to Graphics API format
     mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
-                                                 .SetFormat( format )
+                                                 .SetFormat( ConvertPixelFormat( pixelData->GetPixelFormat() ) )
                                                  .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
                                                  .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
                                                  .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )

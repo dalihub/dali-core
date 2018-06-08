@@ -84,7 +84,8 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
   {
     mGraphicsShader = mShaderCache->GetShader(
       Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
-      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
+      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)),
+      shaderData->GetSpecializationConstants());
   }
 }
 

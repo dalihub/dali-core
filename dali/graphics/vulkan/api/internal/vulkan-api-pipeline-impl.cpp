@@ -297,6 +297,7 @@ bool Pipeline::Initialise()
       attributeDescriptions.emplace_back(vk::VertexInputAttributeDescription{}
                                            .setBinding(vb.binding)
                                            .setFormat(attribs[GetLocationIndex( attribs, vb.location)].format)
+                                           .setFormat(attribs[GetLocationIndex( attribs, vb.location)].format)
                                            .setLocation(vb.location )
                                            .setOffset(vb.offset));
     }

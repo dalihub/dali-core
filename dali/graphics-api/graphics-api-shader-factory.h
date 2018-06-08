@@ -55,6 +55,10 @@ protected:
   // derived types should not be moved direcly to prevent slicing
   ShaderFactory(ShaderFactory&&) = default;
   ShaderFactory& operator=(ShaderFactory&&) = default;
+
+public:
+
+  int tag;
 };
 
 } // namespace API
