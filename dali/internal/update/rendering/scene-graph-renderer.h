@@ -52,7 +52,6 @@ typedef RendererContainer::ConstIterator RendererConstIter;
 
 
 class Renderer : public PropertyOwner,
-                 public UniformMapDataProvider,
                  public UniformMap::Observer,
                  public ConnectionChangePropagator::Observer
 {
@@ -337,6 +336,13 @@ public:
   float GetOpacity( BufferIndex updateBufferIndex ) const;
 
   /**
+   * Helper function to update the uniform map.
+   * @param[in] bufferIndex The buffer to read from.
+   * @param[in] node NodeDataProvider to get uniform map
+   */
+  void UpdateUniformMap( BufferIndex bufferIndex, Node& node );
+
+  /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -421,18 +427,6 @@ public: // PropertyOwner implementation
    */
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex ){};
 
-public: // From UniformMapDataProvider
-
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMapChanged
-   */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const{ return mUniformMapChanged[bufferIndex];}
-
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMap
-   */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
-
 private:
 
   /**
@@ -440,10 +434,6 @@ private:
    */
   Renderer();
 
-  /**
-   * Helper function to update the uniform map.
-   */
-  void UpdateUniformMap( BufferIndex updateBufferIndex );
 
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
@@ -468,7 +458,6 @@ private:
   DepthWriteMode::Type         mDepthWriteMode:2;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:2;                  ///< Local copy of the depth test mode
 
-  bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
   std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO

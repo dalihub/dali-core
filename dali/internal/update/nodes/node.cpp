@@ -110,13 +110,9 @@ Node::Node()
   mIsLayer( false ),
   mPositionUsesAnchorPoint( true )
 {
-  mUniformMapChanged[0] = 0u;
-  mUniformMapChanged[1] = 0u;
-
 #ifdef DEBUG_ENABLED
   gNodeCount++;
 #endif
-
 }
 
 Node::~Node()
@@ -180,35 +176,22 @@ void Node::RemoveUniformMapping( const std::string& uniformName )
   mRegenerateUniformMap = 2;
 }
 
+bool Node::GetUniformMapChanged( BufferIndex bufferIndex ) const
+{
+  return mRegenerateUniformMap > 0;
+}
+
 void Node::PrepareRender( BufferIndex bufferIndex )
 {
-  if(mRegenerateUniformMap != 0 )
+  // Each renderer will query back to find out if the node's map has been updated
+  for(auto renderer : mRenderer )
   {
-    if( mRegenerateUniformMap == 2 )
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
-      localMap.Resize(0);
+    renderer->UpdateUniformMap( bufferIndex, *this );
+  }
 
-      for( unsigned int i=0, count=mUniformMaps.Count(); i<count; ++i )
-      {
-        localMap.PushBack( &mUniformMaps[i] );
-      }
-    }
-    else if( mRegenerateUniformMap == 1 )
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
-      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-bufferIndex ];
-
-      localMap.Resize( oldMap.Count() );
-
-      unsigned int index=0;
-      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
-      {
-        localMap[index] = *iter;
-      }
-    }
-    --mRegenerateUniformMap;
-    mUniformMapChanged[bufferIndex] = 1u;
+  if( mRegenerateUniformMap > 0 )
+  {
+    mRegenerateUniformMap--;
   }
 }
 

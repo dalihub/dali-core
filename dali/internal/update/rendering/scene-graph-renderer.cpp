@@ -60,14 +60,13 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
   //   Any maps that aren't in localMap should be added in a single step
   Dali::Internal::SceneGraph::CollectedUniformMap newUniformMappings;
 
-  for( unsigned int i=0, count=uniformMap.Count(); i<count; ++i )
+  for( unsigned int i=0, count = uniformMap.Count(); i<count; ++i )
   {
     Dali::Internal::SceneGraph::UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
     bool found = false;
 
-    for( Dali::Internal::SceneGraph::CollectedUniformMap::Iterator iter = localMap.Begin() ; iter != localMap.End() ; ++iter )
+    for( auto map : localMap )
     {
-      const Dali::Internal::SceneGraph::UniformPropertyMapping* map = (*iter);
       if( map->uniformNameHash == nameHash )
       {
         if( map->uniformName == uniformMap[i].uniformName )
@@ -88,12 +87,8 @@ void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, con
   {
     localMap.Reserve( localMap.Count() + newUniformMappings.Count() );
 
-    for( Dali::Internal::SceneGraph::CollectedUniformMap::Iterator iter = newUniformMappings.Begin(),
-           end = newUniformMappings.End() ;
-         iter != end ;
-         ++iter )
+    for( auto map : newUniformMappings )
     {
-      const Dali::Internal::SceneGraph::UniformPropertyMapping* map = (*iter);
       localMap.PushBack( map );
     }
   }
@@ -134,9 +129,6 @@ Renderer::Renderer()
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
-  mUniformMapChanged[0] = false;
-  mUniformMapChanged[1] = false;
-
   // Observe our own PropertyOwner's uniform map
   AddUniformMapObserver( *this );
 }
@@ -174,40 +166,44 @@ void* AllocateUniformBufferMemory( size_t size )
 }
 
 
-void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex )
+void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 {
+  // Called every frame.
+  CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
 
-  if( mRegenerateUniformMap > UNIFORM_MAP_READY )
+  // See if we need to update the collected map:
+  if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP || // renderer or shader's uniform map has changed
+      node.GetUniformMapChanged( updateBufferIndex ) ) // node's uniform map has change
   {
-    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
+    localMap.Resize(0);
+
+    // Priority is: High: Node, Renderer, Shader, to Low
+    AddMappings( localMap, node.GetUniformMap() );
+
+    const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+    AddMappings( localMap, rendererUniformMap );
+
+    if( mShader )
     {
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      localMap.Resize(0);
-
-      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-      AddMappings( localMap, rendererUniformMap );
-
-      if( mShader )
-      {
-        AddMappings( localMap, mShader->GetUniformMap() );
-      }
+      AddMappings( localMap, mShader->GetUniformMap() );
     }
-    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
+  }
+  else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
+  {
+    // Copy old map into current map
+    CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
+
+    localMap.Resize( oldMap.Count() );
+
+    unsigned int index=0;
+    for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
     {
-      // Copy old map into current map
-      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
-
-      localMap.Resize( oldMap.Count() );
-
-      unsigned int index=0;
-      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
-      {
-        localMap[index] = *iter;
-      }
+      localMap[index] = *iter;
     }
+  }
 
-    mUniformMapChanged[updateBufferIndex] = true;
+  if( mRegenerateUniformMap > 0 )
+  {
     mRegenerateUniformMap--;
   }
 }
@@ -266,8 +262,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
              .size() != vertexAttributeBindings.size())
     return;
 
-  UpdateUniformMap(updateBufferIndex);
-
   auto &shader = mShader->GetGfxObject().Get();
   auto uboCount = shader.GetUniformBlockCount();
 
@@ -306,96 +300,86 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   // add built-in uniforms
 
   // write to memory
-  for (auto &&i : mCollectedUniformMap)
+  for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
   {
-    for (auto &&j : i)
+    std::string uniformName(uniformMap->uniformName);
+    int         arrayIndex       = 0;
+    auto        arrayLeftBracket = uniformMap->uniformName .find('[');
+    if (arrayLeftBracket != std::string::npos)
     {
-      std::string uniformName(j->uniformName);
-      int         arrayIndex       = 0;
-      auto        arrayLeftBracket = j->uniformName
-                                      .find('[');
-      if (arrayLeftBracket != std::string::npos)
-      {
-        auto arrayRightBracket = j->uniformName
-                                  .find(']');
-        arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
-        DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << j->uniformName << ", index: " << arrayIndex );
-        uniformName = uniformName.substr(0, arrayLeftBracket);
-      }
+      auto arrayRightBracket = uniformMap->uniformName.find(']');
+      arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
+      uniformName = uniformName.substr(0, arrayLeftBracket);
+    }
 
-      auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-      if (shader.GetNamedUniform(uniformName, uniformInfo))
+    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+    if (shader.GetNamedUniform(uniformName, uniformInfo))
+    {
+      // write into correct uniform buffer
+      auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
+
+      switch (uniformMap->propertyPtr->GetType())
       {
-        // write into correct uniform buffer
-        auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
-        switch (j->propertyPtr
-                 ->GetType())
+        case Property::Type::FLOAT:
+        case Property::Type::INTEGER:
+        case Property::Type::BOOLEAN:
         {
-          case Property::Type::FLOAT:
-          case Property::Type::INTEGER:
-          case Property::Type::BOOLEAN:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(float) );
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(float) );
 
-            dst += sizeof(float) * arrayIndex;
-            memcpy(dst, &j->propertyPtr
-                          ->GetFloat(updateBufferIndex), sizeof(float));
-            break;
-          }
-          case Property::Type::VECTOR2:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
-            dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
-            memcpy(dst, &j->propertyPtr
-                          ->GetVector2(updateBufferIndex), sizeof(Vector2));
-            break;
-          }
-          case Property::Type::VECTOR3:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(Vector3) );
-            dst += sizeof(Vector3) * arrayIndex;
-            memcpy(dst, &j->propertyPtr
-                          ->GetVector3(updateBufferIndex), sizeof(Vector3));
-            break;
-          }
-          case Property::Type::VECTOR4:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(Vector4) );
+          dst += sizeof(float) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetFloat(updateBufferIndex), sizeof(float));
+          break;
+        }
+        case Property::Type::VECTOR2:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
+          dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
+          memcpy(dst, &uniformMap->propertyPtr->GetVector2(updateBufferIndex), sizeof(Vector2));
+          break;
+        }
+        case Property::Type::VECTOR3:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
+                  << uniformInfo.offset << ", size: " << sizeof(Vector3) );
+          dst += sizeof(Vector3) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
+          break;
+        }
+        case Property::Type::VECTOR4:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Vector4) );
 
-            dst += sizeof(float) * arrayIndex;
-            memcpy(dst, &j->propertyPtr
-                          ->GetVector4(updateBufferIndex), sizeof(Vector4));
-            break;
-          }
-          case Property::Type::MATRIX:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(Matrix)  );
-            dst += sizeof(Matrix) * arrayIndex;
-            memcpy(dst, &j->propertyPtr
-                          ->GetMatrix(updateBufferIndex), sizeof(Matrix));
-            break;
-          }
-          case Property::Type::MATRIX3:
-          {
-            DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
-                   << uniformInfo.offset << ", size: " << sizeof(Matrix3) );
-            dst += sizeof(Matrix3) * arrayIndex;
-            memcpy(dst, &j->propertyPtr
-                          ->GetMatrix3(updateBufferIndex), sizeof(Matrix3));
-            break;
-          }
-          default:
-          {
-          }
+          dst += sizeof(float) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
+          break;
+        }
+        case Property::Type::MATRIX:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Matrix)  );
+          dst += sizeof(Matrix) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetMatrix(updateBufferIndex), sizeof(Matrix));
+          break;
+        }
+        case Property::Type::MATRIX3:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Matrix3) );
+          dst += sizeof(Matrix3) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetMatrix3(updateBufferIndex), sizeof(Matrix3));
+          break;
+        }
+        default:
+        {
         }
       }
     }
   }
+
 
   /**
    * Prepare textures
@@ -506,7 +490,6 @@ void Renderer::SetTextures( TextureSet* textureSet )
 
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -710,11 +693,6 @@ float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
   return mOpacity[updateBufferIndex];
 }
 
-const CollectedUniformMap& Renderer::GetUniformMap( BufferIndex bufferIndex ) const
-{
-  return mCollectedUniformMap[bufferIndex];
-}
-
 Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;
@@ -776,19 +754,20 @@ void Renderer::TextureSetDeleted()
 
 void Renderer::ConnectionsChanged( PropertyOwner& object )
 {
-  // One of our child objects has changed it's connections. Ensure the uniform
-  // map gets regenerated during PrepareRender
+  // One of our child objects has changed it's connections. Ensure the collected uniform
+  // map gets regenerated during UpdateUniformMap
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
 void Renderer::ConnectedUniformMapChanged()
 {
+  // Called if the shader's uniform map has changed
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
 void Renderer::UniformMappingsChanged( const UniformMap& mappings )
 {
-  // The mappings are either from PropertyOwner base class, or the Actor
+  // The mappings are from PropertyOwner base class
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
