@@ -378,7 +378,7 @@ struct RasterizationState
 struct InputAssemblyState
 {
   PrimitiveTopology topology               {};
-  bool              primitiveRestartEnable { false };
+  bool              primitiveRestartEnable { true };
 
   Extension         extension              { nullptr };
 
@@ -390,7 +390,7 @@ struct InputAssemblyState
 
   InputAssemblyState& SetPrimitiveRestartEnable( bool value )
   {
-    primitiveRestartEnable = value;
+    primitiveRestartEnable = true;
     return *this;
   }
 };

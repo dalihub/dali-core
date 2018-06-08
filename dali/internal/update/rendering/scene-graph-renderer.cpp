@@ -292,6 +292,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
       switch (uniformMap->propertyPtr->GetType())
       {
+
         case Property::Type::FLOAT:
         case Property::Type::INTEGER:
         case Property::Type::BOOLEAN:
@@ -341,7 +342,16 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
                            << uniformInfo.offset << ", size: " << sizeof(Matrix3) );
           dst += sizeof(Matrix3) * arrayIndex;
-          memcpy(dst, &uniformMap->propertyPtr->GetMatrix3(updateBufferIndex), sizeof(Matrix3));
+
+          auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
+
+          float* values = reinterpret_cast<float*>(dst);
+          std::fill( values, values+12, 10.0f );
+          std::memcpy( &values[0], matrix.AsFloat(), sizeof(float)*3 );
+          std::memcpy( &values[4], &matrix.AsFloat()[3], sizeof(float)*3 );
+          std::memcpy( &values[8], &matrix.AsFloat()[6], sizeof(float)*3 );
+
+          memcpy(dst, values, sizeof(float)*12);
           break;
         }
         default:
