@@ -50,7 +50,8 @@ void LocklessBuffer::Write( const unsigned char *src, size_t size )
   DALI_ASSERT_ALWAYS( size <= mSize );
 
   // set WRITING bit
-  BufferState currentState( __sync_fetch_and_or( &mState, WRITING ) );
+  BufferState currentState( std::atomic_fetch_or( &mState, WRITING ) );
+
   DALI_ASSERT_DEBUG( !(currentState & WRITING_MASK) ); // WRITING bit should never be set when we get here
 
   // copy data to current write buffer, negate state to get actual index (recap: R0W1 = 0, R1W0 = 1)
@@ -58,9 +59,9 @@ void LocklessBuffer::Write( const unsigned char *src, size_t size )
   memcpy( mBuffer[index], src, size );
 
   // unset WRITING bit, set UPDATED bit
-  BufferState checkState = __sync_val_compare_and_swap( &mState,
-                                                        static_cast<BufferState>(currentState | WRITING),
-                                                        static_cast<BufferState>(index | UPDATED) );
+  BufferState writingState = static_cast<BufferState>(currentState | WRITING);
+  BufferState checkState = mState;
+  mState.compare_exchange_strong( writingState, static_cast<BufferState>(index | UPDATED) );
 
   DALI_ASSERT_DEBUG( checkState & WRITING );
   (void)checkState; // Avoid unused variable warning
@@ -76,9 +77,8 @@ const unsigned char* LocklessBuffer::Read()
   {
     // Try to swap buffers.
     // This will set mState to 1 if readbuffer 0 was updated, 0 if readbuffer 1 was updated and fail if WRITING is set
-    if( __sync_bool_compare_and_swap( &mState,
-                                      static_cast<BufferState>(currentWriteBuf | UPDATED),
-                                      static_cast<BufferState>(!currentWriteBuf) )  )
+    BufferState writingState = static_cast<BufferState>(currentWriteBuf | UPDATED);
+    if( mState.compare_exchange_strong( writingState, static_cast<BufferState>(!currentWriteBuf) ) )
     {
       // swap successful
       return mBuffer[currentWriteBuf];

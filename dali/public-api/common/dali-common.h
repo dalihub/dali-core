@@ -43,12 +43,26 @@
 #    define DALI_INTERNAL   __attribute__ ((visibility ("hidden")))
 #  endif
 #else
-/** Visibility attribute to show method definitions */
-#  define DALI_EXPORT_API
+#ifdef WIN32
+ /** Visibility attribute to show declarations */
+#  define DALI_EXPORT_API __declspec(dllexport) //Deprecated
+
+#ifdef BUILDING_DALI_CORE
+ /** Visibility attribute to hide declarations */
+#  define DALI_CORE_API __declspec(dllexport)
+#else
+/** Visibility attribute to hide declarations */
+#  define DALI_CORE_API __declspec(dllimport)
+#endif
+
+#else
+ /** Visibility attribute to show declarations */
+#  define DALI_EXPORT_API //Deprecated
 /** Visibility attribute to show declarations */
 #  define DALI_IMPORT_API
 /** Visibility attribute to show declarations */
 #  define DALI_CORE_API
+#endif
 /** Visibility attribute to hide declarations */
 #  define DALI_INTERNAL
 #endif
@@ -73,8 +87,13 @@
  * DALI_UNLIKELY should be used when a branch is almost never taken.
  * @SINCE_1_0.0
  */
+#ifdef __GNUC
 #define DALI_LIKELY(expression)   __builtin_expect( !!(expression), 1 )
 #define DALI_UNLIKELY(expression) __builtin_expect( !!(expression), 0 )
+#else
+#define DALI_LIKELY(expression)   !!(expression)
+#define DALI_UNLIKELY(expression) !!(expression)
+#endif
 
 /**
  * @brief The DALi namespace.
