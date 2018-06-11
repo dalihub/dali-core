@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1226,14 +1226,14 @@ int UtcDaliPropertyValueOutputStream(void)
     value = Property::Value( Matrix3::IDENTITY );
     std::ostringstream stream;
     stream <<  value;
-    DALI_TEST_CHECK( stream.str() == "[ [1, 0, 0], [0, 1, 0], [0, 0, 1] ]" );
+    DALI_TEST_CHECK( stream.str() == "[ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]" );
   }
 
   {
     value = Property::Value( Matrix::IDENTITY );
     std::ostringstream stream;
     stream <<  value;
-    DALI_TEST_CHECK( stream.str() == "[ [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1] ]" );
+    DALI_TEST_CHECK( stream.str() == "[ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]" );
   }
 
   {
