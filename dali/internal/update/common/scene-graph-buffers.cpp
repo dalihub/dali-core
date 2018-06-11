@@ -42,7 +42,7 @@ SceneGraphBuffers::~SceneGraphBuffers()
 
 void SceneGraphBuffers::Swap()
 {
-  mUpdateBufferIndex = std::atomic_fetch_xor<BufferIndex>(&mEventBufferIndex, 1);
+  mUpdateBufferIndex = __sync_fetch_and_xor( &mEventBufferIndex, 1 );
 }
 
 } // namespace SceneGraph
