@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a201580_555a511d",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-06-11T13:17:47Z",
+      "side": 1,
+      "message": "Comment why we need to do this.",
+      "revId": "a81063df0ad9ee64e42315b972aadc80cbd1a75e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4fb6a469_b34ccee6",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-06-11T13:17:47Z",
+      "side": 1,
+      "message": "Not sure if it\u0027s the gerrithub UI or not, but the code below looks wrong.",
+      "revId": "a81063df0ad9ee64e42315b972aadc80cbd1a75e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd878b7a_221c3101",
+        "filename": "dali/graphics/vulkan/vulkan-resource-cache.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-06-11T13:17:47Z",
+      "side": 1,
+      "message": "Missing documentation",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 64
+      },
+      "revId": "a81063df0ad9ee64e42315b972aadc80cbd1a75e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
