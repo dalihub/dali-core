@@ -22,8 +22,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
-#include <atomic>
-
 namespace Dali
 {
 /**
@@ -102,7 +100,8 @@ protected:
   RefObject& operator=(const RefObject& rhs);
 
 private:
-  volatile std::atomic<int> mCount; ///< Reference count
+
+  volatile int mCount; ///< Reference count
 };
 
 /**
