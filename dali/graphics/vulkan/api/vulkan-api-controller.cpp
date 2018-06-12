@@ -234,9 +234,6 @@ struct Controller::Impl
   std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
   std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
 
-  // todo: should be per thread
-  Vulkan::RefCountedCommandPool mCommandPool;
-
   std::vector<std::unique_ptr<VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 
   std::unique_ptr<Vulkan::PipelineCache> mPipelineCache;

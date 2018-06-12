@@ -159,7 +159,10 @@ ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
   {
     auto found = std::find_if(mBuffers.begin(),
                               mBuffers.end(),
-                              [&](const RefCountedBuffer entry) { return &(*entry) == &buffer; });
+                              [&](const RefCountedBuffer& entry)
+                              {
+                                return entry->GetVkHandle() == buffer.GetVkHandle();
+                              });
 
     std::iter_swap(found, std::prev(mBuffers.end()));
     mBuffers.back().Reset();
@@ -174,7 +177,10 @@ ResourceCache& ResourceCache::RemoveImage( Image& image )
   {
     auto found = std::find_if(mImages.begin(),
                               mImages.end(),
-                              [&](const RefCountedImage entry) { return &(*entry) == &image; });
+                              [&](const RefCountedImage& entry)
+                              {
+                                return entry->GetVkHandle() == image.GetVkHandle();
+                              });
 
     std::iter_swap(found, std::prev(mImages.end()));
     mImages.back().Reset();
@@ -189,7 +195,10 @@ ResourceCache& ResourceCache::RemoveImageView( ImageView& imageView )
   {
     auto found = std::find_if(mImageViews.begin(),
                               mImageViews.end(),
-                              [&](const RefCountedImageView entry) { return &(*entry) == &imageView; });
+                              [&](const RefCountedImageView& entry)
+                              {
+                                return entry->GetVkHandle() == imageView.GetVkHandle();
+                              });
 
     std::iter_swap(found, std::prev(mImageViews.end()));
     mImageViews.back().Reset();
@@ -204,7 +213,10 @@ ResourceCache& ResourceCache::RemoveShader( Shader& shader )
   {
     auto iterator = std::find_if(mShaders.begin(),
                                  mShaders.end(),
-                                 [&](const RefCountedShader entry) { return &*entry == &shader; });
+                                 [&](const RefCountedShader& entry)
+                                 {
+                                   return &*entry == &shader;
+                                 });
 
     std::iter_swap(iterator, std::prev(mShaders.end()));
     mShaders.back().Reset();
@@ -217,12 +229,23 @@ ResourceCache& ResourceCache::RemoveCommandPool( CommandPool& commandPool )
 {
   if( !mCommandPools.empty() )
   {
-    using EntryPair = std::pair< std::thread::id, RefCountedCommandPool >;
-    auto iterator = std::find_if(mCommandPools.begin(),
-                                 mCommandPools.end(),
-                                 [&](const EntryPair& entry) { return &*(entry.second) == &commandPool; });
 
-    mCommandPools.erase( iterator );
+    auto found = mCommandPools.end();
+
+    auto it = mCommandPools.begin();
+    while ( it != mCommandPools.end() )
+    {
+      auto& refcounted = (*it).second;
+      if ( refcounted->GetVkHandle() == commandPool.GetVkHandle() )
+      {
+        found = it;
+        break;
+      }
+
+      ++it;
+    }
+
+    mCommandPools.erase( found );
   }
   return *this;
 }
@@ -233,7 +256,10 @@ ResourceCache& ResourceCache::RemoveDescriptorPool( DescriptorPool& descriptorPo
   {
     auto iterator = std::find_if(mDescriptorPools.begin(),
                                  mDescriptorPools.end(),
-                                 [&](const RefCountedDescriptorPool entry) { return &*entry == &descriptorPool; });
+                                 [&](const RefCountedDescriptorPool& entry)
+                                 {
+                                   return entry->GetVkHandle() == descriptorPool.GetVkHandle();
+                                 });
 
     std::iter_swap(iterator, std::prev(mDescriptorPools.end()));
     mDescriptorPools.back().Reset();
@@ -248,7 +274,10 @@ ResourceCache& ResourceCache::RemoveFramebuffer( Framebuffer &framebuffer )
   {
     auto iterator = std::find_if(mFramebuffers.begin(),
                                  mFramebuffers.end(),
-                                 [&](const RefCountedFramebuffer entry) { return &*entry == &framebuffer; });
+                                 [&](const RefCountedFramebuffer& entry)
+                                 {
+                                   return entry->GetVkHandle() == framebuffer.GetVkHandle();
+                                 });
 
     std::iter_swap(iterator, std::prev(mFramebuffers.end()));
     mFramebuffers.back().Reset();
@@ -263,7 +292,10 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler &sampler )
   {
     auto iterator = std::find_if(mSamplers.begin(),
                                  mSamplers.end(),
-                                 [&](const RefCountedSampler entry) { return &*entry == &sampler; });
+                                 [&](const RefCountedSampler& entry)
+                                 {
+                                   return entry->GetVkHandle() == sampler.GetVkHandle();
+                                 });
 
     std::iter_swap(iterator, std::prev(mSamplers.end()));
     mSamplers.back().Reset();
@@ -285,6 +317,120 @@ void ResourceCache::CollectGarbage()
 void ResourceCache::EnqueueDiscardOperation( std::function<void()> deleter )
 {
   mDiscardQueue.push_back(std::move(deleter));
+#ifndef NDEBUG
+  printf("DISCARD QUEUE SIZE: %ld\n", mDiscardQueue.size());
+#endif
+}
+
+// Called only by the Graphics class destructor
+void ResourceCache::Clear()
+{
+  //This call assumes that all possible render threads have been joined by this point.
+  //This function is called by the Graphics class destructor. At this point the caches
+  //should contain the last reference of all created objects.
+  //Clearing the cache here will enqueue all resources to the discard queue ready to be garbage collected.
+  mBuffers.clear();
+  mImages.clear();
+  mImageViews.clear();
+  mDescriptorPools.clear();
+  mShaders.clear();
+  mSamplers.clear();
+  mFramebuffers.clear();
+  mCommandPools.clear();
+}
+
+void ResourceCache::PrintReferenceCountReport( size_t* outObjectCount )
+{
+  auto totalObjectCount = mBuffers.size() +
+                          mImages.size() +
+                          mImageViews.size() +
+                          mShaders.size() +
+                          mDescriptorPools.size() +
+                          mFramebuffers.size() +
+                          mSamplers.size();
+
+  if( outObjectCount )
+  {
+    *outObjectCount = totalObjectCount;
+  }
+
+  uint32_t totalRefCount = 0;
+  printf("TOTAL OBJECT COUNT: %ld\n", totalObjectCount);
+  printf("BUFFER REFERENCES:\n");
+  for (auto& buffer : mBuffers)
+  {
+    auto refCount = buffer->GetRefCount();
+    printf("\tbuffer->%p : %d\n", static_cast< void* >(buffer->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mBuffers.size());
+  totalRefCount = 0;
+
+  printf("IMAGE REFERENCES:\n");
+  for( auto& image : mImages )
+  {
+    auto refCount = image->GetRefCount();
+    printf("\timage->%p : %d\n", static_cast< void* >(image->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mImages.size());
+  totalRefCount = 0;
+
+  printf("IMAGE VIEW REFERENCES:\n");
+  for( auto& imageView : mImageViews )
+  {
+    auto refCount = imageView->GetRefCount();
+    printf("\timage view->%p : %d\n", static_cast< void* >(imageView->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mImageViews.size());
+  totalRefCount = 0;
+
+  printf("SHADER MODULE REFERENCES:\n");
+  for( auto& shader : mShaders )
+  {
+    auto refCount = shader->GetRefCount();
+    printf("\tshader module->%p : %d\n", static_cast< void* >(shader->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mShaders.size());
+  totalRefCount = 0;
+
+  printf("DESCRIPTOR POOL REFERENCES:\n");
+  for( auto& descPool : mDescriptorPools )
+  {
+    auto refCount = descPool->GetRefCount();
+    printf("\tdescriptor pool->%p : %d\n", static_cast< void* >(descPool->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mDescriptorPools.size());
+  totalRefCount = 0;
+
+  printf("FRAMEBUFFER REFERENCES:\n");
+  for( auto& framebuffer : mFramebuffers )
+  {
+    auto refCount = framebuffer->GetRefCount();
+    printf("\tframebuffer->%p : %d\n", static_cast< void* >(framebuffer->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mFramebuffers.size());
+  totalRefCount = 0;
+
+  printf("SAMPLER REFERENCES:\n");
+  for( auto& sampler : mSamplers )
+  {
+    auto refCount = sampler->GetRefCount();
+    printf("\tsampler->%p : %d\n", static_cast< void* >(sampler->GetVkHandle()), refCount);
+    totalRefCount += refCount;
+  }
+  printf("\tTotal reference count: %d\n", totalRefCount);
+  printf("\tTotal object count: %ld\n\n", mSamplers.size());
 }
 
 } //namespace Vulkan

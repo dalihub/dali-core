@@ -107,7 +107,22 @@ vk::ShaderModule Shader::GetVkHandle() const
 
 bool Shader::OnDestroy()
 {
-  mImpl->mGraphics.RemoveShader( *this );
+  if( !mImpl->mGraphics.IsShuttingDown() )
+  {
+    mImpl->mGraphics.RemoveShader( *this );
+  }
+
+  auto device = mImpl->mGraphics.GetDevice();
+  auto shaderModule = mImpl->mShaderModule;
+  auto allocator = &mImpl->mGraphics.GetAllocator();
+
+  mImpl->mGraphics.DiscardResource( [device, shaderModule, allocator]() {
+#ifndef NDEBUG
+    printf("Invoking SHADER MODULE deleter function\n");
+#endif
+    device.destroyShaderModule( shaderModule, allocator );
+  } );
+
   return true;
 }
 

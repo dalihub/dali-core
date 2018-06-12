@@ -60,7 +60,7 @@ public:
    * @param offset
    * @param size
    */
-  void WriteStorageBuffer( Handle<Buffer> buffer, uint32_t offset, uint32_t size );
+  void WriteStorageBuffer( RefCountedBuffer buffer, uint32_t offset, uint32_t size );
 
   /**
    *
@@ -83,11 +83,14 @@ private:
 
   DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet, vk::DescriptorSetAllocateInfo allocateInfo );
 
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
-};
+  Graphics* mGraphics;
+  DescriptorPool* mPool;
+  vk::DescriptorSetAllocateInfo mAllocateInfo;
+  vk::DescriptorSet             mDescriptorSet;
 
-using DescriptorSetHandle = Handle<DescriptorSet>;
+  // attached resources
+  std::vector<Handle<VkManaged>> mResources;
+};
 
 class DescriptorPool : public VkManaged
 {
@@ -97,21 +100,30 @@ public:
 
   ~DescriptorPool() override;
 
+  bool Initialise();
+
   vk::DescriptorPool GetVkHandle() const;
 
-  std::vector<DescriptorSetHandle> AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
+  std::vector< RefCountedDescriptorSet > AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
 
   /**
    * Resets descriptor pool
    */
   void Reset();
 
+  bool OnDestroy() override;
+
 private:
 
   DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo );
 
-  struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  Graphics* mGraphics;
+  vk::DescriptorPoolCreateInfo mCreateInfo;
+
+  vk::DescriptorPool mDescriptorPool;
+
+  // cache
+  std::vector<Handle<DescriptorSet>> mDescriptorSetCache;
 };
 
 #if 0

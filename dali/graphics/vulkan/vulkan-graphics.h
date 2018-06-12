@@ -188,6 +188,8 @@ public: // Getters
 
   PipelineCache& GetPipelineCache();
 
+  bool IsShuttingDown();
+
 public: //Cache management methods
 
   void AddBuffer( RefCountedBuffer buffer );
@@ -230,6 +232,7 @@ public: //Cache management methods
 
   void DiscardResource( std::function< void() > deleter );
 
+
 private: // Methods
 
   void CreateInstance( const std::vector< const char* >& extensions,
@@ -251,27 +254,23 @@ private: // Methods
 
 private: // Members
 
-  std::unique_ptr< GpuMemoryManager > mDeviceMemoryManager;
-
-  vk::Instance mInstance;
-  std::unique_ptr< vk::AllocationCallbacks > mAllocator{ nullptr };
-
   // physical device
   vk::PhysicalDevice mPhysicalDevice;
 
   // logical device
   vk::Device mDevice;
 
+  vk::Instance mInstance;
+
   // physical device properties
   std::unique_ptr< vk::PhysicalDeviceProperties > mPhysicalDeviceProperties;
   std::unique_ptr< vk::PhysicalDeviceMemoryProperties > mPhysicalDeviceMemoryProperties;
   std::unique_ptr< vk::PhysicalDeviceFeatures > mPhysicalDeviceFeatures;
 
+  std::unique_ptr< vk::AllocationCallbacks > mAllocator{ nullptr };
+
   // queue family properties
   std::vector< vk::QueueFamilyProperties > mQueueFamilyProperties;
-
-  std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
-  FBID mBaseFBID{ 0u };
 
   // Sets of queues
   std::vector< std::unique_ptr< Queue > > mGraphicsQueues;
@@ -279,15 +278,23 @@ private: // Members
   std::vector< std::unique_ptr< Queue > > mComputeQueues;
   //std::unique_ptr< Queue > mPresentQueue;
 
-  Platform mPlatform{ Platform::UNDEFINED };
+  std::unique_ptr< ResourceCache > mResourceCache;
 
-  std::unique_ptr< Dali::Graphics::VulkanAPI::Controller > mGfxController;
+  std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
+  FBID mBaseFBID{ 0u };
+
+  std::unique_ptr< GpuMemoryManager > mDeviceMemoryManager;
+
+  Platform mPlatform{ Platform::UNDEFINED };
 
   // TODO: rename
   std::unique_ptr< PipelineCache > mPipelineDatabase;
 
   std::mutex mMutex;
-  std::unique_ptr< ResourceCache > mResourceCache;
+
+  std::unique_ptr< Dali::Graphics::VulkanAPI::Controller > mGfxController;
+
+  bool mShuttingDown = false;
 
 };
 

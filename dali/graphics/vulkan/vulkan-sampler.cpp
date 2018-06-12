@@ -150,10 +150,18 @@ Sampler::operator vk::Sampler*()
 
 bool Sampler::OnDestroy()
 {
-  mGraphics->RemoveSampler( *this );
+  if( mGraphics->IsShuttingDown() )
+  {
+    mGraphics->RemoveSampler( *this );
+  }
 
-  mGraphics->DiscardResource( [this]() {
-    mGraphics->GetDevice().destroySampler( mSampler, mGraphics->GetAllocator() );
+  auto device = mGraphics->GetDevice();
+  auto sampler = mSampler;
+  auto allocator = &mGraphics->GetAllocator();
+
+  mGraphics->DiscardResource( [device, sampler, allocator]() {
+    printf("Invoking SAMPLER deleter function\n");
+    device.destroySampler( sampler, allocator );
   } );
 
   return false;

@@ -70,8 +70,6 @@ struct Pipeline::Impl
     return mPipeline;
   }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   vk::Result Initialise()
   {
     if( !ValidateShaderModules() )
@@ -243,7 +241,6 @@ struct Pipeline::Impl
     mColorBlendState.setPAttachments( &mAttachementNoBlendState );
     mInfo.setPColorBlendState(&mColorBlendState);
   }
-#pragma GCC diagnostic pop
 
   /**
    * Sets the shader. Must be set before compiling the pipeline, compiled pipeline
@@ -283,8 +280,6 @@ struct Pipeline::Impl
    * @todo: Store SPIRV data of shader modules in the cache rather than
    * parsing every time
    */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wframe-larger-than="
   void CreatePipelineLayout()
   {
 
@@ -342,7 +337,6 @@ struct Pipeline::Impl
     mDSLayoutArray = dsLayouts;
     mInfo.setLayout( mPipelineLayout );
   }
-#pragma GCC diagnostic pop
 
   vk::ShaderStageFlagBits GetShaderStage( RefCountedShader shader )
   {

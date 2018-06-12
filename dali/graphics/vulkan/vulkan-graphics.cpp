@@ -83,7 +83,46 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
 
 Graphics::Graphics() = default;
 
-Graphics::~Graphics() = default;
+Graphics::~Graphics()
+{
+  // Wait for everything to finish on the GPU
+  DeviceWaitIdle();
+
+  // We are shutting down. This flag is used to avoid cache manipulation by Handles' OnDestroy function calls.
+  // The cache will do its own house keeping on teardown
+  mShuttingDown = true;
+
+  // Manually resetting unique pointer here because we need to control the order of destruction.
+  // This defeats the purpose of unique pointers and we might as well use raw pointers. But a unique ptr
+  // communicates ownership more clearly (e.g by not allowing copies).
+  mGfxController.reset(nullptr);
+  mSurfaceFBIDMap.clear();
+  mPipelineDatabase.reset(nullptr);
+
+#ifndef NDEBUG
+  printf("DESTROYING GRAPHICS CONTEXT--------------------------------\n");
+  size_t totalObjCount = 0;
+  mResourceCache->PrintReferenceCountReport( &totalObjCount );
+#endif
+
+  // Clear the last references of resources in the cache.
+  // This should ensure that all resources have been queued for garbage collection
+  // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
+  mResourceCache->Clear();
+
+  mDeviceMemoryManager.reset(nullptr);
+
+  // Collect the garbage! And shut down gracefully...
+  CollectGarbage();
+
+  // We are done with all resources (technically... . If not we will get a ton of validation layer errors)
+  // Kill the Vulkan logical device
+  mDevice.destroy(mAllocator.get());
+
+  // Kill the Vulkan instance
+  mInstance.destroy(mAllocator.get());
+
+}
 
 // Create methods -----------------------------------------------------------------------------------------------
 void Graphics::Create()
@@ -612,6 +651,11 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 PipelineCache& Graphics::GetPipelineCache()
 {
   return *mPipelineDatabase;
+}
+
+bool Graphics::IsShuttingDown()
+{
+  return mShuttingDown;
 }
 // --------------------------------------------------------------------------------------------------------------
 

@@ -159,7 +159,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   {
     for( auto&& block : mUniqueBlocks )
     {
-      if( block->GetRefCount() == 1 )
+      if( block != nullptr && block->GetRefCount() == 1 )
       {
         // collect and make invalid ( maybe freelist or sumtink )
         mGraphics.GetDevice().freeMemory( (**block.get()), mGraphics.GetAllocator() );

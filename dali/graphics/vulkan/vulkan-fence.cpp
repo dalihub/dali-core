@@ -73,6 +73,9 @@ bool Fence::OnDestroy()
 
   // capture copies of the pointers and handles
   mGraphics->DiscardResource( [device, fence, allocator]() {
+#ifndef NDEBUG
+    printf("Invoking FENCE deleter function\n");
+#endif
     device.destroyFence( fence, allocator );
   } );
 

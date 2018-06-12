@@ -63,7 +63,8 @@ CommandPool::InternalPool::~InternalPool()
   }
 }
 
-std::vector< vk::CommandBuffer > CommandPool::InternalPool::AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo )
+std::vector< vk::CommandBuffer >
+        CommandPool::InternalPool::AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo )
 {
   return VkAssert( mGraphics->GetDevice().allocateCommandBuffers( allocateInfo ) );
 }
@@ -183,13 +184,7 @@ CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& cr
 {
 }
 
-CommandPool::~CommandPool()
-{
-  if(mCommandPool)
-  {
-    mGraphics->GetDevice().destroyCommandPool( mCommandPool, mGraphics->GetAllocator());
-  }
-}
+CommandPool::~CommandPool() = default;
 
 vk::CommandPool CommandPool::GetVkHandle() const
 {
@@ -254,13 +249,19 @@ uint32_t CommandPool::GetAllocationCount( vk::CommandBufferLevel level ) const
 
 bool CommandPool::OnDestroy()
 {
-  mGraphics->RemoveCommandPool( *this );
+  if( !mGraphics->IsShuttingDown() )
+  {
+    mGraphics->RemoveCommandPool( *this );
+  }
 
   auto device = mGraphics->GetDevice();
   auto commandPool = mCommandPool;
   auto allocator = &mGraphics->GetAllocator();
 
   mGraphics->DiscardResource( [device, commandPool, allocator]() {
+#ifndef NDEBUG
+    printf("Invoking COMMAND POOL deleter function\n");
+#endif
     device.destroyCommandPool( commandPool, allocator );
   } );
 
