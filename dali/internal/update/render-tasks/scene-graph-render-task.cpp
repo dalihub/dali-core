@@ -301,6 +301,7 @@ void RenderTask::UpdateState()
       }
       else
       {
+        mWaitingToRender = false;
         mNotifyTrigger = true;
       }
     }
